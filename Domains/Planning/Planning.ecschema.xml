@@ -18,17 +18,28 @@
             <CustomHandledProperty/>
           </ECCustomAttributes>
         </ECProperty>
-        <ECProperty propertyName="PlanId" typeName="long">
-          <ECCustomAttributes>
-            <CustomHandledProperty/>
-          </ECCustomAttributes>
-        </ECProperty>
+        <ECNavigationProperty propertyName="Plan" relationshipName="PlanningElementBelongsToPlan" direction="forward" displayLabel="Planning Element belongs to Plan">
+            <ECCustomAttributes>
+                <CustomHandledProperty/>
+                <HideProperty xmlns="EditorCustomAttributes.1.3"/>
+            </ECCustomAttributes>
+        </ECNavigationProperty>
         <ECProperty propertyName="WBSCode" displayLabel="WBS Code" typeName="string">
             <ECCustomAttributes>
                 <CustomHandledProperty/>
             </ECCustomAttributes>
         </ECProperty>
     </ECEntityClass>
+
+    <ECRelationshipClass typeName="PlanningElementBelongsToPlan" strength="referencing" strengthDirection="forward" modifier="Sealed">
+        <!-- @see PlanningElement.PlanId ECNavigationProperty -->
+        <Source multiplicity="(0..*)" roleLabel="belongs to" polymorphic="true">
+            <Class class="PlanningElement"/>
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="has many" polymorphic="true">
+            <Class class="Plan" />
+        </Target>
+    </ECRelationshipClass>
 
     <ECEntityClass typeName="PlanningPartition" modifier="Sealed">
         <BaseClass>bis:InformationPartitionElement</BaseClass>
@@ -42,7 +53,6 @@
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.1.0"/>
         </ECCustomAttributes>
-        <ECProperty propertyName="PlanId" typeName="long"/>
     </ECEntityClass>
     
     <ECEntityClass typeName="Plan">
@@ -86,25 +96,17 @@
         <ECProperty propertyName="Format" typeName="Duration_Format"/>
         <ECProperty propertyName="Value" typeName="double"/>
     </ECStructClass>
-    
+
     <ECEntityClass typeName="TimeSpan">
         <BaseClass>bis:ElementMultiAspect</BaseClass>
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.1.0"/>
-            <DbIndexList xmlns="ECDbMap.2.0">
-                <Indexes>
-                    <DbIndex>
-                        <Name>ix_bp_TimeSpan_TimeSpanInParent</Name>
-                        <IsUnique>True</IsUnique>
-                        <Properties>
-                            <string>Element.Id</string>
-                            <string>BaselineId</string>
-                        </Properties>
-                    </DbIndex>
-                </Indexes>
-            </DbIndexList>
         </ECCustomAttributes>
-        <ECProperty propertyName="BaselineId" typeName="long"/>
+        <ECNavigationProperty propertyName="Baseline" relationshipName="TimeSpanBelongsToBaseline" direction="forward" displayLabel="Time Span is belongs to Baseline">
+            <ECCustomAttributes>
+                <HideProperty xmlns="EditorCustomAttributes.1.3"/>
+            </ECCustomAttributes>
+        </ECNavigationProperty>
         <ECProperty propertyName="PlannedStart" typeName="dateTime" description="Time the activity has been planned to be started" displayLabel="Planned Start">
             <ECCustomAttributes>
                 <DateTimeInfo xmlns="CoreCustomAttributes.1.0">
@@ -166,7 +168,17 @@
         <ECStructProperty propertyName="TotalFloat" typeName="Duration" displayLabel="Total Float"/>
         <ECStructProperty propertyName="FreeFloat" typeName="Duration" displayLabel="Free Float"/>
     </ECEntityClass>
-    
+
+    <ECRelationshipClass typeName="TimeSpanBelongsToBaseline" strength="referencing" strengthDirection="forward" modifier="Sealed">
+        <!-- @see TimeSpan.BaselineId ECNavigationProperty -->
+        <Source multiplicity="(0..*)" roleLabel="belongs to" polymorphic="true">
+            <Class class="TimeSpan"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="has many" polymorphic="true">
+            <Class class="Baseline" />
+        </Target>
+    </ECRelationshipClass>
+
     <ECEntityClass typeName="Baseline">
         <BaseClass>bis:ElementMultiAspect</BaseClass>
         <ECCustomAttributes>
@@ -209,19 +221,27 @@
         </Target>
     </ECRelationshipClass>
 
-    <ECRelationshipClass typeName="PlanOwnsBaselines" isDomainClass="True" strength="embedding" strengthDirection="forward" modifier="None">
+    <ECRelationshipClass typeName="PlanOwnsBaselines" isDomainClass="True" strength="embedding" strengthDirection="forward" modifier="Sealed">
         <BaseClass>bis:ElementOwnsMultiAspects</BaseClass>
         <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="True">
             <Class class="Plan" />
         </Source>
-        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="True">
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="False">
             <Class class="Baseline"/>
         </Target>
     </ECRelationshipClass>
     
     <ECRelationshipClass typeName="ActivityAffectsElements" strength="referencing" modifier="None">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
-        <ECProperty propertyName="ElementAppearanceProfileId" typeName="long"/>
+        <ECNavigationProperty propertyName="ElementAppearanceProfile" relationshipName="AppearanceProfileSpecifiesAppearance" direction="backward" displayLabel="Appearance Profile" description="Profile that controls the appearance of the affected elements.">
+            <ECCustomAttributes>
+                <HideProperty xmlns="EditorCustomAttributes.1.3"/>
+                <ForeignKeyConstraint xmlns="ECDbMap.2.0">
+                    <!-- Creates the ElementAppearanceProfile foreign key column in the bis_ElementRefersToElements table -->
+                    <OnDeleteAction>NoAction</OnDeleteAction>
+                </ForeignKeyConstraint>
+            </ECCustomAttributes>
+        </ECNavigationProperty>
         <Source multiplicity="(0..*)" roleLabel="affects" polymorphic="true">
             <Class class="Activity"/>
         </Source>
@@ -229,7 +249,17 @@
             <Class class="bis:Element"/>
         </Target>
     </ECRelationshipClass>
-    
+
+    <ECRelationshipClass typeName="AppearanceProfileSpecifiesAppearance" strength="referencing" modifier="Sealed">
+        <!-- @see ActivityAffectsElements.ElementAppearanceProfile ECNavigationProperty -->
+        <Source multiplicity="(0..1)" roleLabel="specifies appearance of" polymorphic="true">
+            <Class class="ElementAppearanceProfile" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="has appearance specified in" polymorphic="true">
+            <Class class="ActivityAffectsElements"/>
+        </Target>
+    </ECRelationshipClass>
+
     <ECRelationshipClass typeName="ActivityHasConstraint" strength="referencing" modifier="None">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <ECStructProperty propertyName="LagTime" typeName="Duration"/>
@@ -242,24 +272,24 @@
         </Target>
     </ECRelationshipClass>
 
-    <ECRelationshipClass typeName="WorkBreakdownOwnsTimeSpans" isDomainClass="True" strength="embedding" strengthDirection="forward" modifier="None">
+    <ECRelationshipClass typeName="WorkBreakdownOwnsTimeSpans" isDomainClass="True" strength="embedding" strengthDirection="forward" modifier="Sealed">
         <BaseClass>bis:ElementOwnsMultiAspects</BaseClass>
         <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="True">
             <Class class="WorkBreakdown" />
         </Source>
         <!-- TODO: Ideally we want this to be (1...*), but does ElementOwnsMultiAspects allow this??-->
-        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="True">
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="False">
             <Class class="TimeSpan"/>
         </Target>
     </ECRelationshipClass>
 
-    <ECRelationshipClass typeName="ActivityOwnsTimeSpans" isDomainClass="True" strength="embedding" strengthDirection="forward" modifier="None">
+    <ECRelationshipClass typeName="ActivityOwnsTimeSpans" isDomainClass="True" strength="embedding" strengthDirection="forward" modifier="Sealed">
         <BaseClass>bis:ElementOwnsMultiAspects</BaseClass>
         <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="True">
             <Class class="Activity" />
         </Source>
         <!-- TODO: Ideally we want this to be (1...*), but does ElementOwnsMultiAspects allow this??-->
-        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="True">
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="False">
             <Class class="TimeSpan"/>
         </Target>
     </ECRelationshipClass>
