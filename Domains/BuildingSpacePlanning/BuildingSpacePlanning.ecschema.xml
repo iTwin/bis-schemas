@@ -1,0 +1,411 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!-- =====================================================================================
+|
+|     $Source: BuildingSpacePlanning.ecschema.xml $
+|
+|  $Copyright: (c) 2017 Bentley Systems, Incorporated. All rights reserved. $
+|
+======================================================================================= -->
+<ECSchema schemaName="BuildingSpacePlanning" nameSpacePrefix="bsp" version="01.00" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.0">
+    <ECSchemaReference name="Bentley_Standard_CustomAttributes" version="01.10" prefix="bsca" />
+    <ECSchemaReference name="EditorCustomAttributes" version="01.00" prefix="beca" />
+    <ECSchemaReference name="BisCore" version="01.00" prefix="bis" />
+    <ECSchemaReference name="Functional" version="01.00" prefix="func" />
+    <ECSchemaReference name="ConstraintModel" version="01.00" prefix="cml"/>
+    <ECSchemaReference name="Grids" version="01.00" prefix="grids"/>
+    <ECSchemaReference name="RoadRailPhysical" version="01.00.00" prefix="rrp"/>
+    <ECSchemaReference name="ECDbMap" version="2.0" prefix="ecdbmap"/>
+
+    <ECRelationshipClass typeName="AllocatedVolumeDecomposesToElements" strength="embedding" modifier="None">
+      <!-- Relationship that indicates a decomposition of child AllocatedVolume -->
+      <Source multiplicity="(0..1)" roleLabel="composes of" polymorphic="true">
+        <Class class="AllocatedVolume"/>
+      </Source>
+      <Target multiplicity="(0..*)" roleLabel="is part of" polymorphic="true">
+        <Class class="AllocatedVolume"/>
+      </Target>
+    </ECRelationshipClass>
+  
+    <ECEntityClass typeName="GraphicalDimension" displayLabel="GraphicalDimension">
+      <BaseClass>bis:SpatialLocationElement</BaseClass>
+      <ECCustomAttributes>
+        <ClassHasHandler xmlns="BisCore.01.00" />
+      </ECCustomAttributes>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="BoundedPlane" displayLabel="BoundedPlane">
+      <BaseClass>AllocatedVolume</BaseClass>
+      <ECCustomAttributes>
+        <ClassHasHandler xmlns="BisCore.01.00" />
+      </ECCustomAttributes>
+      <ECProperty propertyName="IsLocked" displayLabel="IsLocked" typeName="boolean"/>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="GridSetPortion" displayLabel="Grid Set Portion" description="A Grid Set Portion represents a gridset portion of an element">
+      <BaseClass>bis:SpatialLocationPortion</BaseClass>
+      <ECCustomAttributes>
+        <ClassHasHandler xmlns="BisCore.01.00"/>
+      </ECCustomAttributes>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="GridCurvePortion">
+      <BaseClass>bis:SpatialLocationPortion</BaseClass>
+      <ECCustomAttributes>
+        <ClassHasHandler xmlns="BisCore.01.00" />
+      </ECCustomAttributes>
+    </ECEntityClass>
+    
+    <ECEntityClass typeName="Building" displayLabel="Building">
+        <BaseClass>AllocatedVolume</BaseClass>
+        <BaseClass>bis:ISubModeledElement</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.01.00" />
+        </ECCustomAttributes>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="UserDefinedMarkup">
+      <BaseClass>bis:SpatialLocationElement</BaseClass>
+      <ECCustomAttributes>
+        <ClassHasHandler xmlns="BisCore.01.00"/>
+      </ECCustomAttributes>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="EgressPath" displayLabel="Egress Path">
+        <BaseClass>bis:SpatialLocationElement</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.01.00" />
+        </ECCustomAttributes>
+        <ECProperty propertyName="Length" displayLabel="Length" typeName="double"/>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="MarkupPortion">
+      <BaseClass>bis:SpatialLocationPortion</BaseClass>
+      <ECCustomAttributes>
+        <ClassHasHandler xmlns="BisCore.01.00"/>
+      </ECCustomAttributes>
+    </ECEntityClass>
+  
+    <!--Mirrored Program Manager geometric elements start-->
+    <ECEntityClass typeName="AllocatedVolume">
+        <BaseClass>bis:SpatialLocationElement</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.01.00" />
+        </ECCustomAttributes>
+        <ECProperty propertyName="Name" displayLabel="Name" typeName="string"/>
+        <ECProperty propertyName="Area" displayLabel="Area" typeName="double"/>
+        <ECProperty propertyName="Cost" displayLabel="Cost" typeName="double"/>
+        <ECProperty propertyName="Occupancy" displayLabel="Occupancy" typeName="double"/>
+        <ECNavigationProperty propertyName="ComposedElement" relationshipName="AllocatedVolumeDecomposesToElements" direction="Backward" description="The composed Element" />
+    </ECEntityClass>
+
+    <ECEnumeration typeName="ConflictVolumeType" backingTypeName="int" isStrict="true">
+        <ECEnumerator value="0" displayLabel="Undefined"/>
+        <ECEnumerator value="1" displayLabel="Missing Owner"/>
+        <ECEnumerator value="2" displayLabel="Multiple Equal Owners"/>
+        <ECEnumerator value="3" displayLabel="Multiple Unequal Owners"/>
+    </ECEnumeration>
+
+    <ECEntityClass typeName="ConflictVolume" displayLabel="ConflictVolume">
+        <BaseClass>bis:SpatialLocationElement</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.01.00" />
+        </ECCustomAttributes>
+        <ECProperty propertyName="Type" typeName="ConflictVolumeType"/>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="OpeningLocation" displayLabel="OpeningLocation">
+        <BaseClass>bis:SpatialLocationElement</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.01.00" />
+        </ECCustomAttributes>
+        <ECProperty propertyName="Width" displayLabel="Width" typeName="double"/>
+    </ECEntityClass>
+  
+    <ECEntityClass typeName="Story" displayLabel="Story">
+      <BaseClass>AllocatedVolume</BaseClass>
+      <BaseClass>bis:ISubModeledElement</BaseClass>
+      <ECCustomAttributes>
+        <ClassHasHandler xmlns="BisCore.01.00" />
+      </ECCustomAttributes>
+    </ECEntityClass>
+    <ECEntityClass typeName="Zone" displayLabel="Zone">
+        <BaseClass>AllocatedVolume</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.01.00" />
+        </ECCustomAttributes>
+    </ECEntityClass>
+    <ECEntityClass typeName="Space" displayLabel="Space">
+        <BaseClass>AllocatedVolume</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.01.00" />
+        </ECCustomAttributes>
+        <ECProperty propertyName="IsFormed" displayLabel="IsFormed" typeName="boolean"/>
+    </ECEntityClass>
+    <ECEntityClass typeName="AreaStructure" displayLabel="Area">
+        <BaseClass>AllocatedVolume</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.01.00" />
+        </ECCustomAttributes>
+    </ECEntityClass>
+  
+    <ECRelationshipClass typeName="SpaceHasAdjacentSpaces" strength="referencing">
+      <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <Source cardinality="(0,N)" polymorphic="false">
+            <Class class="Space"/>
+        </Source>
+        <Target cardinality="(0,N)" polymorphic="false">
+            <Class class="Space"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="SpaceContains" strength="referencing">
+      <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <Source cardinality="(0,N)" polymorphic="false">
+            <Class class="Space"/>
+        </Source>
+        <Target cardinality="(0,N)" polymorphic="false">
+            <Class class="bis:PhysicalElement"/>
+        </Target>
+    </ECRelationshipClass>
+    
+    <ECRelationshipClass typeName="SpaceHasOpeningLocations" strength="referencing">
+      <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <Source cardinality="(0,N)" polymorphic="false">
+            <Class class="Space"/>
+        </Source>
+        <Target cardinality="(0,N)" polymorphic="false">
+            <Class class="OpeningLocation"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="EgressPathGoesThroughOpeningLocations" strength="referencing">
+        <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <Source cardinality="(0,N)" polymorphic="false">
+            <Class class="EgressPath"/>
+        </Source>
+        <Target cardinality="(0,N)" polymorphic="false">
+            <Class class="OpeningLocation"/>
+        </Target>
+        <ECProperty propertyName="Index" displayLabel="Index" typeName="int"/>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="SpatialStoryOpeningLocations" strength="referencing">
+      <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <Source cardinality="(0,N)" polymorphic="false">
+            <Class class="Story"/>
+        </Source>
+        <Target cardinality="(0,N)" polymorphic="false">
+            <Class class="OpeningLocation"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="SpatialPropertyAspect" displayTitle="Spatial Property Aspect" Description="The aspect used to storial Spatial properties">
+        <BaseClass>bis:ElementUniqueAspect</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.1.0"/>
+        </ECCustomAttributes>
+        <ECProperty propertyName="Area" typeName="double" />
+    </ECEntityClass>
+    
+    <!--Anticipating BIS TYPECATALOG ENHANCEMENTS START-->
+
+    <ECEntityClass typeName="FunctionalTypeLibraryModel" displayLabel="A collection of building types">
+        <BaseClass>bis:DefinitionModel</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.01.00"/>
+        </ECCustomAttributes>
+        <ECProperty propertyName="SourceUrl" displayLabel="Identifies the BIM that this library of scripts was copied from." typeName="string"/>
+
+    </ECEntityClass>
+
+    <ECEntityClass typeName="AllocationRequirementTypeCatalog">
+        <BaseClass>bis:DefinitionElement</BaseClass>
+        <BaseClass>bis:ISubModeledElement</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.01.00"/>
+        </ECCustomAttributes>
+        <ECProperty propertyName="SourceUrl" displayLabel="Identifies the BIM that this library of scripts was copied from." typeName="string"/>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="FunctionalTypeLibraryModelBreaksDownAllocationRequirementCatalog" strength="embedding" strengthDirection="Backward">
+        <BaseClass>bis:ModelModelsElement</BaseClass>
+        <Source cardinality="(0,1)" polymorphic="true">
+            <Class class="FunctionalTypeLibraryModel"/>
+        </Source>
+        <Target cardinality="(1,1)" polymorphic="true">
+            <Class class="AllocationRequirementTypeCatalog" />
+        </Target>
+    </ECRelationshipClass>
+
+    <!--Anticipating BIS TYPECATALOG ENHANCEMENTS END-->
+
+    <!--Program Manager ECClasses START-->
+    <ECEnumeration typeName="ElementRelationshipType" backingTypeName="int" isStrict="true">
+        <ECEnumerator value="0" displayLabel="Undefined"/>
+        <ECEnumerator value="1" displayLabel="Input"/>
+        <ECEnumerator value="2" displayLabel="Output"/>
+        <ECEnumerator value="3" displayLabel="Adjacent"/>
+        <ECEnumerator value="4" displayLabel="Connected"/>
+        <ECEnumerator value="5" displayLabel="Contains"/>
+        <ECEnumerator value="6" displayLabel="Disconnected"/>
+    </ECEnumeration>
+
+    <ECEntityClass typeName="AllocationRequirementType">
+        <BaseClass>func:FunctionalType</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.01.00"/>
+        </ECCustomAttributes>
+        <ECProperty propertyName="OmniClass" displayLabel="OmniClass" typeName="string"/>
+        <ECProperty propertyName="Cost" displayLabel="Cost" typeName="double"/>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="BuildingRequirementType">
+        <BaseClass>AllocationRequirementType</BaseClass>
+         <ECCustomAttributes>
+             <ClassHasHandler xmlns="BisCore.01.00"/>
+         </ECCustomAttributes>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="SpaceRequirementType">
+        <BaseClass>AllocationRequirementType</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.01.00"/>
+        </ECCustomAttributes>
+    </ECEntityClass>
+
+    <ECEnumeration typeName="SpatialContextType" backingTypeName="int" isStrict="true">
+        <ECEnumerator value="0" displayLabel="Exterior"/>
+        <ECEnumerator value="1" displayLabel="Interior"/>
+        <ECEnumerator value="2" displayLabel="Interior-Void"/>
+        <ECEnumerator value="3" displayLabel="Interior-Plenum"/>
+    </ECEnumeration>
+
+    <ECEntityClass typeName="SpatialContext">
+        <BaseClass>bis:ElementUniqueAspect</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.01.00"/>
+        </ECCustomAttributes>
+        <ECProperty propertyName="Context" typeName="SpatialContextType"/>
+    </ECEntityClass>
+
+    <!--Mirrored Program Manager geometric elements end-->
+    <ECEntityClass typeName="AllocationRequirement" displayLabel="Allocation Requirement" modifier="Abstract">
+        <BaseClass>func:FunctionalBreakdownElement</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.01.00"/>
+        </ECCustomAttributes>
+
+        <ECProperty propertyName="Name" displayLabel="Name" typeName="string"/>
+        <ECProperty propertyName="Area" displayLabel="Area" typeName="double"/>
+        <ECProperty propertyName="Cost" displayLabel="Cost" typeName="double"/>
+        <ECProperty propertyName="Occupancy" displayLabel="Occupancy" typeName="double"/>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="AllocationRequirementIsOfAllocationRequirementType" strength="referencing">
+        <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <Source cardinality="(0,N)" polymorphic="true">
+            <Class class="AllocationRequirement" />
+        </Source>
+        <Target cardinality="(0,N)" polymorphic="true">
+            <Class class="AllocationRequirementType"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="SpaceRequirementTypeIsRelevantForBuildingRequirementTypes" strength="referencing">
+      <BaseClass>bis:ElementRefersToElements</BaseClass>
+      <Source cardinality="(0,N)" polymorphic="true">
+        <Class class="SpaceRequirementType" />
+      </Source>
+      <Target cardinality="(0,N)" polymorphic="true">
+        <Class class="BuildingRequirementType"/>
+      </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="ProjectDefinition" displayLabel="ProjectDefinition">
+        <BaseClass>AllocationRequirement</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.01.00"/>
+        </ECCustomAttributes>
+      <ECProperty propertyName="Number" displayLabel="Number" typeName="string"/>
+      <ECProperty propertyName="ClientName" displayLabel="Client Name" typeName="string"/>
+      <ECProperty propertyName="Description" displayLabel="Description" typeName="string"/>
+      <ECProperty propertyName="AssetIndustry" displayLabel="Asset Industry" typeName="string"/>
+      <ECProperty propertyName="AssetType" displayLabel="Asset Type" typeName="string"/>
+      <ECProperty propertyName="UnitMeasure" displayLabel="Unit of Measure" typeName="string"/>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="BuildingRequirement" displayLabel="Building">
+        <BaseClass>AllocationRequirement</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.01.00"/>
+        </ECCustomAttributes>
+    </ECEntityClass>
+    <ECEntityClass typeName="StoryRequirement" displayLabel="Story Requirement">
+        <BaseClass>AllocationRequirement</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.01.00"/>
+        </ECCustomAttributes>
+    </ECEntityClass>
+    <ECEntityClass typeName="ZoneRequirement" displayLabel="Zone Requirement">
+        <BaseClass>AllocationRequirement</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.01.00"/>
+        </ECCustomAttributes>
+    </ECEntityClass>
+    <ECEntityClass typeName="SpaceRequirement" displayLabel="Space Requirement">
+        <BaseClass>AllocationRequirement</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.01.00"/>
+        </ECCustomAttributes>
+    </ECEntityClass>
+    <ECEntityClass typeName="FunctionalArea" displayLabel="Area">
+        <BaseClass>AllocationRequirement</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.01.00"/>
+        </ECCustomAttributes>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="AllocationRequirementConnections" strength="referencing">
+        <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <Source cardinality="(0,N)" polymorphic="true">
+            <Class class="AllocationRequirement"/>
+        </Source>
+        <Target cardinality="(0,N)" polymorphic="true">
+            <Class class="AllocationRequirement"/>
+        </Target>
+        <ECProperty propertyName="RelationshipType" typeName="ElementRelationshipType"/>
+    </ECRelationshipClass>
+    
+    <ECRelationshipClass typeName="SpatialStructureElementConnections" strength="referencing">
+      <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <Source cardinality="(0,N)" polymorphic="true">
+            <Class class="AllocatedVolume"/>
+        </Source>
+        <Target cardinality="(0,N)" polymorphic="true">
+            <Class class="AllocatedVolume"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="FunctionalToStructureConnections" strength="referencing">
+        <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <Source cardinality="(0,N)" polymorphic="true">
+            <Class class="AllocationRequirement"/>
+        </Source>
+        <Target cardinality="(0,N)" polymorphic="true">
+            <Class class="AllocatedVolume"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="SpaceToGridSurfaceConnections" strength="referencing">
+      <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <Source cardinality="(0,N)" polymorphic="true">
+            <Class class="Space"/>
+        </Source>
+        <Target cardinality="(0,N)" polymorphic="true">
+            <Class class="grids:GridSurface"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <!--Program Manager ECClasses END-->   
+
+</ECSchema>
