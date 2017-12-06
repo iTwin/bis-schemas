@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ECSchema schemaName="ProcessFunctional" alias="pfunc" version="01.00.00" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.1">
     <ECSchemaReference name="Functional" version="01.00.00" alias="func"/>
-    <ECSchemaReference name="BisCore" version="01.00.00" alias="bis"/>
     <ECSchemaReference name="CoreCustomAttributes" version="01.00.00" alias="CoreCA"/>
+    <ECSchemaReference name="BisCore" version="01.00.00" alias="bis"/>
     <ECSchemaReference name="PlantCustomAttributes" version="01.00.00" alias="PlantCA"/>
     <ECEnumeration typeName="CONCEPTUAL_PIPE_HEAD_CONNECTION_TYPE" backingTypeName="int" isStrict="true">
         <ECEnumerator value="0" displayLabel="Outlet"/>
@@ -1043,14 +1043,18 @@
     </ECEntityClass>
     <ECEntityClass typeName="CROSS_PAGE_CONNECTION" description="An Object used to identify Connections between Document Pages" displayLabel="Cross Page Connection">
         <BaseClass>PLANT_BASE_OBJECT</BaseClass>
-        <ECProperty propertyName="LINK_LABEL" typeName="string" description="Identifier of a Link Object" displayLabel="Link Label"/>
+        <ECCustomAttributes>
+            <BisCorePropertyMappingsCustomAttribute xmlns="PlantCustomAttributes.01.00">
+                <BisCorePropertyMappings>CodeValue,LINK_LABEL;FederationGuid,GUID</BisCorePropertyMappings>
+            </BisCorePropertyMappingsCustomAttribute>
+        </ECCustomAttributes>
         <ECProperty propertyName="NOTES" typeName="string" description="Notes, which are same for connected cross page connectors" displayLabel="Notes"/>
         <ECProperty propertyName="OffModel" typeName="string" description="Name of model with off page connector" displayLabel="Off Page Model Name" category="GENERAL"/>
         <ECProperty propertyName="OnModel" typeName="string" description="Name of model with on page connector." displayLabel="On Page Model Name" category="GENERAL"/>
         <ECProperty propertyName="OffNotes" typeName="string" description="Notes for off page connector" displayLabel="Off Page Notes" category="GENERAL"/>
         <ECProperty propertyName="OnNotes" typeName="string" description="Notes for on page connector" displayLabel="On Page Notes" category="GENERAL"/>
     </ECEntityClass>
-    <ECRelationshipClass typeName="CROSS_PAGE_CONNECTION_CONNECTS_TO_SEGMENT" displayLabel="Off Page Connector Connects to Segment" modifier="None" strength="referencing">
+    <ECRelationshipClass typeName="CROSS_PAGE_CONNECTION_CONNECTS_TO_SEGMENT" displayLabel="Cross Page Connector Connects to Pipe Run" modifier="None" strength="referencing">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Holds OpenPlant class name used for round tripping."/>
         <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="true">
@@ -1058,6 +1062,16 @@
         </Source>
         <Target multiplicity="(0..1)" roleLabel="is referenced by" polymorphic="true">
             <Class class="PIPING_NETWORK_SEGMENT"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="CROSS_PAGE_CONNECTION_CONNECTS_TO_SIGNALLINE" displayLabel="Cross Page Connector Connects to Signalline" modifier="None" strength="referencing">
+        <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Holds OpenPlant class name used for round tripping."/>
+        <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="true">
+            <Class class="CROSS_PAGE_CONNECTION"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is referenced by" polymorphic="true">
+            <Class class="SIGNALLINE"/>
         </Target>
     </ECRelationshipClass>
     <ECRelationshipClass typeName="Cable_Has_Core" displayLabel="Cable Has Core" modifier="None" strength="referencing">
