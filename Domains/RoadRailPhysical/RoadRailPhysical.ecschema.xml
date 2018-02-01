@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ECSchema schemaName="RoadRailPhysical" alias="rrphys" version="01.00.00" description="Base schema for the Road and Rail domains." xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.1">
+    <ECSchemaReference name="BisCore" version="01.00.00" alias="bis"/>
+    <ECSchemaReference name="LinearReferencing" version="01.00.00" alias="lr"/>
+    <ECSchemaReference name="RoadRailAlignment" version="01.00.00" alias="rralign"/>
+    <ECSchemaReference name="AecUnits" version="01.00.00" alias="aecu"/>
+
+    <ECEntityClass typeName="RoadRailCategoryModel">
+        <BaseClass>bis:DefinitionModel</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.01.00.00"/>
+        </ECCustomAttributes>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="PathwayElement" modifier="Abstract" description="A long, narrow physical stretch specially constructed for a particular travel type." >
+        <BaseClass>bis:PhysicalElement</BaseClass>
+        <BaseClass>lr:ILinearElementSource</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.01.00.00"/>
+        </ECCustomAttributes>
+        <ECNavigationProperty propertyName="MainAlignment" relationshipName="PathwayRefersToMainAlignment" direction="Forward"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="PathwayRefersToMainAlignment" strength="referencing" strengthDirection="Forward" modifier="Sealed">
+        <Source multiplicity="(0..*)" polymorphic="true" roleLabel="refers to main">
+            <Class class="PathwayElement"/>
+        </Source>
+        <Target multiplicity="(0..1)" polymorphic="false" roleLabel="main is referenced by">
+            <Class class="rralign:Alignment"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="Roadway" modifier="Sealed" description="A Pathway with a smoothed or paved surface, made for traveling by motor vehicle, carriage, etc." >
+        <BaseClass>PathwayElement</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.01.00.00"/>
+        </ECCustomAttributes>
+    </ECEntityClass>
+    <ECEntityClass typeName="Railway" modifier="Sealed" description="A Pathway with a track or set of tracks along which passenger and freight trains run." >
+        <BaseClass>PathwayElement</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.01.00.00"/>
+        </ECCustomAttributes>
+    </ECEntityClass>
+</ECSchema>
