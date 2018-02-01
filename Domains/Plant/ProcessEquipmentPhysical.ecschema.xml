@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ECSchema schemaName="ProcessEquipmentPhysical" alias="pequip" version="01.00.00" displayLabel="Process Equipment Physical" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.1">
+    <ECSchemaReference name="EditorCustomAttributes" version="01.00.03" alias="beca"/>
+    <ECSchemaReference name="BisCore" version="01.00.00" alias="bis"/>
+    <ECSchemaReference name="CoreCustomAttributes" version="01.00.00" alias="CoreCA"/>
+    <ECSchemaReference name="ECDbMap" version="02.00.00" alias="ecdbmap"/>
+    <ECEntityClass typeName="Equipment" description="base class for all equipments. not in rdl." modifier="Abstract">
+        <BaseClass>bis:PhysicalElement</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.01.00"/>
+        </ECCustomAttributes>
+        <ECProperty propertyName="State" typeName="string" description="OPM uses as pick list value" displayLabel="Component State"/>
+        <ECProperty propertyName="CreateTime" typeName="dateTime" description="Date/Time when object was created" displayLabel="Create Time" readOnly="true"/>
+        <ECProperty propertyName="CreatedBy" typeName="string" description="ID of a user created this object" displayLabel="Created By" readOnly="true"/>
+        <ECProperty propertyName="DesignState" typeName="string" displayLabel="Design State"/>
+        <ECProperty propertyName="ModifiedBy" typeName="string" description="ID of a user modified this object" displayLabel="Modified By"/>
+        <ECProperty propertyName="OrderNumber" typeName="string" description="order number " displayLabel="Order Number"/>
+        <ECProperty propertyName="StockNumber" typeName="string" displayLabel="Stock Number"/>
+        <ECProperty propertyName="IsParametric" typeName="boolean" description="Determines if graphics are generated using a parametric script" displayLabel="Is Parametric"/>
+        <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Temporary property used to hold OpenPlant class name used for round tripping."/>
+    </ECEntityClass>
+    <ECEntityClass typeName="HorizontalPump" displayLabel="Horizontal Pump">
+        <BaseClass>Equipment</BaseClass>
+        <ECProperty propertyName="BaseLength" typeName="double" displayLabel="Base length"/>
+        <ECProperty propertyName="BaseSideToDriverCl" typeName="double" displayLabel="Base side to driver centerline"/>
+        <ECProperty propertyName="BaseThickness" typeName="double" displayLabel="Base thickness"/>
+        <ECProperty propertyName="DischargeLength" typeName="double" displayLabel="Dischare nozzle length"/>
+        <ECProperty propertyName="DischargeDirection" typeName="string" description="Top, left, right, end" displayLabel="Discharge nozzle direction"/>
+        <ECProperty propertyName="DischargeHeight" typeName="double" displayLabel="Discharge nozzle height"/>
+        <ECProperty propertyName="DischargeWidthPosition" typeName="double" displayLabel="Discharge nozzle offset from pump centerline"/>
+        <ECProperty propertyName="DischargeLengthPosition" typeName="double" displayLabel="Discharge nozzle offset from pump face"/>
+        <ECProperty propertyName="DriverDiameter" typeName="double" displayLabel="Driver diameter"/>
+        <ECProperty propertyName="DriverLength" typeName="double" displayLabel="Driver length"/>
+        <ECProperty propertyName="DriverCoverDiameter" typeName="double" displayLabel="Driver-cover diameter"/>
+        <ECProperty propertyName="DriverCoverLength" typeName="double" displayLabel="Driver-cover length"/>
+        <ECProperty propertyName="DriverClToBase" typeName="double" displayLabel="Height of driver centerline above base"/>
+        <ECProperty propertyName="MotorClToBaseEdge" typeName="double" displayLabel="Motor centerline to edge of base"/>
+        <ECProperty propertyName="MotorDiameter" typeName="double" displayLabel="Motor diameter"/>
+        <ECProperty propertyName="MotorLength" typeName="double" description="Length of motor" displayLabel="Motor length"/>
+        <ECProperty propertyName="BaseOtherSideToDriverCl" typeName="double" displayLabel="Other base side to driver centerline"/>
+        <ECProperty propertyName="PumpDiameter" typeName="double" description="Diameter of pump" displayLabel="Pump diameter"/>
+        <ECProperty propertyName="PumpLength" typeName="double" description="Length of pump" displayLabel="Pump length"/>
+        <ECProperty propertyName="SuctionLengthPostion" typeName="double" displayLabel="Suction nozzle distance from pump face"/>
+        <ECProperty propertyName="SuctionHeight" typeName="double" displayLabel="Suction nozzle height above base"/>
+        <ECProperty propertyName="SuctionLength" typeName="double" displayLabel="Suction nozzle length"/>
+        <ECProperty propertyName="SuctionWidthPosition" typeName="double" displayLabel="Suction nozzle offset from pump centerline"/>
+        <ECProperty propertyName="SuctionDirection" typeName="string" description="End, left, right, top" displayLabel="Suction-nozzle direction"/>
+    </ECEntityClass>
+    <ECEntityClass typeName="Vessel" modifier="Abstract">
+        <BaseClass>Equipment</BaseClass>
+        <ECProperty propertyName="Diameter" typeName="double"/>
+    </ECEntityClass>
+    <ECEntityClass typeName="HorizontalVessel" displayLabel="Horizontal Vessel">
+        <BaseClass>Vessel</BaseClass>
+        <ECProperty propertyName="Head2Length" typeName="double" description="distance for head 2 length" displayLabel="Head 2 length"/>
+        <ECProperty propertyName="Head2Type" typeName="string" description="type of head or crown" displayLabel="Head 2 type"/>
+        <ECProperty propertyName="HeadLength" typeName="double" description="distance for head length" displayLabel="Head length"/>
+        <ECProperty propertyName="NumberOfIdenticalUnits" typeName="int" description="A count that is the number of identical products." displayLabel="NUMBER OF IDENTICAL UNITS"/>
+        <ECProperty propertyName="SaddleThickness" typeName="double" displayLabel="Saddle thickness"/>
+        <ECProperty propertyName="SaddleWidth" typeName="double" description="Width of saddle" displayLabel="Saddle width"/>
+        <ECProperty propertyName="LengthTanTan" typeName="double" description="a straight linear distance which is the total length of the cylindrical section/part of a cylindrical vessel, i.e. including the cylindrical sections of the vessel heads."/>
+        <ECProperty propertyName="HeadType" typeName="string" description="type of head or crown"/>
+        <ECProperty propertyName="LengthBaseToCentreline" typeName="double" description="distance between the base and centreline of a vessel, tank or other fabricated equipment"/>
+        <ECProperty propertyName="LengthTanToSaddle" typeName="double" description="distance between 2 tangent and saddle or support of a vessel, tank or other fabricated equipment"/>
+        <ECProperty propertyName="LengthSaddleToSaddle" typeName="double" description="distance between 2 saddles or supports on a vessel, tank or other fabricated equipment"/>
+    </ECEntityClass>
+    <ECEntityClass typeName="SphericalTank" displayLabel="Spherical Tank">
+        <BaseClass>Vessel</BaseClass>
+        <ECProperty propertyName="CenterFloorToCenterLeg" typeName="double" description="Distance from bottom center-of-leg to center-tank" displayLabel="Center (floor elev.) to center-leg"/>
+        <ECProperty propertyName="CenterTankToCenterLeg" typeName="double" description="Distance from center of tank to center of legs" displayLabel="Center-tank to center-leg"/>
+        <ECProperty propertyName="CenterToFloor" typeName="double" description="Distance from center of tank to floor / ground" displayLabel="Height of center above floor"/>
+        <ECProperty propertyName="LegDiameter" typeName="double" description="Diameter of legs" displayLabel="Leg diameter"/>
+        <ECProperty propertyName="LegHeight" typeName="double" description="Height of legs" displayLabel="Leg height"/>
+        <ECProperty propertyName="NumberOfLegs" typeName="int" description="Number of supporting legs" displayLabel="Number of legs"/>
+    </ECEntityClass>
+    <ECEntityClass typeName="StorageTank" displayLabel="Storage Tank">
+        <BaseClass>Vessel</BaseClass>
+        <ECProperty propertyName="Basediameter" typeName="double" description="Diameter of base" displayLabel="Base Diameter"/>
+        <ECProperty propertyName="Baseheight" typeName="double" description="Height of base" displayLabel="Base Height"/>
+        <ECProperty propertyName="FoundationDiameter" typeName="double" description="Diameter or side-length of the foundation / pad" displayLabel="Diameter/length of foundation"/>
+        <ECProperty propertyName="FoundationThickness" typeName="double" description="Thickness of the foundation or pad beneath the tank" displayLabel="Foundation thickness"/>
+        <ECProperty propertyName="RoofHeight" typeName="double" description="Height of roof" displayLabel="Roof height"/>
+        <ECProperty propertyName="RoofType" typeName="string" displayLabel="Roof type"/>
+        <ECProperty propertyName="FoundationSlope" typeName="double" description="Amount slope downward and outward from tank of the top of the foundation " displayLabel="Sloped foundation"/>
+        <ECProperty propertyName="FoundationType" typeName="string" description="Type of foundation or pad under the tank " displayLabel="Type of foundation"/>
+    </ECEntityClass>
+    <ECEntityClass typeName="VerticalInlinePump" displayLabel="Vertical Inline Pump">
+        <BaseClass>Equipment</BaseClass>
+        <ECProperty propertyName="BodyDiameter" typeName="double" displayLabel="Body diameter"/>
+        <ECProperty propertyName="BodyLength" typeName="double" displayLabel="Body length"/>
+        <ECProperty propertyName="DischargeLength" typeName="double" displayLabel="Discharge nozzle length"/>
+        <ECProperty propertyName="DischargeAngle" typeName="double" description="Angle between discharge and suction nozzles" displayLabel="Discharge-nozzle angle"/>
+        <ECProperty propertyName="HeadDiameter" typeName="double" displayLabel="Head diameter"/>
+        <ECProperty propertyName="HeadHeight" typeName="double" displayLabel="Head height"/>
+        <ECProperty propertyName="HeadTanTan" typeName="double" displayLabel="Head tangent-to-tangent length"/>
+        <ECProperty propertyName="DischargeClToBodyBase" typeName="double" displayLabel="Height of discharge nozzle centerline above body base"/>
+        <ECProperty propertyName="SuctionClToBodyBase" typeName="double" displayLabel="Suction nozzle centerline height above body base"/>
+        <ECProperty propertyName="SuctionLength" typeName="double" displayLabel="Suction-nozzle length"/>
+        <ECProperty propertyName="TransitionLength" typeName="double" displayLabel="Transition length"/>
+    </ECEntityClass>
+    <ECEntityClass typeName="VerticalPump" displayLabel="Vertical Pump">
+        <BaseClass>Equipment</BaseClass>
+        <ECProperty propertyName="BodyDiameter" typeName="double" displayLabel="Body diameter"/>
+        <ECProperty propertyName="BodyLength" typeName="double" displayLabel="Body length above discharge centerline"/>
+        <ECProperty propertyName="DischargeClToBodyBase" typeName="double" displayLabel="Discharge nozzle centerline height above body base"/>
+        <ECProperty propertyName="HeadDiameter" typeName="double" displayLabel="Head diameter"/>
+        <ECProperty propertyName="HeadTanTan" typeName="double" displayLabel="Head length"/>
+        <ECProperty propertyName="LowerShellDiameter" typeName="double" displayLabel="Lower-shell diameter"/>
+        <ECProperty propertyName="LowerShellLength" typeName="double" displayLabel="Lower-shell length"/>
+        <ECProperty propertyName="TransitionLength" typeName="double" displayLabel="Transition length"/>
+    </ECEntityClass>
+    <ECEntityClass typeName="VerticalVessel" displayLabel="Vertical Vessel">
+        <BaseClass>Vessel</BaseClass>
+        <ECProperty propertyName="SkirtBaseDiameter" typeName="double" displayLabel="Base diameter of supporting skirt"/>
+        <ECProperty propertyName="HeadHeight" typeName="double" description="distance for head height" displayLabel="Head height"/>
+        <ECProperty propertyName="LengthSurveyToFloor" typeName="double" displayLabel="Height of survey above floor or base"/>
+        <ECProperty propertyName="LegDepth" typeName="double" description="Leg depth, radial to shell" displayLabel="Leg depth"/>
+        <ECProperty propertyName="LegType" typeName="string" displayLabel="Leg type"/>
+        <ECProperty propertyName="LegWidth" typeName="double" description="Dimension of legs tangential to shell" displayLabel="Leg width"/>
+        <ECProperty propertyName="ShellLegOverlap" typeName="double" displayLabel="Length that legs overlap shell"/>
+        <ECProperty propertyName="LowerHeadHeight" typeName="double" description="distance for lower head height" displayLabel="Lower head height"/>
+        <ECProperty propertyName="Head2Type" typeName="string" description="type of head or crown" displayLabel="Lower head type"/>
+        <ECProperty propertyName="NumberOfLegs" typeName="int" displayLabel="Number of supporting legs"/>
+        <ECProperty propertyName="HeadType" typeName="string" description="type of head or crown"/>
+    </ECEntityClass>
+</ECSchema>
