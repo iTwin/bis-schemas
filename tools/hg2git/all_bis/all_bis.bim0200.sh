@@ -6,13 +6,24 @@
 #```
 set -e
 start=$SECONDS
-
-# OVERIDE
-DIR_BIM0200="${DIR_BIM0200:-/mnt/c/dev/Bim0200Dev}"
-DIR_GIT="${DIR_GIT:-/mnt/c/dev/Bim0200dev_bisMerge/bis-schemas}"
-# !OVERIDE
-
 DIR_ROOT=$(pwd)
+
+# OVERRIDE
+if [ -n "$TEST" ] && [ $TEST -eq 1 ]; then
+    DIR_GIT="${DIR_ROOT}/test"
+else
+    TEST=0
+fi
+
+if [ "$DIR_GIT" == "" ]; then
+    echo "error: must define DIR_GIT"
+    exit 1
+elif [ "$DIR_BIM0200" == "" ]; then
+    echo "error: must define DIR_BIM0200"
+    exit 1
+fi
+# OVERRIDE
+
 DIR_BIM0200_SRC="${DIR_BIM0200}/src"
 DIR_ALL_BIS="${DIR_ROOT}/all_bis"
 DIR_ALL_BIS_FILEMAPS="${DIR_ALL_BIS}/filemaps"
@@ -103,44 +114,78 @@ for r in ${DIRS_HG}; do
 done
 
 ## Setup example git repo.
-## Uncomment this section for testing.
-## If you do uncomment the section be sure to override DIR_GIT.
-#rm -rf $DIR_GIT
-#mkdir -p $DIR_GIT
-#cecho ${HEADER1} "SETTING UP GIT REPO"
-#cd $DIR_GIT
-#git init
-#echo "This git repo is #monolit." > README.txt
-#git add .
-#git commit -m "init commit"
-#cecho ${HEADER2} "GIT REPO AFTER SETUP"
-#tree $DIR_GIT -n
+if [ $TEST -ne 0 ]; then
+    set -x
+    rm -rf $DIR_GIT
+    mkdir -p $DIR_GIT
+
+    cecho ${HEADER1} "SETTING UP GIT REPO"
+    cd $DIR_GIT
+    git init
+    echo "This git repo is #monolit." > README.txt
+    git add .
+    git commit -m "init commit"
+
+    cecho ${HEADER2} "GIT REPO AFTER SETUP"
+    tree $DIR_GIT -n
+    set +x
+fi
 
 ## Create new branch
-GIT_BRANCH="bim0200dev_merge_$(date +%Y-%m-%d)"
+if [ $TEST -ne 0 ]; then
+    GIT_BRANCH="test_branch"
+else
+    GIT_BRANCH="bim0200dev_merge_$(date +%Y-%m-%d)"
+fi
 cd $DIR_GIT
+set +e
+CURR_BRANCH=$(git symbolic-ref HEAD | sed -e 's,.*/\(.*\),\1,')
 git checkout -b $GIT_BRANCH
+if [ $? -ne 0 ]; then
+    echo "BRANCH ALREADY EXISTS"
+    git checkout $GIT_BRANCH
+fi
+set -e
+
 
 ## Conversion/Merge.
+set +e
 i=0
 while [ $i -lt ${#DIRS_HG[@]} ]; do
-    ${DIR_ROOT}/hg2git.py convert ${DIRS_HG[$i]} $DIR_GIT ${MAPS_HG[$i]} || {
-        cecho ${ANSI_ESC_FG_RED} "FAILURE DURING CONVERT"
-        exit 1
-    }
-    echo "================================================================"
+    cecho ${ANSI_ESC_FG_YELLOW} "${DIRS_HG[$i]}"
+    OUT_STR=$(${DIR_ROOT}/hg2git.py convert ${DIRS_HG[$i]} $DIR_GIT ${MAPS_HG[$i]})
+    STATUS=$?
+    echo "$OUT_STR"
+    echo "STATUS: ${STATUS}"
+    if [ $STATUS -ne 0 ]; then
+        # vv grep returns zero if found so this "bool" actually has inverted meaning.
+        FAILED_BECUASE_NO_CHANGES=$(echo "${OUT_STR}" | grep "no changes found")
+        if [ -z "$FAILED_BECUASE_NO_CHANGES" ]; then
+            cecho ${ANSI_ESC_FG_RED} "NON-ZERO EXIT STATUS RETURNED DURING CONVERT"
+            cecho ${ANSI_ESC_FG_RED} "MERGE ON ${DIRS_HG[$i]} WILL NOT BE PERFORMED"
+        else
+            cecho ${ANSI_ESC_FG_YELLOW} "NO CHANGES FOUND"
+        fi
+    fi
     advanced_engineering_strategy_to_prevent_random_failures
 
-    ${DIR_ROOT}/hg2git.py merge ${DIRS_HG[$i]} $DIR_GIT $GIT_BRANCH || {
-        cecho ${ANSI_ESC_FG_RED} "FAILURE DURING MERGE"
-        exit 1
-    }
-    echo "================================================================"
-    advanced_engineering_strategy_to_prevent_random_failures
+    if [ $STATUS -eq 0 ]; then # Only merge is convert succeded.
+        OUT_STR=$(${DIR_ROOT}/hg2git.py merge ${DIRS_HG[$i]} $DIR_GIT "test_branch") #$GIT_BRANCH)
+        echo "$OUT_STR"
+        STATUS=$?
+        echo "STATUS: ${STATUS}"
+        if [ $STATUS -ne 0 ]; then
+            cecho ${ANSI_ESC_FG_RED} "FAILURE DURING MERGE"
+        fi
+        advanced_engineering_strategy_to_prevent_random_failures
+    fi
 
+    echo "================================================================"
     i=$(expr ${i} + 1)
 done
+set -e
 
 duration=$(( $SECONDS - start ))
 echo "TOTAL ELAPSED TIME: ${duration} seconds"
+git checkout $CURR_BRANCH
 exit 0

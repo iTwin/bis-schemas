@@ -29,7 +29,7 @@ import time
 SUCCESS = 0
 FAILURE = 1
 MODE_CONVERT = "convert"
-MODE_MERGE   = "merge"
+MODE_MERGE = "merge"
 
 class ansiterm:
     DEFAULT       = "\033[0m"
@@ -82,8 +82,6 @@ def run_cmd(workingdir, cmd):
     proc = subprocess.Popen(cwd=workingdir, args=cmd.split())
     output, error = proc.communicate()
     proc.wait()
-    if proc.returncode != SUCCESS:
-        print_error("non-SUCCESS status code was returned from subprocess")
     return proc.returncode
 
 ################################################################################
@@ -214,10 +212,7 @@ def main():
     end_time = time.time()
     print "ELAPSED TIME: {}s".format(str(end_time - start_time))
 
-    if status != SUCCESS:
-        print_error("non-SUCCESS status code was returned within script")
-        sys.exit(status)
-    sys.exit(SUCCESS)
+    sys.exit(status)
 
 ################################################################################
 if __name__ == '__main__':
