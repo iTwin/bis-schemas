@@ -6,14 +6,12 @@
 |  $Copyright: (c) 2018 Bentley Systems, Incorporated. All rights reserved. $
 |
 ======================================================================================= -->
-<ECSchema schemaName="BuildingSpacePlanning" nameSpacePrefix="bsp" version="01.00" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.0">
-    <ECSchemaReference name="Bentley_Standard_CustomAttributes" version="01.10" prefix="bsca" />
-    <ECSchemaReference name="EditorCustomAttributes" version="01.00" prefix="beca" />
-    <ECSchemaReference name="BisCore" version="01.00" prefix="bis" />
-    <ECSchemaReference name="Functional" version="01.00" prefix="func" />
-    <ECSchemaReference name="Grids" version="01.00" prefix="grids"/>
-    <ECSchemaReference name="ECDbMap" version="2.0" prefix="ecdbmap"/>
-    <ECSchemaReference name="AecUnits" version="01.00" prefix="AECU" />
+<ECSchema schemaName="BuildingSpacePlanning" alias="bsp" version="01.00" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.1">
+    <ECSchemaReference name="BisCore" version="01.00" alias="bis"/>
+    <ECSchemaReference name="CoreCustomAttributes" version="01.00.00" alias="CoreCA"/>
+    <ECSchemaReference name="Functional" version="01.00" alias="func" />
+    <ECSchemaReference name="Grids" version="01.00" alias="grids"/>
+    <ECSchemaReference name="AecUnits" version="01.00" alias="AECU" />
 
     <ECRelationshipClass typeName="AllocatedVolumeDecomposesToElements" strength="embedding" modifier="None">
       <!-- Relationship that indicates a decomposition of child AllocatedVolume -->
@@ -25,56 +23,56 @@
       </Target>
     </ECRelationshipClass>
 
-    <ECRelationshipClass typeName="BuildingDrivesSlicerInputsElement" strength="referencing">
+    <ECRelationshipClass typeName="BuildingDrivesSlicerInputsElement" modifier="None" strength="referencing">
       <BaseClass>bis:ElementDrivesElement</BaseClass>
       <ECCustomAttributes>
         <ClassHasHandler xmlns="BisCore.01.00"/>
       </ECCustomAttributes>
-      <Source multiplicity="(0..1)" polymorphic="true">
+      <Source multiplicity="(0..1)" roleLabel="drives" polymorphic="true">
         <Class class="Building"/>
       </Source>
-      <Target multiplicity="(1..1)" polymorphic="true">
+      <Target multiplicity="(1..1)" roleLabel="is driven by" polymorphic="true">
         <Class class="BuildingSlicerInputsBundle"/>
       </Target>
     </ECRelationshipClass>
 
 
-    <ECRelationshipClass typeName="FloorPlaneDrivesSlicerInputsElement" strength="referencing">
+    <ECRelationshipClass typeName="FloorPlaneDrivesSlicerInputsElement" modifier="None" strength="referencing">
       <BaseClass>bis:ElementDrivesElement</BaseClass>
       <ECCustomAttributes>
         <ClassHasHandler xmlns="BisCore.01.00"/>
       </ECCustomAttributes>
-      <Source multiplicity="(0..N)" polymorphic="true">
+      <Source multiplicity="(0..N)" roleLabel="drives" polymorphic="true">
         <Class class="grids:GridPlanarSurface"/>
       </Source>
-      <Target multiplicity="(1..1)" polymorphic="true">
+      <Target multiplicity="(1..1)" roleLabel="is driven by" polymorphic="true">
         <Class class="BuildingSlicerInputsBundle"/>
       </Target>
     </ECRelationshipClass>
 
 
-    <ECRelationshipClass typeName="BuildingSlicerInputsDrivesBuildingSlicerOutputs" strength="referencing">
+    <ECRelationshipClass typeName="BuildingSlicerInputsDrivesBuildingSlicerOutputs" modifier="None" strength="referencing">
       <BaseClass>bis:ElementDrivesElement</BaseClass>
       <ECCustomAttributes>
         <ClassHasHandler xmlns="BisCore.01.00"/>
       </ECCustomAttributes>
-      <Source multiplicity="(1..1)" polymorphic="true">
+      <Source multiplicity="(1..1)" roleLabel="drives" polymorphic="true">
         <Class class="BuildingSlicerInputsBundle"/>
       </Source>
-      <Target multiplicity="(1..1)" polymorphic="true">
+      <Target multiplicity="(1..1)" roleLabel="is driven by" polymorphic="true">
         <Class class="BuildingSlicerOutputsBundle"/>
       </Target>
     </ECRelationshipClass>
 
-    <ECRelationshipClass typeName="BuildingSlicerOutputsBundleCreatesStory" strength="referencing">
+    <ECRelationshipClass typeName="BuildingSlicerOutputsBundleCreatesStory" modifier="None" strength="referencing">
       <BaseClass>bis:ElementDrivesElement</BaseClass>
       <ECCustomAttributes>
         <ClassHasHandler xmlns="BisCore.01.00"/>
       </ECCustomAttributes>
-      <Source multiplicity="(1..1)" polymorphic="true">
+      <Source multiplicity="(1..1)" roleLabel="drives" polymorphic="true">
         <Class class="BuildingSlicerOutputsBundle"/>
       </Source>
-      <Target multiplicity="(0..N)" polymorphic="true">
+      <Target multiplicity="(0..N)" roleLabel="is driven by" polymorphic="true">
         <Class class="Story"/>
       </Target>
     </ECRelationshipClass>
@@ -184,42 +182,52 @@
         <ECProperty propertyName="TargetArea" typeName="double" kindOfQuantity="AECU:AREA"/>
     </ECEntityClass>
   
-    <ECRelationshipClass typeName="SpaceHasAdjacentSpaces" strength="referencing">
-      <BaseClass>bis:ElementRefersToElements</BaseClass>
-        <Source cardinality="(0,N)" polymorphic="false">
+    <ECRelationshipClass typeName="SpaceOwnsBubbleAspect" strength="embedding" modifier="None">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
             <Class class="Space"/>
         </Source>
-        <Target cardinality="(0,N)" polymorphic="false">
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="BubbleAspect"/>
+        </Target>
+    </ECRelationshipClass>
+  
+    <ECRelationshipClass typeName="SpaceHasAdjacentSpaces" modifier="None" strength="referencing">
+      <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="is adjacent to" polymorphic="false">
+            <Class class="Space"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is adjacent to" polymorphic="false">
             <Class class="Space"/>
         </Target>
     </ECRelationshipClass>
 
-    <ECRelationshipClass typeName="AllocatedVolumeContains" strength="referencing">
+    <ECRelationshipClass typeName="AllocatedVolumeContains" modifier="None" strength="referencing">
       <BaseClass>bis:ElementRefersToElements</BaseClass>
-        <Source cardinality="(0,N)" polymorphic="false">
+        <Source multiplicity="(0..*)" roleLabel="contains" polymorphic="false">
             <Class class="Space"/>
         </Source>
-        <Target cardinality="(0,N)" polymorphic="false">
+        <Target multiplicity="(0..*)" roleLabel="is contained by" polymorphic="false">
             <Class class="bis:SpatialElement"/>
         </Target>
     </ECRelationshipClass>
     
-    <ECRelationshipClass typeName="SpaceHasOpeningLocations" strength="referencing">
+    <ECRelationshipClass typeName="SpaceHasOpeningLocations" modifier="None" strength="referencing">
       <BaseClass>bis:ElementRefersToElements</BaseClass>
-        <Source cardinality="(0,N)" polymorphic="false">
+        <Source multiplicity="(0..*)" roleLabel="contains" polymorphic="false">
             <Class class="Space"/>
         </Source>
-        <Target cardinality="(0,N)" polymorphic="false">
+        <Target multiplicity="(0..*)" roleLabel="is in" polymorphic="false">
             <Class class="OpeningLocation"/>
         </Target>
     </ECRelationshipClass>
 
-    <ECRelationshipClass typeName="SpatialStoryOpeningLocations" strength="referencing">
+    <ECRelationshipClass typeName="SpatialStoryOpeningLocations" modifier="None" strength="referencing">
       <BaseClass>bis:ElementRefersToElements</BaseClass>
-        <Source cardinality="(0,N)" polymorphic="false">
+        <Source multiplicity="(0..*)" roleLabel="contains" polymorphic="false">
             <Class class="Story"/>
         </Source>
-        <Target cardinality="(0,N)" polymorphic="false">
+        <Target multiplicity="(0..*)" roleLabel="is in" polymorphic="false">
             <Class class="OpeningLocation"/>
         </Target>
     </ECRelationshipClass>
@@ -252,12 +260,12 @@
         <ECProperty propertyName="SourceUrl" displayLabel="Identifies the BIM that this library of scripts was copied from." typeName="string"/>
     </ECEntityClass>
 
-    <ECRelationshipClass typeName="FunctionalTypeLibraryModelBreaksDownAllocationRequirementCatalog" strength="embedding" strengthDirection="Backward">
+    <ECRelationshipClass typeName="FunctionalTypeLibraryModelBreaksDownAllocationRequirementCatalog" modifier="None" strength="embedding" strengthDirection="Backward">
         <BaseClass>bis:ModelModelsElement</BaseClass>
-        <Source cardinality="(0,1)" polymorphic="true">
+        <Source multiplicity="(0..1)" roleLabel="breaks down"  polymorphic="true">
             <Class class="FunctionalTypeLibraryModel"/>
         </Source>
-        <Target cardinality="(1,1)" polymorphic="true">
+        <Target multiplicity="(1..1)" roleLabel="is modeled in" polymorphic="true">
             <Class class="AllocationRequirementTypeCatalog" />
         </Target>
     </ECRelationshipClass>
@@ -302,6 +310,16 @@
         </ECCustomAttributes>
         <ECProperty propertyName="Context" typeName="SpatialContextType"/>
     </ECEntityClass>
+  
+    <ECRelationshipClass typeName="SpaceRequirementTypeOwnsSpatialContext" strength="embedding" modifier="None">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="SpaceRequirementType"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="SpatialContext"/>
+        </Target>
+    </ECRelationshipClass>
 
     <!--Mirrored Program Manager geometric elements end-->
     <ECEntityClass typeName="AllocationRequirement" displayLabel="Allocation Requirement" modifier="Abstract">
@@ -320,22 +338,22 @@
                               direction="Backward" description="Parent allocation requirement" />
     </ECEntityClass>
 
-    <ECRelationshipClass typeName="AllocationRequirementIsOfAllocationRequirementType" strength="referencing">
+    <ECRelationshipClass typeName="AllocationRequirementIsOfAllocationRequirementType" modifier="None" strength="referencing">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
-        <Source cardinality="(0,N)" polymorphic="true">
+        <Source multiplicity="(0..*)" roleLabel="is of" polymorphic="true">
             <Class class="AllocationRequirement" />
         </Source>
-        <Target cardinality="(0,N)" polymorphic="true">
+        <Target multiplicity="(0..*)" roleLabel="is implemented by" polymorphic="true">
             <Class class="AllocationRequirementType"/>
         </Target>
     </ECRelationshipClass>
 
-    <ECRelationshipClass typeName="SpaceRequirementTypeIsRelevantForBuildingRequirementTypes" strength="referencing">
+    <ECRelationshipClass typeName="SpaceRequirementTypeIsRelevantForBuildingRequirementTypes" modifier="None" strength="referencing">
       <BaseClass>bis:ElementRefersToElements</BaseClass>
-      <Source cardinality="(0,N)" polymorphic="true">
+      <Source multiplicity="(0..*)" roleLabel="is relevant for" polymorphic="true">
         <Class class="SpaceRequirementType" />
       </Source>
-      <Target cardinality="(0,N)" polymorphic="true">
+      <Target multiplicity="(0..*)" roleLabel="groups" polymorphic="true">
         <Class class="BuildingRequirementType"/>
       </Target>
     </ECRelationshipClass>
@@ -365,31 +383,31 @@
         </ECCustomAttributes>
     </ECEntityClass>
 
-    <ECRelationshipClass typeName="AllocationRequirementGroupsRequirements" strength="referencing">
-        <Source multiplicity="(0..*)" polymorphic="true">
+    <ECRelationshipClass typeName="AllocationRequirementGroupsRequirements" modifier="None" strength="referencing">
+        <Source multiplicity="(0..1)" roleLabel="groups" polymorphic="true">
             <Class class="AllocationRequirement"/>
         </Source>
-        <Target multiplicity="(0..1)" polymorphic="true">
+        <Target multiplicity="(0..*)" roleLabel="is grouped by" polymorphic="true">
             <Class class="AllocationRequirement"/>
         </Target>
     </ECRelationshipClass>
     
-    <ECRelationshipClass typeName="AllocationRequirementDefinesAllocatedVolume" strength="referencing">
+    <ECRelationshipClass typeName="AllocationRequirementDefinesAllocatedVolume" modifier="None" strength="referencing">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
-        <Source cardinality="(0,N)" polymorphic="true">
+        <Source multiplicity="(0..*)" roleLabel="sets expectations for" polymorphic="true">
             <Class class="AllocationRequirement"/>
         </Source>
-        <Target cardinality="(0,N)" polymorphic="true">
+        <Target multiplicity="(0..*)" roleLabel="is implementation of" polymorphic="true">
             <Class class="AllocatedVolume"/>
         </Target>
     </ECRelationshipClass>
 
-    <ECRelationshipClass typeName="SpaceIsBoundedByGridSurface" strength="referencing">
+    <ECRelationshipClass typeName="SpaceIsBoundedByGridSurface" modifier="None" strength="referencing">
       <BaseClass>bis:ElementRefersToElements</BaseClass>
-        <Source cardinality="(0,N)" polymorphic="true">
+        <Source multiplicity="(0..*)" roleLabel="is bounded by" polymorphic="true">
             <Class class="Space"/>
         </Source>
-        <Target cardinality="(0,N)" polymorphic="true">
+        <Target multiplicity="(0..*)" roleLabel="bounds" polymorphic="true">
             <Class class="grids:GridSurface"/>
         </Target>
     </ECRelationshipClass>
