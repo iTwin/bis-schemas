@@ -170,7 +170,7 @@ while [ $i -lt ${#DIRS_HG[@]} ]; do
     advanced_engineering_strategy_to_prevent_random_failures
 
     if [ $STATUS -eq 0 ]; then # Only merge is convert succeded.
-        OUT_STR=$(${DIR_ROOT}/hg2git.py merge ${DIRS_HG[$i]} $DIR_GIT "test_branch") #$GIT_BRANCH)
+        OUT_STR=$(${DIR_ROOT}/hg2git.py merge ${DIRS_HG[$i]} $DIR_GIT $GIT_BRANCH)
         echo "$OUT_STR"
         STATUS=$?
         echo "STATUS: ${STATUS}"
