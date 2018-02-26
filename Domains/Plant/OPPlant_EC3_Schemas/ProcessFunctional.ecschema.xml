@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ECSchema schemaName="ProcessFunctional" alias="pfunc" version="01.00.00" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.1">
-    <ECSchemaReference name="ECv3ConversionAttributes" version="01.00.00" alias="V2ToV3"/>
+    <ECSchemaReference name="PlantCustomAttributes" version="01.00.00" alias="PlantCA"/>
     <ECSchemaReference name="Functional" version="01.00.00" alias="func"/>
     <ECSchemaReference name="BisCore" version="01.00.00" alias="bis"/>
     <ECSchemaReference name="CoreCustomAttributes" version="01.00.00" alias="CoreCA"/>
-    <ECSchemaReference name="PlantCustomAttributes" version="01.00.00" alias="PlantCA"/>
+    <ECSchemaReference name="ECv3ConversionAttributes" version="01.00.00" alias="V2ToV3"/>
     <ECEnumeration typeName="CONCEPTUAL_PIPE_HEAD_CONNECTION_TYPE" backingTypeName="int" isStrict="true">
         <ECEnumerator value="0" displayLabel="Outlet"/>
         <ECEnumerator value="1" displayLabel="ShellOutlet"/>
@@ -55,13 +55,7 @@
         <ECProperty propertyName="MANUFACTURER" typeName="string" description="device manufacturer" displayLabel="Manufacturer" category="GENERAL" priority="97"/>
         <ECProperty propertyName="DEVICE_TYPE_CODE" typeName="string" description="code uses to describe the type of component." displayLabel="Device Type Code" category="GENERAL" priority="95"/>
         <ECProperty propertyName="NUMBER" typeName="string" description="(bentley added property) for allocating serial numbers to components" displayLabel="Number" category="GENERAL" priority="94"/>
-        <ECProperty propertyName="NOMINAL_SIZE" typeName="string" displayLabel="Nominal Size" category="DESIGN_CONDITIONS" kindOfQuantity="LENGTH">
-            <ECCustomAttributes>
-                <OldPersistenceUnit xmlns="ECv3ConversionAttributes.01.00">
-                    <Name>MILLIMETRE</Name>
-                </OldPersistenceUnit>
-            </ECCustomAttributes>
-        </ECProperty>
+        <ECProperty propertyName="NOMINAL_SIZE" typeName="string" displayLabel="Nominal Size" category="DESIGN_CONDITIONS"/>
         <ECProperty propertyName="PLANT_AREA" typeName="string" description="code uses to describe the Plant Area of component" displayLabel="Area"/>
         <ECProperty propertyName="PLANT" typeName="string" displayLabel="Plant"/>
         <ECProperty propertyName="SERVICE" typeName="string" description="Serving in performing work asked and paid for by someone else." displayLabel="Service"/>
@@ -339,7 +333,13 @@
                 </OldPersistenceUnit>
             </ECCustomAttributes>
         </ECProperty>
-        <ECProperty propertyName="NORMAL_OPERATING_PRESSURE" typeName="double" displayLabel="Normal Operating Pressure" category="OPERATING_CONDITIONS" priority="90"/>
+        <ECProperty propertyName="NORMAL_OPERATING_PRESSURE" typeName="double" displayLabel="Normal Operating Pressure" category="OPERATING_CONDITIONS" priority="90" kindOfQuantity="PRESSURE">
+            <ECCustomAttributes>
+                <OldPersistenceUnit xmlns="ECv3ConversionAttributes.01.00">
+                    <Name>KILOPASCAL_GAUGE</Name>
+                </OldPersistenceUnit>
+            </ECCustomAttributes>
+        </ECProperty>
         <ECProperty propertyName="OUTSIDE_DIAMETER" typeName="double" description="a diameter which is across the outside cross section of a circular object.                " displayLabel="Outside Diameter" category="OPERATING_CONDITIONS" kindOfQuantity="DIAMETER">
             <ECCustomAttributes>
                 <OldPersistenceUnit xmlns="ECv3ConversionAttributes.01.00">
@@ -3052,6 +3052,7 @@
     </ECEntityClass>
     <ECEntityClass typeName="PRESSURE_REDUCING_VALVE" description="a self actuated pressure control valve that is equipped with an internal pressure sensing element that reduces the upstream line pressure to a set level downstream, and maintains the reduced pressure irrespective of changes in upstream pressure." displayLabel="Pressure Reducing Valve">
         <BaseClass>SELF_ACTUATED_PRESSURE_CONTROL_VALVE</BaseClass>
+        <ECProperty propertyName="NORMAL_OPERATING_PRESSURE" typeName="double" displayLabel="Normal Operating Pressure" category="OPERATING_CONDITIONS" priority="90"/>
     </ECEntityClass>
     <ECEntityClass typeName="PRESSURE_REGULATOR" description="a regulator that is regulating the pressure in system." displayLabel="Pressure Regulator">
         <BaseClass>REGULATOR</BaseClass>
@@ -3467,7 +3468,7 @@
             <Class class="INSTRUMENT"/>
         </Target>
     </ECRelationshipClass>
-    <ECEntityClass typeName="SIGNAL_CONNECTOR_SYMBOL" displayLabel="Signal Connector">
+    <ECEntityClass typeName="SIGNAL_CONNECTOR_SYMBOL" displayLabel="Signal Page Connector">
         <BaseClass>CROSS_PAGE_CONNECTION</BaseClass>
     </ECEntityClass>
     <ECRelationshipClass typeName="SIGNALLINE_CONNECTS_TO_SIGNAL_CONNECTOR" displayLabel="Signal Line Connects To Signal Connector" modifier="None" strength="referencing">
