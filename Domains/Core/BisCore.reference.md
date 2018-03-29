@@ -6,4 +6,4 @@ The BisCore schema also defines the database structure for an iModel.  Other sch
 ##PhysicalPortion
 Using this as an example because I want to get a better definition written down.
 
-Part of a larger Element that can be broken down in more detail in a sub Model.  Division of the larger Element into partitions is defined by convention in a domain or by a user and individual partitions are not viable outside the larger Element. 
+Abstract base used to represent a part of a larger Element that can be broken down in more detail in a sub Model.  Division of the larger Element into partitions is arbitry, defined by convention in a domain or by a user and individual portions are not viable outside the larger Element. 
