@@ -47,8 +47,6 @@ DIRS_HG=(
     "${DIR_BIM0200_SRC}/DgnDomains/Site"
     "${DIR_BIM0200_SRC}/DgnDomains/Structural"
 
-    "${DIR_BIM0200_SRC}/DgnPlatform"
-
     # TODO: iModelSchemaEditor is a git repo, so the hg2git.py script obviously
     # won't work on it.
     # "${DIR_BIM0200_SRC}/iModelSchemaEditor"
@@ -72,8 +70,6 @@ MAPS_HG=(
     "${DIR_ALL_BIS_FILEMAPS}/DgnDomains/RoadRailPhysical.filemap"
     "${DIR_ALL_BIS_FILEMAPS}/DgnDomains/Site.filemap"
     "${DIR_ALL_BIS_FILEMAPS}/DgnDomains/Structural.filemap"
-
-    "${DIR_ALL_BIS_FILEMAPS}/DgnPlatform.filemap"
 
     # TODO: iModelSchemaEditor is a git repo, so the hg2git.py script obviously
     # won't work on it.
