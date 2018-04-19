@@ -1,6 +1,6 @@
 # BIS ECSchemas
 
-This repository is __*going*__ to be the single-source-of-truth (SSOT) for all BIS schemas.
+This repository is the single-source-of-truth (SSOT) for all BIS schemas.
 
 List of current BIS Schemas in this repository as SSOT:
 
