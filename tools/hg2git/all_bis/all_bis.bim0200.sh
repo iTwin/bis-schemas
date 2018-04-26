@@ -43,7 +43,7 @@ DIRS_HG=(
     "${DIR_BIM0200_SRC}/DgnDomains/Profiles"
     "${DIR_BIM0200_SRC}/DgnDomains/RealityModeling"
     "${DIR_BIM0200_SRC}/DgnDomains/RoadRailAlignment"
-#    "${DIR_BIM0200_SRC}/DgnDomains/RoadRailPhysical"
+    "${DIR_BIM0200_SRC}/DgnDomains/RoadRailPhysical"
     "${DIR_BIM0200_SRC}/DgnDomains/Site"
     "${DIR_BIM0200_SRC}/DgnDomains/Structural"
 
@@ -67,7 +67,7 @@ MAPS_HG=(
     "${DIR_ALL_BIS_FILEMAPS}/DgnDomains/Profiles.filemap"
     "${DIR_ALL_BIS_FILEMAPS}/DgnDomains/RealityModeling.filemap"
     "${DIR_ALL_BIS_FILEMAPS}/DgnDomains/RoadRailAlignment.filemap"
-#    "${DIR_ALL_BIS_FILEMAPS}/DgnDomains/RoadRailPhysical.filemap"
+    "${DIR_ALL_BIS_FILEMAPS}/DgnDomains/RoadRailPhysical.filemap"
     "${DIR_ALL_BIS_FILEMAPS}/DgnDomains/Site.filemap"
     "${DIR_ALL_BIS_FILEMAPS}/DgnDomains/Structural.filemap"
 
