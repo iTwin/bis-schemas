@@ -43,7 +43,7 @@ if __name__ == "__main__":
     regex = re.compile("^The schema '%s.ecschema.xml' SUCCEEDED.* validation.$" % args.schemaName)
     with open(logFile, 'r') as log:
         for line in log:
-            print(line)
+            print(line.rstrip('\n'))
             if regex.match(line):
                 success = True
             
