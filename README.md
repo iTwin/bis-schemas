@@ -79,3 +79,10 @@ The Team is owned by the schema owner, which gives them the ability to add/remov
 
 
 
+
+
+## Schema Validation
+
+A build is set up to validate schemas against a set of [validation rules](https://imodeljs.github.io/iModelJs-docs-output/bis/intro/bis-schema-validation/). Additionally, it performs a difference audit of all schemas against their latest released version, if one exists. The validation and difference logs are published as build artifacts and made accessible. 
+
+
