@@ -5,6 +5,8 @@
     <ECSchemaReference name="LinearReferencing" version="01.00.00" alias="lr"/>
     <ECSchemaReference name="RoadRailAlignment" version="01.00.00" alias="rralign"/>
 
+    <KindOfQuantity typeName="VELOCITY" displayLabel="Velocity" persistenceUnit="M/SEC(DefaultReal)" presentationUnits="MPH(real4u);KM/HR(real4u)" relativeError="0.0001"/>
+
     <ECEntityClass typeName="RoadwayStandardsModel">
         <BaseClass>bis:DefinitionModel</BaseClass>
         <ECCustomAttributes>
@@ -77,36 +79,6 @@
             <ClassHasHandler xmlns="BisCore.01.00.00"/>
         </ECCustomAttributes>
     </ECEntityClass>    
-    <ECEntityClass typeName="PathwaySeparationElement" modifier="Abstract" description="A Physical Portion of a Corridor specially constructed to separate two of its Pathways. It is typically defined along an alignment.">
-        <BaseClass>CorridorPortionElement</BaseClass>
-        <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00.00"/>
-        </ECCustomAttributes>
-        <ECNavigationProperty propertyName="PathwayLeftSide" relationshipName="PathwaySeparationRefersToPathwayLeftSide" direction="Forward"/>
-        <ECNavigationProperty propertyName="PathwayRightSide" relationshipName="PathwaySeparationRefersToPathwayRightSide" direction="Forward"/>
-    </ECEntityClass>
-    <ECRelationshipClass typeName="PathwaySeparationRefersToPathwayLeftSide" strength="referencing" strengthDirection="Forward" modifier="Sealed">
-        <Source multiplicity="(0..*)" polymorphic="true" roleLabel="refers to left side">
-            <Class class="PathwaySeparationElement"/>
-        </Source>
-        <Target multiplicity="(0..1)" polymorphic="true" roleLabel="is referenced by">
-            <Class class="PathwayElement"/>
-        </Target>
-    </ECRelationshipClass>
-    <ECRelationshipClass typeName="PathwaySeparationRefersToPathwayRightSide" strength="referencing" strengthDirection="Forward" modifier="Sealed">
-        <Source multiplicity="(0..*)" polymorphic="true" roleLabel="refers to right side">
-            <Class class="PathwaySeparationElement"/>
-        </Source>
-        <Target multiplicity="(0..1)" polymorphic="true" roleLabel="is referenced by">
-            <Class class="PathwayElement"/>
-        </Target>
-    </ECRelationshipClass>
-    <ECEntityClass typeName="PathwaySeparation" modifier="Sealed" description="A generic PathwaySeparationElement.">
-        <BaseClass>PathwaySeparationElement</BaseClass>
-        <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00.00"/>
-        </ECCustomAttributes>
-    </ECEntityClass>
     <ECRelationshipClass typeName="CorridorRefersToOrderedPathways" strength="referencing" modifier="Sealed">
         <BaseClass>bis:ElementGroupsMembers</BaseClass>
         <Source multiplicity="(0..1)" roleLabel="refers to" polymorphic="false">
@@ -158,6 +130,53 @@
             <ClassHasHandler xmlns="BisCore.01.00.00"/>
         </ECCustomAttributes>
     </ECEntityClass>
+    <ECEntityClass typeName="DesignSpeedElement" modifier="Abstract"  displayLabel="Design Speed" description="Base class for Linearly located properties of a Pathway specifying design-speeds along it." >
+        <BaseClass>bis:InformationRecordElement</BaseClass>
+        <BaseClass>lr:ILinearlyLocatedAttribution</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.01.00.00"/>
+            <ILinearlyLocatedSegmentationHints xmlns="LinearReferencing.01.00.00">
+                <SupportedLinearlyReferencedLocationTypes>2</SupportedLinearlyReferencedLocationTypes>
+            </ILinearlyLocatedSegmentationHints>
+        </ECCustomAttributes>
+    </ECEntityClass>
+    <ECEntityClass typeName="DesignSpeedDefinition" modifier="Sealed"  displayLabel="Design Speed Definition" description="Standardized design-speed definition in the context of a Subject." >
+        <BaseClass>bis:DefinitionElement</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.01.00.00"/>
+        </ECCustomAttributes>
+        <ECProperty propertyName="DesignSpeed" typeName="double" kindOfQuantity="VELOCITY"/>
+    </ECEntityClass>
+    <ECEntityClass typeName="DesignSpeed" modifier="Sealed"  displayLabel="Design Speed" description="Linearly located property of a Pathway specifying uniform design-speeds along it." >
+        <BaseClass>DesignSpeedElement</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.01.00.00"/>
+        </ECCustomAttributes>
+        <ECNavigationProperty propertyName="Definition" relationshipName="DesignSpeedRefersToDefinition" direction="Forward"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="DesignSpeedRefersToDefinition" strength="referencing" strengthDirection="Backward" modifier="Sealed">
+        <Source multiplicity="(0..*)" polymorphic="false" roleLabel="refers to">
+            <Class class="DesignSpeed"/>
+        </Source>
+        <Target multiplicity="(0..1)" polymorphic="false" roleLabel="is referenced by">
+            <Class class="DesignSpeedDefinition"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="DesignSpeedTransition" modifier="Sealed"  displayLabel="Design Speed Transition" description="Linearly located property of a Pathway specifying varying design-speeds along it." >
+        <BaseClass>DesignSpeedElement</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.01.00.00"/>
+        </ECCustomAttributes>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="PathwayOwnsLinearlyLocatedAttribution" strength="embedding" modifier="Sealed">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(0..1)" polymorphic="true" roleLabel="owns">
+            <Class class="PathwayElement"/>
+        </Source>
+        <Target multiplicity="(0..*)" polymorphic="true" roleLabel="is owned by">
+            <Class class="lr:ILinearlyLocatedAttribution"/>
+        </Target>
+    </ECRelationshipClass>
     <ECRelationshipClass typeName="DrawingGraphicRepresentsCorridor" strength="referencing" modifier="Sealed">
         <BaseClass>bis:DrawingGraphicRepresentsElement</BaseClass>
         <Source multiplicity="(0..*)" roleLabel="represents" polymorphic="true">
@@ -198,5 +217,14 @@
         </ECCustomAttributes>
         <ECProperty propertyName="AssociatedFacet" typeName="AssociatedFacetEnum" />
     </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsAssociatedFacetAspect" strength="embedding" modifier="Sealed">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" polymorphic="true" roleLabel="owns">
+            <Class class="bis:Element"/>
+        </Source>
+        <Target multiplicity="(0..1)" polymorphic="false" roleLabel="is owned by">
+            <Class class="AssociatedFacetAspect"/>
+        </Target>
+    </ECRelationshipClass>
 </ECSchema>
 
