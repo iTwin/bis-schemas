@@ -7,11 +7,7 @@
 +--------------------------------------------------------------------------------------*/
 
 #include <DgnPlatform/DesktopTools/KnownDesktopLocationsAdmin.h>
-#include <DgnPlatform/DgnPlatformLib.h>
-#include <DgnPlatform/DgnCoreAPI.h>
 #include <WebServices/Configuration/UrlProvider.h>
-#include <WebServices/iModelHub/Common.h>
-#include <BeSQLite/L10N.h>
 
 USING_NAMESPACE_BENTLEY_DGN
 
