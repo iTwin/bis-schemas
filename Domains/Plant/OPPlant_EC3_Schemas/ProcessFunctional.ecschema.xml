@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ECSchema schemaName="ProcessFunctional" alias="pfunc" version="01.00.00" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.1">
-    <ECSchemaReference name="PlantCustomAttributes" version="01.00.00" alias="PlantCA"/>
-    <ECSchemaReference name="Functional" version="01.00.00" alias="func"/>
-    <ECSchemaReference name="BisCore" version="01.00.00" alias="bis"/>
-    <ECSchemaReference name="CoreCustomAttributes" version="01.00.00" alias="CoreCA"/>
     <ECSchemaReference name="ECv3ConversionAttributes" version="01.00.00" alias="V2ToV3"/>
+    <ECSchemaReference name="CoreCustomAttributes" version="01.00.00" alias="CoreCA"/>
+    <ECSchemaReference name="BisCore" version="01.00.00" alias="bis"/>
+    <ECSchemaReference name="Functional" version="01.00.00" alias="func"/>
+    <ECSchemaReference name="PlantCustomAttributes" version="01.00.00" alias="PlantCA"/>
     <ECEnumeration typeName="CONCEPTUAL_PIPE_HEAD_CONNECTION_TYPE" backingTypeName="int" isStrict="true">
         <ECEnumerator value="0" displayLabel="Outlet"/>
         <ECEnumerator value="1" displayLabel="ShellOutlet"/>
@@ -511,7 +511,13 @@
         <ECProperty propertyName="CODE" typeName="string" description="code" displayLabel="Code" category="OPERATING_CONDITIONS"/>
         <ECProperty propertyName="TYPE" typeName="string" displayLabel="Type"/>
         <ECProperty propertyName="AREAID" typeName="string" displayLabel="Areaid"/>
-        <ECProperty propertyName="NOMINAL_DIAMETER" typeName="double" description="a diameter which is an expected (theoretical/as designed) diameter.        " displayLabel="Nominal Diameter" category="DESIGN_CONDITIONS"/>
+        <ECProperty propertyName="NOMINAL_DIAMETER" typeName="double" description="a diameter which is an expected (theoretical/as designed) diameter.        " displayLabel="Nominal Diameter" category="DESIGN_CONDITIONS" kindOfQuantity="DIAMETER">
+            <ECCustomAttributes>
+                <OldPersistenceUnit xmlns="ECv3ConversionAttributes.01.00">
+                    <Name>MILLIMETRE</Name>
+                </OldPersistenceUnit>
+            </ECCustomAttributes>
+        </ECProperty>
         <ECProperty propertyName="RATING" typeName="string" displayLabel="Rating" category="OPERATING_CONDITIONS"/>
         <ECProperty propertyName="SCHEDULE" typeName="string" displayLabel="Schedule" category="OPERATING_CONDITIONS"/>
         <ECProperty propertyName="SHORT_DESCRIPTION" typeName="string" description="short description of unit." displayLabel="Short Description"/>
@@ -578,6 +584,7 @@
     <ECRelationshipClass typeName="AREA_HAS_AREA" displayLabel="Area Has Area" modifier="None" strength="referencing">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Holds OpenPlant class name used for round tripping."/>
+        <ECProperty propertyName="CheckOutId" typeName="int" description="Holds the Checkout Id Number for the relationship."/>
         <Source multiplicity="(0..*)" roleLabel="Utility Area Has Plant Area" polymorphic="true">
             <Class class="AREA_CLASS"/>
         </Source>
@@ -588,6 +595,7 @@
     <ECRelationshipClass typeName="AREA_HAS_NAMED_ITEM" displayLabel="Area Has Named Item" modifier="None" strength="referencing">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Holds OpenPlant class name used for round tripping."/>
+        <ECProperty propertyName="CheckOutId" typeName="int" description="Holds the Checkout Id Number for the relationship."/>
         <Source multiplicity="(0..1)" roleLabel="refers to" polymorphic="true">
             <Class class="AREA_CLASS"/>
         </Source>
@@ -1140,6 +1148,7 @@
     <ECRelationshipClass typeName="COMPONENT_CONNECTS_TO_SEGMENT" displayLabel="Component Connects To Segment" modifier="None" strength="referencing">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Holds OpenPlant class name used for round tripping."/>
+        <ECProperty propertyName="CheckOutId" typeName="int" description="Holds the Checkout Id Number for the relationship."/>
         <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="true">
             <Class class="PIPING_COMPONENT"/>
         </Source>
@@ -1166,6 +1175,7 @@
     <ECRelationshipClass typeName="COMPONENT_CONNECTS_TO_SIGNALLINE" displayLabel="Component Connects To SignalLine" modifier="None" strength="referencing">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Holds OpenPlant class name used for round tripping."/>
+        <ECProperty propertyName="CheckOutId" typeName="int" description="Holds the Checkout Id Number for the relationship."/>
         <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="true">
             <Class class="PIPING_COMPONENT"/>
         </Source>
@@ -1253,6 +1263,7 @@
     <ECRelationshipClass typeName="CONCEPTUAL_EQUIPMENT_HAS_DESIGN_CASE" displayLabel="Conceptual Equipment Has Design Case" modifier="None" strength="referencing">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Holds OpenPlant class name used for round tripping."/>
+        <ECProperty propertyName="CheckOutId" typeName="int" description="Holds the Checkout Id Number for the relationship."/>
         <Source multiplicity="(0..1)" roleLabel="Conceptual Object has Design Case" polymorphic="true">
             <Class class="CONCEPTUAL_ITEM"/>
         </Source>
@@ -1334,6 +1345,7 @@
     <ECRelationshipClass typeName="CONCEPTUAL_PIPE_HAS_DESIGN" displayLabel="Conceptual Pipe Has Design" modifier="None" strength="referencing">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Holds OpenPlant class name used for round tripping."/>
+        <ECProperty propertyName="CheckOutId" typeName="int" description="Holds the Checkout Id Number for the relationship."/>
         <Source multiplicity="(0..1)" roleLabel="Conceptual Pipe Has Design" polymorphic="true">
             <Class class="CONCEPTUAL_PIPE"/>
         </Source>
@@ -1344,6 +1356,7 @@
     <ECRelationshipClass typeName="CONCEPTUAL_PIPE_HAS_HEAD_EQUIPMENT" displayLabel="Conceptual Pipe Has Head Equipment" modifier="None" strength="referencing">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Holds OpenPlant class name used for round tripping."/>
+        <ECProperty propertyName="CheckOutId" typeName="int" description="Holds the Checkout Id Number for the relationship."/>
         <Source multiplicity="(0..*)" roleLabel="Conceptual Pipe Has Head Equipment" polymorphic="true">
             <Class class="CONCEPTUAL_PIPE"/>
         </Source>
@@ -1354,6 +1367,7 @@
     <ECRelationshipClass typeName="CONCEPTUAL_PIPE_HAS_HEAD_PIPE" displayLabel="Conceptual Pipe Has Head Pipe" modifier="None" strength="referencing">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Holds OpenPlant class name used for round tripping."/>
+        <ECProperty propertyName="CheckOutId" typeName="int" description="Holds the Checkout Id Number for the relationship."/>
         <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="true">
             <Class class="CONCEPTUAL_PIPE"/>
         </Source>
@@ -1379,6 +1393,7 @@
     <ECRelationshipClass typeName="CONCEPTUAL_PIPE_HAS_STREAM" description="Pipe on PFD has process stream" displayLabel="Conceptual Pipe Has Stream" modifier="None" strength="referencing">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Holds OpenPlant class name used for round tripping."/>
+        <ECProperty propertyName="CheckOutId" typeName="int" description="Holds the Checkout Id Number for the relationship."/>
         <Source multiplicity="(0..1)" roleLabel="Conceptual Pipe Has Stream" polymorphic="true">
             <Class class="CONCEPTUAL_PIPE"/>
         </Source>
@@ -1389,6 +1404,7 @@
     <ECRelationshipClass typeName="CONCEPTUAL_PIPE_HAS_TAIL_EQUIPMENT" displayLabel="Conceptual Pipe Has Tail Equipment" modifier="None" strength="referencing">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Holds OpenPlant class name used for round tripping."/>
+        <ECProperty propertyName="CheckOutId" typeName="int" description="Holds the Checkout Id Number for the relationship."/>
         <Source multiplicity="(0..*)" roleLabel="Conceptual Pipe Has Tail Equipment" polymorphic="true">
             <Class class="CONCEPTUAL_PIPE"/>
         </Source>
@@ -1399,6 +1415,7 @@
     <ECRelationshipClass typeName="CONCEPTUAL_PIPE_HAS_TAIL_PIPE" displayLabel="Conceptual Pipe Has Tail Pipe" modifier="None" strength="referencing">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Holds OpenPlant class name used for round tripping."/>
+        <ECProperty propertyName="CheckOutId" typeName="int" description="Holds the Checkout Id Number for the relationship."/>
         <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="true">
             <Class class="CONCEPTUAL_PIPE"/>
         </Source>
@@ -1627,6 +1644,7 @@
     <ECRelationshipClass typeName="CROSS_PAGE_CONNECTION_CONNECTS_TO_SEGMENT" displayLabel="Cross Page Connector Connects to Pipe Run" modifier="None" strength="referencing">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Holds OpenPlant class name used for round tripping."/>
+        <ECProperty propertyName="CheckOutId" typeName="int" description="Holds the Checkout Id Number for the relationship."/>
         <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="true">
             <Class class="CROSS_PAGE_CONNECTION"/>
         </Source>
@@ -1637,6 +1655,7 @@
     <ECRelationshipClass typeName="CROSS_PAGE_CONNECTION_CONNECTS_TO_SIGNALLINE" displayLabel="Cross Page Connector Connects to Signalline" modifier="None" strength="referencing">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Holds OpenPlant class name used for round tripping."/>
+        <ECProperty propertyName="CheckOutId" typeName="int" description="Holds the Checkout Id Number for the relationship."/>
         <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="true">
             <Class class="CROSS_PAGE_CONNECTION"/>
         </Source>
@@ -1647,6 +1666,7 @@
     <ECRelationshipClass typeName="Cable_Has_Core" displayLabel="Cable Has Core" modifier="None" strength="referencing">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Holds OpenPlant class name used for round tripping."/>
+        <ECProperty propertyName="CheckOutId" typeName="int" description="Holds the Checkout Id Number for the relationship."/>
         <Source multiplicity="(0..1)" roleLabel="Cable Has Core" polymorphic="true">
             <Class class="CABLE"/>
         </Source>
@@ -1677,6 +1697,7 @@
     <ECRelationshipClass typeName="Card_Has_IO_Channel" displayLabel="Card Has IO Channel" modifier="None" strength="referencing">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Holds OpenPlant class name used for round tripping."/>
+        <ECProperty propertyName="CheckOutId" typeName="int" description="Holds the Checkout Id Number for the relationship."/>
         <Source multiplicity="(0..1)" roleLabel="Card Has IO Channel" polymorphic="true">
             <Class class="CARD"/>
         </Source>
@@ -1687,6 +1708,7 @@
     <ECRelationshipClass typeName="Card_Has_Terminal_Strip" displayLabel="Card Has Terminal Strip" modifier="None" strength="referencing">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Holds OpenPlant class name used for round tripping."/>
+        <ECProperty propertyName="CheckOutId" typeName="int" description="Holds the Checkout Id Number for the relationship."/>
         <Source multiplicity="(0..1)" roleLabel="Card Has Terminal Strip" polymorphic="true">
             <Class class="CARD"/>
         </Source>
@@ -1720,6 +1742,7 @@
     <ECRelationshipClass typeName="DEVICE_HAS_NODE" description="Object has a node which can be used to connect to networks" displayLabel="Device Has Node" modifier="None" strength="referencing">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Holds OpenPlant class name used for round tripping."/>
+        <ECProperty propertyName="CheckOutId" typeName="int" description="Holds the Checkout Id Number for the relationship."/>
         <Source multiplicity="(0..1)" roleLabel="Device Has Node" polymorphic="true">
             <Class class="DEVICE"/>
         </Source>
@@ -1759,6 +1782,7 @@
     <ECRelationshipClass typeName="Document_Is_Related_To_Object" displayLabel="Document Is Related To Object" modifier="None" strength="referencing">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Holds OpenPlant class name used for round tripping."/>
+        <ECProperty propertyName="CheckOutId" typeName="int" description="Holds the Checkout Id Number for the relationship."/>
         <Source multiplicity="(0..*)" roleLabel="Document Is Related To Object" polymorphic="true">
             <Class class="DOCUMENT"/>
         </Source>
@@ -2103,6 +2127,7 @@
     <ECRelationshipClass typeName="Device_Has_Terminal_Strip" displayLabel="Device Has Terminal Strip" modifier="None" strength="referencing">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Holds OpenPlant class name used for round tripping."/>
+        <ECProperty propertyName="CheckOutId" typeName="int" description="Holds the Checkout Id Number for the relationship."/>
         <Source multiplicity="(0..1)" roleLabel="Device Has Terminal Strip" polymorphic="true">
             <Class class="DEVICE"/>
         </Source>
@@ -2134,6 +2159,7 @@
     <ECRelationshipClass typeName="EQUIPMENT_HAS_DESIGN_CASE" displayLabel="Equipment has Design Case" modifier="None" strength="referencing">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Holds OpenPlant class name used for round tripping."/>
+        <ECProperty propertyName="CheckOutId" typeName="int" description="Holds the Checkout Id Number for the relationship."/>
         <Source multiplicity="(0..1)" roleLabel="Equipment has Design Case" polymorphic="true">
             <Class class="EQUIPMENT"/>
         </Source>
@@ -2190,6 +2216,7 @@
     <ECRelationshipClass typeName="EQUIPMENT_HAS_INSTRUMENT_NOZZLE" displayLabel="Equipment Has Instrument Nozzle" modifier="None" strength="referencing">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Holds OpenPlant class name used for round tripping."/>
+        <ECProperty propertyName="CheckOutId" typeName="int" description="Holds the Checkout Id Number for the relationship."/>
         <Source multiplicity="(0..1)" roleLabel="refers to" polymorphic="true">
             <Class class="EQUIPMENT"/>
         </Source>
@@ -2209,6 +2236,7 @@
     <ECRelationshipClass typeName="EQUIPMENT_HAS_INSULATION" displayLabel="Equipment Has Insulation" modifier="None" strength="referencing">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Holds OpenPlant class name used for round tripping."/>
+        <ECProperty propertyName="CheckOutId" typeName="int" description="Holds the Checkout Id Number for the relationship."/>
         <Source multiplicity="(0..1)" roleLabel="refers to" polymorphic="true">
             <Class class="EQUIPMENT"/>
         </Source>
@@ -2222,6 +2250,7 @@
     <ECRelationshipClass typeName="EQUIPMENT_HAS_MANWAY" displayLabel="Equipment Has Manway" modifier="None" strength="referencing">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Holds OpenPlant class name used for round tripping."/>
+        <ECProperty propertyName="CheckOutId" typeName="int" description="Holds the Checkout Id Number for the relationship."/>
         <Source multiplicity="(0..1)" roleLabel="Equipment Has Manway" polymorphic="true">
             <Class class="EQUIPMENT"/>
         </Source>
@@ -2232,6 +2261,7 @@
     <ECRelationshipClass typeName="EQUIPMENT_HAS_NOZZLE" displayLabel="Equipment Has Nozzle" modifier="None" strength="referencing">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Holds OpenPlant class name used for round tripping."/>
+        <ECProperty propertyName="CheckOutId" typeName="int" description="Holds the Checkout Id Number for the relationship."/>
         <Source multiplicity="(0..1)" roleLabel="Equipment Has Nozzle" polymorphic="true">
             <Class class="EQUIPMENT"/>
         </Source>
@@ -2249,6 +2279,7 @@
     <ECRelationshipClass typeName="EQUIPMENT_HAS_UNIT_OP" description="Equipment is derived from Simulation unit operation" displayLabel="Equipment has UnitOp" modifier="None" strength="referencing">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Holds OpenPlant class name used for round tripping."/>
+        <ECProperty propertyName="CheckOutId" typeName="int" description="Holds the Checkout Id Number for the relationship."/>
         <Source multiplicity="(0..*)" roleLabel="Equipment has UnitOp" polymorphic="true">
             <Class class="EQUIPMENT"/>
         </Source>
@@ -2259,6 +2290,7 @@
     <ECRelationshipClass typeName="EQUIPMENT_IS_DRIVEN_BY_DRIVER" displayLabel="Equipment Is Driven By Driver" modifier="None" strength="referencing">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Holds OpenPlant class name used for round tripping."/>
+        <ECProperty propertyName="CheckOutId" typeName="int" description="Holds the Checkout Id Number for the relationship."/>
         <Source multiplicity="(0..1)" roleLabel="Equipment Is Driven By Driver" polymorphic="true">
             <Class class="EQUIPMENT"/>
         </Source>
@@ -2492,6 +2524,7 @@
     <ECRelationshipClass typeName="HVACSYSTEM_HAS_SEGMENT" displayLabel="HvacSystem Has Segment" modifier="None" strength="referencing">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Holds OpenPlant class name used for round tripping."/>
+        <ECProperty propertyName="CheckOutId" typeName="int" description="Holds the Checkout Id Number for the relationship."/>
         <Source multiplicity="(0..1)" roleLabel="refers to" polymorphic="true">
             <Class class="HVAC_NETWORK_SYSTEM"/>
         </Source>
@@ -2538,6 +2571,7 @@
     <ECRelationshipClass typeName="INSTRUMENT_HAS_INPUT" description="Instrument has Instrument Input" displayLabel="Instrument has Instrument Input" modifier="None" strength="referencing">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Holds OpenPlant class name used for round tripping."/>
+        <ECProperty propertyName="CheckOutId" typeName="int" description="Holds the Checkout Id Number for the relationship."/>
         <Source multiplicity="(0..1)" roleLabel="refers to" polymorphic="true">
             <Class class="INSTRUMENT"/>
         </Source>
@@ -2548,6 +2582,7 @@
     <ECRelationshipClass typeName="INSTRUMENT_HAS_OUTPUT" description="(Deprecated) instrument has instrument output" displayLabel="(Deprecated) Instrument has Instrument Output" modifier="None" strength="referencing">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Holds OpenPlant class name used for round tripping."/>
+        <ECProperty propertyName="CheckOutId" typeName="int" description="Holds the Checkout Id Number for the relationship."/>
         <Source multiplicity="(0..1)" roleLabel="refers to" polymorphic="true">
             <Class class="INSTRUMENT"/>
         </Source>
@@ -2561,6 +2596,7 @@
     <ECRelationshipClass typeName="INSTRUMENT_NOZZLE_CONNECTS_TO_SIGNALLINE" displayLabel="Instrument Nozzle Connects To Signal Line" modifier="None" strength="referencing">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Holds OpenPlant class name used for round tripping."/>
+        <ECProperty propertyName="CheckOutId" typeName="int" description="Holds the Checkout Id Number for the relationship."/>
         <Source multiplicity="(0..1)" roleLabel="refers to" polymorphic="true">
             <Class class="INSTRUMENT_NOZZLE"/>
         </Source>
@@ -2601,6 +2637,7 @@
     <ECRelationshipClass typeName="Instrument_Has_Terminal_Strip" displayLabel="Instrument Has Terminal Strip" modifier="None" strength="referencing">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Holds OpenPlant class name used for round tripping."/>
+        <ECProperty propertyName="CheckOutId" typeName="int" description="Holds the Checkout Id Number for the relationship."/>
         <Source multiplicity="(0..1)" roleLabel="Instrument Has Terminal Strip" polymorphic="true">
             <Class class="INSTRUMENT"/>
         </Source>
@@ -2611,6 +2648,7 @@
     <ECRelationshipClass typeName="Instrument_Is_Allocated_To_IO_Channel" displayLabel="Instrument Is Allocated To IO Channel" modifier="None" strength="referencing">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Holds OpenPlant class name used for round tripping."/>
+        <ECProperty propertyName="CheckOutId" typeName="int" description="Holds the Checkout Id Number for the relationship."/>
         <Source multiplicity="(0..1)" roleLabel="Instrument Is Allocated To IO Channel" polymorphic="true">
             <Class class="INSTRUMENT"/>
         </Source>
@@ -2657,6 +2695,7 @@
     <ECRelationshipClass typeName="LOOP_HAS_INSTRUMENT" displayLabel="Loop has Instrument" modifier="None" strength="referencing">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Holds OpenPlant class name used for round tripping."/>
+        <ECProperty propertyName="CheckOutId" typeName="int" description="Holds the Checkout Id Number for the relationship."/>
         <Source multiplicity="(0..1)" roleLabel="Loop has Instrument" polymorphic="true">
             <Class class="LOOP"/>
         </Source>
@@ -2667,6 +2706,7 @@
     <ECRelationshipClass typeName="LOOP_HAS_OBJECT" description="Relationship between a Loop and a Plant Base Object" displayLabel="Loop Has Object" modifier="None" strength="referencing">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Holds OpenPlant class name used for round tripping."/>
+        <ECProperty propertyName="CheckOutId" typeName="int" description="Holds the Checkout Id Number for the relationship."/>
         <Source multiplicity="(0..1)" roleLabel="refers to" polymorphic="true">
             <Class class="LOOP"/>
         </Source>
@@ -2763,6 +2803,7 @@
     <ECRelationshipClass typeName="NOZZLE_CONNECTS_TO_SEGMENT" description="Nozzle on device conects to Piping Network Segment" displayLabel="Nozzle Connects To Segment" modifier="None" strength="referencing">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Holds OpenPlant class name used for round tripping."/>
+        <ECProperty propertyName="CheckOutId" typeName="int" description="Holds the Checkout Id Number for the relationship."/>
         <Source multiplicity="(0..*)" roleLabel="Nozzle Connects To Segment" polymorphic="true">
             <Class class="NOZZLE"/>
         </Source>
@@ -2773,6 +2814,7 @@
     <ECRelationshipClass typeName="OBJECT_HAS_INSTRUMENT" displayLabel="Object Has Instrument" modifier="None" strength="referencing">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Holds OpenPlant class name used for round tripping."/>
+        <ECProperty propertyName="CheckOutId" typeName="int" description="Holds the Checkout Id Number for the relationship."/>
         <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="true">
             <Class class="PLANT_BASE_OBJECT"/>
         </Source>
@@ -2808,6 +2850,7 @@
     <ECRelationshipClass typeName="Object_Connects_To_Object" displayLabel="Object Connects To Object" modifier="None" strength="referencing">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Holds OpenPlant class name used for round tripping."/>
+        <ECProperty propertyName="CheckOutId" typeName="int" description="Holds the Checkout Id Number for the relationship."/>
         <Source multiplicity="(0..*)" roleLabel="Object Connects To Object" polymorphic="true">
             <Class class="PLANT_BASE_OBJECT"/>
         </Source>
@@ -2818,6 +2861,7 @@
     <ECRelationshipClass typeName="Object_Has_Object" displayLabel="Object Has Object" modifier="None" strength="referencing">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Holds OpenPlant class name used for round tripping."/>
+        <ECProperty propertyName="CheckOutId" typeName="int" description="Holds the Checkout Id Number for the relationship."/>
         <Source multiplicity="(0..1)" roleLabel="Object Has Object" polymorphic="true">
             <Class class="PLANT_BASE_OBJECT"/>
         </Source>
@@ -2828,6 +2872,7 @@
     <ECRelationshipClass typeName="Object_Is_Driven_By_Object" displayLabel="Object Is Driven By Object" modifier="None" strength="referencing">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Holds OpenPlant class name used for round tripping."/>
+        <ECProperty propertyName="CheckOutId" typeName="int" description="Holds the Checkout Id Number for the relationship."/>
         <Source multiplicity="(0..1)" roleLabel="Object Is Driven By Object" polymorphic="true">
             <Class class="PLANT_BASE_OBJECT"/>
         </Source>
@@ -2838,6 +2883,7 @@
     <ECRelationshipClass typeName="Object_Is_Related_To_Object" displayLabel="Object Is Related To Object" modifier="None" strength="referencing">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Holds OpenPlant class name used for round tripping."/>
+        <ECProperty propertyName="CheckOutId" typeName="int" description="Holds the Checkout Id Number for the relationship."/>
         <Source multiplicity="(0..1)" roleLabel="Object Is Related To Object" polymorphic="true">
             <Class class="PLANT_BASE_OBJECT"/>
         </Source>
@@ -2874,6 +2920,7 @@
     <ECRelationshipClass typeName="PIPELINE_HAS_SEGMENT" displayLabel="Pipeline Has Segment" modifier="None" strength="referencing">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Holds OpenPlant class name used for round tripping."/>
+        <ECProperty propertyName="CheckOutId" typeName="int" description="Holds the Checkout Id Number for the relationship."/>
         <Source multiplicity="(0..1)" roleLabel="Pipeline Has Segment" polymorphic="true">
             <Class class="PIPING_NETWORK_SYSTEM"/>
         </Source>
@@ -2884,6 +2931,7 @@
     <ECRelationshipClass typeName="PIPELINE_HAS_STREAM" displayLabel="Pipeline Has Stream" modifier="None" strength="referencing">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Holds OpenPlant class name used for round tripping."/>
+        <ECProperty propertyName="CheckOutId" typeName="int" description="Holds the Checkout Id Number for the relationship."/>
         <Source multiplicity="(0..1)" roleLabel="refers to" polymorphic="true">
             <Class class="PIPING_NETWORK_SYSTEM"/>
         </Source>
@@ -2980,6 +3028,7 @@
     <ECRelationshipClass typeName="PLANT_AREA_HAS_NAMED_ITEM" description="Plant Area Has Device" displayLabel="Plant Area Has Named Item" modifier="None" strength="referencing">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Holds OpenPlant class name used for round tripping."/>
+        <ECProperty propertyName="CheckOutId" typeName="int" description="Holds the Checkout Id Number for the relationship."/>
         <Source multiplicity="(0..*)" roleLabel="Plant Area Has Named Item" polymorphic="true">
             <Class class="PLANT_AREA"/>
         </Source>
@@ -2990,6 +3039,7 @@
     <ECRelationshipClass typeName="PLANT_AREA_HAS_PIPING_COMPONENT" displayLabel="Plant Area Has Piping Component" modifier="None" strength="referencing">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Holds OpenPlant class name used for round tripping."/>
+        <ECProperty propertyName="CheckOutId" typeName="int" description="Holds the Checkout Id Number for the relationship."/>
         <Source multiplicity="(0..1)" roleLabel="Plant Area Has Piping Component" polymorphic="true">
             <Class class="PLANT_AREA"/>
         </Source>
@@ -3000,6 +3050,7 @@
     <ECRelationshipClass typeName="PLANT_HAS_NAMED_ITEM" displayLabel="Plant Has Named Item" modifier="None" strength="referencing">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Holds OpenPlant class name used for round tripping."/>
+        <ECProperty propertyName="CheckOutId" typeName="int" description="Holds the Checkout Id Number for the relationship."/>
         <Source multiplicity="(0..1)" roleLabel="refers to" polymorphic="true">
             <Class class="PLANT"/>
         </Source>
@@ -3136,6 +3187,7 @@
     <ECRelationshipClass typeName="Panel_Has_Card" displayLabel="Panel Has Card" modifier="None" strength="referencing">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Holds OpenPlant class name used for round tripping."/>
+        <ECProperty propertyName="CheckOutId" typeName="int" description="Holds the Checkout Id Number for the relationship."/>
         <Source multiplicity="(0..1)" roleLabel="Panel Has Card" polymorphic="true">
             <Class class="PANEL"/>
         </Source>
@@ -3146,6 +3198,7 @@
     <ECRelationshipClass typeName="Panel_Has_Device" displayLabel="Panel Has Device" modifier="None" strength="referencing">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Holds OpenPlant class name used for round tripping."/>
+        <ECProperty propertyName="CheckOutId" typeName="int" description="Holds the Checkout Id Number for the relationship."/>
         <Source multiplicity="(0..1)" roleLabel="Panel Has Device" polymorphic="true">
             <Class class="PANEL"/>
         </Source>
@@ -3156,6 +3209,7 @@
     <ECRelationshipClass typeName="Panel_Has_Instrument" displayLabel="Panel Has Instrument" modifier="None" strength="referencing">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Holds OpenPlant class name used for round tripping."/>
+        <ECProperty propertyName="CheckOutId" typeName="int" description="Holds the Checkout Id Number for the relationship."/>
         <Source multiplicity="(0..1)" roleLabel="Panel Has Instrument" polymorphic="true">
             <Class class="PANEL"/>
         </Source>
@@ -3166,6 +3220,7 @@
     <ECRelationshipClass typeName="Panel_Has_Terminal_Strip" displayLabel="Panel Has Terminal Strip" modifier="None" strength="referencing">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Holds OpenPlant class name used for round tripping."/>
+        <ECProperty propertyName="CheckOutId" typeName="int" description="Holds the Checkout Id Number for the relationship."/>
         <Source multiplicity="(0..1)" roleLabel="Panel Has Terminal Strip" polymorphic="true">
             <Class class="PANEL"/>
         </Source>
@@ -3193,6 +3248,7 @@
     <ECRelationshipClass typeName="REDUCER_CONNECTS_TO_SEGMENT" description="Relationship between an Pipe Reducer and a Piping Network Segment" displayLabel="Reducer Connects To Segment" modifier="None" strength="referencing">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Holds OpenPlant class name used for round tripping."/>
+        <ECProperty propertyName="CheckOutId" typeName="int" description="Holds the Checkout Id Number for the relationship."/>
         <Source multiplicity="(0..*)" roleLabel="Reducer Connects To Segment" polymorphic="true">
             <Class class="PIPE_REDUCER"/>
         </Source>
@@ -3259,6 +3315,7 @@
     <ECRelationshipClass typeName="SEGMENT_CONNECTS_TO_NODE" displayLabel="Segment Connects to Node" modifier="None" strength="referencing">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Holds OpenPlant class name used for round tripping."/>
+        <ECProperty propertyName="CheckOutId" typeName="int" description="Holds the Checkout Id Number for the relationship."/>
         <Source multiplicity="(0..1)" roleLabel="Segment Connects To Node" polymorphic="true">
             <Class class="PIPING_NETWORK_SEGMENT"/>
         </Source>
@@ -3269,6 +3326,7 @@
     <ECRelationshipClass typeName="SEGMENT_CONNECTS_TO_PROCESS_CONNECTOR" displayLabel="Segment Connects To Process Connector" modifier="None" strength="referencing">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Holds OpenPlant class name used for round tripping."/>
+        <ECProperty propertyName="CheckOutId" typeName="int" description="Holds the Checkout Id Number for the relationship."/>
         <Source multiplicity="(0..1)" roleLabel="Segment Connects To Process Connector" polymorphic="true">
             <Class class="PIPING_NETWORK_SEGMENT"/>
         </Source>
@@ -3279,6 +3337,7 @@
     <ECRelationshipClass typeName="SEGMENT_CONNECTS_TO_SEGMENT" description="Relationship between two Piping Network Segments" displayLabel="Segment Connects To Segment" modifier="None" strength="referencing">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Holds OpenPlant class name used for round tripping."/>
+        <ECProperty propertyName="CheckOutId" typeName="int" description="Holds the Checkout Id Number for the relationship."/>
         <Source multiplicity="(0..*)" roleLabel="Segment Connects To Segment" polymorphic="true">
             <Class class="PIPING_NETWORK_SEGMENT"/>
         </Source>
@@ -3289,6 +3348,7 @@
     <ECRelationshipClass typeName="SEGMENT_CONNECTS_TO_SIGNALLINE" displayLabel="Segment Connects To SignalLine" modifier="None" strength="referencing">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Holds OpenPlant class name used for round tripping."/>
+        <ECProperty propertyName="CheckOutId" typeName="int" description="Holds the Checkout Id Number for the relationship."/>
         <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="true">
             <Class class="PIPING_NETWORK_SEGMENT"/>
         </Source>
@@ -3299,6 +3359,7 @@
     <ECRelationshipClass typeName="SEGMENT_HAS_FLOW_ELEMENT" displayLabel="Segment Has Flow Element" modifier="None" strength="referencing">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Holds OpenPlant class name used for round tripping."/>
+        <ECProperty propertyName="CheckOutId" typeName="int" description="Holds the Checkout Id Number for the relationship."/>
         <Source multiplicity="(0..1)" roleLabel="refers to" polymorphic="true">
             <Class class="PIPING_NETWORK_SEGMENT"/>
         </Source>
@@ -3309,6 +3370,7 @@
     <ECRelationshipClass typeName="SEGMENT_HAS_HEAD_EQUIPMENT" description="Piping Network Segment has Head Equipment" displayLabel="Segment Has Head Equipment" modifier="None" strength="referencing">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Holds OpenPlant class name used for round tripping."/>
+        <ECProperty propertyName="CheckOutId" typeName="int" description="Holds the Checkout Id Number for the relationship."/>
         <Source multiplicity="(0..1)" roleLabel="Segment Has Head Equipment" polymorphic="true">
             <Class class="PIPING_NETWORK_SEGMENT"/>
         </Source>
@@ -3319,6 +3381,7 @@
     <ECRelationshipClass typeName="SEGMENT_HAS_INSTRUMENT" displayLabel="Segment Has Instrument" modifier="None" strength="referencing">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Holds OpenPlant class name used for round tripping."/>
+        <ECProperty propertyName="CheckOutId" typeName="int" description="Holds the Checkout Id Number for the relationship."/>
         <Source multiplicity="(0..1)" roleLabel="Segment Has Instrument" polymorphic="true">
             <Class class="PIPING_NETWORK_SEGMENT"/>
         </Source>
@@ -3329,6 +3392,7 @@
     <ECRelationshipClass typeName="SEGMENT_HAS_PIPING_COMPONENT" displayLabel="Segment Has Piping Component" modifier="None" strength="referencing">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Holds OpenPlant class name used for round tripping."/>
+        <ECProperty propertyName="CheckOutId" typeName="int" description="Holds the Checkout Id Number for the relationship."/>
         <Source multiplicity="(0..*)" roleLabel="Segment Has Piping Component" polymorphic="true">
             <Class class="PIPING_NETWORK_SEGMENT"/>
         </Source>
@@ -3339,6 +3403,7 @@
     <ECRelationshipClass typeName="SEGMENT_HAS_STREAM" description="Pipeline Segment is Derived From Stream" displayLabel="Segment Has Stream" modifier="None" strength="referencing">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Holds OpenPlant class name used for round tripping."/>
+        <ECProperty propertyName="CheckOutId" typeName="int" description="Holds the Checkout Id Number for the relationship."/>
         <Source multiplicity="(0..1)" roleLabel="Segment Has Stream" polymorphic="true">
             <Class class="PIPING_NETWORK_SEGMENT"/>
         </Source>
@@ -3349,6 +3414,7 @@
     <ECRelationshipClass typeName="SEGMENT_HAS_TAIL_EQUIPMENT" description="Piping Network Segment has Tail Equipment" displayLabel="Segment Has Tail Equipment" modifier="None" strength="referencing">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Holds OpenPlant class name used for round tripping."/>
+        <ECProperty propertyName="CheckOutId" typeName="int" description="Holds the Checkout Id Number for the relationship."/>
         <Source multiplicity="(0..1)" roleLabel="Segment Has Tail Equipment" polymorphic="true">
             <Class class="PIPING_NETWORK_SEGMENT"/>
         </Source>
@@ -3442,6 +3508,7 @@
     <ECRelationshipClass typeName="SERVICE_IS_RELATED_TO_NAMED_ITEM" displayLabel="Service Is Related to Named Item" modifier="None" strength="referencing">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Holds OpenPlant class name used for round tripping."/>
+        <ECProperty propertyName="CheckOutId" typeName="int" description="Holds the Checkout Id Number for the relationship."/>
         <Source multiplicity="(0..1)" roleLabel="Service Is Related to Named Item" polymorphic="true">
             <Class class="SERVICE"/>
         </Source>
@@ -3461,6 +3528,7 @@
     <ECRelationshipClass typeName="SIGNALLINE_CONNECTS_TO_INSTRUMENT" displayLabel="Signal Line Connects To Instrument" modifier="None" strength="referencing">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Holds OpenPlant class name used for round tripping."/>
+        <ECProperty propertyName="CheckOutId" typeName="int" description="Holds the Checkout Id Number for the relationship."/>
         <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="true">
             <Class class="SIGNALLINE"/>
         </Source>
@@ -3474,6 +3542,7 @@
     <ECRelationshipClass typeName="SIGNALLINE_CONNECTS_TO_SIGNAL_CONNECTOR" displayLabel="Signal Line Connects To Signal Connector" modifier="None" strength="referencing">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Holds OpenPlant class name used for round tripping."/>
+        <ECProperty propertyName="CheckOutId" typeName="int" description="Holds the Checkout Id Number for the relationship."/>
         <Source multiplicity="(0..1)" roleLabel="Signal Line Connects To Signal Connector" polymorphic="true">
             <Class class="SIGNALLINE"/>
         </Source>
@@ -3667,6 +3736,7 @@
     <ECRelationshipClass typeName="SYSTEM_HAS_NAMED_ITEM" description="Abstract Relationship" displayLabel="System has Named Item" modifier="None" strength="referencing">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Holds OpenPlant class name used for round tripping."/>
+        <ECProperty propertyName="CheckOutId" typeName="int" description="Holds the Checkout Id Number for the relationship."/>
         <Source multiplicity="(0..1)" roleLabel="refers to" polymorphic="true">
             <Class class="SYSTEM"/>
         </Source>
@@ -3840,6 +3910,7 @@
     <ECRelationshipClass typeName="TRAYLINE_HAS_SEGMENT" displayLabel="TrayLine Has Segment" modifier="None" strength="referencing">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Holds OpenPlant class name used for round tripping."/>
+        <ECProperty propertyName="CheckOutId" typeName="int" description="Holds the Checkout Id Number for the relationship."/>
         <Source multiplicity="(0..1)" roleLabel="Trayline Has Segment" polymorphic="true">
             <Class class="TRAY_NETWORK_SYSTEM"/>
         </Source>
@@ -3856,6 +3927,7 @@
     <ECRelationshipClass typeName="UNIT_HAS_NAMED_ITEM" displayLabel="Unit Has Named Item" modifier="None" strength="referencing">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Holds OpenPlant class name used for round tripping."/>
+        <ECProperty propertyName="CheckOutId" typeName="int" description="Holds the Checkout Id Number for the relationship."/>
         <Source multiplicity="(0..1)" roleLabel="Unit Has Named Item" polymorphic="true">
             <Class class="UNIT"/>
         </Source>
