@@ -13,6 +13,38 @@
     <ECSchemaReference name="AecUnits" version="01.00.00" alias="AECU" />
     <ECSchemaReference name="CoreCustomAttributes" version="01.00.00" alias="CoreCA" />
 
+    
+    <ECEntityClass typeName="ObjectDefinitionElement">
+        <BaseClass>bis:DefinitionElement</BaseClass>
+    </ECEntityClass>
+
+    
+    <ECEntityClass typeName="BuildingObject">
+        <BaseClass>ObjectDefinitionElement</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.01.00.00" />
+        </ECCustomAttributes>
+    </ECEntityClass>
+    
+    <ECEntityClass typeName="IEntity" modifier="Abstract" displayLabel="Entity" description="An interface that indicates that an element is an entity of an object">
+        <ECCustomAttributes>
+            <IsMixin xmlns="CoreCustomAttributes.01.00.00">
+                <AppliesToEntityClass>bis:Element</AppliesToEntityClass>
+            </IsMixin>
+        </ECCustomAttributes>
+        <ECNavigationProperty propertyName="ObjectDefinition" relationshipName="ObjectDefinitionConsistsOfEntities" direction="Backward" description="The Object definition of this entity" />
+    </ECEntityClass>
+    
+    <ECRelationshipClass typeName="ObjectDefinitionConsistsOfEntities" strength="embedding" modifier="None">
+      <!-- Relationship that indicates a decomposition of child AllocatedVolume -->
+      <Source multiplicity="(1..1)" roleLabel="composes of" polymorphic="true">
+        <Class class="ObjectDefinitionElement"/>
+      </Source>
+      <Target multiplicity="(0..*)" roleLabel="is part of" polymorphic="true">
+        <Class class="IEntity"/>
+      </Target>
+    </ECRelationshipClass>
+
     <ECRelationshipClass typeName="AllocatedVolumeDecomposesToElements" strength="embedding" modifier="None">
       <!-- Relationship that indicates a decomposition of child AllocatedVolume -->
       <Source multiplicity="(0..1)" roleLabel="composes of" polymorphic="true">
