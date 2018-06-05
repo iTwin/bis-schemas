@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ECSchema schemaName="BisCore" alias="bis" version="01.00.00" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.1" displayLabel="BIS Core" description="The BIS core classes that all other domain schemas extend.">
+<ECSchema schemaName="BisCore" alias="bis" version="01.00.01" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.1" displayLabel="BIS Core" description="The BIS core classes that all other domain schemas extend.">
 
     <ECSchemaReference name="CoreCustomAttributes" version="01.00.00" alias="CoreCA"/>
     <ECSchemaReference name="ECDbMap" version="02.00.00" alias="ecdbmap"/>
@@ -254,7 +254,7 @@
         </ECCustomAttributes>
     </ECEntityClass>
 
-    <ECRelationshipClass typeName="ModelOwnsSubModel" strength="embedding" modifier="Sealed">
+    <ECRelationshipClass typeName="ModelOwnsSubModel" strength="embedding" modifier="Sealed" description="The relationship that is used to build a model hierarchy index. This is done for performance reasons, rather than data modeling reasons.">
         <!-- @see Model.ParentModel ECNavigationProperty -->
         <Source multiplicity="(0..1)" roleLabel="owns sub" polymorphic="true">
             <Class class="Model"/>
@@ -264,7 +264,7 @@
         </Target>
     </ECRelationshipClass>
 
-    <ECRelationshipClass typeName="ModelContainsElements" strength="embedding" modifier="Sealed" description="Associates Elements with a Model">
+    <ECRelationshipClass typeName="ModelContainsElements" strength="embedding" modifier="Sealed" description="The relationship that enforces that each Element belongs to exactly one Model.">
         <!-- @see Element.Model ECNavigationProperty -->
         <Source multiplicity="(1..1)" roleLabel="contains" polymorphic="true">
             <Class class="Model"/>
@@ -282,7 +282,7 @@
             </IsMixin>
         </ECCustomAttributes>
     </ECEntityClass>
-    <ECRelationshipClass typeName="ModelModelsElement" strength="embedding" strengthDirection="Backward" modifier="None">
+    <ECRelationshipClass typeName="ModelModelsElement" strength="embedding" strengthDirection="Backward" modifier="None" description="Relates a Model to the Element which it describes or breaks down into more detail.">
         <!-- @see Model.ModeledElement ECNavigationProperty -->
         <Source multiplicity="(0..1)" roleLabel="models" polymorphic="true">
             <Class class="Model"/>
@@ -1186,9 +1186,9 @@
             </IsMixin>
         </ECCustomAttributes>
     </ECEntityClass>
-    <ECRelationshipClass typeName="ElementOwnsChildElements" strength="embedding" modifier="None">
+    <ECRelationshipClass typeName="ElementOwnsChildElements" strength="embedding" modifier="None" description="Relates an Element to child Elements which represent parts of the Entity modeled by the parent Element.">
         <!-- @see Element.Parent ECNavigationProperty -->
-        <!-- WIP: Should be abstract? -->
+        <!-- NOTE: Was not made abstract because of too many legacy situations. -->
         <Source multiplicity="(0..1)" roleLabel="owns child" polymorphic="true">
             <Class class="Element"/>
         </Source>
@@ -1196,8 +1196,7 @@
             <Class class="Element"/>
         </Target>
     </ECRelationshipClass>
-    <ECRelationshipClass typeName="ElementEncapsulatesElements" strength="embedding" modifier="None">
-        <!-- Relationship that indicates that child elements are "hidden" -->
+    <ECRelationshipClass typeName="ElementEncapsulatesElements" strength="embedding" modifier="None" description="A relationship that indicates that child Elements are meant to be hidden.">
         <BaseClass>ElementOwnsChildElements</BaseClass>
         <Source multiplicity="(0..1)" roleLabel="encapsulates" polymorphic="true">
             <Class class="Element"/>
@@ -1206,8 +1205,7 @@
             <Class class="Element"/>
         </Target>
     </ECRelationshipClass>
-    <ECRelationshipClass typeName="PhysicalElementAssemblesElements" strength="embedding" modifier="None">
-        <!-- Relationship that indicates a physical assembly of child PhysicalElements -->
+    <ECRelationshipClass typeName="PhysicalElementAssemblesElements" strength="embedding" modifier="None" description="A relationship that indicates a physical assembly of child PhysicalElements.">
         <BaseClass>ElementOwnsChildElements</BaseClass>
         <Source multiplicity="(0..1)" roleLabel="assembles" polymorphic="true">
             <Class class="PhysicalElement"/>
@@ -1870,10 +1868,20 @@
         </ECProperty>
     </ECEntityClass>
 
-    <ECRelationshipClass typeName="DrawingGraphicRepresentsElement" strength="referencing" modifier="None">
+    <ECRelationshipClass typeName="DrawingGraphicRepresentsElement" strength="referencing" modifier="None" description="Relates a 2D DrawingGraphic to the Element that it represents.">
         <BaseClass>ElementRefersToElements</BaseClass>
         <Source multiplicity="(0..*)" roleLabel="represents" polymorphic="true">
             <Class class="DrawingGraphic"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is represented by" polymorphic="true">
+            <Class class="Element"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="GraphicalElement3dRepresentsElement" strength="referencing" modifier="None" description="Relates a 3D graphical annotation to the Element that it represents.">
+        <BaseClass>ElementRefersToElements</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="represents" polymorphic="true">
+            <Class class="GraphicalElement3d"/>
         </Source>
         <Target multiplicity="(0..*)" roleLabel="is represented by" polymorphic="true">
             <Class class="Element"/>
