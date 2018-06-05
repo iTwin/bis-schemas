@@ -87,3 +87,13 @@ The Team is owned by the schema owner, which gives them the ability to add/remov
 A build is set up to validate schemas against a set of [validation rules](https://imodeljs.github.io/iModelJs-docs-output/bis/intro/bis-schema-validation/). Additionally, it performs a difference audit of all schemas against their latest released version, if one exists. The validation and difference logs are published as build artifacts and made accessible. 
 
 
+
+
+
+*This section is a work in progress*
+
+### iModel Schema Validation
+
+The iModel Schema Validation tool imports each individual schema in the bis-schema repository (along with schema references) into an local snapshot iModel. The schemas are then exported to a temp directory in order to perform the required validations. 
+
+ To use it, simply add the 'BIS - Verify iModel Schemas' task to any build definition and fill out a few parameters to specify the iModel name, project ID, and IMS credentials. See the iModel Schema Validation -- sample build definition for an example.
