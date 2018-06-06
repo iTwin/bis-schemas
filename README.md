@@ -21,7 +21,6 @@ All tooling will be under the "tools" directory at the root of the repository.
 The BIS Schemas all live under the "Domains" directory, off the root, and will be broken up based on domain. Each domain will have their own directory, this provides the [permissions](#managing-permissions-to-bis-schema) control to the domain owner. All domains are placed under the "Domains" directory. How the each domain directory is split up will be up to their discretion.
 
 Example:
-
 ```
 \Domains\Core\
 \Domains\Core\BisCore.ecschema.xml
@@ -48,15 +47,15 @@ All other changes made outside of a domain directory will require review by a re
 An owner of a BIS Schema can move their Schema from Mercurial to this repository being the new Single-Source-Of-Truth with a few simple steps,
 
 1. Ensure all consumers of the current Part delivering the Schema has Git installed. This proactively avoids not being able to successfully pull/build.
-    - Update all PRG/Firebug Product builds to add Git as a build dependency
+    + Update all PRG/Firebug Product builds to add Git as a build dependency
 2. 
-
-    - 
-    
+    + Now create a related part and prewire.mke file. 
+    + 
+    + Use the `Core` part and its associated make file as a guide.
 3. Identify the owner of the Schema and request the appropriate permissions.
-    - See [Schema Permissions](#managing-permissions-to-bis-schema) for more information.
+    + See [Schema Permissions](#managing-permissions-to-bis-schema) for more information.
 4. Request a final merge from Mercurial to Git.
-    - Remove [file map](tools/hg2git/all_bis/filemaps) for individual Schema. 
+    + Remove [file map](tools/hg2git/all_bis/filemaps) for individual Schema. 
 5. 
 6. Remove schemas from Mercurial.
 7. Your BIS Schema is now officially moved!
