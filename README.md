@@ -95,4 +95,13 @@ A build is set up to validate schemas against a set of [validation rules](https:
 
 The iModel Schema Validation tool imports each individual schema in the bis-schema repository (along with schema references) into an local snapshot iModel. The schemas are then exported to a temp directory in order to perform the required validations. 
 
- To use it, simply add the 'BIS - Verify iModel Schemas' task to any build definition and fill out a few parameters to specify the iModel name, project ID, and IMS credentials. See the iModel Schema Validation -- sample build definition for an example.
+
+
+2. Add the 'BIS - Verify iModel Schemas' task and fill out the following parameters:
+    - iModelName
+    - hubProjectID
+    - hubEnvironment
+    - hubUserName
+    - hubPassWord
+
+See the iModel Schema Validation -- sample build definition for an example.
