@@ -3,7 +3,7 @@
     <ECSchemaReference name="ECDbMap" version="02.00.00" alias="ecdbmap"/>
     <ECSchemaReference name="BisCore" version="01.00.00" alias="bis"/>
     <ECSchemaReference name="LinearReferencing" version="01.00.00" alias="lr"/>
-    <!--<ECSchemaReference name="RoadRailPhysical" version="01.00.00" alias="rrp"/>-->
+    <ECSchemaReference name="RoadRailAlignment" version="01.00.00" alias="rralign"/>
     <ECSchemaReference name="StructuralPhysical" alias="sp" version="01.00.00" />
     <KindOfQuantity typeName="LENGTH" displayLabel="LENGTH" persistenceUnit="M" relativeError="1e-2" />
     <KindOfQuantity typeName="LENGTH_SHORT" displayLabel="LENGTH" persistenceUnit="M" relativeError="1e-2" />
@@ -42,16 +42,6 @@
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.01.00.00"/>>
         </ECCustomAttributes>
-    </ECEntityClass>
-    <ECEntityClass typeName="SupportLine" modifier="Sealed" displayLabel="Support Line" description="2D Lines indicating where supports will meet supersertructre/Deck">
-        <BaseClass>bis:SpatialLocationElement</BaseClass>
-        <BaseClass>lr:ILinearElement</BaseClass>
-        <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00.00"/>
-        </ECCustomAttributes>
-        <ECProperty propertyName="Skew" typeName="double" kindOfQuantity="PLANE_ANGLE" displayLabel="Skew" description="Skew angle of support relative to deck perpendicular (0 is perpendicular to alignment)" />
-        <ECProperty propertyName="Length" typeName="double" displayLabel="Length" kindOfQuantity="LENGTH" />
-        <ECProperty propertyName="DistanceAlongHorizontalAlignment" typeName="double" kindOfQuantity="LENGTH" displayLabel="Distance Along Horizontal"/>
     </ECEntityClass>
     <ECEntityClass typeName="BridgeSupport" modifier="Sealed" description="Physical element head of an assembly, linearly-located, supporting a bridge." >
         <BaseClass>bis:PhysicalElement</BaseClass>
@@ -102,7 +92,27 @@
         </Target>
     </ECRelationshipClass>
     <!-- END Elements -->
-
+    <!-- BEGIN Plan Elements -->
+    <ECEntityClass typeName="SupportLine" modifier="Sealed" displayLabel="Support Line" description="2D Lines indicating where supports will meet supersertructre/Deck">
+        <BaseClass>bis:SpatialLocationElement</BaseClass>
+        <BaseClass>lr:ILinearElement</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.01.00.00"/>
+        </ECCustomAttributes>
+        <ECProperty propertyName="Skew" typeName="double" kindOfQuantity="PLANE_ANGLE" displayLabel="Skew" description="Skew angle of support relative to deck perpendicular (0 is perpendicular to alignment)" />
+        <ECProperty propertyName="Length" typeName="double" displayLabel="Length" kindOfQuantity="LENGTH" />
+        <ECProperty propertyName="DistanceAlongHorizontalAlignment" typeName="double" kindOfQuantity="LENGTH" displayLabel="Distance Along Horizontal"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="AlignmentOwnsSupportLines" strength="embedding" modifier="Sealed">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(1..1)" polymorphic="true" roleLabel="owns support lines">
+            <Class class="rralign:Alignment"/>
+        </Source>
+        <Target multiplicity="(0..*)" polymorphic="false" roleLabel="assembles N support lines">
+            <Class class="SupportLine"/>
+        </Target>
+    </ECRelationshipClass>
+    <!-- END Plan Elements -->
     <!-- BEGIN Superstructure Elements -->
     <ECEntityClass typeName="BridgeSuperstructureElement" modifier="Abstract" description="Base class for the element describing a Bridge superstructure Cross-Section." >
         <BaseClass>bis:PhysicalElement</BaseClass>
@@ -207,7 +217,7 @@
         </Target>
     </ECRelationshipClass>
     <!-- END Superstructure Elements -->
-
+    
     <!-- BEGIN BridgeSubstructure Elements -->
     <ECEntityClass typeName="VirtualBridgeSubstructure" modifier="Sealed">
         <BaseClass>BridgeSubstructureElement</BaseClass>
