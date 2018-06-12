@@ -11,14 +11,47 @@
     <ECSchemaReference name="AecUnits" version="01.00.00" alias="AECU" />
     <ECSchemaReference name="CoreCustomAttributes" version="01.00.00" alias="CoreCA" />
 
-    <ECEntityClass typeName="GridCurvesPortion">
+    <ECEntityClass typeName="GridCurvesPortion" description="a portion which holds GridCurves" >
       <BaseClass>bis:SpatialLocationPortion</BaseClass>
       <ECCustomAttributes>
         <ClassHasHandler xmlns="BisCore.01.00.00" />
       </ECCustomAttributes>
     </ECEntityClass>
 
-    <ECRelationshipClass typeName="GridDrivesGridSurface" modifier="None" strength="referencing">
+    <ECEntityClass typeName="GridCurveBundle" displayLabel="GridCurve bundle">
+      <BaseClass>bis:DriverBundleElement</BaseClass>
+      <ECCustomAttributes>
+        <ClassHasHandler xmlns="BisCore.01.00.00" />
+      </ECCustomAttributes>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="GridSurfaceDrivesGridCurveBundle" modifier="None" strength="referencing" description="a driving relationship which tells that gridsurface influences the creation of GridCurve">
+      <BaseClass>bis:ElementDrivesElement</BaseClass>
+      <ECCustomAttributes>
+        <ClassHasHandler xmlns="BisCore.01.00.00"/>
+      </ECCustomAttributes>
+      <Source multiplicity="(0..*)" roleLabel="influences" polymorphic="true">
+        <Class class="GridSurface"/>
+      </Source>
+      <Target multiplicity="(0..*)" roleLabel="is influenced by" polymorphic="true">
+        <Class class="GridCurveBundle"/>
+      </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="GridCurveBundleCreatesGridCurve" modifier="None" strength="referencing" description="a driving relationship which tells that gridcurve was created by the mapped GridCurveBundle">
+      <BaseClass>bis:ElementDrivesElement</BaseClass>
+      <ECCustomAttributes>
+        <ClassHasHandler xmlns="BisCore.01.00.00"/>
+      </ECCustomAttributes>
+      <Source multiplicity="(1..1)" roleLabel="creates" polymorphic="true">
+        <Class class="GridCurveBundle"/>
+      </Source>
+      <Target multiplicity="(0..1)" roleLabel="is created by" polymorphic="true">
+        <Class class="GridCurve"/>
+      </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="GridDrivesGridSurface" modifier="None" strength="referencing" description="a driving relationship which tells that a grid is driving a gridsurface.">
       <BaseClass>bis:ElementDrivesElement</BaseClass>
       <ECCustomAttributes>
         <ClassHasHandler xmlns="BisCore.01.00.00"/>
@@ -31,7 +64,7 @@
       </Target>
     </ECRelationshipClass>
   
-    <ECRelationshipClass typeName="GridSurfaceCreatesGridCurve" modifier="None" strength="referencing">
+    <ECRelationshipClass typeName="GridSurfaceCreatesGridCurve" modifier="None" strength="referencing" description="a driving relationship which tells that gridcurve was created by the mapped gridsurface">
       <BaseClass>bis:ElementDrivesElement</BaseClass>
       <ECCustomAttributes>
         <ClassHasHandler xmlns="BisCore.01.00.00"/>
@@ -44,7 +77,7 @@
       </Target>
     </ECRelationshipClass>
 
-    <ECRelationshipClass typeName="GridHasAxes" strength="referencing" modifier="None">
+    <ECRelationshipClass typeName="GridHasAxes" strength="embedding" modifier="None" description="maps grid to its axes">
       <Source multiplicity="(1..1)" roleLabel="Has Axis" polymorphic="true">
         <Class class="Grid"/>
       </Source>
@@ -53,7 +86,7 @@
       </Target>
     </ECRelationshipClass>
 
-    <ECRelationshipClass typeName="GridAxisContainsGridSurfaces" modifier="None" strength="embedding">
+    <ECRelationshipClass typeName="GridAxisContainsGridSurfaces" modifier="None" strength="embedding" description="maps axis to grouped surfaces">
       <Source multiplicity="(1..1)" roleLabel="contains" polymorphic="true">
         <Class class="GridAxis"/>
       </Source>
@@ -62,74 +95,74 @@
       </Target>
     </ECRelationshipClass>
   
-    <ECEntityClass typeName="GridAxis" modifier="Abstract">
+    <ECEntityClass typeName="GridAxis" modifier="Abstract" description="an element which groups (typically parallel) GridSurfaces">
       <BaseClass>bis:DefinitionElement</BaseClass>
       <ECProperty propertyName="Name" displayLabel="Name" typeName="string"/>
       <ECNavigationProperty propertyName="Grid" relationshipName="GridHasAxes" direction="Backward" description="Grid this axis belong to" />
     </ECEntityClass>
   
-    <ECEntityClass typeName="OrthogonalAxisX">
+    <ECEntityClass typeName="OrthogonalAxisX" description="an element which groups all PlanCartesianGridSurface in the X direction">
       <BaseClass>GridAxis</BaseClass>
       <ECCustomAttributes>
         <ClassHasHandler xmlns="BisCore.01.00.00" />
       </ECCustomAttributes>
     </ECEntityClass>
   
-    <ECEntityClass typeName="OrthogonalAxisY">
+    <ECEntityClass typeName="OrthogonalAxisY" description="an element which groups all PlanCartesianGridSurface in the Y direction">
       <BaseClass>GridAxis</BaseClass>
       <ECCustomAttributes>
         <ClassHasHandler xmlns="BisCore.01.00.00" />
       </ECCustomAttributes>
     </ECEntityClass>
       
-    <ECEntityClass typeName="CircularAxis">
+    <ECEntityClass typeName="CircularAxis" description="an element which groups all PlanCircumferentialGridSurface in a RadialGrid together">
       <BaseClass>GridAxis</BaseClass>
       <ECCustomAttributes>
         <ClassHasHandler xmlns="BisCore.01.00.00" />
       </ECCustomAttributes>
     </ECEntityClass>
   
-    <ECEntityClass typeName="RadialAxis">
+    <ECEntityClass typeName="RadialAxis" description="an element which groups all PlanRadialGridSurface in a RadialGrid together">
       <BaseClass>GridAxis</BaseClass>
       <ECCustomAttributes>
         <ClassHasHandler xmlns="BisCore.01.00.00" />
       </ECCustomAttributes>
     </ECEntityClass>
   
-    <ECEntityClass typeName="GeneralGridAxis">
+    <ECEntityClass typeName="GeneralGridAxis" description="an element which groups GridSurfaces together in other grids">
       <BaseClass>GridAxis</BaseClass>
       <ECCustomAttributes>
         <ClassHasHandler xmlns="BisCore.01.00.00" />
       </ECCustomAttributes>
     </ECEntityClass>
   
-    <ECEntityClass typeName="GridCurve" modifier="Abstract">
+    <ECEntityClass typeName="GridCurve" modifier="Abstract" description="an element representing a gridcurve - typically intersection of 2 surfaces">
       <BaseClass>bis:SpatialLocationElement</BaseClass>
     </ECEntityClass>
 
 
-    <ECEntityClass typeName="GeneralGridCurve">
+    <ECEntityClass typeName="GeneralGridCurve" description="a gridcurve that is a result of 2 non-planar surfaces">
       <BaseClass>GridCurve</BaseClass>
       <ECCustomAttributes>
         <ClassHasHandler xmlns="BisCore.01.00.00" />
       </ECCustomAttributes>
     </ECEntityClass>
   
-    <ECEntityClass typeName="GridLine">
+    <ECEntityClass typeName="GridLine" description="a gridcurve that is a result of 2 planar surfaces">
       <BaseClass>GridCurve</BaseClass>
       <ECCustomAttributes>
         <ClassHasHandler xmlns="BisCore.01.00.00" />
       </ECCustomAttributes>
     </ECEntityClass>
 
-    <ECEntityClass typeName="GridSpline">
+    <ECEntityClass typeName="GridSpline" description="a gridcurve that is a result of a planar and a spline surface">
       <BaseClass>GridCurve</BaseClass>
       <ECCustomAttributes>
         <ClassHasHandler xmlns="BisCore.01.00.00" />
       </ECCustomAttributes>
     </ECEntityClass>
 
-    <ECEntityClass typeName="GridArc">
+    <ECEntityClass typeName="GridArc" description="a gridcurve that is a result of a planar and arc surface">
       <BaseClass>GridCurve</BaseClass>
       <ECCustomAttributes>
         <ClassHasHandler xmlns="BisCore.01.00.00" />
@@ -165,7 +198,7 @@
       <BaseClass>GridSurface</BaseClass>
     </ECEntityClass>
 
-    <ECEntityClass typeName="GridSplineSurface" modifier="Abstract" description="A grid surface that is an extruded spline.">
+    <ECEntityClass typeName="GridSplineSurface" modifier="Abstract" description="A grid surface that is parallel to an extruded spline.">
       <BaseClass>GridSurface</BaseClass>
     </ECEntityClass>
 
@@ -229,7 +262,7 @@
       </ECCustomAttributes>
     </ECEntityClass>
 
-    <ECEntityClass typeName="IPlanGridSurface" modifier="Abstract" displayLabel="PlanGrid Surface" description="An interface that indicates that this Surface is suitable to be placed in PlanGrid" >
+    <ECEntityClass typeName="IPlanGridSurface" modifier="Abstract" displayLabel="PlanGrid Surface" description="An interface that indicates that this Surface is suitable to be placed in a PlanGrid" >
       <ECCustomAttributes>
         <IsMixin xmlns="CoreCustomAttributes.01.00.00">
           <!-- Only subclasses of grids:GridSurface can implement the IPlanGridSurface interface -->
@@ -296,7 +329,7 @@
       <ECProperty propertyName="Arc2d" displayLabel="Arc2d" typeName="Bentley.Geometry.Common.IGeometry"/>
     </ECEntityClass>
   
-    <ECEntityClass typeName="PlanGridSplineSurface" modifier="Abstract" description="An arc plangrid surface element.">
+    <ECEntityClass typeName="PlanGridSplineSurface" modifier="Abstract" description="A spline plangrid surface element.">
       <BaseClass>GridSplineSurface</BaseClass>
       <BaseClass>IPlanGridSurface</BaseClass>
     </ECEntityClass>
