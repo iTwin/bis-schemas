@@ -11,6 +11,10 @@ from shutil import copy
 import sys
 from BisConstants import SCHEMA_EXTENSION, RELEASED_SCHEMA_EXTENSION_REGEX
 
+# Array of schemas to pull
+schema_list = []
+schema_list.append("BisCore.ecschema.xml")
+
 # Return a string of last directory in a given path
 def getLastDirInPath(path):
     return os.path.basename(os.path.normpath(path))
@@ -53,9 +57,10 @@ def findAllNonReleaseSchemaPaths(schemaDirRoot):
 # directory, copies all the xml schemas within the root
 # or directories in the root to the output directory
 def __collectAllNonReleaseSchemaFiles(schemaDirRoot, outDir):
-  # Copy the files that are found into the dir
+  # Copy the files that are found and in the schema_list into the dir
   for schemaFile in findAllNonReleaseSchemaPaths(schemaDirRoot):
-    copy(schemaFile, outDir)
+    if os.path.split(schemaFile)[-1] in schema_list:
+        copy(schemaFile, outDir)
 
 # Copies all non-release xml schemas into the specified
 # output directory
