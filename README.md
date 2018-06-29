@@ -120,5 +120,8 @@ The iModel Schema Validation tool imports each individual schema in the bis-sche
     - hubEnvironment
     - hubUserName
     - hubPassWord
+   
+ 
+
 
 See the iModel Schema Validation -- sample build definition for an example.
