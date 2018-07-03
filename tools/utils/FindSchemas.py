@@ -5,16 +5,11 @@
 #
 #  $Copyright: (c) 2018 Bentley Systems, Incorporated. All rights reserved. $
 #
-#-----------------------------------------------------------------------------------
+#--------------------------------------------------------------------------------------
 import os
 from shutil import copy
 import sys
 from BisConstants import SCHEMA_EXTENSION, RELEASED_SCHEMA_EXTENSION_REGEX
-
-# Array of schemas to pull
-schema_list = []
-schema_list.append("BisCore.ecschema.xml")
-schema_list.append("Grids.ecschema.xml")
 
 # Return a string of last directory in a given path
 def getLastDirInPath(path):
@@ -40,7 +35,7 @@ def generateSchemaDirectoryLists(schemaDirectory):
 # directories within that directory
 def findAllNonReleaseSchemaPaths(schemaDirRoot):
   # Recursively find all the directories that contain schemas
-  schemaDirectories = generateSchemaDirectoryLists(schemaDirRoot);
+  schemaDirectories = generateSchemaDirectoryLists(schemaDirRoot)
 
   # Just grab the non-release schemas
   schemaDirectories = schemaDirectories[0]
@@ -58,10 +53,9 @@ def findAllNonReleaseSchemaPaths(schemaDirRoot):
 # directory, copies all the xml schemas within the root
 # or directories in the root to the output directory
 def __collectAllNonReleaseSchemaFiles(schemaDirRoot, outDir):
-  # Copy the files that are found and in the schema_list into the dir
+  # Copy the files
   for schemaFile in findAllNonReleaseSchemaPaths(schemaDirRoot):
-    if os.path.split(schemaFile)[-1] in schema_list:
-        copy(schemaFile, outDir)
+    copy(schemaFile, outDir)
 
 # Copies all non-release xml schemas into the specified
 # output directory
