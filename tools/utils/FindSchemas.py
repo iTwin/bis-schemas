@@ -14,6 +14,7 @@ from BisConstants import SCHEMA_EXTENSION, RELEASED_SCHEMA_EXTENSION_REGEX
 # Array of schemas to pull
 schema_list = []
 schema_list.append("BisCore.ecschema.xml")
+schema_list.append("Grids.ecschema.xml")
 
 # Return a string of last directory in a given path
 def getLastDirInPath(path):
