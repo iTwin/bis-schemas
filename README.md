@@ -120,6 +120,7 @@ The iModel Schema Validation tool imports each individual schema in the bis-sche
     - hubEnvironment
     - hubUserName
     - hubPassWord
+        - It is recommended that you use a Secret variable for the password. Under the 'Variables' section, add a new variable and select the lock icon to make it secret. In the hubPassWord field, you can then use the variable like this: `$(variableName)`
    
  
 
