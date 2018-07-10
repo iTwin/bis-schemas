@@ -27,205 +27,6 @@
         <ECProperty propertyName="FileName" typeName="string"/>
     </ECCustomAttributeClass>
     <!-- END CustomAttributes and Enums -->
-
-    <!-- BEGIN Elements -->
-    <ECEntityClass typeName="Bridge" modifier="Sealed" description="Physical bridge supporting a segment of a road or rail." >
-        <BaseClass>bis:PhysicalElement</BaseClass>
-        <BaseClass>lr:ILinearElement</BaseClass>
-        <BaseClass>lr:ILinearlyLocatedElement</BaseClass>
-        <BaseClass>bis:ISubModeledElement</BaseClass>
-        <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00.00"/>>
-        </ECCustomAttributes>
-    </ECEntityClass>
-    <ECRelationshipClass typeName="PhysicalModelBreaksDownBridgeElement" strength="embedding" strengthDirection="Backward" modifier="Sealed" description="Relationship enabling break-down of an Physical Bridge Element into its constituent components">
-        <BaseClass>bis:ModelModelsElement</BaseClass>
-        <Source multiplicity="(0..1)" polymorphic="false" roleLabel="breaks down">
-            <Class class="bis:PhysicalModel"/>
-        </Source>
-        <Target multiplicity="(1..1)" polymorphic="false" roleLabel="is broken down by">
-            <Class class="Bridge"/>
-        </Target>
-    </ECRelationshipClass>
-
-    <ECEntityClass typeName="BridgeSubstructure" modifier="Abstract" description="Physical element aggregating all Substructure Elements" >
-        <BaseClass>bis:PhysicalElement</BaseClass>
-        <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00.00"/>
-        </ECCustomAttributes>
-    </ECEntityClass>
-    <ECRelationshipClass typeName="BridgeSubstructureAssemblesSubstructureElements" strength="embedding" modifier="Sealed">
-      <BaseClass>bis:PhysicalElementAssemblesElements</BaseClass>
-      <Source multiplicity="(0..1)" polymorphic="false" roleLabel="is owned by 1 bridge substructure">
-        <Class class="BridgeSubstructure"/>
-      </Source>
-      <Target multiplicity="(0..*)" polymorphic="true" roleLabel="owns N substructure elements">
-        <Class class="BridgeSubstructureElement"/>
-      </Target>
-    </ECRelationshipClass>
-    <ECEntityClass typeName="BridgeSuperstructure" modifier="Abstract" description="Physical element aggregating all Superstructure Elements" >
-        <BaseClass>bis:PhysicalElement</BaseClass>
-        <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00.00"/>
-        </ECCustomAttributes>
-    </ECEntityClass>
-    <ECEntityClass typeName="SuperstructureElement" modifier="Abstract" description="Base class for the element describing a Bridge superstructure component" >
-        <BaseClass>bis:PhysicalElement</BaseClass>
-        <BaseClass>lr:ILinearlyLocatedElement</BaseClass>
-        <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00"/>
-        </ECCustomAttributes>
-    </ECEntityClass>
-    <ECRelationshipClass typeName="BridgeSuperstructureAssemblesSuperstructureElements" strength="embedding" modifier="Sealed">
-      <BaseClass>bis:PhysicalElementAssemblesElements</BaseClass>
-      <Source multiplicity="(0..1)" polymorphic="false" roleLabel="is owned by 1 bridge substructure">
-        <Class class="BridgeSuperstructure"/>
-      </Source>
-      <Target multiplicity="(0..*)" polymorphic="true" roleLabel="owns N substructure elements">
-        <Class class="SuperstructureElement"/>
-      </Target>
-    </ECRelationshipClass>
-    <ECEntityClass typeName="IBridgeSubstructureMember" modifier="Abstract" description="Base mix-in for physical Elements to be a part of a Bridge Support" >
-        <ECCustomAttributes>
-            <IsMixin xmlns='CoreCustomAttributes.01.00'>
-                <AppliesToEntityClass>bis:PhysicalElement</AppliesToEntityClass> <!-- Should be structural member? -->
-            </IsMixin>
-            <ClassHasHandler xmlns="BisCore.01.00.00"/>
-        </ECCustomAttributes>
-    </ECEntityClass>
-    <ECRelationshipClass typeName="BridgeSubstructureElementAssemblesIBridgeSubstructureMembers" strength="embedding" modifier="Sealed">
-      <BaseClass>bis:PhysicalElementAssemblesElements</BaseClass>
-      <Source multiplicity="(0..1)" polymorphic="false" roleLabel="is owned by 1 bridge support">
-        <Class class="BridgeSubstructureElement"/>
-      </Source>
-      <Target multiplicity="(0..*)" polymorphic="true" roleLabel="owns N support members">
-        <Class class="IBridgeSubstructureMember"/>
-      </Target>
-    </ECRelationshipClass>
-    <ECEntityClass typeName="IBridgeSuperstructureMember" modifier="Abstract" description="Base mix-in for physical Elements to be a part of a Bridge SuperstructureElement" >
-        <ECCustomAttributes>
-            <IsMixin xmlns='CoreCustomAttributes.01.00'>
-                <AppliesToEntityClass>bis:PhysicalElement</AppliesToEntityClass> <!-- Should be structural member? -->
-            </IsMixin>
-            <ClassHasHandler xmlns="BisCore.01.00.00"/>
-        </ECCustomAttributes>
-    </ECEntityClass>
-    <ECRelationshipClass typeName="SuperstructureElementAssemblesIBridgeSuperstructureMembers" strength="embedding" modifier="Sealed">
-      <BaseClass>bis:PhysicalElementAssemblesElements</BaseClass>
-      <Source multiplicity="(0..1)" polymorphic="false" roleLabel="is owned by 1 bridge support">
-        <Class class="SuperstructureElement"/>
-      </Source>
-      <Target multiplicity="(0..*)" polymorphic="true" roleLabel="owns N support members">
-        <Class class="IBridgeSuperstructureMember"/>
-      </Target>
-    </ECRelationshipClass>
-
-    <ECEntityClass typeName="BridgeSubstructureElement" modifier="Abstract" description="Base class for physical elements describing substructures of a bridge." >
-        <BaseClass>bis:PhysicalElement</BaseClass>
-        <BaseClass>lr:ILinearlyLocatedElement</BaseClass>
-        <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00.00"/>
-        </ECCustomAttributes>
-    </ECEntityClass>
-    <ECEntityClass typeName="GenericBridgeSupport" modifier="Sealed" description="Generic Support type that can contain any configuration of IBridgeSubstructureMembers" >
-        <BaseClass>BridgeSubstructureElement</BaseClass>
-        <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00.00"/>
-        </ECCustomAttributes>
-    </ECEntityClass>
-    <ECEntityClass typeName="Strut" modifier="Sealed" description="Brace connecting columns" >
-        <BaseClass>sp:StructuralMember</BaseClass>
-        <BaseClass>IBridgeSubstructureMember</BaseClass>
-        <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00.00"/>
-        </ECCustomAttributes>
-    </ECEntityClass>
-    <ECEntityClass typeName="DrilledShaft" modifier="Sealed" description="Drilled Shaft for a Support" >
-        <BaseClass>sp:StructuralMember</BaseClass>
-        <BaseClass>IBridgeSubstructureMember</BaseClass>
-        <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00.00"/>
-        </ECCustomAttributes>
-    </ECEntityClass>
-    <ECEntityClass typeName="RockSocket" modifier="Sealed" description="A Socket with rocks for a Support" >
-        <BaseClass>sp:StructuralMember</BaseClass>
-        <BaseClass>IBridgeSubstructureMember</BaseClass>
-        <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00.00"/>
-        </ECCustomAttributes>
-    </ECEntityClass>    
-    <ECEntityClass typeName="BridgeSupportColumn">
-        <BaseClass>sp:Column</BaseClass>
-        <BaseClass>IBridgeSubstructureMember</BaseClass>
-        <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00"/>
-        </ECCustomAttributes>
-        <ECArrayProperty propertyName="ColumnsSpacing" typeName="double" description="List of column spacings with respect to the left side of the pier, from spacing between col_1-2 to col_(n-2)-(n-1)." displayLabel="Columns spacing" minOccurs="0" maxOccurs="unbounded" kindOfQuantity="LENGTH" />
-    </ECEntityClass>
-    <ECEntityClass typeName="BeamSeat" modifier="Sealed" description="Seat that connects Beam with the rest of the substructure" >
-        <BaseClass>sp:StructuralMember</BaseClass>
-        <BaseClass>IBridgeSubstructureMember</BaseClass>
-        <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00.00"/>
-        </ECCustomAttributes>
-    </ECEntityClass>
-    <ECEntityClass typeName="SupportCap" modifier="Sealed" description="Cap that sits on top of the rest of the substructure and connects to beam seat or superstructure" >
-        <BaseClass>sp:StructuralMember</BaseClass>
-        <BaseClass>IBridgeSubstructureMember</BaseClass>
-        <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00.00"/>
-        </ECCustomAttributes>
-    </ECEntityClass>
-    <ECEntityClass typeName="SupportSpreadFooting" modifier="Sealed" description="Spread Footing for a Bridge Support" >
-        <BaseClass>sp:SpreadFooting</BaseClass>
-        <BaseClass>IBridgeSubstructureMember</BaseClass>
-        <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00.00"/>
-        </ECCustomAttributes>
-    </ECEntityClass>
-    <ECEntityClass typeName="SupportStripFooting" modifier="Sealed" description="Strip Footing for a Bridge Support" >
-        <BaseClass>sp:StripFooting</BaseClass>
-        <BaseClass>IBridgeSubstructureMember</BaseClass>
-        <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00.00"/>
-        </ECCustomAttributes>
-    </ECEntityClass>
-    <ECEntityClass typeName="SupportPileCap" modifier="Sealed" description="Pile Cap for a Bridge Support" >
-        <BaseClass>sp:PileCap</BaseClass>
-        <BaseClass>IBridgeSubstructureMember</BaseClass>
-        <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00.00"/>
-        </ECCustomAttributes>
-    </ECEntityClass>
-    <ECEntityClass typeName="SupportPile" modifier="Sealed" description="Pile for a Bridge Support" >
-        <BaseClass>sp:Pile</BaseClass>
-        <BaseClass>IBridgeSubstructureMember</BaseClass>
-        <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00.00"/>
-        </ECCustomAttributes>
-    </ECEntityClass>
-        <ECEntityClass typeName="WingWall">
-        <BaseClass>sp:Wall</BaseClass>
-        <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00"/>
-        </ECCustomAttributes>
-        <ECProperty propertyName="Depth" typeName="double" displayLabel="Depth" kindOfQuantity="LENGTH" />
-        <ECProperty propertyName="LongSideWidth" typeName="double" displayLabel="Long-side Width" kindOfQuantity="LENGTH"/>
-        <ECProperty propertyName="ShortSideWidth" typeName="double" displayLabel="Short-side Width" kindOfQuantity="LENGTH"/>
-        <ECProperty propertyName="LongSideHeight" typeName="double" displayLabel="Long-side Height" kindOfQuantity="LENGTH_SHORT"/>
-        <ECProperty propertyName="ShortSideHeight" typeName="double" displayLabel="Short-side Height" kindOfQuantity="LENGTH_SHORT"/>
-        <ECProperty propertyName="Skew" typeName="double" displayLabel="Skew" kindOfQuantity="PLANE_ANGLE" />
-        <ECProperty propertyName="LongitudinalOffset" typeName="double" displayLabel="Offset - Longitudinal" kindOfQuantity="LENGTH_SHORT"/>
-        <ECProperty propertyName="TransversalOffset" typeName="double" displayLabel="Offset - Transversal" kindOfQuantity="LENGTH_SHORT"/>
-        <ECProperty propertyName="VerticalOffset" typeName="double" displayLabel="Offset - Vertical" kindOfQuantity="LENGTH_SHORT"/>
-    </ECEntityClass>
-    <ECEntityClass typeName="CantileveredWingWall" modifier="Sealed" displayLabel="Cantilevered">
-        <BaseClass>WingWall</BaseClass>
-        <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00"/>
-        </ECCustomAttributes>
-    </ECEntityClass>
-    <!-- END Elements -->
     <!-- BEGIN Plan Elements -->
     <ECEntityClass typeName="PlanLine"  displayLabel="Plan Line" description="2D Lines indicating along a linear element in a Bridge Model">
         <BaseClass>bis:SpatialLocationElement</BaseClass>
@@ -253,7 +54,320 @@
         </ECCustomAttributes>
     </ECEntityClass>
     <!-- END Plan Elements -->
+    <!-- BEGIN Bridge Items -->
+    <ECEntityClass typeName="Bridge" modifier="Sealed" description="Physical bridge supporting a segment of a road or rail." >
+        <BaseClass>bis:PhysicalElement</BaseClass>
+        <BaseClass>lr:ILinearElement</BaseClass>
+        <BaseClass>lr:ILinearlyLocatedElement</BaseClass>
+        <BaseClass>bis:ISubModeledElement</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.01.00.00"/>>
+        </ECCustomAttributes>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="PhysicalModelBreaksDownBridgeElement" strength="embedding" strengthDirection="Backward" modifier="Sealed" description="Relationship enabling break-down of an Physical Bridge Element into its constituent components">
+        <BaseClass>bis:ModelModelsElement</BaseClass>
+        <Source multiplicity="(0..1)" polymorphic="false" roleLabel="breaks down">
+            <Class class="bis:PhysicalModel"/>
+        </Source>
+        <Target multiplicity="(1..1)" polymorphic="false" roleLabel="is broken down by">
+            <Class class="Bridge"/>
+        </Target>
+    </ECRelationshipClass>
+    <!-- END Bridge Items -->
+    <!-- BEGIN SubstructureElements-->
+        <ECEntityClass typeName="BridgeSubstructure" modifier="Abstract" description="Physical element aggregating all Substructure Elements" >
+            <BaseClass>bis:PhysicalElement</BaseClass>
+            <ECCustomAttributes>
+                <ClassHasHandler xmlns="BisCore.01.00.00"/>
+            </ECCustomAttributes>
+        </ECEntityClass>
+        <ECEntityClass typeName="BridgeSubstructureElement" modifier="Abstract" description="Base class for physical elements describing substructures of a bridge." >
+            <BaseClass>bis:PhysicalElement</BaseClass>
+            <BaseClass>lr:ILinearlyLocatedElement</BaseClass>
+            <ECCustomAttributes>
+                <ClassHasHandler xmlns="BisCore.01.00.00"/>
+            </ECCustomAttributes>
+        </ECEntityClass>
+        <ECRelationshipClass typeName="BridgeSubstructureAssemblesSubstructureElements" strength="embedding" modifier="Sealed">
+        <BaseClass>bis:PhysicalElementAssemblesElements</BaseClass>
+        <Source multiplicity="(0..1)" polymorphic="false" roleLabel="is owned by 1 bridge substructure">
+            <Class class="BridgeSubstructure"/>
+        </Source>
+        <Target multiplicity="(0..*)" polymorphic="true" roleLabel="owns N substructure elements">
+            <Class class="BridgeSubstructureElement"/>
+        </Target>
+        </ECRelationshipClass>
+        <ECEntityClass typeName="IBridgeSubstructureMember" modifier="Abstract" description="Base mix-in for physical Elements to be a part of a Bridge Support" >
+            <ECCustomAttributes>
+                <IsMixin xmlns='CoreCustomAttributes.01.00'>
+                    <AppliesToEntityClass>bis:PhysicalElement</AppliesToEntityClass> <!-- Should be structural member? -->
+                </IsMixin>
+                <ClassHasHandler xmlns="BisCore.01.00.00"/>
+            </ECCustomAttributes>
+        </ECEntityClass>
+        <ECRelationshipClass typeName="BridgeSubstructureElementAssemblesIBridgeSubstructureMembers" strength="embedding" modifier="Sealed">
+        <BaseClass>bis:PhysicalElementAssemblesElements</BaseClass>
+        <Source multiplicity="(0..1)" polymorphic="false" roleLabel="is owned by 1 bridge support">
+            <Class class="BridgeSubstructureElement"/>
+        </Source>
+        <Target multiplicity="(0..*)" polymorphic="true" roleLabel="owns N support members">
+            <Class class="IBridgeSubstructureMember"/>
+        </Target>
+        </ECRelationshipClass>
+        <ECEntityClass typeName="GenericBridgeSupport" modifier="Sealed" description="Generic Support type that can contain any configuration of IBridgeSubstructureMembers" >
+            <BaseClass>BridgeSubstructureElement</BaseClass>
+            <ECCustomAttributes>
+                <ClassHasHandler xmlns="BisCore.01.00.00"/>
+            </ECCustomAttributes>
+        </ECEntityClass>
+        <ECEntityClass typeName="Strut" modifier="Sealed" description="Brace connecting columns" >
+            <BaseClass>sp:StructuralMember</BaseClass>
+            <BaseClass>IBridgeSubstructureMember</BaseClass>
+            <ECCustomAttributes>
+                <ClassHasHandler xmlns="BisCore.01.00.00"/>
+            </ECCustomAttributes>
+        </ECEntityClass>
+        <ECEntityClass typeName="DrilledShaft" modifier="Sealed" description="Drilled Shaft for a Support" >
+            <BaseClass>sp:StructuralMember</BaseClass>
+            <BaseClass>IBridgeSubstructureMember</BaseClass>
+            <ECCustomAttributes>
+                <ClassHasHandler xmlns="BisCore.01.00.00"/>
+            </ECCustomAttributes>
+        </ECEntityClass>
+        <ECEntityClass typeName="RockSocket" modifier="Sealed" description="A Socket with rocks for a Support" >
+            <BaseClass>sp:StructuralMember</BaseClass>
+            <BaseClass>IBridgeSubstructureMember</BaseClass>
+            <ECCustomAttributes>
+                <ClassHasHandler xmlns="BisCore.01.00.00"/>
+            </ECCustomAttributes>
+        </ECEntityClass>    
+        <ECEntityClass typeName="BridgeSupportColumn">
+            <BaseClass>sp:Column</BaseClass>
+            <BaseClass>IBridgeSubstructureMember</BaseClass>
+            <ECCustomAttributes>
+                <ClassHasHandler xmlns="BisCore.01.00"/>
+            </ECCustomAttributes>
+            <ECArrayProperty propertyName="ColumnsSpacing" typeName="double" description="List of column spacings with respect to the left side of the pier, from spacing between col_1-2 to col_(n-2)-(n-1)." displayLabel="Columns spacing" minOccurs="0" maxOccurs="unbounded" kindOfQuantity="LENGTH" />
+        </ECEntityClass>
+        <ECEntityClass typeName="BeamSeat" modifier="Sealed" description="Seat that connects Beam with the rest of the substructure" >
+            <BaseClass>sp:StructuralMember</BaseClass>
+            <BaseClass>IBridgeSubstructureMember</BaseClass>
+            <ECCustomAttributes>
+                <ClassHasHandler xmlns="BisCore.01.00.00"/>
+            </ECCustomAttributes>
+        </ECEntityClass>
+        <ECEntityClass typeName="SupportCap" modifier="Sealed" description="Cap that sits on top of the rest of the substructure and connects to beam seat or superstructure" >
+            <BaseClass>sp:StructuralMember</BaseClass>
+            <BaseClass>IBridgeSubstructureMember</BaseClass>
+            <ECCustomAttributes>
+                <ClassHasHandler xmlns="BisCore.01.00.00"/>
+            </ECCustomAttributes>
+        </ECEntityClass>
+        <ECEntityClass typeName="SupportSpreadFooting" modifier="Sealed" description="Spread Footing for a Bridge Support" >
+            <BaseClass>sp:SpreadFooting</BaseClass>
+            <BaseClass>IBridgeSubstructureMember</BaseClass>
+            <ECCustomAttributes>
+                <ClassHasHandler xmlns="BisCore.01.00.00"/>
+            </ECCustomAttributes>
+        </ECEntityClass>
+        <ECEntityClass typeName="SupportStripFooting" modifier="Sealed" description="Strip Footing for a Bridge Support" >
+            <BaseClass>sp:StripFooting</BaseClass>
+            <BaseClass>IBridgeSubstructureMember</BaseClass>
+            <ECCustomAttributes>
+                <ClassHasHandler xmlns="BisCore.01.00.00"/>
+            </ECCustomAttributes>
+        </ECEntityClass>
+        <ECEntityClass typeName="SupportPileCap" modifier="Sealed" description="Pile Cap for a Bridge Support" >
+            <BaseClass>sp:PileCap</BaseClass>
+            <BaseClass>IBridgeSubstructureMember</BaseClass>
+            <ECCustomAttributes>
+                <ClassHasHandler xmlns="BisCore.01.00.00"/>
+            </ECCustomAttributes>
+        </ECEntityClass>
+        <ECEntityClass typeName="SupportPile" modifier="Sealed" description="Pile for a Bridge Support" >
+            <BaseClass>sp:Pile</BaseClass>
+            <BaseClass>IBridgeSubstructureMember</BaseClass>
+            <ECCustomAttributes>
+                <ClassHasHandler xmlns="BisCore.01.00.00"/>
+            </ECCustomAttributes>
+        </ECEntityClass>
+            <ECEntityClass typeName="WingWall">
+            <BaseClass>sp:Wall</BaseClass>
+            <ECCustomAttributes>
+                <ClassHasHandler xmlns="BisCore.01.00"/>
+            </ECCustomAttributes>
+            <ECProperty propertyName="Depth" typeName="double" displayLabel="Depth" kindOfQuantity="LENGTH" />
+            <ECProperty propertyName="LongSideWidth" typeName="double" displayLabel="Long-side Width" kindOfQuantity="LENGTH"/>
+            <ECProperty propertyName="ShortSideWidth" typeName="double" displayLabel="Short-side Width" kindOfQuantity="LENGTH"/>
+            <ECProperty propertyName="LongSideHeight" typeName="double" displayLabel="Long-side Height" kindOfQuantity="LENGTH_SHORT"/>
+            <ECProperty propertyName="ShortSideHeight" typeName="double" displayLabel="Short-side Height" kindOfQuantity="LENGTH_SHORT"/>
+            <ECProperty propertyName="Skew" typeName="double" displayLabel="Skew" kindOfQuantity="PLANE_ANGLE" />
+            <ECProperty propertyName="LongitudinalOffset" typeName="double" displayLabel="Offset - Longitudinal" kindOfQuantity="LENGTH_SHORT"/>
+            <ECProperty propertyName="TransversalOffset" typeName="double" displayLabel="Offset - Transversal" kindOfQuantity="LENGTH_SHORT"/>
+            <ECProperty propertyName="VerticalOffset" typeName="double" displayLabel="Offset - Vertical" kindOfQuantity="LENGTH_SHORT"/>
+        </ECEntityClass>
+        <ECEntityClass typeName="CantileveredWingWall" modifier="Sealed" displayLabel="Cantilevered">
+            <BaseClass>WingWall</BaseClass>
+            <ECCustomAttributes>
+                <ClassHasHandler xmlns="BisCore.01.00"/>
+            </ECCustomAttributes>
+        </ECEntityClass>
+            <ECEntityClass typeName="PileCapAbutment" modifier="Sealed" displayLabel="Pile-Cap">
+            <BaseClass>BridgeSubstructureElement</BaseClass>
+            <ECCustomAttributes>
+                <ClassHasHandler xmlns="BisCore.01.00"/>
+            </ECCustomAttributes>
+        </ECEntityClass>
+        <ECEntityClass typeName="StemWallAbutment" displayLabel="Stem-Wall">
+            <BaseClass>BridgeSubstructureElement</BaseClass>
+            <ECCustomAttributes>
+                <ClassHasHandler xmlns="BisCore.01.00"/>
+            </ECCustomAttributes>
+        </ECEntityClass>
+        <!-- BEGIN BridgeSupportColumn Elements -->
+        <ECEntityClass typeName="CircularSupportColumn" displayLabel="Circular">
+            <BaseClass>BridgeSupportColumn</BaseClass>
+            <ECCustomAttributes>
+                <ClassHasHandler xmlns="BisCore.01.00"/>
+            </ECCustomAttributes>
+            <ECProperty propertyName="Diameter" typeName="double" description="Diameter of column support" displayLabel="Diameter" kindOfQuantity="DIAMETER"/>
+        </ECEntityClass>
+        <ECEntityClass typeName="RectangularSupportColumn" modifier="Sealed" displayLabel="Rectangular">
+            <BaseClass>BridgeSupportColumn</BaseClass>
+            <ECCustomAttributes>
+                <ClassHasHandler xmlns="BisCore.01.00"/>
+            </ECCustomAttributes>
+            <ECProperty propertyName="Width" typeName="double" description="Width of column support" displayLabel="Width" kindOfQuantity="LENGTH_SHORT"/>
+            <ECProperty propertyName="Depth" typeName="double" description="Depth of column support" displayLabel="Depth" kindOfQuantity="LENGTH_SHORT"/>
+        </ECEntityClass>
+        <ECEntityClass typeName="SquareSupportColumn" modifier="Sealed" displayLabel="Square Support Column">
+            <BaseClass>BridgeSupportColumn</BaseClass>
+            <ECCustomAttributes>
+                <ClassHasHandler xmlns="BisCore.01.00"/>
+            </ECCustomAttributes>
+            <ECProperty propertyName="Width" typeName="double" description="Width of column support" displayLabel="Width" kindOfQuantity="LENGTH_SHORT"/>
+        </ECEntityClass>
+        <ECEntityClass typeName="GenericSupportColumn" modifier="Sealed" displayLabel="Generic Support Column">
+            <BaseClass>BridgeSupportColumn</BaseClass>
+            <ECCustomAttributes>
+                <ClassHasHandler xmlns="BisCore.01.00"/>
+            </ECCustomAttributes>
+        </ECEntityClass>
+        <ECRelationshipClass typeName="RegularMultiColumnPierAssemblesColumns" strength="embedding" modifier="Sealed">
+            <BaseClass>bis:PhysicalElementAssemblesElements</BaseClass>
+            <Source multiplicity="(1..1)" polymorphic="true" roleLabel="is assembled by 1 pier">
+                <Class class="RegularMultiColumnPier"/>
+            </Source>
+            <Target multiplicity="(0..*)" polymorphic="true" roleLabel="assembles N pier columns">
+                <Class class="BridgeSupportColumn"/>
+            </Target>
+        </ECRelationshipClass>
+        <ECRelationshipClass typeName="PileBentPierAssemblesColumns" strength="embedding" modifier="Sealed">
+            <BaseClass>bis:PhysicalElementAssemblesElements</BaseClass>
+            <Source multiplicity="(1..1)" polymorphic="true" roleLabel="is assembled by 1 PileBent pier">
+                <Class class="PileBentPier"/>
+            </Source>
+            <Target multiplicity="(0..*)" polymorphic="true" roleLabel="assembles N Pile pier columns">
+                <Class class="BridgeSupportColumn"/>
+            </Target>
+        </ECRelationshipClass>
+        <!-- END BridgeSupportColumn Elements -->
+
+        <!-- BEGIN BridgePier Elements -->
+        <ECEntityClass typeName="RegularMultiColumnPier" modifier="Abstract" description="Base class for the element describing a Bridge pier with multiple columns." >
+            <BaseClass>BridgeSubstructureElement</BaseClass>
+            <ECCustomAttributes>
+                <ClassHasHandler xmlns="BisCore.01.00"/>
+            </ECCustomAttributes>
+        </ECEntityClass>
+        <ECEntityClass typeName="InvertedTCapPier" modifier="Sealed" displayLabel="Inverted T-Cap">
+            <BaseClass>RegularMultiColumnPier</BaseClass>
+            <ECCustomAttributes>
+                <ClassHasHandler xmlns="BisCore.01.00"/>
+            </ECCustomAttributes>
+        </ECEntityClass>
+        <ECEntityClass typeName="PileBentPier" displayLabel="Pile Bent">
+            <BaseClass>BridgeSubstructureElement</BaseClass>
+            <ECCustomAttributes>
+                <ClassHasHandler xmlns="BisCore.01.00"/>
+            </ECCustomAttributes>
+        </ECEntityClass>
+        <ECEntityClass typeName="HammerHeadPier" displayLabel="Hammer Head">
+            <BaseClass>BridgeSubstructureElement</BaseClass>
+            <ECCustomAttributes>
+                <ClassHasHandler xmlns="BisCore.01.00"/>
+            </ECCustomAttributes>
+            <ECProperty propertyName="TopWidth" typeName="double" description="Top Width of column support" displayLabel="Top Width" kindOfQuantity="LENGTH_SHORT"/>
+            <ECProperty propertyName="BottomWidth" typeName="double" description="Bottom Width of column support" displayLabel="Bottom Width" kindOfQuantity="LENGTH_SHORT"/>
+            <ECProperty propertyName="Depth" typeName="double" description="Depth of column support" displayLabel="Depth" kindOfQuantity="LENGTH_SHORT"/>
+        </ECEntityClass>
+        <ECEntityClass typeName="IntegralPier" displayLabel="Integral">
+            <BaseClass>RegularMultiColumnPier</BaseClass>
+            <ECCustomAttributes>
+                <ClassHasHandler xmlns="BisCore.01.00"/>
+            </ECCustomAttributes>
+        </ECEntityClass>
+        <ECEntityClass typeName="DropCapPier" displayLabel="Drop-Cap">
+            <BaseClass>RegularMultiColumnPier</BaseClass>
+            <ECCustomAttributes>
+                <ClassHasHandler xmlns="BisCore.01.00"/>
+            </ECCustomAttributes>
+        </ECEntityClass>
+        <ECEntityClass typeName="TaperedCapPier" displayLabel="Tapered-Cap">
+            <BaseClass>RegularMultiColumnPier</BaseClass>
+            <ECCustomAttributes>
+                <ClassHasHandler xmlns="BisCore.01.00"/>
+            </ECCustomAttributes>
+        </ECEntityClass>
+        <ECEntityClass typeName="WallPier" displayLabel="Wall">
+            <BaseClass>BridgeSubstructureElement</BaseClass>
+            <ECCustomAttributes>
+                <ClassHasHandler xmlns="BisCore.01.00"/>
+            </ECCustomAttributes>
+            <ECProperty propertyName="Depth" typeName="double" displayLabel="Wall depth" kindOfQuantity="LENGTH_SHORT" />
+        </ECEntityClass>
+        <!-- END BridgePier Elements-->
+    <!-- END SubstructureElements -->
     <!-- BEGIN Superstructure Elements -->
+    <ECEntityClass typeName="BridgeSuperstructure" modifier="Abstract" description="Physical element aggregating all Superstructure Elements" >
+        <BaseClass>bis:PhysicalElement</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.01.00.00"/>
+        </ECCustomAttributes>
+    </ECEntityClass>
+    <ECEntityClass typeName="SuperstructureElement" modifier="Abstract" description="Base class for the element describing a Bridge superstructure component" >
+        <BaseClass>bis:PhysicalElement</BaseClass>
+        <BaseClass>lr:ILinearlyLocatedElement</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.01.00"/>
+        </ECCustomAttributes>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="BridgeSuperstructureAssemblesSuperstructureElements" strength="embedding" modifier="Sealed">
+      <BaseClass>bis:PhysicalElementAssemblesElements</BaseClass>
+      <Source multiplicity="(0..1)" polymorphic="false" roleLabel="is owned by 1 bridge substructure">
+        <Class class="BridgeSuperstructure"/>
+      </Source>
+      <Target multiplicity="(0..*)" polymorphic="true" roleLabel="owns N substructure elements">
+        <Class class="SuperstructureElement"/>
+      </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="IBridgeSuperstructureMember" modifier="Abstract" description="Base mix-in for physical Elements to be a part of a Bridge SuperstructureElement" >
+        <ECCustomAttributes>
+            <IsMixin xmlns='CoreCustomAttributes.01.00'>
+                <AppliesToEntityClass>bis:PhysicalElement</AppliesToEntityClass> <!-- Should be structural member? -->
+            </IsMixin>
+            <ClassHasHandler xmlns="BisCore.01.00.00"/>
+        </ECCustomAttributes>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="SuperstructureElementAssemblesIBridgeSuperstructureMembers" strength="embedding" modifier="Sealed">
+      <BaseClass>bis:PhysicalElementAssemblesElements</BaseClass>
+      <Source multiplicity="(0..1)" polymorphic="false" roleLabel="is owned by 1 bridge support">
+        <Class class="SuperstructureElement"/>
+      </Source>
+      <Target multiplicity="(0..*)" polymorphic="true" roleLabel="owns N support members">
+        <Class class="IBridgeSuperstructureMember"/>
+      </Target>
+    </ECRelationshipClass>
     <ECEntityClass typeName="SimpleBeamSuperstructureElement" modifier="Abstract" description="Base class for the element describing a Simple beam Bridge superstructure Cross-Section." >
         <BaseClass>SuperstructureElement</BaseClass>
         <ECCustomAttributes>
@@ -281,121 +395,5 @@
             <ClassHasHandler xmlns="BisCore.01.00"/>
         </ECCustomAttributes>
     </ECEntityClass>
-    <ECEntityClass typeName="PileCapAbutment" modifier="Sealed" displayLabel="Pile-Cap">
-        <BaseClass>BridgeSubstructureElement</BaseClass>
-        <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00"/>
-        </ECCustomAttributes>
-    </ECEntityClass>
-    <!-- Segmental spans and balances-->
-    <ECEntityClass typeName="StemWallAbutment" displayLabel="Stem-Wall">
-        <BaseClass>BridgeSubstructureElement</BaseClass>
-        <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00"/>
-        </ECCustomAttributes>
-    </ECEntityClass>
-    <!-- END BridgeSubstructure Elements -->
-    <!-- BEGIN BridgeSupportColumn Elements -->
-    <ECEntityClass typeName="CircularSupportColumn" displayLabel="Circular">
-        <BaseClass>BridgeSupportColumn</BaseClass>
-        <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00"/>
-        </ECCustomAttributes>
-        <ECProperty propertyName="Diameter" typeName="double" description="Diameter of column support" displayLabel="Diameter" kindOfQuantity="DIAMETER"/>
-    </ECEntityClass>
-    <ECEntityClass typeName="RectangularSupportColumn" modifier="Sealed" displayLabel="Rectangular">
-        <BaseClass>BridgeSupportColumn</BaseClass>
-        <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00"/>
-        </ECCustomAttributes>
-        <ECProperty propertyName="Width" typeName="double" description="Width of column support" displayLabel="Width" kindOfQuantity="LENGTH_SHORT"/>
-        <ECProperty propertyName="Depth" typeName="double" description="Depth of column support" displayLabel="Depth" kindOfQuantity="LENGTH_SHORT"/>
-    </ECEntityClass>
-    <ECEntityClass typeName="SquareSupportColumn" modifier="Sealed" displayLabel="Square Support Column">
-        <BaseClass>BridgeSupportColumn</BaseClass>
-        <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00"/>
-        </ECCustomAttributes>
-        <ECProperty propertyName="Width" typeName="double" description="Width of column support" displayLabel="Width" kindOfQuantity="LENGTH_SHORT"/>
-    </ECEntityClass>
-    <ECEntityClass typeName="GenericSupportColumn" modifier="Sealed" displayLabel="Generic Support Column">
-        <BaseClass>BridgeSupportColumn</BaseClass>
-        <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00"/>
-        </ECCustomAttributes>
-    </ECEntityClass>
-    <ECRelationshipClass typeName="RegularMultiColumnPierAssemblesColumns" strength="embedding" modifier="Sealed">
-        <BaseClass>bis:PhysicalElementAssemblesElements</BaseClass>
-        <Source multiplicity="(1..1)" polymorphic="true" roleLabel="is assembled by 1 pier">
-            <Class class="RegularMultiColumnPier"/>
-        </Source>
-        <Target multiplicity="(0..*)" polymorphic="true" roleLabel="assembles N pier columns">
-            <Class class="BridgeSupportColumn"/>
-        </Target>
-    </ECRelationshipClass>
-    <ECRelationshipClass typeName="PileBentPierAssemblesColumns" strength="embedding" modifier="Sealed">
-        <BaseClass>bis:PhysicalElementAssemblesElements</BaseClass>
-        <Source multiplicity="(1..1)" polymorphic="true" roleLabel="is assembled by 1 PileBent pier">
-            <Class class="PileBentPier"/>
-        </Source>
-        <Target multiplicity="(0..*)" polymorphic="true" roleLabel="assembles N Pile pier columns">
-            <Class class="BridgeSupportColumn"/>
-        </Target>
-    </ECRelationshipClass>
-    <!-- END BridgeSupportColumn Elements -->
-
-    <!-- BEGIN BridgePier Elements -->
-    <ECEntityClass typeName="RegularMultiColumnPier" modifier="Abstract" description="Base class for the element describing a Bridge pier with multiple columns." >
-        <BaseClass>BridgeSubstructureElement</BaseClass>
-        <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00"/>
-        </ECCustomAttributes>
-    </ECEntityClass>
-    <ECEntityClass typeName="InvertedTCapPier" modifier="Sealed" displayLabel="Inverted T-Cap">
-        <BaseClass>RegularMultiColumnPier</BaseClass>
-        <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00"/>
-        </ECCustomAttributes>
-    </ECEntityClass>
-    <ECEntityClass typeName="PileBentPier" displayLabel="Pile Bent">
-        <BaseClass>BridgeSubstructureElement</BaseClass>
-        <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00"/>
-        </ECCustomAttributes>
-    </ECEntityClass>
-    <ECEntityClass typeName="HammerHeadPier" displayLabel="Hammer Head">
-        <BaseClass>BridgeSubstructureElement</BaseClass>
-        <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00"/>
-        </ECCustomAttributes>
-        <ECProperty propertyName="TopWidth" typeName="double" description="Top Width of column support" displayLabel="Top Width" kindOfQuantity="LENGTH_SHORT"/>
-        <ECProperty propertyName="BottomWidth" typeName="double" description="Bottom Width of column support" displayLabel="Bottom Width" kindOfQuantity="LENGTH_SHORT"/>
-        <ECProperty propertyName="Depth" typeName="double" description="Depth of column support" displayLabel="Depth" kindOfQuantity="LENGTH_SHORT"/>
-    </ECEntityClass>
-    <ECEntityClass typeName="IntegralPier" displayLabel="Integral">
-        <BaseClass>RegularMultiColumnPier</BaseClass>
-        <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00"/>
-        </ECCustomAttributes>
-    </ECEntityClass>
-    <ECEntityClass typeName="DropCapPier" displayLabel="Drop-Cap">
-        <BaseClass>RegularMultiColumnPier</BaseClass>
-        <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00"/>
-        </ECCustomAttributes>
-    </ECEntityClass>
-    <ECEntityClass typeName="TaperedCapPier" displayLabel="Tapered-Cap">
-        <BaseClass>RegularMultiColumnPier</BaseClass>
-        <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00"/>
-        </ECCustomAttributes>
-    </ECEntityClass>
-    <ECEntityClass typeName="WallPier" displayLabel="Wall">
-        <BaseClass>BridgeSubstructureElement</BaseClass>
-        <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00"/>
-        </ECCustomAttributes>
-        <ECProperty propertyName="Depth" typeName="double" displayLabel="Wall depth" kindOfQuantity="LENGTH_SHORT" />
-    </ECEntityClass>
-    <!-- END BridgePier Aspect -->
+    <!-- END BridgeSuperstructure Elements -->
 </ECSchema>
