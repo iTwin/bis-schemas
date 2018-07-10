@@ -57,7 +57,43 @@
         <ECProperty propertyName="CapLengthExtensionRightSide" typeName="double" displayLabel="Cap extension (right)" kindOfQuantity="LENGTH" />
         <ECProperty propertyName="CapLengthExtensionLeftSide" typeName="double" displayLabel="Cap extension (left)" kindOfQuantity="LENGTH" />
     </ECEntityClass>
-  
+    <ECEntityClass typeName="BridgeSubstructure" modifier="Abstract" description="Physical element aggregating all Substructure Elements" >
+        <BaseClass>bis:PhysicalElement</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.01.00.00"/>
+        </ECCustomAttributes>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="BridgeSubstructureAssemblesSubstructureElements" strength="embedding" modifier="Sealed">
+      <BaseClass>bis:PhysicalElementAssemblesElements</BaseClass>
+      <Source multiplicity="(0..1)" polymorphic="false" roleLabel="is owned by 1 bridge substructure">
+        <Class class="BridgeSubstructure"/>
+      </Source>
+      <Target multiplicity="(0..*)" polymorphic="true" roleLabel="owns N substructure elements">
+        <Class class="BridgeSubstructureElement"/>
+      </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="BridgeSuperstructure" modifier="Abstract" description="Physical element aggregating all Superstructure Elements" >
+        <BaseClass>bis:PhysicalElement</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.01.00.00"/>
+        </ECCustomAttributes>
+    </ECEntityClass>
+    <ECEntityClass typeName="SuperstructureElement" modifier="Abstract" description="Base class for the element describing a Bridge superstructure component" >
+        <BaseClass>bis:PhysicalElement</BaseClass>
+        <BaseClass>lr:ILinearlyLocatedElement</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.01.00"/>
+        </ECCustomAttributes>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="BridgeSuperstructureAssemblesSuperstructureElements" strength="embedding" modifier="Sealed">
+      <BaseClass>bis:PhysicalElementAssemblesElements</BaseClass>
+      <Source multiplicity="(0..1)" polymorphic="false" roleLabel="is owned by 1 bridge substructure">
+        <Class class="BridgeSuperstructure"/>
+      </Source>
+      <Target multiplicity="(0..*)" polymorphic="true" roleLabel="owns N substructure elements">
+        <Class class="SuperstructureElement"/>
+      </Target>
+    </ECRelationshipClass>
     <ECEntityClass typeName="IBridgeSupportMember" modifier="Abstract" description="Base mix-in for physical Elements to be a part of a Bridge Support" >
         <ECCustomAttributes>
             <IsMixin xmlns='CoreCustomAttributes.01.00'>
@@ -75,6 +111,24 @@
         <Class class="IBridgeSupportMember"/>
       </Target>
     </ECRelationshipClass>
+    <ECEntityClass typeName="IBridgeSuperstructureMember" modifier="Abstract" description="Base mix-in for physical Elements to be a part of a Bridge SuperstructureElement" >
+        <ECCustomAttributes>
+            <IsMixin xmlns='CoreCustomAttributes.01.00'>
+                <AppliesToEntityClass>bis:PhysicalElement</AppliesToEntityClass> <!-- Should be structural member? -->
+            </IsMixin>
+            <ClassHasHandler xmlns="BisCore.01.00.00"/>
+        </ECCustomAttributes>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="SuperstructureElementAssemblesIBridgeSuperstructureMembers" strength="embedding" modifier="Sealed">
+      <BaseClass>bis:PhysicalElementAssemblesElements</BaseClass>
+      <Source multiplicity="(0..1)" polymorphic="false" roleLabel="is owned by 1 bridge support">
+        <Class class="SuperstructureElement"/>
+      </Source>
+      <Target multiplicity="(0..*)" polymorphic="true" roleLabel="owns N support members">
+        <Class class="IBridgeSuperstructureMember"/>
+      </Target>
+    </ECRelationshipClass>
+
     <ECEntityClass typeName="BridgeSubstructureElement" modifier="Abstract" description="Base class for physical elements describing substructures of a bridge." >
         <BaseClass>bis:PhysicalElement</BaseClass>
         <BaseClass>lr:ILinearlyLocatedElement</BaseClass>
@@ -209,13 +263,7 @@
     </ECEntityClass>
     <!-- END Plan Elements -->
     <!-- BEGIN Superstructure Elements -->
-    <ECEntityClass typeName="SuperstructureElement" modifier="Abstract" description="Base class for the element describing a Bridge superstructure component" >
-        <BaseClass>bis:PhysicalElement</BaseClass>
-        <BaseClass>lr:ILinearlyLocatedElement</BaseClass>
-        <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00"/>
-        </ECCustomAttributes>
-    </ECEntityClass>
+
     <!--
     <ECRelationshipClass typeName="BridgeSupportConnectsAtBeginOfSuperstructure" strength="referencing" modifier="Sealed">
         <Source multiplicity="(0..1)" polymorphic="false" roleLabel="connects to a support">
