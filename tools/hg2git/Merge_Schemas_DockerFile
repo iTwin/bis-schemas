@@ -1,0 +1,37 @@
+FROM debian:latest
+
+# Path to bim0200dev root in the context
+ARG BIM0200DEV_PATH="bim0200dev/"
+
+# Add both dirs
+ADD ${BIM0200DEV_PATH} /bim0200dev
+
+# Set terminal to noninteractive
+ENV DEBIAN_FRONTEND noninteractive
+
+RUN DATE=`date +%Y-%m-%d`
+RUN PR_SOURCE_NAME="bim0200dev_merge_$DATE"
+
+# Update packages
+RUN apt-get update && apt-get upgrade -y
+
+# Install needed packages
+RUN apt-get install apt-utils python-dev mercurial python-setuptools git gcc make tree -y
+
+# Install hg-git extension for mercurial
+RUN easy_install hg-git
+
+# Enable extension for mercurial
+RUN echo "[extensions]\nhgext.bookmarks=\nhgext.convert=\nhggit=">> /etc/mercurial/hgrc
+
+# Configure git
+RUN git config --global user.email "prgremotebuilder"
+RUN git config --global user.name "prgremotebuilder"
+
+WORKDIR /bim0200dev/src/BisSchemas/tools/hg2git/
+
+# Make sure the script is executable
+RUN chmod +x ./all_bis/all_bis.bim0200.sh
+
+# Run the make file, targeting all_bis to convert hg to git, create branch, merge in schemas, and commit them
+RUN env DIR_GIT=/bim0200dev/src/BisSchemas/ DIR_BIM0200=/bim0200dev make all_bis
