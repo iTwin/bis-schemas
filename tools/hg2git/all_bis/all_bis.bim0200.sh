@@ -29,11 +29,13 @@ DIR_ALL_BIS="${DIR_ROOT}/all_bis"
 DIR_ALL_BIS_FILEMAPS="${DIR_ALL_BIS}/filemaps"
 DIRS_HG=(
     "${DIR_BIM0200_SRC}/DgnDomains/AecUnits"
-    "${DIR_BIM0200_SRC}/DgnDomains/BridgePhysical"
+    "${DIR_BIM0200_SRC}/DgnDomains/BridgeStructuralPhysical"
     "${DIR_BIM0200_SRC}/DgnDomains/Building"
     "${DIR_BIM0200_SRC}/DgnDomains/BuildingSpacePlanning"
+    "${DIR_BIM0200_SRC}/DgnDomains/ClassificationSystems"
     "${DIR_BIM0200_SRC}/DgnDomains/ConstraintSystem"
     "${DIR_BIM0200_SRC}/DgnDomains/Costing"
+    "${DIR_BIM0200_SRC}/DgnDomains/Egress"
     "${DIR_BIM0200_SRC}/DgnDomains/Electrical"
     "${DIR_BIM0200_SRC}/DgnDomains/Forms"
     "${DIR_BIM0200_SRC}/DgnDomains/Grids"
@@ -46,18 +48,16 @@ DIRS_HG=(
     "${DIR_BIM0200_SRC}/DgnDomains/RoadRailPhysical"
     "${DIR_BIM0200_SRC}/DgnDomains/Site"
     "${DIR_BIM0200_SRC}/DgnDomains/Structural"
-
-    # TODO: iModelSchemaEditor is a git repo, so the hg2git.py script obviously
-    # won't work on it.
-    # "${DIR_BIM0200_SRC}/iModelSchemaEditor"
 )
 MAPS_HG=(
     "${DIR_ALL_BIS_FILEMAPS}/DgnDomains/AecUnits.filemap"
-    "${DIR_ALL_BIS_FILEMAPS}/DgnDomains/BridgePhysical.filemap"
+    "${DIR_ALL_BIS_FILEMAPS}/DgnDomains/BridgeStructuralPhysical.filemap"
     "${DIR_ALL_BIS_FILEMAPS}/DgnDomains/Building.filemap"
     "${DIR_ALL_BIS_FILEMAPS}/DgnDomains/BuildingSpacePlanning.filemap"
+    "${DIR_ALL_BIS_FILEMAPS}/DgnDomains/ClassificationSystems.filemap"
     "${DIR_ALL_BIS_FILEMAPS}/DgnDomains/ConstraintSystem.filemap"
     "${DIR_ALL_BIS_FILEMAPS}/DgnDomains/Costing.filemap"
+    "${DIR_ALL_BIS_FILEMAPS}/DgnDomains/Egress.filemap"
     "${DIR_ALL_BIS_FILEMAPS}/DgnDomains/Electrical.filemap"
     "${DIR_ALL_BIS_FILEMAPS}/DgnDomains/Forms.filemap"
     "${DIR_ALL_BIS_FILEMAPS}/DgnDomains/Grids.filemap"
@@ -70,10 +70,6 @@ MAPS_HG=(
     "${DIR_ALL_BIS_FILEMAPS}/DgnDomains/RoadRailPhysical.filemap"
     "${DIR_ALL_BIS_FILEMAPS}/DgnDomains/Site.filemap"
     "${DIR_ALL_BIS_FILEMAPS}/DgnDomains/Structural.filemap"
-
-    # TODO: iModelSchemaEditor is a git repo, so the hg2git.py script obviously
-    # won't work on it.
-    # "${DIR_ALL_BIS_FILEMAPS}/iModelSchemaEditor.filemap"
 )
 
 ANSI_ESC="\033["
