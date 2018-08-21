@@ -143,7 +143,7 @@ set +e
 i=0
 while [ $i -lt ${#DIRS_HG[@]} ]; do
     cecho ${ANSI_ESC_FG_YELLOW} "${DIRS_HG[$i]}"
-    OUT_STR=$(${DIR_ROOT}/hg2git.py convert ${DIRS_HG[$i]} $DIR_GIT ${MAPS_HG[$i]})
+    OUT_STR=$(python ${DIR_ROOT}/hg2git.py convert ${DIRS_HG[$i]} $DIR_GIT ${MAPS_HG[$i]})
     STATUS=$?
     echo "$OUT_STR"
     echo "STATUS: ${STATUS}"
@@ -160,7 +160,7 @@ while [ $i -lt ${#DIRS_HG[@]} ]; do
     advanced_engineering_strategy_to_prevent_random_failures
 
     if [ $STATUS -eq 0 ]; then # Only merge is convert succeded.
-        OUT_STR=$(${DIR_ROOT}/hg2git.py merge ${DIRS_HG[$i]} $DIR_GIT $GIT_BRANCH)
+        OUT_STR=$(python ${DIR_ROOT}/hg2git.py merge ${DIRS_HG[$i]} $DIR_GIT $GIT_BRANCH)
         echo "$OUT_STR"
         STATUS=$?
         echo "STATUS: ${STATUS}"
