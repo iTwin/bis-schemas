@@ -16,10 +16,14 @@ RUN PR_SOURCE_NAME="bim0200dev_merge_$DATE"
 RUN apt-get update && apt-get upgrade -y
 
 # Install needed packages
-RUN apt-get install apt-utils python-dev mercurial python-setuptools git gcc make tree -y
+RUN apt-get install apt-utils python-dev mercurial python-setuptools python-pip git gcc make tree -y
 
 # Install hg-git extension for mercurial
 RUN easy_install hg-git
+
+# Downgrade dulwich to 0.18.xx (hg-git is currently broken with dulwich-0.19.xx)
+RUN pip uninstall -y dulwich
+RUN pip install 'dulwich >= 0.18, < 0.19'
 
 # Enable extension for mercurial
 RUN echo "[extensions]\nhgext.bookmarks=\nhgext.convert=\nhggit=">> /etc/mercurial/hgrc
