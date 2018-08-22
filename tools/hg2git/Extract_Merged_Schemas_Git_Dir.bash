@@ -44,5 +44,5 @@ else
   git checkout $PR_SOURCE_NAME
   git branch -a
   git -c http.extraheader="AUTHORIZATION: bearer $SAT" push -u origin $PR_SOURCE_NAME
-  docker build -f ../bis-schemas/tools/PR_DockerFile --build-arg SAT=$SAT --build-arg PR_TITLE=$PR_TITLE  --build-arg PR_SOURCE=$PR_SOURCE_NAME --build-arg PR_DESC=$PR_DESC --build-arg REPO_PATH=$REPO_PATH --build-arg PR_REVIEWERS=$PR_REVIEWERS --build-arg PR_REVIEWERS=$PR_REVIEWERS ../
+  docker build -f $DOCKERFILE --build-arg SAT=$SAT --build-arg PR_TITLE=$PR_TITLE  --build-arg PR_SOURCE=$PR_SOURCE_NAME --build-arg PR_DESC=$PR_DESC --build-arg REPO_PATH=$REPO_PATH --build-arg PR_REVIEWERS=$PR_REVIEWERS --build-arg PR_REVIEWERS=$PR_REVIEWERS ../
 fi
