@@ -132,7 +132,7 @@ def run_merge(hgpath, gitpath, gitbranch):
     print "MERGING {}".format(ansiterm.to_color_str(hgbasename, COLOR_HG))
     
     # Merge Bis branch into git repo without committing changes.
-    cmd = "git merge {} {} --no-commit --no-ff".format(hgbasename, gitbranch)
+    cmd = "git merge {} {} --no-commit --no-ff --allow-unrelated-histories".format(hgbasename, gitbranch)
     workingdir = gitpath
     print_faux_cmd(workingdir, cmd)
     returncode = run_cmd(workingdir, cmd)

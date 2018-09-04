@@ -29,7 +29,7 @@ DIR_ALL_BIS="${DIR_ROOT}/all_bis"
 DIR_ALL_BIS_FILEMAPS="${DIR_ALL_BIS}/filemaps"
 DIRS_HG=(
     "${DIR_BIM0200_SRC}/DgnDomains/AecUnits"
-    "${DIR_BIM0200_SRC}/DgnDomains/BridgeStructuralPhysical"
+#    "${DIR_BIM0200_SRC}/DgnDomains/BridgeStructuralPhysical"
     "${DIR_BIM0200_SRC}/DgnDomains/Building"
     "${DIR_BIM0200_SRC}/DgnDomains/BuildingSpacePlanning"
     "${DIR_BIM0200_SRC}/DgnDomains/ClassificationSystems"
@@ -52,7 +52,7 @@ DIRS_HG=(
 )
 MAPS_HG=(
     "${DIR_ALL_BIS_FILEMAPS}/DgnDomains/AecUnits.filemap"
-    "${DIR_ALL_BIS_FILEMAPS}/DgnDomains/BridgeStructuralPhysical.filemap"
+#    "${DIR_ALL_BIS_FILEMAPS}/DgnDomains/BridgeStructuralPhysical.filemap"
     "${DIR_ALL_BIS_FILEMAPS}/DgnDomains/Building.filemap"
     "${DIR_ALL_BIS_FILEMAPS}/DgnDomains/BuildingSpacePlanning.filemap"
     "${DIR_ALL_BIS_FILEMAPS}/DgnDomains/ClassificationSystems.filemap"
