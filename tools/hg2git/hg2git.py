@@ -3,7 +3,7 @@
 Author: Victor Cushman
 Date: 01/2018
 Description:
-    This script is designed to convert mercurial repositories containing Bis
+    This script is designed to convert mercurial repositories containing BIS
     schemas over to a git mono-repository.
 Setup:
     1. install hg-git
