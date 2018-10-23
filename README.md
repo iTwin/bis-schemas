@@ -11,6 +11,11 @@ List of current BIS Schemas in this repository as SSOT:
 - Core\PhysicalMaterial
 - Grids
 - Structural\PhysicalRebar
+- RealityModeling\DataCaptureSchema
+- RealityModeling\PointCloudSchema
+- RealityModeling\RasterSchema
+- RealityModeling\ScalableMeshSchema
+- RealityModeling\ThreeMxSchema
 
 Weekly merges of all other BIS schemas are done from their current location into this repository, preserving change history. A side affect is all BIS schemas that reside elsewhere are read-only in this repository. This is enforced by not approving any pull request (see [Contributing](#contributing)) that contains a change to one of these schemas.
 
