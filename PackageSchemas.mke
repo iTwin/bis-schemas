@@ -1,0 +1,32 @@
+#----------------------------------------------------------------------
+#
+#     $Source: PackageSchemas.mke $
+#
+#  $Copyright: (c) 2018 Bentley Systems, Incorporated. All rights reserved. $
+#
+#----------------------------------------------------------------------
+%include mdl.mki
+
+o = $(OutputRootDir)packages/
+baseDir = $(_MakeFilePath)
+
+# NB: Do NOT create $(o) ... in fact, we must make sure it does not exist. The script creates it (in a special way).
+
+%iffile $(o)$(DOMAIN)
+	always:
+		|-- Removing Pre-Existing Package --
+		-$(rmdirRecursiveCmd) $(o)$(DOMAIN)
+%endif
+
+%if ($(DOMAIN) == "Standard")
+	always:
+		| -- Building $(DOMAIN) Schema Packages --
+		python $(baseDir)packageSchemas.py $(o) $(DOMAIN) $(baseDir) $(baseDir)package.json.template print
+%else
+	always:
+		|-- Building $(DOMAIN) Schema Packages --
+		python $(baseDir)packageSchemas.py $(o) $(DOMAIN) $(baseDir)Domains $(baseDir)package.json.template print
+%endif
+
+#-$(rmdirRecursiveCmd) $(o)
+    
