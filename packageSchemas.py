@@ -1,0 +1,113 @@
+#--------------------------------------------------------------------------------------
+#
+#     $Source: packageSchemas.py $
+#
+#  $Copyright: (c) 2018 Bentley Systems, Incorporated. All rights reserved. $
+#
+#--------------------------------------------------------------------------------------
+
+# This program creates a directory that looks like an npm package, naming it
+# with the specified name, and copying into it the imodeljs node addons that are defined in the
+# specified product.
+
+import os
+import sys
+import re
+import shutil
+import subprocess
+
+# determine if version2 is a newer version
+def isNewer(version1, version2):
+    v1 = [int(x) for x in version1.strip('.').split('.')]
+    v2 = [int(x) for x in version2.strip('.').split('.')]
+    if cmp(v1, v2) == -1:
+        return True
+    return False
+
+# publish a package
+def publishPackage(packagedir, doPublish):
+
+    if not doPublish:
+        print packagedir;
+        return;
+
+    pubcmd = 'npm publish '
+    pubcmd += '--@bentley:registry=https://bentley.jfrog.io/bentley/api/npm/staging/ '
+    pubcmd += packagedir
+    pubcmd += ' --dry-run'
+
+    if 0 != os.system(pubcmd):
+        exit(1);
+
+# Replace ${macros} with values in specified file
+def setMacros(packagedir, domainName, PACKAGE_VERSION = None):
+    packagefile = os.path.join(packagedir, 'package.json')
+    str = ''
+    with open(packagefile, 'r') as pf:
+        str = pf.read()
+
+    with open(packagefile, 'w') as pf:
+        str = str.replace(r'${DOMAIN_NAME}', domainName)
+        if (PACKAGE_VERSION):
+            str = str.replace(r'${PACKAGE_VERSION}', PACKAGE_VERSION.lower())
+        pf.write(str)
+
+# Generate BIS Schemas packages
+# @param outdirParent The path to the output package's parent directory
+# @param parentSourceDir The source directory, i.e., %SrcRoot%Domains
+# @param packageVersion The semantic version number for the generated package
+# @param packageDir The domain to be packaged
+# @return the full path to the generated package directory
+def generate_schema_package(outputpackagedir, parentSourceDir, domain, templateFile):
+
+    version = '1.0.0'
+    schemaSourceDir = os.path.join(parentSourceDir, domain)
+
+    os.makedirs(outputpackagedir);
+
+    # Copy schemas into place without modifying them.
+    filesToCopy = []
+    for root, dirnames, filenames in os.walk(schemaSourceDir):
+        for file in filenames:
+            if 'Released' in root and file.endswith('ecschema.xml'):
+                fileversion = file.split('.', 1)[1].replace('.ecschema.xml', '')
+                if isNewer(version, fileversion):
+                    version = fileversion
+            if file.endswith('ecschema.xml') and 'Released' not in root:
+                filesToCopy.append(os.path.join(root, file))
+
+    for fileToCopy in filesToCopy:
+        shutil.copyfile(fileToCopy, os.path.join(outputpackagedir, os.path.basename(fileToCopy)))
+
+    # Generate the package.json file
+    dstpackagefile = os.path.join(outputpackagedir, 'package.json')
+    shutil.copyfile(templateFile, dstpackagefile);
+
+    setMacros(outputpackagedir, domain, version)
+#
+#   main
+#
+if __name__ == '__main__':
+    if len(sys.argv) < 5:
+        print "Syntax: ", sys.argv[0], " outputpackageparentdir nodeOS domain sourceDir templateFile {publish|print}"
+        exit(1)
+    
+    outdirParent = sys.argv[1]
+    domain = sys.argv[2]
+    sourceDir = sys.argv[3]
+    templateFile = sys.argv[4]
+    doPublish = (sys.argv[5].lower() == 'publish');
+
+    if outdirParent.endswith ('/') or outdirParent.endswith ('\\'):
+        outdirParent = outdirParent[0:len(outdirParent)-1]
+    
+    pkgdir = os.path.join(outdirParent, domain)
+
+    if os.path.exists(pkgdir):
+        print '*** ' + pkgdir + ' already exists. Remove output directory before calling this script';
+        exit(1)
+
+    generate_schema_package(pkgdir, sourceDir, domain, templateFile)
+    publishPackage(pkgdir, doPublish)
+
+    exit(0)
