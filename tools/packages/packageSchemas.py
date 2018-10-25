@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------
 #
-#     $Source: packageSchemas.py $
+#     $Source: tools\packages\packageSchemas.py $
 #
 #  $Copyright: (c) 2018 Bentley Systems, Incorporated. All rights reserved. $
 #
