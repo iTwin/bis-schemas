@@ -55,9 +55,8 @@ def setMacros(packagedir, domainName, PACKAGE_VERSION = None):
 # Generate BIS Schemas packages
 # @param outdirParent The path to the output package's parent directory
 # @param parentSourceDir The source directory, i.e., %SrcRoot%Domains
-# @param packageVersion The semantic version number for the generated package
-# @param packageDir The domain to be packaged
-# @return the full path to the generated package directory
+# @param domain The domain to be packaged
+# @param templateFile The location of the package template file
 def generate_schema_package(outputpackagedir, parentSourceDir, domain, templateFile):
 
     version = '1.0.0'
@@ -73,7 +72,7 @@ def generate_schema_package(outputpackagedir, parentSourceDir, domain, templateF
                 fileversion = file.split('.', 1)[1].replace('.ecschema.xml', '')
                 if isNewer(version, fileversion):
                     version = fileversion
-            if file.endswith('ecschema.xml') and 'Released' not in root:
+            elif file.endswith('ecschema.xml'):
                 filesToCopy.append(os.path.join(root, file))
 
     for fileToCopy in filesToCopy:
