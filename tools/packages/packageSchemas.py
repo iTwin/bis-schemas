@@ -88,7 +88,7 @@ def generate_schema_package(outputpackagedir, parentSourceDir, domain, templateF
 #
 if __name__ == '__main__':
     if len(sys.argv) < 5:
-        print "Syntax: ", sys.argv[0], " outputpackageparentdir nodeOS domain sourceDir templateFile {publish|print}"
+        print "Syntax: ", sys.argv[0], " outputpackageparentdir domain sourceDir templateFile {publish|print}"
         exit(1)
     
     outdirParent = sys.argv[1]
