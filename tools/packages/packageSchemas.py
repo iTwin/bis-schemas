@@ -43,8 +43,9 @@ def publishPackage(packagedir, doPublish):
 def setMacros(packagedir, domainName, PACKAGE_VERSION = None, IS_BETA = False):
     packagefile = os.path.join(packagedir, 'package.json')
     version = PACKAGE_VERSION.lower()
+    packageName = 'bis-' + domainName.lower();
     if IS_BETA:
-        cmd = 'npm view @bentley/BisSchemas-' + domainName + ' versions'
+        cmd = 'npm view @bentley/' + packageName + ' versions'
         try:
             list = subprocess.check_output(cmd, shell=False)
             betaversionlist = filter(lambda x: 'beta' in x, list)
@@ -60,6 +61,7 @@ def setMacros(packagedir, domainName, PACKAGE_VERSION = None, IS_BETA = False):
         str = pf.read()
 
     with open(packagefile, 'w') as pf:
+        str = str.replace(r'${PACKAGE_NAME}', packageName)
         str = str.replace(r'${DOMAIN_NAME}', domainName)
         if (PACKAGE_VERSION):
             str = str.replace(r'${PACKAGE_VERSION}', version)
