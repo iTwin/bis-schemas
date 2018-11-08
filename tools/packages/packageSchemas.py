@@ -50,11 +50,11 @@ def setMacros(packagedir, domainName, PACKAGE_VERSION = None, IS_BETA = False):
             list = subprocess.check_output(cmd, shell=False)
             betaversionlist = filter(lambda x: 'beta' in x, list)
             if not betaversionlist:
-                raise Exception('go to beta.1')
+                raise Exception('go to alpha.1')
             betanum = float(betaversionlist[len(betaversionlist)].rsplit('.', 1)[1]) + 1
-            version = version + '-beta.' + str(betanum)
+            version = version + '-alpha.' + str(betanum)
         except:
-            version = version + '-beta.1'
+            version = version + '-alpha.1'
     
     str = ''
     with open(packagefile, 'r') as pf:
