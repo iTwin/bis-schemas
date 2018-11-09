@@ -21,8 +21,8 @@ def isNewer(version1, version2):
     v1 = [int(x) for x in version1.strip('.').split('.')]
     v2 = [int(x) for x in version2.strip('.').split('.')]
     if cmp(v1, v2) == -1:
-        return v2[0] + "." v2[1] + "." + v2[2]
-    return v1[0] + "." v1[1] + "." + v1[2]
+        return str(v2[0]) + "." + str(v2[1]) + "." + str(v2[2])
+    return str(v1[0]) + "." + str(v1[1]) + "." + str(v1[2])
 
 # publish a package
 def publishPackage(packagedir, doPublish):
