@@ -21,8 +21,8 @@ def isNewer(version1, version2):
     v1 = [int(x) for x in version1.strip('.').split('.')]
     v2 = [int(x) for x in version2.strip('.').split('.')]
     if cmp(v1, v2) == -1:
-        return True
-    return False
+        return v2[0] + "." v2[1] + "." + v2[2]
+    return v1[0] + "." v1[1] + "." + v1[2]
 
 # publish a package
 def publishPackage(packagedir, doPublish):
@@ -48,13 +48,13 @@ def setMacros(packagedir, domainName, PACKAGE_VERSION = None, IS_BETA = False):
         cmd = 'npm view @bentley/' + packageName + ' versions'
         try:
             list = subprocess.check_output(cmd, shell=False)
-            betaversionlist = filter(lambda x: 'beta' in x, list)
+            betaversionlist = filter(lambda x: '-' in x, list)
             if not betaversionlist:
-                raise Exception('go to alpha.1')
-            betanum = float(betaversionlist[len(betaversionlist)].rsplit('.', 1)[1]) + 1
-            version = version + '-alpha.' + str(betanum)
+                raise Exception('go to -1')
+            betanum = float(betaversionlist[len(betaversionlist)].rsplit('-', 1)[1]) + 1
+            version = version + '-' + str(betanum)
         except:
-            version = version + '-alpha.1'
+            version = version + '-1'
     
     str = ''
     with open(packagefile, 'r') as pf:
@@ -85,8 +85,7 @@ def generate_schema_package(outputpackagedir, parentSourceDir, domain, templateF
         for file in filenames:
             if 'Released' in root and file.endswith('ecschema.xml'):
                 fileversion = file.split('.', 1)[1].replace('.ecschema.xml', '')
-                if isNewer(version, fileversion):
-                    version = fileversion
+                version = isNewer(version, fileversion)
             elif file.endswith('ecschema.xml'):
                 filesToCopy.append(os.path.join(root, file))
 
