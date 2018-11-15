@@ -7,8 +7,8 @@
 #--------------------------------------------------------------------------------------
 
 # This program creates a directory that looks like an npm package, naming it
-# with the specified name, and copying into it the imodeljs node addons that are defined in the
-# specified product.
+# with the specified name, and copying into it the schemas that are defined in the
+# specified domain.
 
 import os
 import sys
@@ -47,25 +47,27 @@ def setMacros(packagedir, domainName, PACKAGE_VERSION = None, IS_BETA = False):
     if IS_BETA:
         cmd = 'npm view @bentley/' + packageName + ' versions'
         try:
-            list = subprocess.check_output(cmd, shell=False)
-            betaversionlist = filter(lambda x: '-' in x, list)
+            origlist = subprocess.check_output(cmd, shell=True)
+            origlist = origlist.strip('\n[] ').split(',')
+            vlist = map(lambda x: x.strip("' "), origlist)
+            betaversionlist = filter(lambda x: '-beta' in x, vlist)
             if not betaversionlist:
-                raise Exception('go to -1')
-            betanum = float(betaversionlist[len(betaversionlist)].rsplit('-', 1)[1]) + 1
-            version = version + '-' + str(betanum)
+                raise Exception('go to -beta.1')
+            betanum = int(betaversionlist[len(betaversionlist)-1].rsplit('-beta.', 1)[1]) + 1
+            version = version + '-beta.' + str(betanum)
         except:
-            version = version + '-1'
+            version = version + '-beta.1'
     
-    str = ''
+    reader = ''
     with open(packagefile, 'r') as pf:
-        str = pf.read()
+        reader = pf.read()
 
     with open(packagefile, 'w') as pf:
-        str = str.replace(r'${PACKAGE_NAME}', packageName)
-        str = str.replace(r'${DOMAIN_NAME}', domainName)
+        reader = reader.replace(r'${PACKAGE_NAME}', packageName)
+        reader = reader.replace(r'${DOMAIN_NAME}', domainName)
         if (PACKAGE_VERSION):
-            str = str.replace(r'${PACKAGE_VERSION}', version)
-        pf.write(str)
+            reader = reader.replace(r'${PACKAGE_VERSION}', version)
+        pf.write(reader)
 
 # Generate BIS Schemas packages
 # @param outdirParent The path to the output package's parent directory
