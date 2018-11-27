@@ -10,6 +10,10 @@
 o = $(OutputRootDir)packages/
 sourceDir = $(_MakeFilePath)../../
 
+%ifndef PRERELEASE
+	PRERELEASE = false
+%endif
+
 # NB: Do NOT create $(o) ... in fact, we must make sure it does not exist. The script creates it (in a special way).
 
 %iffile $(o)$(DOMAIN)
@@ -21,11 +25,11 @@ sourceDir = $(_MakeFilePath)../../
 %if ($(DOMAIN) == "Standard")
 	always:
 		| -- Building $(DOMAIN) Schema Package --
-		python $(_MakeFilePath)packageSchemas.py $(o) $(DOMAIN) $(sourceDir) $(_MakeFilePath)package.json.template print true
+		python $(_MakeFilePath)packageSchemas.py $(o) $(DOMAIN) $(sourceDir) $(_MakeFilePath)package.json.template print $(PRERELEASE)
 %else
 	always:
 		|-- Building $(DOMAIN) Schema Package --
-		python $(_MakeFilePath)packageSchemas.py $(o) $(DOMAIN) $(sourceDir)Domains $(_MakeFilePath)package.json.template print true
+		python $(_MakeFilePath)packageSchemas.py $(o) $(DOMAIN) $(sourceDir)Domains $(_MakeFilePath)package.json.template print $(PRERELEASE)
 %endif
 
 #-$(rmdirRecursiveCmd) $(o)
