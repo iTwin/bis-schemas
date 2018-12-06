@@ -17,7 +17,7 @@ All `TopologyElement`s within a `Model` have the same `Origin`, `Roll`, `Pitch` 
 
  Every subclass must be sealed.
 
-`SharedTopologyElement`s are `Model`-scope resources that never have a parent `Element`. The sharing (via referencing relationships) of these `Element`s provides and defines the location and connectivity of the structural analysis `Element`s.
+`SharedTopologyElement`s are `Model`-scope resources that never have a parent `DgnElement`. The sharing (via referencing relationships) of these `DgnElement`s provides and defines the location and connectivity of the structural analysis `DgnElement`s.
 
  `SharedTopologyElement`s are generally immutable, except for two use cases:
 
@@ -32,7 +32,7 @@ Instead of being modified, `ShareTopologyElement`s are typically replaced. For e
 
 `Vertex`es provide a point location and connectivity at the point.
 
- `Vertex`es are `Model`-scope shared resources that ***never*** have a parent `Element`.
+ `Vertex`es are `Model`-scope shared resources that ***never*** have a parent `DgnElement`.
 
 *Parasolid Equivalent: Vertex*
 
@@ -40,9 +40,9 @@ Instead of being modified, `ShareTopologyElement`s are typically replaced. For e
 
 `Edge`s provide a curve location (between two `Vertex`es) and connectivity along the curve .
 
-`Edge`s are ***only*** referred to by `Path`s (through `OrientedEdgeAspect`s). Any other Element with a relationship to an `Edge` will not be considered (for updating) in operations that split, merge or delete the `Edge`.
+`Edge`s are ***only*** referred to by `Path`s (through `OrientedEdgeAspect`s). Any other DgnElement with a relationship to an `Edge` will not be considered (for updating) in operations that split, merge or delete the `Edge`.
 
-`Edge`s are `Model`-scope shared resources that ***never*** have a parent `Element`.
+`Edge`s are `Model`-scope shared resources that ***never*** have a parent `DgnElement`.
 
 *Parasolid Equivalent: Edge*
 
@@ -54,15 +54,15 @@ Instead of being modified, `ShareTopologyElement`s are typically replaced. For e
 
 `Vertex`es that are connected to the `Face` (and are not part of `Loop`s or `Wire`s) are related to the Face with the `FaceHasInternalVertices` relationship.
 
-`Face`s are ***only*** referred to by `FaceSet`s (through `OrientedFaceAspect`s). Any other Element with a relationship to a `Face` will not be considered in operations that split, merge or delete the `Face`.
+`Face`s are ***only*** referred to by `FaceSet`s (through `OrientedFaceAspect`s). Any other DgnElement with a relationship to a `Face` will not be considered in operations that split, merge or delete the `Face`.
 
-`Face`s are `Model`-scope shared resources that ***never*** have a parent `Element`.
+`Face`s are `Model`-scope shared resources that ***never*** have a parent `DgnElement`.
 
 *Parasolid Equivalent: Face*
 
 ### PrivateTopologyElement
 
-`PrivateTopologyElement`s ***always*** have a parent `Element` that owns them; if the parent is deleted, the `PrivateTopologyElement` is deleted also. The parent Element may be a `TopologyElement` (such as a `Face` owning `Loop`s) or may be a `StructuralElement` (such as a `CurveMember` owning a `Wire`).
+`PrivateTopologyElement`s ***always*** have a parent `DgnElement` that owns them; if the parent is deleted, the `PrivateTopologyElement` is deleted also. The parent DgnElement may be a `TopologyElement` (such as a `Face` owning `Loop`s) or may be a `StructuralElement` (such as a `CurveMember` owning a `Wire`).
 
 There is one and only one subclass of `PrivateTopologyElement` for each dimensionality above zero:
 
