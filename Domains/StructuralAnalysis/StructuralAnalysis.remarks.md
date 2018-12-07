@@ -134,4 +134,10 @@ Every `Sheet` has a parent that is one of the following:
 
 ### OrientedEdgeAspect
 
+`OrientedEdgeAspect` shows relationship between a `Path` and `Edge`.
+A `Path` might have multiple `Edges` one of `OrientedEdgeAspect` purposes is to define the order of multiple `Edge`s in a `Path` by prociding a unique (for that `Path`) index.
+`Edge`s in a `Path` are required to be connecting from one's start to other's end. It is posible to have a case where two `Edge`s are connected by their start points or end points, 
+for this case direction proeprty of `OrientedEdgeAspect` needs to be configure, so that in a `Path` all `Edge`s would have same direction.
+API user does not need to create `OrientedEdgeAspect`, since it will be auto-created after assigning `Edge` to a `Path`.
+
 ### OrientedFaceAspect
