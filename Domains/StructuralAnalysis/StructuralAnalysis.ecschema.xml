@@ -3,6 +3,7 @@
 
     <ECSchemaReference name="BisCore" version="1.0.0" alias="bis" />
     <ECSchemaReference name="CoreCustomAttributes" version="1.0.0" alias="CoreCA"/>
+    <ECSchemaReference name="Profiles" version="1.0.0" alia="prf" />
 
     <!-- Used for setting Edge direction (OrientedEdgeAspect) -->
     <ECEnumeration typeName="EdgeDirection" backingTypeName="int" isStrict="true">
@@ -301,8 +302,15 @@
         </ECCustomAttributes>
     </ECEntityClass>
 
-<!-- Member classes -->
+    <!-- Curve Member System Classes -->
+    <ECEntityClass typeName="CurveMemberSystem" modifier="Abstract" displayLabel="Curve Member System">
+        <BaseClass>bis:DefinitionElement</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.1.0"/>
+        </ECCustomAttributes>
+    </ECEntityClass>
 
+    <!-- Member classes -->
     <ECEntityClass typeName="AnalysisElement" modifier="Abstract" displayLabel="Analysis Element">
         <BaseClass>bis:SpatialLocationElement</BaseClass>
         <ECCustomAttributes>
@@ -329,7 +337,46 @@
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.1.0"/>
         </ECCustomAttributes>
+        <ECProperty propertyName="Orientation" typeName="point3d" modifier="Sealed" displayLabel="Orientation" description="Shows Curve Member Orientation at the start of the member. Must be unit vector and perpendicular to curveMember direction at start." >
+            <ECCustomAttributes>
+                <CustomHandledProperty>
+                    <StatementTypes>7</StatementTypes>
+                </CustomHandledProperty>
+            </ECCustomAttributes>
+        </ECProperty>
+        <ECNavigationProperty propertyName="Location" relationshipName="CurveMemberHasPath" direction="Forward" displayLabel="Location.">
+            <ECCustomAttributes>
+                <CustomHandledProperty>
+                    <StatementTypes>7</StatementTypes>
+                </CustomHandledProperty>
+            </ECCustomAttributes>
+        </ECNavigationProperty>
+        <ECNavigationProperty propertyName="CurveMemberSystem" relationshipName="CurveMemberHasCurveMemberSystem" direction="Forward" displayLabel="Curve Member System">
+            <ECCustomAttributes>
+                <CustomHandledProperty>
+                    <StatementTypes>7</StatementTypes>
+                </CustomHandledProperty>
+            </ECCustomAttributes> 
+        </ECNavigationProperty>
     </ECEntityClass>
+  
+    <ECRelationshipClass typeName="CurveMemberHasPath" strength="referencing" modifier="Sealed">
+        <Source multiplicity="(0..*)" roleLabel="has" polymorphic="false">
+            <Class class="CurveMember"/>
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="false">
+            <Class class="Path"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="CurveMemberHasCurveMemberSystem" strength="referencing" modifier="Sealed">
+        <Source multiplicity="(0..*)" roleLabel="has" polymorphic="false">
+            <Class class="CurveMember"/>
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="true">
+            <Class class="CurveMemberSystem"/>
+        </Target>
+    </ECRelationshipClass>
 
     <ECEntityClass typeName="SurfaceMember" modifier="Sealed" displayLabel="Surface Member" description="Defines a Member that is located by an Shell, and whose behavior is defined at that Shell.">
         <BaseClass>Member</BaseClass>
