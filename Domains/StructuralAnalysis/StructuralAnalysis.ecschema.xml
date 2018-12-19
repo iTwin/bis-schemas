@@ -17,6 +17,12 @@
         <ECEnumerator value="1" displayLabel="Downward"/>
     </ECEnumeration>
 
+    <!-- Used for settting MaterialProfile placement for -->
+    <ECEnumeration typeName="MaterialProfilePlacement" backingTypeName="int" isStrict="true">
+        <ECEnumerator value="0" displayLabel="Start"/>
+        <ECEnumerator value="1" displayLabel="End"/>
+    </ECEnumeration>
+
     <!-- Topology classes -->
     <ECEntityClass typeName="TopologyElement" modifier="Abstract" displayLabel="Topology Element" description="Abstract class for all topology-related classes to derive from.">
         <BaseClass>bis:SpatialLocationElement</BaseClass>
@@ -81,39 +87,6 @@
         </ECProperty>
     </ECEntityClass>
 
-    <ECEntityClass typeName="EdgeVertexBundle" displayLabel="Edge Vertex Bundle">
-        <BaseClass>bis:DriverBundleElement</BaseClass>
-              <ECCustomAttributes>
-        <ClassHasHandler xmlns="BisCore.01.00.00" />
-      </ECCustomAttributes>
-    </ECEntityClass>
-
-    <ECRelationshipClass typeName="EdgeVertexBundleDrivesEdge" strength="referencing" modifier="sealed">
-        <BaseClass>bis:ElementDrivesElement</BaseClass>
-        <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00" />
-        </ECCustomAttributes>
-        <Source polymorphic="true" roleLabel="drives" multiplicity="(1..1)">
-            <Class class="Edge"/>
-        </Source>
-        <Target polymorphic="true" roleLabel="is driven by" multiplicity="(1..1)">
-            <Class class="EdgeVertexBundle"/>
-        </Target>
-    </ECRelationshipClass>
-
-    <ECRelationshipClass typeName="EdgeVertexBundleDrivesVertex" strength="referencing" modifier="sealed">
-        <BaseClass>bis:ElementDrivesElement</BaseClass>
-        <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00" />
-        </ECCustomAttributes>
-        <Source polymorphic="true" roleLabel="drives" multiplicity="(1..1)">
-            <Class class="EdgeVertexBundle"/>
-        </Source>
-        <Target polymorphic="true" roleLabel="is driven by" multiplicity="(2..2)">
-            <Class class="Vertex"/>
-        </Target>
-    </ECRelationshipClass>
-
     <ECRelationshipClass typeName="EdgeHasStartVertex" strength="referencing" modifier="Sealed">
         <Source multiplicity="(0..*)" roleLabel="has" polymorphic="false">
             <Class class="Edge"/>
@@ -169,39 +142,6 @@
         </Source>
         <Target multiplicity="(1..*)" roleLabel="is owned by" polymorphic="false">
             <Class class="OrientedEdgeAspect" />
-        </Target>
-    </ECRelationshipClass>
-
-        <ECEntityClass typeName="PathEdgeBundle" displayLabel="Edge Vertex Bundle">
-        <BaseClass>bis:DriverBundleElement</BaseClass>
-              <ECCustomAttributes>
-        <ClassHasHandler xmlns="BisCore.01.00.00" />
-      </ECCustomAttributes>
-    </ECEntityClass>
-
-    <ECRelationshipClass typeName="PathEdgeBundleDrivesPath" strength="referencing" modifier="sealed">
-        <BaseClass>bis:ElementDrivesElement</BaseClass>
-        <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00" />
-        </ECCustomAttributes>
-        <Source polymorphic="true" roleLabel="drives" multiplicity="(1..1)">
-            <Class class="Path"/>
-        </Source>
-        <Target polymorphic="true" roleLabel="is driven by" multiplicity="(1..1)">
-            <Class class="PathEdgeBundle"/>
-        </Target>
-    </ECRelationshipClass>
-
-    <ECRelationshipClass typeName="PathEdgeBundleDrivesEdge" strength="referencing" modifier="sealed">
-        <BaseClass>bis:ElementDrivesElement</BaseClass>
-        <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00" />
-        </ECCustomAttributes>
-        <Source polymorphic="true" roleLabel="drives" multiplicity="(1..1)">
-            <Class class="PathEdgeBundle"/>
-        </Source>
-        <Target polymorphic="true" roleLabel="is driven by" multiplicity="(1..*)">
-            <Class class="Edge"/>
         </Target>
     </ECRelationshipClass>
 
@@ -304,11 +244,83 @@
 
     <!-- Curve Member System Classes -->
     <ECEntityClass typeName="CurveMemberSystem" modifier="Abstract" displayLabel="Curve Member System">
-        <BaseClass>bis:DefinitionElement</BaseClass>
+        <BaseClass>bis:DriverBundleElement</BaseClass>
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.1.0"/>
         </ECCustomAttributes>
     </ECEntityClass>
+
+    <ECEntityClass typeName="SegmentedCurveMemberSystem" modifier="Sealed" displayLabel="Segmented Curve Member System">
+        <BaseClass>CurveMemberSystem</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.1.0"/>
+        </ECCustomAttributes>        
+    </ECEntityClass>
+
+    <ECEntityClass typeName="SingleCurveMemberSystem" modifier="Abstract" displayLabel="Single Curve Member System">
+        <BaseClass>CurveMemberSystem</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.1.0"/>
+        </ECCustomAttributes>                
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="SegmentedCurveMemberSystemDrivesSingleCurveMemberSystem" strength="referencing" modifier="Sealed">
+        <BaseClass>bis:ElementDrivesElement</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="drives" polymorphic="false">
+            <Class class="SegmentedCurveMemberSystem"/>
+        </Source>
+        <Target multiplicity="(2..*)" roleLabel="is drven by" polymorphic="true">
+            <Class class="SingleCurveMemberSystem"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="MaterialProfileSystemTapering" modifier="Abstract" displayLabel="Material Profile System Tapering">
+        <BaseClass>SingleCurveMemberSystem</BaseClass>        
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.1.0"/>
+        </ECCustomAttributes>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="MaterialProfileSystemLinearTapering" modifier="Sealed" displayLabel="Material Profile System Linear Tapering">
+        <BaseClass>MaterialProfileSystemTapering</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.1.0"/>
+        </ECCustomAttributes>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="MaterialProfileSystem" modifier="Sealed" displayLabel="Material Profile System">
+        <BaseClass>SingleCurveMemberSystem</BaseClass>        
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.1.0"/>
+        </ECCustomAttributes>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="MaterialProfileSystemDrivesMaterialProfileDefinition" modifier="Sealed" displayLabel="Material Profile System drives Material Profile Definition">
+        <BaseClass>bis:ElementDrivesElement</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="drives" polymorphic="false">
+            <Class class="MaterialProfileSystem"/>
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="is driven by" polymorphic="true">
+            <Class class="prf:MaterialProfileDefinition"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="MaterialProfileSystemTaperingDrivesMaterialProfileDefinition" modifier="Sealed" displayLabel="Material Profile System Tapering drives Material Profile Definition">
+        <BaseClass>bis:ElementDrivesElement</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="drives" polymorphic="false">
+            <Class class="MaterialProfileSystemTapering"/>
+        </Source>
+        <Target multiplicity="(2..2)" roleLabel="is driven by" polymorphic="true">
+            <Class class="prf:MaterialProfileDefinition"/>
+        </Target>
+        <ECProperty propertyName="MaterialProfilePlacement" typeName="point3d" modifier="Sealed" displayLabel="Material Profile Placement" description="Shows material profile placement for Material Pro" >
+            <ECCustomAttributes>
+                <CustomHandledProperty>
+                    <StatementTypes>3</StatementTypes>
+                </CustomHandledProperty>
+            </ECCustomAttributes>
+        </ECProperty>
+    </ECRelationshipClass>
 
     <!-- Member classes -->
     <ECEntityClass typeName="AnalysisElement" modifier="Abstract" displayLabel="Analysis Element">
