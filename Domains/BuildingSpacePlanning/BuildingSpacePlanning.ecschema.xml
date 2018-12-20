@@ -56,22 +56,11 @@
     </ECEntityClass>
     
     <ECRelationshipClass typeName="ObjectDefinitionConsistsOfEntities" strength="embedding" modifier="None">
-      <!-- Relationship that indicates a decomposition of child AllocatedVolume -->
       <Source multiplicity="(1..1)" roleLabel="composes of" polymorphic="true">
         <Class class="ObjectDefinitionElement"/>
       </Source>
       <Target multiplicity="(0..*)" roleLabel="is part of" polymorphic="true">
         <Class class="IEntity"/>
-      </Target>
-    </ECRelationshipClass>
-
-    <ECRelationshipClass typeName="AllocatedVolumeDecomposesToElements" strength="embedding" modifier="None">
-      <!-- Relationship that indicates a decomposition of child AllocatedVolume -->
-      <Source multiplicity="(0..1)" roleLabel="composes of" polymorphic="true">
-        <Class class="AllocatedVolume"/>
-      </Source>
-      <Target multiplicity="(0..*)" roleLabel="is part of" polymorphic="true">
-        <Class class="AllocatedVolume"/>
       </Target>
     </ECRelationshipClass>
 
@@ -135,25 +124,14 @@
     </ECEntityClass>
 
     <ECEntityClass typeName="Building" displayLabel="Building">
-        <BaseClass>AllocatedVolume</BaseClass>
+        <BaseClass>spcomp:CompositeVolume</BaseClass>
         <BaseClass>bis:ISubModeledElement</BaseClass>
         <BaseClass>IEntity</BaseClass>
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.01.00.00" />
         </ECCustomAttributes>
-    </ECEntityClass>
-
-    <!--Mirrored Program Manager geometric elements start-->
-    <ECEntityClass typeName="AllocatedVolume">
-        <BaseClass>spcomp:CompositeVolume</BaseClass>
-        <BaseClass>IAllocation</BaseClass>
-        <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00.00" />
-        </ECCustomAttributes>
-        <ECProperty propertyName="Name" displayLabel="Name" typeName="string"/>
         <ECProperty propertyName="Cost" displayLabel="Cost" typeName="double"/>
         <ECProperty propertyName="Occupancy" displayLabel="Occupancy" typeName="int"/>
-        <ECNavigationProperty propertyName="ComposedElement" relationshipName="AllocatedVolumeDecomposesToElements" direction="Backward" description="The composed Element" />
     </ECEntityClass>
 
     <ECEnumeration typeName="ConflictVolumeType" backingTypeName="int" isStrict="true">
@@ -182,12 +160,14 @@
   
     <ECEntityClass typeName="Story" displayLabel="Story">
       <!-- this should abstract -->
-      <BaseClass>AllocatedVolume</BaseClass>
+      <BaseClass>spcomp:CompositeVolume</BaseClass>
       <BaseClass>bis:ISubModeledElement</BaseClass>
       <BaseClass>IEntity</BaseClass>
       <ECCustomAttributes>
         <ClassHasHandler xmlns="BisCore.01.00.00" />
       </ECCustomAttributes>
+      <ECProperty propertyName="Cost" displayLabel="Cost" typeName="double"/>
+      <ECProperty propertyName="Occupancy" displayLabel="Occupancy" typeName="int"/>
     </ECEntityClass>
 
     <ECRelationshipClass typeName="ElevationDrivenStoryHasTopSurface" strength="embedding" strengthDirection="Backward" modifier="none">
@@ -232,11 +212,13 @@
     </ECEntityClass>
   
     <ECEntityClass typeName="Space" displayLabel="Space">
-        <BaseClass>AllocatedVolume</BaseClass>
+        <BaseClass>spcomp:CompositeVolume</BaseClass>
         <BaseClass>IEntity</BaseClass>
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.01.00.00" />
         </ECCustomAttributes>
+        <ECProperty propertyName="Cost" displayLabel="Cost" typeName="double"/>
+        <ECProperty propertyName="Occupancy" displayLabel="Occupancy" typeName="int"/>
     </ECEntityClass>
 
     <ECEntityClass typeName="StorySpacePlanBundle" displayLabel="An element that bundles extrusion spaces">
@@ -327,7 +309,7 @@
             <ClassHasHandler xmlns="BisCore.01.00.00"/>
         </ECCustomAttributes>
         <Source multiplicity="(0..*)" roleLabel="drives" polymorphic="true">
-            <Class class="AllocatedVolume"/>
+            <Class class="spcomp:CompositeVolume"/>
         </Source>
         <Target multiplicity="(1..1)" roleLabel="is driven by" polymorphic="true">
             <Class class="ConflictVolumeBundle"/>
@@ -340,7 +322,7 @@
             <ClassHasHandler xmlns="BisCore.01.00.00"/>
         </ECCustomAttributes>
         <Source multiplicity="(0..*)" roleLabel="drives" polymorphic="true">
-            <Class class="AllocatedVolume"/>
+            <Class class="spcomp:CompositeVolume"/>
         </Source>
         <Target multiplicity="(1..1)" roleLabel="is driven by" polymorphic="true">
             <Class class="ConflictVolumeBundle"/>
@@ -596,7 +578,7 @@
             <Class class="AllocationRequirement"/>
         </Source>
         <Target multiplicity="(0..*)" roleLabel="is implementation of" polymorphic="true">
-            <Class class="AllocatedVolume"/>
+            <Class class="spcomp:CompositeVolume"/>
         </Target>
     </ECRelationshipClass>
 
