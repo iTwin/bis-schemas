@@ -84,14 +84,13 @@ Permissions for an individual domain schema, or a domain group are managed throu
 
 The Team is owned by the schema owner, which gives them the ability to add/remove people from that team. A given team can be setup as a required reviewer for Schema(s) it owns. Anyone within that team can review/approve pull requests to the schemas. (Note: If you are within the team and you make a pull request you will still need at least one additional reviewer.)
 
-
-
+#
 
 
 
 ## Schema Validation
 
-A build is set up to validate schemas against a set of [validation rules](https://imodeljs.github.io/iModelJs-docs-output/bis/intro/bis-schema-validation/). Additionally, it performs a difference audit of all schemas against their latest released version, if one exists. The validation and difference logs are published as build artifacts and made accessible. 
+A build is set up to validate schemas against a set of [validation rules](https://imodeljs.github.io/iModelJs-docs-output/bis/intro/bis-schema-validation/). Additionally, it performs a difference audit of all schemas against their latest released version, if one exists. The validation and difference logs are published as build artifacts and made accessible.
 
 
 
@@ -121,6 +120,7 @@ The iModel Schema Validation tool imports each individual schema in the bis-sche
 
 
 
+
 2. Add the 'BIS - Verify iModel Schemas' task and fill out the following parameters:
     - iModelName
     - hubProjectID
@@ -128,9 +128,6 @@ The iModel Schema Validation tool imports each individual schema in the bis-sche
     - hubUserName
     - hubPassWord
         - It is recommended that you use a Secret variable for the password. Under the 'Variables' section, add a new variable and select the lock icon to make it secret. In the hubPassWord field, you can then use the variable like this: `$(variableName)`
-   
- 
-
 
 See the iModel Schema Validation -- sample build definition for an example.
 
@@ -145,8 +142,9 @@ When a schema has passed validation and received signoff, it can be moved to rel
 - A new npm package release is created when a new version of a schema is added to the "Released" directory
   - The version of the npm package will be the exact version of the schema.
   - When an npm install happens it will be up to semantic versioning to pull in the correct version
-  
+
 ### Non-released/pre-release Schemas
+
 - Use pre-release flags to handle unreleased schemas version
   - Schema version is `1.0.1` the version number of the prerelease will be, `1.0.1-beta.x`
 - To consume a pre-release schema it must be explicitly stated in the npm dependency that this is desired
