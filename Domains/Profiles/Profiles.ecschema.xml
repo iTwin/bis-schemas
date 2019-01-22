@@ -1,78 +1,520 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ECSchema schemaName="Profiles" alias="prf" version="01.00.00" description="Profiles Schema" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.1">
-    <ECSchemaReference name="BisCore" version="01.00.00" alias="bis"/>
-    <ECEntityClass typeName="ProfileDefinitionModel" displayLabel="Profiles Type Definition Model">
-        <BaseClass>bis:DefinitionModel</BaseClass>
+<ECSchema schemaName="Profiles" alias="prf" description="EC Schema for Profiles" version="01.00.00" displayLabel="Profiles" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.1">
+    <ECSchemaReference name="BisCore" version="01.00.00" alias="bis" />
+
+    <!-- Enumerations -->
+    <ECEnumeration typeName="DoubleLShapeProfileType" backingTypeName="int" isStrict="true">
+        <ECEnumerator value="0" displayLabel="LLBB" />
+        <ECEnumerator value="1" displayLabel="SLBB" />
+    </ECEnumeration>
+
+    <ECEnumeration typeName="MaterialProfileCategoryType" backingTypeName="int" isStrict="true">
+        <ECEnumerator value="0" displayLabel="Load Bearing" />
+        <ECEnumerator value="1" displayLabel="Insulation" />
+        <ECEnumerator value="2" displayLabel="Finish" />
+    </ECEnumeration>
+
+  <!-- Mixins -->
+    <ECEntityClass typeName="ICenterLineProfile" modifier="Abstract" displayLabel="Center Line Profile Mixin">
         <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00"/>
+            <IsMixin xmlns="CoreCustomAttributes.1.0">
+                <AppliesToEntityClass>Profile</AppliesToEntityClass>
+            </IsMixin>
         </ECCustomAttributes>
+        <ECProperty propertyName="CenterLine" typeName="Bentley.Geometry.Common.IGeometry" description="" />
+        <ECProperty propertyName="WallThickness" typeName="double" description="Constant thickness of profile walls." />
     </ECEntityClass>
-    <ECStructClass typeName="CardinalPointStruct" description = "Cardinal point structure">
-        <ECProperty propertyName="Name" typeName="string" readOnly= "false"/>
-        <ECProperty propertyName="Coordinates" typeName="point2d" readOnly="false"/>
+
+    <!-- Aspects -->
+    <ECEntityClass typeName="StandardProfileAspect">
+        <BaseClass>bis:ElementUniqueAspect</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.1.0" />
+        </ECCustomAttributes>
+        <ECProperty propertyName="Manufacturer" typeName="string" description="The manufacturer of the sections (certain manufacturers may make sections with deviations from the base standard)." />
+        <ECProperty propertyName="Revision" typeName="string" description="The revision date or number of the standard." />
+        <ECProperty propertyName="StandardsOrganization" typeName="string" description="The organization that creates the table where this section appears." />
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="ProfileOwnsStandardProfileAspect" modifier="Sealed" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="Profile" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="StandardProfileAspect" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECStructClass typeName="CustomCardinalPoint" description="Custom location cardinal point of a profile.">
+        <ECProperty propertyName="Name" typeName="string" description="Name of the cardinal point. It is used to reference the custom cardinal point." />
+        <ECProperty propertyName="Location" typeName="point2d" description="Coordinates inside the bounding box of a profile defining the cardinal point." />
     </ECStructClass>
-    <ECEntityClass typeName="Profile" description="A structural cross section profile (2D shape)." modifier="Abstract">
+
+    <ECEntityClass typeName="CustomCardinalPointsAspect">
+        <BaseClass>bis:ElementUniqueAspect</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.1.0" />
+        </ECCustomAttributes>
+        <ECStructArrayProperty propertyName="Points" typeName="CustomCardinalPoint" minOccurs="1" maxOccurs="unbounded" description="" />
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="ProfileOwnsCustomCardinalPointsAspect" modifier="Sealed" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="Profile" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="CustomCardinalPointsAspect" />
+        </Target>
+    </ECRelationshipClass>
+
+    <!-- Core Profile classes -->
+    <ECEntityClass typeName="Profile" modifier="Abstract" description="A resource defining one or more 2D areas that may have voids.">
         <BaseClass>bis:DefinitionElement</BaseClass>
         <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00" />
+            <ClassHasHandler xmlns="BisCore.1.0" />
         </ECCustomAttributes>
-        <ECStructArrayProperty propertyName="CardinalPoints" displayLabel = "Cardinal Points" typeName="CardinalPointStruct" readOnly="false" minOccurs="0" maxOccurs="unbounded"/>
+        <ECProperty propertyName="Name" typeName="string" description="" />
+        <ECProperty propertyName="Shape" typeName="Bentley.Geometry.Common.IGeometry" description="" />
     </ECEntityClass>
-    <ECEntityClass typeName="ConstantProfile" description="A Profile that does not varying along its length (unlike Varying Profile).">
+
+    <ECEntityClass typeName="SinglePerimeterProfile" modifier="Abstract" description="A Profile with a single outer perimiter.">
         <BaseClass>Profile</BaseClass>
         <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00" />
-        </ECCustomAttributes>
-        <!--<ECProperty propertyName="Shape" typeName="Bentley.Geometry.Common.ISurfaceGroup"/>
-        <ECProperty propertyName="StandardizedProperties" typeName="string" description="JSON storage of section properties using BIS-standard names and BIS-standard units."/>
-        <ECArrayProperty propertyName="AlternateShapeClassification" typeName="string" description="Alternative ways shape can be classified. See ShapeClassification for list of standard values." minOccurs="1" maxOccurs="1"/>
-        <ECProperty propertyName="ShapeClassification" typeName="string" description="The primary classification of the shape. Leave unset if unknown. Standard values are&quot;BentPlate&quot;, &quot;C&quot;, &quot;DoubleL&quot;, &quot;HollowCircle&quot;, &quot;HollowRectangle&quot;, &quot;I&quot;, &quot;L&quot;, &quot;RoundedC&quot;, &quot;RoundedLippedC&quot;, &quot;RoundedLippedZ&quot;, &quot;RoundedHollowRectangle&quot;, &quot;RoundedZ&quot;, &quot;SchifflerizedL&quot;, &quot;SolidCircle&quot;, &quot;SolidRectangle&quot;, &quot;T&quot;."/>-->
-    </ECEntityClass>
-    <ECEntityClass typeName="BuiltUpProfile" description="A Constant Profile that is built up from other Constant Profiles.">
-        <BaseClass>ConstantProfile</BaseClass>
-        <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00" />
+            <ClassHasHandler xmlns="BisCore.1.0" />
         </ECCustomAttributes>
     </ECEntityClass>
 
-    <ECEntityClass typeName="BuiltUpProfileComponent">
+    <ECEntityClass typeName="ParametricProfile" modifier="Abstract" description="A SinglePerimeterProfile that is guaranteed to have the center of the bounding box at (0, 0).">
+        <BaseClass>SinglePerimeterProfile</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.1.0" />
+        </ECCustomAttributes>
+    </ECEntityClass>
+
+    <!-- Letter shapes -->
+    <ECEntityClass typeName="CShapeProfile" modifier="Sealed" description="A C shaped Profile similar to rolled steel C-shapes.">
+        <BaseClass>ParametricProfile</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.1.0" />
+        </ECCustomAttributes>
+        <ECProperty propertyName="FlangeWidth" typeName="double" description="Extent of the flange, defined parallel to the x axis of the position coordinate system." />
+        <ECProperty propertyName="Depth" typeName="double" description="Extent of the web, defined parallel to the y axis of the position coordinate system." />
+        <ECProperty propertyName="FlangeThickness" typeName="double" description="Constant wall thickness of flanges." />
+        <ECProperty propertyName="WebThickness" typeName="double" description="Constant wall thickness of the web." />
+        <!-- Optional properties -->
+        <ECProperty propertyName="FilletRadius" typeName="double" description="The fillet radius between the web and the flange. 0 if sharp-edged, default 0 if not specified." />
+        <ECProperty propertyName="FlangeEdgeRadius" typeName="double" description="Radius of the lower edges of the top flange and the upper edges of the bottom flange. 0 if sharp-edged, default 0 if not specified." />
+        <ECProperty propertyName="FlangeSlope" typeName="double" description="Slope of the lower face of the top flange and of the upper face of the bottom flange. Non-zero in case of tapered flanges, 0 in case of parallel flanges, default 0 if not specified." />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="IShapeProfile" modifier="Sealed" description="An I shaped Profile similar to rolled steel I-shapes.">
+        <BaseClass>ParametricProfile</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.1.0" />
+        </ECCustomAttributes>
+        <ECProperty propertyName="FlangeWidth" typeName="double" description="Extent of the width (flange length), defined parallel to the x axis of the position coordinate system." />
+        <ECProperty propertyName="Depth" typeName="double" description="Extent of the depth (web length), defined parallel to the y axis of the position coordinate system." />
+        <ECProperty propertyName="FlangeThickness" typeName="double" description="Flange thickness of the I-shape. Both, the upper and the lower flanges have the same thickness and they are centred on the y-axis of the position coordinate system." />
+        <ECProperty propertyName="WebThickness" typeName="double" description="Web thickness of the I-shape. The web is centred on the x-axis and the y-axis of the position coordinate system." />
+        <!-- Optional properties -->
+        <ECProperty propertyName="FilletRadius" typeName="double" description="The fillet radius between the web and the flange. 0 if sharp-edged, default 0 if not specified." />
+        <ECProperty propertyName="FlangeEdgeRadius" typeName="double" description="Radius of the lower edges of the top flange and the upper edges of the bottom flange. 0 if sharp-edged, default 0 if not specified." />
+        <ECProperty propertyName="FlangeSlope" typeName="double" description="Slope of the lower faces of the top flange and of the upper faces of the bottom flange. Non-zero in case of tapered flanges, 0 in case of parallel flanges, default 0 if not specified." />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="AsymmetricIShapeProfile" modifier="Sealed" description="An asymmetric (about x-axis) I shaped Profile similar to rolled steel I-shapes.">
+        <BaseClass>ParametricProfile</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.1.0" />
+        </ECCustomAttributes>
+        <ECProperty propertyName="TopFlangeWidth" typeName="double" description="Extent of the top flange, defined parallel to the x axis of the position coordinate system." />
+        <ECProperty propertyName="BottomFlangeWidth" typeName="double" description="Extent of the bottom flange, defined parallel to the x axis of the position coordinate system." />
+        <ECProperty propertyName="Depth" typeName="double" description="Extent of the depth (web length), defined parallel to the y axis of the position coordinate system." />
+        <ECProperty propertyName="TopFlangeThickness" typeName="double" description="Flange thickness of the top flange." />
+        <ECProperty propertyName="BottomFlangeThickness" typeName="double" description="Flange thickness of the bottom flange." />
+        <ECProperty propertyName="WebThickness" typeName="double" description="Web thickness of the I-shape. The web is centred on the x-axis and the y-axis of the position coordinate system." />
+        <!-- Optional properties -->
+        <ECProperty propertyName="TopFlangeFilletRadius" typeName="double" descriptin="The fillet radius between the web and the top flange. 0 if sharp-edged, default 0 if not specified." />
+        <ECProperty propertyName="TopFlangeEdgeRadius" typeName="double" description="Radius of the lower edges of the top flange. 0 if sharp-edged, default 0 if not specified." />
+        <ECProperty propertyName="TopFlangeSlope" typeName="double" description="Slope of the lower faces of the top flange. Non-zero in case of of tapered top flange, 0 in case of parallel top flange, default 0 if not specified." />
+        <ECProperty propertyName="BottomFlangeFilletRadius" typeName="double" description="The fillet radius between the web and the bottom flange. 0 if sharp-edged, default 0 if not specified." />
+        <ECProperty propertyName="BottomFlangeEdgeRadius" typeName="double" description="Radius of the upper edges of the bottom flange. 0 if sharp-edged, default 0 if not specified." />
+        <ECProperty propertyName="BottomFlangeSlope" typeName="double" description="Slope of the upper faces of the bottom flange. Non-zero in case of of tapered bottom flange, 0 in case of parallel bottom flange, default 0 if not specified." />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="LShapeProfile" modifier="Sealed" description="An L-shaped Profile similar to rolled steel L-shapes.">
+        <BaseClass>ParametricProfile</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.1.0" />
+        </ECCustomAttributes>
+        <ECProperty propertyName="Width" typeName="double" description="Horizontal leg length, defined parallel to the x axis of the position coordinate system." />
+        <ECProperty propertyName="Depth" typeName="double" description="Vertical leg length, defined parallel to the y axis of the position coordinate system." />
+        <ECProperty propertyName="Thickness" typeName="double" description="Constant wall thickness of profile." />
+        <!-- Optional properties -->
+        <ECProperty propertyName="FilletRadius" typeName="double" description="Fillet radius between legs. 0 if sharp-edged, default 0 if not specified." />
+        <ECProperty propertyName="EdgeRadius" typeName="double" description="Radius of flange edges. 0 if sharp-edged, default 0 if not specified." />
+        <ECProperty propertyName="LegSlope" typeName="double" description="Slope of the inner faces of the legs. Non-zero in case of tapered legs, 0 in case of perpendicular legs, default 0 if not specified." />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="SchifflerizedLShapeProfile" modifier="Sealed" description="">
+        <BaseClass>ParametricProfile</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.1.0" />
+        </ECCustomAttributes>
+        <ECProperty propertyName="LegLength" typeName="double" description="" />
+        <ECProperty propertyName="Thickness" typeName="double" description="" />
+        <!-- Optional properties -->
+        <ECProperty propertyName="LegBendOffset" typeName="double" description="" />
+        <ECProperty propertyName="FilletRadius" typeName="double" description="Fillet radius between legs. 0 if sharp-edged, default 0 if not specified." />
+        <ECProperty propertyName="EdgeRadius" typeName="double" description="Radius of flange edges. 0 if sharp-edged, default 0 if not specified." />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="TShapeProfile" modifier="Sealed" description="A T-shaped Profile similar to rolled steel T-shapes.">
+        <BaseClass>ParametricProfile</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.1.0" />
+        </ECCustomAttributes>
+        <ECProperty propertyName="FlangeWidth" typeName="double" description="Extent of the width (top flange), defined parallel to the x axis of the position coordinate system." />
+        <ECProperty propertyName="Depth" typeName="double" description="Extent of the depth (web length), defined parallel to the y axis of the position coordinate system." />
+        <ECProperty propertyName="FlangeThickness" typeName="double" description="Constant wall thickness of the flange." />
+        <ECProperty propertyName="WebThickness" typeName="double" description="Constant wall thickness of the web." />
+        <!-- Optional properties -->
+        <ECProperty propertyName="FilletRadius" typeName="double" description="The fillet radius between the web and the flange. 0 if sharp-edged, default 0 if not specified." />
+        <ECProperty propertyName="FlangeEdgeRadius" typeName="double" description="Radius of flange edges. 0 if sharp-edged, default 0 if not specified." />
+        <ECProperty propertyName="FlangeSlope" typeName="double" description="Slope of the lower face of the flange. Non-zero in case of tapered flange, 0 in case of non-tapered flange, default 0 if not specified." />
+        <ECProperty propertyName="WebEdgeRadius" typeName="double" description="Radius of web edges. 0 if sharp-edged, default 0 if not specified." />
+        <ECProperty propertyName="WebSlope" typeName="double" description="Slope of the web. Non-zero in case of tapered web, 0 in case of non-tapered web, default 0 if not specified." />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="TTShapeProfile" modifier="Sealed" description="A TT-shaped Profile similar to double-tee concrete shapes.">
+        <BaseClass>ParametricProfile</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.1.0" />
+        </ECCustomAttributes>
+        <ECProperty propertyName="OverallWidth" typeName="double" description="" />
+        <ECProperty propertyName="LeftFlangeWidth" typeName="double" description="" />
+        <ECProperty propertyName="RightFlangeWidth" typeName="double" description="" />
+        <ECProperty propertyName="OverallDepth" typeName="double" description="" />
+        <ECProperty propertyName="FlangeDepth" typeName="double" description="" />
+        <ECProperty propertyName="FlangeDraft" typeName="double" description="" />
+        <ECProperty propertyName="FlangeChamfer" typeName="double" description="" />
+        <ECProperty propertyName="FlangeBaseFillet" typeName="double" description="" />
+        <ECProperty propertyName="FlangeTopFillet" typeName="double" description="" />
+        <ECProperty propertyName="StemBaseWidth" typeName="double" description="" />
+        <ECProperty propertyName="StemTopWidth" typeName="double" description="" />
+        <ECProperty propertyName="StemBaseChamfer" typeName="double" description="" />
+        <ECProperty propertyName="StemTopChamfer" typeName="double" description="" />
+        <ECProperty propertyName="StemBaseFillet" typeName="double" description="" />
+        <ECProperty propertyName="StemTopFillet" typeName="double" description="" />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="ZShapeProfile" modifier="Sealed" description="A Z-shaped Profile similar to rolled steel Z-shapes.">
+        <BaseClass>ParametricProfile</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.1.0" />
+        </ECCustomAttributes>
+        <ECProperty propertyName="FlangeWidth" typeName="double" description="Extent of single flange, defined parallel to the x axis of the position coordinate system." />
+        <ECProperty propertyName="Depth" typeName="double" description="Extent of the depth (web length), defined parallel to the y axis of the position coordinate system." />
+        <ECProperty propertyName="FlangeThickness" typeName="double" description="Constant wall thickness of flanges." />
+        <ECProperty propertyName="WebThickness" typeName="double" description="Constant wall thickness of the web." />
+        <!-- Optional properties -->
+        <ECProperty propertyName="FilletRadius" typeName="double" description="The fillet radius between the web and the flanges. 0 if sharp-edged, default 0 if not specified." />
+        <ECProperty propertyName="FlangeEdgeRadius" typeName="double" description="Radius of flange edges. 0 if sharp-edged, default 0 if not specified." />
+        <ECProperty propertyName="FlangeSlope" typeName="double" description="Slope of the lower face of the top flange and of the upper face of the bottom flange. Non-zero in case of tapered flanges, 0 in case of parallel flanges, default 0 if not specified." />
+    </ECEntityClass>
+
+    <!-- Center line shapes -->
+    <ECEntityClass typeName="CenterLineCShapeProfile" modifier="Sealed" description="A C shaped Profile with rounded corners, similar to cold-formed steel C-shapes.">
+        <BaseClass>ParametricProfile</BaseClass>
+        <BaseClass>ICenterLineProfile</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.1.0" />
+        </ECCustomAttributes>
+        <ECProperty propertyName="FlangeWidth" typeName="double" description="Extent of the flange, defined parallel to the x axis of the position coordinate system." />
+        <ECProperty propertyName="Depth" typeName="double" description="Extent of the web, defined parallel to the y axis of the position coordinate system." />
+        <ECProperty propertyName="FilletRadius" typeName="double" description="Inner fillet radius." />
+        <!-- Optional properties -->
+        <ECProperty propertyName="Girth" typeName="double" description="Length of lips. 0 if profile doesn't have lips, default 0 if not specified." />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="CenterLineLShapeProfile" modifier="Sealed" description="An L-shaped Profile with rounded corners, similar to cold-formed steel L-shapes.">
+        <BaseClass>ParametricProfile</BaseClass>
+        <BaseClass>ICenterLineProfile</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.1.0" />
+        </ECCustomAttributes>
+        <ECProperty propertyName="Width" typeName="double" description="Horizontal leg length, defined parallel to the x axis of the position coordinate system." />
+        <ECProperty propertyName="Depth" typeName="double" description="Vertical leg length, defined parallel to the y axis of the position coordinate system." />
+        <ECProperty propertyName="FilletRadius" typeName="double" description="Inner fillet radius." />
+        <!-- Optional properties -->
+        <ECProperty propertyName="Girth" typeName="double" description="Length of lips. 0 if profile doesn't have lips, default 0 if not specified." />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="CenterLineZShapeProfile" modifier="Sealed" description="A Z-shaped Profile with rounded corners, similar to cold-formed steel Z-shapes">
+        <BaseClass>ParametricProfile</BaseClass>
+        <BaseClass>ICenterLineProfile</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.1.0" />
+        </ECCustomAttributes>
+        <ECProperty propertyName="FlangeWidth" typeName="double" description="Extent of single flange, defined parallel to the x axis of the position coordinate system." />
+        <ECProperty propertyName="Depth" typeName="double" description="Extent of the depth (web length), defined parallel to the y axis of the position coordinate system." />
+        <ECProperty propertyName="FilletRadius" typeName="double" description="Inner fillet radius." />
+        <!-- Optional properties -->
+        <ECProperty propertyName="Girth" typeName="double" description="Length of lips. 0 if profile doesn't have lips, default 0 if not specified." />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="BentPlateProfile" modifier="Sealed" description="">
+        <BaseClass>ParametricProfile</BaseClass>
+        <BaseClass>ICenterLineProfile</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.1.0" />
+        </ECCustomAttributes>
+        <ECProperty propertyName="Width" typeName="double" description="Extent of the plate length, defined parallel to the x axis of the position coordinate system." />
+        <ECProperty propertyName="BendAngle" typeName="double" description="Plate bend angle." />
+        <ECProperty propertyName="BendRadius" typeName="double" description="Plate bend radius." />
+        <ECProperty propertyName="BendOffset" typeName="double" description="" />
+    </ECEntityClass>
+
+    <!-- Geometric shapes -->
+    <ECEntityClass typeName="EllipseProfile" modifier="Sealed" description="">
+        <BaseClass>ParametricProfile</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.1.0" />
+        </ECCustomAttributes>
+        <ECProperty propertyName="XRadius" typeName="double" description="The first radius of the ellipse. It is measured along the direction of x axis of the position coordinate system." />
+        <ECProperty propertyName="YRadius" typeName="double" description="The second radius of the ellipse. It is measured along the direction of y axis of the position coordinate system." />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="CircleProfile" modifier="Sealed" description="">
+        <BaseClass>ParametricProfile</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.1.0" />
+        </ECCustomAttributes>
+        <ECProperty propertyName="Radius" typeName="double" description="The radius of the circle." />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="HollowCircleProfile" modifier="Sealed" description="">
+        <BaseClass>ParametricProfile</BaseClass>
+        <BaseClass>ICenterLineProfile</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.1.0" />
+        </ECCustomAttributes>
+        <ECProperty propertyName="Radius" typeName="double" description="The radius of the circle." />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="RectangleProfile" modifier="Sealed" description="">
+        <BaseClass>ParametricProfile</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.1.0" />
+        </ECCustomAttributes>
+        <ECProperty propertyName="Width" typeName="double" description="Extent of the rectangle in the direction of the x-axis." />
+        <ECProperty propertyName="Depth" typeName="double" description="Extent of the rectangle in the direction of the y-axis." />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="RoundedRectangleProfile" modifier="Sealed" description="">
+        <BaseClass>ParametricProfile</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.1.0" />
+        </ECCustomAttributes>
+        <ECProperty propertyName="Width" typeName="double" description="Extent of the rectangle in the direction of the x-axis." />
+        <ECProperty propertyName="Depth" typeName="double" description="Extent of the rectangle in the direction of the y-axis." />
+        <ECProperty propertyName="RoundingRadius" typeName="double" description="Radius of the circular arcs by which all four corners of the rectangle are equally rounded." />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="HollowRectangleProfile" modifier="Sealed" description="">
+        <BaseClass>ParametricProfile</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.1.0" />
+        </ECCustomAttributes>
+        <ECProperty propertyName="Width" typeName="double" description="Extent of the rectangle in the direction of the x-axis." />
+        <ECProperty propertyName="Depth" typeName="double" description="Extent of the rectangle in the direction of the y-axis." />
+        <ECProperty propertyName="WallThickness" typeName="double" description="Constant thickness of profile walls." />
+        <!-- Optional properties -->
+        <ECProperty propertyName="InnerFilletRadius" typeName="double" description="Radius of the circular arcs, by which all four corners of the inner contour of rectangle are equally rounded. Default 0 (= no rounding arcs) if not specified." />
+        <ECProperty propertyName="OuterFilletRadius" typeName="double" description="Radius of the circular arcs, by which all four corners of the outer contour of rectangle are equally rounded. Default 0 (= no rounding arcs) if not specified." />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="TrapeziumProfile" modifier="Sealed" description="">
+        <BaseClass>ParametricProfile</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.1.0" />
+        </ECCustomAttributes>
+        <ECProperty propertyName="TopWidth" typeName="double" description="Extent of the top line measured along the implicit x-axis." />
+        <ECProperty propertyName="BottomWidth" typeName="double" description="Extent of the bottom line measured along the implicit x-axis." />
+        <ECProperty propertyName="Depth" typeName="double" description="Extent of the distance between the parallel bottom and top lines measured along the implicit y-axis." />
+        <ECProperty propertyName="TopOffset" typeName="double" description="Offset from the beginning of the top line to the bottom line, measured along the implicit x-axis." />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="RegularPolygonProfile" modifier="Sealed" description="">
+        <BaseClass>ParametricProfile</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.1.0" />
+        </ECCustomAttributes>
+        <ECProperty propertyName="SideCount" typeName="int" description="Count of sides (edges) the polygon is made of. Value cannot be less than 3 (triangle)." />
+        <ECProperty propertyName="SideLength" typeName="double" description="Constant length of each polygon side (edge)." />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="CapsuleProfile" modifier="Sealed" description="">
+        <BaseClass>ParametricProfile</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.1.0" />
+        </ECCustomAttributes>
+        <ECProperty propertyName="Width" typeName="double" description="" />
+        <ECProperty propertyName="Depth" typeName="double" description="" />
+    </ECEntityClass>
+
+    <!-- Arbitrary single perimeter profile classes -->
+    <ECEntityClass typeName="ArbitraryShapeProfile" modifier="None">
+        <BaseClass>SinglePerimeterProfile</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.1.0" />
+        </ECCustomAttributes>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="ArbitraryCenterLineProfile" modifier="Sealed">
+        <BaseClass>ArbitraryShapeProfile</BaseClass>
+        <BaseClass>ICenterLineProfile</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.1.0" />
+        </ECCustomAttributes>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="DerivedProfile" modifier="Sealed" description="This class represents a SinglePerimeterProfile that has been converted into a different shape via a matrix transform. Usage outside of IFC compatability is not recommended">
+        <BaseClass>SinglePerimeterProfile</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.1.0" />
+        </ECCustomAttributes>
+        <ECProperty propertyName="MirrorProfileAboutYAxis" typeName="boolean" description="" />
+        <ECProperty propertyName="Offset" typeName="point2d" description="" />
+        <ECProperty propertyName="Rotation" typeName="point2d" description="" />
+        <ECProperty propertyName="Scale" typeName="point2d" description="" />
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="SinglePerimeterProfileOwnsDerivedProfile" modifier="Sealed" strength="embedding">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="is base profile of" polymorphic="true">
+            <Class class="SinglePerimeterProfile" />
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is derived profile of" polymorphic="false">
+            <Class class="DerivedProfile" />
+        </Target>
+    </ECRelationshipClass>
+
+    <!-- Composite Profile classes -->
+    <ECEntityClass typeName="CompositeProfile" modifier="Abstract" description="A Profile comprised of multiple SinglePerimeterProfiles.">
+        <BaseClass>Profile</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.1.0" />
+        </ECCustomAttributes>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="ArbitraryCompositeProfile" modifier="Sealed" description="A Profile comprised of multiple SinglePerimeterProfiles.">
+        <BaseClass>CompositeProfile</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.1.0" />
+        </ECCustomAttributes>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="ArbitraryCompositeProfileAspect" modifier="Sealed" description="Aspect used by ArbitraryCompostiteProfile to reference SinglePerimeterProfile and geometry transformations for it. This cannot be done by a relationship class because we allow multiple references to the same profile with different transformations.">
         <BaseClass>bis:ElementMultiAspect</BaseClass>
         <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00" />
+            <ClassHasHandler xmlns="BisCore.1.0" />
         </ECCustomAttributes>
-        <ECProperty propertyName="Index" typeName="int" description="Zero-based index corresponding to the order in which this component was added to its BuiltUpProfile."/>
-        <ECProperty propertyName="PlacementPoint" typeName="int" description="The identifier of the location on the related Profile that is Offet away from 0,0 of BuiltUpProfile. This values are exactly the same as CIS/2 cardinal points."/>
-        <ECProperty propertyName="MirrorProfileAboutYAxis" typeName="boolean" description="The profile used by the component is actually a mirror image of Profile. The mirroring is done about the profile's y-axis and is done before rotation and before determining the PlacementPoint."/>
-        <ECProperty propertyName="OffsetPoint" typeName="point2d" description="The offset in BuiltUpProfile coordinates from 0,0 to the PlacementPoint."/>
-        <ECProperty propertyName="Rotation" typeName="double" description="The rotation of this component's profile relative to the BuiltUpProfile's axes. Rotation are positive ccw (acw). A value of zero implies that the profile's x- and y- axes are parallel to those of the BuiltUpProfile. All rotation is done about the PlacementPoint."/>
-        <ECNavigationProperty propertyName="Profile" relationshipName="BuiltUpProfileComponentUsesConstantProfile" direction="Forward" description="The using MultiAspect">
-            <ECCustomAttributes>
-            </ECCustomAttributes>
-        </ECNavigationProperty>
-    </ECEntityClass>
-    <ECRelationshipClass typeName="BuiltUpProfileOwnsBuiltUpProfileComponent" description="BuildUpProfile's ownership of BuildUpProfileComponent." modifier="None" strength="embedding">
-        <BaseClass>bis:ElementOwnsMultiAspects</BaseClass>
-        <Source multiplicity="(1..1)" roleLabel="BuiltUpProfileOwnsComponent" polymorphic="false">
-            <Class class="BuiltUpProfile"/>
-        </Source>
-        <Target multiplicity="(0..*)" roleLabel="BuiltUpProfileOwnsComponent (Reversed)" polymorphic="false">
-            <Class class="BuiltUpProfileComponent"/>
-        </Target>
-    </ECRelationshipClass>
-    <ECRelationshipClass typeName="BuiltUpProfileComponentUsesConstantProfile" modifier="None" strength="referencing">
-        <Source multiplicity="(0..*)" roleLabel="BuiltUpProfileComponent Uses ConstantProfile" polymorphic="false">
-            <Class class="BuiltUpProfileComponent"/>
-        </Source>
-        <Target multiplicity="(1..1)" roleLabel="BuiltUpProfileComponent Uses ConstantProfile (Reversed)" polymorphic="true">
-            <Class class="ConstantProfile"/>
-        </Target>
-    </ECRelationshipClass>
-    <ECEntityClass typeName="ParametricProfile" description="A Constant Profile that can be defined by a small set of dimensions and a known profile type.">
-        <BaseClass>ConstantProfile</BaseClass>
-        <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00" />
-        </ECCustomAttributes>
-        <ECProperty propertyName="InputProperties" typeName="string" description="JSON storage of input properties for the parametric shape."/>
+        <ECNavigationProperty propertyName="SingleProfile" relationshipName="ArbitraryCompositeProfileAspectRefersToSinglePerimeterProfile" direction="Forward" description="" />
+        <ECProperty propertyName="Offset" typeName="point2d" description="" />
+        <ECProperty propertyName="Rotation" typeName="double" description="" />
+        <ECProperty propertyName="MirrorProfileAboutYAxis" typeName="boolean" description="" />
+        <ECProperty propertyName="MemberPriority" typeName="int" description="Member Priority, same as in bis:ElementGorupsMembers" />
     </ECEntityClass>
 
+    <ECRelationshipClass typeName="ArbitraryCompositeProfileAspectRefersToSinglePerimeterProfile" modifier="Sealed" strength="referencing">
+        <Source multiplicity="(0..*)" roleLabel="refers to profile" polymorphic="false">
+            <Class class="ArbitraryCompositeProfileAspect" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is referenced by" polymorphic="true">
+            <Class class="SinglePerimeterProfile" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="DoubleLShapeProfile" modifier="Sealed" description="A CompositeProfile comprised of back-to-back Ls with the horizontal legs at the top of the Profile.">
+        <BaseClass>CompositeProfile</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.1.0" />
+        </ECCustomAttributes>
+        <ECProperty propertyName="Spacing" typeName="double" description="" />
+        <ECProperty propertyName="Type" typeName="DoubleLShapeProfileType" description="" />
+        <ECNavigationProperty propertyName="SingleProfile" relationshipName="DoubleLShapeProfileRefersToLShapeProfile" direction="Forward" description="" />
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="DoubleLShapeProfileRefersToLShapeProfile" modifier="Sealed" strength="referencing">
+        <Source multiplicity="(0..*)" roleLabel="is double profile of" polymorphic="false">
+            <Class class="DoubleLShapeProfile" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is single profile of" polymorphic="false">
+            <Class class="LShapeProfile" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="DoubleCShapeProfile" modifier="Sealed" description="A CompositeProfile comprised of back-to-back Cs.">
+        <BaseClass>CompositeProfile</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.1.0" />
+        </ECCustomAttributes>
+        <ECProperty propertyName="Spacing" typeName="double" />
+        <ECNavigationProperty propertyName="SingleProfile" relationshipName="DoubleCShapeProfileRefersToCShapeProfile" direction="Forward" description="" />
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="DoubleCShapeProfileRefersToCShapeProfile" modifier="Sealed" strength="referencing">
+        <Source multiplicity="(0..*)" roleLabel="is double profile of" polymorphic="false">
+            <Class class="DoubleCShapeProfile" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is single profile of" polymorphic="false">
+            <Class class="CShapeProfile" />
+        </Target>
+    </ECRelationshipClass>
+
+    <!-- Material Profile classes-->
+    <ECEntityClass typeName="MaterialProfileDefinition" modifier="abstract" description="Material Profile Definition">
+        <BaseClass>bis:DefinitionElement</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.1.0" />
+        </ECCustomAttributes>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="MaterialProfile" modifier="Sealed" description="Material Profile">
+        <BaseClass>MaterialProfileDefinition</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.1.0" />
+        </ECCustomAttributes>
+        <ECProperty propertyName="Priority" typeName="int" description="" />
+        <ECProperty propertyName="Category" typeName="MaterialProfileCategoryType" description="" />
+        <ECNavigationProperty propertyName="Material" relationshipName="MaterialProfileRefersToMaterial" direction="Forward" displayLabel="Material" />
+        <ECNavigationProperty propertyName="Profile" relationshipName="MaterialProfileRefersToProfile" direction="Forward" displayLabel="Profile" />
+    </ECEntityClass>
+
+    <!--TODO: remove this after material schema is developed-->
+    <ECEntityClass typeName="TempMaterial" modifier="Sealed" displayLabel="Material">
+        <BaseClass>bis:PhysicalMaterial</BaseClass>
+    </ECEntityClass>
+
+    <!-- TODO: Replace bis Element with material instance-->
+    <ECRelationshipClass typeName="MaterialProfileRefersToMaterial" strength="referencing" strengthDirection="Forward" modifier="Sealed">
+        <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="true">
+            <Class class="MaterialProfile" />
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="true">
+            <Class class="TempMaterial"/>
+        </Target>
+    </ECRelationshipClass>
+
+   <ECRelationshipClass typeName="MaterialProfileRefersToProfile" strength="referencing" strengthDirection="Forward" modifier="Sealed">
+        <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="true">
+            <Class class="MaterialProfile" />
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="true">
+            <Class class="Profile"/>
+        </Target>
+    </ECRelationshipClass>
 </ECSchema>
