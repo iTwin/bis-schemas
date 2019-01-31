@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ECSchema schemaName="Simulation4D" alias="simul" version="1.0.0" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.1">
+    <ECSchemaReference name="BisCore" version="1.0" alias="bis"/>
+    <ECSchemaReference name="ECDbMap" version="2.0" alias="ecdbmap"/>
+    <ECSchemaReference name="CoreCustomAttributes" version="1.0.0" alias="CoreCA"/>
+
+	<!-- Question: inheritance, naming -->
+    <ECEntityClass typeName="ProjectSimulation">
+        <BaseClass>bis:InformationRecordElement</BaseClass>
+        <BaseClass>bis:IParentElement</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.1.0"/>
+        </ECCustomAttributes>
+        <ECProperty propertyName="Duration" typeName="double" description="Duration of the simulation (in seconds)" displayLabel="Duration">
+            <ECCustomAttributes>
+                <CustomHandledProperty/>
+            </ECCustomAttributes>
+        </ECProperty>
+    </ECEntityClass>
+	
+    <ECEntityClass typeName="CameraKeyframe" description="Defines a keyframe for camera">
+        <BaseClass>bis:ElementMultiAspect</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.1.0"/>
+        </ECCustomAttributes>
+        <ECProperty propertyName="KeyframeTime" typeName="double" description="Time (in seconds) of the keyframe" displayLabel="Keyframe Time">
+            <ECCustomAttributes>
+                <CustomHandledProperty/>
+            </ECCustomAttributes>
+        </ECProperty>
+        <ECProperty propertyName="Interpolation" typeName="Interpolation_Type" description="Interpolation type used between the current keyframe and the next one" displayLabel="Interpolation">
+            <ECCustomAttributes>
+                <CustomHandledProperty/>
+            </ECCustomAttributes>
+        </ECProperty>
+        <ECStructProperty propertyName="CameraValue" typeName="Camera" description="Camera parameters" displayLabel="Camera Value"/>
+    </ECEntityClass>
+	
+    <ECEntityClass typeName="DateTimeKeyframe" description="Defines a keyframe for project time">
+        <BaseClass>bis:ElementMultiAspect</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.1.0"/>
+        </ECCustomAttributes>
+        <ECProperty propertyName="KeyframeTime" typeName="double" description="Time (in seconds) of the keyframe" displayLabel="Keyframe Time">
+            <ECCustomAttributes>
+                <CustomHandledProperty/>
+            </ECCustomAttributes>
+        </ECProperty>
+        <ECProperty propertyName="Interpolation" typeName="Interpolation_Type" description="Interpolation type used between the current keyframe and the next one" displayLabel="Interpolation">
+            <ECCustomAttributes>
+                <CustomHandledProperty/>
+            </ECCustomAttributes>
+        </ECProperty>
+        <ECProperty propertyName="DateTimeValue" typeName="dateTime" description="Project time value" displayLabel="DateTime Value">
+            <ECCustomAttributes>
+                <DateTimeInfo xmlns="CoreCustomAttributes.1.0">
+                    <DateTimeKind>Unspecified</DateTimeKind>
+                </DateTimeInfo>
+            </ECCustomAttributes>
+        </ECProperty>
+    </ECEntityClass>
+	
+	<!-- Question: inheritance, naming -->
+    <ECEntityClass typeName="AnimatedElement">
+        <BaseClass>bis:InformationRecordElement</BaseClass>
+        <BaseClass>bis:IParentElement</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.1.0"/>
+        </ECCustomAttributes>
+    </ECEntityClass>
+
+	<!-- Question: inheritance, naming -->
+    <ECEntityClass typeName="AnimatedInstance">
+        <BaseClass>bis:InformationRecordElement</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.1.0"/>
+        </ECCustomAttributes>
+    </ECEntityClass>
+	
+    <ECEntityClass typeName="ColorKeyframe" description="Defines a keyframe for element color change">
+        <BaseClass>bis:ElementMultiAspect</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.1.0"/>
+        </ECCustomAttributes>
+        <ECProperty propertyName="KeyframeTime" typeName="double" description="Time (in seconds) of the keyframe" displayLabel="Keyframe Time">
+            <ECCustomAttributes>
+                <CustomHandledProperty/>
+            </ECCustomAttributes>
+        </ECProperty>
+        <ECProperty propertyName="Interpolation" typeName="Interpolation_Type" description="Interpolation type used between the current keyframe and the next one" displayLabel="Interpolation">
+            <ECCustomAttributes>
+                <CustomHandledProperty/>
+            </ECCustomAttributes>
+        </ECProperty>
+        <ECStructProperty propertyName="ColorValue" typeName="RgbColor" description="Color value ( if set the element should be colored by the given value, null means that color is not overriden and the elemnt should be displayed with its original material )" displayLabel="Color Value"/>
+    </ECEntityClass>
+	
+    <ECEntityClass typeName="VisibilityKeyframe" description="Defines a keyframe for element transparency/visibility">
+        <BaseClass>bis:ElementMultiAspect</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.1.0"/>
+        </ECCustomAttributes>
+        <ECProperty propertyName="KeyframeTime" typeName="double" description="Time (in seconds) of the keyframe" displayLabel="Keyframe Time">
+            <ECCustomAttributes>
+                <CustomHandledProperty/>
+            </ECCustomAttributes>
+        </ECProperty>
+        <ECProperty propertyName="Interpolation" typeName="Interpolation_Type" description="Interpolation type used between the current keyframe and the next one" displayLabel="Interpolation">
+            <ECCustomAttributes>
+                <CustomHandledProperty/>
+            </ECCustomAttributes>
+        </ECProperty>
+        <ECProperty propertyName="VisibilityValue" typeName="int" description="Visibility value ( 100 - element is fully opaque, 0 - element is invisible, null - visibility is not overriden )" displayLabel="Visibility Value">
+            <ECCustomAttributes>
+                <CustomHandledProperty/>
+            </ECCustomAttributes>
+        </ECProperty>
+    </ECEntityClass>
+	
+    <ECEntityClass typeName="CuttingPlaneKeyframe" description="Defines a keyframe for clipping (growth simulation)">
+        <BaseClass>bis:ElementMultiAspect</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.1.0"/>
+        </ECCustomAttributes>
+        <ECProperty propertyName="KeyframeTime" typeName="double" description="Time (in seconds) of the keyframe" displayLabel="Keyframe Time">
+            <ECCustomAttributes>
+                <CustomHandledProperty/>
+            </ECCustomAttributes>
+        </ECProperty>
+        <ECProperty propertyName="Interpolation" typeName="Interpolation_Type" description="Interpolation type used between the current keyframe and the next one" displayLabel="Interpolation">
+            <ECCustomAttributes>
+                <CustomHandledProperty/>
+            </ECCustomAttributes>
+        </ECProperty>
+        <ECStructProperty propertyName="CuttingPlane" typeName="Plane" description="Clipping plane parameter" displayLabel="Cutting Plane"/>
+    </ECEntityClass>
+	
+	<!-- Question: how to represent 4x4 transfomation matrix in BIS? -->
+    <ECEntityClass typeName="TransformationKeyframe" description="Defines a keyframe for element movement: it stores 4x4 transformation matrix and optionally decomposed form of transformation for elements moving along 3D path ( M.position x M.oriemataion x M.pivot )">
+        <BaseClass>bis:ElementMultiAspect</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.1.0"/>
+        </ECCustomAttributes>
+        <ECProperty propertyName="KeyframeTime" typeName="double" description="Time (in seconds) of the keyframe" displayLabel="Keyframe Time">
+            <ECCustomAttributes>
+                <CustomHandledProperty/>
+            </ECCustomAttributes>
+        </ECProperty>
+        <ECProperty propertyName="Interpolation" typeName="Interpolation_Type" description="Interpolation type used between the current keyframe and the next one" displayLabel="Interpolation">
+            <ECCustomAttributes>
+                <CustomHandledProperty/>
+            </ECCustomAttributes>
+        </ECProperty>
+        <ECArrayProperty propertyName="RelativeTransform" typeName="double" minOccurs="16" maxOccurs="16" isStruct="True" description="Transformation matrix 4x4 ( if set the element should be post-transformed by the given value relative to its original position, null means that transformation is not overriden and the element should be placed in its original position )" displayLabel="Relative Transform"/>
+        <ECProperty propertyName="PathPosition" typeName="point3d" description="Translation" displayLabel="Path Position">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.1.0"/>
+                <CustomHandledProperty/>
+            </ECCustomAttributes>
+        </ECProperty>
+        <ECStructProperty propertyName="PathOrientation" typeName="Quaternion" description="Orientation" displayLabel="Path Orientation"/>
+        <ECProperty propertyName="PathPivot" typeName="point3d" description="Pre-translation" displayLabel="Path Pivot">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.1.0"/>
+                <CustomHandledProperty/>
+            </ECCustomAttributes>
+        </ECProperty>
+    </ECEntityClass>
+	
+	<!-- Question: is there something similar in BIS and how is this compatible with Navigator? -->
+    <ECStructClass typeName="Camera" description="Represents a camera">
+        <ECProperty propertyName="Position" typeName="point3d" description="Camera position in the scene"/>
+        <ECProperty propertyName="ForwardVector" typeName="point3d" description="Normalized camera direction"/>
+        <ECProperty propertyName="UpVector" typeName="point3d" description="Direction the top of the camera should face"/>
+        <ECProperty propertyName="FieldOfView" typeName="double" description="Field of view in degrees"/>
+		<ECProperty propertyName="ProjectionMode" typeName="CameraProjectionMode_Type" description="Camera projection mode ( perspective / isometric )"/>
+    </ECStructClass>
+
+	<!-- Question: is there something similar in BIS and how is this compatible with Navigator? -->
+    <ECStructClass typeName="RgbColor" description="Represents a color as three floating-point numbers">
+        <ECProperty propertyName="Red" typeName="double" description="Red component [0.0;1.0]"/>
+        <ECProperty propertyName="Green" typeName="double" description="Green component [0.0;1.0]"/>
+        <ECProperty propertyName="Blue" typeName="double" description="Blue component [0.0;1.0]"/>
+    </ECStructClass>
+	
+	<!-- Question: is there something similar in BIS and how is this compatible with Navigator? -->
+    <ECStructClass typeName="Plane" description="Represents a plane in three-dimensional space as point and normal">
+        <ECProperty propertyName="Position" typeName="point3d" description="Plane position"/>
+        <ECProperty propertyName="Direction" typeName="point3d" description="Normalized direction vector"/>
+    </ECStructClass>
+	
+	<!-- Question: is there something similar in BIS and how is this compatible with Navigator? -->
+    <ECStructClass typeName="Quaternion" description="Represents a rotation in 3D space as unit quaternion">
+        <ECProperty propertyName="X" typeName="double" description="X coordinate of vector part"/>
+        <ECProperty propertyName="Y" typeName="double" description="Y coordinate of vector part"/>
+        <ECProperty propertyName="Z" typeName="double" description="Z coordinate of vector part"/>
+        <ECProperty propertyName="W" typeName="double" description="W coordinate ( scalar )"/>
+    </ECStructClass>
+	
+    <ECRelationshipClass typeName="AnimatedElementIncludesSpatialElements" strength="referencing" strengthDirection="forward" modifier="None">
+        <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="includes" polymorphic="true">
+            <Class class="AnimatedElement"/>
+        </Source>
+        <Target multiplicity="(1..*)" roleLabel="is included by" polymorphic="true">
+            <Class class="bis:SpatialElement"/>
+        </Target>
+    </ECRelationshipClass>
+	
+    <ECRelationshipClass typeName="ProjectSimulationOwnsAnimatedElements" strength="embedding" modifier="None">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="ProjectSimulation"/>
+        </Source>
+        <Target multiplicity="(1..*)" roleLabel="is owned by" polymorphic="true">
+            <Class class="AnimatedElement"/>
+        </Target>
+    </ECRelationshipClass>
+	
+    <ECRelationshipClass typeName="AnimatedElementOwnsAnimatedInstances" strength="embedding" modifier="None">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="AnimatedElement"/>
+        </Source>
+        <Target multiplicity="(1..*)" roleLabel="is owned by" polymorphic="true">
+            <Class class="AnimatedInstance"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="ProjectSimulatonOwnsCameraKeyframes" strength="embedding" strengthDirection="forward" modifier="Sealed">
+        <BaseClass>bis:ElementOwnsMultiAspects</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="True">
+            <Class class="ProjectSimulation"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="False">
+            <Class class="CameraKeyframe"/>
+        </Target>
+    </ECRelationshipClass>
+	
+    <ECRelationshipClass typeName="ProjectSimulationOwnsDateTimeKeyframes" strength="embedding" strengthDirection="forward" modifier="Sealed">
+        <BaseClass>bis:ElementOwnsMultiAspects</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="True">
+            <Class class="ProjectSimulation"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="False">
+            <Class class="DateTimeKeyframe"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="AnimatedInstanceOwnsColorKeyframes" strength="embedding" strengthDirection="forward" modifier="Sealed">
+        <BaseClass>bis:ElementOwnsMultiAspects</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="True">
+            <Class class="AnimatedInstance"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="False">
+            <Class class="ColorKeyframe"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="AnimatedInstanceOwnsVisibilityKeyframes" strength="embedding" strengthDirection="forward" modifier="Sealed">
+        <BaseClass>bis:ElementOwnsMultiAspects</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="True">
+            <Class class="AnimatedInstance"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="False">
+            <Class class="VisibilityKeyframe"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="AnimatedInstanceOwnsCuttingPlaneKeyframes" strength="embedding" strengthDirection="forward" modifier="Sealed">
+        <BaseClass>bis:ElementOwnsMultiAspects</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="True">
+            <Class class="AnimatedInstance"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="False">
+            <Class class="CuttingPlaneKeyframe"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="AnimatedInstanceOwnsTransformationKeyframes" strength="embedding" strengthDirection="forward" modifier="Sealed">
+        <BaseClass>bis:ElementOwnsMultiAspects</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="True">
+            <Class class="AnimatedInstance"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="False">
+            <Class class="TransformationKeyframe"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEnumeration typeName="Interpolation_Type" backingTypeName="int" isStrict="true">
+        <ECEnumerator value="0" displayLabel="Step"/>
+        <ECEnumerator value="1" displayLabel="Linear"/>
+        <ECEnumerator value="2" displayLabel="Cubic"/>
+    </ECEnumeration>
+	
+    <ECEnumeration typeName="CameraProjectionMode_Type" backingTypeName="int" isStrict="true">
+        <ECEnumerator value="0" displayLabel="Perspective"/>
+        <ECEnumerator value="1" displayLabel="Isometric"/>
+    </ECEnumeration>
+
+</ECSchema>
