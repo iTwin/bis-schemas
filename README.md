@@ -110,7 +110,7 @@ Please invite the certification team of your bridge to verify the checksums of y
 2. Run the new build job on a fresh iModel you published to iModelHub.
 3. Any verification errors should be filed as a TR to the lead developer as a showstopper. This version of the bridge should NOT be used in production.
 
- 
+
 
 
 
