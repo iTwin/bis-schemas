@@ -11,6 +11,7 @@ List of current BIS Schemas in this repository as SSOT:
 - Core\PhysicalMaterial
 - ECObjects
 - Grids
+- PresentationRules
 - Structural\PhysicalRebar
 - RealityModeling\DataCaptureSchema
 - RealityModeling\PointCloudSchema
