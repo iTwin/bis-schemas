@@ -3,15 +3,16 @@
 |
 |     $Source: BuildingSpacePlanning.ecschema.xml $
 |
-|  $Copyright: (c) 2018 Bentley Systems, Incorporated. All rights reserved. $
+|  $Copyright: (c) 2019 Bentley Systems, Incorporated. All rights reserved. $
 |
 ======================================================================================= -->
 <ECSchema schemaName="BuildingSpacePlanning" alias="bsp" version="01.00.00" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.1">
-    <ECSchemaReference name="BisCore" version="01.00.01" alias="bis"/>
-    <ECSchemaReference name="Functional" version="01.00.00" alias="func" />
+    <ECSchemaReference name="BisCore" version="01.00.02" alias="bis"/>
+    <ECSchemaReference name="Functional" version="01.00.01" alias="func" />
     <ECSchemaReference name="Grids" version="01.00.00" alias="grids"/>
     <ECSchemaReference name="AecUnits" version="01.00.01" alias="AECU" />
     <ECSchemaReference name="ClassificationSystems" version="01.00.00" alias="cs" />
+    <ECSchemaReference name="SpatialComposition" version="01.00.00" alias="spcomp" />
     
     <ECEntityClass typeName="ObjectDefinitionElement">
         <BaseClass>bis:DefinitionElement</BaseClass>
@@ -55,22 +56,11 @@
     </ECEntityClass>
     
     <ECRelationshipClass typeName="ObjectDefinitionConsistsOfEntities" strength="embedding" modifier="None">
-      <!-- Relationship that indicates a decomposition of child AllocatedVolume -->
       <Source multiplicity="(1..1)" roleLabel="composes of" polymorphic="true">
         <Class class="ObjectDefinitionElement"/>
       </Source>
       <Target multiplicity="(0..*)" roleLabel="is part of" polymorphic="true">
         <Class class="IEntity"/>
-      </Target>
-    </ECRelationshipClass>
-
-    <ECRelationshipClass typeName="AllocatedVolumeDecomposesToElements" strength="embedding" modifier="None">
-      <!-- Relationship that indicates a decomposition of child AllocatedVolume -->
-      <Source multiplicity="(0..1)" roleLabel="composes of" polymorphic="true">
-        <Class class="AllocatedVolume"/>
-      </Source>
-      <Target multiplicity="(0..*)" roleLabel="is part of" polymorphic="true">
-        <Class class="AllocatedVolume"/>
       </Target>
     </ECRelationshipClass>
 
@@ -134,25 +124,14 @@
     </ECEntityClass>
 
     <ECEntityClass typeName="Building" displayLabel="Building">
-        <BaseClass>AllocatedVolume</BaseClass>
+        <BaseClass>spcomp:CompositeVolume</BaseClass>
         <BaseClass>bis:ISubModeledElement</BaseClass>
         <BaseClass>IEntity</BaseClass>
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.01.00.00" />
         </ECCustomAttributes>
-    </ECEntityClass>
-
-    <!--Mirrored Program Manager geometric elements start-->
-    <ECEntityClass typeName="AllocatedVolume">
-        <BaseClass>bis:SpatialLocationElement</BaseClass>
-        <BaseClass>IAllocation</BaseClass>
-        <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00.00" />
-        </ECCustomAttributes>
-        <ECProperty propertyName="Name" displayLabel="Name" typeName="string"/>
         <ECProperty propertyName="Cost" displayLabel="Cost" typeName="double"/>
         <ECProperty propertyName="Occupancy" displayLabel="Occupancy" typeName="int"/>
-        <ECNavigationProperty propertyName="ComposedElement" relationshipName="AllocatedVolumeDecomposesToElements" direction="Backward" description="The composed Element" />
     </ECEntityClass>
 
     <ECEnumeration typeName="ConflictVolumeType" backingTypeName="int" isStrict="true">
@@ -181,12 +160,14 @@
   
     <ECEntityClass typeName="Story" displayLabel="Story">
       <!-- this should abstract -->
-      <BaseClass>AllocatedVolume</BaseClass>
+      <BaseClass>spcomp:CompositeVolume</BaseClass>
       <BaseClass>bis:ISubModeledElement</BaseClass>
       <BaseClass>IEntity</BaseClass>
       <ECCustomAttributes>
         <ClassHasHandler xmlns="BisCore.01.00.00" />
       </ECCustomAttributes>
+      <ECProperty propertyName="Cost" displayLabel="Cost" typeName="double"/>
+      <ECProperty propertyName="Occupancy" displayLabel="Occupancy" typeName="int"/>
     </ECEntityClass>
 
     <ECRelationshipClass typeName="ElevationDrivenStoryHasTopSurface" strength="embedding" strengthDirection="Backward" modifier="none">
@@ -231,11 +212,13 @@
     </ECEntityClass>
   
     <ECEntityClass typeName="Space" displayLabel="Space">
-        <BaseClass>AllocatedVolume</BaseClass>
+        <BaseClass>spcomp:CompositeVolume</BaseClass>
         <BaseClass>IEntity</BaseClass>
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.01.00.00" />
         </ECCustomAttributes>
+        <ECProperty propertyName="Cost" displayLabel="Cost" typeName="double"/>
+        <ECProperty propertyName="Occupancy" displayLabel="Occupancy" typeName="int"/>
     </ECEntityClass>
 
     <ECEntityClass typeName="StorySpacePlanBundle" displayLabel="An element that bundles extrusion spaces">
@@ -326,7 +309,7 @@
             <ClassHasHandler xmlns="BisCore.01.00.00"/>
         </ECCustomAttributes>
         <Source multiplicity="(0..*)" roleLabel="drives" polymorphic="true">
-            <Class class="AllocatedVolume"/>
+            <Class class="spcomp:CompositeVolume"/>
         </Source>
         <Target multiplicity="(1..1)" roleLabel="is driven by" polymorphic="true">
             <Class class="ConflictVolumeBundle"/>
@@ -339,7 +322,7 @@
             <ClassHasHandler xmlns="BisCore.01.00.00"/>
         </ECCustomAttributes>
         <Source multiplicity="(0..*)" roleLabel="drives" polymorphic="true">
-            <Class class="AllocatedVolume"/>
+            <Class class="spcomp:CompositeVolume"/>
         </Source>
         <Target multiplicity="(1..1)" roleLabel="is driven by" polymorphic="true">
             <Class class="ConflictVolumeBundle"/>
@@ -421,15 +404,6 @@
             <Class class="OpeningLocation"/>
         </Target>
     </ECRelationshipClass>
-
-    <ECEntityClass typeName="IAllocation" modifier="Abstract" displayLabel="Allocation" description="An interface that indicates that an element is an allocated requirement">
-        <ECCustomAttributes>
-            <IsMixin xmlns="CoreCustomAttributes.01.00.00">
-                <AppliesToEntityClass>bis:Element</AppliesToEntityClass>
-            </IsMixin>
-        </ECCustomAttributes>
-        <ECProperty propertyName="Area" displayLabel="Area" typeName="double" readOnly="true" kindOfQuantity="AECU:AREA"/>
-    </ECEntityClass>
     
     <!--Anticipating BIS TYPECATALOG ENHANCEMENTS START-->
 
@@ -595,7 +569,7 @@
             <Class class="AllocationRequirement"/>
         </Source>
         <Target multiplicity="(0..*)" roleLabel="is implementation of" polymorphic="true">
-            <Class class="AllocatedVolume"/>
+            <Class class="spcomp:CompositeVolume"/>
         </Target>
     </ECRelationshipClass>
 
