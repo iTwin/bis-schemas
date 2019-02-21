@@ -50,6 +50,7 @@ DIRS_HG=(
     "${DIR_BIM0200_SRC}/DgnDomains/RoadRailPhysical"
     "${DIR_BIM0200_SRC}/DgnDomains/Site"
     "${DIR_BIM0200_SRC}/DgnDomains/Structural"
+    "${DIR_BIM0200_SRC}/DgnDomains/StructuralAnalysis"
     "${DIR_BIM0200_SRC}/ecstandards"
 )
 MAPS_HG=(
@@ -73,6 +74,7 @@ MAPS_HG=(
     "${DIR_ALL_BIS_FILEMAPS}/DgnDomains/RoadRailPhysical.filemap"
     "${DIR_ALL_BIS_FILEMAPS}/DgnDomains/Site.filemap"
     "${DIR_ALL_BIS_FILEMAPS}/DgnDomains/Structural.filemap"
+    "${DIR_ALL_BIS_FILEMAPS}/DgnDomains/StructuralAnalysis.filemap"
     "${DIR_ALL_BIS_FILEMAPS}/ECStandards.filemap"
 )
 
