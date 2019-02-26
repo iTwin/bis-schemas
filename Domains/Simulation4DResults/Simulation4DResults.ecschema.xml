@@ -4,7 +4,7 @@
     <ECSchemaReference name="ECDbMap" version="02.00.00" alias="ecdbmap"/>
     <ECSchemaReference name="CoreCustomAttributes" version="01.00.00" alias="CoreCA"/>
 
-    <ECEntityClass typeName="SpatioTemporalSimulationResults" description="Defines a element type containing 4D simulation results">
+    <ECEntityClass typeName="SpatioTemporalSimulationResults" description="Defines an element type containing 4D simulation results">
         <BaseClass>bis:InformationRecordElement</BaseClass>
         <BaseClass>bis:IParentElement</BaseClass>
         <ECCustomAttributes>
@@ -23,7 +23,7 @@
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.1.0"/>
         </ECCustomAttributes>
-        <ECProperty propertyName="Position" typeName="point3d" description="Camera position in the scene" displayLabel="Position">
+        <ECProperty propertyName="EyePoint" typeName="point3d" description="Camera eye point in the scene" displayLabel="EyePoint">
             <ECCustomAttributes>
                 <CustomHandledProperty/>
             </ECCustomAttributes>
@@ -55,7 +55,7 @@
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.1.0"/>
         </ECCustomAttributes>
-        <ECProperty propertyName="KeyframeTime" typeName="double" description="Time (in seconds) of the keyframe" displayLabel="Keyframe Time">
+        <ECProperty propertyName="KeyframeTime" typeName="double" description="Time (in seconds since 0:00 1/1/1970) of the keyframe" displayLabel="Keyframe Time">
             <ECCustomAttributes>
                 <CustomHandledProperty/>
             </ECCustomAttributes>
@@ -72,14 +72,14 @@
         </ECNavigationProperty>
     </ECEntityClass>
 
-    <ECEntityClass typeName="AnimationGroup">
+    <ECEntityClass typeName="AnimationGroup" description="Defines a group of spatial elements that should be animated together (at least one AnimationInstance should be defined for a group)">
         <BaseClass>bis:GroupInformationElement</BaseClass>
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.1.0"/>
         </ECCustomAttributes>
     </ECEntityClass>
 
-    <ECEntityClass typeName="AnimationInstance">
+    <ECEntityClass typeName="AnimationInstance" description="Defines an animation instance that can be associated with one spatial element and owns timelines for coloring, visibilty, transformation and clipping">
         <BaseClass>bis:InformationRecordElement</BaseClass>
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.1.0"/>
@@ -91,7 +91,7 @@
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.1.0"/>
         </ECCustomAttributes>
-        <ECProperty propertyName="KeyframeTime" typeName="double" description="Time (in seconds) of the keyframe" displayLabel="Keyframe Time">
+        <ECProperty propertyName="KeyframeTime" typeName="double" description="Time (in seconds since 0:00 1/1/1970) of the keyframe" displayLabel="Keyframe Time">
             <ECCustomAttributes>
                 <CustomHandledProperty/>
             </ECCustomAttributes>
@@ -122,30 +122,28 @@
             </ECCustomAttributes>
         </ECProperty>
     </ECEntityClass>
-	
+
     <ECEntityClass typeName="CuttingPlaneKeyframe" description="Defines a keyframe for clipping (growth simulation)">
         <BaseClass>Keyframe</BaseClass>
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.1.0"/>
         </ECCustomAttributes>
-        <ECStructProperty propertyName="CuttingPlane" typeName="Plane" description="Clipping plane parameter" displayLabel="Cutting Plane"/>
+        <ECStructProperty propertyName="CuttingPlane" typeName="Plane3dByOriginAndUnitNormal" description="Clipping plane parameter" displayLabel="Cutting Plane"/>
     </ECEntityClass>
-	
-	<!-- Question: how to represent 4x4 transfomation matrix in BIS? -->
-    <ECEntityClass typeName="TransformationKeyframe" description="Defines a keyframe for movement: it stores 4x4 transformation matrix and optionally decomposed form of transformation for instance moving along 3D path ( M.position x M.oriemataion x M.pivot )">
+
+    <ECEntityClass typeName="TransformationKeyframe" description="Defines a keyframe for movement by a task or along 3D path, pivot (pre-translation) is given if only the instance is moved along 3D path">
         <BaseClass>Keyframe</BaseClass>
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.1.0"/>
         </ECCustomAttributes>
-        <ECArrayProperty propertyName="RelativeTransform" typeName="double" minOccurs="16" maxOccurs="16" isStruct="True" description="Transformation matrix 4x4 ( if set the instance should be post-transformed by the given value relative to its original position, null means that transformation is not overriden and the instance should be placed in its original position )" displayLabel="Relative Transform"/>
-        <ECProperty propertyName="PathPosition" typeName="point3d" description="Translation" displayLabel="Path Position">
+        <ECProperty propertyName="Position" typeName="point3d" description="Translation" displayLabel="Position">
             <ECCustomAttributes>
                 <HiddenProperty xmlns="CoreCustomAttributes.1.0"/>
                 <CustomHandledProperty/>
             </ECCustomAttributes>
         </ECProperty>
-        <ECStructProperty propertyName="PathOrientation" typeName="Quaternion" description="Orientation" displayLabel="Path Orientation"/>
-        <ECProperty propertyName="PathPivot" typeName="point3d" description="Pre-translation" displayLabel="Path Pivot">
+        <ECStructProperty propertyName="Orientation" typeName="Quaternion" description="Orientation" displayLabel="Orientation"/>
+        <ECProperty propertyName="Pivot" typeName="point3d" description="Pre-translation" displayLabel="Pivot">
             <ECCustomAttributes>
                 <HiddenProperty xmlns="CoreCustomAttributes.1.0"/>
                 <CustomHandledProperty/>
@@ -154,16 +152,16 @@
     </ECEntityClass>
 
 	<!-- Question: is there something similar in BIS and how is this compatible with Navigator? -->
-    <ECStructClass typeName="RgbColor" description="Represents a color as three floating-point numbers">
-        <ECProperty propertyName="Red" typeName="double" description="Red component [0.0;1.0]"/>
-        <ECProperty propertyName="Green" typeName="double" description="Green component [0.0;1.0]"/>
-        <ECProperty propertyName="Blue" typeName="double" description="Blue component [0.0;1.0]"/>
+    <ECStructClass typeName="RgbColor" description="Represents a color as three integer numbers">
+        <ECProperty propertyName="Red" typeName="int" description="Red component [0;255]"/>
+        <ECProperty propertyName="Green" typeName="int" description="Green component [0;255]"/>
+        <ECProperty propertyName="Blue" typeName="int" description="Blue component [0;255]"/>
     </ECStructClass>
 	
 	<!-- Question: is there something similar in BIS and how is this compatible with Navigator? -->
-    <ECStructClass typeName="Plane" description="Represents a plane in three-dimensional space as point and normal">
-        <ECProperty propertyName="Position" typeName="point3d" description="Plane position"/>
-        <ECProperty propertyName="Direction" typeName="point3d" description="Normalized direction vector"/>
+    <ECStructClass typeName="Plane3dByOriginAndUnitNormal" description="Represents a plane in three-dimensional space as an origin point and normal">
+        <ECProperty propertyName="Origin" typeName="point3d" description="Origin point on the plane"/>
+        <ECProperty propertyName="Normal" typeName="point3d" description="Normalized direction vector"/>
     </ECStructClass>
 	
 	<!-- Question: is there something similar in BIS and how is this compatible with Navigator? -->
