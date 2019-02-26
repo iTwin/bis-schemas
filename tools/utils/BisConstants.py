@@ -3,7 +3,7 @@
 #
 #     $Source: tools/utils/BisConstants.py $
 #
-#  $Copyright: (c) 2018 Bentley Systems, Incorporated. All rights reserved. $
+#  $Copyright: (c) 2019 Bentley Systems, Incorporated. All rights reserved. $
 #
 #-----------------------------------------------------------------------------------
 SCHEMA_EXTENSION = '.ecschema.xml'
