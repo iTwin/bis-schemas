@@ -9,6 +9,7 @@ List of current BIS Schemas in this repository as SSOT:
 - Core\Generic
 - Core\Markup
 - Core\PhysicalMaterial
+- ClassificationSystems
 - ECObjects
 - Grids
 - PresentationRules
