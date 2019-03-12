@@ -1,5 +1,5 @@
 ---
-remarksTarget: StructuralAnalysis.md
+remarksTarget: StructuralAnalysis.ecschema.md
 ---
 
 ### TopologyElement
