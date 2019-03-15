@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ECSchema schemaName="StructuralAnalysis" alias="sa" version="1.0.0" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.1" displayLabel="Structural Analysis" description="Structural Analysis Schema.">
     <ECSchemaReference name="BisCore" version="1.0.0" alias="bis" />
-    <ECSchemaReference name="CoreCustomAttributes" version="1.0.0" alias="CoreCA"/>
+    <ECSchemaReference name="CoreCustomAttributes" version="1.0.0" alias="CoreCA" />
     <ECSchemaReference name="Profiles" version="1.0.0" alias="prf" />
 
     <!-- Used for setting Edge direction (OrientedEdgeAspect) -->
     <ECEnumeration typeName="EdgeDirection" backingTypeName="int" isStrict="true">
-        <ECEnumerator value="0" displayLabel="Forward"/>
-        <ECEnumerator value="1" displayLabel="Backward"/>
+        <ECEnumerator value="0" displayLabel="Forward" />
+        <ECEnumerator value="1" displayLabel="Backward" />
     </ECEnumeration>
 
     <!-- Used for setting Face direction (OrientedFaceAspect) -->
     <ECEnumeration typeName="FaceOrientation" backingTypeName="int" isStrict="true">
-        <ECEnumerator value="0" displayLabel="Upward"/>
-        <ECEnumerator value="1" displayLabel="Downward"/>
+        <ECEnumerator value="0" displayLabel="Upward" />
+        <ECEnumerator value="1" displayLabel="Downward" />
     </ECEnumeration>
 
     <!-- Used for settting MaterialProfile placement for -->
@@ -26,28 +26,28 @@
     <ECEntityClass typeName="TopologyElement" modifier="Abstract" displayLabel="Topology Element" description="Abstract class for all topology-related classes to derive from.">
         <BaseClass>bis:SpatialLocationElement</BaseClass>
         <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.1.0"/>
+            <ClassHasHandler xmlns="BisCore.1.0" />
         </ECCustomAttributes>
     </ECEntityClass>
 
     <ECEntityClass typeName="SharedTopologyElement" modifier="Abstract" displayLabel="Shared Topology Element" description="Abstract class is topology type that can shared by multiple other Elements. The sharing defines the connectivity of the topological network. Each subclass is also the lowest level concept for a particular dimensionality (Face is the lowest 2D concept).">
         <BaseClass>TopologyElement</BaseClass>
         <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.1.0"/>
+            <ClassHasHandler xmlns="BisCore.1.0" />
         </ECCustomAttributes>
     </ECEntityClass>
 
     <ECEntityClass typeName="PrivateTopologyElement" modifier="Abstract" displayLabel="Privete Topology Element" description="Abstract class as a common parent class for each  topology type that is not shared. Each subclass represents a direct or indirect collection of the shared topology. Each subclass is also a collection of the topology of the same dimensionality.">
-        <BaseClass>TopologyElement</BaseClass> 
+        <BaseClass>TopologyElement</BaseClass>
         <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.1.0"/>
+            <ClassHasHandler xmlns="BisCore.1.0" />
         </ECCustomAttributes>
     </ECEntityClass>
 
     <ECEntityClass typeName="Vertex" modifier="Sealed" displayLabel="Vertex" description="An identified location in 3D space.">
         <BaseClass>SharedTopologyElement</BaseClass>
         <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.1.0"/>
+            <ClassHasHandler xmlns="BisCore.1.0" />
         </ECCustomAttributes>
         <ECProperty propertyName="Point" typeName="point3d" displayLabel="Vertex placement point." >
             <ECCustomAttributes>
@@ -61,7 +61,7 @@
     <ECEntityClass typeName="Edge" modifier="Sealed" displayLabel="Edge" description="A curve connecting two Vertices.">
         <BaseClass>SharedTopologyElement</BaseClass>
         <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.1.0"/>
+            <ClassHasHandler xmlns="BisCore.1.0" />
         </ECCustomAttributes>
         <ECNavigationProperty propertyName="StartVertex" relationshipName="EdgeHasStartVertex" direction="Forward" displayLabel="Start Vertex." >
             <ECCustomAttributes>
@@ -88,7 +88,7 @@
 
     <ECRelationshipClass typeName="EdgeHasStartVertex" strength="referencing" modifier="Sealed">
         <Source multiplicity="(0..*)" roleLabel="has" polymorphic="false">
-            <Class class="Edge"/>
+            <Class class="Edge" />
         </Source>
         <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="false">
             <Class class="Vertex" />
@@ -97,7 +97,7 @@
 
     <ECRelationshipClass typeName="EdgeHasEndVertex" strength="referencing" modifier="Sealed">
         <Source multiplicity="(0..*)" roleLabel="has" polymorphic="false">
-            <Class class="Edge"/>
+            <Class class="Edge" />
         </Source>
         <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="false">
             <Class class="Vertex" />
@@ -107,7 +107,7 @@
     <ECEntityClass typeName="OrientedEdgeAspect" modifier="Sealed" displayLabel="Oriented Edge Aspect" description="This Aspect stores the Edges (and related data) for a Path." >
         <BaseClass>bis:ElementMultiAspect</BaseClass>
         <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.1.0"/>
+            <ClassHasHandler xmlns="BisCore.1.0" />
         </ECCustomAttributes>
         <ECProperty propertyName="Index" typeName="int" displayLabel="Index" description="Zero based index for Edge order in Path." >
             <ECCustomAttributes>
@@ -120,7 +120,7 @@
 
     <ECRelationshipClass typeName="OrientedEdgeAspectHasEdge" strength="referencing" strengthDirection="Backward" modifier="Sealed">
         <Source multiplicity="(0..*)" roleLabel="is referenced by" polymorphic="false">
-            <Class class="OrientedEdgeAspect"/>
+            <Class class="OrientedEdgeAspect" />
         </Source>
         <Target multiplicity="(1..1)" roleLabel="has" polymorphic="false">
             <Class class="Edge" />
@@ -130,14 +130,14 @@
     <ECEntityClass typeName="Path" modifier="Abstract" displayLabel="Path" description="A Path that does not need to be closed and is not defining the boundary of a face.">
         <BaseClass>PrivateTopologyElement</BaseClass>
         <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.1.0"/>
+            <ClassHasHandler xmlns="BisCore.1.0" />
         </ECCustomAttributes>
     </ECEntityClass>
 
     <ECRelationshipClass typeName="PathOwnsOrientedEdgeAspects" strength="embedding" modifier="Sealed">
         <BaseClass>bis:ElementOwnsMultiAspects</BaseClass>
         <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
-            <Class class="Path"/>
+            <Class class="Path" />
         </Source>
         <Target multiplicity="(1..*)" roleLabel="is owned by" polymorphic="false">
             <Class class="OrientedEdgeAspect" />
@@ -147,22 +147,23 @@
     <ECEntityClass typeName="Wire" modifier="Sealed" displayLabel="Wire" description="A Path that does not need to be closed and is not defining the boundary of a face.">
         <BaseClass>Path</BaseClass>
         <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.1.0"/>
+            <ClassHasHandler xmlns="BisCore.1.0" />
         </ECCustomAttributes>
     </ECEntityClass>
 
     <ECEntityClass typeName="Loop" modifier="Sealed" displayLabel="Loop" description="A Path that is closed and defines a boundary of a Face.">
         <BaseClass>Path</BaseClass>
         <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.1.0"/>
+            <ClassHasHandler xmlns="BisCore.1.0" />
         </ECCustomAttributes>
     </ECEntityClass>
 
     <ECEntityClass typeName="Face" modifier="Sealed" displayLabel="Face" description="A surface bounded by Loops.">
         <BaseClass>SharedTopologyElement</BaseClass>
         <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.1.0"/>
+            <ClassHasHandler xmlns="BisCore.1.0" />
         </ECCustomAttributes>
+        <ECProperty propertyName="Surface" typeName="Bentley.Geometry.Common.IGeometry" displayLabel="Location Curve." />
         <ECNavigationProperty propertyName="Boundary" relationshipName="FaceOwnsBoundaryLoop" direction="Forward" displayLabel="Location Boundary. Cannot be one of the inner Loops" >
             <ECCustomAttributes>
                 <CustomHandledProperty>
@@ -171,13 +172,12 @@
             </ECCustomAttributes>
         </ECNavigationProperty>
     </ECEntityClass>
-  
-  
+
     <ECRelationshipClass typeName="FaceOwnsBoundaryLoop" strength="embedding" strengthDirection="Backward" modifier="Sealed">
         <Source multiplicity="(0..1)" roleLabel="has" polymorphic="true">
             <Class class="Face" />
         </Source>
-        <Target multiplicity="(0..1)" roleLabel="is referenced by" polymorphic="true">
+        <Target multiplicity="(0..1)" roleLabel="is owned by Loop" polymorphic="true">
             <Class class="Loop" />
         </Target>
     </ECRelationshipClass>
@@ -185,17 +185,17 @@
     <ECRelationshipClass typeName="FaceHasInternalVertices" strength="referencing" modifier="Sealed">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <Source multiplicity="(0..*)" roleLabel="has" polymorphic="false">
-            <Class class="Face"/>
+            <Class class="Face" />
         </Source>
         <Target multiplicity="(0..*)" roleLabel="is referenced by" polymorphic="false">
-            <Class class="Vertex"/>
+            <Class class="Vertex" />
         </Target>
     </ECRelationshipClass>
 
     <ECEntityClass typeName="OrientedFaceAspect" modifier="Sealed" displayLabel="Oriented Face Aspect" description="This Aspect stores the Faces (and related data) for a FaceSet.">
         <BaseClass>bis:ElementMultiAspect</BaseClass>
         <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.1.0"/>
+            <ClassHasHandler xmlns="BisCore.1.0" />
         </ECCustomAttributes>
         <ECProperty propertyName="Orientation" typeName="FaceOrientation" modifier="Sealed" displayLabel="Orientation" description="Orientation of face." />
         <ECNavigationProperty propertyName="Face" relationshipName="OrientedFaceAspectHasFace" direction="Forward" displayLabel="Face described by this Aspect." />
@@ -203,7 +203,7 @@
 
     <ECRelationshipClass typeName="OrientedFaceAspectHasFace" strength="referencing" strengthDirection="Backward" modifier="Sealed">
         <Source multiplicity="(0..*)" roleLabel="is referenced by" polymorphic="false">
-            <Class class="OrientedFaceAspect"/>
+            <Class class="OrientedFaceAspect" />
         </Source>
         <Target multiplicity="(1..1)" roleLabel="has" polymorphic="false">
             <Class class="Face" />
@@ -213,14 +213,14 @@
     <ECEntityClass typeName="FaceSet" modifier="Abstract" displayLabel="FaceSet" description="A set of Edge-connected Faces with compatible orientations (up directions). This class defines common data and functionality for Sheet and Shell (future).">
         <BaseClass>PrivateTopologyElement</BaseClass>
         <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.1.0"/>
+            <ClassHasHandler xmlns="BisCore.1.0" />
         </ECCustomAttributes>
     </ECEntityClass>
 
     <ECRelationshipClass typeName="FaceSetOwnsOrientedFaceAspects" strength="embedding" modifier="Sealed">
         <BaseClass>bis:ElementOwnsMultiAspects</BaseClass>
         <Source multiplicity="(1..1)" roleLabel="is owned by" polymorphic="true">
-            <Class class="FaceSet"/>
+            <Class class="FaceSet" />
         </Source>
         <Target multiplicity="(1..*)" roleLabel="owns" polymorphic="false">
             <Class class="OrientedFaceAspect" />
@@ -230,14 +230,14 @@
     <ECEntityClass typeName="Sheet" modifier="Abstract" displayLabel="Sheet" description="A FaceSet that may be open or closed, and does not bound a Region (future concept). Sheets are also constrained to have a single base Surface.">
         <BaseClass>FaceSet</BaseClass>
         <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.1.0"/>
+            <ClassHasHandler xmlns="BisCore.1.0" />
         </ECCustomAttributes>
     </ECEntityClass>
-    
+
     <ECEntityClass typeName="Shell" modifier="Sealed" displayLabel="Shell" description="TODO: Add Description">
         <BaseClass>FaceSet</BaseClass>
         <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.1.0"/>
+            <ClassHasHandler xmlns="BisCore.1.0" />
         </ECCustomAttributes>
     </ECEntityClass>
 
@@ -245,98 +245,98 @@
     <ECEntityClass typeName="CurveMemberSystem" modifier="Abstract" displayLabel="Curve Member System">
         <BaseClass>bis:DriverBundleElement</BaseClass>
         <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.1.0"/>
+            <ClassHasHandler xmlns="BisCore.1.0" />
         </ECCustomAttributes>
     </ECEntityClass>
 
     <ECEntityClass typeName="SegmentedCurveMemberSystem" modifier="Sealed" displayLabel="Segmented Curve Member System">
         <BaseClass>CurveMemberSystem</BaseClass>
         <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.1.0"/>
-        </ECCustomAttributes>        
+            <ClassHasHandler xmlns="BisCore.1.0" />
+        </ECCustomAttributes>
     </ECEntityClass>
 
     <ECEntityClass typeName="SingleCurveMemberSystem" modifier="Abstract" displayLabel="Single Curve Member System">
         <BaseClass>CurveMemberSystem</BaseClass>
         <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.1.0"/>
-        </ECCustomAttributes>                
+            <ClassHasHandler xmlns="BisCore.1.0" />
+        </ECCustomAttributes>
     </ECEntityClass>
 
     <ECRelationshipClass typeName="SegmentedCurveMemberSystemDrivesSingleCurveMemberSystem" strength="referencing" modifier="Sealed">
         <BaseClass>bis:ElementDrivesElement</BaseClass>
         <ECProperty propertyName="Index" typeName="int" modifier="Sealed" displayLabel="Index" description="Index of Single Curve Member System in Segmented Curve Member System" >
             <ECCustomAttributes>
-              <CustomHandledProperty>
-                  <StatementTypes>3</StatementTypes>
-              </CustomHandledProperty>
+                <CustomHandledProperty>
+                    <StatementTypes>3</StatementTypes>
+                </CustomHandledProperty>
             </ECCustomAttributes>
         </ECProperty>
         <Source multiplicity="(0..*)" roleLabel="drives" polymorphic="false">
-            <Class class="SegmentedCurveMemberSystem"/>
+            <Class class="SegmentedCurveMemberSystem" />
         </Source>
         <Target multiplicity="(2..*)" roleLabel="is drven by" polymorphic="true">
-            <Class class="SingleCurveMemberSystem"/>
+            <Class class="SingleCurveMemberSystem" />
         </Target>
     </ECRelationshipClass>
 
     <ECEntityClass typeName="MaterialProfileSystemTapering" modifier="Abstract" displayLabel="Material Profile System Tapering">
         <BaseClass>SingleCurveMemberSystem</BaseClass>
         <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.1.0"/>
+            <ClassHasHandler xmlns="BisCore.1.0" />
         </ECCustomAttributes>
     </ECEntityClass>
 
     <ECEntityClass typeName="MaterialProfileSystemLinearTapering" modifier="Sealed" displayLabel="Material Profile System Linear Tapering">
         <BaseClass>MaterialProfileSystemTapering</BaseClass>
         <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.1.0"/>
+            <ClassHasHandler xmlns="BisCore.1.0" />
         </ECCustomAttributes>
     </ECEntityClass>
 
     <ECEntityClass typeName="MaterialProfileSystem" modifier="Sealed" displayLabel="Material Profile System">
-        <BaseClass>SingleCurveMemberSystem</BaseClass>        
+        <BaseClass>SingleCurveMemberSystem</BaseClass>
         <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.1.0"/>
+            <ClassHasHandler xmlns="BisCore.1.0" />
         </ECCustomAttributes>
     </ECEntityClass>
 
     <ECRelationshipClass typeName="CurveMemberSystemDrivesCurveMember" modifier="Sealed" displayLabel="Curve Member System drives Curve Member">
         <BaseClass>bis:ElementDrivesElement</BaseClass>
         <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.1.0"/>
+            <ClassHasHandler xmlns="BisCore.1.0" />
         </ECCustomAttributes>
         <Source multiplicity="(0..*)" roleLabel="drives" polymorphic="false">
-            <Class class="CurveMemberSystem"/>
+            <Class class="CurveMemberSystem" />
         </Source>
         <Target multiplicity="(1..1)" roleLabel="is driven by" polymorphic="true">
-            <Class class="CurveMember"/>
+            <Class class="CurveMember" />
         </Target>
     </ECRelationshipClass>
 
     <ECRelationshipClass typeName="MaterialProfileSystemDrivesMaterialProfileDefinition" modifier="Sealed" displayLabel="Material Profile System drives Material Profile Definition">
         <BaseClass>bis:ElementDrivesElement</BaseClass>
         <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.1.0"/>
+            <ClassHasHandler xmlns="BisCore.1.0" />
         </ECCustomAttributes>
         <Source multiplicity="(0..*)" roleLabel="drives" polymorphic="false">
-            <Class class="MaterialProfileSystem"/>
+            <Class class="MaterialProfileSystem" />
         </Source>
         <Target multiplicity="(1..1)" roleLabel="is driven by" polymorphic="true">
-            <Class class="prf:MaterialProfileDefinition"/>
+            <Class class="prf:MaterialProfileDefinition" />
         </Target>
     </ECRelationshipClass>
 
     <ECRelationshipClass typeName="MaterialProfileSystemTaperingDrivesMaterialProfileDefinition" modifier="Sealed" displayLabel="Material Profile System Tapering drives Material Profile Definition">
         <BaseClass>bis:ElementDrivesElement</BaseClass>
         <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.1.0"/>
+            <ClassHasHandler xmlns="BisCore.1.0" />
         </ECCustomAttributes>
         <Source multiplicity="(0..*)" roleLabel="drives" polymorphic="false">
-            <Class class="MaterialProfileSystemTapering"/>
+            <Class class="MaterialProfileSystemTapering" />
         </Source>
         <Target multiplicity="(2..2)" roleLabel="is driven by" polymorphic="true">
-            <Class class="prf:MaterialProfileDefinition"/>
+            <Class class="prf:MaterialProfileDefinition" />
         </Target>
         <ECProperty propertyName="Placement" typeName="MaterialProfilePlacement" modifier="Sealed" displayLabel="Material Profile Placement" description="Shows material profile placement for Material Profile" >
             <ECCustomAttributes>
@@ -351,28 +351,28 @@
     <ECEntityClass typeName="AnalysisElement" modifier="Abstract" displayLabel="Analysis Element">
         <BaseClass>bis:SpatialLocationElement</BaseClass>
         <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.1.0"/>
+            <ClassHasHandler xmlns="BisCore.1.0" />
         </ECCustomAttributes>
     </ECEntityClass>
 
     <ECEntityClass typeName="StructuralAnalysisElement" modifier="Abstract" displayLabel="Structural Analysis Element" description="Abstract class for all Structural Analysis Element classes to descend from.">
         <BaseClass>AnalysisElement</BaseClass>
         <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.1.0"/>
+            <ClassHasHandler xmlns="BisCore.1.0" />
         </ECCustomAttributes>
     </ECEntityClass>
 
     <ECEntityClass typeName="Member" modifier="Abstract" displayLabel="Member" description="Abstract class for all member classes to descend from.">
         <BaseClass>StructuralAnalysisElement</BaseClass>
         <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.1.0"/>
+            <ClassHasHandler xmlns="BisCore.1.0" />
         </ECCustomAttributes>
     </ECEntityClass>
 
     <ECEntityClass typeName="CurveMember" modifier="Sealed" displayLabel="Curve Member" description="Defines a Member that is located along a Path, and whose behavior is defined along that Path.">
         <BaseClass>Member</BaseClass>
         <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.1.0"/>
+            <ClassHasHandler xmlns="BisCore.1.0" />
         </ECCustomAttributes>
         <ECProperty propertyName="Orientation" typeName="point3d" modifier="Sealed" displayLabel="Orientation" description="Shows Curve Member Orientation at the start of the member. Must be unit vector and perpendicular to curveMember direction at start." >
             <ECCustomAttributes>
@@ -414,97 +414,120 @@
                 <CustomHandledProperty>
                     <StatementTypes>7</StatementTypes>
                 </CustomHandledProperty>
-            </ECCustomAttributes> 
+            </ECCustomAttributes>
         </ECNavigationProperty>
     </ECEntityClass>
-  
+
     <ECRelationshipClass typeName="CurveMemberHasPath" strength="referencing" modifier="Sealed">
         <Source multiplicity="(0..*)" roleLabel="owns" polymorphic="false">
-            <Class class="CurveMember"/>
+            <Class class="CurveMember" />
         </Source>
         <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="false">
-            <Class class="Path"/>
+            <Class class="Path" />
         </Target>
     </ECRelationshipClass>
 
     <ECRelationshipClass typeName="CurveMemberHasCurveMemberSystem" strength="referencing" modifier="Sealed">
         <Source multiplicity="(0..*)" roleLabel="has" polymorphic="false">
-            <Class class="CurveMember"/>
+            <Class class="CurveMember" />
         </Source>
         <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="true">
-            <Class class="CurveMemberSystem"/>
+            <Class class="CurveMemberSystem" />
         </Target>
     </ECRelationshipClass>
 
     <ECEntityClass typeName="SurfaceMember" modifier="Sealed" displayLabel="Surface Member" description="Defines a Member that is located by an Shell, and whose behavior is defined at that Shell.">
         <BaseClass>Member</BaseClass>
         <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.1.0"/>
+            <ClassHasHandler xmlns="BisCore.1.0" />
         </ECCustomAttributes>
     </ECEntityClass>
 
     <ECEntityClass typeName="SurfaceMemberRegion" modifier="Abstract" displayLabel="Surface Member Region" description="Defines a region of a SurfaceMember that has different behavior (or is an opening).">
         <BaseClass>AnalysisElement</BaseClass>
         <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.1.0"/>
+            <ClassHasHandler xmlns="BisCore.1.0" />
         </ECCustomAttributes>
     </ECEntityClass>
 
     <ECEntityClass typeName="SurfaceMemberModifier" modifier="Sealed" displayLabel="Surface Member Region" description="Defines a solid region of a SurfaceMember that has different behavior.">
         <BaseClass>AnalysisElement</BaseClass>
         <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.1.0"/>
+            <ClassHasHandler xmlns="BisCore.1.0" />
         </ECCustomAttributes>
     </ECEntityClass>
 
     <ECEntityClass typeName="SurfaceMemberOpening" modifier="Sealed" displayLabel="Surface Member Region" description="Defines a void region of a SurfaceMember.">
         <BaseClass>AnalysisElement</BaseClass>
         <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.1.0"/>
+            <ClassHasHandler xmlns="BisCore.1.0" />
         </ECCustomAttributes>
     </ECEntityClass>
 
     <!-- Loading classes -->
-  
+
     <!-- Used for setting Coordinate System (Load) -->
     <ECEnumeration typeName="CoordinateSystem" backingTypeName="int" isStrict="true">
-        <ECEnumerator value="0" displayLabel="Global"/>
-        <ECEnumerator value="1" displayLabel="Local"/>
+        <ECEnumerator value="0" displayLabel="Global" />
+        <ECEnumerator value="1" displayLabel="Local" />
     </ECEnumeration>
-  
+
+    <!-- Enumeration of published standard cardinal points -->
+    <ECEnumeration typeName="CardinalPoint" backingTypeName="int">
+        <ECEnumerator value="0" displayLabel="BottomLeft" />
+        <ECEnumerator value="1" displayLabel="BottomCenter" />
+        <ECEnumerator value="2" displayLabel="BottomRight" />
+        <ECEnumerator value="3" displayLabel="MinDepthLeft" />
+        <ECEnumerator value="4" displayLabel="MinDepthCenter" />
+        <ECEnumerator value="5" displayLabel="MinDepthRight" />
+        <ECEnumerator value="6" displayLabel="TopLeft" />
+        <ECEnumerator value="7" displayLabel="TopCenter" />
+        <ECEnumerator value="8" displayLabel="TopRight" />
+        <ECEnumerator value="9" displayLabel="GeometricCentroid" />
+        <ECEnumerator value="10" displayLabel="BottomInLineWithGeometricCentroid" />
+        <ECEnumerator value="11" displayLabel="LeftInLineWithGeometricCentroid" />
+        <ECEnumerator value="12" displayLabel="RightInLineWithGeometricCentroid" />
+        <ECEnumerator value="13" displayLabel="TopInLineWithGeometricCentroid" />
+        <ECEnumerator value="14" displayLabel="ShearCentre" />
+        <ECEnumerator value="15" displayLabel="BottomInLineWithShearCentroid" />
+        <ECEnumerator value="16" displayLabel="LeftInLineWithShearCentroid" />
+        <ECEnumerator value="17" displayLabel="RightInLineWithShearCentroid" />
+        <ECEnumerator value="18" displayLabel="TopInLineWithShearCentroid" />
+    </ECEnumeration>
+
     <ECStructClass typeName="Force" description="Force struct." modifier="Sealed">
-        <ECProperty propertyName="FX" typeName="double" description="Force in X axis."/>
-        <ECProperty propertyName="FY" typeName="double" description="Force in Y axis."/>
-        <ECProperty propertyName="FZ" typeName="double" description="Force in Z axis."/>
-        <ECProperty propertyName="MX" typeName="double" description="Moment abount X axis."/>
-        <ECProperty propertyName="MY" typeName="double" description="Moment abount Y axis."/>
-        <ECProperty propertyName="MZ" typeName="double" description="Moment abount Z axis."/>
+        <ECProperty propertyName="FX" typeName="double" description="Force in X axis." />
+        <ECProperty propertyName="FY" typeName="double" description="Force in Y axis." />
+        <ECProperty propertyName="FZ" typeName="double" description="Force in Z axis." />
+        <ECProperty propertyName="MX" typeName="double" description="Moment abount X axis." />
+        <ECProperty propertyName="MY" typeName="double" description="Moment abount Y axis." />
+        <ECProperty propertyName="MZ" typeName="double" description="Moment abount Z axis." />
     </ECStructClass>
 
     <ECStructClass typeName="LinearForce" description="Force per unit length struct." modifier="Sealed">
-        <ECProperty propertyName="FX" typeName="double" description="Force per unit length in X axis."/>
-        <ECProperty propertyName="FY" typeName="double" description="Force per unit length in Y axis."/>
-        <ECProperty propertyName="FZ" typeName="double" description="Force per unit length in Z axis."/>
-        <ECProperty propertyName="MX" typeName="double" description="Moment per unit length abount X axis."/>
-        <ECProperty propertyName="MY" typeName="double" description="Moment per unit length abount Y axis."/>
-        <ECProperty propertyName="MZ" typeName="double" description="Moment per unit length abount Z axis."/>
+        <ECProperty propertyName="FX" typeName="double" description="Force per unit length in X axis." />
+        <ECProperty propertyName="FY" typeName="double" description="Force per unit length in Y axis." />
+        <ECProperty propertyName="FZ" typeName="double" description="Force per unit length in Z axis." />
+        <ECProperty propertyName="MX" typeName="double" description="Moment per unit length abount X axis." />
+        <ECProperty propertyName="MY" typeName="double" description="Moment per unit length abount Y axis." />
+        <ECProperty propertyName="MZ" typeName="double" description="Moment per unit length abount Z axis." />
     </ECStructClass>
-  
+
     <ECStructClass typeName="AreaForce" description="Force per unit area struct." modifier="Sealed">
-        <ECProperty propertyName="FX" typeName="double" description="Force per unit area in X axis."/>
-        <ECProperty propertyName="FY" typeName="double" description="Force per unit area in Y axis."/>
-        <ECProperty propertyName="FZ" typeName="double" description="Force per unit area in Z axis."/>
+        <ECProperty propertyName="FX" typeName="double" description="Force per unit area in X axis." />
+        <ECProperty propertyName="FY" typeName="double" description="Force per unit area in Y axis." />
+        <ECProperty propertyName="FZ" typeName="double" description="Force per unit area in Z axis." />
     </ECStructClass>
 
     <ECEntityClass typeName="IDefinedPoint" modifier="Abstract" displayLabel="Point location definition" description="An Element that directly or indirectly defines a point location and clear coordinate system.">
-    <ECCustomAttributes>
+        <ECCustomAttributes>
             <IsMixin xmlns="CoreCustomAttributes.1.0">
                 <!-- Only subclasses of bis:Element can implement the IDefinePoint interface -->
                 <AppliesToEntityClass>bis:Element</AppliesToEntityClass>
             </IsMixin>
         </ECCustomAttributes>
     </ECEntityClass>
-  
+
     <ECEntityClass typeName="IDefinedCurve" modifier="Abstract" displayLabel="Curve location definition" description="An Element that directly or indirectly defines a curve location and a clear coordinate system with the z-axis along the curve. The Element may have cardinal points defined; if not all the cardinal points should be considered to lie on the z-axis.">
         <ECCustomAttributes>
             <IsMixin xmlns="CoreCustomAttributes.1.0">
@@ -513,7 +536,7 @@
             </IsMixin>
         </ECCustomAttributes>
     </ECEntityClass>
-    
+
     <ECEntityClass typeName="IDefinedSurface" modifier="Abstract" displayLabel="Surface location definition" description="An Element that directly or indirectly defines a surface location and a clear coordinate system with the x- and y- axes in the surface. The Element may have a top, bottom and center defined; if not, the top and bottom and center should be considered to lie on the surface.">
         <ECCustomAttributes>
             <IsMixin xmlns="CoreCustomAttributes.1.0">
@@ -522,108 +545,121 @@
             </IsMixin>
         </ECCustomAttributes>
     </ECEntityClass>
-    
+
     <ECEntityClass typeName="RelativeLocationAspect" modifier="Abstract" displayLabel="Relative location data" description="Abstract class to define a relative location.">
         <BaseClass>bis:ElementUniqueAspect</BaseClass>
         <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.1.0"/>
+            <ClassHasHandler xmlns="BisCore.1.0" />
         </ECCustomAttributes>
     </ECEntityClass>
-    
+
     <ECEntityClass typeName="RelativePointLocationAspect" modifier="Abstract" displayLabel="Relative point location data" description="Point relative to other elements.">
         <BaseClass>RelativeLocationAspect</BaseClass>
         <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.1.0"/>
+            <ClassHasHandler xmlns="BisCore.1.0" />
         </ECCustomAttributes>
     </ECEntityClass>
 
     <ECEntityClass typeName="PointRelativeToPointAspect" modifier="Sealed" displayLabel="Point relative to point location data" description="Point relative to point.">
         <BaseClass>RelativePointLocationAspect</BaseClass>
         <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.1.0"/>
+            <ClassHasHandler xmlns="BisCore.1.0" />
         </ECCustomAttributes>
         <ECNavigationProperty propertyName="ReferencePoint" relationshipName="PointRelativeToPointAspectRefersToIDefinedPoint" direction="Forward" displayLabel="Reference point." />
     </ECEntityClass>
-    
+
     <!-- Check all relationships with this example -->
     <ECRelationshipClass typeName="PointRelativeToPointAspectRefersToIDefinedPoint" strength="referencing" strengthDirection="Forward" modifier="Sealed">
         <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="false">
-            <Class class="PointRelativeToPointAspect"/>
+            <Class class="PointRelativeToPointAspect" />
         </Source>
-        <Target multiplicity="(1..1)" roleLabel="referenced by" polymorphic="true"> <!-- mixin classes are abstract, check when gen -->
+        <Target multiplicity="(1..1)" roleLabel="referenced by" polymorphic="true">
+            <!-- mixin classes are abstract, check when gen -->
             <Class class="IDefinedPoint" />
         </Target>
     </ECRelationshipClass>
-    
+
     <ECEntityClass typeName="PointRelativeToCurveAspect" modifier="Sealed" displayLabel="Point relative to curve location data" description="Point relative to curve.">
         <BaseClass>RelativePointLocationAspect</BaseClass>
         <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.1.0"/>
+            <ClassHasHandler xmlns="BisCore.1.0" />
         </ECCustomAttributes>
+        <ECProperty propertyName="Location" typeName="double" displayLabel="Location" />
+        <ECProperty propertyName="Offset" typeName="Point2d" displayLabel="Offset" />
+        <ECProperty propertyName="CardinalPoint" typeName="CardinalPoint" displayLabel="Cardinal point" />
         <ECNavigationProperty propertyName="ReferenceCurve" relationshipName="PointRelativeToCurveAspectRefersToIDefinedCurve" direction="Forward" displayLabel="Reference curve." />
     </ECEntityClass>
-    
+
     <ECRelationshipClass typeName="PointRelativeToCurveAspectRefersToIDefinedCurve" strength="referencing" strengthDirection="Forward" modifier="Sealed">
         <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="false">
-            <Class class="PointRelativeToCurveAspect"/>
+            <Class class="PointRelativeToCurveAspect" />
         </Source>
         <Target multiplicity="(1..1)" roleLabel="referenced by" polymorphic="true">
             <Class class="IDefinedCurve" />
         </Target>
-    </ECRelationshipClass>    
+    </ECRelationshipClass>
 
     <ECEntityClass typeName="PointRelativeToSurfaceAspect" modifier="Sealed" displayLabel="Point relative to surface location data" description="Point relative to surface.">
         <BaseClass>RelativePointLocationAspect</BaseClass>
         <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.1.0"/>
+            <ClassHasHandler xmlns="BisCore.1.0" />
         </ECCustomAttributes>
+        <ECProperty propertyName="Location" typeName="Point2d" displayLabel="Location" />
+        <ECProperty propertyName="Offset" typeName="double" displayLabel="Offset" />
+        <ECProperty propertyName="Surface" typeName="Bentley.Geometry.Common.IGeometry" displayLabel="Surface" />
         <ECNavigationProperty propertyName="ReferenceSurface" relationshipName="PointRelativeToSurfaceAspectRefersToIDefinedSurface" direction="Forward" displayLabel="Reference surface." />
     </ECEntityClass>
-    
+
     <ECRelationshipClass typeName="PointRelativeToSurfaceAspectRefersToIDefinedSurface" strength="referencing" strengthDirection="Forward" modifier="Sealed">
         <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="false">
-            <Class class="PointRelativeToSurfaceAspect"/>
+            <Class class="PointRelativeToSurfaceAspect" />
         </Source>
         <Target multiplicity="(1..1)" roleLabel="referenced by" polymorphic="true">
             <Class class="IDefinedSurface" />
         </Target>
-    </ECRelationshipClass>    
-    
+    </ECRelationshipClass>
+
     <ECEntityClass typeName="RelativeCurveLocationAspect" modifier="Abstract" displayLabel="Relative curve location data" description="Curve relative to other elements.">
         <BaseClass>RelativeLocationAspect</BaseClass>
         <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.1.0"/>
+            <ClassHasHandler xmlns="BisCore.1.0" />
         </ECCustomAttributes>
     </ECEntityClass>
 
     <ECEntityClass typeName="CurveRelativeToCurveAspect" modifier="Sealed" displayLabel="Curve relative to curve location data" description="Curve relative to curve.">
         <BaseClass>RelativeCurveLocationAspect</BaseClass>
         <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.1.0"/>
+            <ClassHasHandler xmlns="BisCore.1.0" />
         </ECCustomAttributes>
+        <ECProperty propertyName="Location" typeName="range1d" displayLabel="Location" />
+        <ECProperty propertyName="Offset" typeName="Point2d" displayLabel="Offset" />
+        <ECProperty propertyName="CardinalPoint" typeName="CardinalPoint" displayLabel="Cardinal point" />
         <ECNavigationProperty propertyName="ReferenceCurve" relationshipName="CurveRelativeToCurveAspectRefersToIDefineCurve" direction="Forward" displayLabel="Reference curve." />
     </ECEntityClass>
-    
+
     <ECRelationshipClass typeName="CurveRelativeToCurveAspectRefersToIDefineCurve" strength="referencing" strengthDirection="Forward" modifier="Sealed">
         <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="false">
-            <Class class="CurveRelativeToCurveAspect"/>
+            <Class class="CurveRelativeToCurveAspect" />
         </Source>
         <Target multiplicity="(1..1)" roleLabel="referenced by" polymorphic="true">
             <Class class="IDefinedCurve" />
         </Target>
-    </ECRelationshipClass>    
+    </ECRelationshipClass>
 
     <ECEntityClass typeName="CurveRelativeToSurfaceAspect" modifier="Sealed" displayLabel="Curve relative to surface location data" description="Curve relative to surface.">
         <BaseClass>RelativeCurveLocationAspect</BaseClass>
         <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.1.0"/>
+            <ClassHasHandler xmlns="BisCore.1.0" />
         </ECCustomAttributes>
+        <ECProperty propertyName="Location" typeName="Curve2d" displayLabel="Location" />
+        <ECProperty propertyName="Offset" typeName="double" displayLabel="Offset" />
+        <ECProperty propertyName="Surface" typeName="Bentley.Geometry.Common.IGeometry" displayLabel="Surface" />
         <ECNavigationProperty propertyName="ReferenceSurface" relationshipName="CurveRelativeToSurfaceAspectRefersToIDefinedSurface" direction="Forward" displayLabel="Reference surface." />
     </ECEntityClass>
-    
+
     <ECRelationshipClass typeName="CurveRelativeToSurfaceAspectRefersToIDefinedSurface" strength="referencing" strengthDirection="Forward" modifier="Sealed">
         <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="false">
-            <Class class="CurveRelativeToSurfaceAspect"/>
+            <Class class="CurveRelativeToSurfaceAspect" />
         </Source>
         <Target multiplicity="(1..1)" roleLabel="referenced by" polymorphic="true">
             <Class class="IDefinedSurface" />
@@ -633,21 +669,24 @@
     <ECEntityClass typeName="RelativeSurfaceLocationAspect" modifier="Abstract" displayLabel="Relative surface location data" description="Surface relative to other elements.">
         <BaseClass>RelativeLocationAspect</BaseClass>
         <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.1.0"/>
+            <ClassHasHandler xmlns="BisCore.1.0" />
         </ECCustomAttributes>
     </ECEntityClass>
 
     <ECEntityClass typeName="SurfaceRelativeToSurfaceAspect" modifier="Sealed" displayLabel="Surface relative to surface location data" description="Surface relative to surface.">
         <BaseClass>RelativeSurfaceLocationAspect</BaseClass>
         <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.1.0"/>
+            <ClassHasHandler xmlns="BisCore.1.0" />
         </ECCustomAttributes>
+        <ECProperty propertyName="Location" typeName="Shape2d" displayLabel="Location" />
+        <ECProperty propertyName="Offset" typeName="double" displayLabel="Offset" />
+        <ECProperty propertyName="Surface" typeName="Bentley.Geometry.Common.IGeometry" displayLabel="Surface" />
         <ECNavigationProperty propertyName="ReferenceSurface" relationshipName="SurfaceRelativeToSurfaceAspectRefersToIDefinedSurface" direction="Forward" displayLabel="Reference surface." />
     </ECEntityClass>
-    
+
     <ECRelationshipClass typeName="SurfaceRelativeToSurfaceAspectRefersToIDefinedSurface" strength="referencing" strengthDirection="Forward" modifier="Sealed">
         <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="false">
-            <Class class="SurfaceRelativeToSurfaceAspect"/>
+            <Class class="SurfaceRelativeToSurfaceAspect" />
         </Source>
         <Target multiplicity="(1..1)" roleLabel="referenced by" polymorphic="true">
             <Class class="IDefinedSurface" />
@@ -657,21 +696,21 @@
     <ECEntityClass typeName="LoadValueAspect" modifier="Abstract" displayLabel="Load value data" description="A value that can be applied to a (compatible) Load.">
         <BaseClass>bis:ElementUniqueAspect</BaseClass>
         <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.1.0"/>
+            <ClassHasHandler xmlns="BisCore.1.0" />
         </ECCustomAttributes>
     </ECEntityClass>
 
     <ECEntityClass typeName="PointLoadValueAspect" modifier="Abstract" displayLabel="Point load value data" description="A LoadValueAspect that can be assigned to a PointLoad.">
         <BaseClass>LoadValueAspect</BaseClass>
         <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.1.0"/>
+            <ClassHasHandler xmlns="BisCore.1.0" />
         </ECCustomAttributes>
     </ECEntityClass>
 
     <ECEntityClass typeName="ForcePointLoadValueAspect" modifier="Sealed" displayLabel="Point Force value data" description="A PointLoadValueAspect for Force.">
         <BaseClass>PointLoadValueAspect</BaseClass>
         <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.1.0"/>
+            <ClassHasHandler xmlns="BisCore.1.0" />
         </ECCustomAttributes>
         <ECStructProperty propertyName="Value" typeName="Force" displayLabel="Point force" description="Force values." />
     </ECEntityClass>
@@ -679,18 +718,18 @@
     <ECEntityClass typeName="Load" modifier="Abstract" displayLabel="Load applited to a relative location" description="An structural imposition of any type (force, displacement, environmental).">
         <BaseClass>StructuralAnalysisElement</BaseClass>
         <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.1.0"/>
+            <ClassHasHandler xmlns="BisCore.1.0" />
         </ECCustomAttributes>
         <ECProperty propertyName="CoordinateSystem" typeName="CoordinateSytem" displayLabel="Coordinate system" description="Coordinate system of th load." />
     </ECEntityClass>
-  
+
     <ECEntityClass typeName="PointLoad" modifier="Sealed" displayLabel="Load applied to point" description="A Load that is applied at a point..">
         <BaseClass>Load</BaseClass>
         <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.1.0"/>
+            <ClassHasHandler xmlns="BisCore.1.0" />
         </ECCustomAttributes>
     </ECEntityClass>
-  
+
     <!-- check multiplicity -->
     <ECRelationshipClass typeName="PointLoadHasLocation" strength="embedding" modifier="Sealed">
         <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
