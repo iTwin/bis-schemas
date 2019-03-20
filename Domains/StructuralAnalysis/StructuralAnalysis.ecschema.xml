@@ -464,6 +464,7 @@
         </ECCustomAttributes>
     </ECEntityClass>
 
+
     <!-- Loading classes -->
 
     <!-- Used for setting Coordinate System (Load) -->
@@ -495,6 +496,21 @@
         <ECEnumerator value="18" displayLabel="TopInLineWithShearCentroid" />
     </ECEnumeration>
 
+    <!-- Enumeration of Curve Load Variation types -->
+    <!-- TODO: This is not complete according to the IFC documentation -->
+    <ECEnumeration typeName="CurveVariationType" backingTypeName="int">
+        <ECEnumerator value="0" displayLabel="Linear" />
+        <ECEnumerator value="1" displayLabel="Parabola" />
+    </ECEnumeration>
+
+    <!-- Enumeration of Surface Load Variation types -->
+    <!-- TODO: This is not complete according to the IFC documentation -->
+    <ECEnumeration typeName="SurfaceVariationType" backingTypeName="int">
+        <ECEnumerator value="0" displayLabel="Plane" />
+        <ECEnumerator value="1" displayLabel="Parabola" />
+    </ECEnumeration>
+
+
     <ECStructClass typeName="Force" description="Force struct." modifier="Sealed">
         <ECProperty propertyName="FX" typeName="double" description="Force in X axis." />
         <ECProperty propertyName="FY" typeName="double" description="Force in Y axis." />
@@ -518,6 +534,7 @@
         <ECProperty propertyName="FY" typeName="double" description="Force per unit area in Y axis." />
         <ECProperty propertyName="FZ" typeName="double" description="Force per unit area in Z axis." />
     </ECStructClass>
+
 
     <ECEntityClass typeName="IDefinedPoint" modifier="Abstract" displayLabel="Point location definition" description="An Element that directly or indirectly defines a point location and clear coordinate system.">
         <ECCustomAttributes>
@@ -678,7 +695,7 @@
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.1.0" />
         </ECCustomAttributes>
-        <ECProperty propertyName="Location" typeName="Shape2d" displayLabel="Location" />
+        <ECProperty propertyName="Location" typeName="Bentley.Geometry.Common.IGeometry" displayLabel="Location" />
         <ECProperty propertyName="Offset" typeName="double" displayLabel="Offset" />
         <ECProperty propertyName="Surface" typeName="Bentley.Geometry.Common.IGeometry" displayLabel="Surface" />
         <ECNavigationProperty propertyName="ReferenceSurface" relationshipName="SurfaceRelativeToSurfaceAspectRefersToIDefinedSurface" direction="Forward" displayLabel="Reference surface." />
@@ -692,6 +709,9 @@
             <Class class="IDefinedSurface" />
         </Target>
     </ECRelationshipClass>
+
+
+    <!-- Load Value Aspect Classes -->
 
     <ECEntityClass typeName="LoadValueAspect" modifier="Abstract" displayLabel="Load value data" description="A value that can be applied to a (compatible) Load.">
         <BaseClass>bis:ElementUniqueAspect</BaseClass>
@@ -714,6 +734,87 @@
         </ECCustomAttributes>
         <ECStructProperty propertyName="Value" typeName="Force" displayLabel="Point force" description="Force values." />
     </ECEntityClass>
+
+    <ECEntityClass typeName="CurveLoadValueAspect" modifier="Abstract" displayLabel="Curve load value data" description="A LoadValueAspect that can be assigned to a CurveLoad.">
+        <BaseClass>LoadValueAspect</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.1.0"/>
+        </ECCustomAttributes>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="UniformCurveLoadValueAspect" modifier="Abstract" displayLabel="Uniform Curve load value data" description="A CurveLoadValueAspect that has constant intensity along the application length.">
+        <BaseClass>CurveLoadValueAspect</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.1.0"/>
+        </ECCustomAttributes>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="UniformForceCurveLoadValueAspect" modifier="Sealed" displayLabel="Uniform Curve Force value data" description="A UniformCurveLoadValueAspect for Force.">
+        <BaseClass>UniformCurveLoadValueAspect</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.1.0"/>
+        </ECCustomAttributes>
+        <ECStructProperty propertyName="Value" typeName="LinearForce" displayLabel="Uniform Curve Linear force" description="Linear Force values." />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="VaryingCurveLoadValueAspect" modifier="Abstract" displayLabel="Varying Curve load value data" description="A CurveLoadValueAspect that varies in intensity along the application length.">
+        <BaseClass>CurveLoadValueAspect</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.1.0"/>
+        </ECCustomAttributes>
+        <ECProperty propertyName="CurveVariationType" typeName="CurveVariationType" displayLabel="Variation" />
+        <ECArrayProperty propertyName="Locations" typename="DPoint1d" displayLabel="Locations" />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="VaryingForceCurveLoadValueAspect" modifier="Sealed" displayLabel="Varying Curve Force value data" description="A VaryingCurveLoadValueAspect for Force.">
+        <BaseClass>VaryingCurveLoadValueAspect</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.1.0"/>
+        </ECCustomAttributes>
+        <ECStructArrayProperty propertyName="Value" typeName="LinearForce" displayLabel="Curve forces" description="Force values." />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="SurfaceLoadValueAspect" modifier="Abstract" displayLabel="Surface load value data" description="A LoadValueAspect that can be assigned to a SurfaceLoad.">
+        <BaseClass>LoadValueAspect</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.1.0"/>
+        </ECCustomAttributes>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="UniformSurfaceLoadValueAspect" modifier="Abstract" displayLabel="Uniform Surface load value data" description="A SurfaceLoadValueAspect that has constant intensity across the application area.">
+        <BaseClass>SurfaceLoadValueAspect</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.1.0"/>
+        </ECCustomAttributes>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="UniformForceSurfaceLoadValueAspect" modifier="Sealed" displayLabel="Uniform Surface Force value data" description="A UniformSurfaceLoadValueAspect for Force.">
+        <BaseClass>UniformSurfaceLoadValueAspect</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.1.0"/>
+        </ECCustomAttributes>
+        <ECStructProperty propertyName="Value" typeName="AreaForce" displayLabel="Uniform Surface Area force" description="Area Force values." />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="VaryingSurfaceLoadValueAspect" modifier="Abstract" displayLabel="Varying Surface load value data" description="A SurfaceLoadValueAspect that varies in intensity across the application area.">
+        <BaseClass>SurfaceLoadValueAspect</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.1.0"/>
+        </ECCustomAttributes>
+        <ECProperty propertyName="SurfaceVariationType" typeName="SurfaceVariationType" displayLabel="Variation" />
+        <ECArrayProperty propertyName="Locations" typeName="DPoint2d" displayLabel="Locations" />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="VaryingForceSurfaceLoadValueAspect" modifier="Sealed" displayLabel="Curve Force value data" description="A VaryingSurfaceLoadValueAspect for Force.">
+        <BaseClass>VaryingSurfaceLoadValueAspect</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.1.0"/>
+        </ECCustomAttributes>
+        <ECStructArrayProperty propertyName="Value" typeName="AreaForce" displayLabel="Surface forces" description="Force values." />
+    </ECEntityClass>
+
+
+    <!-- Load Classes -->
 
     <ECEntityClass typeName="Load" modifier="Abstract" displayLabel="Load applited to a relative location" description="An structural imposition of any type (force, displacement, environmental).">
         <BaseClass>StructuralAnalysisElement</BaseClass>
