@@ -338,20 +338,20 @@
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.1.0" />
         </ECCustomAttributes>
-        <ECNavigationProperty propertyName="BaseProfile" relationshipName="DerivedProfileRefersToSinglePerimeterProfile" direction="Forward" description="" />
         <ECProperty propertyName="Offset" typeName="point2d" description="2D vector specifying how the profiles geometry will be offseted from it's original coordinates." />
         <ECProperty propertyName="Scale" typeName="point2d" description="A non-uniform scale factor." />
         <ECProperty propertyName="Rotation" typeName="double" kindOfQuantity="AECU:ANGLE" description="Angle by which the profiles geometry will be rotated." />
         <ECProperty propertyName="MirrorAboutYAxis" typeName="boolean" description="Flag indicating whether the profiles geometry should be mirrored around the Y axis." />
     </ECEntityClass>
 
-    <ECRelationshipClass typeName="DerivedProfileRefersToSinglePerimeterProfile" modifier="Sealed" strength="referencing">
-        <Source multiplicity="(0..*)" roleLabel="is derived profile of" polymorphic="false">
-            <Class class="DerivedProfile" />
-        </Source>
-        <Target multiplicity="(0..1)" roleLabel="is base profile of" polymorphic="true">
-            <Class class="SinglePerimeterProfile" />
-        </Target>
+    <ECRelationshipClass typeName="SinglePerimeterProfileOwnsDerivedProfile" modifier="Sealed" strength="embedding">
+      <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+      <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+        <Class class="SinglePerimeterProfile"/>
+      </Source>
+      <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="false">
+        <Class class="DerivedProfile"/>
+      </Target>
     </ECRelationshipClass>
 
     <ECEntityClass typeName="CompositeProfile" modifier="Abstract" description="A Profile comprised of multiple SinglePerimeterProfiles.">
@@ -401,15 +401,15 @@
         </ECCustomAttributes>
         <ECProperty propertyName="Spacing" typeName="double" kindOfQuantity="AECU:LENGTH" description="Distance separating the individual back to back LShapeProfiles." />
         <ECProperty propertyName="Type" typeName="DoubleLShapeProfileType" description="Enumeration defining which legs are to be placed back to back." />
-        <ECNavigationProperty propertyName="SingleProfile" relationshipName="DoubleLShapeProfileRefersToLShapeProfile" direction="Forward" description="Reference to LShapeProfile that will be used to construct the profile." />
     </ECEntityClass>
 
-    <ECRelationshipClass typeName="DoubleLShapeProfileRefersToLShapeProfile" modifier="Sealed" strength="referencing">
-        <Source multiplicity="(0..*)" roleLabel="is double profile of" polymorphic="false">
-            <Class class="DoubleLShapeProfile" />
+    <ECRelationshipClass typeName="LShapeProfileOwnsDoubleLShapeProfile" modifier="Sealed" strength="embedding">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="LShapeProfile"/>
         </Source>
-        <Target multiplicity="(0..1)" roleLabel="is single profile of" polymorphic="false">
-            <Class class="LShapeProfile" />
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="false">
+            <Class class="DoubleLShapeProfile"/>
         </Target>
     </ECRelationshipClass>
 
@@ -419,15 +419,15 @@
             <ClassHasHandler xmlns="BisCore.1.0" />
         </ECCustomAttributes>
         <ECProperty propertyName="Spacing" typeName="double" kindOfQuantity="AECU:LENGTH" description="Distance separating the individual back to back CShapeProfiles." />
-        <ECNavigationProperty propertyName="SingleProfile" relationshipName="DoubleCShapeProfileRefersToCShapeProfile" direction="Forward" description="Reference to CShapeProfile that will be used to construct the profile." />
     </ECEntityClass>
 
-    <ECRelationshipClass typeName="DoubleCShapeProfileRefersToCShapeProfile" modifier="Sealed" strength="referencing">
-        <Source multiplicity="(0..*)" roleLabel="is double profile of" polymorphic="false">
-            <Class class="DoubleCShapeProfile" />
+    <ECRelationshipClass typeName="CShapeProfileOwnsDoubleCShapeProfile" modifier="Sealed" strength="embedding">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="CShapeProfile"/>
         </Source>
-        <Target multiplicity="(0..1)" roleLabel="is single profile of" polymorphic="false">
-            <Class class="CShapeProfile" />
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="false">
+            <Class class="DoubleCShapeProfile"/>
         </Target>
     </ECRelationshipClass>
 
