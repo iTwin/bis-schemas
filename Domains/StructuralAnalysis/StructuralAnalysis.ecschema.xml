@@ -145,6 +145,25 @@
         </ECCustomAttributes>
     </ECEntityClass>
 
+    <ECEntityClass typeName="IWireOwner" modifier="Abstract" displayLabel="Wire Owner" description="Element which uses child Wire do represent it's location.">
+        <ECCustomAttributes>
+            <IsMixin xmlns="CoreCustomAttributes.1.0">
+                <!-- Only subclasses of bis:Element can implement the IDefinePoint interface -->
+                <AppliesToEntityClass>bis:Element</AppliesToEntityClass>
+            </IsMixin>
+        </ECCustomAttributes>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="IWireOwnerOwnsWire" strength="embedding" modifier="None" description="A relationship that indicates that an Element owns Wire.">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="owns" polymorphic="true">
+            <Class class="IWireOwner"/>
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="is owned by" polymorphic="true">
+            <Class class="Wire"/>
+        </Target>
+    </ECRelationshipClass>
+
     <ECEntityClass typeName="Loop" modifier="Sealed" displayLabel="Loop" description="A Path that is closed and defines a boundary of a Face.">
         <BaseClass>Path</BaseClass>
         <ECCustomAttributes>
@@ -365,6 +384,7 @@
 
     <ECEntityClass typeName="CurveMember" modifier="Sealed" displayLabel="Curve Member" description="Defines a Member that is located along a Path, and whose behavior is defined along that Path.">
         <BaseClass>Member</BaseClass>
+        <BaseClass>IWireOwner</BaseClass>
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.1.0" />
         </ECCustomAttributes>
@@ -375,13 +395,6 @@
                 </CustomHandledProperty>
             </ECCustomAttributes>
         </ECProperty>
-        <ECNavigationProperty propertyName="Location" relationshipName="CurveMemberHasPath" direction="Forward" displayLabel="Location.">
-            <ECCustomAttributes>
-                <CustomHandledProperty>
-                    <StatementTypes>7</StatementTypes>
-                </CustomHandledProperty>
-            </ECCustomAttributes>
-        </ECNavigationProperty>
         <ECProperty propertyName="StartRigidZoneLength" typeName="double" displayLabel="Start Rigid Zone Lenght" description="defines the lenght of Rigid Zone at the start of Curve Member">
             <ECCustomAttributes>
                 <CustomHandledProperty>
@@ -411,15 +424,6 @@
             </ECCustomAttributes>
         </ECNavigationProperty>
     </ECEntityClass>
-
-    <ECRelationshipClass typeName="CurveMemberHasPath" strength="referencing" modifier="Sealed">
-        <Source multiplicity="(0..*)" roleLabel="owns" polymorphic="false">
-            <Class class="CurveMember" />
-        </Source>
-        <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="false">
-            <Class class="Path" />
-        </Target>
-    </ECRelationshipClass>
 
     <ECRelationshipClass typeName="CurveMemberHasCurveMemberSystem" strength="referencing" modifier="Sealed">
         <Source multiplicity="(0..*)" roleLabel="has" polymorphic="false">
