@@ -28,6 +28,16 @@
         <ECProperty propertyName="Revision" typeName="string" />
     </ECEntityClass>
 
+    <ECRelationshipClass typeName="ProfileOwnsCatalogCodeAspect" modifier="Sealed" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="Profile" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="StandardCatalogCodeAspect" />
+        </Target>
+    </ECRelationshipClass>
+
     <ECEntityClass typeName="SinglePerimeterProfile" modifier="Abstract" description="A Profile with a single outer perimiter.">
         <BaseClass>Profile</BaseClass>
         <ECCustomAttributes>
@@ -305,7 +315,7 @@
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.1.0" />
         </ECCustomAttributes>
-        <ECProperty propertyName="SideCount" typeName="long" description="Count of sides (edges) the polygon is made of. Value cannot be less than 3 or greater than 32." />
+        <ECProperty propertyName="SideCount" typeName="int" description="Count of sides (edges) the polygon is made of. Value cannot be less than 3 or greater than 32." />
         <ECProperty propertyName="SideLength" typeName="double" kindOfQuantity="AECU:LENGTH_SHORT" description="Constant length of each polygon side (edge)." />
     </ECEntityClass>
 
@@ -384,8 +394,18 @@
         <Source multiplicity="(0..*)" roleLabel="refers to profile" polymorphic="false">
             <Class class="ArbitraryCompositeProfileAspect" />
         </Source>
-        <Target multiplicity="(0..1)" roleLabel="is referenced by" polymorphic="true">
+        <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="true">
             <Class class="SinglePerimeterProfile" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="ArbitraryCompositeProfileOwnsArbitraryCompositeProfileAspect" modifier="Sealed" strength="embedding">
+        <BaseClass>bis:ElementOwnsMultiAspects</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="ArbitraryCompositeProfile" />
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="false">
+            <Class class="ArbitraryCompositeProfileAspect" />
         </Target>
     </ECRelationshipClass>
 
