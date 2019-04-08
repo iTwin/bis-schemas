@@ -240,7 +240,7 @@
         </Target>
     </ECRelationshipClass>
 
-    <ECEntityClass typeName="Sheet" displayLabel="Sheet" description="A FaceSet that may be open or closed, and does not bound a Region (future concept). Sheets are also constrained to have a single base Surface.">
+    <ECEntityClass typeName="Sheet" modifier="Sealed" displayLabel="Sheet" description="A FaceSet that may be open or closed, and does not bound a Region (future concept). Sheets are also constrained to have a single base Surface.">
         <BaseClass>FaceSet</BaseClass>
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.1.0" />
@@ -248,6 +248,25 @@
     </ECEntityClass>
     
     <ECEntityClass typeName="ISheetOwner" modifier="Abstract" displayLabel="Sheet Owner" description="Element which uses child Sheet do represent it's location.">
+        <ECCustomAttributes>
+            <IsMixin xmlns="CoreCustomAttributes.1.0">
+                <!-- Only subclasses of bis:Element can implement the IDefinePoint interface -->
+                <AppliesToEntityClass>bis:Element</AppliesToEntityClass>
+            </IsMixin>
+        </ECCustomAttributes>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="ISheetOwnerOwnsSheet" strength="embedding" modifier="None" description="A relationship that indicates that an Element owns Sheet.">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="owns" polymorphic="true">
+            <Class class="ISheetOwner"/>
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="is owned by" polymorphic="true">
+            <Class class="Sheet"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="ISheetOwner" modifier="Abstract" displayLabel="Sheet Owner" description="Element which uses child Sheet to represent it's location.">
         <ECCustomAttributes>
             <IsMixin xmlns="CoreCustomAttributes.1.0">
                 <!-- Only subclasses of bis:Element can implement the IDefinePoint interface -->
@@ -414,7 +433,7 @@
                 </CustomHandledProperty>
             </ECCustomAttributes>
         </ECProperty>
-        <ECProperty propertyName="StartRigidZoneLength" typeName="double" displayLabel="Start Rigid Zone Lenght" description="defines the lenght of Rigid Zone at the start of Curve Member">
+        <ECProperty propertyName="StartRigidZoneLength" typeName="double" displayLabel="Start Rigid Zone Length" description="defines the lenght of Rigid Zone at the start of Curve Member">
             <ECCustomAttributes>
                 <CustomHandledProperty>
                     <StatementTypes>7</StatementTypes>
