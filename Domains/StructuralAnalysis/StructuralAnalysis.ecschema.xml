@@ -240,12 +240,31 @@
         </Target>
     </ECRelationshipClass>
 
-    <ECEntityClass typeName="Sheet" modifier="Abstract" displayLabel="Sheet" description="A FaceSet that may be open or closed, and does not bound a Region (future concept). Sheets are also constrained to have a single base Surface.">
+    <ECEntityClass typeName="Sheet" displayLabel="Sheet" description="A FaceSet that may be open or closed, and does not bound a Region (future concept). Sheets are also constrained to have a single base Surface.">
         <BaseClass>FaceSet</BaseClass>
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.1.0" />
         </ECCustomAttributes>
     </ECEntityClass>
+    
+    <ECEntityClass typeName="ISheetOwner" modifier="Abstract" displayLabel="Sheet Owner" description="Element which uses child Sheet do represent it's location.">
+        <ECCustomAttributes>
+            <IsMixin xmlns="CoreCustomAttributes.1.0">
+                <!-- Only subclasses of bis:Element can implement the IDefinePoint interface -->
+                <AppliesToEntityClass>bis:Element</AppliesToEntityClass>
+            </IsMixin>
+        </ECCustomAttributes>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="ISheetOwnerOwnsSheet" strength="embedding" modifier="None" description="A relationship that indicates that an Element owns Sheet.">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="owns" polymorphic="true">
+            <Class class="ISheetOwner"/>
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="is owned by" polymorphic="true">
+            <Class class="Sheet"/>
+        </Target>
+    </ECRelationshipClass>
 
     <ECEntityClass typeName="Shell" modifier="Sealed" displayLabel="Shell" description="TODO: Add Description">
         <BaseClass>FaceSet</BaseClass>
@@ -436,6 +455,7 @@
 
     <ECEntityClass typeName="SurfaceMember" modifier="Sealed" displayLabel="Surface Member" description="Defines a Member that is located by an Shell, and whose behavior is defined at that Shell.">
         <BaseClass>Member</BaseClass>
+        <BaseClass>ISheetOwner</BaseClass>
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.1.0" />
         </ECCustomAttributes>
