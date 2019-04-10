@@ -128,6 +128,24 @@
         </ECCustomAttributes>
     </ECEntityClass>
 
+    <ECEntityClass typeName="IPathsOwner" modifier="Abstract" displayLabel="Paths Owner" description="Element which uses child Paths to represent it's location.">
+        <ECCustomAttributes>
+            <IsMixin xmlns="CoreCustomAttributes.1.0">
+                <AppliesToEntityClass>bis:Element</AppliesToEntityClass>
+            </IsMixin>
+        </ECCustomAttributes>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="IPathsOwnerOwnsPaths" strength="embedding" modifier="None" description="A relationship that indicates that an Element owns Paths.">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="owns" polymorphic="true">
+            <Class class="IPathsOwner"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="true">
+            <Class class="Path"/>
+        </Target>
+    </ECRelationshipClass>
+
     <ECRelationshipClass typeName="PathOwnsOrientedEdgeAspects" strength="embedding" modifier="Sealed">
         <BaseClass>bis:ElementOwnsMultiAspects</BaseClass>
         <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
@@ -171,29 +189,32 @@
         </ECCustomAttributes>
     </ECEntityClass>
 
+    <ECEntityClass typeName="ILoopOwner" modifier="Abstract" displayLabel="Loop Owner" description="Element which uses child Loop to represent it's location.">
+        <ECCustomAttributes>
+            <IsMixin xmlns="CoreCustomAttributes.1.0">
+                <AppliesToEntityClass>bis:Element</AppliesToEntityClass>
+            </IsMixin>
+        </ECCustomAttributes>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="ILoopOwnerOwnsLoop" strength="embedding" modifier="None" description="A relationship that indicates that an Element owns Loop.">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="owns" polymorphic="true">
+            <Class class="ILoopOwner"/>
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="is owned by" polymorphic="true">
+            <Class class="Loop"/>
+        </Target>
+    </ECRelationshipClass>
+
     <ECEntityClass typeName="Face" modifier="Sealed" displayLabel="Face" description="A surface bounded by Loops.">
         <BaseClass>SharedTopologyElement</BaseClass>
+        <BaseClass>ILoopOwner</BaseClass>
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.1.0" />
         </ECCustomAttributes>
         <ECProperty propertyName="Surface" typeName="Bentley.Geometry.Common.IGeometry" displayLabel="Location Curve." />
-        <ECNavigationProperty propertyName="Boundary" relationshipName="FaceOwnsBoundaryLoop" direction="Forward" displayLabel="Location Boundary. Cannot be one of the inner Loops" >
-            <ECCustomAttributes>
-                <CustomHandledProperty>
-                    <StatementTypes>3</StatementTypes>
-                </CustomHandledProperty>
-            </ECCustomAttributes>
-        </ECNavigationProperty>
     </ECEntityClass>
-
-    <ECRelationshipClass typeName="FaceOwnsBoundaryLoop" strength="embedding" strengthDirection="Backward" modifier="Sealed">
-        <Source multiplicity="(0..1)" roleLabel="has" polymorphic="true">
-            <Class class="Face" />
-        </Source>
-        <Target multiplicity="(0..1)" roleLabel="is owned by Loop" polymorphic="true">
-            <Class class="Loop" />
-        </Target>
-    </ECRelationshipClass>
 
     <ECRelationshipClass typeName="FaceHasInternalVertices" strength="referencing" modifier="Sealed">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
