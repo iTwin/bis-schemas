@@ -4,6 +4,7 @@ This repository is the single-source-of-truth (SSOT) for all BIS schemas.
 
 List of current BIS Schemas in this repository as SSOT:
 
+- BuildingSpatial
 - Core\BisCore
 - Core\Functional
 - Core\Generic
@@ -18,8 +19,8 @@ List of current BIS Schemas in this repository as SSOT:
 - RealityModeling\RasterSchema
 - RealityModeling\ScalableMeshSchema
 - RealityModeling\ThreeMxSchema
-- StructuralAnalysis
 - Simulation4DResults
+- SpatialComposition
 - Structural\PhysicalRebar
 - StructuralAnalysis
 
