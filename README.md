@@ -18,8 +18,8 @@ List of current BIS Schemas in this repository as SSOT:
 - RealityModeling\RasterSchema
 - RealityModeling\ScalableMeshSchema
 - RealityModeling\ThreeMxSchema
-- StructuralAnalysis
 - Simulation4DResults
+- SpatialComposition
 - Structural\PhysicalRebar
 - StructuralAnalysis
 
