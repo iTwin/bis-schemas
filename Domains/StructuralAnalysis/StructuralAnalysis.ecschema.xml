@@ -4,12 +4,6 @@
     <ECSchemaReference name="CoreCustomAttributes" version="01.00.00" alias="CoreCA" />
     <ECSchemaReference name="Profiles" version="01.00.00" alias="prf" />
 
-    <!-- Used for setting Face direction (OrientedFaceAspect) -->
-    <ECEnumeration typeName="FaceOrientation" backingTypeName="int" isStrict="true">
-        <ECEnumerator value="0" displayLabel="Upward" />
-        <ECEnumerator value="1" displayLabel="Downward" />
-    </ECEnumeration>
-
     <!-- Used for settting MaterialProfile placement for -->
     <ECEnumeration typeName="MaterialProfilePlacement" backingTypeName="int" isStrict="true">
         <ECEnumerator value="0" displayLabel="Start" />
@@ -128,6 +122,24 @@
         </ECCustomAttributes>
     </ECEntityClass>
 
+    <ECEntityClass typeName="IPathsOwner" modifier="Abstract" displayLabel="Paths Owner" description="Element which uses child Paths to represent it's location.">
+        <ECCustomAttributes>
+            <IsMixin xmlns="CoreCustomAttributes.1.0">
+                <AppliesToEntityClass>bis:Element</AppliesToEntityClass>
+            </IsMixin>
+        </ECCustomAttributes>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="IPathsOwnerOwnsPaths" strength="embedding" modifier="None" description="A relationship that indicates that an Element owns Paths.">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="owns" polymorphic="true">
+            <Class class="IPathsOwner"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="true">
+            <Class class="Path"/>
+        </Target>
+    </ECRelationshipClass>
+
     <ECRelationshipClass typeName="PathOwnsOrientedEdgeAspects" strength="embedding" modifier="Sealed">
         <BaseClass>bis:ElementOwnsMultiAspects</BaseClass>
         <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
@@ -171,29 +183,32 @@
         </ECCustomAttributes>
     </ECEntityClass>
 
+    <ECEntityClass typeName="ILoopOwner" modifier="Abstract" displayLabel="Loop Owner" description="Element which uses child Loop to represent it's location.">
+        <ECCustomAttributes>
+            <IsMixin xmlns="CoreCustomAttributes.1.0">
+                <AppliesToEntityClass>bis:Element</AppliesToEntityClass>
+            </IsMixin>
+        </ECCustomAttributes>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="ILoopOwnerOwnsLoop" strength="embedding" modifier="None" description="A relationship that indicates that an Element owns Loop.">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="owns" polymorphic="true">
+            <Class class="ILoopOwner"/>
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="is owned by" polymorphic="true">
+            <Class class="Loop"/>
+        </Target>
+    </ECRelationshipClass>
+
     <ECEntityClass typeName="Face" modifier="Sealed" displayLabel="Face" description="A surface bounded by Loops.">
         <BaseClass>SharedTopologyElement</BaseClass>
+        <BaseClass>ILoopOwner</BaseClass>
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.1.0" />
         </ECCustomAttributes>
         <ECProperty propertyName="Surface" typeName="Bentley.Geometry.Common.IGeometry" displayLabel="Location Curve." />
-        <ECNavigationProperty propertyName="Boundary" relationshipName="FaceOwnsBoundaryLoop" direction="Forward" displayLabel="Location Boundary. Cannot be one of the inner Loops" >
-            <ECCustomAttributes>
-                <CustomHandledProperty>
-                    <StatementTypes>3</StatementTypes>
-                </CustomHandledProperty>
-            </ECCustomAttributes>
-        </ECNavigationProperty>
     </ECEntityClass>
-
-    <ECRelationshipClass typeName="FaceOwnsBoundaryLoop" strength="embedding" strengthDirection="Backward" modifier="Sealed">
-        <Source multiplicity="(0..1)" roleLabel="has" polymorphic="true">
-            <Class class="Face" />
-        </Source>
-        <Target multiplicity="(0..1)" roleLabel="is owned by Loop" polymorphic="true">
-            <Class class="Loop" />
-        </Target>
-    </ECRelationshipClass>
 
     <ECRelationshipClass typeName="FaceHasInternalVertices" strength="referencing" modifier="Sealed">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
@@ -210,7 +225,7 @@
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.1.0" />
         </ECCustomAttributes>
-        <ECProperty propertyName="Orientation" typeName="FaceOrientation" displayLabel="Orientation" description="Orientation of face." />
+        <ECProperty propertyName="IsForwardDirection" typeName="boolean" displayLabel="Is Forward Direction" description="Shows if direction matches Face direction." />
         <ECNavigationProperty propertyName="Face" relationshipName="OrientedFaceAspectHasFace" direction="Forward" displayLabel="Face described by this Aspect." />
     </ECEntityClass>
 
@@ -240,12 +255,31 @@
         </Target>
     </ECRelationshipClass>
 
-    <ECEntityClass typeName="Sheet" modifier="Abstract" displayLabel="Sheet" description="A FaceSet that may be open or closed, and does not bound a Region (future concept). Sheets are also constrained to have a single base Surface.">
+    <ECEntityClass typeName="Sheet" modifier="Sealed" displayLabel="Sheet" description="A FaceSet that may be open or closed, and does not bound a Region (future concept). Sheets are also constrained to have a single base Surface.">
         <BaseClass>FaceSet</BaseClass>
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.1.0" />
         </ECCustomAttributes>
     </ECEntityClass>
+    
+    <ECEntityClass typeName="ISheetOwner" modifier="Abstract" displayLabel="Sheet Owner" description="Element which uses child Sheet do represent it's location.">
+        <ECCustomAttributes>
+            <IsMixin xmlns="CoreCustomAttributes.1.0">
+                <!-- Only subclasses of bis:Element can implement the IDefinePoint interface -->
+                <AppliesToEntityClass>bis:Element</AppliesToEntityClass>
+            </IsMixin>
+        </ECCustomAttributes>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="ISheetOwnerOwnsSheet" strength="embedding" modifier="None" description="A relationship that indicates that an Element owns Sheet.">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="owns" polymorphic="true">
+            <Class class="ISheetOwner"/>
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="is owned by" polymorphic="true">
+            <Class class="Sheet"/>
+        </Target>
+    </ECRelationshipClass>
 
     <ECEntityClass typeName="Shell" modifier="Sealed" displayLabel="Shell" description="TODO: Add Description">
         <BaseClass>FaceSet</BaseClass>
@@ -395,7 +429,7 @@
                 </CustomHandledProperty>
             </ECCustomAttributes>
         </ECProperty>
-        <ECProperty propertyName="StartRigidZoneLength" typeName="double" displayLabel="Start Rigid Zone Lenght" description="defines the lenght of Rigid Zone at the start of Curve Member">
+        <ECProperty propertyName="StartRigidZoneLength" typeName="double" displayLabel="Start Rigid Zone Length" description="defines the lenght of Rigid Zone at the start of Curve Member">
             <ECCustomAttributes>
                 <CustomHandledProperty>
                     <StatementTypes>7</StatementTypes>
@@ -436,6 +470,7 @@
 
     <ECEntityClass typeName="SurfaceMember" modifier="Sealed" displayLabel="Surface Member" description="Defines a Member that is located by an Shell, and whose behavior is defined at that Shell.">
         <BaseClass>Member</BaseClass>
+        <BaseClass>ISheetOwner</BaseClass>
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.1.0" />
         </ECCustomAttributes>
@@ -769,7 +804,7 @@
             <ClassHasHandler xmlns="BisCore.1.0"/>
         </ECCustomAttributes>
         <ECProperty propertyName="CurveVariationType" typeName="CurveVariationType" displayLabel="Variation" />
-        <ECArrayProperty propertyName="Locations" typename="double" displayLabel="Locations" />
+        <ECArrayProperty propertyName="Locations" typeName="double" displayLabel="Locations" />
     </ECEntityClass>
 
     <ECEntityClass typeName="VaryingForceCurveLoadValueAspect" modifier="Sealed" displayLabel="Varying Curve Force value data" description="A VaryingCurveLoadValueAspect for Force.">
@@ -837,28 +872,79 @@
         </ECCustomAttributes>
     </ECEntityClass>
 
-    <!-- check multiplicity -->
-    <ECRelationshipClass typeName="PointLoadHasLocation" strength="embedding" modifier="Sealed">
+    <ECRelationshipClass typeName="PointLoadOwnsRelativePointLocationAspect" strength="embedding" modifier="Sealed">
         <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
-    <!-- <BaseClass>bis:ElementRefersToElements</BaseClass> -->
-    <Source multiplicity="(1..1)" roleLabel="has" polymorphic="false">
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
             <Class class="PointLoad"/>
         </Source>
-        <Target multiplicity="(1..1)" roleLabel="referenced by" polymorphic="true">
+        <Target multiplicity="(1..1)" roleLabel="is owned by" polymorphic="true">
             <Class class="RelativePointLocationAspect" />
         </Target>
     </ECRelationshipClass>
   
-    <ECRelationshipClass typeName="PointLoadHasValue" strength="embedding" modifier="Sealed">
+    <ECRelationshipClass typeName="PointLoadOwnsPointLoadValueAspect" strength="embedding" modifier="Sealed">
         <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
-    <!-- <BaseClass>bis:ElementRefersToElements</BaseClass> -->
-        <Source multiplicity="(1..1)" roleLabel="has" polymorphic="false">
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
             <Class class="PointLoad"/>
         </Source>
-        <Target multiplicity="(1..1)" roleLabel="referenced by" polymorphic="true">
+        <Target multiplicity="(1..1)" roleLabel="is owned by" polymorphic="true">
             <Class class="PointLoadValueAspect" />
         </Target>
     </ECRelationshipClass>
+
+    <ECEntityClass typeName="CurveLoad" modifier="Sealed" displayLabel="Curve Load" description="A Load that is applied along a curve.">
+        <BaseClass>Load</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.1.0" />
+        </ECCustomAttributes>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="CurveLoadOwnsRelativeCurveLocationAspect" strength="embedding" modifier="Sealed">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="CurveLoad"/>
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="is owned by" polymorphic="true">
+            <Class class="RelativeCurveLocationAspect" />
+        </Target>
+    </ECRelationshipClass>
+  
+    <ECRelationshipClass typeName="CurveLoadOwnsCurveLoadValueAspect" strength="embedding" modifier="Sealed">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="CurveLoad"/>
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="is owned by" polymorphic="true">
+            <Class class="CurveLoadValueAspect" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="SurfaceLoad" modifier="Sealed" displayLabel="Surface Load" description="A Load that is applied over a surface.">
+        <BaseClass>Load</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.1.0" />
+        </ECCustomAttributes>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="SurfaceLoadOwnsRelativeSurfaceLocationAspect" strength="embedding" modifier="Sealed">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="SurfaceLoad"/>
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="is owned by" polymorphic="true">
+            <Class class="RelativeSurfaceLocationAspect" />
+        </Target>
+    </ECRelationshipClass>
+  
+    <ECRelationshipClass typeName="SurfaceLoadOwnsSurfaceLoadValueAspect" strength="embedding" modifier="Sealed">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="SurfaceLoad"/>
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="is owned by" polymorphic="true">
+            <Class class="SurfaceLoadValueAspect" />
+        </Target>
+    </ECRelationshipClass>    
 
     <!-- Load groups -->
     <ECEnumeration typeName="LoadType" backingTypeName="int" isStrict="true" description="Used for specifying LoadType in LoadContainer.">
