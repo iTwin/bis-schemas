@@ -32,8 +32,6 @@ DIRS_HG=(
     "${DIR_BIM0200_SRC}/DgnDomains/BridgeStructuralPhysical"
     "${DIR_BIM0200_SRC}/DgnDomains/Building"
     "${DIR_BIM0200_SRC}/DgnDomains/BuildingSpacePlanning"
-    "${DIR_BIM0200_SRC}/DgnDomains/ClassificationSystems"
-    "${DIR_BIM0200_SRC}/DgnDomains/ConstraintSystem"
     "${DIR_BIM0200_SRC}/ConstructionSchema"
     "${DIR_BIM0200_SRC}/DgnDomains/Costing"
 # The DgnV8OpenRoadsDesigner cannot be merged since the first attempt was squashed into master, essentially losing the
@@ -45,12 +43,10 @@ DIRS_HG=(
     "${DIR_BIM0200_SRC}/DgnDomains/LinearReferencing"
     "${DIR_BIM0200_SRC}/DgnDomains/Planning"
     "${DIR_BIM0200_SRC}/DgnDomains/Plant"
-    "${DIR_BIM0200_SRC}/DgnDomains/Profiles"
     "${DIR_BIM0200_SRC}/DgnDomains/RoadRailAlignment"
     "${DIR_BIM0200_SRC}/DgnDomains/RoadRailPhysical"
     "${DIR_BIM0200_SRC}/DgnDomains/Site"
     "${DIR_BIM0200_SRC}/DgnDomains/Structural"
-    "${DIR_BIM0200_SRC}/DgnDomains/StructuralAnalysis"
     "${DIR_BIM0200_SRC}/ecstandards"
 )
 MAPS_HG=(
@@ -58,8 +54,6 @@ MAPS_HG=(
     "${DIR_ALL_BIS_FILEMAPS}/DgnDomains/BridgeStructuralPhysical.filemap"
     "${DIR_ALL_BIS_FILEMAPS}/DgnDomains/Building.filemap"
     "${DIR_ALL_BIS_FILEMAPS}/DgnDomains/BuildingSpacePlanning.filemap"
-    "${DIR_ALL_BIS_FILEMAPS}/DgnDomains/ClassificationSystems.filemap"
-    "${DIR_ALL_BIS_FILEMAPS}/DgnDomains/ConstraintSystem.filemap"
     "${DIR_ALL_BIS_FILEMAPS}/DgnDomains/ConstructionPlanning.filemap"
     "${DIR_ALL_BIS_FILEMAPS}/DgnDomains/Costing.filemap"
 #    "${DIR_ALL_BIS_FILEMAPS}/DgnDomains/DgnV8OpenRoadsDesigner.filemap"
@@ -69,12 +63,10 @@ MAPS_HG=(
     "${DIR_ALL_BIS_FILEMAPS}/DgnDomains/LinearReferencing.filemap"
     "${DIR_ALL_BIS_FILEMAPS}/DgnDomains/Planning.filemap"
     "${DIR_ALL_BIS_FILEMAPS}/DgnDomains/Plant.filemap"
-    "${DIR_ALL_BIS_FILEMAPS}/DgnDomains/Profiles.filemap"
     "${DIR_ALL_BIS_FILEMAPS}/DgnDomains/RoadRailAlignment.filemap"
     "${DIR_ALL_BIS_FILEMAPS}/DgnDomains/RoadRailPhysical.filemap"
     "${DIR_ALL_BIS_FILEMAPS}/DgnDomains/Site.filemap"
     "${DIR_ALL_BIS_FILEMAPS}/DgnDomains/Structural.filemap"
-    "${DIR_ALL_BIS_FILEMAPS}/DgnDomains/StructuralAnalysis.filemap"
     "${DIR_ALL_BIS_FILEMAPS}/ECStandards.filemap"
 )
 

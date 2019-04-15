@@ -4,16 +4,18 @@ This repository is the single-source-of-truth (SSOT) for all BIS schemas.
 
 List of current BIS Schemas in this repository as SSOT:
 
+- Building\BuildingDataGroupBase
 - BuildingSpatial
+- ClassificationSystems
 - Core\BisCore
 - Core\Functional
 - Core\Generic
 - Core\Markup
 - Core\PhysicalMaterial
-- ClassificationSystems
 - ECObjects
 - Grids
 - PresentationRules
+- Profiles
 - RealityModeling\DataCaptureSchema
 - RealityModeling\PointCloudSchema
 - RealityModeling\RasterSchema
