@@ -51,21 +51,21 @@
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.1.0" />
         </ECCustomAttributes>
-        <ECNavigationProperty propertyName="StartVertex" relationshipName="EdgeHasStartVertex" direction="Forward" displayLabel="Start Vertex." >
+        <ECNavigationProperty propertyName="StartVertex" relationshipName="EdgeHasStartVertex" direction="Forward" displayLabel="Start Vertex" description="Start Vertex (Point)." >
             <ECCustomAttributes>
                 <CustomHandledProperty>
                     <StatementTypes>3</StatementTypes>
                 </CustomHandledProperty>
             </ECCustomAttributes>
         </ECNavigationProperty>
-        <ECNavigationProperty propertyName="EndVertex" relationshipName="EdgeHasEndVertex" direction="Forward" displayLabel="End Vertex." >
+        <ECNavigationProperty propertyName="EndVertex" relationshipName="EdgeHasEndVertex" direction="Forward" displayLabel="End Vertex" description="End Vertex (Point).">
             <ECCustomAttributes>
                 <CustomHandledProperty>
                     <StatementTypes>3</StatementTypes>
                 </CustomHandledProperty>
             </ECCustomAttributes>
         </ECNavigationProperty>
-        <ECProperty propertyName="Curve" typeName="Bentley.Geometry.Common.IGeometry" displayLabel="Location Curve." >
+        <ECProperty propertyName="Curve" typeName="Bentley.Geometry.Common.IGeometry" displayLabel="Location Curve" description="Location (ICurvePrimitive).">
             <ECCustomAttributes>
                 <CustomHandledProperty>
                     <StatementTypes>3</StatementTypes>
@@ -106,7 +106,7 @@
         <ECNavigationProperty propertyName="Edge" relationshipName="OrientedEdgeAspectHasEdge" direction="Forward" displayLabel="Edge described by this Aspect." />
     </ECEntityClass>
 
-    <ECRelationshipClass typeName="OrientedEdgeAspectHasEdge" strength="referencing" strengthDirection="Backward" modifier="Sealed">
+    <ECRelationshipClass typeName="OrientedEdgeAspectHasEdge" strength="referencing" modifier="Sealed">
         <Source multiplicity="(0..*)" roleLabel="is referenced by" polymorphic="false">
             <Class class="OrientedEdgeAspect" />
         </Source>
@@ -229,7 +229,7 @@
         <ECNavigationProperty propertyName="Face" relationshipName="OrientedFaceAspectHasFace" direction="Forward" displayLabel="Face described by this Aspect." />
     </ECEntityClass>
 
-    <ECRelationshipClass typeName="OrientedFaceAspectHasFace" strength="referencing" strengthDirection="Backward" modifier="Sealed">
+    <ECRelationshipClass typeName="OrientedFaceAspectHasFace" strength="referencing" modifier="Sealed">
         <Source multiplicity="(0..*)" roleLabel="is referenced by" polymorphic="false">
             <Class class="OrientedFaceAspect" />
         </Source>
@@ -290,7 +290,7 @@
 
     <!-- Curve Member System Classes -->
     <ECEntityClass typeName="CurveMemberSystem" modifier="Abstract" displayLabel="Curve Member System">
-        <BaseClass>bis:DriverBundleElement</BaseClass>
+        <BaseClass>bis:DefinitionElement</BaseClass>
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.1.0" />
         </ECCustomAttributes>
@@ -309,23 +309,6 @@
             <ClassHasHandler xmlns="BisCore.1.0" />
         </ECCustomAttributes>
     </ECEntityClass>
-
-    <ECRelationshipClass typeName="SegmentedCurveMemberSystemDrivesSingleCurveMemberSystem" strength="referencing" modifier="Sealed">
-        <BaseClass>bis:ElementDrivesElement</BaseClass>
-        <ECProperty propertyName="Index" typeName="int" displayLabel="Index" description="Index of Single Curve Member System in Segmented Curve Member System" >
-            <ECCustomAttributes>
-                <CustomHandledProperty>
-                    <StatementTypes>3</StatementTypes>
-                </CustomHandledProperty>
-            </ECCustomAttributes>
-        </ECProperty>
-        <Source multiplicity="(0..*)" roleLabel="drives" polymorphic="false">
-            <Class class="SegmentedCurveMemberSystem" />
-        </Source>
-        <Target multiplicity="(2..*)" roleLabel="is drven by" polymorphic="true">
-            <Class class="SingleCurveMemberSystem" />
-        </Target>
-    </ECRelationshipClass>
 
     <ECEntityClass typeName="MaterialProfileSystemTapering" modifier="Abstract" displayLabel="Material Profile System Tapering">
         <BaseClass>SingleCurveMemberSystem</BaseClass>
@@ -785,7 +768,7 @@
             <ClassHasHandler xmlns="BisCore.1.0"/>
         </ECCustomAttributes>
         <ECProperty propertyName="CurveVariationType" typeName="CurveVariationType" displayLabel="Variation" />
-        <ECPrimitiveArrayProperty propertyName="Locations" typeName="double" displayLabel="Locations" />
+        <ECArrayProperty propertyName="Locations" typeName="double" displayLabel="Locations" />
     </ECEntityClass>
 
     <ECEntityClass typeName="VaryingForceCurveLoadValueAspect" modifier="Sealed" displayLabel="Varying Curve Force value data" description="A VaryingCurveLoadValueAspect for Force.">
@@ -824,7 +807,7 @@
             <ClassHasHandler xmlns="BisCore.1.0"/>
         </ECCustomAttributes>
         <ECProperty propertyName="SurfaceVariationType" typeName="SurfaceVariationType" displayLabel="Variation" />
-        <ECPrimitiveArrayProperty propertyName="Locations" typeName="DPoint2d" displayLabel="Locations" />
+        <ECArrayProperty propertyName="Locations" typeName="Point2d" displayLabel="Locations" />
     </ECEntityClass>
 
     <ECEntityClass typeName="VaryingForceSurfaceLoadValueAspect" modifier="Sealed" displayLabel="Curve Force value data" description="A VaryingSurfaceLoadValueAspect for Force.">
@@ -835,7 +818,6 @@
         <ECStructArrayProperty propertyName="Forces" typeName="AreaForce" displayLabel="Surface forces" description="Force values." />
     </ECEntityClass>
 
-
     <!-- Load Classes -->
 
     <ECEntityClass typeName="Load" modifier="Abstract" displayLabel="Load applited to a relative location" description="An structural imposition of any type (force, displacement, environmental).">
@@ -843,7 +825,7 @@
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.1.0" />
         </ECCustomAttributes>
-        <ECProperty propertyName="CoordinateSystem" typeName="CoordinateSytem" displayLabel="Coordinate system" description="Coordinate system of th load." />
+        <ECProperty propertyName="CoordinateSystem" typeName="CoordinateSystem" displayLabel="Coordinate system" description="Coordinate system of th load." />
     </ECEntityClass>
 
     <ECEntityClass typeName="PointLoad" modifier="Sealed" displayLabel="Load applied to point" description="A Load that is applied at a point..">
@@ -1026,7 +1008,7 @@
         </Target>
     </ECRelationshipClass>
     
-    <ECEntityClass typeName="LoadCombination" modifier="Sealed" displayLabel="Load Combination Base" description="Combination of LoadCases.">
+    <ECEntityClass typeName="LoadCombination" modifier="Sealed" displayLabel="Load Combination" description="Combination of LoadCases.">
         <BaseClass>LoadCombinationBase</BaseClass>
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.1.0"/>
@@ -1034,7 +1016,7 @@
         <ECProperty propertyName="CombinationType" typeName="CombinationType" description="Load combination type." />
     </ECEntityClass>
     
-    <ECEntityClass typeName="LoadCombinationSRSS" modifier="Sealed" displayLabel="Load Combination Base" description="Combination of LoadCases.">
+    <ECEntityClass typeName="LoadCombinationSRSS" modifier="Sealed" displayLabel="Load Combination SRSS" description="Combination of LoadCases.">
         <BaseClass>LoadCombinationBase</BaseClass>
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.1.0"/>
@@ -1134,7 +1116,7 @@
         <ECProperty propertyName="TAxis" typeName="point3d" displayLabel="T-Axis" description="" />
     </ECEntityClass>
 
-    <ECEntityClass typeName="CurveSupport" modifier="Sealed" displayLabel="Point Support" description="">
+    <ECEntityClass typeName="CurveSupport" modifier="Sealed" displayLabel="Curve Support" description="">
         <BaseClass>Support</BaseClass>
         <BaseClass>IWireOwner</BaseClass>
         <ECCustomAttributes>
@@ -1143,7 +1125,7 @@
         <ECProperty propertyName="Orientation" typeName="point3d" displayLabel="Orientation" description="" />
     </ECEntityClass>
 
-    <ECEntityClass typeName="SurfaceSupport" modifier="Sealed" displayLabel="Point Support" description="">
+    <ECEntityClass typeName="SurfaceSupport" modifier="Sealed" displayLabel="Surface Support" description="">
         <BaseClass>Support</BaseClass>
         <BaseClass>ISheetOwner</BaseClass>
         <ECCustomAttributes>
