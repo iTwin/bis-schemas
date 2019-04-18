@@ -1083,25 +1083,65 @@
             <ClassHasHandler xmlns="BisCore.1.0"/>
         </ECCustomAttributes>
         <ECProperty propertyName="RAxis" typeName="point3d" displayLabel="R-Axis" description="" />
-        <ECProperty propertyName="TAxis" typeName="point3d" displayLabel="T-Axis" description="" />
+        <ECProperty propertyName="SAxis" typeName="point3d" displayLabel="S-Axis" description="" />
+        <ECNavigationProperty propertyName="Vertex" relationshipName="PointSupportRefersToVertex" direction="Forward" displayLabel="Vertex" />
+        <ECNavigationProperty propertyName="Behavior" relationshipName="PointSupportRefersToPointSupportBehavior" direction="Forward" displayLabel="Behavior" />
     </ECEntityClass>
 
-    <ECEntityClass typeName="CurveSupport" modifier="Sealed" displayLabel="Curve Support" description="">
+    <ECRelationshipClass typeName="PointSupportRefersToVertex" strength="referencing" modifier="Sealed">
+        <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="false">
+            <Class class="PointSupport" />
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="false">
+            <Class class="Vertex" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="PointSupportRefersToPointSupportBehavior" strength="referencing" modifier="Sealed">
+        <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="false">
+            <Class class="PointSupport" />
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="false">
+            <Class class="PointSupportBehavior" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="CurveSupport" modifier="Sealed" displayLabel="Point Support" description="">
         <BaseClass>Support</BaseClass>
         <BaseClass>IWireOwner</BaseClass>
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.1.0"/>
         </ECCustomAttributes>
         <ECProperty propertyName="Orientation" typeName="point3d" displayLabel="Orientation" description="" />
+        <ECNavigationProperty propertyName="Behavior" relationshipName="CurveSupportRefersToCurveSupportBehavior" direction="Forward" displayLabel="Behavior" />
     </ECEntityClass>
 
-    <ECEntityClass typeName="SurfaceSupport" modifier="Sealed" displayLabel="Surface Support" description="">
+    <ECRelationshipClass typeName="CurveSupportRefersToCurveSupportBehavior" strength="referencing" modifier="Sealed">
+        <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="false">
+            <Class class="CurveSupport" />
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="false">
+            <Class class="CurveSupportBehavior" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="SurfaceSupport" modifier="Sealed" displayLabel="Point Support" description="">
         <BaseClass>Support</BaseClass>
         <BaseClass>ISheetOwner</BaseClass>
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.1.0"/>
         </ECCustomAttributes>
+        <ECNavigationProperty propertyName="Behavior" relationshipName="SurfaceSupportRefersToSurfaceSupportBehavior" direction="Forward" displayLabel="Behavior" />
     </ECEntityClass>
+
+    <ECRelationshipClass typeName="SurfaceSupportRefersToSurfaceSupportBehavior" strength="referencing" modifier="Sealed">
+        <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="false">
+            <Class class="SurfaceSupport" />
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="false">
+            <Class class="SurfaceSupportBehavior" />
+        </Target>
+    </ECRelationshipClass>
 
     <ECEntityClass typeName="SupportBehavior" modifier="Abstract" displayLabel="Support Behavior" description="">
         <BaseClass>bis:DefinitionElement</BaseClass>
@@ -1110,17 +1150,17 @@
         </ECCustomAttributes>
     </ECEntityClass>
 
-    <ECEntityClass typeName="VertexSupportBehavior" modifier="Sealed" displayLabel="Vertex Support Behavior" description="">
+    <ECEntityClass typeName="PointSupportBehavior" modifier="Sealed" displayLabel="Vertex Support Behavior" description="">
         <BaseClass>SupportBehavior</BaseClass>
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.1.0"/>
         </ECCustomAttributes>
-        <ECNavigationProperty propertyName="TranslationalR" relationshipName="VertexSupportBehaviorRefersToVertexTranslationalBehaviorR" direction="Forward" displayLabel="TranslationalR" />
-        <ECNavigationProperty propertyName="TranslationalS" relationshipName="VertexSupportBehaviorRefersToVertexTranslationalBehaviorS" direction="Forward" displayLabel="TranslationalS" />
-        <ECNavigationProperty propertyName="TranslationalT" relationshipName="VertexSupportBehaviorRefersToVertexTranslationalBehaviorT" direction="Forward" displayLabel="TranslationalT" />
-        <ECNavigationProperty propertyName="RotationalR" relationshipName="VertexSupportBehaviorRefersToVertexRotationalBehaviorR" direction="Forward" displayLabel="RotationalR" />
-        <ECNavigationProperty propertyName="RotationalS" relationshipName="VertexSupportBehaviorRefersToVertexRotationalBehaviorS" direction="Forward" displayLabel="RotationalS" />
-        <ECNavigationProperty propertyName="RotationalT" relationshipName="VertexSupportBehaviorRefersToVertexRotationalBehaviorT" direction="Forward" displayLabel="RotationalT" />
+        <ECNavigationProperty propertyName="TranslationalR" relationshipName="PointSupportBehaviorRefersToPointTranslationalBehaviorR" direction="Forward" displayLabel="TranslationalR" />
+        <ECNavigationProperty propertyName="TranslationalS" relationshipName="PointSupportBehaviorRefersToPointTranslationalBehaviorS" direction="Forward" displayLabel="TranslationalS" />
+        <ECNavigationProperty propertyName="TranslationalT" relationshipName="PointSupportBehaviorRefersToPointTranslationalBehaviorT" direction="Forward" displayLabel="TranslationalT" />
+        <ECNavigationProperty propertyName="RotationalR" relationshipName="PointSupportBehaviorRefersToPointRotationalBehaviorR" direction="Forward" displayLabel="RotationalR" />
+        <ECNavigationProperty propertyName="RotationalS" relationshipName="PointSupportBehaviorRefersToPointRotationalBehaviorS" direction="Forward" displayLabel="RotationalS" />
+        <ECNavigationProperty propertyName="RotationalT" relationshipName="PointSupportBehaviorRefersToPointRotationalBehaviorT" direction="Forward" displayLabel="RotationalT" />
     </ECEntityClass>
 
     <ECEntityClass typeName="CurveSupportBehavior" modifier="Sealed" displayLabel="Curve Support Behavior" description="">
@@ -1155,56 +1195,56 @@
         <ECEnumerator value="2" displayLabel="CompressionAndTension" />
     </ECEnumeration>
 
-    <ECEntityClass typeName="VertexTranslationalBehavior" modifier="Abstract" displayLabel="Vertex Translational Behavior" description="">
+    <ECEntityClass typeName="PointTranslationalBehavior" modifier="Abstract" displayLabel="Point Translational Behavior" description="">
         <BaseClass>bis:DefinitionElement</BaseClass>
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.1.0"/>
         </ECCustomAttributes>
     </ECEntityClass>
 
-    <ECRelationshipClass typeName="VertexSupportBehaviorRefersToVertexTranslationalBehaviorR" strength="referencing" strengthDirection="Forward" modifier="Sealed">
+    <ECRelationshipClass typeName="PointSupportBehaviorRefersToPointTranslationalBehaviorR" strength="referencing" strengthDirection="Forward" modifier="Sealed">
         <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="false">
-            <Class class="VertexSupportBehavior" />
+            <Class class="PointSupportBehavior" />
         </Source>
         <Target multiplicity="(0..1)" roleLabel="is referenced by" polymorphic="true">
-            <Class class="VertexTranslationalBehavior" />
+            <Class class="PointTranslationalBehavior" />
         </Target>
     </ECRelationshipClass>
 
-    <ECRelationshipClass typeName="VertexSupportBehaviorRefersToVertexTranslationalBehaviorS" strength="referencing" strengthDirection="Forward" modifier="Sealed">
+    <ECRelationshipClass typeName="PointSupportBehaviorRefersToPointTranslationalBehaviorS" strength="referencing" strengthDirection="Forward" modifier="Sealed">
         <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="false">
-            <Class class="VertexSupportBehavior" />
+            <Class class="PointSupportBehavior" />
         </Source>
         <Target multiplicity="(0..1)" roleLabel="is referenced by" polymorphic="true">
-            <Class class="VertexTranslationalBehavior" />
+            <Class class="PointTranslationalBehavior" />
         </Target>
     </ECRelationshipClass>
 
-    <ECRelationshipClass typeName="VertexSupportBehaviorRefersToVertexTranslationalBehaviorT" strength="referencing" strengthDirection="Forward" modifier="Sealed">
+    <ECRelationshipClass typeName="PointSupportBehaviorRefersToPointTranslationalBehaviorT" strength="referencing" strengthDirection="Forward" modifier="Sealed">
         <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="false">
-            <Class class="VertexSupportBehavior" />
+            <Class class="PointSupportBehavior" />
         </Source>
         <Target multiplicity="(0..1)" roleLabel="is referenced by" polymorphic="true">
-            <Class class="VertexTranslationalBehavior" />
+            <Class class="PointTranslationalBehavior" />
         </Target>
     </ECRelationshipClass>
 
-    <ECEntityClass typeName="FixedVertexTranslationalBehavior" modifier="Sealed" displayLabel="Fixed Vertex Translational Behavior" description="">
-        <BaseClass>VertexTranslationalBehavior</BaseClass>
+    <ECEntityClass typeName="FixedPointTranslationalBehavior" modifier="Sealed" displayLabel="Fixed Point Translational Behavior" description="">
+        <BaseClass>PointTranslationalBehavior</BaseClass>
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.1.0"/>
         </ECCustomAttributes>
     </ECEntityClass>
 
-    <ECEntityClass typeName="ReleasedVertexTranslationalBehavior" modifier="Sealed" displayLabel="Released Vertex Translational Behavior" description="">
-        <BaseClass>VertexTranslationalBehavior</BaseClass>
+    <ECEntityClass typeName="ReleasedPointTranslationalBehavior" modifier="Sealed" displayLabel="Released Point Translational Behavior" description="">
+        <BaseClass>PointTranslationalBehavior</BaseClass>
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.1.0"/>
         </ECCustomAttributes>
     </ECEntityClass>
 
-    <ECEntityClass typeName="LinearSpringVertexTranslationalBehavior" modifier="Sealed" displayLabel="Linear Spring Vertex Translational Behavior" description="">
-        <BaseClass>VertexTranslationalBehavior</BaseClass>
+    <ECEntityClass typeName="LinearSpringPointTranslationalBehavior" modifier="Sealed" displayLabel="Linear Spring Point Translational Behavior" description="">
+        <BaseClass>PointTranslationalBehavior</BaseClass>
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.1.0"/>
         </ECCustomAttributes>
@@ -1212,56 +1252,56 @@
         <ECProperty propertyName="Stiffness" typeName="double" displayLabel="Stiffness" description="" />
     </ECEntityClass>
 
-    <ECEntityClass typeName="VertexRotationalBehavior" modifier="Abstract" displayLabel="Vertex Rotational Behavior" description="">
+    <ECEntityClass typeName="PointRotationalBehavior" modifier="Abstract" displayLabel="Vertex Rotational Behavior" description="">
         <BaseClass>bis:DefinitionElement</BaseClass>
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.1.0"/>
         </ECCustomAttributes>
     </ECEntityClass>
 
-    <ECRelationshipClass typeName="VertexSupportBehaviorRefersToVertexRotationalBehaviorR" strength="referencing" strengthDirection="Forward" modifier="Sealed">
+    <ECRelationshipClass typeName="PointSupportBehaviorRefersToPointRotationalBehaviorR" strength="referencing" strengthDirection="Forward" modifier="Sealed">
         <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="false">
-            <Class class="VertexSupportBehavior" />
+            <Class class="PointSupportBehavior" />
         </Source>
         <Target multiplicity="(0..1)" roleLabel="is referenced by" polymorphic="true">
-            <Class class="VertexRotationalBehavior" />
+            <Class class="PointRotationalBehavior" />
         </Target>
     </ECRelationshipClass>
 
-    <ECRelationshipClass typeName="VertexSupportBehaviorRefersToVertexRotationalBehaviorS" strength="referencing" strengthDirection="Forward" modifier="Sealed">
+    <ECRelationshipClass typeName="PointSupportBehaviorRefersToPointRotationalBehaviorS" strength="referencing" strengthDirection="Forward" modifier="Sealed">
         <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="false">
-            <Class class="VertexSupportBehavior" />
+            <Class class="PointSupportBehavior" />
         </Source>
         <Target multiplicity="(0..1)" roleLabel="is referenced by" polymorphic="true">
-            <Class class="VertexRotationalBehavior" />
+            <Class class="PointRotationalBehavior" />
         </Target>
     </ECRelationshipClass>
 
-    <ECRelationshipClass typeName="VertexSupportBehaviorRefersToVertexRotationalBehaviorT" strength="referencing" strengthDirection="Forward" modifier="Sealed">
+    <ECRelationshipClass typeName="PointSupportBehaviorRefersToPointRotationalBehaviorT" strength="referencing" strengthDirection="Forward" modifier="Sealed">
         <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="false">
-            <Class class="VertexSupportBehavior" />
+            <Class class="PointSupportBehavior" />
         </Source>
         <Target multiplicity="(0..1)" roleLabel="is referenced by" polymorphic="true">
-            <Class class="VertexRotationalBehavior" />
+            <Class class="PointRotationalBehavior" />
         </Target>
     </ECRelationshipClass>
 
-    <ECEntityClass typeName="FixedVertexRotationalBehavior" modifier="Sealed" displayLabel="Fixed Vertex Rotational Behavior" description="">
-        <BaseClass>VertexRotationalBehavior</BaseClass>
+    <ECEntityClass typeName="FixedPointRotationalBehavior" modifier="Sealed" displayLabel="Fixed Point Rotational Behavior" description="">
+        <BaseClass>PointRotationalBehavior</BaseClass>
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.1.0"/>
         </ECCustomAttributes>
     </ECEntityClass>
 
-    <ECEntityClass typeName="ReleasedVertexRotationalBehavior" modifier="Sealed" displayLabel="Released Vertex Rotational Behavior" description="">
-        <BaseClass>VertexRotationalBehavior</BaseClass>
+    <ECEntityClass typeName="ReleasedPointRotationalBehavior" modifier="Sealed" displayLabel="Released Point Rotational Behavior" description="">
+        <BaseClass>PointRotationalBehavior</BaseClass>
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.1.0"/>
         </ECCustomAttributes>
     </ECEntityClass>
 
-    <ECEntityClass typeName="LinearSpringVertexRotationalBehavior" modifier="Sealed" displayLabel="Linear Spring Vertex Rotational Behavior" description="">
-        <BaseClass>VertexRotationalBehavior</BaseClass>
+    <ECEntityClass typeName="LinearSpringPointRotationalBehavior" modifier="Sealed" displayLabel="Linear Spring Point Rotational Behavior" description="">
+        <BaseClass>PointRotationalBehavior</BaseClass>
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.1.0"/>
         </ECCustomAttributes>
