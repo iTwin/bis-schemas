@@ -628,10 +628,9 @@
     </ECStructClass>
 
 
-    <ECEntityClass typeName="IDefinedPoint" modifier="Abstract" displayLabel="Point location definition" description="An Element that directly or indirectly defines a point location and clear coordinate system.">
+    <ECEntityClass typeName="IDefinedPoint" modifier="Abstract" displayLabel="Point location definition" description="An Element that directly or indirectly defines a point in 3D space.">
         <ECCustomAttributes>
             <IsMixin xmlns="CoreCustomAttributes.1.0">
-                <!-- Only subclasses of bis:Element can implement the IDefinePoint interface -->
                 <AppliesToEntityClass>bis:Element</AppliesToEntityClass>
             </IsMixin>
         </ECCustomAttributes>
@@ -640,19 +639,20 @@
     <ECEntityClass typeName="IDefinedCurve" modifier="Abstract" displayLabel="Curve location definition" description="An Element that directly or indirectly defines a curve location and a clear coordinate system with the z-axis along the curve. The Element may have cardinal points defined; if not all the cardinal points should be considered to lie on the z-axis.">
         <ECCustomAttributes>
             <IsMixin xmlns="CoreCustomAttributes.1.0">
-                <!-- Only subclasses of bis:Element can implement the IDefineCurve interface -->
                 <AppliesToEntityClass>bis:Element</AppliesToEntityClass>
             </IsMixin>
         </ECCustomAttributes>
+        <ECProperty propertyName="Orientation" typeName="Point3d" displayLabel="Orientation" description="Orientation (normal) vector of the curve." />
     </ECEntityClass>
 
     <ECEntityClass typeName="IDefinedSurface" modifier="Abstract" displayLabel="Surface location definition" description="An Element that directly or indirectly defines a surface location and a clear coordinate system with the x- and y- axes in the surface. The Element may have a top, bottom and center defined; if not, the top and bottom and center should be considered to lie on the surface.">
         <ECCustomAttributes>
             <IsMixin xmlns="CoreCustomAttributes.1.0">
-                <!-- Only subclasses of bis:Element can implement the IDefineSurface interface -->
                 <AppliesToEntityClass>bis:Element</AppliesToEntityClass>
             </IsMixin>
         </ECCustomAttributes>
+        <ECProperty propertyName="Origin" typeName="Point3d" displayLabel="Origin" description="Point on the surface defining the start of its local coordinate system." />
+        <ECProperty propertyName="RAxis" typeName="Point3d" displayLabel="RAxis" description="First vector defining the local coordinate system. This vector should be from tangent plane at the origin point of the surface." />
     </ECEntityClass>
 
     <ECEntityClass typeName="RelativeLocationAspect" modifier="Abstract" displayLabel="Relative location data" description="Abstract class to define a relative location.">
@@ -1522,7 +1522,7 @@
     </ECEntityClass>
 
     <ECEntityClass typeName="LinearSpringSurfaceRotationalBehavior" modifier="Sealed" displayLabel="Linear Spring Surface Rotational Behavior" description="">
-        <BaseClass>CurveRotationalBehavior</BaseClass>
+        <BaseClass>SurfaceRotationalBehavior</BaseClass>
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.1.0"/>
         </ECCustomAttributes>
