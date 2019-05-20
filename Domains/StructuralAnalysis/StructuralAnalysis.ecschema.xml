@@ -926,14 +926,56 @@
 
     <!-- Load groups -->
     <ECEnumeration typeName="LoadType" backingTypeName="int" isStrict="true" description="Used for specifying LoadType in LoadContainer.">
-        <ECEnumerator value="0" displayLabel="permanent_g"/>
-        <ECEnumerator value="1" displayLabel="variable_q"/>
-        <ECEnumerator value="2" displayLabel="extraordinary_a"/>
-        <ECEnumerator value="3" displayLabel="userdefined"/>
-        <ECEnumerator value="4" displayLabel="notdefined"/>
+        <ECEnumerator value="0" displayLabel="Unset"/>
+        <ECEnumerator value="1" displayLabel="Blast"/>
+        <ECEnumerator value="2" displayLabel="DeadUnspecified"/>
+        <ECEnumerator value="3" displayLabel="DeadStructure"/>
+        <ECEnumerator value="4" displayLabel="DeadSuperimposed"/>
+        <ECEnumerator value="5" displayLabel="DeadConstruction"/>
+        <ECEnumerator value="6" displayLabel="EarthPressureUltimate"/>
+        <ECEnumerator value="7" displayLabel="Equipment"/>
+        <ECEnumerator value="8" displayLabel="FloorUnspecified"/>
+        <ECEnumerator value="9" displayLabel="FloorConstruction"/>
+        <ECEnumerator value="10" displayLabel="FloorResidential"/>
+        <ECEnumerator value="11" displayLabel="FloorOffice"/>
+        <ECEnumerator value="12" displayLabel="FloorAssembly"/>
+        <ECEnumerator value="13" displayLabel="FloorStorage"/>
+        <ECEnumerator value="14" displayLabel="FloorRetail"/>
+        <ECEnumerator value="15" displayLabel="FluidUnspecified"/>
+        <ECEnumerator value="16" displayLabel="FluidContained"/>
+        <ECEnumerator value="17" displayLabel="FluidUncontained"/>
+        <ECEnumerator value="18" displayLabel="GroundWaterPressure"/>
+        <ECEnumerator value="19" displayLabel="Hydrodynamic"/>
+        <ECEnumerator value="20" displayLabel="Hydrostatic"/>
+        <ECEnumerator value="21" displayLabel="Ice"/>
+        <ECEnumerator value="22" displayLabel="MechanicalVibration"/>
+        <ECEnumerator value="23" displayLabel="Notional"/>
+        <ECEnumerator value="24" displayLabel="ParkingUnspecified"/>
+        <ECEnumerator value="25" displayLabel="ParkingLight"/>
+        <ECEnumerator value="26" displayLabel="ParkingHeavy"/>
+        <ECEnumerator value="27" displayLabel="PostTensioning"/>
+        <ECEnumerator value="28" displayLabel="PostTensioningRestraint"/>
+        <ECEnumerator value="29" displayLabel="Hyperstatic"/>
+        <ECEnumerator value="30" displayLabel="RoofUnspecified"/>
+        <ECEnumerator value="31" displayLabel="RoofAccess"/>
+        <ECEnumerator value="32" displayLabel="RoofRain"/>
+        <ECEnumerator value="33" displayLabel="RoofSnowUnspecified"/>
+        <ECEnumerator value="34" displayLabel="RoofSnowUniform"/>
+        <ECEnumerator value="35" displayLabel="RoofSnowDrift"/>
+        <ECEnumerator value="36" displayLabel="SeismicUnspecified"/>
+        <ECEnumerator value="37" displayLabel="SeismicService"/>
+        <ECEnumerator value="38" displayLabel="SeismicUltimate"/>
+        <ECEnumerator value="39" displayLabel="Settlement"/>
+        <ECEnumerator value="40" displayLabel="Shrinkage"/>
+        <ECEnumerator value="41" displayLabel="Thermal"/>
+        <ECEnumerator value="42" displayLabel="TimeHistory"/>
+        <ECEnumerator value="43" displayLabel="WindUnspecified"/>
+        <ECEnumerator value="44" displayLabel="WindService"/>
+        <ECEnumerator value="45" displayLabel="WindUltimate"/>
+        <ECEnumerator value="46" displayLabel="Other"/>
     </ECEnumeration>
     
-    <ECEnumeration typeName="CombinationType" backingTypeName="int" isStrict="true" description="Used for specifying combination type.">
+    <ECEnumeration typeName="LoadCombinationType" backingTypeName="int" isStrict="true" description="Used for specifying combination type.">
         <ECEnumerator value="0" displayLabel="Normal"/>
         <ECEnumerator value="1" displayLabel="ABS"/>
         <ECEnumerator value="2" displayLabel="SRSS"/>
@@ -945,7 +987,7 @@
             <ClassHasHandler xmlns="BisCore.1.0"/>
         </ECCustomAttributes>
         <ECProperty propertyName="LoadType" typeName="LoadType" description="Load Type." />
-        <ECProperty propertyName="SelfWeightVector" typeName="point3d" description="Self Weight Vector. Must be a unit vector." />     
+        <ECProperty propertyName="SelfWeightVector" typeName="point3d" description="Self Weight Vector." />     
     </ECEntityClass>
     
     <ECRelationshipClass typeName="LoadContainerOwnsLoads" strength="embedding" modifier="Sealed">
@@ -1001,9 +1043,6 @@
     
     <ECEntityClass typeName="FactoredLoadGroupAspect" modifier="Sealed" displayLabel="Factored Load Group Aspect" description="Adds a factor to a specified LoadGroup.">
         <BaseClass>bis:ElementMultiAspect</BaseClass>
-        <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.1.0"/>
-        </ECCustomAttributes> 
         <ECProperty propertyName="Factor" typeName="double" description="Factor to be applied to the group." />
         <ECNavigationProperty propertyName="LoadGroup" relationshipName="FactoredLoadGroupAspectRefersToLoadGroup" direction="Forward" displayLabel="Load Group." />
     </ECEntityClass>
@@ -1019,18 +1058,12 @@
 
     <ECEntityClass typeName="FactoredLoadConditionAspect" modifier="Abstract" displayLabel="Factored Load Case Aspect" description="Adds a factor to a specified LoadCase.">
         <BaseClass>bis:ElementMultiAspect</BaseClass>
-        <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.1.0"/>
-        </ECCustomAttributes> 
         <ECProperty propertyName="Factor" typeName="double" description="Factor to be applied to the group." />
-        <ECProperty propertyName="CombinationType" typeName="CombinationType" description="Type of load combination" />
+        <ECProperty propertyName="LoadCombinationType" typeName="LoadCombinationType" description="Type of load combination" />
     </ECEntityClass>
     
     <ECEntityClass typeName="FactoredLoadCaseAspect" modifier="Sealed" displayLabel="Factored Load Case Aspect" description="Adds a factor to a specified LoadCase.">
         <BaseClass>FactoredLoadConditionAspect</BaseClass>
-        <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.1.0"/>
-        </ECCustomAttributes> 
         <ECNavigationProperty propertyName="LoadCase" relationshipName="FactoredLoadCaseAspectRefersToLoadCase" direction="Forward" displayLabel="Load Case." />
     </ECEntityClass>
     
@@ -1045,9 +1078,6 @@
     
     <ECEntityClass typeName="FactoredLoadCombinationAspect" modifier="Sealed" displayLabel="Factored Load Combination Aspect" description="Adds a factor to a specified LoadCase.">
         <BaseClass>FactoredLoadConditionAspect</BaseClass>
-        <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.1.0"/>
-        </ECCustomAttributes> 
         <ECNavigationProperty propertyName="LoadCombination" relationshipName="FactoredLoadCombinationAspectRefersToLoadCombination" direction="Forward" displayLabel="Load Combination." />
     </ECEntityClass>
     
