@@ -1,37 +1,78 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ECSchema schemaName="RoadRailAlignment" alias="rralign" version="01.00.00" description="Base schema for the Alignment domain in light of Road and Rail applications." xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.1">
+<ECSchema schemaName="RoadRailAlignment" alias="rralign" version="02.00.00" description="Base schema for the Alignment domain in light of Road and Rail applications." xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
     <ECSchemaReference name="CoreCustomAttributes" version="01.00.00" alias="CoreCA"/>
     <ECSchemaReference name="BisCore" version="01.00.01" alias="bis"/>
-    <ECSchemaReference name="LinearReferencing" version="01.00.00" alias="lr"/>
+    <ECSchemaReference name="LinearReferencing" version="02.00.00" alias="lr"/>
+    <ECSchemaReference name="Formats" version="01.00.00" alias="f"/>
+    <ECSchemaReference name="Units" version="01.00.00" alias="u"/>
 
-    <KindOfQuantity typeName="STATION" displayLabel="Road &amp; Rail Station" persistenceUnit="M(DefaultReal)" presentationUnits="M(stop1000-2-3z);FT(stop100-2-2z);M(real2u);FT(real2u)" relativeError="0.0001"/>
-    <KindOfQuantity typeName="LENGTH" displayLabel="Road &amp; Rail Alignment Length" persistenceUnit="M(DefaultReal)" presentationUnits="M(real2u);FT(real2u)" relativeError="0.0001"/>
-    <KindOfQuantity typeName="AREA" displayLabel="Road &amp; Rail Area" persistenceUnit="SQ.M(DefaultReal)" presentationUnits="SQ.M(real2u);SQ.FT(real2u)" relativeError="0.0001"/>
-    <KindOfQuantity typeName="ANGLE" displayLabel="Road &amp; Rail Angle" persistenceUnit="RAD(DefaultReal)" presentationUnits="ARC_DEG(real2u);ARC_DEG(dms)" relativeError="0.0001"/>
-    <KindOfQuantity typeName="BEARING" displayLabel="Road &amp; Rail Bearing" persistenceUnit="RAD(DefaultReal)" presentationUnits="ARC_DEG(dms)" relativeError="0.0001"/>
-    <KindOfQuantity typeName="SLOPE" displayLabel="Road &amp; Rail Slope" persistenceUnit="M/M" presentationUnits="M/M(real2u);FT/FT(real2u)" relativeError="0.0001" />
+    <KindOfQuantity typeName="STATION" displayLabel="Road &amp; Rail Station" persistenceUnit="u:M" presentationUnits="f:StationZ_1000_3[u:M];f:StationZ_100_2[u:FT];f:DefaultRealU(2)[u:M];f:DefaultRealU(2)[u:FT]" relativeError="0.0001"/>
+    <KindOfQuantity typeName="LENGTH" displayLabel="Road &amp; Rail Alignment Length" persistenceUnit="u:M" presentationUnits="f:DefaultRealU(2)[u:M];f:DefaultRealU(2)[u:FT]" relativeError="0.0001"/>
+    <KindOfQuantity typeName="AREA" displayLabel="Road &amp; Rail Area" persistenceUnit="u:SQ_M" presentationUnits="f:DefaultRealU(2)[u:SQ_M];f:DefaultRealU(2)[u:SQ_FT]" relativeError="0.0001"/>
+    <KindOfQuantity typeName="ANGLE" displayLabel="Road &amp; Rail Angle" persistenceUnit="u:RAD" presentationUnits="f:DefaultRealU(2)[u:ARC_DEG];f:AngleDMS" relativeError="0.0001"/>
+    <KindOfQuantity typeName="BEARING" displayLabel="Road &amp; Rail Bearing" persistenceUnit="u:RAD" presentationUnits="f:AngleDMS" relativeError="0.0001"/>
+    <KindOfQuantity typeName="SLOPE" displayLabel="Road &amp; Rail Slope" persistenceUnit="u:M_PER_M" presentationUnits="f:DefaultRealU(2)[u:M_PER_M];f:DefaultRealU(2)[u:FT_PER_FT]" relativeError="0.0001" />
+    <KindOfQuantity typeName="VELOCITY" displayLabel="Road &amp; Rail Velocity" persistenceUnit="u:M_PER_SEC" presentationUnits="f:DefaultRealU(2)[u:KM_PER_HR];f:DefaultRealU(2)[u:MPH]" relativeError="0.0001"/>
 
-    <ECEntityClass typeName="RoadRailCategoryModel">
-        <BaseClass>bis:DefinitionModel</BaseClass>
-        <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00.00"/>
-        </ECCustomAttributes>
-    </ECEntityClass>
-    <ECEntityClass typeName="ConfigurationModel" description="Container for configuration elements, such as categories, view-definitions, etc.">
-        <BaseClass>bis:DefinitionModel</BaseClass>
-        <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00.00"/>
-        </ECCustomAttributes>
-    </ECEntityClass>
     <ECEntityClass typeName="Alignment" modifier="Sealed" displayLabel="Alignment" description="Reference system to position elements mainly for linear construction works. Provides concrete implementation of an ILinearElement mix-in in the context of Road and Rail disciplines.">
         <BaseClass>bis:SpatialLocationElement</BaseClass>
         <BaseClass>bis:ISubModeledElement</BaseClass>
         <BaseClass>lr:ILinearElement</BaseClass>
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.01.00.00"/>
+            <DbIndexList xmlns="ECDbMap.02.00.00">
+                <Indexes>
+                    <DbIndex>
+                        <Name>ix_rra_Alignment_Horizontal</Name>
+                        <IsUnique>True</IsUnique>
+                        <Properties>
+                            <string>Horizontal.Id</string>
+                        </Properties>
+                        <Where>IndexedColumnsAreNotNull</Where>
+                    </DbIndex>
+                </Indexes>
+            </DbIndexList>
         </ECCustomAttributes>
         <ECProperty propertyName="StartStation" typeName="double" kindOfQuantity="STATION" displayLabel="Start Station"/>
-        <ECProperty propertyName="StartValue" typeName="double" kindOfQuantity="LENGTH" displayLabel="Start Distance Along"/>
+        <ECProperty propertyName="StartValue" typeName="double" kindOfQuantity="LENGTH" displayLabel="Start Distance Along">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.00"/>
+            </ECCustomAttributes>
+        </ECProperty>
+        <ECNavigationProperty propertyName="Horizontal" relationshipName="AlignmentRefersToHorizontal" direction="Forward" displayLabel="Horizontal Alignment">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.00"/>
+            </ECCustomAttributes>
+        </ECNavigationProperty>
+        <ECNavigationProperty propertyName="MainVertical" relationshipName="AlignmentRefersToMainVertical" direction="Forward" displayLabel="Main Vertical Alignment">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.00"/>
+            </ECCustomAttributes>
+        </ECNavigationProperty>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="AlignmentRefersToHorizontal" strength="referencing" modifier="Sealed" description="Relationship enabling an Alignment to refer to its Horizontal alignment.">
+        <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="false">
+            <Class class="Alignment"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is referenced by" polymorphic="false">
+            <Class class="HorizontalAlignment"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="AlignmentRefersToMainVertical" strength="referencing" modifier="Sealed" description="Relationship enabling an Alignment to refer to its main Vertical alignment.">
+        <Source multiplicity="(0..*)" roleLabel="refers to main" polymorphic="false">
+            <Class class="Alignment"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="main is referenced by" polymorphic="false">
+            <Class class="VerticalAlignment"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="DesignAlignments" description="Entry-point element into an AlignmentModel containing Alignments used for design purposes in given Spatial Model.">
+        <BaseClass>bis:SpatialLocationElement</BaseClass>
+        <BaseClass>bis:ISubModeledElement</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.01.00.00"/>
+            <HiddenClass xmlns="CoreCustomAttributes.01.00.00"/>
+        </ECCustomAttributes>
     </ECEntityClass>
     <ECEntityClass typeName="HorizontalAlignments" description="Horizontal/Top perspective on Alignments in an AlignmentModel that will be broken down in more detail in a separate HorizontalAlignmentModel.">
         <BaseClass>bis:SpatialLocationElement</BaseClass>
@@ -47,7 +88,11 @@
             <ClassHasHandler xmlns="BisCore.01.00.00"/>
             <HiddenClass xmlns="CoreCustomAttributes.01.00.00"/>
         </ECCustomAttributes>
-        <ECProperty propertyName="HorizontalGeometry" typeName="Bentley.Geometry.Common.IGeometry" kindOfQuantity="LENGTH"/>
+        <ECProperty propertyName="HorizontalGeometry" typeName="Bentley.Geometry.Common.IGeometry" kindOfQuantity="LENGTH">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.00"/>
+            </ECCustomAttributes>
+        </ECProperty>
     </ECEntityClass>
     <ECEntityClass typeName="VerticalAlignment" description="Detailing of a Alignment or a portion of it, vertically along its path.">
         <BaseClass>bis:GeometricElement2d</BaseClass>
@@ -55,19 +100,11 @@
             <ClassHasHandler xmlns="BisCore.01.00.00"/>
             <HiddenClass xmlns="CoreCustomAttributes.01.00.00"/>
         </ECCustomAttributes>
-        <ECProperty propertyName="VerticalGeometry" typeName="Bentley.Geometry.Common.IGeometry" kindOfQuantity="LENGTH" description="Geometry primitives accurately describing the vertical alignment. X-values mean distance-along the HorizontalAlignment; Y-values are always zero; Z-values provide elevation information."/>
-    </ECEntityClass>
-    <ECEntityClass typeName="AlignmentModel" description="Container for related Alignments, uniquely scoping their Codes.">
-        <BaseClass>bis:SpatialLocationModel</BaseClass>
-        <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00.00"/>
-        </ECCustomAttributes>
-    </ECEntityClass>
-    <ECEntityClass typeName="HorizontalAlignmentModel" description="Container for Horizontal Alignments for all Alignments in a particular AlignmentModel.">
-        <BaseClass>bis:SpatialLocationModel</BaseClass>
-        <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00.00"/>
-        </ECCustomAttributes>
+        <ECProperty propertyName="VerticalGeometry" typeName="Bentley.Geometry.Common.IGeometry" kindOfQuantity="LENGTH" description="Geometry primitives accurately describing the vertical alignment. X-values mean distance-along the HorizontalAlignment; Y-values are always zero; Z-values provide elevation information.">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.00"/>
+            </ECCustomAttributes>
+        </ECProperty>
     </ECEntityClass>
     <ECEntityClass typeName="VerticalAlignmentModel" description="Container for all Vertical Alignments breaking down an Alignment.">
         <BaseClass>bis:GeometricModel2d</BaseClass>
@@ -78,30 +115,12 @@
     <ECRelationshipClass typeName="HorizontalModelBreaksDownAlignments" strength="embedding" strengthDirection="Backward" modifier="Sealed" description="Relationship enabling break-down of an AlignmentModel (3d) into a 2d model focusing on Horizontal/Plan-view of them.">
         <BaseClass>bis:ModelModelsElement</BaseClass>
         <Source multiplicity="(0..1)" polymorphic="false" roleLabel="breaks down">
-            <Class class="HorizontalAlignmentModel"/>
+            <Class class="bis:SpatialLocationModel"/>
         </Source>
         <Target multiplicity="(1..1)" polymorphic="false" roleLabel="is broken down by">
             <Class class="HorizontalAlignments"/>
         </Target>
-    </ECRelationshipClass>
-    <ECRelationshipClass typeName="AlignmentRefersToHorizontal" strength="referencing" modifier="Sealed" description="Relationship enabling an Alignment to refer to its Horizontal alignment.">
-        <BaseClass>bis:ElementRefersToElements</BaseClass>
-        <Source multiplicity="(1..*)" roleLabel="refers to" polymorphic="false">
-            <Class class="Alignment"/>
-        </Source>
-        <Target multiplicity="(0..1)" roleLabel="is referenced by" polymorphic="false">
-            <Class class="HorizontalAlignment"/>
-        </Target>
-    </ECRelationshipClass>
-    <ECRelationshipClass typeName="AlignmentRefersToMainVertical" strength="referencing" modifier="Sealed" description="Relationship enabling an Alignment to refer to its main Vertical alignment.">
-        <BaseClass>bis:ElementRefersToElements</BaseClass>
-        <Source multiplicity="(1..*)" roleLabel="refers to main" polymorphic="false">
-            <Class class="Alignment"/>
-        </Source>
-        <Target multiplicity="(0..1)" roleLabel="main is referenced by" polymorphic="false">
-            <Class class="VerticalAlignment"/>
-        </Target>
-    </ECRelationshipClass>
+    </ECRelationshipClass>    
     <ECRelationshipClass typeName="VerticalModelBreaksDownAlignment" strength="embedding" strengthDirection="Backward" modifier="Sealed" description="Relationship enabling break-downs of an Alignment into Vertical-Alignments.">
         <BaseClass>bis:ModelModelsElement</BaseClass>
         <Source multiplicity="(0..1)" polymorphic="false" roleLabel="breaks down">
@@ -111,16 +130,8 @@
             <Class class="Alignment"/>
         </Target>
     </ECRelationshipClass>
-    <ECEntityClass typeName="LinearlyLocatedReferentElement" modifier="Abstract" description="Base class for concrete implementations of IReferent that are Spatially-located as well as linearly-located.">
-        <BaseClass>bis:SpatialLocationElement</BaseClass>
-        <BaseClass>lr:ILinearlyLocatedElement</BaseClass>
-        <BaseClass>lr:IReferent</BaseClass>
-        <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00.00"/>
-        </ECCustomAttributes>
-    </ECEntityClass>
     <ECEntityClass typeName="AlignmentStation" modifier="Sealed" description="Well-known location along a Linear-Element, with a specific Station value assigned to it.">
-        <BaseClass>LinearlyLocatedReferentElement</BaseClass>
+        <BaseClass>lr:ReferentElement</BaseClass>
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.01.00.00"/>
             <HiddenClass xmlns="CoreCustomAttributes.01.00.00"/>
@@ -133,10 +144,10 @@
             <Class class="Alignment"/>
         </Source>
         <Target multiplicity="(0..*)" polymorphic="true" roleLabel="is owned by">
-            <Class class="LinearlyLocatedReferentElement"/>
+            <Class class="lr:ReferentElement"/>
         </Target>
     </ECRelationshipClass>
-    <ECEntityClass typeName="AlignmentProfileViewDefinition" description="A specialized view for vertical alignments.">
+    <!--ECEntityClass typeName="AlignmentProfileViewDefinition" description="A specialized view for vertical alignments.">
       <BaseClass>bis:SpatialViewDefinition</BaseClass>
       <ECCustomAttributes>
         <ClassHasHandler xmlns="BisCore.01.00.00"/>
@@ -147,23 +158,5 @@
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.01.00.00"/>
         </ECCustomAttributes>
-    </ECEntityClass>
-    <ECRelationshipClass typeName="DrawingGraphicRepresentsAlignment" strength="referencing" modifier="Sealed">
-        <BaseClass>bis:DrawingGraphicRepresentsElement</BaseClass>
-        <Source multiplicity="(0..*)" roleLabel="represents" polymorphic="true">
-            <Class class="bis:DrawingGraphic"/>
-        </Source>
-        <Target multiplicity="(0..1)" roleLabel="is represented by" polymorphic="false">
-            <Class class="Alignment"/>
-        </Target>
-    </ECRelationshipClass>
-    <ECRelationshipClass typeName="GraphicalElement3dRepresentsAlignment" strength="referencing" modifier="Sealed">
-        <BaseClass>bis:GraphicalElement3dRepresentsElement</BaseClass>
-        <Source multiplicity="(0..*)" roleLabel="represents" polymorphic="true">
-            <Class class="bis:GraphicalElement3d"/>
-        </Source>
-        <Target multiplicity="(0..1)" roleLabel="is represented by" polymorphic="false">
-            <Class class="Alignment"/>
-        </Target>
-    </ECRelationshipClass>
+    </ECEntityClass-->
 </ECSchema>
