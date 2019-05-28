@@ -9,7 +9,7 @@
 <ECSchema schemaName="ClassificationSystems" alias="clsf" version="01.00.00" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.1">
     <ECSchemaReference name="BisCore" version="01.00.02" alias="bis" />
 
-    <ECEntityClass typeName="IClassified" modifier="Abstract" displayTitle="IClassifiedElement" Description="An interface that indicates that an element could be classified by classification(s)">
+    <ECEntityClass typeName="IClassified" modifier="Abstract" displayLabel="IClassifiedElement" description="An interface that indicates that an element could be classified by classification(s)">
         <ECCustomAttributes>
             <IsMixin xmlns="CoreCustomAttributes.1.0">
                 <AppliesToEntityClass>bis:Element</AppliesToEntityClass>
@@ -17,17 +17,17 @@
         </ECCustomAttributes>
     </ECEntityClass>
 
-    <ECEntityClass typeName="ClassificationSystem" modifier="Sealed" displayLabel="ClassificationSystem">
+    <ECEntityClass typeName="ClassificationSystem" modifier="Sealed" displayLabel="ClassificationSystem" description="an element that stores data about the whole classificationsystem">
         <BaseClass>bis:DefinitionElement</BaseClass>
         <ECCustomAttributes>
           <ClassHasHandler xmlns="BisCore.1.0"/>
         </ECCustomAttributes>
-      <ECProperty propertyName="Source" displayLabel="Source" typeName="string"/>
-      <ECProperty propertyName="Edition" displayLabel="Edition" typeName="string"/>
-      <ECProperty propertyName="Location" displayLabel="Location" typeName="string"/>
+      <ECProperty propertyName="Source" displayLabel="Source" typeName="string" description="Source (or publisher) for this classification" />
+      <ECProperty propertyName="Edition" displayLabel="Edition" typeName="string" description="The edition or version of the classification system from which the classification notation is derived." />
+      <ECProperty propertyName="Location" displayLabel="Location" typeName="string" description="Resource identifier or locator, provided as URI, URN or URL, of the classification." />
     </ECEntityClass>
   
-    <ECEntityClass typeName="ClassificationTable" modifier="Sealed" displayLabel="ClassificationTable">
+    <ECEntityClass typeName="ClassificationTable" modifier="Sealed" displayLabel="ClassificationTable" description="an element used to represent a table in a classificationsystem">
         <BaseClass>bis:DefinitionElement</BaseClass>
         <BaseClass>bis:ISubModeledElement</BaseClass>
         <ECCustomAttributes>
@@ -35,22 +35,22 @@
         </ECCustomAttributes>
     </ECEntityClass>
   
-    <ECEntityClass typeName="Classification" modifier="Sealed" displayLabel="ClassificationSystem ClassDefinition" description="The ClassDefinition used to store classificationSystem data.">
+    <ECEntityClass typeName="Classification" modifier="Sealed" displayLabel="ClassificationSystem ClassDefinition" description="An element that represents a single entry in a classificationsystem">
         <BaseClass>bis:DefinitionElement</BaseClass>
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.1.0"/>
         </ECCustomAttributes>
-        <ECProperty propertyName="Description" typeName="string" displayLabel="Description"/>
+        <ECProperty propertyName="Description" typeName="string" displayLabel="Description" description="description for this classification"/>
     </ECEntityClass>
     
-    <ECEntityClass typeName="ClassificationGroup" modifier="Sealed" displayLabel="ClassificationSystem ClassDefinition group" description="The ClassDefinition group element">
+    <ECEntityClass typeName="ClassificationGroup" modifier="Sealed" displayLabel="ClassificationSystem ClassDefinition group" description="ClassificationGroup groups classifications">
         <BaseClass>bis:GroupInformationElement</BaseClass>
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.1.0"/>
         </ECCustomAttributes>
     </ECEntityClass>
         
-    <ECRelationshipClass typeName="IClassifiedIsClassifiedAs" modifier="None" strength="referencing" description="a relationship to map IClassified to Classifications">
+    <ECRelationshipClass typeName="IClassifiedIsClassifiedAs" modifier="None" strength="referencing" description="maps IClassified elements to Classifications">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <Source multiplicity="(0..*)" roleLabel="is classified as" polymorphic="true">
             <Class class="IClassified"/>
@@ -60,7 +60,7 @@
         </Target>
     </ECRelationshipClass>
 
-    <ECRelationshipClass typeName="ClassificationGroupGroupsClassifications" modifier="None" strength="referencing" description="a relationship to map Classification to its group">
+    <ECRelationshipClass typeName="ClassificationGroupGroupsClassifications" modifier="None" strength="referencing" description="maps Classification to its group">
         <BaseClass>bis:ElementGroupsMembers</BaseClass>
         <Source multiplicity="(0..*)" roleLabel="groups" polymorphic="false">
             <Class class="ClassificationGroup"/>
@@ -70,7 +70,7 @@
         </Target>
     </ECRelationshipClass>
 
-    <ECRelationshipClass typeName="ClassificationSpecializesClassification" modifier="None" strength="embedding" description="a relationship">
+    <ECRelationshipClass typeName="ClassificationSpecializesClassification" modifier="None" strength="embedding" description="a relationship used to indicate that one classification specializes other classification">
         <BaseClass>bis:ElementOwnsChildElements</BaseClass>
         <Source multiplicity="(0..1)" roleLabel="specializes" polymorphic="false">
             <Class class="Classification"/>
@@ -80,7 +80,7 @@
          </Target>
     </ECRelationshipClass>
 
-    <ECRelationshipClass typeName="ClassificationSystemContainsClassificationTable" modifier="None" strength="embedding" description="a relationship">
+    <ECRelationshipClass typeName="ClassificationSystemContainsClassificationTable" modifier="None" strength="embedding" description="maps classificationsystems to their tables">
         <BaseClass>bis:ElementOwnsChildElements</BaseClass>
         <Source multiplicity="(0..1)" roleLabel="contains" polymorphic="false">
             <Class class="ClassificationSystem"/>
