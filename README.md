@@ -7,6 +7,7 @@ List of current BIS Schemas in this repository as SSOT:
 - Building\BuildingDataGroupBase
 - BuildingSpatial
 - ClassificationSystems
+- Construction
 - Core\BisCore
 - Core\Functional
 - Core\Generic
