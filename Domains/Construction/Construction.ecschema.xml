@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ECSchema schemaName="Construction" alias="constr" version="01.00.00" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.1" description="Base schema for the Construction domain.">
+    <ECSchemaReference name="BisCore" version="01.00.04" alias="bis" />
+    <ECSchemaReference name="Generic" version="01.00.01" alias="gen" />
+        
+    <ECEntityClass typeName="ConstructionModel" displayLabel="Construction Model" description="A container for persisting constr:ConstructionItem instances and geometry elements split up into smaller pieces.">
+        <BaseClass>bis:InformationModel</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="ConstructionPartition" modifier="Sealed" displayLabel="Construction Partition" description="A constr:ConstructionPartition element indicates that there is a construction modeling perspective within the overall information hierarchy. A constr:ConstructionPartition is always parented to a bis:Subject and broken down by a constr:ConstructionModel.">
+        <BaseClass>bis:InformationPartitionElement</BaseClass>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="PhysicalElementSplitsPhysicalElement" strength="referencing" strengthDirection="Forward" modifier="Sealed" description="Relationship enabling split-up of PhysicalElement and gen:Graphic3d elements into the smaller pieces.">
+        <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="splits up" polymorphic="true" abstractConstraint="bis:GeometricElement3d">
+            <Class class="gen:Graphic3d"/>
+            <Class class="bis:PhysicalElement"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is split into" polymorphic="true" abstractConstraint="bis:GeometricElement3d">
+            <Class class="gen:Graphic3d"/>
+            <Class class="bis:PhysicalElement"/>
+        </Target>
+    </ECRelationshipClass>
+	
+    <ECEntityClass typeName="ConstructionItem" displayLabel="Construction Item" modifier="Sealed" description="Defines a constructible component which may or may not be modeled in the 3D model.">
+        <BaseClass>bis:InformationRecordElement</BaseClass>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="ConstructionItemConstructsPhysicalElement" strength="referencing" strengthDirection="Forward" modifier="Sealed" description="Relates constr:ConstructionItem to the real world entities (or their split up pieces) it constructs.">
+        <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="constructs" polymorphic="false">
+            <Class class="ConstructionItem"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is constructed by" polymorphic="true" abstractConstraint="bis:GeometricElement3d">
+            <Class class="gen:Graphic3d"/>
+            <Class class="bis:PhysicalElement"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="CostCode" modifier="Sealed" displayLabel="Cost Code" description="The aspect used to store Cost Code assignments to constr:ConstructionItem elements.">
+        <BaseClass>bis:ElementMultiAspect</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.1.0"/>
+            <DbIndexList xmlns="ECDbMap.2.0">
+                <Indexes>
+                    <DbIndex>
+                        <Name>ix_constr_costcode</Name>
+                        <IsUnique>True</IsUnique>
+                        <Properties>
+                            <string>Element.Id</string>
+                            <string>CodeId</string>
+                        </Properties>
+                    </DbIndex>
+                </Indexes>
+            </DbIndexList>
+        </ECCustomAttributes>
+ 		<ECProperty propertyName="CodeId" displayLabel="Cost Code Id" description="The Id of the Cost Code in Construction QTO service." typeName="string">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.1.0"/>
+            </ECCustomAttributes>
+		</ECProperty>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="ConstructionItemOwnsCostCodes" strength="embedding" strengthDirection="Forward" modifier="Sealed" description="Defines aspect's ownership.">
+        <BaseClass>bis:ElementOwnsMultiAspects</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="ConstructionItem" />
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="false">
+            <Class class="CostCode"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="ConstructionQuantity" modifier="Sealed" displayLabel="Construction Quantity" description="The aspect used to store construction quantity data for constr:ConstructionItem elements.">
+        <BaseClass>bis:ElementMultiAspect</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.1.0"/>
+            <DbIndexList xmlns="ECDbMap.2.0">
+                <Indexes>
+                    <DbIndex>
+                        <Name>ix_constr_workstepcode</Name>
+                        <IsUnique>True</IsUnique>
+                        <Properties>
+                            <string>Element.Id</string>
+                            <string>CostCodeId</string>
+                            <string>WorkStepCode</string>
+                        </Properties>
+                    </DbIndex>
+                </Indexes>
+            </DbIndexList>
+        </ECCustomAttributes>
+		<ECProperty propertyName="CostCodeId" displayLabel="Cost Code Id" description="The Id of the Cost Code in Construction QTO service." typeName="string">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.1.0"/>
+            </ECCustomAttributes>
+		</ECProperty>
+        <ECProperty propertyName="WorkStepCode" displayLabel="Work Step Code" typeName="string" description="Work Step Code for which the value is calculated."/>
+        <ECProperty propertyName="Quantity" displayLabel="Quantity value" typeName="double" description="Calculated quantity value."/>
+        <ECProperty propertyName="QuantityUnit" displayLabel="Unit of Measure of quantity" typeName="string" description="Unit of Measure of the calculated quantity."/>
+        <ECProperty propertyName="JsonProperties" typeName="string" extendedTypeName="Json" displayLabel="JSON Properties" description="A string property that users and/or applications can use to persist ad hoc JSON values.">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.1.0"/>
+            </ECCustomAttributes>
+        </ECProperty>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="ConstructionItemOwnsConstuctionQuantities" strength="embedding" strengthDirection="Forward" modifier="Sealed" description="Defines aspect's ownership.">
+        <BaseClass>bis:ElementOwnsMultiAspects</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="ConstructionItem" />
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="false">
+            <Class class="ConstructionQuantity"/>
+        </Target>
+    </ECRelationshipClass>
+    
+</ECSchema>
