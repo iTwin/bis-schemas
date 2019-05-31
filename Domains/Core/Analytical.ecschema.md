@@ -44,7 +44,7 @@ The BIS classes that specialized Analytical domain schemas extend.
 
 **typeName:** EntityClass
 
-**description:** Defines a shared set of properties (the 'type') that can be associated with an anlyt:AnalyticalElement. It is not meant to replace a bis:PhysicalType if it is available. E.g. an analytical pump should refer to a physical pump type, augmenting it with data needed for a specialized analysis.
+**description:** Defines a shared set of properties (the 'type') that can be associated with an anlyt:AnalyticalElement. It is not meant to replace a bis:PhysicalType if it is available.
 
 **baseClass:** [BisCore:TypeDefinitionElement](biscore.ecschema.md#typedefinitionelement)
 
@@ -54,7 +54,7 @@ The BIS classes that specialized Analytical domain schemas extend.
 
 **typeName:** RelationshipClass
 
-**description:** A type-instance relation; one that indicates that the specific anlyt:AnalyticalElement is an instance of the defined anlyt:AnalyticalType. E.g. an analytical Storm instance used in a Hydrological Analysis is of type N-years Storm Event.
+**description:** A type-instance relation; one that indicates that the specific anlyt:AnalyticalElement is an instance of the defined anlyt:AnalyticalType.
 
 **baseClass:** [BisCore:GeometricElement3dHasTypeDefinition](biscore.ecschema.md#geometricelement3dhastypedefinition)
 
