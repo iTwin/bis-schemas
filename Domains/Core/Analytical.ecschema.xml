@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ECSchema schemaName="Analytical" alias="anlyt" version="01.00.00" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.1" displayLabel="Analytical" description="The BIS classes that specialized Analytical domain schemas extend.">
+
+    <ECSchemaReference name="BisCore" version="01.00.04" alias="bis"/>
+
+    <ECEntityClass typeName="AnalyticalPartition" modifier="Abstract" displayLabel="Analytical Partition" description="An anlyt:AnalyticalPartition element indicates that there is a specialized analytical perspective within the overall information hierarchy. An anlyt:AnalyticalPartition subclass is always parented to a bis:Subject and broken down by an anlyt:AnalyticalModel.">
+        <BaseClass>bis:InformationPartitionElement</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="AnalyticalModel" modifier="Abstract" displayLabel="Analytical Model" description="A container for persisting anlyt:AnalyticalElement instances used to model a specialized analytical perspective.">
+        <BaseClass>bis:SpatialModel</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="AnalyticalElement" modifier="Abstract" displayLabel="Analytical Element" description="An anlyt:AnalyticalElement is spatially located, simulating zero or more bis:SpatialLocationElement or bis:PhysicalElement instances in light of a specialized analytical perspective.">
+        <BaseClass>bis:SpatialElement</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="AnalyticalType" modifier="Abstract" displayLabel="Analytical Type" description="Defines a shared set of properties (the 'type') that can be associated with an anlyt:AnalyticalElement. It is not meant to replace a bis:PhysicalType if it is available.">
+        <BaseClass>bis:TypeDefinitionElement</BaseClass>
+    </ECEntityClass>
+    
+    <ECRelationshipClass typeName="AnalyticalElementIsOfType" strength="referencing" modifier="None" description="A type-instance relation; one that indicates that the specific anlyt:AnalyticalElement is an instance of the defined anlyt:AnalyticalType.">
+        <BaseClass>bis:GeometricElement3dHasTypeDefinition</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="is of" polymorphic="true">
+            <Class class="AnalyticalElement" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="defines" polymorphic="true">
+            <Class class="AnalyticalType"/>
+        </Target>
+    </ECRelationshipClass>
+    
+    <ECRelationshipClass typeName="AnalyticalSimulatesSpatialElement" strength="referencing" modifier="None" description="Relates an anlyt:AnalyticalElement to the bis:SpatialLocationElement or bis:PhysicalElement it is simulating, in light of a specialized analytical perspective.">
+        <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="simulates" polymorphic="true">
+            <Class class="AnalyticalElement"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is simulated by" polymorphic="true">
+            <Class class="bis:SpatialElement"/>
+        </Target>
+    </ECRelationshipClass>
+</ECSchema>
