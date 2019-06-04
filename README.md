@@ -7,6 +7,7 @@ List of current BIS Schemas in this repository as SSOT:
 - Building\BuildingDataGroupBase
 - BuildingSpatial
 - ClassificationSystems
+- Core\Analytical
 - Core\BisCore
 - Core\Functional
 - Core\Generic
@@ -14,8 +15,13 @@ List of current BIS Schemas in this repository as SSOT:
 - Core\PhysicalMaterial
 - ECObjects
 - Grids
+- QuantityTakeoffsAspects
 - PresentationRules
 - Profiles
+- DgnV8OpenRoadsDesigner
+- LinearReferencing
+- RoadRailAlignment
+- RoadRailPhysical
 - RealityModeling\DataCaptureSchema
 - RealityModeling\PointCloudSchema
 - RealityModeling\RasterSchema
