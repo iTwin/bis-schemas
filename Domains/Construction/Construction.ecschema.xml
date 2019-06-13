@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ECSchema schemaName="Construction" alias="constr" version="01.00.00" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.1" description="Base schema for the Construction domain.">
     <ECSchemaReference name="BisCore" version="01.00.04" alias="bis" />
-    <ECSchemaReference name="Generic" version="01.00.01" alias="generic" />
         
     <ECEntityClass typeName="ConstructionModel" displayLabel="Construction Model" description="A container for persisting constr:ConstructionItem instances and geometry elements split up into smaller pieces.">
         <BaseClass>bis:PhysicalModel</BaseClass>
@@ -11,15 +10,13 @@
         <BaseClass>bis:InformationPartitionElement</BaseClass>
     </ECEntityClass>
 
-    <ECRelationshipClass typeName="PhysicalElementSplitsPhysicalElement" strength="referencing" strengthDirection="Forward" modifier="Sealed" description="Relationship enabling split-up of PhysicalElement and gen:Graphic3d elements into the smaller pieces.">
+    <ECRelationshipClass typeName="GeometricElement3dSplitsGeometricElement3d" strength="referencing" strengthDirection="Forward" modifier="Sealed" description="Relationship enabling splitup of bis:GeometricElement3d elements into the smaller pieces.">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
-        <Source multiplicity="(0..*)" roleLabel="splits up" polymorphic="true" abstractConstraint="bis:GeometricElement3d">
-            <Class class="generic:Graphic3d"/>
-            <Class class="bis:PhysicalElement"/>
+        <Source multiplicity="(0..*)" roleLabel="splits up" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
         </Source>
-        <Target multiplicity="(0..1)" roleLabel="is split into" polymorphic="true" abstractConstraint="bis:GeometricElement3d">
-            <Class class="generic:Graphic3d"/>
-            <Class class="bis:PhysicalElement"/>
+        <Target multiplicity="(0..1)" roleLabel="is split into" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
         </Target>
     </ECRelationshipClass>
 	
@@ -27,14 +24,13 @@
         <BaseClass>bis:InformationRecordElement</BaseClass>
     </ECEntityClass>
 
-    <ECRelationshipClass typeName="ConstructionItemConstructsPhysicalElement" strength="referencing" strengthDirection="Forward" modifier="Sealed" description="Relates constr:ConstructionItem to the real world entities (or their split up pieces) it constructs.">
+    <ECRelationshipClass typeName="ConstructionItemConstructsGeometricElement3d" strength="referencing" strengthDirection="Forward" modifier="Sealed" description="Relates constr:ConstructionItem to the real world entities (or their split up pieces) it constructs.">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <Source multiplicity="(0..*)" roleLabel="constructs" polymorphic="false">
             <Class class="ConstructionItem"/>
         </Source>
-        <Target multiplicity="(0..*)" roleLabel="is constructed by" polymorphic="true" abstractConstraint="bis:GeometricElement3d">
-            <Class class="generic:Graphic3d"/>
-            <Class class="bis:PhysicalElement"/>
+        <Target multiplicity="(0..*)" roleLabel="is constructed by" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
         </Target>
     </ECRelationshipClass>
 
