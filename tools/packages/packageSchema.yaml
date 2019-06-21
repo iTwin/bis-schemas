@@ -1,81 +1,103 @@
-pool:
-  name: iModelTechCI
-  demands:
-  - Cmd
+trigger:
+  - master
 
-variables:
-  bbSrcRoot: $(Agent.BuildDirectory)/bbsrc
-  bbStream: bim0200
-  buildStrategy: BisSchemasPackaging
-  architecture: x64
-  verbosity: 6
-  system.debug: true
+stages:
+- stage: Build
+  jobs:
+  - job:
+    pool:
+      name: iModelTechCI
+      demands:
+      - Cmd
 
-steps:
+    variables:
+      bbSrcRoot: $(Agent.BuildDirectory)/bbsrc
+      bbStream: bim0200
+      buildStrategy: BisSchemasPackaging
+      architecture: x64
+      verbosity: 6
+      system.debug: true
 
-- task: PythonScript@0
-  displayName: Setup Environment
-  inputs:
-    scriptSource: inline
-    script: |
-     import os, sys
-     def set_vsts_env(key, value): print(key + ' = ' + value + '\n##vso[task.setvariable variable={0}]{1}'.format(key, value))
-     
-     set_vsts_env('PYTHONUNBUFFERED', '1')
-     set_vsts_env('BsiSrc', os.environ['bbSrcRoot'].replace('/', os.path.sep) + os.path.sep)
-     set_vsts_env('BsiOut', os.environ['BUILD_BINARIESDIRECTORY'] + os.path.sep)
+    steps:
+      - task: PythonScript@0
+        displayName: Setup Environment
+        inputs:
+          scriptSource: inline
+          script: |
+            import os, sys
+            def set_vsts_env(key, value): print(key + ' = ' + value + '\n##vso[task.setvariable variable={0}]{1}'.format(key, value))
+            
+            set_vsts_env('PYTHONUNBUFFERED', '1')
+            set_vsts_env('BsiSrc', os.environ['bbSrcRoot'].replace('/', os.path.sep) + os.path.sep)
+            set_vsts_env('BsiOut', os.environ['BUILD_BINARIESDIRECTORY'] + os.path.sep)
 
-- task: bentleysystemsinternal.cum-code-cvge-tsk.bentleybootstrap.bentleybootstrap@0
-  displayName: BentleyBootstrap
-  inputs:
-    streamname: '$(bbStream)'
-    srcroot: '$(bbSrcRoot)'
+      - task: bentleysystemsinternal.cum-code-cvge-tsk.bentleybootstrap.bentleybootstrap@0
+        displayName: BentleyBootstrap
+        inputs:
+          streamname: '$(bbStream)'
+          srcroot: '$(bbSrcRoot)'
 
-- task: PythonScript@0
-  displayName: 'Link Repo'
-  inputs:
-    scriptSource: inline
-    script: |
-     import os, sys
-     
-     if os.name == 'nt':
-         import win32file
-         def createDirLink(target, link):
-             win32file.CreateSymbolicLink(link, target, 1)
-     elif os.name == 'posix':
-         def createDirLink(target, link):
-             os.symlink(target, link)
-     else:
-         sys.stderr.write('Unknown OS name "' + os.name + '".\n')
-         sys.exit(-1)
-     
-     link = os.path.join(sys.argv[1], 'BisSchemas')
-     target = os.environ['BUILD_SOURCESDIRECTORY']
-     if not os.path.exists(link):
-         createDirLink(target, link)
-     
-    arguments: '$(bbSrcRoot)'
+      - task: PythonScript@0
+        displayName: 'Link Repo'
+        inputs:
+          scriptSource: inline
+          script: |
+            import os, sys
+            
+            if os.name == 'nt':
+                import win32file
+                def createDirLink(target, link):
+                    win32file.CreateSymbolicLink(link, target, 1)
+            elif os.name == 'posix':
+                def createDirLink(target, link):
+                    os.symlink(target, link)
+            else:
+                sys.stderr.write('Unknown OS name "' + os.name + '".\n')
+                sys.exit(-1)
+            
+            link = os.path.join(sys.argv[1], 'BisSchemas')
+            target = os.environ['BUILD_SOURCESDIRECTORY']
+            if not os.path.exists(link):
+                createDirLink(target, link)
 
-- task: BatchScript@1
-  displayName: 'Shared Shell'
-  inputs:
-    filename: '$(bbSrcRoot)\bsicommon\shell\SharedShellEnv.bat'
-    modifyEnvironment: true
+          arguments: '$(bbSrcRoot)'
 
-- task: CmdLine@1
-  displayName: 'bb pull'
-  inputs:
-    filename: bb
-    arguments: -v$(verbosity) -s $(buildStrategy) -a $(architecture) pull
+      - task: BatchScript@1
+        displayName: 'Shared Shell'
+        inputs:
+          filename: '$(bbSrcRoot)\bsicommon\shell\SharedShellEnv.bat'
+          modifyEnvironment: true
 
-- task: CmdLine@1
-  displayName: 'bb build'
-  inputs:
-    filename: bb
-    arguments: -v$(verbosity) -s $(buildStrategy) -a $(architecture) build --tmrbuild --noprompt
+      - task: CmdLine@1
+        displayName: 'bb pull'
+        inputs:
+          filename: bb
+          arguments: -v$(verbosity) -s $(buildStrategy) -a $(architecture) pull
 
-- task: PublishPipelineArtifact@0
-  displayName: 'Publish Pipeline Artifact'
-  inputs:
-    artifactName: 'bis-schemas-packages'
-    targetPath: '$(BsiOut)\Winx64\packages'
+      - task: CmdLine@1
+        displayName: 'bb build'
+        inputs:
+          filename: bb
+          arguments: -v$(verbosity) -s $(buildStrategy) -a $(architecture) build --tmrbuild --noprompt
+
+      - task: PublishPipelineArtifact@0
+        displayName: 'Publish Pipeline Artifact'
+        inputs:
+          artifactName: 'bis-schemas-packages'
+          targetPath: '$(BsiOut)\Winx64\packages'
+
+- stage: Publish_Packages
+  displayName: Publish Packages
+  dependsOn: Build
+  conditions: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+  jobs:
+  - job: Publish JFrog
+    steps:
+      - task: Npm@1
+        displayName: 'Publish Core'
+        inputs:
+          command: publish
+          workingDir: '$(System.ArtifactsDirectory)\_Bis Schemas Packaging\bis-schemas-packages\Core'
+          verbose: false
+          publishEndpoint: 'JFrog Bentley npm staging'
+      
