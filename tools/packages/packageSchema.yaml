@@ -62,11 +62,17 @@ steps:
     filename: '$(bbSrcRoot)\bsicommon\shell\SharedShellEnv.bat'
     modifyEnvironment: true
 
-- bash: 'python bb -v$(verbosity) -s $(buildStrategy) -a $(architecture) pull'
+- task: CmdLine@1
   displayName: 'bb pull'
+  inputs:
+    filename: bb
+    arguments: -v$(verbosity) -s $(buildStrategy) -a $(architecture) pull
 
-- bash: 'python bb -v$(verbosity) -s $(buildStrategy) -a $(architecture) build --tmrbuild --noprompt'
+- task: CmdLine@1
   displayName: 'bb build'
+  inputs:
+    filename: bb
+    arguments: -v$(verbosity) -s $(buildStrategy) -a $(architecture) build --tmrbuild --noprompt
 
 - task: PublishPipelineArtifact@0
   displayName: 'Publish Pipeline Artifact'
