@@ -7,8 +7,8 @@
 #--------------------------------------------------------------------------------------
 
 # This program creates a directory that looks like an npm package, naming it
-# with the specified name, and copying into it the schemas that are defined in the
-# specified domain.
+# with the specified name, and copying the schemas that are defined in the
+# specified domain folder into it.
 
 import os
 import sys
@@ -16,114 +16,152 @@ import re
 import shutil
 import subprocess
 
-# determine if version2 is a newer version
-def isNewer(version1, version2):
-    v1 = [int(x) for x in version1.strip('.').split('.')]
-    v2 = [int(x) for x in version2.strip('.').split('.')]
-    if cmp(v1, v2) == -1:
-        return str(v2[0]) + "." + str(v2[1]) + "." + str(v2[2])
-    return str(v1[0]) + "." + str(v1[1]) + "." + str(v1[2])
+def removeLeadingZeroes(version):
+    # Strip the leading zeroes from the version string
+    versionArray = ['0', '0', '0']
+    vArray = version.split('.')
 
-# publish a package
-def publishPackage(packagedir, doPublish):
+    if len(vArray) == 2:
+        vArray.insert(1, '0')
 
-    if not doPublish:
-        print packagedir;
-        return;
+    for i in range(0, len(vArray)):
+        versionArray[i] = str(int(vArray[i]))
 
-    pubcmd = 'npm publish '
-    pubcmd += '--@bentley:registry=https://bentley.jfrog.io/bentley/api/npm/staging/ '
-    pubcmd += packagedir
-    pubcmd += ' --dry-run'
+    return ".".join(versionArray)
 
-    if 0 != os.system(pubcmd):
-        exit(1);
+def getSchemaVersionFromFile(schemaFile):
+    # Check if the version is in the file version first.
+    versionMatch = re.search("\d{2}\.\d{2}\.\d{2}", schemaFile)
+
+    if versionMatch is not None:
+        return removeLeadingZeroes(versionMatch.group(0))
+
+    # If it's not in the 
+    with open(schemaFile, 'r') as f:
+        contents = f.read()
+        match = re.search(r'<ECSchema\s.*version=\"(\d{1,2}\.\d{1,2}(\.\d{1,2})?)', contents)
+        if match is None:
+            print 'Failed to get the version of Schema: ' + schemaFile
+            exit(1)
+        version = removeLeadingZeroes(match.group(1))
+
+        if version is None:
+            print 'Failed to get the version of Schema: ' + schemaFile
+            exit(1)
+
+    return version
+
+# Check the npm registry to get a map of all the versions of a specific package.
+def getExistingVersions(packageName):
+    cmd = "npm view " + packageName + " versions"
+    try:
+        origlist = subprocess.check_output(cmd, shell=True)
+        origlist = origlist.strip('\n[] ').split(',')
+        vlist = map(lambda x: x.strip("' "), origlist)
+    except:
+        print "Failed to check if the package " + packageName + " has existing versions in the registry"
+        exit(1)
+
+    return vlist
 
 # Replace ${macros} with values in specified file
-def setMacros(packagedir, domainName, PACKAGE_VERSION = None, IS_BETA = False):
+# @param pkgDir         The directory of the package in the output folder
+# @param domainName     The name of the domain this package will represent.
+def populatePackageJson(packagedir, domainName, version, isPrerelease = False):
     packagefile = os.path.join(packagedir, 'package.json')
-    version = PACKAGE_VERSION.lower()
-    packageName = 'bis-' + domainName.lower();
-    if IS_BETA:
-        cmd = 'npm view @bentley/' + packageName + ' versions'
-        try:
-            origlist = subprocess.check_output(cmd, shell=True)
-            origlist = origlist.strip('\n[] ').split(',')
-            vlist = map(lambda x: x.strip("' "), origlist)
-            betaversionlist = filter(lambda x: '-beta' in x, vlist)
-            if not betaversionlist:
-                raise Exception('go to -beta.1')
-            betanum = int(betaversionlist[len(betaversionlist)-1].rsplit('-beta.', 1)[1]) + 1
-            version = version + '-beta.' + str(betanum)
-        except:
-            version = version + '-beta.1'
-    
-    reader = ''
+    packageName = "@bentley/bis-" + domainName.lower()
+
+    vlist = getExistingVersions(packageName)
+
+    if isPrerelease:
+        betaVersion = version + "-beta"
+        versionList = filter(lambda x: betaVersion in x, vlist)
+        if versionList:
+            betanum = int(versionList[len(versionList)-1].rsplit('-beta.', 1)[1]) + 1
+            version = betaVersion + "." + str(betanum)
+        else:  # There are no existing pre-release versions.  Start it at -beta.0
+            version = betaVersion + ".0"
+
+    reader = ""
     with open(packagefile, 'r') as pf:
         reader = pf.read()
 
     with open(packagefile, 'w') as pf:
         reader = reader.replace(r'${PACKAGE_NAME}', packageName)
         reader = reader.replace(r'${DOMAIN_NAME}', domainName)
-        if (PACKAGE_VERSION):
-            reader = reader.replace(r'${PACKAGE_VERSION}', version)
+        reader = reader.replace(r'${PACKAGE_VERSION}', version)
         pf.write(reader)
 
-# Generate BIS Schemas packages
-# @param outdirParent The path to the output package's parent directory
-# @param parentSourceDir The source directory, i.e., %SrcRoot%Domains
-# @param domain The domain to be packaged
-# @param templateFile The location of the package template file
-def generate_schema_package(outputpackagedir, parentSourceDir, domain, templateFile):
-
-    version = '1.0.0'
-    schemaSourceDir = os.path.join(parentSourceDir, domain)
-
-    os.makedirs(outputpackagedir);
+# Creates the directory that represents the BIS Schemas package by placing all files in the correct output directory.
+#   All schemas within a domain folder are currently added to the package.
+# @param outdir         The path to the output package's parent directory
+# @param domainPath     The path to the domain that will be packaged, i.e. %SrcRoot%\bis-schemas\Domains.
+# @param templateFile   The location of the package template file
+# @param prerelease      Whether to package up the latest release version of the schema to release.
+def generatePackage(outDir, domainPath, templateFile, prerelease = False):
+    os.makedirs(outDir)
 
     # Copy schemas into place without modifying them.
     filesToCopy = []
-    for root, dirnames, filenames in os.walk(schemaSourceDir):
+    for root, dirnames, filenames in os.walk(domainPath):
         for file in filenames:
-            if 'Released' in root and file.endswith('ecschema.xml'):
-                fileversion = file.split('.', 1)[1].replace('.ecschema.xml', '')
-                version = isNewer(version, fileversion)
+            if 'Released' in root:
+                # TODO
+                continue
             elif file.endswith('ecschema.xml'):
                 filesToCopy.append(os.path.join(root, file))
 
+    version = None
     for fileToCopy in filesToCopy:
-        shutil.copyfile(fileToCopy, os.path.join(outputpackagedir, os.path.basename(fileToCopy)))
+        shutil.copyfile(fileToCopy, os.path.join(outDir, os.path.basename(fileToCopy)))
+        # TODO: Not the best solution but right now we determine the package version by the last schema to be copied
+        # into the package.  This needs work...
+        version = getSchemaVersionFromFile(fileToCopy)
 
-    # Generate the package.json file
-    dstpackagefile = os.path.join(outputpackagedir, 'package.json')
-    shutil.copyfile(templateFile, dstpackagefile);
+    # Copy the template package.json file
+    dstpackagefile = os.path.join(outDir, 'package.json')
+    shutil.copyfile(templateFile, dstpackagefile)
 
     return version
-#
-#   main
-#
+
+# @param outDir  The output directory for the package folder
+# @param domain  The name of the domain folder to use
+# @param sourceDir  The root folder where 
+# @param templateFile  The template package.json file to use when generating the new package json.
+# @param isPrerelease  Boolean flag to determine whether to add where the package should use a pre-release flag or not.
 if __name__ == '__main__':
     if len(sys.argv) < 6:
-        print "Syntax: ", sys.argv[0], " outputpackageparentdir domain sourceDir templateFile {publish|print} isBeta"
+        print "Syntax: ", sys.argv[0], " outputDir domain sourceDir templateFile isPrerelease"
         exit(1)
-    
-    outdirParent = sys.argv[1]
-    domain = sys.argv[2]
-    sourceDir = sys.argv[3]
-    templateFile = sys.argv[4]
-    doPublish = (sys.argv[5].lower() == 'publish');
-    beta = (sys.argv[6].lower() == 'true')
 
-    if outdirParent.endswith ('/') or outdirParent.endswith ('\\'):
-        outdirParent = outdirParent[0:len(outdirParent)-1]
-    
-    pkgdir = os.path.join(outdirParent, domain)
+    outDir = os.path.normpath(sys.argv[1])
+    domain = sys.argv[2]
+    sourceDir = os.path.normpath(sys.argv[3])
+    templateFile = sys.argv[4]
+    if not os.path.exists(templateFile):
+        print "Missing template package.json file, " + templateFile
+        exit(1)
+
+    prerelease = (sys.argv[5].lower() == 'true')
+    if not prerelease:
+        print "Packaging released versions is not yet supported."
+        exit(1)
+
+    if outDir.endswith ('/') or outDir.endswith ('\\'):
+        outDir = outDir[0:len(outDir)-1]
+
+    pkgdir = os.path.join(outDir, domain)
 
     if os.path.exists(pkgdir):
-        print '*** ' + pkgdir + ' already exists. Remove output directory before calling this script';
+        print "*** " + pkgdir + " already exists. Remove output directory before calling this script."
         exit(1)
 
-    setMacros(pkgdir, domain, generate_schema_package(pkgdir, sourceDir, domain, templateFile), beta)
-    publishPackage(pkgdir, doPublish)
+    # Generates the package direction in the path provided and returns the version of the package it just created.
+    domainDir = os.path.join(sourceDir, domain)
+    version = generatePackage(pkgdir, domainDir, templateFile, prerelease)
+    if version is None:
+        print "Failed to get the version the package should be."
+        exit(1)
 
-    exit(0)
+    # Populate the template package.json file
+    populatePackageJson(pkgdir, domain, version, prerelease)
