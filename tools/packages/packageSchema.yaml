@@ -4,7 +4,8 @@ trigger:
 stages:
 - stage: Build
   jobs:
-  - job:
+  - job: build_packages
+    displayName: Build Packages
     pool:
       name: iModelTechCI
       demands:
@@ -19,6 +20,8 @@ stages:
       system.debug: true
 
     steps:
+      - checkout: self
+        clean: true
       - task: PythonScript@0
         displayName: Setup Environment
         inputs:
@@ -68,36 +71,72 @@ stages:
           filename: '$(bbSrcRoot)\bsicommon\shell\SharedShellEnv.bat'
           modifyEnvironment: true
 
-      - task: CmdLine@1
-        displayName: 'bb pull'
-        inputs:
-          filename: bb
-          arguments: -v$(verbosity) -s $(buildStrategy) -a $(architecture) pull
+      - script: bb -v$(verbosity) -s $(buildStrategy) -a $(architecture) pull
+        displayName: bb pull
 
-      - task: CmdLine@1
-        displayName: 'bb build'
-        inputs:
-          filename: bb
-          arguments: -v$(verbosity) -s $(buildStrategy) -a $(architecture) build --tmrbuild --noprompt
+      - script: bb -v$(verbosity) -s $(buildStrategy) -a $(architecture) build --tmrbuild --noprompt
+        displayName: bb build
 
-      - task: PublishPipelineArtifact@0
+      - publish: $(BsiOut)\Winx64\packages
+        artifact: bis-schemas-packages
         displayName: 'Publish Pipeline Artifact'
-        inputs:
-          artifactName: 'bis-schemas-packages'
-          targetPath: '$(BsiOut)\Winx64\packages'
 
 - stage: Publish_Packages
   displayName: Publish Packages
-  dependsOn: Build
+  dependsOn: build_packages
   conditions: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
   jobs:
-  - job: Publish JFrog
+  - job: Publish npm packages to JFrog
     steps:
+      - checkout: none
+      - download: current
+        artifact: bis-schemas-packages
       - task: Npm@1
         displayName: 'Publish Core'
         inputs:
           command: publish
-          workingDir: '$(System.ArtifactsDirectory)\_Bis Schemas Packaging\bis-schemas-packages\Core'
+          workingDir: '$(Pipeline.Workspace)\bis-schemas-packages\Core'
           verbose: false
           publishEndpoint: 'JFrog Bentley npm staging'
-      
+      - task: Npm@1
+        displayName: 'Publish Standard'
+        inputs:
+          command: publish
+          workingDir: '$(Pipeline.Workspace)\bis-schemas-packages\Standard'
+          verbose: false
+          publishEndpoint: 'JFrog Bentley npm staging'
+      - task: Npm@1
+        displayName: 'Publish Grids'
+        inputs:
+          command: publish
+          workingDir: '$(Pipeline.Workspace)\bis-schemas-packages\Grids'
+          verbose: false
+          publishEndpoint: 'JFrog Bentley npm staging'
+      - task: Npm@1
+        displayName: 'Publish Structural'
+        inputs:
+          command: publish
+          workingDir: '$(Pipeline.Workspace)\bis-schemas-packages\Structural'
+          verbose: false
+          publishEndpoint: 'JFrog Bentley npm staging'
+      - task: Npm@1
+        displayName: 'Publish RealityModeling'
+        inputs:
+          command: publish
+          workingDir: '$(Pipeline.Workspace)\bis-schemas-packages\RealityModeling'
+          verbose: false
+          publishEndpoint: 'JFrog Bentley npm staging'
+      - task: Npm@1
+        displayName: 'Publish RoadRailAlignment'
+        inputs:
+          command: publish
+          workingDir: '$(Pipeline.Workspace)\bis-schemas-packages\RoadRailAlignment'
+          verbose: false
+          publishEndpoint: 'JFrog Bentley npm staging'
+      - task: Npm@1
+        displayName: 'Publish ECObjects'
+        inputs:
+          command: publish
+          workingDir: '$(Pipeline.Workspace)\bis-schemas-packages\ECObjects'
+          verbose: false
+          publishEndpoint: 'JFrog Bentley npm staging'
