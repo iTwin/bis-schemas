@@ -1,30 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ECSchema schemaName="Construction" alias="constr" version="01.00.00" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.1" description="Base schema for the Construction domain.">
     <ECSchemaReference name="BisCore" version="01.00.04" alias="bis" />
-        
-    <ECEntityClass typeName="ConstructionModel" displayLabel="Construction Model" description="A container for persisting constr:ConstructionItem instances and geometry elements split up into smaller pieces.">
-        <BaseClass>bis:PhysicalModel</BaseClass>
+
+    <ECEntityClass typeName="ConstructionModel" displayLabel="Construction Model" description="A container for persisting constr:ConstructionItem instances.">
+        <BaseClass>bis:InformationModel</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="ConstructionSpatialModel" displayLabel="Construction Spatial Model" description="A container for persisting constr:ConstructionDetailingElement instances.">
+        <BaseClass>bis:SpatialLocationModel</BaseClass>
     </ECEntityClass>
 
     <ECEntityClass typeName="ConstructionPartition" modifier="Sealed" displayLabel="Construction Partition" description="A constr:ConstructionPartition element indicates that there is a construction modeling perspective within the overall information hierarchy. A constr:ConstructionPartition is always parented to a bis:Subject and broken down by a constr:ConstructionModel.">
         <BaseClass>bis:InformationPartitionElement</BaseClass>
     </ECEntityClass>
 
-    <ECRelationshipClass typeName="GeometricElement3dSplitsGeometricElement3d" strength="referencing" strengthDirection="Forward" modifier="Sealed" description="Relationship enabling splitup of bis:GeometricElement3d elements into the smaller pieces.">
+    <ECEntityClass typeName="ConstructionDetailingElement" displayLabel="Construction Detailing Element" modifier="Sealed" description="Identifies a portion of real-world physical object that is suitable for construction.">
+        <BaseClass>bis:SpatialLocationElement</BaseClass>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="ConstructionDetailingElementSplitsGeometricElement3d" strength="referencing" strengthDirection="Forward" modifier="Sealed" description="Relationship enabling splitup of bis:GeometricElement3d elements into the smaller pieces.">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
-        <Source multiplicity="(0..*)" roleLabel="splits up" polymorphic="true">
-            <Class class="bis:GeometricElement3d"/>
+        <Source multiplicity="(0..*)" roleLabel="splits up" polymorphic="false">
+            <Class class="ConstructionDetailingElement"/>
         </Source>
         <Target multiplicity="(0..1)" roleLabel="is split into" polymorphic="true">
             <Class class="bis:GeometricElement3d"/>
         </Target>
     </ECRelationshipClass>
-	
+
     <ECEntityClass typeName="ConstructionItem" displayLabel="Construction Item" modifier="Sealed" description="Defines a constructible component which may or may not be modeled in the 3D model.">
         <BaseClass>bis:InformationRecordElement</BaseClass>
     </ECEntityClass>
 
-    <ECRelationshipClass typeName="ConstructionItemConstructsGeometricElement3d" strength="referencing" strengthDirection="Forward" modifier="Sealed" description="Relates constr:ConstructionItem to the real world entities (or their split up pieces) it constructs.">
+    <ECRelationshipClass typeName="ConstructionItemConstructsGeometricElement3d" strength="referencing" strengthDirection="Forward" modifier="Sealed" description="Relates constr:ConstructionItem to the real world entities (or their split up pieces modeled as constr:ConstructionDetailingElement elements) it constructs.">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <Source multiplicity="(0..*)" roleLabel="constructs" polymorphic="false">
             <Class class="ConstructionItem"/>
