@@ -14,6 +14,7 @@ List of current BIS Schemas in this repository as SSOT:
 - Core\Markup
 - Core\PhysicalMaterial
 - ECObjects
+- FederatedDocumentStore
 - Grids
 - QuantityTakeoffsAspects
 - PresentationRules
