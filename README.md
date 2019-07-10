@@ -4,7 +4,10 @@ This repository is the single-source-of-truth (SSOT) for all BIS schemas.
 
 List of current BIS Schemas in this repository as SSOT:
 
+- AecUnits
+- Building\ArchitecturalPhysicalSchema
 - Building\BuildingDataGroupBase
+- Building\BuildingPhysicalSchema
 - BuildingSpatial
 - ClassificationSystems
 - Core\Analytical
@@ -30,6 +33,7 @@ List of current BIS Schemas in this repository as SSOT:
 - RealityModeling\ThreeMxSchema
 - Simulation4DResults
 - SpatialComposition
+- Structural
 - Structural\PhysicalRebar
 - StructuralAnalysis
 
