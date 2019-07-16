@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ECSchema schemaName="Earthwork" alias="ew" version="01.00.00" description="Base schema for the Earthwork domain." xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
+    <ECSchemaReference name="BisCore" version="01.00.01" alias="bis"/>
+
+    <ECEntityClass typeName="Fill" modifier="None" description="A bis:PhysicalElement created by earthwork activities to build subgrade or a part of a structure above it (such as “soft” courses in pavement or ballast), or to raise the level of ground in general. Usually formed by spreading and compacting construction materials such as sand and gravel.">
+        <BaseClass>bis:PhysicalElement</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="FillType" modifier="None" description="Defines a shared set of properties and classification (the 'type') that can be associated with a ew:Fill instance.">
+        <BaseClass>bis:PhysicalType</BaseClass>
+        <ECNavigationProperty propertyName="Material" relationshipName="FillTypeUsesMaterial" direction="Forward"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="FillTypeUsesMaterial" strength="referencing" modifier="None" description="Relationship indicating the bis:PhysicalMaterial used by a particular ew:FillType.">
+        <Source multiplicity="(0..*)" polymorphic="true" roleLabel="refers to">
+            <Class class="FillType"/>
+        </Source>
+        <Target multiplicity="(0..1)" polymorphic="true" roleLabel="is referenced by">
+            <Class class="bis:PhysicalMaterial"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="FillIsOfType" strength="referencing" modifier="None" description="A type-instance relation; one that indicates that the specific ew:Fill is an instance of the defined ew:FillType.">
+        <BaseClass>bis:PhysicalElementIsOfType</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="is of" polymorphic="true">
+            <Class class="Fill" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="classifies" polymorphic="true">
+            <Class class="FillType"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="Cut" modifier="None" description="A bis:SpatialLocationElement modeling the resulting void from a modification of existing terrain by bulk excavation of material.">
+        <BaseClass>bis:SpatialLocationElement</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="CutType" modifier="None" description="Defines a shared set of properties and classification (the 'type') that can be associated with a ew:Cut instance.">
+        <BaseClass>bis:SpatialLocationType</BaseClass>
+        <ECNavigationProperty propertyName="Material" relationshipName="CutTypeRemovesMaterial" direction="Forward"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="CutTypeRemovesMaterial" strength="referencing" modifier="None" description="Relationship indicating the bis:PhysicalMaterial being removed by a particular ew:CutType.">
+        <Source multiplicity="(0..*)" polymorphic="true" roleLabel="refers to">
+            <Class class="CutType"/>
+        </Source>
+        <Target multiplicity="(0..1)" polymorphic="true" roleLabel="is referenced by">
+            <Class class="bis:PhysicalMaterial"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="CutIsOfType" strength="referencing" modifier="None" description="A type-instance relation; one that indicates that the specific ew:Cut is an instance of the defined ew:CutType.">
+        <BaseClass>bis:SpatialLocationIsOfType</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="is of" polymorphic="true">
+            <Class class="Cut" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="classifies" polymorphic="true">
+            <Class class="CutType"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="SurfaceGrade" modifier="None" description="A bis:PhysicalElement capturing the target grade of ground after introducing modifications to the existing terrain.">
+        <BaseClass>bis:PhysicalElement</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="SurfaceGradeType" modifier="None" description="Defines a shared set of properties and classification (the 'type') that can be associated with a ew:SurfaceGrade instance.">
+        <BaseClass>bis:PhysicalType</BaseClass>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="SurfaceGradeIsOfType" strength="referencing" modifier="None" description="A type-instance relation; one that indicates that the specific ew:SurfaceGrade is an instance of the defined ew:SurfaceGradeType.">
+        <BaseClass>bis:PhysicalElementIsOfType</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="is of" polymorphic="true">
+            <Class class="SurfaceGrade" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="classifies" polymorphic="true">
+            <Class class="SurfaceGradeType"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="ClippingArea" modifier="None" description="A bis:SpatialLocationElement utilized to hide an area of existing terrain in order to prevent visual conflicts with proposed changes to it.">
+        <BaseClass>bis:SpatialLocationElement</BaseClass>
+    </ECEntityClass>
+</ECSchema>
