@@ -1,0 +1,126 @@
+resources:
+- repo: self
+  clean: true
+
+trigger:
+  branches:
+    include: [ master ]
+  paths:
+    include: [ 
+      '*.ecschema.xml',
+      '*.remarks.md'
+      ]
+
+pool:
+  name: 
+  demands:
+  - Agent.OS -equals Windows_NT
+  - npm
+
+variables:
+  ECObjectsToolsPath: '$(Build.BinariesDirectory)\ECObjectsToolsNuGet_imodel02_x64'
+
+steps:
+- task: NuGetCommand@2
+  displayName: 'Install ECObjects Tools'
+  inputs:
+    command: custom
+    arguments: 'install ECObjectsToolsNuGet_imodel02_x64 -ExcludeVersion -Source https://npm.bentley.com/nuget/Default/ -OutputDirectory $(Build.BinariesDirectory)'
+
+- task: Npm@0
+  displayName: 'Install ECJson2md'
+  inputs:
+    arguments: '@bentley/ecjson2md@latest'
+
+- task: CopyFiles@2
+  displayName: 'Copy all schemas to staging directory'
+  inputs:
+    SourceFolder: '$(System.DefaultWorkingDirectory)'
+    Contents: '**/*.ecschema.xml'
+    TargetFolder: '$(Build.StagingDirectory)\xml\'
+
+- task: PythonScript@0
+  displayName: 'Run Schema Json Serializer'
+  inputs:
+    scriptSource: inline
+    script: |
+     import os, sys, subprocess
+     
+     defaultWorkingDir = os.path.realpath(sys.argv[1])
+     
+     # Adding base search paths
+     rDir = os.path.realpath(defaultWorkingDir + '\\Standard\\ECDb\\Released\\') + " "
+     rDir += os.path.realpath(defaultWorkingDir + '\\Standard\\Released\\')  + " "
+     rDir += os.path.realpath(defaultWorkingDir + '\\Domains\\Core\\Released\\')  + " "
+     rDir += os.path.realpath(defaultWorkingDir + '\\Domains\\AecUnits\\Released\\')  + " "
+     rDir += os.path.realpath(defaultWorkingDir + '\\Domains\\Profiles\\Released\\')
+     
+     schemaPaths = [
+        "Domains\Core\Analytical.ecschema.xml",
+        "Domains\Core\BisCore.ecschema.xml",
+        "Domains\Core\Functional.ecschema.xml",
+        "Domains\Core\Generic.ecschema.xml",
+        "Domains\Core\LinearReferencing.ecschema.xml",
+        "Domains\Core\PhysicalMaterial.ecschema.xml",
+        "Domains\Grids\Grids.ecschema.xml",
+        "Domains\StructuralAnalysis\StructuralAnalysis.ecschema.xml",
+        "Standard\CoreCustomAttributes.ecschema.xml",
+        "Standard\Formats.ecschema.xml",
+        "Standard\Units.ecschema.xml"
+     ]
+     
+     schemaSerializer = os.path.realpath(sys.argv[2])
+     print "Using the schema json serializer, '" + schemaSerializer + "'."
+     
+     outputDir = os.path.realpath(sys.argv[3])
+     print "Using the output directory, '" + outputDir + "'."
+     
+     args = [
+       schemaSerializer,
+       "-a",  # Serializes all of the schemas in the Schema Graph
+       "-u",  # Inclues the standard schemas in the conversion
+       "-r", rDir,  # The reference directories to use to find other schemas
+       "-o", outputDir,  # The output directory to place the ECJson schemas
+       "-i", # The input file to be serialized to ECJson
+     ]
+     
+     for schemaPath in schemaPaths:
+       fullSchemaPath = os.path.join(defaultWorkingDir, schemaPath)
+     
+       args.append(fullSchemaPath)
+       
+       print "Serializing the schema path '" + fullSchemaPath+ "'."
+     
+       proc = subprocess.Popen(' '.join(args), stdin = subprocess.PIPE, stdout = subprocess.PIPE, shell=True)
+     
+       if proc.returncode is not None and proc.returncode != 0:
+         print "The serialization left a non-zero exit code: " + str(proc.returncode)
+         exit(proc.returncode)
+     
+       print "Finished serializing the schema path '" + fullSchemaPath + "'."
+     
+       args.pop()
+    arguments: '$(System.DefaultWorkingDirectory)  $(Build.StagingDirectory)\json\'
+
+- script: |
+   mkdir $(Build.StagingDirectory)\markdown\
+   
+   cmd | for %%a in ($(Build.StagingDirectory)\json\*.json) do (
+     $(Build.SourcesDirectory)/node_modules/.bin/ecjson2md -i %%a -r $(Build.StagingDirectory)\json\ -o $(Build.StagingDirectory)\markdown\
+     $(Build.SourcesDirectory)/node_modules/.bin/ecjson2md -i $(Build.StagingDirectory)\json\Grids.ecschema.json -r $(Build.StagingDirectory)\json\ -o $(Build.StagingDirectory)\markdown\ -n
+   )
+  displayName: 'Generate Markdown'
+
+- task: CopyFiles@2
+  displayName: 'Copy remarks files to staging directory'
+  inputs:
+    SourceFolder: $(System.DefaultWorkingDirectory)
+    Contents: '**\*.remarks.md'
+    TargetFolder: '$(Build.StagingDirectory)\markdown\'
+    flattenFolders: true
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact: Bis Docs'
+  inputs:
+    PathtoPublish: '$(Build.StagingDirectory)\markdown\'
+    ArtifactName: 'Bis Docs'
