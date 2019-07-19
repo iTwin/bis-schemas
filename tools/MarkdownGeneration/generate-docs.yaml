@@ -40,41 +40,44 @@ steps:
     TargetFolder: '$(Build.StagingDirectory)\xml\'
 
 - task: PythonScript@0
-  displayName: 'Run Schema Json Serializer'
+  displayName: Run Schema Json Serializer
   inputs:
     scriptSource: inline
     script: |
-     import os, sys, subprocess
-     
+     import os, sys, shutil, subprocess
+
      defaultWorkingDir = os.path.realpath(sys.argv[1])
-     
-     # Adding base search paths
-     rDir = os.path.realpath(defaultWorkingDir + '\\Standard\\ECDb\\Released\\') + " "
-     rDir += os.path.realpath(defaultWorkingDir + '\\Standard\\Released\\')  + " "
-     rDir += os.path.realpath(defaultWorkingDir + '\\Domains\\Core\\Released\\')  + " "
-     rDir += os.path.realpath(defaultWorkingDir + '\\Domains\\AecUnits\\Released\\')  + " "
-     rDir += os.path.realpath(defaultWorkingDir + '\\Domains\\Profiles\\Released\\')
-     
+
+     # Add all released folders to the reference search paths
+     rDir = ""
+     for root, dirs, files in os.walk(defaultWorkingDir):
+       for dirName in dirs:
+         if dirName == "Released":
+           rDir += os.path.join(os.path.realpath(defaultWorkingDir), root, dirName) + " "
+
      schemaPaths = [
-        "Domains\Core\Analytical.ecschema.xml",
-        "Domains\Core\BisCore.ecschema.xml",
-        "Domains\Core\Functional.ecschema.xml",
-        "Domains\Core\Generic.ecschema.xml",
-        "Domains\Core\LinearReferencing.ecschema.xml",
-        "Domains\Core\PhysicalMaterial.ecschema.xml",
-        "Domains\Grids\Grids.ecschema.xml",
-        "Domains\StructuralAnalysis\StructuralAnalysis.ecschema.xml",
-        "Standard\CoreCustomAttributes.ecschema.xml",
-        "Standard\Formats.ecschema.xml",
-        "Standard\Units.ecschema.xml"
+        "Domains\BuildingSpatial\BuildingSpatial",
+        "Domains\ClassificationSystems\ClassificationSystems",
+        "Domains\Core\Analytical",
+        "Domains\Core\BisCore",
+        "Domains\Core\Functional",
+        "Domains\Core\Generic",
+        "Domains\Core\LinearReferencing",
+        "Domains\Core\PhysicalMaterial",
+        "Domains\Grids\Grids",
+        "Domains\SpatialComposition\SpatialComposition",
+        "Domains\StructuralAnalysis\StructuralAnalysis",
+        "Standard\CoreCustomAttributes",
+        "Standard\Formats",
+        "Standard\Units"
      ]
-     
+
      schemaSerializer = os.path.realpath(sys.argv[2])
      print "Using the schema json serializer, '" + schemaSerializer + "'."
-     
-     outputDir = os.path.realpath(sys.argv[3])
+
+     outputDir = os.path.join(os.path.realpath(sys.argv[3]), "json")
      print "Using the output directory, '" + outputDir + "'."
-     
+
      args = [
        schemaSerializer,
        "-a",  # Serializes all of the schemas in the Schema Graph
@@ -83,41 +86,41 @@ steps:
        "-o", outputDir,  # The output directory to place the ECJson schemas
        "-i", # The input file to be serialized to ECJson
      ]
-     
+
+     mdOutputDir = os.path.join(os.path.realpath(sys.argv[3]), "markdown")
+     if not os.path.exists(mdOutputDir):
+      os.makedirs(mdOutputDir)
+
      for schemaPath in schemaPaths:
-       fullSchemaPath = os.path.join(defaultWorkingDir, schemaPath)
-     
-       args.append(fullSchemaPath)
-       
-       print "Serializing the schema path '" + fullSchemaPath+ "'."
-     
+       fullXmlSchemaPath = os.path.join(defaultWorkingDir, schemaPath) + ".ecschema.xml"
+
+       args.append(fullXmlSchemaPath)
+
+       print "Serializing the schema path '" + fullXmlSchemaPath+ "'."
+
        proc = subprocess.Popen(' '.join(args), stdin = subprocess.PIPE, stdout = subprocess.PIPE, shell=True)
-     
+
        if proc.returncode is not None and proc.returncode != 0:
          print "The serialization left a non-zero exit code: " + str(proc.returncode)
          exit(proc.returncode)
-     
-       print "Finished serializing the schema path '" + fullSchemaPath + "'."
-     
+
+       print "Finished serializing the schema path '" + fullXmlSchemaPath + "'."
+
        args.pop()
-    arguments: '$(System.DefaultWorkingDirectory)  $(Build.StagingDirectory)\json\'
+
+       # Copy all markdown files that also have a schema.
+       fullMdSchemaPath = os.path.join(defaultWorkingDir, schemaPath) + ".remarks.md"
+       if os.path.exists(fullMdSchemaPath):
+         shutil.copy(fullMdSchemaPath, mdOutputDir)
+    arguments: '$(System.DefaultWorkingDirectory)  $(Build.StagingDirectory)'
 
 - script: |
    mkdir $(Build.StagingDirectory)\markdown\
    
    cmd | for %%a in ($(Build.StagingDirectory)\json\*.json) do (
      $(Build.SourcesDirectory)/node_modules/.bin/ecjson2md -i %%a -r $(Build.StagingDirectory)\json\ -o $(Build.StagingDirectory)\markdown\
-     $(Build.SourcesDirectory)/node_modules/.bin/ecjson2md -i $(Build.StagingDirectory)\json\Grids.ecschema.json -r $(Build.StagingDirectory)\json\ -o $(Build.StagingDirectory)\markdown\ -n
    )
   displayName: 'Generate Markdown'
-
-- task: CopyFiles@2
-  displayName: 'Copy remarks files to staging directory'
-  inputs:
-    SourceFolder: $(System.DefaultWorkingDirectory)
-    Contents: '**\*.remarks.md'
-    TargetFolder: '$(Build.StagingDirectory)\markdown\'
-    flattenFolders: true
 
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Artifact: Bis Docs'
