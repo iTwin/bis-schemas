@@ -13,11 +13,11 @@ This schema contains classes that are used for the arrangement of objects into a
 `ClassificationSystem` identifies the classification system that the individual Classifications belong to.
 A `ClassificationSystem` owns `ClassificationTable` elements which further break down into `Classification` and `ClassificationGroup` elements.
 
- - `ClassificationSystem`s recomended to be in the DictionaryModel. However in cases where ClassificationSystem seems to be local for some purpose, it is reasonable to put the `ClassificationSystem` in any other DefinitionModel.
- - DgnCode for all global classificationsystems is expected to be in the form of (RootSubjectId, ClassificationSystemName, CodeSpecId("ClassificationSystem")). if the classificationSystem is not deemed global, the scopeId should be other than the RootSubjectId.
+ - `ClassificationSystem`s recommended to be in the DictionaryModel. However in cases where ClassificationSystem seems to be local for some purpose, it is reasonable to put the `ClassificationSystem` in any other DefinitionModel.
+ - DgnCode for all global classification systems is expected to be in the form of (RootSubjectId, ClassificationSystemName, CodeSpecId("ClassificationSystem")). if the classificationSystem is not deemed global, the scopeId should be other than the RootSubjectId.
 
 
-It is expected that any imodel will not contain all known classificationsystems, instead, an imodel will only contain those ClassificationSystems that are used from within the imodel.
+It is expected that any iModel will not contain all known classification systems, instead, an iModel will only contain those ClassificationSystems that are used from within the iModel.
 
 ### ClassificationTable
 
@@ -31,7 +31,7 @@ a `ClassificationGroup` is a group of `Classification` elements, as grouped orig
 
 ###Classification
 
-a `Classification` element is a reference into a classificatio system for a specific classification key (or notation).
+a `Classification` element is a reference into a classification system for a specific classification key (or notation).
 
 - DgnCode for classifications is required to be in the form of (ClassificationTable.id, ClassificationName, CodeSpecId("Classification"))
 
