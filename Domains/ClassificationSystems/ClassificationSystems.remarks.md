@@ -63,6 +63,7 @@ is not mapped to or from IFC, as the group concept does not exist in IFC
 a `Classification` element is a reference into a classification system for a specific classification key (or notation).
 
 - Code for classifications is required to be in the form of (ClassificationTable.id, ClassificationName, CodeSpecId("Classification"))
+- OmniClass 11-13 11 11 and UniClass 2015 En_20_10_45 are examples of classifications
 
 a `Classification` may be specializing another `Classification` element, via the `ClassificationSpecializesClassification` relationship.
 - MasterFormat: 00 31 13 Preliminary Schedules -> 00 31 13.13 Preliminary Project Schedule and OmniClass Table 13: 13-11 00 00 Space Planning Types -> 13-11 11 00 Planned Work Space are examples of classification specialization.
