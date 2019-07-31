@@ -3,12 +3,12 @@
 |
 |     $Source: Egress.ecschema.xml $
 |
-|  $Copyright: (c) 2018 Bentley Systems, Incorporated. All rights reserved. $
+|  $Copyright: (c) 2019 Bentley Systems, Incorporated. All rights reserved. $
 |
 ======================================================================================= -->
-<ECSchema schemaName="Egress" nameSpacePrefix="egr" version="01.00.00" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.0">
-  <ECSchemaReference name="BisCore" version="01.00.01" prefix="bis" />
-  <ECSchemaReference name="BuildingSpacePlanning" version="01.00.00" prefix="bsp" />
+<ECSchema schemaName="Egress" alias="egr" version="01.00.00" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.1">
+  <ECSchemaReference name="BisCore" version="01.00.01" alias="bis" />
+  <ECSchemaReference name="BuildingSpacePlanning" version="01.00.00" alias="bsp" />
 
   <KindOfQuantity typeName="Length" description="Length" persistenceUnit="M" relativeError="1e-6" presentationUnits="FT(fi8)"/>
   <KindOfQuantity typeName="Area" description="Area" persistenceUnit="SQ.M" relativeError="1e-6" presentationUnits="SQ.FT(fi8)"/>
@@ -16,7 +16,7 @@
   <ECEntityClass typeName="EgressPath" displayLabel="Egress Path">
     <BaseClass>bis:SpatialLocationElement</BaseClass>
     <ECCustomAttributes>
-      <ClassHasHandler xmlns="BisCore.01.00" />
+      <ClassHasHandler xmlns="BisCore.01.00.00" />
     </ECCustomAttributes>
     <ECProperty propertyName="Length" displayLabel="Length" typeName="double" readOnly="true" kindOfQuantity="Length"/>
     <ECProperty propertyName="IsPrimary" displayLabel="isPrimary" typeName="boolean" readOnly="true"/>
@@ -25,19 +25,19 @@
   </ECEntityClass>
 
   <ECRelationshipClass typeName="EgressPathHasSourceElement" strength="referencing" strengthDirection="backward" modifier="None">
-    <Source multiplicity="0..1" roleLabel="starts from" polymorphic ="false">
+    <Source multiplicity="(0..1)" roleLabel="starts from" polymorphic ="false">
       <Class class="EgressPath"/>
     </Source>
-    <Target multiplicity="0..1" roleLabel="has" polymorphic="true">
+    <Target multiplicity="(0..1)" roleLabel="has" polymorphic="true">
       <Class class ="bis:SpatialLocationElement"/>
     </Target>
   </ECRelationshipClass>
 
   <ECRelationshipClass typeName="EgressPathHasTargetElement" strength="referencing" strengthDirection="backward" modifier="None">
-    <Source multiplicity="0..1" roleLabel="goes to" polymorphic ="false">
+    <Source multiplicity="(0..1)" roleLabel="goes to" polymorphic ="false">
       <Class class="EgressPath"/>
     </Source>
-    <Target multiplicity="0..1" roleLabel="has" polymorphic="true">
+    <Target multiplicity="(0..1)" roleLabel="has" polymorphic="true">
       <Class class ="bis:SpatialLocationElement"/>
     </Target>
   </ECRelationshipClass>
@@ -61,27 +61,27 @@
     </Target>
   </ECRelationshipClass>
 
-  <ECRelationshipClass typeName="EgressPathHasSections" strength="referencing">
+  <ECRelationshipClass typeName="EgressPathHasSections" strength="referencing" strengthDirection="forward" modifier="None">
     <BaseClass>bis:ElementRefersToElements</BaseClass>
-    <Source cardinality="(0,N)" roleLabel="owns sections" polymorphic="true">
+    <Source multiplicity="(0..*)" roleLabel="owns sections" polymorphic="true">
       <Class class="EgressPath"/>
     </Source>
-    <Target cardinality="(0,N)" roleLabel="composes" polymorphic="true">
+    <Target multiplicity="(0..*)" roleLabel="composes" polymorphic="true">
       <Class class="EgressPathSection"/>
     </Target>
     <ECProperty propertyName="Index" displayLabel="Index" typeName="int"/>
   </ECRelationshipClass>
 
-  <ECRelationshipClass typeName="EgressSectionConnectsElements" strength="referencing">
+  <ECRelationshipClass typeName="EgressSectionConnectsElements" strength="referencing" strengthDirection="forward" modifier="None">
     <BaseClass>bis:ElementRefersToElements</BaseClass>
-    <Source cardinality="(0,N)" polymorphic="false">
+    <ECProperty propertyName="IsSource" displayLabel="IsSource" typeName="boolean"/>
+    <Source multiplicity="(0..*)" roleLabel="connects" polymorphic="false">
       <Class class="EgressPathSection"/>
     </Source>
-    <Target cardinality="(0,N)" polymorphic="true">
+    <Target multiplicity="(0..*)" roleLabel="is connected" polymorphic="true">
       <Class class="bis:SpatialLocationElement"/>
       <!--Should be able to hold both spaces and openings-->
     </Target>
-    <ECProperty propertyName="IsSource" displayLabel="IsSource" typeName="boolean"/>
   </ECRelationshipClass>
 
 </ECSchema>
