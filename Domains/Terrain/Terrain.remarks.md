@@ -9,7 +9,9 @@ This schema contains classes that are used to provide *context* terrains. Cuts, 
 
 See the `TerrainReference` documentation for details on how terrain is defined in iModels.
 
-## TerrainReference
+## Entity Classes
+
+### TerrainReference
 
 `TerrainReference` is used to define a static *context* for assets and projects. The terrain data is always provided by a service, but may be locally cached.
 
@@ -40,10 +42,12 @@ Every `TerrainReference` has a *Footprint* that is stored in its `GeometryStream
 - The visibility of the terrain is controlled along with the visibility of other `Element`s in the `Model`.
 - There is an implication that the party responsible for the other `Element`s in the `Model` is also responsible for the `TerrainReference`.
 
-### ServiceName
+**ServiceName Property**
 
 `ServiceName` also indirectly defines the API and data format of the service. Currently these services are supported:
 
 | ServiceName Value | Service |
 |-------------------|---------|
 | "ScalableMesh" | Bentley's scalable mesh service |
+
+## Relationship Classes
