@@ -1,6 +1,5 @@
-resources:
-- repo: self
-  clean: true
+workspace:
+  clean: all
 
 trigger:
   branches:
@@ -22,15 +21,14 @@ variables:
 
 steps:
 - task: NuGetCommand@2
-  displayName: 'Install ECObjects Tools'
+  displayName: Install ECObjects Tools
   inputs:
     command: custom
-    arguments: 'install  -ExcludeVersion -Source https://npm.bentley.com/nuget/Default/ -OutputDirectory $(Build.BinariesDirectory)'
+    arguments: install  -ExcludeVersion -Source https://npm.bentley.com/nuget/Default/ -OutputDirectory $(Build.BinariesDirectory)
 
-- task: Npm@0
-  displayName: 'Install ECJson2md'
-  inputs:
-    arguments: '@bentley/ecjson2md@latest'
+- script: npm install @bentley/ecjson2md@latest
+  displayName: Install ECJson2md
+  workingDirectory: $(Build.BinariesDirectory)
 
 - task: CopyFiles@2
   displayName: 'Copy all schemas to staging directory'
@@ -45,15 +43,21 @@ steps:
     scriptSource: inline
     script: |
      import os, sys, shutil, subprocess
+     from sets import Set
 
      defaultWorkingDir = os.path.realpath(sys.argv[1])
 
-     # Add all released folders to the reference search paths
-     rDir = ""
+     # Add folders that contain a schema but aren't a released folder.
+     refDir = Set()
      for root, dirs, files in os.walk(defaultWorkingDir):
-       for dirName in dirs:
-         if dirName == "Released":
-           rDir += os.path.join(os.path.realpath(defaultWorkingDir), root, dirName) + " "
+       for fileName in files:
+         if "Released" not in root and fileName.endswith(".ecschema.xml"):
+           refDir.add(root)
+           print "Added directory " + root + " as a reference path."
+
+     # add the released versions of the ECDb schemas because the real versions are not copied over
+     refDir.add(os.path.join(defaultWorkingDir, "Standard", "ECDb", "Released"))
+     rDir = ' '.join(refDir)
 
      schemaPaths = [
         "Domains\BuildingSpatial\BuildingSpatial",
@@ -117,7 +121,7 @@ steps:
    mkdir $(Build.StagingDirectory)\markdown\
    
    cmd | for %%a in ($(Build.StagingDirectory)\json\*.json) do (
-     $(Build.SourcesDirectory)/node_modules/.bin/ecjson2md -i %%a -r $(Build.StagingDirectory)\json\ -o $(Build.StagingDirectory)\markdown\
+     $(Build.BinariesDirectory)/node_modules/.bin/ecjson2md -i %%a -r $(Build.StagingDirectory)\json\ -o $(Build.StagingDirectory)\markdown\
    )
   displayName: 'Generate Markdown'
 
