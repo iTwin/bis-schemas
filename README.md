@@ -18,6 +18,7 @@ List of current BIS Schemas in this repository as SSOT:
 - Core\PhysicalMaterial
 - Earthwork
 - ECObjects
+- Egress
 - FederatedDocumentStore
 - Grids
 - QuantityTakeoffsAspects
@@ -170,3 +171,7 @@ When a schema has passed validation and received signoff, it can be moved to rel
   - Schema version is `1.0.1` the version number of the prerelease will be, `1.0.1-beta.x`
 - To consume a pre-release schema it must be explicitly stated in the npm dependency that this is desired
   - Example for consuming a pre-release: `~1.0.1-beta.1 <1.0.1` would match any package with version `1.0.1-beta.x` but not match `1.0.1`.
+
+## Schema Documentation
+
+See the documentation for writing schema documentation [here](./docs/writing-schema-documentation.md)
