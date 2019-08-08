@@ -109,6 +109,8 @@
             <ClassHasHandler xmlns="BisCore.01.00.00"/>
         </ECCustomAttributes>
         <ECProperty propertyName="Name" typeName="string" displayLabel="Name"/>
+        <ECProperty propertyName="HorizontalName" typeName="string" displayLabel="Horizontal Name" />
+        <ECProperty propertyName="ActiveProfileName" typeName="string" displayLabel="Active Profile Name" />
     </ECEntityClass>
     <ECRelationshipClass typeName="ElementOwnsCorridorAspect" strength="embedding" modifier="Sealed">
         <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
@@ -125,7 +127,7 @@
             <ClassHasHandler xmlns="BisCore.01.00.00"/>
         </ECCustomAttributes>
         <ECProperty propertyName="Volume" typeName="double" displayLabel="Volume" kindOfQuantity="VOLUME"/>
-        <ECProperty propertyName="SurfaceArea" typeName="double" displayLabel="Surface Area" kindOfQuantity="rralign:AREA"/>
+        <ECProperty propertyName="SlopedArea" typeName="double" displayLabel="Sloped Area" kindOfQuantity="rralign:AREA"/>
     </ECEntityClass>
     <ECRelationshipClass typeName="ElementOwnsVolumetricQuantityAspect" strength="embedding" modifier="Sealed">
         <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
@@ -175,6 +177,24 @@
         </Source>
         <Target multiplicity="(0..1)" roleLabel="has content bounded by" polymorphic="false">
             <Class class="bis:Sheet"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="AlignmentAspect" modifier="Sealed" displayLabel="Geometry (Alignment)" description="UniqueAspect to be applied to elements carrying Alignment data from ORD.">
+        <BaseClass>bis:ElementUniqueAspect</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.01.00.00"/>
+        </ECCustomAttributes>
+        <ECProperty propertyName="StartPoint" typeName="Point2d" displayLabel="Start Point" />
+        <ECProperty propertyName="EndPoint" typeName="Point2d" displayLabel="End Point" />
+        <ECProperty propertyName="ActiveProfileName" typeName="string" displayLabel="Active Profile Name" />
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsAlignmentAspect" strength="embedding" modifier="Sealed">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" polymorphic="true" roleLabel="owns">
+            <Class class="bis:Element"/>
+        </Source>
+        <Target multiplicity="(0..1)" polymorphic="false" roleLabel="is owned by">
+            <Class class="AlignmentAspect"/>
         </Target>
     </ECRelationshipClass>
 </ECSchema>
