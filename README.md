@@ -14,7 +14,6 @@ List of current BIS Schemas in this repository as SSOT:
 - Core\BisCore
 - Core\Functional
 - Core\Generic
-- Core\Markup
 - Core\PhysicalMaterial
 - Earthwork
 - ECObjects
