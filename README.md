@@ -84,6 +84,7 @@ An owner of a BIS Schema can move their Schema from Mercurial to this repository
     
 3. Identify the owner of the Schema and request the appropriate permissions.
     - See [Schema Permissions](#managing-permissions-to-bis-schema) for more information.
+  
 4. Request a final merge from Mercurial to Git.
     - Remove [file map](tools/hg2git/all_bis/filemaps) for individual Schema. 
 5. 
@@ -144,33 +145,19 @@ The iModel Schema Validation tool imports each individual schema in the bis-sche
 
 
 2. Add the 'BIS - Verify iModel Schemas' task and fill out the following parameters:
-    - iModelName
-    - hubProjectID
-    - hubEnvironment
-    - hubUserName
-    - hubPassWord
-        - It is recommended that you use a Secret variable for the password. Under the 'Variables' section, add a new variable and select the lock icon to make it secret. In the hubPassWord field, you can then use the variable like this: `$(variableName)`
+
+- iModelName
+- hubProjectID
+- hubEnvironment
+- hubUserName
+- hubPassWord
+  - It is recommended that you use a Secret variable for the password. Under the 'Variables' section, add a new variable and select the lock icon to make it secret. In the hubPassWord field, you can then use the variable like this: `$(variableName)`
 
 See the iModel Schema Validation -- sample build definition for an example.
 
 ## Schema Packaging - *WIP*
 
-Each schema can be built into an npm package.
-
-### New Released Version Schemas
-
-When a schema has passed validation and received signoff, it can be moved to released and begin packaging
-
-- A new npm package release is created when a new version of a schema is added to the "Released" directory
-  - The version of the npm package will be the exact version of the schema.
-  - When an npm install happens it will be up to semantic versioning to pull in the correct version
-
-### Non-released/pre-release Schemas
-
-- Use pre-release flags to handle unreleased schemas version
-  - Schema version is `1.0.1` the version number of the prerelease will be, `1.0.1-beta.x`
-- To consume a pre-release schema it must be explicitly stated in the npm dependency that this is desired
-  - Example for consuming a pre-release: `~1.0.1-beta.1 <1.0.1` would match any package with version `1.0.1-beta.x` but not match `1.0.1`.
+See [Schema Release Proposal](./docs/schema-release-process.md)
 
 ## Schema Documentation
 
