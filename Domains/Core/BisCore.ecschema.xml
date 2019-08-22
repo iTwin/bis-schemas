@@ -1716,6 +1716,41 @@
         <ECProperty propertyName="Enabled" typeName="boolean" displayLabel="Is light turned on" />
     </ECEntityClass>
 
+    <ECEnumeration typeName="SectionType" backingTypeName="int" isStrict="false">
+        <ECEnumerator value="3" displayLabel="Section"/>
+        <ECEnumerator value="4" displayLabel="Detail"/>
+        <ECEnumerator value="5" displayLabel="Elevation"/>
+        <ECEnumerator value="6" displayLabel="Plan"/>
+    </ECEnumeration>
+    
+    <ECEntityClass typeName="SectionLocation" displayLabel="Section Location Element" description="The section location defines how a section drawing should be generated in a 3d view.">
+        <BaseClass>SpatialLocationElement</BaseClass>
+        <ECProperty propertyName="SectionType" typeName="SectionType" displayLabel="Section Type" description="Type of the section: e.g. Section, Plan, Elevation, Detail."/>
+        <ECProperty propertyName="ClipGeometry" typeName="string" extendedTypeName="Json" displayLabel="Clip Geometry" description=" Details on how this section was clipped."/>
+        <ECNavigationProperty propertyName="ModelSelector" relationshipName="SectionLocationUsesModelSelector" direction="Forward" displayLabel="Model Selector" description="Describes the models relevant for this section location display."/>
+        <ECNavigationProperty propertyName="CategorySelector" relationshipName="SectionLocationUsesCategorySelector" direction="Forward" displayLabel="Category Selector" description="Describes the categories relevant for this section location display."/>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="SectionLocationUsesModelSelector" strength="referencing" modifier="Sealed" description="Relates a section location to the models relevant for this section location display.">
+        <!-- @see SectionLocation.ModelSelector ECNavigationProperty -->
+        <Source multiplicity="(0..*)" roleLabel="uses" polymorphic="true">
+            <Class class="SectionLocation"/>
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="is used by" polymorphic="true">
+            <Class class="ModelSelector"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="SectionLocationUsesCategorySelector" strength="referencing" modifier="Sealed" description="Relates a section location to the categories relevant for this section location display.">
+        <!-- @see SectionLocation.CategorySelector ECNavigationProperty -->
+        <Source multiplicity="(0..*)" roleLabel="uses" polymorphic="true">
+            <Class class="SectionLocation"/>
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="is used by" polymorphic="true">
+            <Class class="CategorySelector"/>
+        </Target>
+    </ECRelationshipClass>
+    
     <ECRelationshipClass typeName="BaseModelForView2d" strength="referencing" modifier="Sealed">
         <!-- @see ViewDefinition2d.BaseModel ECNavigationProperty -->
         <Source multiplicity="(1..1)" roleLabel="is base model for" polymorphic="true">
