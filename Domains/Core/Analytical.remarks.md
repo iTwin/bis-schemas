@@ -9,6 +9,8 @@ Contains the core classes which define the base classes used by specialized BIS 
 
 Each specialized BIS Analytical Domain is expected to introduce subclasses for anlyt:AnalyticalPartition, anlyt:AnalyticalModel, anlyt:AnalyticalElement and, if needed, anlyt:AnalyticalType.
 
+## Entity Classes
+
 ### AnalyticalElement
 
 anlyt:AnalyticalElement is expected to be subclassed by specialized BIS Analytical Domain schemas.
