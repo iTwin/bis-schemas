@@ -51,8 +51,8 @@ The "Physical" Perspective is for modeling physical Entities, which have mass an
 
 The “Spatial Location” perspective is a strict subset of the “Physical” perspective. Spatial locations are massless, but they manifest in the real physical world:
 
-- They may be defined in relation to physical entities, e.g. the air gap between two conductors, the space around an access panel, the volume occupied by a physical Entity, or a surface demarcating a region on the surface of a physical entity. 
-- They may be used to guide positioning of physical Entities, e.g. gridlines that may be manifested physically on a construction site via chalk lines or laser beams. 
+- They may be defined in relation to physical entities, e.g. the air gap between two conductors, the space around an access panel, the volume occupied by a physical Entity, or a surface demarcating a region on the surface of a physical entity.
+- They may be used to guide positioning of physical Entities, e.g. gridlines that may be manifested physically on a construction site via chalk lines or laser beams.
 - They may be abstractions of physical consequence, like property or political boundaries that are often demarcated in the physical world via markers, signs, or natural boundaries.
 
 The "Spatial Location" perspective is used by SpatialLocationModel and SpatialLocationElement in order to segregate certain kinds of elements.
