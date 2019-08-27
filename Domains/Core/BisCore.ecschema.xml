@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ECSchema schemaName="BisCore" alias="bis" version="01.00.04" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.1" displayLabel="BIS Core" description="The BIS core schema contains classes that all other domain schemas extend.">
+<ECSchema schemaName="BisCore" alias="bis" version="01.00.06" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.1" displayLabel="BIS Core" description="The BIS core schema contains classes that all other domain schemas extend.">
 
     <ECSchemaReference name="CoreCustomAttributes" version="01.00.01" alias="CoreCA"/>
     <ECSchemaReference name="ECDbMap" version="02.00.00" alias="ecdbmap"/>
@@ -144,12 +144,28 @@
                 <HiddenProperty xmlns="CoreCustomAttributes.1.0"/>
             </ECCustomAttributes>
         </ECProperty>
+        <ECProperty propertyName="LastMod" typeName="dateTime" displayLabel="Last Modified" description="The last time any element in this Model was modified.">
+            <ECCustomAttributes>
+                <CustomHandledProperty>
+                    <StatementTypes>0</StatementTypes>
+                </CustomHandledProperty>
+                <DateTimeInfo xmlns="CoreCustomAttributes.1.0">
+                    <DateTimeKind>Utc</DateTimeKind>
+                </DateTimeInfo>
+                <HiddenProperty xmlns="CoreCustomAttributes.1.0"/>
+            </ECCustomAttributes>
+       </ECProperty>
     </ECEntityClass>
     <ECEntityClass typeName="GeometricModel" modifier="Abstract" displayLabel="Geometric Model" description="A container for persisting bis:GeometricElement instances.">
         <BaseClass>Model</BaseClass>
         <ECCustomAttributes>
             <NotSubclassableInReferencingSchemas xmlns="CoreCustomAttributes.1.0"/>
         </ECCustomAttributes>
+       <ECProperty propertyName="GeometryGuid" typeName="binary" extendedTypeName="BeGuid" displayLabel="Geometry GUID" description="A GUID that changes whenever any element in this GeometricModel has a change to its geometry.">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.1.0"/>
+            </ECCustomAttributes>
+       </ECProperty>
     </ECEntityClass>
     <ECEntityClass typeName="GeometricModel3d" modifier="Abstract" displayLabel="3D Geometric Model" description="A container for persisting bis:GeometricElement3d instances.">
         <BaseClass>GeometricModel</BaseClass>
@@ -159,7 +175,7 @@
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.1.0"/>
         </ECCustomAttributes>
-        <ECProperty propertyName="GlobalOrigin" typeName="point2d" displayLabel="Global Origin" description="The actual coordinates of (0,0) in modeling coordinates. An offest applied to all modeling coordinates."/>
+        <ECProperty propertyName="GlobalOrigin" typeName="point2d" displayLabel="Global Origin" description="The actual coordinates of (0,0) in modeling coordinates. An offset applied to all modeling coordinates."/>
     </ECEntityClass>
     <ECEntityClass typeName="GraphicalModel2d" modifier="Abstract" displayLabel="2D Graphical Model" description="A container for persisting bis:GraphicalElement2d instances.">
         <BaseClass>GeometricModel2d</BaseClass>
@@ -254,9 +270,12 @@
             <ClassHasHandler xmlns="BisCore.1.0"/>
         </ECCustomAttributes>
     </ECEntityClass>
-    <ECEntityClass typeName="WebMercatorModel" displayLabel="Web Mercator Model">
+    <ECEntityClass typeName="WebMercatorModel" displayLabel="Web Mercator Model" description="DEPRECATED. Not used.">
         <BaseClass>SpatialModel</BaseClass>
         <ECCustomAttributes>
+            <Deprecated xmlns="CoreCustomAttributes.1.0">
+                <Description>Instances of WebMercatorModel are no longer created.</Description>
+            </Deprecated>
             <ClassHasHandler xmlns="BisCore.1.0"/>
         </ECCustomAttributes>
     </ECEntityClass>
@@ -308,7 +327,7 @@
         <Source multiplicity="(0..1)" roleLabel="breaks down" polymorphic="true">
             <Class class="PhysicalModel"/>
         </Source>
-        <Target multiplicity="(0..1)" roleLabel="is broken down by" polymorphic="true">
+        <Target multiplicity="(0..1)" roleLabel="is sub-modeled by" polymorphic="true">
             <Class class="PhysicalPortion" />
         </Target>
     </ECRelationshipClass>
@@ -317,7 +336,7 @@
         <Source multiplicity="(0..1)" roleLabel="breaks down" polymorphic="true">
             <Class class="DrawingModel"/>
         </Source>
-        <Target multiplicity="(1..1)" roleLabel="is broken down by" polymorphic="true">
+        <Target multiplicity="(1..1)" roleLabel="is sub-modeled by" polymorphic="true">
             <Class class="Drawing" />
         </Target>
     </ECRelationshipClass>
@@ -326,7 +345,7 @@
         <Source multiplicity="(0..1)" roleLabel="breaks down" polymorphic="true">
             <Class class="SheetModel"/>
         </Source>
-        <Target multiplicity="(1..1)" roleLabel="is broken down by" polymorphic="true">
+        <Target multiplicity="(1..1)" roleLabel="is sub-modeled by" polymorphic="true">
             <Class class="Sheet" />
         </Target>
     </ECRelationshipClass>
@@ -599,7 +618,7 @@
             <Class class="GraphicalType2d"/>
         </Target>
     </ECRelationshipClass>
-    
+
     <ECRelationshipClass typeName="GeometricElement3dHasTypeDefinition" strength="referencing" modifier="Abstract">
         <!-- @see GeometricElement3d.TypeDefinition ECNavigationProperty -->
         <Source multiplicity="(0..*)" roleLabel="has" polymorphic="true">
@@ -672,7 +691,7 @@
             <Class class="Subject"/>
         </Target>
     </ECRelationshipClass>
-    <ECEntityClass typeName="InformationPartitionElement" modifier="Abstract" displayLabel="Information Partition" description="Instances of bis:InformationPartitionElement ared used to indicate that there is a new modeling perspective within the overall information hierarchy. A bis:InformationPartitionElement is always parented to a bis:Subject and broken down by a bis:Model.">
+    <ECEntityClass typeName="InformationPartitionElement" modifier="Abstract" displayLabel="Information Partition" description="Instances of specializations of bis:InformationPartitionElement establish a particular Modeling Perspective for its parent bis:Subject. Instances are always sub-modeled by a specialization of bis:Model of the appropriate Modeling Perspective.">
         <BaseClass>InformationContentElement</BaseClass>
         <BaseClass>ISubModeledElement</BaseClass>
         <ECCustomAttributes>
@@ -684,43 +703,43 @@
         </ECCustomAttributes>
         <ECProperty propertyName="Description" typeName="string"/>
     </ECEntityClass>
-    <ECEntityClass typeName="DefinitionPartition" modifier="Sealed" displayLabel="Definition Partition" description="A bis:DefinitionPartition element indicates that there is a definition-related modeling perspective within the overall information hierarchy. A bis:DefinitionPartition is always parented to a bis:Subject and broken down by a bis:DefinitionModel.">
+    <ECEntityClass typeName="DefinitionPartition" modifier="Sealed" displayLabel="Definition Partition" description="A bis:DefinitionPartition element establishes a 'Definition' Modeling Perspective for its parent bis:Subject. A bis:DefinitionPartition is always sub-modeled by a bis:DefinitionModel.">
         <BaseClass>InformationPartitionElement</BaseClass>
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.1.0" />
         </ECCustomAttributes>
     </ECEntityClass>
-    <ECEntityClass typeName="DocumentPartition" modifier="Sealed" displayLabel="Document Partition" description="A bis:DocumentPartition element indicates that there is a document-related modeling perspective within the overall information hierarchy. A bis:DocumentPartition is always parented to a bis:Subject and broken down by a bis:DocumentListModel.">
+    <ECEntityClass typeName="DocumentPartition" modifier="Sealed" displayLabel="Document Partition" description="A bis:DocumentPartition element establishes a 'Document' Modeling Perspective for its parent bis:Subject. A bis:DocumentPartition is always sub-modeled by a bis:DocumentListModel.">
         <BaseClass>InformationPartitionElement</BaseClass>
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.1.0" />
         </ECCustomAttributes>
     </ECEntityClass>
-    <ECEntityClass typeName="GroupInformationPartition" modifier="Sealed" displayLabel="Group Information Partition" description="A bis:GroupInformationPartition element indicates that there is a group-information-related modeling perspective within the overall information hierarchy. A bis:GroupInformationPartition is always parented to a bis:Subject and broken down by a bis:GroupInformationModel.">
+    <ECEntityClass typeName="GroupInformationPartition" modifier="Sealed" displayLabel="Group Information Partition" description="A bis:GroupInformationPartition element establishes a 'Group Information' Modeling Perspective for its parent bis:Subject. A bis:GroupInformationPartition is always sub-modeled by a bis:GroupInformationModel.">
         <BaseClass>InformationPartitionElement</BaseClass>
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.1.0" />
         </ECCustomAttributes>
     </ECEntityClass>
-    <ECEntityClass typeName="InformationRecordPartition" modifier="Sealed" displayLabel="Information Record Partition" description="A bis:InformationRecordPartition element indicates that there is an information-record-related modeling perspective within the overall information hierarchy. A bis:InformationRecordPartition is always parented to a bis:Subject and broken down by a bis:InformationRecordModel.">
+    <ECEntityClass typeName="InformationRecordPartition" modifier="Sealed" displayLabel="Information Record Partition" description="A bis:InformationRecordPartition element establishes a 'Information Record' Modeling Perspective for its parent bis:Subject. A bis:InformationRecordPartition is always sub-modeled by a bis:InformationRecordModel.">
         <BaseClass>InformationPartitionElement</BaseClass>
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.1.0" />
         </ECCustomAttributes>
     </ECEntityClass>
-    <ECEntityClass typeName="LinkPartition" modifier="Sealed" displayLabel="Link Partition" description="A bis:LinkPartition element indicates that there is a link-related modeling perspective within the overall information hierarchy. A bis:LinkPartition is always parented to a bis:Subject and broken down by a bis:LinkModel.">
+    <ECEntityClass typeName="LinkPartition" modifier="Sealed" displayLabel="Link Partition" description="A bis:LinkPartition element establishes a 'Link' Modeling Perspective for its parent bis:Subject. A bis:LinkPartition is always sub-modeled by a bis:LinkModel.">
         <BaseClass>InformationPartitionElement</BaseClass>
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.1.0" />
         </ECCustomAttributes>
     </ECEntityClass>
-    <ECEntityClass typeName="PhysicalPartition" modifier="Sealed" displayLabel="Physical Partition" description="A bis:PhysicalPartition element indicates that there is a physical modeling perspective within the overall information hierarchy. A bis:PhysicalPartition is always parented to a bis:Subject and broken down by a bis:PhysicalModel.">
+    <ECEntityClass typeName="PhysicalPartition" modifier="Sealed" displayLabel="Physical Partition" description="A bis:PhysicalPartition element establishes a 'Physical' Modeling Perspective for its parent bis:Subject. A bis:PhysicalPartition is always sub-modeled by a bis:PhysicalModel.">
         <BaseClass>InformationPartitionElement</BaseClass>
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.1.0" />
         </ECCustomAttributes>
     </ECEntityClass>
-    <ECEntityClass typeName="SpatialLocationPartition" modifier="Sealed" displayLabel="Spatial Location Partition" description="A bis:SpatialLocationPartition element indicates that there is a spatial-location-related modeling perspective within the overall information hierarchy. A bis:SpatialLocationPartition is always parented to a bis:Subject and broken down by a bis:SpatialLocationModel.">
+    <ECEntityClass typeName="SpatialLocationPartition" modifier="Sealed" displayLabel="Spatial Location Partition" description="A bis:SpatialLocationPartition element establishes a 'SpatialLocation' Modeling Perspective for its parent bis:Subject. A bis:SpatialLocationPartition is always sub-modeled by a bis:SpatialLocationModel.">
         <BaseClass>InformationPartitionElement</BaseClass>
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.1.0" />
@@ -746,7 +765,7 @@
     <ECEntityClass typeName="LinkElement" modifier="Abstract" displayLabel="Link" description="A bis:LinkElement is a bis:InformationReferenceElement that specifies a link.">
         <BaseClass>InformationReferenceElement</BaseClass>
     </ECEntityClass>
-    
+
     <ECEntityClass typeName="UrlLink" displayLabel="URL Link" description="A bis:UrlLink is a bis:LinkElement that specifies a URL link.">
         <BaseClass>LinkElement</BaseClass>
         <ECCustomAttributes>
@@ -775,7 +794,7 @@
         </ECProperty>
     </ECEntityClass>
 
-    <ECEntityClass typeName="RepositoryLink" modifier="Sealed" displayLabel="Repository Link" description="A bis:RepositoryLink is a bis:UrlLink element that links to a repository.">
+    <ECEntityClass typeName="RepositoryLink" modifier="Sealed" displayLabel="Repository Link" description="A bis:RepositoryLink is a bis:UrlLink element that links to an external repository. It implements ISubModeledElement only so that a sub-Model could be used to cache information from the external repository.">
         <BaseClass>UrlLink</BaseClass>
         <BaseClass>ISubModeledElement</BaseClass>
         <ECCustomAttributes>
@@ -1028,7 +1047,7 @@
             </ECCustomAttributes>
         </ECNavigationProperty>
     </ECEntityClass>
-    <ECEntityClass typeName="GraphicalElement3d" modifier="Abstract" displayLabel="3D Graphical Element" description="A bis:GrapicalElement3d element conveys information within 3D graphical presentations.">
+    <ECEntityClass typeName="GraphicalElement3d" modifier="Abstract" displayLabel="3D Graphical Element" description="A bis:GraphicalElement3d element conveys information within 3D graphical presentations.">
         <BaseClass>GeometricElement3d</BaseClass>
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.1.0"/>
@@ -1043,10 +1062,10 @@
             <ClassHasHandler xmlns="BisCore.1.0"/>
         </ECCustomAttributes>
     </ECEntityClass>
-    <ECEntityClass typeName="PhysicalPortion" modifier="Abstract" displayLabel="Physical Portion" description="DEPRECATED: A Physical Portion represents an arbitrary portion of a larger Physical Element that will be broken down in more detail in a separate (sub) Physical Model.">
+    <ECEntityClass typeName="PhysicalPortion" modifier="Abstract" displayLabel="Physical Portion" description="DEPRECATED: A Physical Portion represents an arbitrary portion of a larger Physical Element that will be sub-modeled by a Physical Model.">
         <ECCustomAttributes>
             <Deprecated xmlns="CoreCustomAttributes.1.0">
-                <Description>The best practice is now to inherit from a PhysicalElement subclass and mix in ISubModeledElement when a breakdown concept is needed.</Description>
+                <Description>The best practice is now to inherit from a PhysicalElement subclass and mix-in ISubModeledElement directly.</Description>
             </Deprecated>
         </ECCustomAttributes>
         <BaseClass>PhysicalElement</BaseClass>
@@ -1058,10 +1077,10 @@
             <ClassHasHandler xmlns="BisCore.1.0"/>
         </ECCustomAttributes>
     </ECEntityClass>
-    <ECEntityClass typeName="SpatialLocationPortion" modifier="Abstract" displayLabel="Spatial Location Portion" description="DEPRECATED: A Spatial Location Portion represents an arbitrary portion of a larger Spatial Location Element that will be broken down in more detail in a separate (sub) Spatial Location Model.">
+    <ECEntityClass typeName="SpatialLocationPortion" modifier="Abstract" displayLabel="Spatial Location Portion" description="DEPRECATED: A Spatial Location Portion represents an arbitrary portion of a larger Spatial Location Element that will be sub-modeled by a Spatial Location Model.">
         <ECCustomAttributes>
             <Deprecated xmlns="CoreCustomAttributes.1.0">
-                <Description>The best practice is now to inherit from a SpatialLocationElement subclass and mix in ISubModeledElement when a breakdown concept is needed.</Description>
+                <Description>The best practice is now to inherit from a SpatialLocationElement subclass and mix-in ISubModeledElement directly.</Description>
             </Deprecated>
         </ECCustomAttributes>
         <BaseClass>SpatialLocationElement</BaseClass>
@@ -1073,7 +1092,7 @@
             <ClassHasHandler xmlns="BisCore.1.0"/>
         </ECCustomAttributes>
     </ECEntityClass>
-    <ECEntityClass typeName="GeometricElement2d" modifier="Abstract" displayLabel="2D Geometric Element" description="bis:GeometricElement2d is an abstract base class used to model information entities that intrinsicly have 2D geometry.">
+    <ECEntityClass typeName="GeometricElement2d" modifier="Abstract" displayLabel="2D Geometric Element" description="bis:GeometricElement2d is an abstract base class used to model information entities that intrinsically have 2D geometry.">
         <!-- NOTE: only platform should directly subclass GeometricElement2d -->
         <BaseClass>GeometricElement</BaseClass>
         <ECCustomAttributes>
@@ -1171,7 +1190,7 @@
             <Class class="TextAnnotationData"/>
         </Target>
     </ECRelationshipClass>
-    
+
     <ECEntityClass typeName="TextAnnotation3d" displayLabel="3D Text Annotation">
         <BaseClass>GraphicalElement3d</BaseClass>
         <ECCustomAttributes>
@@ -1311,7 +1330,7 @@
         </Target>
     </ECRelationshipClass>
 
-    <ECEntityClass typeName="ExternalSourceAspect" displayLabel="External Source Aspect" description="A bis:ElementMultiAspect that stores syncrhonization information for a bis:Element originating from an external source.">
+    <ECEntityClass typeName="ExternalSourceAspect" displayLabel="External Source Aspect" description="A bis:ElementMultiAspect that stores synchronization information for a bis:Element originating from an external source.">
         <BaseClass>ElementMultiAspect</BaseClass>
         <ECCustomAttributes>
             <DbIndexList xmlns="ECDbMap.2.0">
@@ -1344,7 +1363,7 @@
         <ECProperty propertyName="Kind" typeName="string" description="The kind of object within the source repository">
             <!-- IsNullable=False -->
         </ECProperty>
-		<ECProperty propertyName="Version" typeName="string" description="An optional value that is typically a version number or a psuedo version number like last modified time. It will be used by the synchronization process to detect that a source object is unchanged so that computing a cryptographic hash can be avoided. If present, this value must be guaranteed to change when any of the source object's content changes.">
+		<ECProperty propertyName="Version" typeName="string" description="An optional value that is typically a version number or a pseudo version number like last modified time. It will be used by the synchronization process to detect that a source object is unchanged so that computing a cryptographic hash can be avoided. If present, this value must be guaranteed to change when any of the source object's content changes.">
             <!-- IsNullable=True -->
             <ECCustomAttributes>
                 <HiddenProperty xmlns="CoreCustomAttributes.1.0"/>
@@ -1429,11 +1448,11 @@
     <ECRelationshipClass typeName="ElementDrivesElement" strength="referencing" modifier="None">
         <!-- WIP: Rename to ElementDriveElements? -->
         <!-- Creates bis_ElementDrivesElement link table -->
-        <!-- Relationship that indicates that an Element drives (controls the lifecyle or structure of) a dependent Element -->
+        <!-- Relationship that indicates that an Element drives (controls the lifecycle or structure of) a dependent Element -->
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.1.0"/>
             <ClassMap xmlns="ECDbMap.2.0">
-                <!-- We must insist that all instances of all possible subclasses are stored together in a single table. 
+                <!-- We must insist that all instances of all possible subclasses are stored together in a single table.
                      TxnManager knows about this table, and expects to find all instances this kind of relationship there. -->
                 <MapStrategy>TablePerHierarchy</MapStrategy>
             </ClassMap>
@@ -1443,7 +1462,6 @@
             </ShareColumns>
             <LinkTableRelationshipMap xmlns="ECDbMap.2.0">
                 <CreateForeignKeyConstraints>False</CreateForeignKeyConstraints>
-                <AllowDuplicateRelationships>True</AllowDuplicateRelationships>
             </LinkTableRelationshipMap>
         </ECCustomAttributes>
         <Source multiplicity="(0..*)" roleLabel="drives" polymorphic="true">
@@ -1452,7 +1470,7 @@
         <Target multiplicity="(0..*)" roleLabel="is driven by" polymorphic="true">
             <Class class="Element"/>
         </Target>
-        <ECProperty propertyName="Status" typeName="int" description="Bits that indicate the status of the dependency. Satisfied=0, Failed=1, Deferred=128. Deferred and Failed bits can be OR'd together."/>
+        <ECProperty propertyName="Status" typeName="int" description="Bits that indicate the status of the dependency. Satisfied=0, Failed=1, Deferred=128. Deferred and Failed bits can be OR-ed together."/>
         <ECProperty propertyName="Priority" typeName="int" description="The priority of this dependency, relative to other EntityDrivesEntity instances. Note that EntityHasChildEntities dependencies always take priority over EntityDrivesEntity dependencies."/>
     </ECRelationshipClass>
 
@@ -1701,6 +1719,41 @@
         <ECProperty propertyName="Enabled" typeName="boolean" displayLabel="Is light turned on" />
     </ECEntityClass>
 
+    <ECEnumeration typeName="SectionType" backingTypeName="int" isStrict="false">
+        <ECEnumerator value="3" displayLabel="Section"/>
+        <ECEnumerator value="4" displayLabel="Detail"/>
+        <ECEnumerator value="5" displayLabel="Elevation"/>
+        <ECEnumerator value="6" displayLabel="Plan"/>
+    </ECEnumeration>
+    
+    <ECEntityClass typeName="SectionLocation" displayLabel="Section Location Element" description="The section location defines how a section drawing should be generated in a 3d view.">
+        <BaseClass>SpatialLocationElement</BaseClass>
+        <ECProperty propertyName="SectionType" typeName="SectionType" displayLabel="Section Type" description="Type of the section: e.g. Section, Plan, Elevation, Detail."/>
+        <ECProperty propertyName="ClipGeometry" typeName="string" extendedTypeName="Json" displayLabel="Clip Geometry" description=" Details on how this section was clipped."/>
+        <ECNavigationProperty propertyName="ModelSelector" relationshipName="SectionLocationUsesModelSelector" direction="Forward" displayLabel="Model Selector" description="Describes the models relevant for this section location display."/>
+        <ECNavigationProperty propertyName="CategorySelector" relationshipName="SectionLocationUsesCategorySelector" direction="Forward" displayLabel="Category Selector" description="Describes the categories relevant for this section location display."/>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="SectionLocationUsesModelSelector" strength="referencing" modifier="Sealed" description="Relates a section location to the models relevant for this section location display.">
+        <!-- @see SectionLocation.ModelSelector ECNavigationProperty -->
+        <Source multiplicity="(0..*)" roleLabel="uses" polymorphic="true">
+            <Class class="SectionLocation"/>
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="is used by" polymorphic="true">
+            <Class class="ModelSelector"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="SectionLocationUsesCategorySelector" strength="referencing" modifier="Sealed" description="Relates a section location to the categories relevant for this section location display.">
+        <!-- @see SectionLocation.CategorySelector ECNavigationProperty -->
+        <Source multiplicity="(0..*)" roleLabel="uses" polymorphic="true">
+            <Class class="SectionLocation"/>
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="is used by" polymorphic="true">
+            <Class class="CategorySelector"/>
+        </Target>
+    </ECRelationshipClass>
+    
     <ECRelationshipClass typeName="BaseModelForView2d" strength="referencing" modifier="Sealed">
         <!-- @see ViewDefinition2d.BaseModel ECNavigationProperty -->
         <Source multiplicity="(1..1)" roleLabel="is base model for" polymorphic="true">
@@ -1751,8 +1804,12 @@
         </Target>
     </ECRelationshipClass>
 
-    <ECRelationshipClass typeName="PartitionOriginatesFromRepository" strength="referencing" modifier="Sealed" description="DEPRECATED">
-        <!-- deprecated - use ElementHasLinks -->
+    <ECRelationshipClass typeName="PartitionOriginatesFromRepository" strength="referencing" modifier="Sealed" description="DEPRECATED: Use ElementHasLinks">
+        <ECCustomAttributes>
+            <Deprecated xmlns="CoreCustomAttributes.1.0">
+                <Description>Use ElementHasLinks.</Description>
+            </Deprecated>
+        </ECCustomAttributes>
         <BaseClass>ElementRefersToElements</BaseClass>
         <Source multiplicity="(0..*)" roleLabel="originates from" polymorphic="true">
             <Class class="InformationPartitionElement"/>
@@ -1919,7 +1976,7 @@
             <Class class="LinkElement"/>
         </Target>
     </ECRelationshipClass>
-    
+
     <ECEntityClass typeName="RoleElement" modifier="Abstract" displayLabel="Role Element" description="A real world entity is modeled as a bis:RoleElement when a set of external circumstances define an important role (one that is worth tracking) that is not intrinsic to the entity playing the role. For example, a person can play the role of a teacher or a rock can play the role of a boundary marker.">
         <BaseClass>Element</BaseClass>
         <ECCustomAttributes>
@@ -1928,6 +1985,7 @@
             <NotSubclassableInReferencingSchemas xmlns="CoreCustomAttributes.1.0">
                 <Exceptions>
                     <string>Functional:FunctionalElement</string>
+                    <string>Asset:AssetElement</string>
                 </Exceptions>
             </NotSubclassableInReferencingSchemas>
         </ECCustomAttributes>
