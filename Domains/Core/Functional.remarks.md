@@ -56,4 +56,5 @@ The `FunctionalType` of a `FunctionalElement` is distinct from the `PhysicalType
 `PhysicalElementFulfillsFunctionThis` models the relationship between the functional Entity and the physical Entity that actually fulfills it. There may be other relationships (defined elsewhere) to indicate a `PhysicalType` for `PhysicalElement`s that may potentially be used to fulfill the function.
 
 ### DrawingGraphicRepresentsFunctionalElement
+
 Used to relate schematic drawings to `FunctionalElement`s.
