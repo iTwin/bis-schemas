@@ -35,25 +35,13 @@ If you are designing a specialization of `FunctionalElement` that will not have 
 
 If you are designing a specialization of `FunctionalElement` that will be sub-modeled, then specialize [FunctionalElement](#functionalelement) directly.
 
-### FunctionalBreakdownElement
-
-This specialization of `FunctionalElement` models an aggregate functional Entity with child functional Entities modeling its parts.
-
-### FunctionalComposite
-
-This class will be DEPRECATED in an upcoming release. Use your own specialization of [FunctionalBreakdownElement](#functionalbreakdownelement) instead.
-
-### FunctionalComponentElement
-
-This specialization of `FunctionalElement` models an 'atomic' functional Entity which will not be sub-modeled at a finer granularity and does not have 'child' parts.
-
 ### FunctionalType
 
 The `FunctionalType` of a `FunctionalElement` is distinct from the `PhysicalType` of the `PhysicalElement` that may be used to fulfill the function.
 
 ### PhysicalElementFulfillsFunction
 
-`PhysicalElementFulfillsFunctionThis` models the relationship between the functional Entity and the physical Entity that actually fulfills it. There may be other relationships (defined elsewhere) to indicate a `PhysicalType` for `PhysicalElement`s that may potentially be used to fulfill the function.
+There may be other relationships (defined elsewhere) to indicate a `PhysicalType` for `PhysicalElement`s that may potentially be used to fulfill the function.
 
 ### DrawingGraphicRepresentsFunctionalElement
 
