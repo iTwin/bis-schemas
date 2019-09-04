@@ -43,6 +43,10 @@ The 'InformationRecord' Modeling Perspective is a subset of the 'Information' Mo
 
 The 'Link' Modeling Perspective is a subset of the 'Information' Modeling Perspective. It is used to hold links to external repositories, e.g. in the form of `bis:RepositoryLink` elements.
 
+### LinkElement
+
+The link is generally to some resource, e.g. the subclass `UrlLink` points to an external resource while `EmbeddedFileLink` points to files embedded in and iModel.
+
 ### PhysicalPartition
 
 The 'Physical' Perspective is for modeling physical Entities (which have mass) and for spatial location Entities (which are generally either defined-by physical Entities or are used-to-define physical Entities).

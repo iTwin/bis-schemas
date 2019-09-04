@@ -11,7 +11,7 @@ The "Functional" perspective *sees* an Object not as a physical Entity with form
 
 They say "form follows function". Separating the "Functional" perspective from the "Physical" perspective allows independent modeling of "form" and "function". Functional modeling/planning can occur first and be handled by a different responsible party than physical modeling. There is generally more than one physical Entity that could fulfill a given function. The particular physical Entity may be refined throughout the design process and may be changed over the lifetime of the operation of the Object.
 
-The Functional Modeling Perspective is abstract. Domain authors are expected to specialize [FunctionalPartition](#functionalpartition), [FunctionalModel](#functionalmodel), and one or more of the subclasses of [FunctionalElement](#functionalelement) to express their disciplines particular needs for functional modeling, e.g. architectural functional programming or plant process modeling.
+The Functional Modeling Perspective is abstract. Domain authors are expected to specialize [FunctionalPartition](#functionalpartition), [FunctionalModel](#functionalmodel), and one or more of the subclasses of [FunctionalElement](#functionalelement) to express their discipline's particular needs for functional modeling, e.g. architectural functional programming or plant process modeling.
 
 ## Entity Classes
 
@@ -23,7 +23,7 @@ See [Functional](#functional) for a definition of the "Functional" Modeling Pers
 
 ### FunctionalModel
 
-Should be considered abstract. It should be specialized to hold discipline-specific functional Models.
+Should be considered abstract. It should be specialized to hold discipline-specific functional Elements.
 
 ### FunctionalElement
 
