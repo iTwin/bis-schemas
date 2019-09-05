@@ -77,13 +77,13 @@ stages:
       - script: bb -v$(verbosity) -s $(buildStrategy) -a $(architecture) build --tmrbuild --noprompt
         displayName: bb build
 
-      - task: PublishPipelineArtifact@1
-        inputs:
-          path: $(BsiOut)\Winx64\packages
-          artifact: bis-schemas-packages
-      # - publish: $(BsiOut)\Winx64\packages
-      #   artifact: bis-schemas-packages
-      #   displayName: 'Publish Pipeline Artifact'
+      # - task: PublishPipelineArtifact@1
+      #   inputs:
+      #     path: $(BsiOut)\Winx64\packages
+      #     artifact: bis-schemas-packages
+      - publish: $(BsiOut)\Winx64\packages
+        artifact: bis-schemas-packages
+        displayName: 'Publish Pipeline Artifact'
 
 - stage: Publish_Packages
   displayName: Publish Packages
@@ -139,9 +139,23 @@ stages:
           verbose: false
           publishEndpoint: 'JFrog Bentley npm staging'
       - task: Npm@1
+        displayName: 'Publish RoadRailPhysical'
+        inputs:
+          command: publish
+          workingDir: '$(Pipeline.Workspace)/bis-schemas-packages/RoadRailPhysical'
+          verbose: false
+          publishEndpoint: 'JFrog Bentley npm staging'
+      - task: Npm@1
         displayName: 'Publish ECObjects'
         inputs:
           command: publish
           workingDir: '$(Pipeline.Workspace)/bis-schemas-packages/ECObjects'
+          verbose: false
+          publishEndpoint: 'JFrog Bentley npm staging'
+      - task: Npm@1
+        displayName: 'Publish Earthwork'
+        inputs:
+          command: publish
+          workingDir: '$(Pipeline.Workspace)/bis-schemas-packages/Earthwork'
           verbose: false
           publishEndpoint: 'JFrog Bentley npm staging'
