@@ -55,9 +55,17 @@ def getSchemaVersionFromFile(schemaFile):
 def getExistingVersions(packageName):
     cmd = "npm view " + packageName + " versions"
     try:
-        origlist = subprocess.check_output(cmd, shell=True)
+        origlist = subprocess.check_output(cmd, stderr=subprocess.STDOUT, shell=True)
         origlist = origlist.strip('\n[] ').split(',')
         vlist = map(lambda x: x.strip("' "), origlist)
+    except subprocess.CalledProcessError as exc:
+        # Handle a package being missing from the registry differntly than any other error.  This means there are
+        # no existing versions and we can return an empty list.
+        if "Package not found" in exc.output:
+            return dict()
+        print("Status : FAIL", exc.returncode, exc.output)
+        print "Failed to check if the package " + packageName + " has existing versions in the registry"
+        exit(1)
     except:
         print "Failed to check if the package " + packageName + " has existing versions in the registry"
         exit(1)
@@ -106,7 +114,7 @@ def generatePackage(outDir, domainPath, templateFile, prerelease = False):
     for root, dirnames, filenames in os.walk(domainPath):
         for file in filenames:
             if 'Released' in root:
-                # TODO
+                # TODO this is where the support for creating a "real" release version is needed.
                 continue
             elif file.endswith('ecschema.xml'):
                 filesToCopy.append(os.path.join(root, file))
