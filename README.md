@@ -11,6 +11,7 @@ List of current BIS Schemas in this repository as SSOT:
 - BuildingSpatial
 - ClassificationSystems
 - Core\Analytical
+- Core\Asset
 - Core\BisCore
 - Core\Functional
 - Core\Generic
