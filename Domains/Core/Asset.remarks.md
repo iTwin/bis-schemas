@@ -29,3 +29,7 @@ It should be specialized to hold discipline-specific asset Elements.
 
 Asset Entities are non-geometric in nature, and are considered to be 'roles' played by an Object.
 See [Asset](#Asset) for a definition of "Asset".
+
+### AssetTracksElement
+
+![Asset](./media/AssetTracksElement.png)
