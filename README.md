@@ -48,28 +48,37 @@ The repository is split up into two main parts; the tooling, used to process and
 
 All tooling will be under the "tools" directory at the root of the repository.
 
-The BIS Schemas all live under the "Domains" directory, off the root, and will be broken up based on domain. Each domain will have their own directory, this provides the [permissions](#managing-permissions-to-bis-schema) control to the domain owner. All domains are placed under the "Domains" directory. How the each domain directory is split up will be up to their discretion.
+The BIS Domain Schemas all live under the "Domains" directory, organized by domain group. Each domain group has it own directory, allowing [permissions](#managing-permissions-to-bis-schema) control by the domain group owner.
+
+The organization within the domain group directory generally follows one of two patterns: including all domain schemas at the top level, or giving each domain schema its own subdirectory.
+
+There will be a "Release" subdirectory to hold domain schemas that have been publicly released.
 
 Example:
 
+```shell
+\Domains\{DomainGroupName}\{Domain1}.ecschema.xml
+\Domains\{DomainGroupName}\{Domain2}.ecschema.xml
+\Domains\{DomainGroupName}\Released\{Domain1.MM.mm.bb}.ecschema.xml
+\Domains\{DomainGroupName}\Released\{Domain2.MM.mm.bb}.ecschema.xml
 ```
-\Domains\Core\
-\Domains\Core\BisCore.ecschema.xml
-\Domains\Building\
-\Domains\Building\ECObjects.ecschema.xml
 
-\Domains\{DomainName}\
-\Domains\{DomainName}\{DomainSchemaName}\
-\Domains\{DomainName}\{DomainSchemaName}\{DomainSchemaName}.ecschema.xml
+or
+
+```shell
+\Domains\{DomainGroupName}\{Domain1}Schema\{Domain1}.ecschema.xml
+\Domains\{DomainGroupName}\{Domain1}Schema\Release\{Domain1.MM.mm.bb}.ecschema.xml
+\Domains\{DomainGroupName}\{Domain1}Schema\{Domain2}.ecschema.xml
+\Domains\{DomainGroupName}\{Domain1}Schema\Release\{Domain2.MM.mm.bb}.ecschema.xml
 ```
 
 ## Contributing
 
 All contributions to this repository will be done via [pull requests](https://docs.github.com/en/github/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests) to the master branch.
 
-Each BIS Schema will have an owner, or owners. The owner(s) of a given BIS Schema will have to approve all pull requests before they are merged into the master branch. The owner will automatically be added as a required reviewer to a pull request if it corresponds with their domain directory (see [directory structure](#directory-structure)).
+Each BIS Schema will have an owner, or owners. The owner(s) of a given BIS Schema will have to approve all pull requests before they are merged into the master branch. The owner will automatically be added as a required reviewer to a pull request if it corresponds with their domain group directory (see [directory structure](#directory-structure)).
 
-All other changes made outside of a domain directory will require review by a repository owner(s). The repository owner(s) will be added as optional reviewer(s) to all pull requests that are created within domain directories.
+All other changes made outside of a domain group directory will require review by a repository owner(s). The repository owner(s) will be added as optional reviewer(s) to all pull requests that are created within domain group directories.
 
 ### Adding a new BIS Schema to the repository
 
@@ -94,11 +103,11 @@ An owner of a BIS Schema can move their Schema from Mercurial to this repository
 
 #### Addition/modifications to existing domain Schema
 
-The addition of the new BIS Schemas will be at the discretion of the own of the domain directory it is to be added. The BIS Schema must follow the [directory structure](#directory-structure) of this repository to be added.
+The addition of the new BIS Schemas will be at the discretion of the owner of the domain group directory to which it is to be added. The BIS Schema must follow the [directory structure](#directory-structure) of this repository to be added.
 
 #### Add a new domain
 
-Given that all pull requests outside of a domain directory require a repository owner to review, they are required to review any new domains added. The domain must follow the directory structure, and then identify a person who is designated as the domain owner(s), who will handle all future pull requests.
+Given that all pull requests outside of a domain group directory require a repository owner to review, they are required to review any new domains added. The domain must follow the directory structure, and then identify a person who is designated as the domain owner(s), who will handle all future pull requests.
 
 ### Managing permissions to BIS Schema
 
