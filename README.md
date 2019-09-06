@@ -48,11 +48,7 @@ The repository is split up into two main parts; the tooling, used to process and
 
 All tooling will be under the "tools" directory at the root of the repository.
 
-The BIS Domain Schemas all live under the "Domains" directory, organized by domain group. Each domain group has it own directory, allowing [permissions](#managing-permissions-to-bis-schema) control by the domain group owner.
-
-The organization within the domain group directory generally follows one of two patterns: including all domain schemas at the top level, or giving each domain schema its own subdirectory.
-
-There will be a "Release" subdirectory to hold domain schemas that have been publicly released.
+The BIS Domain Schemas all live under the "Domains" directory, organized by domain group. Each domain group has it own directory, allowing [permissions](#managing-permissions-to-bis-schema) control by the domain group owner. If necessary for finer-grained permissions management, domain group owners can create further subdirectories. Otherwise, all domain schemas should be in the top-level domain group directory. There will be a "Release" subdirectory to hold domain schemas that have been publicly released.
 
 Example:
 
@@ -61,15 +57,6 @@ Example:
 \Domains\{DomainGroupName}\{Domain2}.ecschema.xml
 \Domains\{DomainGroupName}\Released\{Domain1.MM.mm.bb}.ecschema.xml
 \Domains\{DomainGroupName}\Released\{Domain2.MM.mm.bb}.ecschema.xml
-```
-
-or
-
-```shell
-\Domains\{DomainGroupName}\{Domain1}Schema\{Domain1}.ecschema.xml
-\Domains\{DomainGroupName}\{Domain1}Schema\Release\{Domain1.MM.mm.bb}.ecschema.xml
-\Domains\{DomainGroupName}\{Domain1}Schema\{Domain2}.ecschema.xml
-\Domains\{DomainGroupName}\{Domain1}Schema\Release\{Domain2.MM.mm.bb}.ecschema.xml
 ```
 
 ## Contributing
