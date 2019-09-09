@@ -29,11 +29,11 @@ Should be considered abstract. It should be specialized to hold discipline-speci
 
 Models a particular functional Entity--something that will perform a particular activity when in use. Functional Entities are non-geometric in nature, and are considered to be 'roles' played by an Object.
 
-If you are designing a specialization of `FunctionalElement` that will have children, then specialize [FunctionalBreakdownElement](#functionalbreakdownelement).
+### FunctionalBreakdownElement
+FunctionalBreakdownElement and [FunctionalComponentElement](#functionalcomponentelement) are intended for use together, in a style of functional modeling that does not use sub-models. If you using sub-modeling, then specialize `FunctionalElement` directly.
 
-If you are designing a specialization of `FunctionalElement` that will not have children and will not be sub-modeled, then specialize [FunctionalComponentElement](#functionalbreakdownelement).
-
-If you are designing a specialization of `FunctionalElement` that will be sub-modeled, then specialize [FunctionalElement](#functionalelement) directly.
+### FunctionalComponentElement
+FunctionalComponentElement and [FunctionalBreakdownElement](#functionalbreakdownelement) are intended for use together, in a style of functional modeling that does not use sub-models. If you using sub-modeling, then specialize `FunctionalElement` directly.
 
 ### FunctionalType
 
