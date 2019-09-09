@@ -45,7 +45,7 @@ The 'Link' Modeling Perspective is a subset of the 'Information' Modeling Perspe
 
 ### LinkElement
 
-The link is generally to some resource, e.g. the subclass `UrlLink` points to an external resource while `EmbeddedFileLink` points to files embedded in and iModel.
+The link is generally to some resource, e.g. the subclass `UrlLink` points to an external resource while `EmbeddedFileLink` points to files embedded in an iModel.
 
 ### PhysicalPartition
 
