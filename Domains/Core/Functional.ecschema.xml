@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
-<ECSchema schemaName="Functional" alias="func" version="01.00.02" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.1" description="The Functional schema defines common base classes to be used by discipline-specific functional domains.">
+<ECSchema schemaName="Functional" alias="func" version="01.00.03" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.1" description="The Functional schema defines common base classes to be used by discipline-specific functional domains.">
 
     <ECSchemaReference name="CoreCustomAttributes" version="01.00.01" alias="CoreCA"/>
     <ECSchemaReference name="BisCore" version="01.00.02" alias="bis"/>
@@ -19,7 +19,7 @@
         </ECCustomAttributes>
     </ECEntityClass>
 
-    <ECEntityClass typeName="FunctionalElement" modifier="Abstract" displayLabel="Functional Element" description="A func:FunctionalElement captures functional requirements that will ultimately be fulfilled by a bis:PhysicalElement.">
+    <ECEntityClass typeName="FunctionalElement" modifier="Abstract" displayLabel="Functional Element" description="A func:FunctionalElement models required functionality that will ultimately be fulfilled by a physical Entity.">
         <BaseClass>bis:RoleElement</BaseClass>
         <ECCustomAttributes>
             <ShareColumns xmlns="ECDbMap.02.00">
@@ -35,7 +35,7 @@
         </ECNavigationProperty>
     </ECEntityClass>
 
-    <ECEntityClass typeName="FunctionalBreakdownElement" modifier="Abstract" displayLabel="Functional Breakdown" description="A func:FunctionalBreakdownElement is a 'folder' node in the functional hierarchy.">
+    <ECEntityClass typeName="FunctionalBreakdownElement" modifier="Abstract" displayLabel="Functional Breakdown" description="A func:FunctionalBreakdownElement models an aggregate functional Entity with child func:FunctionalElements modeling its parts.">
         <BaseClass>FunctionalElement</BaseClass>
         <BaseClass>bis:IParentElement</BaseClass>
         <ECCustomAttributes>
@@ -43,14 +43,17 @@
         </ECCustomAttributes>
     </ECEntityClass>
 
-    <ECEntityClass typeName="FunctionalComposite" displayLabel="Functional Composite" description="A func:FunctionalComposite is a func:FunctionalElement composed of several other func:FunctionalElement instances.">
+    <ECEntityClass typeName="FunctionalComposite" displayLabel="Functional Composite" description="DEPRECATED: Inherit from FunctionalBreakdownElement instead.">
         <BaseClass>FunctionalBreakdownElement</BaseClass>
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.01.00"/>
+            <Deprecated xmlns="CoreCustomAttributes.1.0">
+                <Description>The best practice is now to inherit from a FunctionalBreakdownElement instead.</Description>
+            </Deprecated>
         </ECCustomAttributes>
     </ECEntityClass>
 
-    <ECEntityClass typeName="FunctionalComponentElement" modifier="Abstract" displayLabel="Functional Component" description="A func:FunctionalComponentElement is a 'leaf' node in the functional hierarchy.">
+    <ECEntityClass typeName="FunctionalComponentElement" modifier="Abstract" displayLabel="Functional Component" description="A func:FunctionalComponentElement models an 'atomic' functional Entity which will not be sub-modeled at a finer granularity and does not have 'child' parts.">
         <BaseClass>FunctionalElement</BaseClass>
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.01.00"/>
@@ -59,15 +62,13 @@
 
     <ECEntityClass typeName="FunctionalPortion" displayLabel="Functional Portion" description="DEPRECATED: A Functional Portion is a Functional Component that will be broken down in more detail in a separate (sub) Functional Model.">
         <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.01.00"/>
             <Deprecated xmlns="CoreCustomAttributes.1.0">
                 <Description>The best practice is now to inherit from a FunctionalComponentElement subclass and mix in ISubModeledElement when a breakdown concept is needed.</Description>
             </Deprecated>
         </ECCustomAttributes>
         <BaseClass>FunctionalComponentElement</BaseClass>
         <BaseClass>bis:ISubModeledElement</BaseClass>
-        <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00"/>
-        </ECCustomAttributes>
     </ECEntityClass>
 
     <ECEntityClass typeName="FunctionalType" modifier="Abstract" displayLabel="Functional Type" description="Defines a shared set of properties (the 'type') that can be associated with a func:FunctionalElement.">
@@ -86,7 +87,7 @@
         </Target>
     </ECRelationshipClass>
 
-    <ECRelationshipClass typeName="PhysicalElementFulfillsFunction" strength="referencing" modifier="None" description="Relates func:FunctionalElement instances which define requirements to the bis:PhysicalElement instances that fulfill those requirements." >
+    <ECRelationshipClass typeName="PhysicalElementFulfillsFunction" strength="referencing" modifier="None" description="Relates func:FunctionalElement instances (which model a required function) to the bis:PhysicalElement instances that model the physical Entity that fulfills the function." >
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <Source multiplicity="(0..*)" roleLabel="fulfills" polymorphic="true">
             <Class class="bis:PhysicalElement"/>

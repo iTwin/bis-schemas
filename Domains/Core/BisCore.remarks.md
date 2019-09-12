@@ -9,7 +9,7 @@ BisCore contains the core classes that define the fundamental building-blocks of
 
 BisCore also contains some less-fundamental classes related to infrastructure engineering visualization and documentation in general, such as drawings, views, etc.
 
-The core class are decorated by ECCustomAttributes that effectively define the database schema mapping for an iModel, but which can be ignored for other kinds of BIS Repositories.  Other schemas may not alter the underlying database schema mapping without explicit permission from BisCore.
+The core classes are decorated by ECCustomAttributes that effectively define the database schema mapping for an iModel, but which can be ignored for other kinds of BIS Repositories.  Other schemas cannot alter the underlying database schema mapping without explicit permission from BisCore.
 
 The classes of BisCore are used as base classes for all classes in other BIS Domain schemas.
 
@@ -17,35 +17,39 @@ The classes of BisCore are used as base classes for all classes in other BIS Dom
 
 ### InformationPartitionElement
 
-An InformationPartitionElement partitions the information in a BIS Repository into non-overlapping hierarchies of Models and Elements, each with a distinct Modeling Perspective.
+An InformationPartitionElement partitions the information in a BIS Repository into non-overlapping hierarchies of Models and Elements, each with a distinct Modeling Perspective. In some cases it further-partitions information into distinct subsets within a Modeling Perspective, based on a specific domain.
 
-A bis:Subject mentions a real-world Object, which BIS *sees* as one-or-more Entities, where each Entity considers the Object from a particular Modeling Perspective. A specialization of a bis:InformationPartitionElement establishes a Perspective for modeling the Object to which the Subject refers. The top-Model sub-models the Partition and begins the actual modeling of the Entity with one-or-more Elements of the appropriate Modeling Perspective.
+A bis:Subject mentions a real-world Object. BIS *sees* the Object as one-or-more Entities, where each Entity considers the Object from a particular Modeling Perspective. A specialization of a bis:InformationPartitionElement establishes a Perspective for modeling the Object to which the Subject refers. The top-Model sub-models the Partition. The actual modeling of the Entity with one-or-more Elements of the appropriate Modeling Perspective begins in the top-Model.
 
 See [Top of the World](../intro/top-of-the-world.md)
 
 ### DefinitionPartition
 
-The "Definition" Modeling Perspective is for modeling definitions of things that are shared by multiple particular Entities.
+The 'Definition' Modeling Perspective is for modeling definitions of things that are shared by multiple particular Entities.
 
 ### DocumentPartition
 
-The "Document" Modeling Perspective describes Entities using Documents and is used to creates primary documents such as Drawings.
+The 'Document' Modeling Perspective is a subset of the 'Information' Modeling Perspective. It holds Elements which describes Entities using Documents and is used to create primary documents such as Drawings.
 
 ### GroupInformationPartition
 
-The "GroupInformation" Perspective is not a distinct Modeling Perspective, but is a somewhat arbitrary partitioning of a larger "Information Content" Perspective. This pattern of partitioning a larger perspective is not considered a best-practice, going forward.
+The 'GroupInformation' Modeling Perspective is a subset of the 'Information' Modeling Perspective. It is used primarily to hold `generic:Group` Elements generated from DgnV8 'Named Groups'.
 
 ### InformationRecordPartition
 
-The "InformationRecord" Perspective is not a distinct Modeling Perspective, but is a somewhat arbitrary partitioning of a larger "Information Content" Perspective. This pattern of partitioning a larger perspective is not considered a best-practice, going forward.
+The 'InformationRecord' Modeling Perspective is a subset of the 'Information' Modeling Perspective. It can hold a broad array of information records describing Entities.
 
 ### LinkPartition
 
-The "Link" Perspective is not a distinct Modeling Perspective, but is a somewhat arbitrary partitioning of a larger "Information Content" Perspective. This pattern of partitioning a larger perspective is not considered a best-practice, going forward.
+The 'Link' Modeling Perspective is a subset of the 'Information' Modeling Perspective. It is used to hold links to external repositories, e.g. in the form of `bis:RepositoryLink` elements.
+
+### LinkElement
+
+The link is generally to some resource, e.g. the subclass `UrlLink` points to an external resource while `EmbeddedFileLink` points to files embedded in an iModel.
 
 ### PhysicalPartition
 
-The "Physical" Perspective is for modeling physical Entities, which have mass and for spatial location Entities, which are generally either defined-by physical Entities are used-to-define physical Entities. See SpatialLocationPartition.
+The 'Physical' Perspective is for modeling physical Entities (which have mass) and for spatial location Entities (which are generally either defined-by physical Entities or are used-to-define physical Entities).
 
 ### SpatialLocationPartition
 
@@ -55,6 +59,6 @@ The “Spatial Location” perspective is a strict subset of the “Physical” 
 - They may be used to guide positioning of physical Entities, e.g. grid lines that may be manifested physically on a construction site via chalk lines or laser beams.
 - They may be abstractions of physical consequence, like property or political boundaries that are often demarcated in the physical world via markers, signs, or natural boundaries.
 
-The "Spatial Location" perspective is used by SpatialLocationModel and SpatialLocationElement in order to segregate certain kinds of elements.
+The 'Spatial Location' perspective is used by SpatialLocationModel and SpatialLocationElement in order to segregate certain kinds of elements.
 
-In retrospect, the complexity added by introducing a distinct "Spatial Location" perspective may have not been worth the benefit. Our current recommendation is to not instantiate a SpatialLocationPartition, but instead organize spatial locations in the context of the 'physical backbone', i.e. the Physical model hierarchy.
+In retrospect, the complexity added by introducing a distinct 'Spatial Location' perspective may have not been worth the benefit. Our current recommendation is to not instantiate a SpatialLocationPartition, but instead to organize spatial locations in the context of the PhysicalModel hierarchy.
