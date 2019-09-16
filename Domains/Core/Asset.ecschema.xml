@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ECSchema schemaName="Asset" alias="asset" version="01.00.00" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.1" displayLabel="Asset" description="Defines the abstract 'Asset' domain. Contains base classes to be used within specialized Asset domain schemas.">
+
+    <ECSchemaReference name="BisCore" version="01.00.06" alias="bis"/>
+
+    <ECEntityClass typeName="AssetPartition" modifier="Abstract" displayLabel="Asset Partition" description="Abstract base class establishing an 'Asset' Modeling Perspective for its parent bis:Subject.">
+        <BaseClass>bis:InformationPartitionElement</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="AssetModel" modifier="Abstract" displayLabel="Asset Model" description="A container for persisting asset:AssetElement instances.">
+        <BaseClass>bis:RoleModel</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="AssetElement" modifier="Abstract" displayLabel="Asset Element" description="An asset:AssetElement models an Entity that embodies the economic value of an Object and/or the role that it plays in a business. The Object will typically also be be primarily modeled as an Element such as a PhysicalElement.">
+        <BaseClass>bis:RoleElement</BaseClass>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="AssetTracksElement" strength="referencing" modifier="None" description="Relates an AssetElement to the primary Element modeling the Object, e.g. to a PhysicalElement.">
+        <Source multiplicity="(0..*)" roleLabel="tracks" polymorphic="true">
+            <Class class="AssetElement" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="tracked by" polymorphic="true">
+            <Class class="bis:Element"/>
+        </Target>
+    </ECRelationshipClass>
+    
+</ECSchema>

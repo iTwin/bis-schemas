@@ -61,7 +61,7 @@ def getExistingVersions(packageName):
     except subprocess.CalledProcessError as exc:
         # Handle a package being missing from the registry differntly than any other error.  This means there are
         # no existing versions and we can return an empty list.
-        if "Package not found" in exc.output:
+        if "E404" in exc.output:
             return dict()
         print("Status : FAIL", exc.returncode, exc.output)
         print "Failed to check if the package " + packageName + " has existing versions in the registry"
