@@ -129,11 +129,18 @@ See [ElementDrivesElement](#elementdriveselement).
 
 ### TypeDefinitionElement
 
+A `TypeDefinitionElement` is an implementation of a data normalization strategy and is meant to hold properties that vary per *type* instead of varying per `Element` instance.
+Rather than storing the same set of *type-specific* properties on every `Element` instance, each `Element` instance will have a set of *instance-specific* properties (as specified by the `Element` class) and a set of related *type-specific* properties found by joining to the `TypeDefinitionElement` instance.
+
 See relationships such as [PhysicalElementIsOfType](#physicalelementisoftype).
 
 ### PhysicalElementIsOfType
 
 ### PhysicalType
+
+A `PhysicalType` is particularly useful in cases where a physical item can be ordered from a *catalog*.
+Each type of item will have the same set of *type-specific* properties.
+For example: manufacturer name, model number, maintenance intervals, etc.
 
 ### RepositoryModel
 
