@@ -5,7 +5,7 @@ remarksTarget: BisCore.ecschema.md
 
 # BisCore
 
-BisCore contains the core classes that define the [fundamental building-blocks of BIS](https://imodeljs.github.io/iModelJs-docs-output/bis/intro/fabric-of-the-universe/) (e.g. Models, Elements, and ElementAspects) and which specialize them to establish domain-neutral base-classes for modeling the real world from multiple Modeling Perspectives.
+BisCore contains the core classes that define the [fundamental building-blocks of BIS](../intro/fabric-of-the-universe/) (e.g. Models, Elements, and ElementAspects) and which specialize them to establish domain-neutral base-classes for modeling the real world from multiple Modeling Perspectives.
 
 BisCore also contains some less-fundamental classes related to infrastructure engineering visualization and documentation in general, such as drawings, views, etc.
 
@@ -44,7 +44,7 @@ An InformationPartitionElement partitions the information in a BIS Repository in
 
 A bis:Subject mentions a real-world Object. BIS *sees* the Object as one-or-more Entities, where each Entity considers the Object from a particular Modeling Perspective. A specialization of a bis:InformationPartitionElement establishes a Perspective for modeling the Object to which the Subject refers. The top-Model sub-models the Partition. The actual modeling of the Entity with one-or-more Elements of the appropriate Modeling Perspective begins in the top-Model.
 
-See [Top of the World](../intro/top-of-the-world.md)
+See [Top of the World](../intro/top-of-the-world/)
 
 ### DefinitionPartition
 
@@ -88,7 +88,7 @@ In retrospect, the complexity added by introducing a distinct "Spatial Location"
 
 ### Model
 
-See [Model Fundamentals](https://imodeljs.github.io/iModelJs-docs-output/bis/intro/model-fundamentals/).
+See [Model Fundamentals](../intro/model-fundamentals/).
 
 ### ModelOwnsSubModel
 
@@ -114,7 +114,7 @@ A more consistent name for this relationship would have been 'SheetModelSubModel
 
 ### Element
 
-See [Element Fundamentals](https://imodeljs.github.io/iModelJs-docs-output/bis/intro/element-fundamentals/).
+See [Element Fundamentals](../intro/element-fundamentals/).
 
 ### ElementDrivesElement
 
@@ -154,7 +154,7 @@ The hierarchy of `Subject`s is not meant to model the root Object's structure, b
 
 Categories should be standardized by domain groups where possible. They generally correlate with groups of BIS Element classes, or a single base class.
 
-See [Categories Introduction](https://imodeljs.github.io/iModelJs-docs-output/bis/intro/categories/).
+See [Categories Introduction](../intro/categories/).
 
 Also see the [ClassificationSystems](https://imodeljs.github.io/iModelJs-docs-output/bis/domains/classificationsystems.ecschema/) domain schema.
 In retrospect, the complexity added by introducing a distinct 'Spatial Location' perspective may have not been worth the benefit. Our current recommendation is to not instantiate a SpatialLocationPartition, but instead to organize spatial locations in the context of the PhysicalModel hierarchy.
