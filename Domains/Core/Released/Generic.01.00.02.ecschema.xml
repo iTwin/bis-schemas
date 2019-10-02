@@ -1,0 +1,152 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ECSchema schemaName="Generic" alias="generic" version="01.00.02" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.1" description="This schema contains classes that are completely generic. These classes should only be used when there is not enough context to pick something more specific.">
+
+    <ECSchemaReference name="BisCore" version="01.00.02" alias="bis"/>
+    <ECSchemaReference name="ECDbMap" version="02.00.00" alias="ecdbmap"/>
+
+    <ECEntityClass typeName="DetailingSymbol" modifier="Abstract" displayLabel="Detailing Symbol" description="A graphical detailing symbol that is placed on a bis:Drawing or bis:Sheet.">
+        <!-- Mimics the like-named V8 type -->
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.01.00"/>
+        </ECCustomAttributes>
+        <BaseClass>bis:GraphicalElement2d</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="TitleText" modifier="Sealed" displayLabel="Title Text" description="A generic:DetailingSymbol that contains title text.">
+        <!-- Mimics the like-named V8 type -->
+        <BaseClass>DetailingSymbol</BaseClass>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="ViewAttachmentLabelAnnotatesViewAttachment" strengthDirection="Backward" strength="referencing" modifier="Sealed">
+        <Source multiplicity="(0..1)" polymorphic="true" roleLabel="annotates" >
+            <Class class="ViewAttachmentLabel"/>
+        </Source>
+        <Target multiplicity="(0..1)" polymorphic="true" roleLabel="is annotated by" >
+            <Class class="bis:ViewAttachment"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="ViewAttachmentLabel" modifier="Sealed" displayLabel="View Attachment Label" description="A generic:DetailingSymbol that contains a view attachment label.">
+        <!-- Maps to the V8 type DrawingBoundary -->
+        <!-- Its CodeValue is the section/elevation/plan/detail "id" -->
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.01.00"/>
+        </ECCustomAttributes>
+        <BaseClass>DetailingSymbol</BaseClass>
+        <ECNavigationProperty propertyName="ViewAttachment" relationshipName="ViewAttachmentLabelAnnotatesViewAttachment" direction="Forward" readOnly="True" displayLabel="View Attachment">
+        </ECNavigationProperty>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="CalloutRefersToDrawingModel" strengthDirection="Backward" strength="referencing" modifier="Sealed">
+        <Source multiplicity="(0..*)" polymorphic="true" roleLabel="refers to" >
+            <Class class="Callout"/>
+        </Source>
+        <!-- 0..* - many callouts can refer to the same DrawingModel, or there may be no callouts that refer to a given DrawingModel. -->
+        <!-- 0..1 - a given callout refers to only on DrawingModel, or the callout may be a TBD and have no DrawingModel -->
+        <Target multiplicity="(0..1)" polymorphic="true" roleLabel="is referenced by" >
+            <Class class="bis:DrawingModel"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="Callout" modifier="Abstract" description="A generic:DetailingSymbol that calls out a reference to another bis:Drawing.">
+        <!-- Mimics the like-named V8 type -->
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.01.00"/>
+        </ECCustomAttributes>
+        <BaseClass>DetailingSymbol</BaseClass>
+        <ECNavigationProperty propertyName="DrawingModel" relationshipName="CalloutRefersToDrawingModel" direction="Forward" readOnly="True" displayLabel="Drawing Model">
+        </ECNavigationProperty>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="SectionCallout" modifier="Sealed" displayLabel="Section Callout" description="A generic:Callout that calls out a reference to a section drawing.">
+        <!-- Mimics the like-named V8 type -->
+        <BaseClass>Callout</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="ElevationCallout" modifier="Sealed" displayLabel="Elevation Callout" description="A generic:Callout that calls out a reference to an elevation drawing.">
+        <!-- Mimics the like-named V8 type -->
+        <BaseClass>Callout</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="PlanCallout" modifier="Sealed" displayLabel="Plan Callout" description="A generic:Callout that calls out a reference to a plan drawing.">
+        <!-- Mimics the like-named V8 type -->
+        <BaseClass>Callout</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="DetailCallout" modifier="Sealed" displayLabel="Detail Callout" description="A generic:Callout that calls out a reference to a detail drawing.">
+        <!-- Mimics the like-named V8 type -->
+        <BaseClass>Callout</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="Graphic3d" modifier="Sealed" displayLabel="3D Graphic" description="The generic:Graphic3d class is a concrete subclass of bis:GraphicalElement3d that can be used for generic 3D graphics which cannot be further classified. More-specific bis:GraphicalElement3d subclasses should be used wherever possible.">
+        <!-- A generic Graphic3d is used by a conversion process when: -->
+        <!-- * It did not have enough information to pick another domain -->
+        <!-- * It determined the element is 3d but does not represent a bis:SpatialElement -->
+        <BaseClass>bis:GraphicalElement3d</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.01.00"/>
+        </ECCustomAttributes>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="GraphicalModel3d" modifier="Sealed" displayLabel="3D Graphical Model" description="A container for persisting bis:GraphicalElement3d instances.">
+        <BaseClass>bis:GraphicalModel3d</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="PhysicalObject" modifier="Sealed" displayLabel="Physical Object" description="The generic:PhysicalObject class is used for bis:PhysicalElements which cannot be further classified. More-specific bis:PhysicalElement subclasses should be used wherever possible.">
+        <!-- A generic PhysicalObject is used by a conversion process when: -->
+        <!-- * It did not have enough information to pick another domain -->
+        <!-- * It determined the element represents a PhysicalObject -->
+        <BaseClass>bis:PhysicalElement</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.01.00"/>
+        </ECCustomAttributes>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="SpatialLocation" modifier="Sealed" displayLabel="Spatial Location" description="The generic:SpatialLocation class is used for bis:SpatialLocationElements which cannot be further classified. More-specific bis:SpatialLocationElement subclasses should be used wherever possible.">
+        <!-- A generic SpatialLocation is used by a conversion process when: -->
+        <!-- * It did not have enough information to pick another domain -->
+        <!-- * It determined the element represents a SpatialLocation -->
+        <BaseClass>bis:SpatialLocationElement</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.01.00"/>
+        </ECCustomAttributes>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="GroupModel" modifier="Sealed" displayLabel="Group Model">
+        <BaseClass>bis:GroupInformationModel</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.01.00"/>
+        </ECCustomAttributes>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="Group" modifier="Sealed">
+        <!-- Groups elements using the ElementGroupsMembers relationship -->
+        <BaseClass>bis:GroupInformationElement</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.01.00"/>
+        </ECCustomAttributes>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="PhysicalType" modifier="Sealed" displayLabel="Physical Type"  description="The generic:PhysicalType class is used for bis:PhysicalType elements which cannot be further classified. More-specific bis:PhysicalType subclasses should be used wherever possible.">
+        <BaseClass>bis:PhysicalType</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.01.00"/>
+        </ECCustomAttributes>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="GraphicalType2d" modifier="Sealed" displayLabel="2D Graphical Type"  description="The generic:GraphicalType2d class is used for bis:GraphicalType2d elements which cannot be further classified. More-specific bis:GraphicalType2d subclasses should be used wherever possible.">
+        <BaseClass>bis:GraphicalType2d</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.01.00"/>
+        </ECCustomAttributes>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="Document" modifier="Sealed" description="The generic:Document class is used for bis:Document elements which cannot be further classified. More-specific bis:Document subclasses should be used wherever possible.">
+        <BaseClass>bis:Document</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="PhysicalMaterial" modifier="Sealed" displayLabel="Physical Material" description="The generic:PhysicalMaterial class is used for bis:PhysicalMaterial elements which cannot be further classified. More-specific bis:PhysicalMaterial subclasses should be used wherever possible.">
+        <BaseClass>bis:PhysicalMaterial</BaseClass>
+    </ECEntityClass>
+
+</ECSchema>
