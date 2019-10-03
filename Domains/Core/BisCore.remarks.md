@@ -5,7 +5,7 @@ remarksTarget: BisCore.ecschema.md
 
 # BisCore
 
-BisCore contains the core classes that define the [fundamental building-blocks of BIS](https://imodeljs.github.io/iModelJs-docs-output/bis/intro/fabric-of-the-universe/) (e.g. Models, Elements, and ElementAspects) and which specialize them to establish domain-neutral base-classes for modeling the real world from multiple Modeling Perspectives.
+BisCore contains the core classes that define the [fundamental building-blocks of BIS](../intro/fabric-of-the-universe/) (e.g. Models, Elements, and ElementAspects) and which specialize them to establish domain-neutral base-classes for modeling the real world from multiple Modeling Perspectives.
 
 BisCore also contains some less-fundamental classes related to infrastructure engineering visualization and documentation in general, such as drawings, views, etc.
 
@@ -20,6 +20,10 @@ See [Base Infrastructure Schemas](https://imodeljs.github.io/iModelJs-docs-outpu
 ### ClassHasHandler
 
 Applied to an ECClass to indicate that a C++ subclass of DgnDomain::Handler will supply behavior for it at run-time.
+This custom attribute may only be used by BisCore or other core schemas. Other schemas should use the SchemaHasBehavior instead.
+It must be applied to any ECClass if the application/domain registers a Handler for that ECClass.
+It should not be applied to any other ECClass.
+It is an error to call RegisterHandler() with a handler for an ECClass that lacks this custom attribute.
 
 ### ISubModeledElement
 
@@ -28,7 +32,10 @@ See also [IParentElement](#iparentelement).
 
 ### IParentElement
 
+Only subclasses of bis:Element can implement the IParentElement interface
+
 Parent-child modeling differs from sub-modeling in that the parent Element and child Elements are to be considered together in the context of a single Model, whereas a sub-modeled Element is considered independently of its sub-Model. For example, and application would view a parent Element and its child Elements together, but would *either* view a sub-modeled Element *or* exclude that Element and instead view the Elements of its sub-Model.
+
 See also [ISubModeledElement](#isubmodeledelement).
 
 ### InformationPartitionElement
@@ -37,7 +44,7 @@ An InformationPartitionElement partitions the information in a BIS Repository in
 
 A bis:Subject mentions a real-world Object. BIS *sees* the Object as one-or-more Entities, where each Entity considers the Object from a particular Modeling Perspective. A specialization of a bis:InformationPartitionElement establishes a Perspective for modeling the Object to which the Subject refers. The top-Model sub-models the Partition. The actual modeling of the Entity with one-or-more Elements of the appropriate Modeling Perspective begins in the top-Model.
 
-See [Top of the World](../intro/top-of-the-world.md)
+See [Top of the World](../intro/top-of-the-world/)
 
 ### DefinitionPartition
 
@@ -81,7 +88,7 @@ In retrospect, the complexity added by introducing a distinct "Spatial Location"
 
 ### Model
 
-See [Model Fundamentals](https://imodeljs.github.io/iModelJs-docs-output/bis/intro/model-fundamentals/).
+See [Model Fundamentals](../intro/model-fundamentals/).
 
 ### ModelOwnsSubModel
 
@@ -107,7 +114,7 @@ A more consistent name for this relationship would have been 'SheetModelSubModel
 
 ### Element
 
-See [Element Fundamentals](https://imodeljs.github.io/iModelJs-docs-output/bis/intro/element-fundamentals/).
+See [Element Fundamentals](../intro/element-fundamentals/).
 
 ### ElementDrivesElement
 
@@ -122,11 +129,18 @@ See [ElementDrivesElement](#elementdriveselement).
 
 ### TypeDefinitionElement
 
+A `TypeDefinitionElement` is an implementation of a data normalization strategy and is meant to hold properties that vary per *type* instead of varying per `Element` instance.
+Rather than storing the same set of *type-specific* properties on every `Element` instance, each `Element` instance will have a set of *instance-specific* properties (as specified by the `Element` class) and a set of related *type-specific* properties found by joining to the `TypeDefinitionElement` instance.
+
 See relationships such as [PhysicalElementIsOfType](#physicalelementisoftype).
 
 ### PhysicalElementIsOfType
 
 ### PhysicalType
+
+A `PhysicalType` is particularly useful in cases where a physical item can be ordered from a *catalog*.
+Each type of item will have the same set of *type-specific* properties.
+For example: manufacturer name, model number, maintenance intervals, etc.
 
 ### RepositoryModel
 
@@ -140,7 +154,104 @@ The hierarchy of `Subject`s is not meant to model the root Object's structure, b
 
 Categories should be standardized by domain groups where possible. They generally correlate with groups of BIS Element classes, or a single base class.
 
-See [Categories Introduction](https://imodeljs.github.io/iModelJs-docs-output/bis/intro/categories/).
+See [Categories Introduction](../intro/categories/).
 
 Also see the [ClassificationSystems](https://imodeljs.github.io/iModelJs-docs-output/bis/domains/classificationsystems.ecschema/) domain schema.
 In retrospect, the complexity added by introducing a distinct 'Spatial Location' perspective may have not been worth the benefit. Our current recommendation is to not instantiate a SpatialLocationPartition, but instead to organize spatial locations in the context of the PhysicalModel hierarchy.
+
+### AutoHandledPropertyStatementType
+
+Restrictions that may be applied to an AutoHandledProperty. Must match the ECSqlClassParams::StatementType enum
+
+### CodeSpecSpecifiesCode
+
+See [Element.CodeSpec](#element) ECNavigationProperty.
+
+### ElementScopesCode
+
+See [Element.CodeScope](#element) ECNavigationProperty.
+
+### TypeDefinitionHasRecipe
+
+See [TypeDefinitionElement.Recipe ECNavigationProperty](#TypeDefinitionElement) ECNavigationProperty
+
+### GeometricElement2dHasTypeDefinition
+
+See [GeometricElement2d.TypeDefinition ECNavigationProperty](#GeometricElement2d) ECNavigationProperty
+
+### GeometricElement3dHasTypeDefinition
+
+See [GeometricElement3d.TypeDefinition ECNavigationProperty](#GeometricElement3d) ECNavigationProperty
+
+### SheetHasSheetTemplate
+
+See [Sheet.SheetTemplate ECNavigationProperty](#Sheet) ECNavigationProperty
+
+### SheetTemplateHasSheetBorder
+
+See [SheetTemplate.Border ECNavigationProperty](#SheetTemplate) ECNavigationProperty
+
+### SheetBorderHasSheetBorderTemplate
+
+See [SheetBorder.BorderTemplate ECNavigationProperty](#SheetBorder) ECNavigationProperty
+
+### ViewIsAttached
+
+See [ViewAttachment.View ECNavigationProperty](#ViewAttachment) ECNavigationProperty
+
+### ElementOwnsChildElements
+
+See [Element.Parent ECNavigationProperty](#Element) ECNavigationProperty
+Should be treated as abstract, but was not made abstract because of legacy usages that were already released.
+
+### Source
+
+Source constraint should logically be IParentElement, but that mixin was invented later, and tightening the constraint could invalidate existing iModels
+
+### ElementOwnsUniqueAspect
+
+See [ElementUniqueAspect.Element ECNavigationProperty](#ElementUniqueAspect) ECNavigationProperty
+
+### ElementOwnsMultiAspects
+
+See [ElementMultiAspect.Element ECNavigationProperty](#ElementMultiAspect) ECNavigationProperty
+
+### GeometricElement2dIsInCategory" strength="referencing
+
+See [GeometricElement2d.Category ECNavigationProperty](#GeometricElement2d) ECNavigationProperty
+
+### GeometricElement3dIsInCategory" strength="referencing
+
+See [GeometricElement3d.Category ECNavigationProperty](#GeometricElement3d) ECNavigationProperty
+
+### ColorBook
+
+Individual colors are stored in JsonProperties
+
+### RenderMaterial
+
+Marked as "Sealed" because JsonProperties will be used to persist data. This allows a single instance to "morph" between a DgnV8 render material and a future PBR material.
+
+### SectionLocationUsesCategorySelector
+
+See [SectionLocation.CategorySelector ECNavigationProperty](#SectionLocation) ECNavigationProperty
+
+### BaseModelForView2d
+
+See [ViewDefinition2d.BaseModel ECNavigationProperty](#ViewDefinition2d) ECNavigationProperty
+
+### SpatialViewDefinitionUsesModelSelector
+
+See [SpatialViewDefinition.ModelSelector ECNavigationProperty](#SpatialViewDefinition) ECNavigationProperty
+
+### ViewDefinitionUsesCategorySelector
+
+See [ViewDefinition.CategorySelector ECNavigationProperty](#ViewDefinition) ECNavigationProperty
+
+### ViewDefinitionUsesDisplayStyle
+
+See [ViewDefinition.DisplayStyle ECNavigationProperty](#ViewDefinition) ECNavigationProperty
+
+### CustomHandledProperty
+
+See [CustomHandledPropertyStatementType](#CustomHandledPropertyStatementType).
