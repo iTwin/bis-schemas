@@ -47,33 +47,34 @@ steps:
 
      defaultWorkingDir = os.path.realpath(sys.argv[1])
 
-     # Add folders that contain a schema but aren't a released folder.
+     schemasToSkip = ["ECDbFileInfo", "ECDbSystem", "ECv3ConversionAttributes", "PresentationRules", "SchemaLocalizationCustomAttributes"]
+     # folders that contain a schema but aren't a released folder as reference directories.
      refDir = Set()
+     # all released schemas found by looking in 'Released' directories and pulling the highest schema version
+     releasedSchemas = {}
+     # files found in 'media' directories that do not end with .cmap
+     schemaMediaFiles = Set()
      for root, dirs, files in os.walk(defaultWorkingDir):
+       files.sort(reverse=True)
        for fileName in files:
+         # reference schema directories
          if "Released" not in root and fileName.endswith(".ecschema.xml"):
            refDir.add(root)
            print "Added directory " + root + " as a reference path."
+         # Relesed schema Files
+         if "Released" in root and fileName.endswith(".ecschema.xml"):
+           schemaName = fileName[:fileName.index(".")]
+           if schemaName not in releasedSchemas and schemaName not in schemasToSkip:
+             releasedSchemas[schemaName] = os.path.join(root, fileName)
+             print "Added released schema " + fileName + " from directory " + root
+         # media files
+         if "media" in root and not fileName.endswith(".cmap"):
+           schemaMediaFiles.add(os.path.join(root, fileName))
+           print "Added media for schema " + fileName + " from directory " + root
 
      # add the released versions of the ECDb schemas because the real versions are not copied over
      refDir.add(os.path.join(defaultWorkingDir, "Standard", "ECDb", "Released"))
      rDir = ' '.join(refDir)
-
-     schemaPaths = [
-        "Domains\BuildingSpatial\BuildingSpatial",
-        "Domains\ClassificationSystems\ClassificationSystems",
-        "Domains\Core\Analytical",
-        "Domains\Core\BisCore",
-        "Domains\Core\Functional",
-        "Domains\Core\Generic",
-        "Domains\Core\LinearReferencing",
-        "Domains\Core\PhysicalMaterial",
-        "Domains\Grids\Grids",
-        "Domains\SpatialComposition\SpatialComposition",
-        "Standard\CoreCustomAttributes",
-        "Standard\Formats",
-        "Standard\Units"
-     ]
 
      schemaSerializer = os.path.realpath(sys.argv[2])
      print "Using the schema json serializer, '" + schemaSerializer + "'."
@@ -92,11 +93,9 @@ steps:
 
      mdOutputDir = os.path.join(os.path.realpath(sys.argv[3]), "markdown")
      if not os.path.exists(mdOutputDir):
-      os.makedirs(mdOutputDir)
-
-     for schemaPath in schemaPaths:
-       fullXmlSchemaPath = os.path.join(defaultWorkingDir, schemaPath) + ".ecschema.xml"
-
+       os.makedirs(mdOutputDir)
+     
+     for schemaName, fullXmlSchemaPath in releasedSchemas.items():
        args.append(fullXmlSchemaPath)
 
        print "Serializing the schema path '" + fullXmlSchemaPath+ "'."
@@ -112,9 +111,22 @@ steps:
        args.pop()
 
        # Copy all markdown files that also have a schema.
-       fullMdSchemaPath = os.path.join(defaultWorkingDir, schemaPath) + ".remarks.md"
+       fullMdSchemaPath = os.path.join(fullXmlSchemaPath[:fullXmlSchemaPath.find("Released")], schemaName) + ".remarks.md"
        if os.path.exists(fullMdSchemaPath):
+         print "Copying schema markdown file " + fullMdSchemaPath
          shutil.copy(fullMdSchemaPath, mdOutputDir)
+
+     mdMediaOutputDir = os.path.join(mdOutputDir, "media")
+     if not os.path.exists(mdMediaOutputDir):
+       os.makedirs(mdMediaOutputDir)
+     for mediaFile in schemaMediaFiles:
+       targetFilePath = os.path.join(mdMediaOutputDir, os.path.basename(mediaFile))
+       if os.path.exists(targetFilePath):
+         print "ERROR - Cannot copy " + mediaFile + " because a file with the same name already exists in the media output directory."
+         exit(-1)
+       print "Copying media file " + mediaFile
+       shutil.copy(mediaFile, targetFilePath)
+
     arguments: '$(System.DefaultWorkingDirectory) $(ECObjectsToolsPath)\lib\native\SchemaJsonSerializer $(Build.StagingDirectory)'
 
 - script: |
