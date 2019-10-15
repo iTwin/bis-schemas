@@ -4,20 +4,32 @@ This repository is the single-source-of-truth (SSOT) for all BIS schemas.
 
 List of current BIS Schemas in this repository as SSOT:
 
+- AecUnits
+- Building\ArchitecturalPhysicalSchema
 - Building\BuildingDataGroupBase
+- Building\BuildingPhysicalSchema
 - BuildingSpatial
 - ClassificationSystems
 - Construction
+- Core\Analytical
+- Core\Asset
 - Core\BisCore
 - Core\Functional
 - Core\Generic
 - Core\Markup
 - Core\PhysicalMaterial
+- Earthwork
 - ECObjects
+- Egress
+- FederatedDocumentStore
 - Grids
 - QuantityTakeoffsAspects
 - PresentationRules
 - Profiles
+- DgnV8OpenRoadsDesigner
+- LinearReferencing
+- RoadRailAlignment
+- RoadRailPhysical
 - RealityModeling\DataCaptureSchema
 - RealityModeling\PointCloudSchema
 - RealityModeling\RasterSchema
@@ -25,6 +37,7 @@ List of current BIS Schemas in this repository as SSOT:
 - RealityModeling\ThreeMxSchema
 - Simulation4DResults
 - SpatialComposition
+- Structural
 - Structural\PhysicalRebar
 - StructuralAnalysis
 
@@ -36,28 +49,24 @@ The repository is split up into two main parts; the tooling, used to process and
 
 All tooling will be under the "tools" directory at the root of the repository.
 
-The BIS Schemas all live under the "Domains" directory, off the root, and will be broken up based on domain. Each domain will have their own directory, this provides the [permissions](#managing-permissions-to-bis-schema) control to the domain owner. All domains are placed under the "Domains" directory. How the each domain directory is split up will be up to their discretion.
+The BIS Domain Schemas all live under the "Domains" directory, organized by domain group. Each domain group has it own directory, allowing [permissions](#managing-permissions-to-bis-schema) control by the domain group owner. If necessary for finer-grained permissions management, domain group owners can create further subdirectories. Otherwise, all domain schemas should be in the top-level domain group directory. There will be a "Release" subdirectory to hold domain schemas that have been publicly released.
 
 Example:
 
-```
-\Domains\Core\
-\Domains\Core\BisCore.ecschema.xml
-\Domains\Building\
-\Domains\Building\ECObjects.ecschema.xml
-
-\Domains\{DomainName}\
-\Domains\{DomainName}\{DomainSchemaName}\
-\Domains\{DomainName}\{DomainSchemaName}\{DomainSchemaName}.ecschema.xml
+```shell
+\Domains\{DomainGroupName}\{Domain1}.ecschema.xml
+\Domains\{DomainGroupName}\{Domain2}.ecschema.xml
+\Domains\{DomainGroupName}\Released\{Domain1.MM.mm.bb}.ecschema.xml
+\Domains\{DomainGroupName}\Released\{Domain2.MM.mm.bb}.ecschema.xml
 ```
 
 ## Contributing
 
 All contributions to this repository will be done via [pull requests](https://docs.github.com/en/github/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests) to the master branch.
 
-Each BIS Schema will have an owner, or owners. The owner(s) of a given BIS Schema will have to approve all pull requests before they are merged into the master branch. The owner will automatically be added as a required reviewer to a pull request if it corresponds with their domain directory (see [directory structure](#directory-structure)).
+Each BIS Schema will have an owner, or owners. The owner(s) of a given BIS Schema will have to approve all pull requests before they are merged into the master branch. The owner will automatically be added as a required reviewer to a pull request if it corresponds with their domain group directory (see [directory structure](#directory-structure)).
 
-All other changes made outside of a domain directory will require review by a repository owner(s). The repository owner(s) will be added as optional reviewer(s) to all pull requests that are created within domain directories.
+All other changes made outside of a domain group directory will require review by a repository owner(s). The repository owner(s) will be added as optional reviewer(s) to all pull requests that are created within domain group directories.
 
 ### Adding a new BIS Schema to the repository
 
@@ -73,6 +82,7 @@ An owner of a BIS Schema can move their Schema from Mercurial to this repository
     
 3. Identify the owner of the Schema and request the appropriate permissions.
     - See [Schema Permissions](#managing-permissions-to-bis-schema) for more information.
+  
 4. Request a final merge from Mercurial to Git.
     - Remove [file map](tools/hg2git/all_bis/filemaps) for individual Schema. 
 5. 
@@ -81,11 +91,11 @@ An owner of a BIS Schema can move their Schema from Mercurial to this repository
 
 #### Addition/modifications to existing domain Schema
 
-The addition of the new BIS Schemas will be at the discretion of the own of the domain directory it is to be added. The BIS Schema must follow the [directory structure](#directory-structure) of this repository to be added.
+The addition of the new BIS Schemas will be at the discretion of the owner of the domain group directory to which it is to be added. The BIS Schema must follow the [directory structure](#directory-structure) of this repository to be added.
 
 #### Add a new domain
 
-Given that all pull requests outside of a domain directory require a repository owner to review, they are required to review any new domains added. The domain must follow the directory structure, and then identify a person who is designated as the domain owner(s), who will handle all future pull requests.
+Given that all pull requests outside of a domain group directory require a repository owner to review, they are required to review any new domains added. The domain must follow the directory structure, and then identify a person who is designated as the domain owner(s), who will handle all future pull requests.
 
 ### Managing permissions to BIS Schema
 
@@ -133,30 +143,20 @@ The iModel Schema Validation tool imports each individual schema in the bis-sche
 
 
 2. Add the 'BIS - Verify iModel Schemas' task and fill out the following parameters:
-    - iModelName
-    - hubProjectID
-    - hubEnvironment
-    - hubUserName
-    - hubPassWord
-        - It is recommended that you use a Secret variable for the password. Under the 'Variables' section, add a new variable and select the lock icon to make it secret. In the hubPassWord field, you can then use the variable like this: `$(variableName)`
+
+- iModelName
+- hubProjectID
+- hubEnvironment
+- hubUserName
+- hubPassWord
+  - It is recommended that you use a Secret variable for the password. Under the 'Variables' section, add a new variable and select the lock icon to make it secret. In the hubPassWord field, you can then use the variable like this: `$(variableName)`
 
 See the iModel Schema Validation -- sample build definition for an example.
 
 ## Schema Packaging - *WIP*
 
-Each schema can be built into an npm package.
+See [Schema Release Proposal](./docs/schema-release-process.md)
 
-### New Released Version Schemas
+## Schema Documentation
 
-When a schema has passed validation and received signoff, it can be moved to released and begin packaging
-
-- A new npm package release is created when a new version of a schema is added to the "Released" directory
-  - The version of the npm package will be the exact version of the schema.
-  - When an npm install happens it will be up to semantic versioning to pull in the correct version
-
-### Non-released/pre-release Schemas
-
-- Use pre-release flags to handle unreleased schemas version
-  - Schema version is `1.0.1` the version number of the prerelease will be, `1.0.1-beta.x`
-- To consume a pre-release schema it must be explicitly stated in the npm dependency that this is desired
-  - Example for consuming a pre-release: `~1.0.1-beta.1 <1.0.1` would match any package with version `1.0.1-beta.x` but not match `1.0.1`.
+See the documentation for writing schema documentation [here](./docs/writing-schema-documentation.md)
