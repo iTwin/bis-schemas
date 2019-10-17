@@ -32,7 +32,6 @@ DIRS_HG=(
     "${DIR_BIM0200_SRC}/DgnDomains/BuildingSpacePlanning"
     "${DIR_BIM0200_SRC}/DgnDomains/Plant"
     "${DIR_BIM0200_SRC}/DgnDomains/Site"
-    "${DIR_BIM0200_SRC}/DgnDomains/Structural"
     "${DIR_BIM0200_SRC}/ecstandards"
 )
 MAPS_HG=(
@@ -40,7 +39,6 @@ MAPS_HG=(
     "${DIR_ALL_BIS_FILEMAPS}/DgnDomains/BuildingSpacePlanning.filemap"
     "${DIR_ALL_BIS_FILEMAPS}/DgnDomains/Plant.filemap"
     "${DIR_ALL_BIS_FILEMAPS}/DgnDomains/Site.filemap"
-    "${DIR_ALL_BIS_FILEMAPS}/DgnDomains/Structural.filemap"
     "${DIR_ALL_BIS_FILEMAPS}/ECStandards.filemap"
 )
 

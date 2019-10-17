@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ECSchema schemaName="Rebar" description="EC Schema for Structural Physical Rebar" displayLabel="Rebar" alias="SPR" version="01.00.00" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.1">
+    <ECSchemaReference name="BisCore" version="01.00.00" alias="bis"/>
+    <ECEntityClass typeName="IReinforceable"  modifier ="Abstract" description="An interface to implement as a base class to a component which is expected to be reinforced." displayLabel="Reinforceable Mixin">
+        <ECCustomAttributes>
+            <IsMixin xmlns="CoreCustomAttributes.1.0">
+                <AppliesToEntityClass>bis:PhysicalElement</AppliesToEntityClass>
+            </IsMixin>
+        </ECCustomAttributes>
+    </ECEntityClass>
+
+    <!--<ECEntityClass typeName="RebarLayoutType" modifier="None" displayLabel="Rebar Layout Type" description="Rebar Layout Type.">
+        <BaseClass>bis:PhysicalType</BaseClass>
+    </ECEntityClass>-->
+    
+    <ECEntityClass typeName="RebarSet" displayLabel="Rebar Set" description="Grouping of similar rebars the reinforce a member or portion of a member.">
+        <BaseClass>bis:PhysicalElement</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="RebarAssembly" displayLabel="Rebar Assembly" description="Grouping of related rebar sets that act together to reinforce a member.">
+        <BaseClass>bis:PhysicalElement</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="Rebar" description="A single reinforcing bar">
+        <BaseClass>bis:PhysicalElement</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="RebarAccessory" description="An accessory for a reinforcing bar." displayLabel="Rebar Accessory">
+        <BaseClass>bis:PhysicalElement</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="RebarAccessoryType" description="Type of accessory for a reinforcing bar." displayLabel="Rebar Accessory Type">
+        <BaseClass>bis:PhysicalType</BaseClass>
+    </ECEntityClass>
+
+     <ECRelationshipClass typeName="RebarAccessoryIsOfType" strength="referencing" modifier="None" description="Relates a specific instance of a rebar accessory to a defined rebar accessory type." displayLabel="Rebar Accessory is of Type">
+        <BaseClass>bis:PhysicalElementIsOfType</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="is of" polymorphic="true">
+            <Class class="RebarAccessory" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="classifies" polymorphic="true">
+            <Class class="RebarAccessoryType"/>
+        </Target>
+    </ECRelationshipClass>
+    
+    <ECRelationshipClass typeName="RebarAssemblyOwnsRebarSet" description="Relates an assembly to its child set(s) of reinforcing bar(s)." displayLabel="Rebar Assembly Owns Rebar Set"  strength="embedding" modifier="None">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="RebarAssembly"/>
+        </Source>
+        <Target multiplicity="(1..*)" roleLabel="is owned by" polymorphic="true">
+            <Class class="RebarSet"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="RebarEndDevice" description="A device at the end of a reinforcing bar." displayLabel="Rebar End Device">
+        <BaseClass>bis:PhysicalElement</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="RebarEndDeviceType" description="A type of device at the end of a reinforcing bar." displayLabel="Rebar End Device Type">
+        <BaseClass>bis:PhysicalType</BaseClass>
+
+    </ECEntityClass>
+    <ECEntityClass typeName="RebarEndTreatment" description="A treatment at the end of a reinforcing bar." displayLabel="Rebar End Treatment">
+        <BaseClass>bis:DefinitionElement</BaseClass>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="RebarHasEndDevice" description="Relates a reiforcing bar to its end device." displayLabel="Rebar has End Device" modifier="None" strength="referencing">
+        <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="Rebar has End Device" polymorphic="true">
+            <Class class="Rebar"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="Rebar has End Device (Reversed)" polymorphic="true">
+            <Class class="RebarEndDevice"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="RebarType" description="Type of reinforcing bar." displayLabel="Rebar Type">
+        <BaseClass>bis:PhysicalType</BaseClass>
+        <ECProperty propertyName="Shape" typeName="Bentley.Geometry.Common.ICurve"/>
+        <ECProperty propertyName="SimplifiedShape" typeName="Bentley.Geometry.Common.IPolygon" displayLabel="Simplified Shape"/>
+
+    </ECEntityClass>
+    <ECRelationshipClass typeName="RebarIsOfRebarType" description="Relates a specific instance of a rebar to a defined rebar type." displayLabel="Rebar is of Rebar Type" modifier="None" strength="referencing">
+        <BaseClass>bis:PhysicalElementIsOfType</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="Rebar is of Rebar Type" polymorphic="true">
+            <Class class="Rebar"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="Rebar is of Rebar Type (Reversed)" polymorphic="true">
+            <Class class="RebarType"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="RebarMechanicalSplice" description="A mechanical splice for a reinforcing bar" displayLabel="Rebar Mechanical Splice">
+        <BaseClass>RebarEndDevice</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="RebarMechanicalSpliceType" description="A type of mechanical splice for a reinforcing bar" displayLabel="Rebar Mechanical Splice Type">
+        <BaseClass>RebarEndDeviceType</BaseClass>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="RebarMechanicalSpliceIsOfType" description="Relates a specific instance of a mechanical splice to a defined type." displayLabel="Rebar Mechanical Splice is of Type" modifier="None" strength="referencing">
+        <BaseClass>bis:PhysicalElementIsOfType</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="Rebar Mechanical Splice is of Type" polymorphic="true">
+            <Class class="RebarMechanicalSplice"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="Rebar Mechanical Splice is of Type (Reversed)" polymorphic="true">
+            <Class class="RebarMechanicalSpliceType"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="RebarSize" description="The size designation of a reinforcing bar." displayLabel="Rebar Size" >
+        <BaseClass>bis:DefinitionElement</BaseClass>
+        <ECProperty propertyName="Name" description="The descriptive name of a reinforcing bar size designation." typeName="string"/>
+        <ECProperty propertyName="Diameter" description="The diameter of a reinforcing bar size designation." typeName="double"/>
+        <ECProperty propertyName="Area" description="The cross-sectional area of a reinforcing bar size designation." typeName="double"/>
+        <ECProperty propertyName="Publisher" description="The governing standard or manufacturer of the reinforcing bar size designation" typeName="string"/>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="RebarSetOwnsRebar" description="Relates a set to its child reinforcing bar(s)." displayLabel="Rebar Set Owns Rebar"  strength="embedding" modifier="None" >
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="Rebar Set Owns Rebar" polymorphic="false">
+            <Class class="RebarSet"/>
+        </Source>
+        <Target multiplicity="(1..*)" roleLabel="Rebar Set Owns Rebar (Reversed)" polymorphic="true">
+            <Class class="Rebar"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="RebarSplicedEnd"  description="A splice on the end of a reinforcing bar." displayLabel="Rebar Spliced End">
+            <BaseClass>RebarEndDevice</BaseClass>
+    </ECEntityClass>
+    
+    <ECEntityClass typeName="RebarTerminator"  description="A terminator on the end of a reinforcing bar." displayLabel="Rebar Terminator">
+        <BaseClass>RebarEndDevice</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="RebarTerminatorType"  description="A type of terminator for a reinforcing bar." displayLabel="Rebar Terminator Type">
+        <BaseClass>RebarEndDeviceType</BaseClass>
+    </ECEntityClass>
+    
+    <ECRelationshipClass typeName="RebarTerminatorIsOfType" description="Relates a specific instance of a rebar terminator to a defined type." displayLabel="Rebar Terminator is of Type" modifier="None" strength="referencing">
+        <BaseClass>bis:PhysicalElementIsOfType</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="is of" polymorphic="true">
+            <Class class="RebarTerminator" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="classifies" polymorphic="true">
+            <Class class="RebarTerminatorType"/>
+        </Target>
+    </ECRelationshipClass>
+    
+    <ECRelationshipClass typeName="RebarTypeHasRebarSize" description="Relates a type of reinforcing bar to its size." displayLabel="Rebar Type has Rebar Size" modifier="None" strength="referencing">
+        <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="Rebar Type has Rebar Size" polymorphic="true">
+            <Class class="RebarType"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="Rebar Type has Rebar Size (Reversed)" polymorphic="true">
+            <Class class="RebarSize"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="RebarTypeHasTreatmentAtEnd" description="Relates a reiforcing bar type to its end treatment opposite its starting end." displayLabel="Rebar Type has Treatment at End" modifier="None" strength="referencing">
+        <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="Rebar Type has Treatment at End" polymorphic="true">
+            <Class class="RebarType"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="Rebar Type has Treatment at End (Reversed)" polymorphic="true">
+            <Class class="RebarEndTreatment"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="RebarTypeHasTreatmentAtStart" description="Relates a reiforcing bar type to its starting end treatment." displayLabel="Rebar Type has Treatment at Start" modifier="None" strength="referencing">
+        <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="Rebar Type has Treatment at Start" polymorphic="true">
+            <Class class="RebarType"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="Rebar Type has Treatment at Start (Reversed)" polymorphic="true">
+            <Class class="RebarEndTreatment"/>
+        </Target>
+    </ECRelationshipClass>
+
+</ECSchema>
