@@ -13,7 +13,7 @@ stages:
 
     variables:
       bbSrcRoot: $(Agent.BuildDirectory)/bbsrc
-      bbStream: bim0200
+      bbStream: imodel02
       buildStrategy: BisSchemasPackaging
       architecture: x64
       verbosity: 6
@@ -74,13 +74,29 @@ stages:
       - script: bb -v$(verbosity) -s $(buildStrategy) -a $(architecture) pull
         displayName: bb pull
 
+      #Your build pipeline references a secret variable named ‘artifactsRegistryToken’. Create or edit the build pipeline for this YAML file, define the variable on the Variables tab, and then select the option to make it secret. See https://go.microsoft.com/fwlink/?linkid=865972
+      - powershell: |
+          $npmrcDir = "$(bbSrcRoot)/BisSchemas"
+          
+          if(!(Test-Path -Path $npmrcDir)){
+              mkdir $npmrcDir
+          }
+          
+          $npmrcFile = $npmrcDir + "/.npmrc"
+          
+          Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "@bentley:registry=/"
+          Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "always-auth=true" -Append
+          Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "///bentleycs/_packaging/Packages/npm/registry/:username=Packages" -Append
+          Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "///bentleycs/_packaging/Packages/npm/registry/:_password=$(artifactsRegistryToken)" -Append
+          Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "///bentleycs/_packaging/Packages/npm/registry/:email=npm requires email to be set but doesn't use the value" -Append
+          Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "///bentleycs/_packaging/Packages/npm/:username=Packages" -Append
+          Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "///bentleycs/_packaging/Packages/npm/:_password=$(artifactsRegistryToken)" -Append
+          Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "///bentleycs/_packaging/Packages/npm/:email=npm requires email to be set but doesn't use the value" -Append
+
+        displayName: 'Seed npmrc'
       - script: bb -v$(verbosity) -s $(buildStrategy) -a $(architecture) build --tmrbuild --noprompt
         displayName: bb build
 
-      # - task: PublishPipelineArtifact@1
-      #   inputs:
-      #     path: $(BsiOut)\Winx64\packages
-      #     artifact: bis-schemas-packages
       - publish: $(BsiOut)\Winx64\packages
         artifact: bis-schemas-packages
         displayName: 'Publish Pipeline Artifact'
