@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ECSchema schemaName="LinearReferencing" alias="lr" version="03.00.00" description="Base schema for Linear Referencing." xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
-    <ECSchemaReference name="BisCore" version="01.00.08" alias="bis"/>
+<ECSchema schemaName="LinearReferencing" alias="lr" version="02.00.00" description="Base schema for Linear Referencing." xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
+    <ECSchemaReference name="BisCore" version="01.00.00" alias="bis"/>
     <ECSchemaReference name="Formats" version="01.00.00" alias="f"/>
     <ECSchemaReference name="Units" version="01.00.00" alias="u"/>
 
@@ -9,7 +9,7 @@
     <ECEntityClass typeName="ILinearElement" description="Mix-in to be supported by Element-subclasses meant to play the role of Linear-Elements." modifier="Abstract">
         <ECCustomAttributes>
             <IsMixin xmlns='CoreCustomAttributes.01.00.00'>
-                <AppliesToEntityClass>bis:GeometricElement3d</AppliesToEntityClass>
+                <AppliesToEntityClass>bis:SpatialElement</AppliesToEntityClass>
             </IsMixin>
         </ECCustomAttributes>
         <ECProperty propertyName="StartValue" typeName="double" kindOfQuantity="LENGTH" displayLabel="Start Value" description="Distance along value at the start of the Linear-Element, measured from an absolute zero."/>
@@ -19,7 +19,7 @@
     <ECEntityClass typeName="ILinearElementSource" description="Mix-in to be supported by Element-subclasses meant to provide Linear-Elements." modifier="Abstract">
         <ECCustomAttributes>
             <IsMixin xmlns='CoreCustomAttributes.01.00.00'>
-                <AppliesToEntityClass>bis:GeometricElement3d</AppliesToEntityClass>
+                <AppliesToEntityClass>bis:SpatialElement</AppliesToEntityClass>
             </IsMixin>
         </ECCustomAttributes>
     </ECEntityClass>
@@ -34,7 +34,7 @@
     <ECEntityClass typeName="ILinearlyLocated" modifier="Abstract" description="Base mix-in for Elements to be linearly-referenced along Linear-Elements.">
         <ECCustomAttributes>
             <IsMixin xmlns='CoreCustomAttributes.01.00.00'>
-                <AppliesToEntityClass>bis:GeometricElement3d</AppliesToEntityClass>
+                <AppliesToEntityClass>bis:SpatialElement</AppliesToEntityClass>
             </IsMixin>
         </ECCustomAttributes>
     </ECEntityClass>
@@ -51,7 +51,7 @@
         <BaseClass>ILinearlyLocated</BaseClass>
         <ECCustomAttributes>
             <IsMixin xmlns='CoreCustomAttributes.01.00.00'>
-                <AppliesToEntityClass>bis:GeometricElement3d</AppliesToEntityClass>
+                <AppliesToEntityClass>bis:SpatialElement</AppliesToEntityClass>
             </IsMixin>
         </ECCustomAttributes>
         <ECNavigationProperty propertyName="AttributedElement" relationshipName="ILinearlyLocatedAttributesElement" direction="Forward" displayLabel="Attributed Element" description="Element being attributed."/>
@@ -75,7 +75,7 @@
         <BaseClass>ILinearlyLocated</BaseClass>
         <ECCustomAttributes>
             <IsMixin xmlns='CoreCustomAttributes.01.00.00'>
-                <AppliesToEntityClass>bis:GeometricElement3d</AppliesToEntityClass>
+                <AppliesToEntityClass>bis:SpatialElement</AppliesToEntityClass>
             </IsMixin>
         </ECCustomAttributes>
     </ECEntityClass>
@@ -112,17 +112,17 @@
         <BaseClass>ILinearlyLocated</BaseClass>
         <ECCustomAttributes>
             <IsMixin xmlns='CoreCustomAttributes.01.00.00'>
-                <AppliesToEntityClass>bis:GeometricElement3d</AppliesToEntityClass>
+                <AppliesToEntityClass>bis:SpatialElement</AppliesToEntityClass>
             </IsMixin>
         </ECCustomAttributes>
         <ECNavigationProperty propertyName="ReferencedElement" relationshipName="IReferentReferencesElement" direction="Forward"/>
     </ECEntityClass>
-    <ECRelationshipClass typeName="IReferentReferencesElement" strength="referencing" modifier="None" description="Relationship indicating the bis:GeometricElement3d being used as Referent for Linear Referencing purposes.">
+    <ECRelationshipClass typeName="IReferentReferencesElement" strength="referencing" modifier="None" description="Relationship indicating the bis:SpatialElement being used as Referent for Linear Referencing purposes.">
         <Source multiplicity="(0..*)" polymorphic="true" roleLabel="references">
             <Class class="IReferent"/>
         </Source>
         <Target multiplicity="(0..1)" polymorphic="true" roleLabel="is referenced by">
-            <Class class="bis:GeometricElement3d"/>
+            <Class class="bis:SpatialElement"/>
         </Target>
     </ECRelationshipClass>
     <ECEntityClass typeName="ReferentElement" description="Base class for IReferent-implementations that are Spatial Location Elements." modifier="Abstract">
@@ -132,7 +132,7 @@
             <ClassHasHandler xmlns="BisCore.01.00.00"/>
         </ECCustomAttributes>
     </ECEntityClass>
-    <ECEntityClass typeName="Referent" description="IReferent-implementation turning any bis:GeometricElement3d not inherently Linearly-Referenced into a Referent for Linear-Referencing purposes." modifier="Sealed">
+    <ECEntityClass typeName="Referent" description="IReferent-implementation turning any bis:SpatialElement not inherently Linearly-Referenced into a Referent for Linear-Referencing purposes." modifier="Sealed">
         <BaseClass>ReferentElement</BaseClass>
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.01.00.00"/>
