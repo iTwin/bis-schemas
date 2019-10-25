@@ -8,7 +8,7 @@ This page provides the recommended style guidelines for creating class diagrams 
 - CMAP with more examples and situational markings can be found [here](.\cmap-example\situational-markings.cmap).
 
 ## **Colors**
-Colors of concepts are determined by the type of the class/entity. This style guide provides a default set of colors to use, but they **can be overridden in different contexts** if needed - in such cases the legend must be updated.
+Colors of nodes are determined by the type of the class/entity. This style guide provides a default set of colors to use, but they **can be overridden in different contexts** if needed - in such cases the legend must be updated.
 
 Bellow are listed default colors by class/entity type (all colors can be picked from the defaults provided in the CMAP tools):
 - `Elements\Models`
@@ -25,7 +25,7 @@ Bellow are listed default colors by class/entity type (all colors can be picked 
 
 ## **Shapes, outlines and Class name style**
 All entity classes have **rectangle** shape with **margin 8**.
-Outline and class name style of concepts are determined by the class modifier:
+Outline and class name style of nodes are determined by the class modifier:
 |Modifier            |Class name style|Line style|Line thickness|
 |--------------------|----------------|----------|-------------:|
 |`Abstract`          |bold + italic   |dotted    |1             |
@@ -46,7 +46,7 @@ Relationships can be detailed by linking the label to the relationship class def
 ![Association classes](.\cmap-example\media\class\relationships-details.png)
 
 ## **Content**
-The following style guide applies to all definitions: classes, structs, relationships etc. All text in a concept should be **left aligned**.
+The following style guide applies to all definitions: classes, structs, relationships etc. All text in a node should be **left aligned**.
 Class contents in order:
 - `Stereotype` - (optional) see [Stereotypes](#stereotypes) for more details
 - `Class name` - **bold text**, first line if stereotype is not present
@@ -73,9 +73,9 @@ Class contents in order:
 
 ## **Stereotypes**
 
-UML like **stereotypes** (profile classes) can be optionally added for concepts to add context specific meaning.
+UML like **stereotypes** (profile classes) can be optionally added for nodes to add context specific meaning.
 
-Stereotypes should be defined in the form: `'<<Name>>'`, should be placed as the first line in a concept and start with an upper-case letter.
+Stereotypes should be defined in the form: `'<<Name>>'`, should be placed as the first line in a node and start with an upper-case letter.
 
 Following stereotypes **must** be added for:
 - `Mixin class` - **&lt;&lt;Mixin>>**
@@ -99,7 +99,7 @@ Full CMAP containing below shown examples can be found [here](.\cmap-example\sit
 - In bigger cmaps placing inheritance/relationship arrows might be
 difficult as the line might extend long distances or cut through other classes.
 In such cases one could use the following marking:
-have a single definition for the class and then place arrows to new concepts
+have a single definition for the class and then place arrows to new nodes
 containing only the name of the referenced class.
 
 ![Situational](.\cmap-example\media\class\situational-gaps.png)
