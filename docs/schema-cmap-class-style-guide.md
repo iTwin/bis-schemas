@@ -78,9 +78,11 @@ UML like **stereotypes** (profile classes) can be optionally added for nodes to 
 Stereotypes should be defined in the form: `'<<Name>>'`, should be placed as the first line in a node and start with an upper-case letter.
 
 Following stereotypes **must** be added for:
+- `Relationship class` - **&lt;&lt;Relationship>>**
+- `Aspect class` - **&lt;&lt;Aspect>>**
 - `Mixin class` - **&lt;&lt;Mixin>>**
-- `Struct class` - **&lt;&lt;Struct>>**
-- `Enumerations` - **&lt;&lt;Enum>>**
+- `Struct` - **&lt;&lt;Struct>>**
+- `Enumeration` - **&lt;&lt;Enum>>**
 
 ![Stereotypes](.\cmap-example\media\class\stereotypes.png)
 
