@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ECSchema schemaName="BisCore" alias="bis" version="01.00.09" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.1" displayLabel="BIS Core" description="The BisCore schema defines the fundamental constructs of BIS. Other domain schemas must extend BisCore classes.">
+<ECSchema schemaName="BisCore" alias="bis" version="01.00.09" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.1" displayLabel="BIS Core" description="The BIS core schema contains classes that all other domain schemas extend.">
 
     <ECSchemaReference name="CoreCustomAttributes" version="01.00.01" alias="CoreCA"/>
     <ECSchemaReference name="ECDbMap" version="02.00.00" alias="ecdbmap"/>
@@ -1803,6 +1803,8 @@
         <ECProperty propertyName="ClipGeometry" typeName="string" extendedTypeName="Json" displayLabel="Clip Geometry" description="Details on how this section was clipped."/>
         <ECNavigationProperty propertyName="ModelSelector" relationshipName="SectionLocationUsesModelSelector" direction="Forward" displayLabel="Model Selector" description="Describes the models relevant for this section location display."/>
         <ECNavigationProperty propertyName="CategorySelector" relationshipName="SectionLocationUsesCategorySelector" direction="Forward" displayLabel="Category Selector" description="Describes the categories relevant for this section location display."/>
+        <ECNavigationProperty propertyName="SheetModel" relationshipName="SectionLocationRefersToSheetModel" direction="Forward"  displayLabel="Describes the sheet attached to this section location"/>
+        <ECNavigationProperty propertyName="DrawingModel" relationshipName="SectionLocationRefersToDrawingModel" direction="Forward"  displayLabel="Describes the drawing model attached to this section location"/>
     </ECEntityClass>
 
     <ECRelationshipClass typeName="SectionLocationUsesModelSelector" strength="referencing" modifier="Sealed" description="Relates a section location to the models relevant for this section location display.">
@@ -1824,7 +1826,31 @@
             <Class class="CategorySelector"/>
         </Target>
     </ECRelationshipClass>
-    
+
+    <ECRelationshipClass typeName="SectionLocationRefersToSheetModel" strengthDirection="Backward" strength="referencing" modifier="Sealed">
+        <!-- @see SectionLocation.Sheet ECNavigationProperty -->
+        <Source multiplicity="(0..*)" polymorphic="true" roleLabel="refers to" >
+            <Class class="SectionLocation"/>
+        </Source>
+        <!-- 0..* - many section location can refer to the same SheetModel, or there may be no section locations that refer to a given SheetModel. -->
+        <!-- 0..1 - a given section location refers to only on SheetModel, or the section location may be a TBD and have no SheetModel -->
+        <Target multiplicity="(0..1)" polymorphic="true" roleLabel="is referenced by" >
+            <Class class="SheetModel"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="SectionLocationRefersToDrawingModel" strengthDirection="Backward" strength="referencing" modifier="Sealed">
+        <!-- @see SectionLocation.Sheet ECNavigationProperty -->
+        <Source multiplicity="(0..*)" polymorphic="true" roleLabel="refers to" >
+            <Class class="SectionLocation"/>
+        </Source>
+        <!-- 0..* - many section location can refer to the same DrawingModel, or there may be no section locations that refer to a given DrawingModel. -->
+        <!-- 0..1 - a given section location refers to only on DrawingModel, or the section location may be a TBD and have no DrawingModel -->
+        <Target multiplicity="(0..1)" polymorphic="true" roleLabel="is referenced by" >
+            <Class class="DrawingModel"/>
+        </Target>
+    </ECRelationshipClass>
+
+
     <ECRelationshipClass typeName="BaseModelForView2d" strength="referencing" modifier="Sealed">
         <!-- @see ViewDefinition2d.BaseModel ECNavigationProperty -->
         <Source multiplicity="(1..1)" roleLabel="is base model for" polymorphic="true">
