@@ -203,14 +203,24 @@
         <BaseClass>CompositeProfile</BaseClass>
     </ECEntityClass>
 
-    <ECEntityClass typeName="ArbitraryCompositeProfileComponentAspect" modifier="Sealed" displayLabel="Arbitrary Composite Profile Component" description="Aspect used by ArbitraryCompostiteProfile to reference SinglePerimeterProfile and store geometry transformations for it.">
+    <ECEntityClass typeName="ArbitraryCompositeProfileComponentAspect" modifier="Sealed" displayLabel="Arbitrary Composite Profile Component" description="Aspect used by ArbitraryCompositeProfile to reference SinglePerimeterProfile and store geometry transformations for it.">
         <BaseClass>bis:ElementMultiAspect</BaseClass>
         <ECNavigationProperty propertyName="Profile" relationshipName="ArbitraryCompositeProfileComponentAspectRefersToSinglePerimeterProfile" direction="Forward" displayLabel="Single Profile" description="Single Profile referenced by ArbitraryCompositeProfile." category="ProfileProperties" />
-        <ECProperty propertyName="Offset" typeName="point2d" description="2D vector specifying how the profiles geometry will be offseted from it's original coordinates." category="ProfileProperties" />
+        <ECProperty propertyName="Offset" typeName="point2d" description="2D vector specifying how the profiles geometry will be offset from it's original coordinates." category="ProfileProperties" />
         <ECProperty propertyName="Rotation" typeName="double" description="Angle by which the profiles geometry will be rotated." category="ProfileProperties" />
         <ECProperty propertyName="MirrorAboutYAxis" typeName="boolean" displayLabel="Mirror About Y-Axis" description="Flag indicating whether the profiles geometry should be mirrored around the Y axis." category="ProfileProperties" />
         <ECProperty propertyName="MemberPriority" typeName="int" displayLabel="Member Priority" description="Index used to strictly order components. This property is a duplicate from bis:ElementGroupsMembers." category="ProfileProperties" />
     </ECEntityClass>
+
+    <ECRelationshipClass typeName="ArbitraryCompositeProfileOwnsArbitraryCompositeProfileComponentAspect" modifier="Sealed" strength="embedding">
+        <BaseClass>bis:ElementOwnsMultiAspects</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="ArbitraryCompositeProfile" />
+        </Source>
+        <Target multiplicity="(1..*)" roleLabel="is owned by" polymorphic="false">
+            <Class class="ArbitraryCompositeProfileComponentAspect" />
+        </Target>
+    </ECRelationshipClass>
 
     <ECRelationshipClass typeName="ArbitraryCompositeProfileComponentAspectRefersToSinglePerimeterProfile" modifier="Sealed" strength="referencing">
         <Source multiplicity="(0..*)" roleLabel="refers to profile" polymorphic="false">
@@ -257,7 +267,7 @@
         </Target>
     </ECRelationshipClass>
 
-    <ECEntityClass typeName="ArbitraryShapeProfile" modifier="None" displayLabel="Arbitrary Shape Profile">
+    <ECEntityClass typeName="ArbitraryShapeProfile" modifier="None" displayLabel="Arbitrary Shape Profile" description="Custom, user defined Profile that can have any shape." >
         <BaseClass>SinglePerimeterProfile</BaseClass>
     </ECEntityClass>
 
