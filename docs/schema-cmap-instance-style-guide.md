@@ -51,3 +51,11 @@ Instance contents in order:
 ![Content](.\cmap-example\media\instance\content.png)
 
 **Models** can have an optional label added denoting concrete type of the model or context specific information like the what real world entity is being modeled. See [shapes and outlines example](#shapes-and-outlines).
+
+## **Additional guidelines**
+- In instance diagrams you should always aim to put parent instances above their child instances.
+
+## **Example**
+Full CMAP containing below shown example can be found [here](.\cmap-example\example-instance.cmap).
+
+![Example](.\cmap-example\media\instance\example.png)
