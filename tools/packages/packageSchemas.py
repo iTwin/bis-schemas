@@ -85,6 +85,7 @@ def populatePackageJson(packagedir, domainName, version, isPrerelease = False):
         betaVersion = version + "-beta"
         versionList = filter(lambda x: betaVersion in x, vlist)
         if versionList:
+            print versionList[len(versionList)-1]
             betanum = int(versionList[len(versionList)-1].rsplit('-beta.', 1)[1]) + 1
             version = betaVersion + "." + str(betanum)
         else:  # There are no existing pre-release versions.  Start it at -beta.0
@@ -99,6 +100,8 @@ def populatePackageJson(packagedir, domainName, version, isPrerelease = False):
         reader = reader.replace(r'${DOMAIN_NAME}', domainName)
         reader = reader.replace(r'${PACKAGE_VERSION}', version)
         pf.write(reader)
+    
+    print packagedir + "; " + domainName + "; " + version
 
 # Creates the directory that represents the BIS Schemas package by placing all files in the correct output directory.
 #   All schemas within a domain folder are currently added to the package.
