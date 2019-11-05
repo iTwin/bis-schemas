@@ -14,6 +14,7 @@ For **Models** colors are determined by the type of the model:
 - `Physical` - light blue (#96C8FF)
 - `Functional` - light green (#C8FFC8)
 - `Spatial Location` - light yellow (#FFFF96)
+- `Drawing` - purple (#C896FF)
 
 ![Model colors](.\cmap-example\media\instance\colors-models.png)
 
