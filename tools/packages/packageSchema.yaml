@@ -13,7 +13,7 @@ stages:
 
     variables:
       bbSrcRoot: $(Agent.BuildDirectory)/bbsrc
-      bbStream: bim0200
+      bbStream: imodel02
       buildStrategy: BisSchemasPackaging
       architecture: x64
       verbosity: 6
@@ -74,13 +74,29 @@ stages:
       - script: bb -v$(verbosity) -s $(buildStrategy) -a $(architecture) pull
         displayName: bb pull
 
+      #Your build pipeline references a secret variable named ‘artifactsRegistryToken’. Create or edit the build pipeline for this YAML file, define the variable on the Variables tab, and then select the option to make it secret. See https://go.microsoft.com/fwlink/?linkid=865972
+      - powershell: |
+          $npmrcDir = "$(bbSrcRoot)/BisSchemas"
+          
+          if(!(Test-Path -Path $npmrcDir)){
+              mkdir $npmrcDir
+          }
+          
+          $npmrcFile = $npmrcDir + "/.npmrc"
+          
+          Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "@bentley:registry=/"
+          Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "always-auth=true" -Append
+          Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "///bentleycs/_packaging/Packages/npm/registry/:username=Packages" -Append
+          Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "///bentleycs/_packaging/Packages/npm/registry/:_password=$(artifactsRegistryToken)" -Append
+          Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "///bentleycs/_packaging/Packages/npm/registry/:email=npm requires email to be set but doesn't use the value" -Append
+          Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "///bentleycs/_packaging/Packages/npm/:username=Packages" -Append
+          Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "///bentleycs/_packaging/Packages/npm/:_password=$(artifactsRegistryToken)" -Append
+          Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "///bentleycs/_packaging/Packages/npm/:email=npm requires email to be set but doesn't use the value" -Append
+
+        displayName: 'Seed npmrc'
       - script: bb -v$(verbosity) -s $(buildStrategy) -a $(architecture) build --tmrbuild --noprompt
         displayName: bb build
 
-      # - task: PublishPipelineArtifact@1
-      #   inputs:
-      #     path: $(BsiOut)\Winx64\packages
-      #     artifact: bis-schemas-packages
       - publish: $(BsiOut)\Winx64\packages
         artifact: bis-schemas-packages
         displayName: 'Publish Pipeline Artifact'
@@ -90,93 +106,100 @@ stages:
   dependsOn: Build
   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
   jobs:
-  - job: publish_ProGet
-    displayName: Publish npm packages to ProGet
+  - job: publish
+    displayName: Publish npm packages to Azure Artifacts
     steps:
       - checkout: none
       - download: current
         artifact: bis-schemas-packages
       - task: Npm@1
-        displayName: 'Publish Core'
+        displayName: 'Publish Core Azure Artifact'
         inputs:
           command: publish
           workingDir: '$(Pipeline.Workspace)/bis-schemas-packages/Core'
-          verbose: false
-          publishEndpoint: 'ProGet npm.bentley.com publish token'
+          publishRegistry: useFeed
+          publishFeed: Packages
       - task: Npm@1
-        displayName: 'Publish Standard'
+        displayName: 'Publish Standard Azure Artifact'
         inputs:
           command: publish
           workingDir: '$(Pipeline.Workspace)/bis-schemas-packages/Standard'
-          verbose: false
-          publishEndpoint: 'ProGet npm.bentley.com publish token'
+          publishRegistry: useFeed
+          publishFeed: Packages
       - task: Npm@1
-        displayName: 'Publish Grids'
+        displayName: 'Publish Grids Azure Artifact'
         inputs:
           command: publish
           workingDir: '$(Pipeline.Workspace)/bis-schemas-packages/Grids'
-          verbose: false
-          publishEndpoint: 'ProGet npm.bentley.com publish token'
+          publishRegistry: useFeed
+          publishFeed: Packages
       - task: Npm@1
-        displayName: 'Publish Structural'
+        displayName: 'Publish Structural Azure Artifact'
         inputs:
           command: publish
-          workingDir: '$(Pipeline.Workspace)/bis-schemas-packages/Structural'
-          verbose: false
-          publishEndpoint: 'ProGet npm.bentley.com publish token'
+          workingDir: '$(Pipeline.Workspace)/bis-schemas-packages/StructuralPhysical'
+          publishRegistry: useFeed
+          publishFeed: Packages
       - task: Npm@1
-        displayName: 'Publish RealityModeling'
+        displayName: 'Publish RealityModeling Azure Artifact'
         inputs:
           command: publish
           workingDir: '$(Pipeline.Workspace)/bis-schemas-packages/RealityModeling'
-          verbose: false
-          publishEndpoint: 'ProGet npm.bentley.com publish token'
+          publishRegistry: useFeed
+          publishFeed: Packages
       - task: Npm@1
-        displayName: 'Publish RoadRailAlignment'
+        displayName: 'Publish RoadRailAlignment Azure Artifact'
         inputs:
           command: publish
           workingDir: '$(Pipeline.Workspace)/bis-schemas-packages/RoadRailAlignment'
-          verbose: false
-          publishEndpoint: 'ProGet npm.bentley.com publish token'
+          publishRegistry: useFeed
+          publishFeed: Packages
       - task: Npm@1
-        displayName: 'Publish RoadRailPhysical'
+        displayName: 'Publish RoadRailPhysical Azure Artifact'
         inputs:
           command: publish
           workingDir: '$(Pipeline.Workspace)/bis-schemas-packages/RoadRailPhysical'
-          verbose: false
-          publishEndpoint: 'ProGet npm.bentley.com publish token'
+          publishRegistry: useFeed
+          publishFeed: Packages
       - task: Npm@1
-        displayName: 'Publish ClassificationSystems'
+        displayName: 'Publish ClassificationSystems Azure Artifact'
         inputs:
           command: publish
           workingDir: '$(Pipeline.Workspace)/bis-schemas-packages/ClassificationSystems'
-          verbose: false
-          publishEndpoint: 'ProGet npm.bentley.com publish token'
+          publishRegistry: useFeed
+          publishFeed: Packages
       - task: Npm@1
-        displayName: 'Publish SpatialComposition'
+        displayName: 'Publish SpatialComposition Azure Artifact'
         inputs:
           command: publish
           workingDir: '$(Pipeline.Workspace)/bis-schemas-packages/SpatialComposition'
-          verbose: false
-          publishEndpoint: 'ProGet npm.bentley.com publish token'
+          publishRegistry: useFeed
+          publishFeed: Packages
       - task: Npm@1
-        displayName: 'Publish BuildingSpatial'
+        displayName: 'Publish BuildingSpatial Azure Artifact'
         inputs:
           command: publish
           workingDir: '$(Pipeline.Workspace)/bis-schemas-packages/BuildingSpatial'
-          verbose: false
-          publishEndpoint: 'ProGet npm.bentley.com publish token'
+          publishRegistry: useFeed
+          publishFeed: Packages
       - task: Npm@1
-        displayName: 'Publish ECObjects'
+        displayName: 'Publish ECObjects Azure Artifact'
         inputs:
           command: publish
           workingDir: '$(Pipeline.Workspace)/bis-schemas-packages/ECObjects'
-          verbose: false
-          publishEndpoint: 'ProGet npm.bentley.com publish token'
+          publishRegistry: useFeed
+          publishFeed: Packages
       - task: Npm@1
-        displayName: 'Publish Earthwork'
+        displayName: 'Publish Earthwork Azure Artifact'
         inputs:
           command: publish
           workingDir: '$(Pipeline.Workspace)/bis-schemas-packages/Earthwork'
-          verbose: false
-          publishEndpoint: 'ProGet npm.bentley.com publish token'
+          publishRegistry: useFeed
+          publishFeed: Packages
+      - task: Npm@1
+        displayName: 'Publish Construction Azure Artifact'
+        inputs:
+          command: publish
+          workingDir: '$(Pipeline.Workspace)/bis-schemas-packages/Construction'
+          publishRegistry: useFeed
+          publishFeed: Packages
