@@ -14,6 +14,7 @@ For **Models** colors are determined by the type of the model:
 - `Physical` - light blue (#96C8FF)
 - `Functional` - light green (#C8FFC8)
 - `Spatial Location` - light yellow (#FFFF96)
+- `Drawing` - purple (#C896FF)
 
 ![Model colors](.\cmap-example\media\instance\colors-models.png)
 
@@ -51,3 +52,11 @@ Instance contents in order:
 ![Content](.\cmap-example\media\instance\content.png)
 
 **Models** can have an optional label added denoting concrete type of the model or context specific information like the what real world entity is being modeled. See [shapes and outlines example](#shapes-and-outlines).
+
+## **Additional guidelines**
+- In instance diagrams you should always aim to put parent instances above their child instances.
+
+## **Example**
+Full CMAP containing below shown example can be found [here](.\cmap-example\example-instance.cmap).
+
+![Example](.\cmap-example\media\instance\example.png)
