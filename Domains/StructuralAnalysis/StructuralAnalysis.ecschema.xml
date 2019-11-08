@@ -597,7 +597,45 @@
             <Class class="MaterialProfileSystem" />
         </Source>
         <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="false">
-            <Class class="prf:MaterialProfile" />
+            <Class class="MaterialProfile" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="MaterialProfileDefinition" modifier="abstract" displayLabel="Material Profile Definition" description="Base class defining an element that pairs Profiles and PhysicalMaterials.">
+        <BaseClass>bis:DefinitionElement</BaseClass>
+        <ECProperty propertyName="Name" typeName="string" description="Name of the MaterialProfile used for identification." />
+        <ECProperty propertyName="Description" typeName="string" description="Description of the MaterialProfile." />
+    </ECEntityClass>
+
+    <ECEnumeration typeName="MaterialProfileCategoryType" backingTypeName="int" isStrict="true" displayLabel="Material Profile Category Type" description="Role of the MaterialProfile.">
+        <ECEnumerator value="0" displayLabel="Load Bearing" />
+        <ECEnumerator value="1" displayLabel="Insulation" />
+        <ECEnumerator value="2" displayLabel="Finish" />
+    </ECEnumeration>
+
+    <ECEntityClass typeName="MaterialProfile" modifier="Sealed" displayLabel="Material Profile" description="Single pair of Profile and PhysicalMaterial.">
+        <BaseClass>MaterialProfileDefinition</BaseClass>
+        <ECProperty propertyName="Priority" typeName="int" description="Index used by MaterialProfileSet to ensure a string ordering of the MaterialProfiles." />
+        <ECProperty propertyName="Category" typeName="MaterialProfileCategoryType" description="Role of the MaterialProfile." />
+        <ECNavigationProperty propertyName="Material" relationshipName="MaterialProfileRefersToMaterial" direction="Forward" description="Referenced PhysicalMaterial." />
+        <ECNavigationProperty propertyName="Profile" relationshipName="MaterialProfileRefersToProfile" direction="Forward" description="Referenced Profile." />
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="MaterialProfileRefersToMaterial" strength="referencing" strengthDirection="Forward" modifier="Sealed">
+        <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="false">
+            <Class class="MaterialProfile" />
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="true">
+            <Class class="bis:PhysicalMaterial"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="MaterialProfileRefersToProfile" strength="referencing" strengthDirection="Forward" modifier="Sealed">
+        <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="false">
+            <Class class="MaterialProfile" />
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="true">
+            <Class class="prf:Profile"/>
         </Target>
     </ECRelationshipClass>
 
