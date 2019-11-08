@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ECSchema schemaName="RoadRailPhysical" alias="rrphys" version="03.00.00" description="Base schema for the Road and Rail domains." xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
+    <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
+    <ECSchemaReference name="BisCore" version="01.00.08" alias="bis"/>
+    <ECSchemaReference name="LinearReferencing" version="02.00.01" alias="lr"/>
+    <ECSchemaReference name="RoadRailAlignment" version="02.00.01" alias="rralign"/>
+    <ECSchemaReference name="RoadRailUnits" version="01.00.00" alias="rru"/>
+
+    <ECCustomAttributes>
+        <ProductionStatus xmlns="CoreCustomAttributes.01.00.00">
+            <SupportedUse>NotForProduction</SupportedUse>
+        </ProductionStatus>
+    </ECCustomAttributes>
+
+    <ECEntityClass typeName="TransportationNetwork" modifier="Abstract" displayLabel="Transportation Network" description="Entry-point element leading to the physical modeling of a network of Corridors, primarily designed for one mode of transportation.">
+        <BaseClass>bis:PhysicalElement</BaseClass>
+        <BaseClass>bis:ISubModeledElement</BaseClass>
+        <ECCustomAttributes>
+            <HiddenClass xmlns="CoreCustomAttributes.01.00.00"/>
+        </ECCustomAttributes>
+    </ECEntityClass>
+    <ECEntityClass typeName="Corridor" modifier="Sealed" displayLabel="Corridor" description="A long, narrow physical stretch that is designed for one mode of transportation as part of a Network. It is typically defined along a main linear-element." >
+        <BaseClass>lr:LinearPhysicalElement</BaseClass>
+        <BaseClass>bis:ISubModeledElement</BaseClass>
+        <BaseClass>lr:ILinearElementSource</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="TransportationSystem" modifier="Sealed"  displayLabel="Transportation System" description="Entry-point element containing Transportation-related details of a Corridor.">
+        <BaseClass>bis:PhysicalElement</BaseClass>
+        <BaseClass>bis:ISubModeledElement</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="CorridorPortionElement" modifier="Abstract" description="Base class for long, narrow physical stretches of a Corridor, constructed for either a particular travel type, or a separation between them." >
+        <BaseClass>bis:PhysicalElement</BaseClass>
+        <BaseClass>bis:IParentElement</BaseClass>
+        <BaseClass>lr:ILinearElementSource</BaseClass>
+        <ECNavigationProperty propertyName="MainAlignment" relationshipName="CorridorPortionRefersToMainAlignment" direction="Forward" displayLabel="Main Alignment"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="CorridorPortionRefersToMainAlignment" strength="referencing" modifier="Sealed" description="Relationship enabling a CorridorPortionElement to refer to its Main Alignment.">
+        <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="true">
+            <Class class="CorridorPortionElement"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is referenced by" polymorphic="false">
+            <Class class="rralign:Alignment"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="UndeterminedCorridorPortion" modifier="Sealed" description="A long, narrow physical stretch of a Corridor whose construction purpose is not known." >
+        <BaseClass>CorridorPortionElement</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="PathwayElement" modifier="Abstract" description="A long, narrow physical stretch of a Corridor especially constructed for a particular travel type." >
+        <BaseClass>CorridorPortionElement</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="PathwayDesignCriteria" modifier="Sealed"  displayLabel="Design Criteria" description="Entry-point element containing design criteria for a Pathway">
+        <BaseClass>bis:SpatialLocationElement</BaseClass>
+        <BaseClass>bis:ISubModeledElement</BaseClass>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="PathwayOwnsDesignCriteria" strength="embedding" modifier="None">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="owns" polymorphic="true">
+            <Class class="PathwayElement"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="false">
+            <Class class="PathwayDesignCriteria"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="CorridorPortionOwnsAlignments" strength="embedding" modifier="None">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="owns" polymorphic="true">
+            <Class class="CorridorPortionElement"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="false">
+            <Class class="rralign:Alignment"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="DesignSpeed" modifier="Sealed"  displayLabel="Design Speed" description="Class for Linearly located properties of a Pathway specifying design-speeds along it." >
+        <BaseClass>lr:LinearlyLocatedAttribution</BaseClass>
+        <ECNavigationProperty propertyName="StartDefinition" relationshipName="DesignSpeedRefersToStartDefinition" direction="Forward"/>
+        <ECNavigationProperty propertyName="EndDefinition" relationshipName="DesignSpeedRefersToEndDefinition" direction="Forward"/>
+    </ECEntityClass>
+    <ECEnumeration typeName="DesignSpeedDefinition_UnitSystem" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="SI" value="0" displayLabel="SI"/>
+        <ECEnumerator name="Imperial" value="1" displayLabel="Imperial"/>
+    </ECEnumeration>
+    <ECEntityClass typeName="DesignSpeedDefinition" modifier="Sealed"  displayLabel="Design Speed Definition" description="Standardized design-speed definition in the context of a Subject." >
+        <BaseClass>bis:DefinitionElement</BaseClass>
+        <ECProperty propertyName="DesignSpeed" typeName="double" kindOfQuantity="rru:VELOCITY"/>
+        <ECProperty propertyName="UnitSystem" typeName="DesignSpeedDefinition_UnitSystem" displayLabel="Unit System applicable for this design speed definition"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="DesignSpeedRefersToStartDefinition" strength="referencing" strengthDirection="Backward" modifier="Sealed">
+        <Source multiplicity="(0..*)" polymorphic="false" roleLabel="refers to">
+            <Class class="DesignSpeed"/>
+        </Source>
+        <Target multiplicity="(0..1)" polymorphic="false" roleLabel="is referenced by">
+            <Class class="DesignSpeedDefinition"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="DesignSpeedRefersToEndDefinition" strength="referencing" strengthDirection="Backward" modifier="Sealed">
+        <Source multiplicity="(0..*)" polymorphic="false" roleLabel="refers to">
+            <Class class="DesignSpeed"/>
+        </Source>
+        <Target multiplicity="(0..1)" polymorphic="false" roleLabel="is referenced by">
+            <Class class="DesignSpeedDefinition"/>
+        </Target>
+    </ECRelationshipClass>
+</ECSchema>

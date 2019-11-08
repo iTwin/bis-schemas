@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ECSchema schemaName="CorridorModeler" alias="cm" version="01.00.00" description="Input classes for the Corridor Modeler engine." xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
     <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
-    <ECSchemaReference name="BisCore" version="01.00.00" alias="bis"/>
-    <ECSchemaReference name="LinearReferencing" version="02.00.00" alias="lr"/>
-    <ECSchemaReference name="RoadRailAlignment" version="02.00.00" alias="rralign"/>
+    <ECSchemaReference name="BisCore" version="01.00.08" alias="bis"/>
+    <ECSchemaReference name="LinearReferencing" version="02.00.01" alias="lr"/>
+    <ECSchemaReference name="RoadRailUnits" version="01.00.00" alias="rru"/>
 
     <ECCustomAttributes>
         <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
@@ -91,8 +91,18 @@
         <BaseClass>bis:TypeDefinitionElement</BaseClass>
         <ECProperty propertyName="RealizableFullClassName" typeName="string" />
         <ECProperty propertyName="RealizableTypeFullBaseClassName" typeName="string" />
+        <ECNavigationProperty propertyName="RealizableTypeCodeSpec" relationshipName="CodeSpecSpecifiedForRealizableTypeCode" direction="Backward" />
+        <ECProperty propertyName="RealizableTypeCodeValue" typeName="string" />
         <ECNavigationProperty propertyName="SpatialSubCategory" relationshipName="TypicalSectionComponentTypeRefersToSubCategory" direction="Forward" description="The Spatial SubCategory to be referenced by Spatial elements generated from a Typical Section Component"/>
     </ECEntityClass>
+    <ECRelationshipClass typeName="CodeSpecSpecifiedForRealizableTypeCode" strength="referencing" modifier="Sealed">
+        <Source multiplicity="(0..1)" roleLabel="code is specified by" polymorphic="true">
+            <Class class="bis:CodeSpec"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="specified code for" polymorphic="true">
+            <Class class="TypicalSectionComponentType"/>
+        </Target>
+    </ECRelationshipClass>
     <ECRelationshipClass typeName="TypicalSectionComponentRefersToSubCategory" strength="referencing" strengthDirection="Forward" modifier="Sealed">
         <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="true">
             <Class class="TypicalSectionComponentElement" />
@@ -415,11 +425,11 @@
     </ECEntityClass>
     <ECEntityClass typeName="TypicalSectionConstraintConstantOffset" displayLabel="Offset" modifier="Sealed">
         <BaseClass>TypicalSectionConstraintOffsetValue</BaseClass>
-        <ECProperty propertyName="Value" typeName="double" displayLabel="Value" kindOfQuantity="rralign:LENGTH"/>
+        <ECProperty propertyName="Value" typeName="double" displayLabel="Value" kindOfQuantity="rru:LENGTH"/>
     </ECEntityClass>
     <ECEntityClass typeName="TypicalSectionConstraintPointsDifference" modifier="Abstract">
         <BaseClass>TypicalSectionConstraintOffsetValue</BaseClass>
-        <ECProperty propertyName="Multiplier" typeName="double" displayLabel="Multiplier" kindOfQuantity="rralign:LENGTH"/>
+        <ECProperty propertyName="Multiplier" typeName="double" displayLabel="Multiplier" kindOfQuantity="rru:LENGTH"/>
         <ECNavigationProperty propertyName="MinuendPointRef" relationshipName="TypicalSectionConstraintDifferenceRefersToMinuend" direction="Forward"/>
         <ECNavigationProperty propertyName="SubtrahendPointRef" relationshipName="TypicalSectionConstraintDifferenceRefersToSubtrahend" direction="Forward"/>
     </ECEntityClass>
@@ -474,11 +484,11 @@
     </ECEntityClass>
     <ECEntityClass typeName="TypicalSectionConstraintConstantSlope" displayLabel="Slope" modifier="Sealed">
         <BaseClass>TypicalSectionConstraintSlopeValue</BaseClass>
-        <ECProperty propertyName="Value" typeName="double" displayLabel="Value" kindOfQuantity="rralign:SLOPE"/>
+        <ECProperty propertyName="Value" typeName="double" displayLabel="Value" kindOfQuantity="rru:SLOPE"/>
     </ECEntityClass>
     <ECEntityClass typeName="TypicalSectionConstraintComputedSlope" displayLabel="Computed Slope" modifier="Sealed">
         <BaseClass>TypicalSectionConstraintSlopeValue</BaseClass>
-        <ECProperty propertyName="Multiplier" typeName="double" displayLabel="Multiplier" kindOfQuantity="rralign:LENGTH"/>
+        <ECProperty propertyName="Multiplier" typeName="double" displayLabel="Multiplier" kindOfQuantity="rru:LENGTH"/>
         <ECNavigationProperty propertyName="PointDef1" relationshipName="TypicalSectionConstraintSlopeRefersToPoint1" direction="Forward"/>
         <ECNavigationProperty propertyName="PointDef2" relationshipName="TypicalSectionConstraintSlopeRefersToPoint2" direction="Forward"/>
     </ECEntityClass>
@@ -527,7 +537,7 @@
     </ECEntityClass>
     <ECEntityClass typeName="TypicalSectionConstraintConstantAngle" displayLabel="Angle" modifier="Sealed">
         <BaseClass>TypicalSectionConstraintAngleValue</BaseClass>
-        <ECProperty propertyName="Value" typeName="double" displayLabel="Value" kindOfQuantity="rralign:ANGLE"/>
+        <ECProperty propertyName="Value" typeName="double" displayLabel="Value" kindOfQuantity="rru:ANGLE"/>
     </ECEntityClass>
     <ECEntityClass typeName="TypicalSectionConstraintParametricAngle" displayLabel="Parametric Angle" modifier="Sealed">
         <BaseClass>TypicalSectionConstraintAngle</BaseClass>
