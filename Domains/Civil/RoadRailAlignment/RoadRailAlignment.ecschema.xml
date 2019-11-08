@@ -1,25 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ECSchema schemaName="RoadRailAlignment" alias="rralign" version="02.00.00" description="Base schema for the Alignment domain in light of Road and Rail applications." xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
+<ECSchema schemaName="RoadRailAlignment" alias="rralign" version="02.00.01" description="Base schema for the Alignment domain in light of Road and Rail applications." xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
     <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
-    <ECSchemaReference name="BisCore" version="01.00.01" alias="bis"/>
-    <ECSchemaReference name="LinearReferencing" version="02.00.00" alias="lr"/>
+    <ECSchemaReference name="BisCore" version="01.00.08" alias="bis"/>
+    <ECSchemaReference name="LinearReferencing" version="02.00.01" alias="lr"/>
+    <ECSchemaReference name="RoadRailUnits" version="01.00.00" alias="rru"/>
     <ECSchemaReference name="Formats" version="01.00.00" alias="f"/>
     <ECSchemaReference name="Units" version="01.00.00" alias="u"/>
 
-    <KindOfQuantity typeName="STATION" displayLabel="Road &amp; Rail Station" persistenceUnit="u:M" presentationUnits="f:StationZ_1000_3[u:M];f:StationZ_100_2[u:FT];f:DefaultRealU(2)[u:M];f:DefaultRealU(2)[u:FT]" relativeError="0.0001"/>
-    <KindOfQuantity typeName="LENGTH" displayLabel="Road &amp; Rail Alignment Length" persistenceUnit="u:M" presentationUnits="f:DefaultRealU(2)[u:M];f:DefaultRealU(2)[u:FT]" relativeError="0.0001"/>
-    <KindOfQuantity typeName="AREA" displayLabel="Road &amp; Rail Area" persistenceUnit="u:SQ_M" presentationUnits="f:DefaultRealU(2)[u:SQ_M];f:DefaultRealU(2)[u:SQ_FT]" relativeError="0.0001"/>
-    <KindOfQuantity typeName="ANGLE" displayLabel="Road &amp; Rail Angle" persistenceUnit="u:RAD" presentationUnits="f:DefaultRealU(2)[u:ARC_DEG];f:AngleDMS" relativeError="0.0001"/>
-    <KindOfQuantity typeName="BEARING" displayLabel="Road &amp; Rail Bearing" persistenceUnit="u:RAD" presentationUnits="f:AngleDMS" relativeError="0.0001"/>
-    <KindOfQuantity typeName="SLOPE" displayLabel="Road &amp; Rail Slope" persistenceUnit="u:M_PER_M" presentationUnits="f:DefaultRealU(2)[u:M_PER_M];f:DefaultRealU(2)[u:FT_PER_FT]" relativeError="0.0001" />
-    <KindOfQuantity typeName="VELOCITY" displayLabel="Road &amp; Rail Velocity" persistenceUnit="u:M_PER_SEC" presentationUnits="f:DefaultRealU(2)[u:KM_PER_HR];f:DefaultRealU(2)[u:MPH]" relativeError="0.0001"/>
+    <ECCustomAttributes>
+        <ProductionStatus xmlns="CoreCustomAttributes.01.00.00">
+            <SupportedUse>FieldTesting</SupportedUse>
+        </ProductionStatus>
+    </ECCustomAttributes>
+
+    <!-- Deprecated KindOfQuantities: Refer to KindOfQuantities defined in the new RoadRailUnits schema instead -->
+    <KindOfQuantity typeName="STATION" displayLabel="Road &amp; Rail Station" persistenceUnit="u:M" presentationUnits="f:StationZ_1000_3[u:M];f:StationZ_100_2[u:FT];f:DefaultRealU(2)[u:M];f:DefaultRealU(2)[u:FT]" relativeError="0.0001" description="DEPRECATED: Refer to KindOfQuantities defined in the new RoadRailUnits schema instead"/>
+    <KindOfQuantity typeName="LENGTH" displayLabel="Road &amp; Rail Alignment Length" persistenceUnit="u:M" presentationUnits="f:DefaultRealU(2)[u:M];f:DefaultRealU(2)[u:FT]" relativeError="0.0001" description="DEPRECATED: Refer to KindOfQuantities defined in the new RoadRailUnits schema instead"/>
+    <KindOfQuantity typeName="AREA" displayLabel="Road &amp; Rail Area" persistenceUnit="u:SQ_M" presentationUnits="f:DefaultRealU(2)[u:SQ_M];f:DefaultRealU(2)[u:SQ_FT]" relativeError="0.0001" description="DEPRECATED: Refer to KindOfQuantities defined in the new RoadRailUnits schema instead"/>
+    <KindOfQuantity typeName="ANGLE" displayLabel="Road &amp; Rail Angle" persistenceUnit="u:RAD" presentationUnits="f:DefaultRealU(2)[u:ARC_DEG];f:AngleDMS" relativeError="0.0001" description="DEPRECATED: Refer to KindOfQuantities defined in the new RoadRailUnits schema instead"/>
+    <KindOfQuantity typeName="BEARING" displayLabel="Road &amp; Rail Bearing" persistenceUnit="u:RAD" presentationUnits="f:AngleDMS" relativeError="0.0001" description="DEPRECATED: Refer to KindOfQuantities defined in the new RoadRailUnits schema instead"/>
+    <KindOfQuantity typeName="SLOPE" displayLabel="Road &amp; Rail Slope" persistenceUnit="u:M_PER_M" presentationUnits="f:DefaultRealU(2)[u:M_PER_M];f:DefaultRealU(2)[u:FT_PER_FT]" relativeError="0.0001" description="DEPRECATED: Refer to KindOfQuantities defined in the new RoadRailUnits schema instead"/>
+    <KindOfQuantity typeName="VELOCITY" displayLabel="Road &amp; Rail Velocity" persistenceUnit="u:M_PER_SEC" presentationUnits="f:DefaultRealU(2)[u:KM_PER_HR];f:DefaultRealU(2)[u:MPH]" relativeError="0.0001" description="DEPRECATED: Refer to KindOfQuantities defined in the new RoadRailUnits schema instead"/>
 
     <ECEntityClass typeName="Alignment" modifier="Sealed" displayLabel="Alignment" description="Reference system to position elements mainly for linear construction works. Provides concrete implementation of an ILinearElement mix-in in the context of Road and Rail disciplines.">
         <BaseClass>bis:SpatialLocationElement</BaseClass>
         <BaseClass>bis:ISubModeledElement</BaseClass>
         <BaseClass>lr:ILinearElement</BaseClass>
         <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00.00"/>
             <DbIndexList xmlns="ECDbMap.02.00.00">
                 <Indexes>
                     <DbIndex>
@@ -33,8 +40,8 @@
                 </Indexes>
             </DbIndexList>
         </ECCustomAttributes>
-        <ECProperty propertyName="StartStation" typeName="double" kindOfQuantity="STATION" displayLabel="Start Station"/>
-        <ECProperty propertyName="StartValue" typeName="double" kindOfQuantity="LENGTH" displayLabel="Start Distance Along">
+        <ECProperty propertyName="StartStation" typeName="double" kindOfQuantity="rru:STATION" displayLabel="Start Station"/>
+        <ECProperty propertyName="StartValue" typeName="double" kindOfQuantity="rru:LENGTH" displayLabel="Start Distance Along">
             <ECCustomAttributes>
                 <HiddenProperty xmlns="CoreCustomAttributes.01.00.00"/>
             </ECCustomAttributes>
@@ -70,7 +77,6 @@
         <BaseClass>bis:SpatialLocationElement</BaseClass>
         <BaseClass>bis:ISubModeledElement</BaseClass>
         <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00.00"/>
             <HiddenClass xmlns="CoreCustomAttributes.01.00.00"/>
         </ECCustomAttributes>
     </ECEntityClass>
@@ -78,17 +84,15 @@
         <BaseClass>bis:SpatialLocationElement</BaseClass>
         <BaseClass>bis:ISubModeledElement</BaseClass>
         <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00.00"/>
             <HiddenClass xmlns="CoreCustomAttributes.01.00.00"/>
         </ECCustomAttributes>
     </ECEntityClass>
     <ECEntityClass typeName="HorizontalAlignment" description="Detailing of an Alignment horizontally (Top/Plan view).">
         <BaseClass>bis:SpatialLocationElement</BaseClass>
         <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00.00"/>
             <HiddenClass xmlns="CoreCustomAttributes.01.00.00"/>
         </ECCustomAttributes>
-        <ECProperty propertyName="HorizontalGeometry" typeName="Bentley.Geometry.Common.IGeometry" kindOfQuantity="LENGTH">
+        <ECProperty propertyName="HorizontalGeometry" typeName="Bentley.Geometry.Common.IGeometry" kindOfQuantity="rru:LENGTH">
             <ECCustomAttributes>
                 <HiddenProperty xmlns="CoreCustomAttributes.01.00.00"/>
             </ECCustomAttributes>
@@ -97,10 +101,9 @@
     <ECEntityClass typeName="VerticalAlignment" description="Detailing of a Alignment or a portion of it, vertically along its path.">
         <BaseClass>bis:GeometricElement2d</BaseClass>
         <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00.00"/>
             <HiddenClass xmlns="CoreCustomAttributes.01.00.00"/>
         </ECCustomAttributes>
-        <ECProperty propertyName="VerticalGeometry" typeName="Bentley.Geometry.Common.IGeometry" kindOfQuantity="LENGTH" description="Geometry primitives accurately describing the vertical alignment. X-values mean distance-along the HorizontalAlignment; Y-values are always zero; Z-values provide elevation information.">
+        <ECProperty propertyName="VerticalGeometry" typeName="Bentley.Geometry.Common.IGeometry" kindOfQuantity="rru:LENGTH" description="Geometry primitives accurately describing the vertical alignment. X-values mean distance-along the HorizontalAlignment; Y-values are always zero; Z-values provide elevation information.">
             <ECCustomAttributes>
                 <HiddenProperty xmlns="CoreCustomAttributes.01.00.00"/>
             </ECCustomAttributes>
@@ -108,9 +111,6 @@
     </ECEntityClass>
     <ECEntityClass typeName="VerticalAlignmentModel" description="Container for all Vertical Alignments breaking down an Alignment.">
         <BaseClass>bis:GeometricModel2d</BaseClass>
-        <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00.00"/>
-        </ECCustomAttributes>
     </ECEntityClass>
     <ECRelationshipClass typeName="HorizontalModelBreaksDownAlignments" strength="embedding" strengthDirection="Backward" modifier="Sealed" description="Relationship enabling break-down of an AlignmentModel (3d) into a 2d model focusing on Horizontal/Plan-view of them.">
         <BaseClass>bis:ModelModelsElement</BaseClass>
@@ -133,10 +133,9 @@
     <ECEntityClass typeName="AlignmentStation" modifier="Sealed" description="Well-known location along a Linear-Element, with a specific Station value assigned to it.">
         <BaseClass>lr:ReferentElement</BaseClass>
         <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00.00"/>
             <HiddenClass xmlns="CoreCustomAttributes.01.00.00"/>
         </ECCustomAttributes>
-        <ECProperty propertyName="Station" typeName="double" kindOfQuantity="STATION"/>
+        <ECProperty propertyName="Station" typeName="double" kindOfQuantity="rru:STATION"/>
     </ECEntityClass>
     <ECRelationshipClass typeName="AlignmentOwnsReferents" strength="embedding" modifier="None" description="Relationship definitiong ownership from an Alignment to its child Referents.">
         <BaseClass>bis:ElementOwnsChildElements</BaseClass>
@@ -147,16 +146,4 @@
             <Class class="lr:ReferentElement"/>
         </Target>
     </ECRelationshipClass>
-    <!--ECEntityClass typeName="AlignmentProfileViewDefinition" description="A specialized view for vertical alignments.">
-      <BaseClass>bis:SpatialViewDefinition</BaseClass>
-      <ECCustomAttributes>
-        <ClassHasHandler xmlns="BisCore.01.00.00"/>
-      </ECCustomAttributes>
-    </ECEntityClass>
-    <ECEntityClass typeName="AlignmentXSViewDefinition" modifier="Sealed" description="Specialized ViewDefinition for transverse geometry of alignments.">
-        <BaseClass>bis:SpatialViewDefinition</BaseClass>
-        <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00.00"/>
-        </ECCustomAttributes>
-    </ECEntityClass-->
 </ECSchema>
