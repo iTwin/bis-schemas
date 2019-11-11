@@ -5,6 +5,10 @@
 
 // This tool is designed to merge the information dumped by the 'signoff.py --getLaunchCodes --dumpJson' script
 // with the schema information gathered from the bis-schemas repository.
+// Usage:
+// generateInventory.js --BisRoot <pathToRootOfBisSchemasRepo>
+// Example:
+//    node ./tools/packages/generateInventory.js --BisRoot .
 
 "use strict";
 
