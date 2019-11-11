@@ -7,6 +7,8 @@
 // Requires '--isRealRun' passed in to actually publish, else it does a dry run
 // Usage:
 // publishPackages.js --packages <directoryToSearchForPackages> [--isRealRun]
+// Example:
+//    node ./tools/packages/publishPackages.js --packages ./packageOut
 
 "use strict";
 

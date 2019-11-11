@@ -61,7 +61,7 @@ stages:
         displayName: Get Launch codes (temp)
       - script: node ./tools/packages/generateInventory.js --BisRoot .
         displayName: Build Schema Inventory (temp)
-      - script: node ./tools/packages/generatePackages.js --inventory ./SchemaInventory.json --outDir $(pkgOut) --template ./tools/packages/package.json.template --skipBetaPackages
+      - script: node ./tools/packages/generatePackages.js --inventory ./SchemaInventory.json --outDir $(pkgOut) --template ./tools/packages/package.json.template
         displayName: Generate Packages (no beta packages)
 
       - publish: $(pkgOut)
@@ -87,5 +87,25 @@ stages:
           command: install
       - download: current
         artifact: bis-schemas-packages
+      #Your build pipeline references a secret variable named ‘artifactsRegistryToken’. Create or edit the build pipeline for this YAML file, define the variable on the Variables tab, and then select the option to make it secret. See https://go.microsoft.com/fwlink/?linkid=865972
+      - powershell: |
+          $npmrcDir = "$(Build.Repository.LocalPath)"
+          
+          if(!(Test-Path -Path $npmrcDir)){
+              mkdir $npmrcDir
+          }
+          
+          $npmrcFile = $npmrcDir + "/.npmrc"
+          
+          Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "@bentley:registry=/"
+          Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "always-auth=true" -Append
+          Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "///bentleycs/_packaging/Packages/npm/registry/:username=Packages" -Append
+          Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "///bentleycs/_packaging/Packages/npm/registry/:_password=$(artifactsRegistryToken)" -Append
+          Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "///bentleycs/_packaging/Packages/npm/registry/:email=npm requires email to be set but doesn't use the value" -Append
+          Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "///bentleycs/_packaging/Packages/npm/:username=Packages" -Append
+          Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "///bentleycs/_packaging/Packages/npm/:_password=$(artifactsRegistryToken)" -Append
+          Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "///bentleycs/_packaging/Packages/npm/:email=npm requires email to be set but doesn't use the value" -Append
+
+        displayName: 'Seed npmrc'
       - script: node ./tools/packages/publishPackages.js --packages $(Pipeline.Workspace)/bis-schemas-packages --isRealRun
-        displayName: Publish packages (dry run)
+        displayName: Publish packages

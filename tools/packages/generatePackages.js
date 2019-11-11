@@ -7,6 +7,8 @@
 // published with the latest tag and beta schemas are released with the next tag.  Use the option --skipBetaPackages to publish only released packages.
 // Usage:
 // node generatePackages.js --template <pathToPackageJsonTemplate> --outDir <pathToDirectoryToBuildPackages> --inventory <pathToSchemaInventory> [--skipBetaPackages]
+// Example:
+//    node ./tools/packages/generatePackages.js --inventory ./SchemaInventory.json --outDir ./packageOut --template ./tools/packages/package.json.template
 
 "use strict";
 
@@ -80,6 +82,7 @@ function getReleaseVersion(schemaInfo, publishedVersions) {
   const matchingPublishedVersion = publishedVersions.find((pub) => 
     !pub.isBeta && versionInfo.read === pub.read && versionInfo.write === pub.write && versionInfo.patch === pub.patch);
   
+  console.log(`Found matching released package for ${schemaInfo.name}.${schemaInfo.version}, skipping package generation`);
   versionInfo.needToPublish = undefined === matchingPublishedVersion;
   return versionInfo;
 }
@@ -94,9 +97,7 @@ function getNextBetaVersion(schemaInfo, publishedVersions) {
   if (undefined !== matchingPublishedVersion) {
     console.log(`Found released version of ${schemaInfo.name}.${schemaInfo.version}, skipping beta package generation.`);
     versionInfo.needToPublish = false;
-  }
-
-  if (undefined === latestPublishedBeta) {
+  } else if (undefined === latestPublishedBeta) {
     console.log (`Did not find any already published versions of ${schemaInfo.name}.${schemaInfo.version}.  Publishing -beta.1`)
     versionInfo.isBeta = true;
     versionInfo.beta = 1;
@@ -105,7 +106,7 @@ function getNextBetaVersion(schemaInfo, publishedVersions) {
     versionInfo.beta = latestPublishedBeta.beta + 1;
     const gitModTime = new Date (child_process.spawnSync(`git`,[`log`, `-1`, `--format=%cI`, schemaInfo.path], {encoding: 'utf8'}).stdout.trimRight());
     versionInfo.needToPublish = gitModTime > latestPublishedBeta.time;
-    console.log(`Found beta version ${latestPublishedBeta.beta} for ${schemaInfo.name}.${schemaInfo.version}.  Local version changed ${gitModTime}, package published ${latestPublishedBeta.time}.  So ${versionInfo.needToPublish? "generating package": "skipping package generation"}.`)
+    console.log(`Found beta version ${latestPublishedBeta.beta} for ${schemaInfo.name}.${schemaInfo.version}.  Local version changed ${gitModTime}, package published ${latestPublishedBeta.time}, ${versionInfo.needToPublish? "generating package": "skipping package generation"}.`)
   }
   return versionInfo;
 }
@@ -141,8 +142,6 @@ async function createPackages(inventoryPath, outDir, packageTemplatePath, skipBe
           versionInfo.packageName = packageName;
           versionInfo.packageVersion = formatPackageVersion(versionInfo);
           buildPackage(outDir, packageJsonTemplate, versionInfo, schemaInfo);
-      } else {
-        console.log(`Skipping package build for file ${JSON.stringify(schemaInfo.path)}`);
       }
     }
   }
