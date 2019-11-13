@@ -4,9 +4,11 @@
 *--------------------------------------------------------------------------------------------*/
 
 // This tool creates an npm package for each schema.  Released released schemas should be 
-// published with the latest tag and beta schemas are released with the next tag.  Use the option --skipBetaPackages to publish only released packages.
+// published with the latest tag and beta schemas are released with the next tag.  
+// Use the option --skipBetaPackages to generate only released packages.
+// Use the option --alwaysGen to generate packages even if they are already published. NOTE: Does not create beta packages for already released schemas
 // Usage:
-// node generatePackages.js --template <pathToPackageJsonTemplate> --outDir <pathToDirectoryToBuildPackages> --inventory <pathToSchemaInventory> [--skipBetaPackages]
+// node generatePackages.js --template <pathToPackageJsonTemplate> --outDir <pathToDirectoryToBuildPackages> --inventory <pathToSchemaInventory> [--skipBetaPackages] [--alwaysGen]
 // Example:
 //    node ./tools/packages/generatePackages.js --inventory ./SchemaInventory.json --outDir ./packageOut --template ./tools/packages/package.json.template
 
@@ -72,22 +74,23 @@ function buildPackage(outPath, packageJsonTemplate, versionInfo, schemaInfo) {
                                      .replace('${PACKAGE_VERSION}', versionInfo.packageVersion);
 
   fs.writeFileSync(path.join(packageDir, "package.json"), pkgJson);
-  const schemaFileName = `${schemaInfo.name}.${schemaInfo.version}.ecschema.xml`;
+  const schemaFileName = `${schemaInfo.name}.ecschema.xml`;
   const packageSchemaPath = path.join(packageDir, schemaFileName);
   fs.copyFileSync(schemaInfo.path, packageSchemaPath);
 }
 
-function getReleaseVersion(schemaInfo, publishedVersions) {
+function getReleaseVersion(schemaInfo, publishedVersions, alwaysGen) {
   const versionInfo = parseVersionString(schemaInfo.version);
   const matchingPublishedVersion = publishedVersions.find((pub) => 
     !pub.isBeta && versionInfo.read === pub.read && versionInfo.write === pub.write && versionInfo.patch === pub.patch);
   
-  console.log(`Found matching released package for ${schemaInfo.name}.${schemaInfo.version}, skipping package generation`);
-  versionInfo.needToPublish = undefined === matchingPublishedVersion;
+  versionInfo.needToPublish = undefined === matchingPublishedVersion || alwaysGen;
+  if (!versionInfo.needToPublish)
+    console.log(`Found matching released package for ${schemaInfo.name}.${schemaInfo.version}, skipping package generation`);
   return versionInfo;
 }
 
-function getNextBetaVersion(schemaInfo, publishedVersions) {
+function getNextBetaVersion(schemaInfo, publishedVersions, alwaysGen) {
   const versionInfo = parseVersionString(schemaInfo.version);
   const latestPublishedBeta = publishedVersions.find((pub) => 
     pub.isBeta && versionInfo.read === pub.read && versionInfo.write === pub.write && versionInfo.patch === pub.patch);
@@ -103,15 +106,16 @@ function getNextBetaVersion(schemaInfo, publishedVersions) {
     versionInfo.beta = 1;
     versionInfo.needToPublish = true;
   } else {
-    versionInfo.beta = latestPublishedBeta.beta + 1;
+    versionInfo.isBeta = true;
+    versionInfo.beta = parseInt(latestPublishedBeta.beta) + 1;
     const gitModTime = new Date (child_process.spawnSync(`git`,[`log`, `-1`, `--format=%cI`, schemaInfo.path], {encoding: 'utf8'}).stdout.trimRight());
-    versionInfo.needToPublish = gitModTime > latestPublishedBeta.time;
+    versionInfo.needToPublish = gitModTime > latestPublishedBeta.time || alwaysGen;
     console.log(`Found beta version ${latestPublishedBeta.beta} for ${schemaInfo.name}.${schemaInfo.version}.  Local version changed ${gitModTime}, package published ${latestPublishedBeta.time}, ${versionInfo.needToPublish? "generating package": "skipping package generation"}.`)
   }
   return versionInfo;
 }
 
-async function createPackages(inventoryPath, outDir, packageTemplatePath, skipBetaPackages) {
+async function createPackages(inventoryPath, outDir, packageTemplatePath, skipBetaPackages, alwaysGen) {
   if (skipBetaPackages) console.log("Skipping beta packages because the '--skipBetaPackages' flag is set");
 
   const schemaInventory = JSON.parse(fs.readFileSync(inventoryPath));
@@ -121,7 +125,7 @@ async function createPackages(inventoryPath, outDir, packageTemplatePath, skipBe
   const packageJsonTemplate = fs.readFileSync(packageTemplatePath, {encoding: 'utf8'});
 
   for (const [name, schemaInfoList] of Object.entries(schemaInventory)) {
-    const packageName = "@bentley/bis-" + name.toLowerCase();
+    const packageName = `@bentley/${name.toLowerCase()}-schema`;
     console.log(`Looking for packages published with the name ${packageName} for schema ${name}`);
     const publishedVersions = getPublishedSchemas(packageName);
     for (const schemaInfo of schemaInfoList) {
@@ -133,9 +137,9 @@ async function createPackages(inventoryPath, outDir, packageTemplatePath, skipBe
       let versionInfo = {needToPublish: false};
       // if released check npm for package, build if does not exist
       if (schemaInfo.released) {
-        versionInfo = getReleaseVersion(schemaInfo, publishedVersions);
+        versionInfo = getReleaseVersion(schemaInfo, publishedVersions, alwaysGen);
       } else if (!skipBetaPackages) {
-        versionInfo = getNextBetaVersion(schemaInfo, publishedVersions);
+        versionInfo = getNextBetaVersion(schemaInfo, publishedVersions, alwaysGen);
       }
     
       if (versionInfo.needToPublish) {
@@ -147,4 +151,4 @@ async function createPackages(inventoryPath, outDir, packageTemplatePath, skipBe
   }
 }
 
-createPackages(argv.inventory, argv.outDir, argv.template, undefined !== argv.skipBetaPackages);
+createPackages(argv.inventory, argv.outDir, argv.template, undefined !== argv.skipBetaPackages, undefined !== argv.alwaysGen);
