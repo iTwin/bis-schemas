@@ -59,7 +59,7 @@
         <ECEnumerator value="6" name="Wall" displayLabel="Wall" />
     </ECEnumeration>
 
-    <ECEnumeration typeName="PlacementPoint" backingTypeName="int" isStrict="true" description="Used for setting Surface location">
+    <ECEnumeration typeName="PlacementPoint" backingTypeName="int" isStrict="true" description="Used for setting Surface location.">
         <ECEnumerator value="0" name="Top" displayLabel="Top" description="Topology defines top boundary of a Surface." />
         <ECEnumerator value="1" name="Middle" displayLabel="Middle" description="Topology defines boundary at the mid depth of a Surface." />
         <ECEnumerator value="2" name="Bottom" displayLabel="Bottom" description="Topology defines boundary at the bottom of a Surface." />
@@ -90,6 +90,8 @@
 
     <ECEntityClass typeName="Face" modifier="Sealed" displayLabel="Face" description="A surface bounded by Loops.">
         <BaseClass>SharedTopologyElement</BaseClass>
+        <BaseClass>ILoopOwner</BaseClass>
+        <BaseClass>IPathsOwner</BaseClass>
     </ECEntityClass>
 
     <ECEntityClass typeName="OrientedFaceAspect" modifier="Sealed" displayLabel="Oriented Face Aspect" description="This Aspect stores the Faces (and related data) for a FaceSet.">
@@ -133,7 +135,7 @@
         </ECCustomAttributes>
     </ECEntityClass>
 
-    <ECRelationshipClass typeName="ISheetOwnerOwnsSheet" strength="embedding" modifier="Sealed" description="A relationship that indicates that an Element owns Sheet.">
+    <ECRelationshipClass typeName="ISheetOwnerOwnsSheet" strength="embedding" modifier="None" description="A relationship that indicates that an Element owns Sheet.">
         <BaseClass>bis:ElementOwnsChildElements</BaseClass>
         <Source multiplicity="(0..1)" roleLabel="owns" polymorphic="true">
             <Class class="ISheetOwner"/>
@@ -155,7 +157,7 @@
         </ECCustomAttributes>
     </ECEntityClass>
 
-    <ECRelationshipClass typeName="IPathsOwnerOwnsPaths" strength="embedding" modifier="Sealed" description="A relationship that indicates that an Element owns Paths.">
+    <ECRelationshipClass typeName="IPathsOwnerOwnsPaths" strength="embedding" modifier="None" description="A relationship that indicates that an Element owns Paths.">
         <BaseClass>bis:ElementOwnsChildElements</BaseClass>
         <Source multiplicity="(0..1)" roleLabel="owns" polymorphic="true">
             <Class class="IPathsOwner"/>
@@ -187,7 +189,7 @@
         </ECCustomAttributes>
     </ECEntityClass>
 
-    <ECRelationshipClass typeName="ILoopOwnerOwnsLoop" strength="embedding" modifier="Sealed" description="A relationship that indicates that an Element owns Loop.">
+    <ECRelationshipClass typeName="ILoopOwnerOwnsLoop" strength="embedding" modifier="None" description="A relationship that indicates that an Element owns Loop.">
         <BaseClass>bis:ElementOwnsChildElements</BaseClass>
         <Source multiplicity="(0..1)" roleLabel="owns" polymorphic="true">
             <Class class="ILoopOwner"/>
@@ -271,7 +273,7 @@
         <ECEnumerator value="3" name="TwoWayTwistFree" displayLabel="TwoWayTwistFree" description="This member can span transverse loads in two (perpendicular) directions (the r- and s- axes), but cannot resist (r-s) twisting moments." />
     </ECEnumeration>
 
-    <ECEnumeration typeName="LoadResistance" backingTypeName="int" isStrict="true" description="Classifies members according to the types of loads they can resist">
+    <ECEnumeration typeName="LoadResistance" backingTypeName="int" isStrict="true" description="Classifies members according to the types of loads they can resist.">
         <ECEnumerator value="0" name="Unset" displayLabel="Unset" description="Value is not set." />
         <ECEnumerator value="1" name="GravityOnly" displayLabel="GravityOnly" description="Resists only gravity loads." />
         <ECEnumerator value="2" name="GravityAndLateral" displayLabel="GravityAndLateral" description="Resists both gravity and lateral loads."/>
@@ -295,17 +297,17 @@
         <BaseClass>MemberBehaviorAspect</BaseClass>
     </ECEntityClass>
 
-    <ECEntityClass typeName="BendingBehaviorAspect" modifier="Sealed" displayLabel="Bending Behavior Aspect" description="Assigns analytical behavior for SurfaceMember when subjected to transverse loads.">
+    <ECEntityClass typeName="BendingBehaviorAspect" modifier="Sealed" displayLabel="Bending Behavior" description="Assigns analytical behavior for SurfaceMember when subjected to transverse loads.">
         <BaseClass>SurfaceMemberBehaviorAspect</BaseClass>
         <ECProperty propertyName="BendingBehavior" typeName="BendingBehavior" displayLabel="Bending behavior" description="Provides value for the behavior." />
     </ECEntityClass>
 
-    <ECEntityClass typeName="LoadResistanceBehaviorAspect" modifier="Sealed" displayLabel="Load Resistance Behavior Aspect" description="Member load resistance.">
+    <ECEntityClass typeName="LoadResistanceBehaviorAspect" modifier="Sealed" displayLabel="Load Resistance Behavior" description="Member load resistance.">
         <BaseClass>MemberBehaviorAspect</BaseClass>
         <ECProperty propertyName="LoadResistance" typeName="LoadResistance" displayLabel="Load resistance" description="Value for load resistance." />
     </ECEntityClass>
 
-    <ECEntityClass typeName="CurveMemberBehaviorAspect" modifier="Abstract" displayLabel="Curve Member Behavior Aspect" description="Defines unique behavior for a specific CurveMember.">
+    <ECEntityClass typeName="CurveMemberBehaviorAspect" modifier="Abstract" displayLabel="Curve Member Behavior" description="Defines unique behavior for a specific CurveMember.">
         <BaseClass>MemberBehaviorAspect</BaseClass>
     </ECEntityClass>
 
@@ -448,14 +450,14 @@
         <BaseClass>bis:DefinitionElement</BaseClass>
     </ECEntityClass>
 
-    <ECEntityClass typeName="SimpleSurfaceSystem" modifier="Sealed" description="Simple Surface System">
+    <ECEntityClass typeName="SimpleSurfaceSystem" modifier="Sealed" description="Simple Surface System.">
         <BaseClass>SurfaceSystem</BaseClass>
         <ECProperty propertyName="Thickness" typeName="double" description="Thickness of all ISurfaces in a system." />
         <ECNavigationProperty propertyName="Material" relationshipName="SimpleSurfaceSystemRefersToMaterial" direction="Forward" displayLabel="Material" description="Material of all ISurfaces in a system." />
     </ECEntityClass>
 
     <ECRelationshipClass typeName="SimpleSurfaceSystemRefersToMaterial" strength="referencing" strengthDirection="Forward" modifier="Sealed">
-        <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="true">
+        <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="false">
             <Class class="SimpleSurfaceSystem" />
         </Source>
         <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="true">
@@ -488,7 +490,7 @@
 
     <ECRelationshipClass typeName="SurfaceMemberOwnsBendingBehaviorAspect" modifier="Sealed" strength="embedding">
         <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
-        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
             <Class class="SurfaceMember" />
         </Source>
         <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
@@ -526,7 +528,7 @@
 
     <ECRelationshipClass typeName="CurveMemberOwnsLocationWire" strength="embedding" modifier="Sealed" description="A relationship that indicates that an Element owns Wire.">
         <BaseClass>IWireOwnerOwnsWire</BaseClass>
-        <Source multiplicity="(0..1)" roleLabel="owns" polymorphic="true">
+        <Source multiplicity="(0..1)" roleLabel="owns" polymorphic="false">
             <Class class="CurveMember"/>
         </Source>
         <Target multiplicity="(1..1)" roleLabel="is owned by" polymorphic="false">
@@ -545,7 +547,7 @@
 
     <ECRelationshipClass typeName="CurveMemberOwnsCamberBehaviorAspect" modifier="Sealed" strength="embedding">
         <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
-        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
             <Class class="CurveMember" />
         </Source>
         <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
@@ -592,8 +594,46 @@
         <Source multiplicity="(0..*)" roleLabel="has" polymorphic="true">
             <Class class="MaterialProfileSystem" />
         </Source>
+        <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="false">
+            <Class class="MaterialProfile" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="MaterialProfileDefinition" modifier="abstract" displayLabel="Material Profile Definition" description="Base class defining an element that pairs Profiles and PhysicalMaterials.">
+        <BaseClass>bis:DefinitionElement</BaseClass>
+        <ECProperty propertyName="Name" typeName="string" description="Name of the MaterialProfile used for identification." />
+        <ECProperty propertyName="Description" typeName="string" description="Description of the MaterialProfile." />
+    </ECEntityClass>
+
+    <ECEnumeration typeName="MaterialProfileCategoryType" backingTypeName="int" isStrict="true" displayLabel="Material Profile Category Type" description="Role of the MaterialProfile.">
+        <ECEnumerator value="0" name="LoadBearing" displayLabel="Load Bearing" />
+        <ECEnumerator value="1" name="Insulation" displayLabel="Insulation" />
+        <ECEnumerator value="2" name="Finish" displayLabel="Finish" />
+    </ECEnumeration>
+
+    <ECEntityClass typeName="MaterialProfile" modifier="Sealed" displayLabel="Material Profile" description="Single pair of Profile and PhysicalMaterial.">
+        <BaseClass>MaterialProfileDefinition</BaseClass>
+        <ECProperty propertyName="Priority" typeName="int" description="Index used by MaterialProfileSet to ensure a string ordering of the MaterialProfiles." />
+        <ECProperty propertyName="Category" typeName="MaterialProfileCategoryType" description="Role of the MaterialProfile." />
+        <ECNavigationProperty propertyName="Material" relationshipName="MaterialProfileRefersToMaterial" direction="Forward" description="Referenced PhysicalMaterial." />
+        <ECNavigationProperty propertyName="Profile" relationshipName="MaterialProfileRefersToProfile" direction="Forward" description="Referenced Profile." />
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="MaterialProfileRefersToMaterial" strength="referencing" strengthDirection="Forward" modifier="Sealed">
+        <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="false">
+            <Class class="MaterialProfile" />
+        </Source>
         <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="true">
-            <Class class="prf:MaterialProfile" />
+            <Class class="bis:PhysicalMaterial"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="MaterialProfileRefersToProfile" strength="referencing" strengthDirection="Forward" modifier="Sealed">
+        <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="false">
+            <Class class="MaterialProfile" />
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="true">
+            <Class class="prf:Profile"/>
         </Target>
     </ECRelationshipClass>
 
@@ -810,7 +850,7 @@
     <!-- Load groups -->
     <ECEnumeration typeName="LoadType" backingTypeName="int" isStrict="true" description="Used for specifying LoadType in LoadContainer.">
         <ECEnumerator value="0" name="Unset" displayLabel="Unset" description="Load type not set." />
-        <ECEnumerator value="1" name="Other" displayLabel="Other" description="Load type is not specified by other available types" />
+        <ECEnumerator value="1" name="Other" displayLabel="Other" description="Load type is not specified by other available types." />
         <ECEnumerator value="2" name="Blast" displayLabel="Blast" description="Blast wave forces due to explosions." />
         <ECEnumerator value="3" name="DeadUnspecified" displayLabel="DeadUnspecified" description="Load which does not change over time and its' source" />
         <ECEnumerator value="4" name="DeadStructure" displayLabel="DeadStructure" description="Dead load from structure self-weight." />
@@ -870,7 +910,7 @@
     <ECEntityClass typeName="LoadContainer" modifier="Abstract" displayLabel="Load Container" description="A collection of loads.">
         <BaseClass>StructuralAnalysisElement</BaseClass>
         <ECProperty propertyName="LoadType" typeName="LoadType" description="Load Type." />
-        <ECProperty propertyName="SelfWeightVector" typeName="Point3d" description="Self Weight Vector" />
+        <ECProperty propertyName="SelfWeightVector" typeName="Point3d" description="Self Weight Vector." />
     </ECEntityClass>
 
     <ECRelationshipClass typeName="LoadContainerOwnsLoads" strength="embedding" modifier="Sealed">
@@ -934,7 +974,7 @@
         description="Adds a factor to a specified LoadCondition.">
         <BaseClass>bis:ElementMultiAspect</BaseClass>
         <ECProperty propertyName="Factor" typeName="double" description="Factor to be applied to the group." />
-        <ECProperty propertyName="LoadCombinationType" typeName="LoadCombinationType" description="Type of load combination" />
+        <ECProperty propertyName="LoadCombinationType" typeName="LoadCombinationType" description="Type of load combination." />
     </ECEntityClass>
 
     <ECEntityClass typeName="FactoredLoadCaseAspect" modifier="Sealed" displayLabel="Factored Load Case Aspect" description="Adds a factor to a specified LoadCase.">
@@ -967,12 +1007,12 @@
     </ECRelationshipClass>
 
     <!-- Load Value Aspect Classes -->
-    <ECEnumeration typeName="CurveVariationType" backingTypeName="int" description="Enumeration of Curve Load Variation types">
+    <ECEnumeration typeName="CurveVariationType" backingTypeName="int" description="Enumeration of Curve Load Variation types.">
         <ECEnumerator value="0" name="Linear" displayLabel="Linear" description="Forces at curve points vary linearly along the host curve." />
         <ECEnumerator value="1" name="Parabola" displayLabel="Parabola" description="Forces at point vary parabolically along the host curve."/>
     </ECEnumeration>
 
-    <ECEnumeration typeName="SurfaceVariationType" backingTypeName="int" description="Enumeration of Surface Load Variation types">
+    <ECEnumeration typeName="SurfaceVariationType" backingTypeName="int" description="Enumeration of Surface Load Variation types.">
         <ECEnumerator value="0" name="Plane" displayLabel="Plane" description="Force at plane points vary linearly from some specific point in the plane." />
         <ECEnumerator value="1" name="Parabola" displayLabel="Parabola" description="Force at plane points vary parabolically from some specific point in the plane." />
     </ECEnumeration>
@@ -1013,10 +1053,10 @@
 
     <ECRelationshipClass typeName="PointLoadOwnsPointLoadValueAspect" strength="embedding" strengthDirection="Forward" modifier="Sealed">
         <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
-        <Source multiplicity="(1..1)" roleLabel="refers to" polymorphic="false">
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
             <Class class="PointLoad" />
         </Source>
-        <Target multiplicity="(0..*)" roleLabel="is referenced by" polymorphic="true">
+        <Target multiplicity="(1..1)" roleLabel="is owned by" polymorphic="true">
             <Class class="PointLoadValueAspect" />
         </Target>
     </ECRelationshipClass>
@@ -1035,10 +1075,10 @@
 
     <ECRelationshipClass typeName="CurveLoadOwnsCurveLoadValueAspect" strength="embedding" strengthDirection="Forward" modifier="Sealed">
         <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
-        <Source multiplicity="(1..1)" roleLabel="refers to" polymorphic="false">
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
             <Class class="CurveLoad" />
         </Source>
-        <Target multiplicity="(0..*)" roleLabel="is referenced by" polymorphic="true">
+        <Target multiplicity="(1..*)" roleLabel="is owned by" polymorphic="true">
             <Class class="CurveLoadValueAspect" />
         </Target>
     </ECRelationshipClass>
@@ -1070,10 +1110,10 @@
 
     <ECRelationshipClass typeName="SurfaceLoadOwnsSurfaceLoadValueAspect" strength="embedding" strengthDirection="Forward" modifier="Sealed">
         <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
-        <Source multiplicity="(1..1)" roleLabel="refers to" polymorphic="false">
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
             <Class class="SurfaceLoad" />
         </Source>
-        <Target multiplicity="(0..*)" roleLabel="is referenced by" polymorphic="true">
+        <Target multiplicity="(1..1)" roleLabel="is owned by" polymorphic="true">
             <Class class="SurfaceLoadValueAspect" />
         </Target>
     </ECRelationshipClass>
@@ -1156,7 +1196,7 @@
         <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="false">
             <Class class="PointSupportBehavior" />
         </Source>
-        <Target multiplicity="(0..1)" roleLabel="is referenced by" polymorphic="true">
+        <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="true">
             <Class class="PointTranslationalBehavior" />
         </Target>
     </ECRelationshipClass>
@@ -1165,7 +1205,7 @@
         <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="false">
             <Class class="PointSupportBehavior" />
         </Source>
-        <Target multiplicity="(0..1)" roleLabel="is referenced by" polymorphic="true">
+        <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="true">
             <Class class="PointTranslationalBehavior" />
         </Target>
     </ECRelationshipClass>
@@ -1174,7 +1214,7 @@
         <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="false">
             <Class class="PointSupportBehavior" />
         </Source>
-        <Target multiplicity="(0..1)" roleLabel="is referenced by" polymorphic="true">
+        <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="true">
             <Class class="PointTranslationalBehavior" />
         </Target>
     </ECRelationshipClass>
@@ -1202,7 +1242,7 @@
         <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="false">
             <Class class="PointSupportBehavior" />
         </Source>
-        <Target multiplicity="(0..1)" roleLabel="is referenced by" polymorphic="true">
+        <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="true">
             <Class class="PointRotationalBehavior" />
         </Target>
     </ECRelationshipClass>
@@ -1211,7 +1251,7 @@
         <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="false">
             <Class class="PointSupportBehavior" />
         </Source>
-        <Target multiplicity="(0..1)" roleLabel="is referenced by" polymorphic="true">
+        <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="true">
             <Class class="PointRotationalBehavior" />
         </Target>
     </ECRelationshipClass>
@@ -1220,7 +1260,7 @@
         <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="false">
             <Class class="PointSupportBehavior" />
         </Source>
-        <Target multiplicity="(0..1)" roleLabel="is referenced by" polymorphic="true">
+        <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="true">
             <Class class="PointRotationalBehavior" />
         </Target>
     </ECRelationshipClass>
@@ -1247,7 +1287,7 @@
         <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="false">
             <Class class="CurveSupportBehavior" />
         </Source>
-        <Target multiplicity="(0..1)" roleLabel="is referenced by" polymorphic="true">
+        <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="true">
             <Class class="CurveTranslationalBehavior" />
         </Target>
     </ECRelationshipClass>
@@ -1256,7 +1296,7 @@
         <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="false">
             <Class class="CurveSupportBehavior" />
         </Source>
-        <Target multiplicity="(0..1)" roleLabel="is referenced by" polymorphic="true">
+        <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="true">
             <Class class="CurveTranslationalBehavior" />
         </Target>
     </ECRelationshipClass>
@@ -1265,7 +1305,7 @@
         <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="false">
             <Class class="CurveSupportBehavior" />
         </Source>
-        <Target multiplicity="(0..1)" roleLabel="is referenced by" polymorphic="true">
+        <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="true">
             <Class class="CurveTranslationalBehavior" />
         </Target>
     </ECRelationshipClass>
@@ -1295,13 +1335,13 @@
         <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="false">
             <Class class="CurveSupportBehavior" />
         </Source>
-        <Target multiplicity="(0..1)" roleLabel="is referenced by" polymorphic="true">
+        <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="true">
             <Class class="CurveRotationalBehavior" />
         </Target>
     </ECRelationshipClass>
 
     <ECEntityClass typeName="FixedCurveRotationalBehavior" modifier="Sealed" displayLabel="Fixed Curve Rotational Behavior"
-        description="Curve has fixed rotational behavior">
+        description="Curve has fixed rotational behavior.">
         <BaseClass>CurveRotationalBehavior</BaseClass>
     </ECEntityClass>
 
@@ -1324,7 +1364,7 @@
         <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="false">
             <Class class="SurfaceSupportBehavior" />
         </Source>
-        <Target multiplicity="(0..1)" roleLabel="is referenced by" polymorphic="true">
+        <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="true">
             <Class class="SurfaceTranslationalBehavior" />
         </Target>
     </ECRelationshipClass>
@@ -1333,7 +1373,7 @@
         <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="false">
             <Class class="SurfaceSupportBehavior" />
         </Source>
-        <Target multiplicity="(0..1)" roleLabel="is referenced by" polymorphic="true">
+        <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="true">
             <Class class="SurfaceTranslationalBehavior" />
         </Target>
     </ECRelationshipClass>
@@ -1342,7 +1382,7 @@
         <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="false">
             <Class class="SurfaceSupportBehavior" />
         </Source>
-        <Target multiplicity="(0..1)" roleLabel="is referenced by" polymorphic="true">
+        <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="true">
             <Class class="SurfaceTranslationalBehavior" />
         </Target>
     </ECRelationshipClass>
