@@ -15,7 +15,9 @@ stages:
     workspace:
       clean: all
     variables:
-      pkgOut: $(Agent.BuildDirectory)/Packages
+    - group: 
+    - name: pkgOut
+      value: '$(Agent.BuildDirectory)/Packages'
 
     steps:
       - task: NodeTool@0
@@ -25,7 +27,7 @@ stages:
       - checkout: self
         clean: true
 
-      #Your build pipeline references a secret variable named ‘’. Create or edit the build pipeline for this YAML file, define the variable on the Variables tab, and then select the option to make it secret. See https://go.microsoft.com/fwlink/?linkid=865972
+      #Your build pipeline references a secret variable named ‘’. This variable is pulled from the '' variable group.  You must authorize this build to use that group: https://docs.microsoft.com/en-us/azure/devops/pipelines/library/variable-groups?view=azure-devops&tabs=yaml#use-a-variable-group
       - powershell: |
           $npmrcDir = "$(Build.Repository.LocalPath)"
           
