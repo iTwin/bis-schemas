@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ECSchema schemaName="StructuralAnalysis" alias="sa" version="01.00.00" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" displayLabel="Structural Analysis" description="Structural Analysis Schema.">
+<ECSchema schemaName="StructuralAnalysis" alias="sa" version="01.00.01" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" displayLabel="Structural Analysis" description="Structural Analysis Schema.">
     <ECSchemaReference name="BisCore" version="01.00.00" alias="bis" />
     <ECSchemaReference name="Profiles" version="01.00.00" alias="prf" />
 
@@ -264,14 +264,14 @@
 
     <!-- Behavior Aspect Classes -->
 
-    <ECEnumeration typeName="BendingBehaviorValue" backingTypeName="int" isStrict="true" description="Describes the structural behavior of element to transverse loads.">
+    <ECEnumeration typeName="BendingBehavior" backingTypeName="int" isStrict="true" description="Describes the structural behavior of element to transverse loads.">
         <ECEnumerator value="0" name="Unset" displayLabel="Unset" description="To indicate this value was never set." />
         <ECEnumerator value="1" name="OneWay" displayLabel="OneWay" description="This member can span transverse loads in one direction (along the region r-axis)." />
         <ECEnumerator value="2" name="TwoWay" displayLabel="TwoWay" description="This member can span transverse loads in two (perpendicular) directions (the r- and s- axes)." />
         <ECEnumerator value="3" name="TwoWayTwistFree" displayLabel="TwoWayTwistFree" description="This member can span transverse loads in two (perpendicular) directions (the r- and s- axes), but cannot resist (r-s) twisting moments." />
     </ECEnumeration>
 
-    <ECEnumeration typeName="LoadResistanceValue" backingTypeName="int" isStrict="true" description="Classifies members according to the types of loads they can resist">
+    <ECEnumeration typeName="LoadResistance" backingTypeName="int" isStrict="true" description="Classifies members according to the types of loads they can resist">
         <ECEnumerator value="0" name="Unset" displayLabel="Unset" description="Value is not set." />
         <ECEnumerator value="1" name="GravityOnly" displayLabel="GravityOnly" description="Resists only gravity loads." />
         <ECEnumerator value="2" name="GravityAndLateral" displayLabel="GravityAndLateral" description="Resists both gravity and lateral loads."/>
@@ -279,7 +279,7 @@
         <ECEnumerator value="4" name="NonStructural" displayLabel="NonStructural" description="Not used to resist loads." />
     </ECEnumeration>
 
-    <ECEnumeration typeName="AxialBehaviorType" backingTypeName="int" isStrict="true" description="Describe the structural behavior of element subject to axial loads.">
+    <ECEnumeration typeName="AxialBehavior" backingTypeName="int" isStrict="true" description="Describe the structural behavior of element subject to axial loads.">
         <ECEnumerator value="0" name="Unset" displayLabel="Unset" description="Value is not set." />
         <ECEnumerator value="1" name="CompressionAndTension" displayLabel="CompressionAndTension" description="Resits both Compression and tension." />
         <ECEnumerator value="2" name="CompressionOnly" displayLabel="CompressionOnly" description="Resists axial compression, but not axial tension." />
@@ -297,36 +297,34 @@
 
     <ECEntityClass typeName="BendingBehaviorAspect" modifier="Sealed" displayLabel="Bending Behavior Aspect" description="Assigns analytical behavior for SurfaceMember when subjected to transverse loads.">
         <BaseClass>SurfaceMemberBehaviorAspect</BaseClass>
-        <ECProperty propertyName="BendingBehaviorValue" typeName="BendingBehaviorValue" displayLabel="Bending behavior value" description="Provides value for the behavior." />
+        <ECProperty propertyName="BendingBehavior" typeName="BendingBehavior" displayLabel="Bending behavior" description="Provides value for the behavior." />
     </ECEntityClass>
 
     <ECEntityClass typeName="LoadResistanceBehaviorAspect" modifier="Sealed" displayLabel="Load Resistance Behavior Aspect" description="Member load resistance.">
         <BaseClass>MemberBehaviorAspect</BaseClass>
-        <ECProperty propertyName="LoadResistanceValue" typeName="LoadResistanceValue" displayLabel="Load resistance value" description="Value for load resistance." />
+        <ECProperty propertyName="LoadResistance" typeName="LoadResistance" displayLabel="Load resistance" description="Value for load resistance." />
     </ECEntityClass>
 
     <ECEntityClass typeName="CurveMemberBehaviorAspect" modifier="Abstract" displayLabel="Curve Member Behavior Aspect" description="Defines unique behavior for a specific CurveMember.">
         <BaseClass>MemberBehaviorAspect</BaseClass>
     </ECEntityClass>
 
-    <ECEntityClass typeName="CamberBehaviorAspect" modifier="Sealed" displayLabel="Camber Behavior Aspect" description="Provides camber behavior for CurveMember.">
+    <ECEntityClass typeName="CamberBehaviorAspect" modifier="Sealed" displayLabel="Camber Behavior" description="Provides camber behavior for CurveMember.">
         <BaseClass>CurveMemberBehaviorAspect</BaseClass>
-        <ECProperty propertyName="CamberValue" typeName="double" displayLabel="Camber value" description="Camber value for the behavior." />
+        <ECProperty propertyName="Camber" typeName="double" displayLabel="Camber" description="Camber distance." />
     </ECEntityClass>
 
-    <ECEntityClass typeName="AxialBehaviorAspect" modifier="Sealed" displayLabel="Axial Behavior Type" description="Defines member as having a particular axial structural behavior.">
+    <ECEntityClass typeName="AxialBehaviorAspect" modifier="Sealed" displayLabel="Axial Behavior" description="Defines member as having a particular axial structural behavior.">
         <BaseClass>CurveMemberBehaviorAspect</BaseClass>
-        <ECProperty propertyName="Type" typeName="AxialBehaviorType" displayLabel="Axial behavior type" description="Specifies axial behavior type." />
+        <ECProperty propertyName="Type" typeName="AxialBehavior" displayLabel="Axial behavior" description="Specifies axial behavior type." />
     </ECEntityClass>
 
-    <ECEntityClass typeName="StiffnessBehaviorAspect" modifier="Sealed" displayLabel="Stiffness Behavior Aspect" description="Stiffness behavior for curve member.">
+    <ECEntityClass typeName="StiffnessBehaviorAspect" modifier="Sealed" displayLabel="Stiffness Behavior" description="Stiffness behavior for curve member.">
         <BaseClass>CurveMemberBehaviorAspect</BaseClass>
         <ECProperty propertyName="RAxisTranslational" typeName="double" displayLabel="R Axis Translational" description="Stiffness along local RAxis." />
         <ECProperty propertyName="SAxisTranslational" typeName="double" displayLabel="S Axis Translational" description="Stiffness along local SAxis." />
         <ECProperty propertyName="TAxisTranslational" typeName="double" displayLabel="T Axis Translational" description="Stiffness along local TAxis." />
         <ECProperty propertyName="RAxisRotational" typeName="double" displayLabel="R Axis Rotational" description="Stiffness about local RAxis." />
-        <ECProperty propertyName="SAxisRotational" typeName="double" displayLabel="S Axis Rotational" description="Stiffness about local SAxis." />
-        <ECProperty propertyName="TAxisRotational" typeName="double" displayLabel="T Axis Rotational" description="Stiffness about local TAxis." />
     </ECEntityClass>
 
     <!-- Member classes -->
@@ -1101,7 +1099,7 @@
     </ECEntityClass>
 
     <!-- Supports / Support behaviors -->
-    <ECEnumeration typeName="SpringBehaviorType" backingTypeName="int" isStrict="true">
+    <ECEnumeration typeName="SpringBehavior" backingTypeName="int" isStrict="true">
         <ECEnumerator value="0" name="CompressionOnly" displayLabel="CompressionOnly" description="Support resists only compression." />
         <ECEnumerator value="1" name="TensionOnly" displayLabel="TensionOnly" description="Support resists only tension." />
         <ECEnumerator value="2" name="CompressionAndTension" displayLabel="CompressionAndTension" description="Support resists both compression and tension." />
