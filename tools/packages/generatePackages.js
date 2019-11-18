@@ -118,6 +118,9 @@ function getNextBetaVersion(schemaInfo, publishedVersions, alwaysGen) {
 async function createPackages(inventoryPath, outDir, packageTemplatePath, skipBetaPackages, alwaysGen) {
   if (skipBetaPackages) console.log("Skipping beta packages because the '--skipBetaPackages' flag is set");
 
+  // Always create the package output directory so we have something to publish.
+  if (!fs.existsSync(outDir)) fs.mkdirSync(outDir, {recursive: true});
+
   const schemaInventory = JSON.parse(fs.readFileSync(inventoryPath));
   if (null === schemaInventory || undefined == schemaInventory)
     throw Error (`Could not load schema invetory file from '${inventoryPath}'`);
