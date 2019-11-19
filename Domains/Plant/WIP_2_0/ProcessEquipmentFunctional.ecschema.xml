@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ECSchema schemaName="ProcessEquipmentFunctional" alias="pequipf" version="01.00.00" description="Process Equipment Functional Schema" displayLabel="Process Equipment Functional" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.1">
+    <ECSchemaReference name="Bentley_Standard_CustomAttributes" version="01.00.13" alias="bsca"/>
+    <ECSchemaReference name="EditorCustomAttributes" version="01.00.03" alias="beca"/>
+    <ECSchemaReference name="ECDbMap" version="02.00.00" alias="ecdbmap"/>
+    <ECSchemaReference name="BisCore" version="01.00.00" alias="bis"/>
+    <ECSchemaReference name="Functional" version="01.00.00" alias="func"/>
+    <ECSchemaReference name="CoreCustomAttributes" version="01.00.00" alias="CoreCA"/>
+    <ECSchemaReference name="AecUnits" version="01.00.00" alias="AECU"/>
+
+    <ECCustomAttributes>
+        <DisplayOptions xmlns="Bentley_Standard_CustomAttributes.01.13">
+            <Hidden>True</Hidden>
+        </DisplayOptions>
+        <SchemaChangeTrackingState xmlns="Bentley_Standard_CustomAttributes.01.13">
+            <SchemaFullNameAtEditingStart>ProcessEquipmentFunctional.01.00</SchemaFullNameAtEditingStart>
+            <TrackingEnabled>False</TrackingEnabled>
+        </SchemaChangeTrackingState>
+    </ECCustomAttributes>
+    
+    <PropertyCategory typeName="BUSINESSKEY"           description="Tag Information"                         displayLabel="Tag Information"      priority="100"/>
+    <PropertyCategory typeName="DESIGN_CONDITIONS"     description="Design Condition Properties"             displayLabel="Design Conditions"    priority="80"/>
+    <PropertyCategory typeName="DESIGN_PARAMETERS"     description="Design Parmeter Properties"              displayLabel="Design Parameters"    priority="90"/>
+    <PropertyCategory typeName="GENERAL"               description="General Properties"                      displayLabel="General Info"         priority="1"/>
+    <PropertyCategory typeName="OPERATING_CONDITIONS"  description="Operating Condition Properties"          displayLabel="Operating Conditions" priority="70"/>
+    
+    <ECEntityClass typeName="EquipmentDesignAttributes" description="These are the set of properties that define the Design condidtions for all equipment" displayLabel="Equipment Design Attributes" modifier="Abstract">
+        <ECCustomAttributes>
+            <IsMixin xmlns="CoreCustomAttributes.01.00">
+                <AppliesToEntityClass>Equipment</AppliesToEntityClass>
+            </IsMixin>
+        </ECCustomAttributes>
+        <ECProperty propertyName="LowerLimitDesignTemperature"  typeName="double" description="The design temperature that is the lowest pressure an object is designed to withstand"                   displayLabel="Lower Limit Design Temperature"       category="DESIGN_CONDITIONS"    priority="90"   kindOfQuantity="AECU:PROCESS_PIPING_TEMPERATURE" />
+        <ECProperty propertyName="LowerLimitDesignPressure"     typeName="double" description="The design pressure that is the lowest pressure an object is designed to withstand"                      displayLabel="Lower Limit Design Pressure"          category="DESIGN_CONDITIONS"    priority="89"   kindOfQuantity="AECU:PROCESS_PIPING_PRESSURE"/>
+        <ECProperty propertyName="UpperLimitDesignPressure"     typeName="double" description="The design pressure that is the highest pressure an object is designed to withstand"                     displayLabel="Upper Limit Design Pressure"          category="DESIGN_CONDITIONS"    priority="80"   kindOfQuantity="AECU:PROCESS_PIPING_PRESSURE"/>
+        <ECProperty propertyName="UpperLimitDesignTemperature"  typeName="double" description="The design temperature which is the highest temperature an object is designed to withstand"              displayLabel="Upper Limit Design Temperature"       category="DESIGN_CONDITIONS"    priority="79"   kindOfQuantity="AECU:PROCESS_PIPING_TEMPERATURE"/>
+        <ECProperty propertyName="OperatingPressure"            typeName="double" description="The pressure under which an object is expected to operate"                                               displayLabel="Operating Pressure"                   category="OPERATING_CONDITIONS" priority="80"   kindOfQuantity="AECU:PROCESS_PIPING_PRESSURE"/>
+        <ECProperty propertyName="OperatingTemperature"         typeName="double" description="The temperature under which an object is expected to operate"                                            displayLabel="Operating Temperature"                category="OPERATING_CONDITIONS" priority="81"   kindOfQuantity="AECU:PROCESS_PIPING_TEMPERATURE"/>
+    </ECEntityClass>
+    
+    
+    <ECEntityClass typeName="ProcessComponent" displayLabel="Process Component" modifier="Abstract">
+        <BaseClass>func:FunctionalComponentElement</BaseClass>
+        <ECProperty propertyName="Designer"                     typeName="string" description="Name of the person the created the component"                                                            displayLabel="Designer"                             category="GENERAL"              priority="90" />
+        <ECProperty propertyName="Manufacturer"                 typeName="string" description="Device manufacturer"                                                                                     displayLabel="Manufacturer"                         category="GENERAL"              priority="85" />
+        <ECProperty propertyName="ModelNumber"                  typeName="string" description="Manufacturer model identification, i.e. piece mark"                                                      displayLabel="Model Number"                         category="GENERAL"              priority="80"/>
+        <ECProperty propertyName="PaintCode"                    typeName="string" description="The Paint Code for the device"                                                                           displayLabel="Paint Code"                           category="GENERAL"              priority="75"  />
+        <ECProperty propertyName="Alias"                        typeName="string" description="User definable"                                                                                          displayLabel="Alias"                                category="GENERAL"              priority="100" />
+        <ECProperty propertyName="Description"                  typeName="string" description="Description of component"                                                                                displayLabel="Description"                          category="GENERAL"              priority="95" />
+        <ECProperty propertyName="DryWeight"                    typeName="double" description="The weight of an object excluding any operating or process fluids"                                       displayLabel="Dry Weight"                           category="DESIGN_PARAMETERS"    priority="100"  kindOfQuantity="AECU:WEIGHT"/>
+        <ECProperty propertyName="Material"                     typeName="string" description="Primary material for the device"                                                                         displayLabel="Material"                             category="DESIGN_PARAMETERS"    priority="95"/>
+        <ECProperty propertyName="TotalWeight"                  typeName="double" description="The weight which is a sum of the weights of identified parts of an assembly"                             displayLabel="Total Weight"                         category="DESIGN_PARAMETERS"    priority="90"   kindOfQuantity="AECU:WEIGHT"/>
+        <ECProperty propertyName="DeviceTypeCode"               typeName="string" description="Code used to describe the type of component."                                                            displayLabel="Device Type Code"                     category="BUSINESSKEY"          priority="100" />
+        <ECProperty propertyName="Number"                       typeName="string" description="Number use in the Code Value for the device"                                                             displayLabel="Number"                               category="BUSINESSKEY"          priority="95"/>
+        <ECProperty propertyName="AdditionalCode"               typeName="string" description="Used in the KKS Tagging scheme"                                                                          displayLabel="Additional Code"                      category="BUSINESSKEY"          priority="80"/>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="Equipment" description="Functional Equipment component" modifier="Abstract">
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.1.0"/>
+        </ECCustomAttributes>
+        <BaseClass>ProcessComponent</BaseClass>
+        <BaseClass>EquipmentDesignAttributes</BaseClass>
+        <ECProperty propertyName="OrderNumber"                  typeName="string" description="Order number"                                                                                            displayLabel="Order Number"                         category="GENERAL"              priority="78" />
+        <ECProperty propertyName="Comment"                      typeName="string" description="Designer Comment"                                                                                        displayLabel="Comment"                              category="GENERAL"              priority="95" />
+        <ECProperty propertyName="FluidDescription"             typeName="string" description="Fluid description"                                                                                       displayLabel="Fluid Description"                    category="DESIGN_PARAMETERS"    priority="97" />
+        <ECProperty propertyName="Height"                       typeName="double" description="The distance from the bottom to the top of something standing upright."                                  displayLabel="Height"                               category="DESIGN_PARAMETERS"    priority="95"   kindOfQuantity="AECU:LENGTH"/>
+        <ECProperty propertyName="Insulation"                   typeName="string" description="A device capable of separate conducting bodies to prevent transfer of electricity, heat, or sound"       displayLabel="Insulation Material"                  category="DESIGN_PARAMETERS"    priority="97" />
+        <ECProperty propertyName="InsulationThickness"          typeName="double" description="The thickness of an insulation layer"                                                                    displayLabel="Insulation Thickness"                 category="DESIGN_PARAMETERS"    priority="96"   kindOfQuantity="AECU:LENGTH_SHORT"/>
+        <ECProperty propertyName="Rating"                       typeName="string" description="Design Pressure Rating of the device"                                                                    displayLabel="Rating"                               category="DESIGN_PARAMETERS"    priority="93" />
+        <ECProperty propertyName="Width"                        typeName="double" description="The distance along one of the horizontal axes of the device"                                             displayLabel="Width"                                category="DESIGN_PARAMETERS"    priority="87"   kindOfQuantity="AECU:LENGTH"/>
+        <ECProperty propertyName="UnitClassification"           typeName="string" description="Unit Classification for KKS only for tagging"                                                            displayLabel="Equipment Unit Classification"        category="BUSINESSKEY"          priority="75"/>
+        <ECProperty propertyName="UnitCode"                     typeName="string" description="Unit Code for KKS only for tagging"                                                                      displayLabel="Equipment Unit Code"                  category="BUSINESSKEY"          priority="70"/>
+    </ECEntityClass>
+    
+    <ECEntityClass typeName="Pump" description="a device in which energy is added or removed, constantly or periodically, to a fluid." modifier="Abstract">
+        <BaseClass>Equipment</BaseClass>
+        <ECProperty propertyName="DesignPressure"               typeName="double" description="A pressure which an object is designed to withstand"                                                     displayLabel="Design Pressure"                      category="DESIGN_CONDITIONS"    priority="100"  kindOfQuantity="AECU:PROCESS_PIPING_PRESSURE"/>
+        <ECProperty propertyName="FlowRateAtNormalFlow"         typeName="double" description="Flow rate"                                                                                               displayLabel="Flow Rate At Normal Flow"             category="DESIGN_CONDITIONS"    priority="97"   kindOfQuantity="AECU:PROCESS_PIPING_FLOW"/>
+        <ECProperty propertyName="InletPressure"                typeName="double" description="Inlet Pressure"                                                                                          displayLabel="Inlet Pressure"                       category="DESIGN_CONDITIONS"    priority="95"   kindOfQuantity="AECU:PROCESS_PIPING_PRESSURE"/>
+        <ECProperty propertyName="OutletPressure"               typeName="double" description="Outlet Pressure"                                                                                         displayLabel="Outlet Pressure"                      category="DESIGN_CONDITIONS"    priority="85"   kindOfQuantity="AECU:PROCESS_PIPING_PRESSURE"/>
+        <ECProperty propertyName="VapourPressure"               typeName="double" description="The pressure of the vapour phase of a substance over a liquid phase when the phases are in equilibrium"  displayLabel="Vapour Pressure"                      category="DESIGN_CONDITIONS"    priority="75"   kindOfQuantity="AECU:PROCESS_PIPING_PRESSURE"/>
+        <ECProperty propertyName="Diameter"                     typeName="double" description="The diameter of the pump housing"                                                                        displayLabel="Diameter"                             category="DESIGN_PARAMETERS"    priority="105"  kindOfQuantity="AECU:LENGTH_SHORT"/>
+        <ECProperty propertyName="Fluid"                        typeName="string" description="The type of fluid in the pump"                                                                           displayLabel="Fluid"                                category="DESIGN_PARAMETERS"    priority="96"/>
+        <ECProperty propertyName="MaterialBody"                 typeName="string" description="Material of the pump body"                                                                               displayLabel="Body Material"                        category="DESIGN_PARAMETERS"    priority="96"/>
+        <ECProperty propertyName="RatedCurrent"                 typeName="double" description="The r.m.s. value of the alternating current for which an apparatus has been designed"                    displayLabel="Rated Current"                        category="DESIGN_PARAMETERS"    priority="96"   kindOfQuantity="AECU:CURRENT"/>
+        <ECProperty propertyName="SteamRating"                  typeName="string" description="The steam rating"                                                                                        displayLabel="Steam Rating"                         category="DESIGN_PARAMETERS"    priority="96" />
+    </ECEntityClass>
+    
+    <ECEntityClass typeName="CentrifugalPump" displayLabel="Centrifugal Pump">
+        <BaseClass>Pump</BaseClass>
+    </ECEntityClass>
+    
+    <ECEntityClass typeName="Driver" description="Functional Driver" modifier="Abstract">
+        <BaseClass>Equipment</BaseClass>
+        <ECProperty propertyName="TagDisplay"                   typeName="string" description="KKS Driver calculated value for annotation purposes only"                                                displayLabel="Tag Display"                          category="BUSINESSKEY"          priority="75"/>
+        <ECProperty propertyName="ComponentClassification"      typeName="string" description="KKS only for tagging, Driver, Nozzle, Tie In,"                                                           displayLabel="Component Classification"             category="BUSINESSKEY"          priority="75"/>
+        <ECProperty propertyName="ComponentNumber"              typeName="string" description="KKS only for tagging, Driver, Nozzle, Tie In,"                                                           displayLabel="Component Number"                     category="BUSINESSKEY"          priority="75"/>
+    </ECEntityClass>
+    
+    
+    <ECEntityClass typeName="Vessel" description="a recepatacle, container or part of a structure designed and manufactured to keep solids or liquids.">
+        <BaseClass>Equipment</BaseClass>
+        <ECProperty propertyName="Diameter"                     typeName="double" description="Diameter"                kindOfQuantity="AECU:LENGTH_SHORT"/>
+        <ECProperty propertyName="HeadType"                     typeName="string" description="Type of head or crown"/>
+        <ECProperty propertyName="Orientation"                  typeName="string" description="Orientation "/>
+    </ECEntityClass>
+    
+    
+    <ECEntityClass typeName="Drum" description="A recepatacle, container or part of a structure designed and manufactured to keep solids or liquids.">
+        <BaseClass>Vessel</BaseClass>
+        <ECProperty propertyName="AmbientOperatingPressure"     typeName="double"  displayLabel="Ambient Operating Pressure"  category="DESIGN_CONDITIONS" priority="96" kindOfQuantity="AECU:PROCESS_PIPING_PRESSURE"/>
+        <ECProperty propertyName="CapacityVolumeFlowRate"       typeName="double"  displayLabel="Capacity Volume Flow Rate"   category="DESIGN_CONDITIONS" priority="97" kindOfQuantity="AECU:PROCESS_PIPING_FLOW"/>
+        <ECProperty propertyName="OutletPressure"               typeName="double"  displayLabel="Outlet Pressure"             category="DESIGN_CONDITIONS" priority="98" kindOfQuantity="AECU:PROCESS_PIPING_PRESSURE"/>
+        <ECProperty propertyName="TrueVaporPressure"            typeName="double"  displayLabel="True Vapor Pressure"         category="DESIGN_CONDITIONS" priority="99" kindOfQuantity="AECU:PROCESS_PIPING_PRESSURE"/>
+    </ECEntityClass>
+    
+    
+    <ECEntityClass typeName="DrumPump" displayLabel="Drum Pump">
+        <BaseClass>Pump</BaseClass>
+    </ECEntityClass>
+    
+    
+    <ECEntityClass typeName="LiquidJetPump" displayLabel="Liquid Jet Pump">
+        <BaseClass>Pump</BaseClass>
+    </ECEntityClass>
+    
+    
+    <ECEntityClass typeName="PositiveDisplacementPump" displayLabel="Positive Displacement Pump">
+        <BaseClass>Pump</BaseClass>
+        <ECProperty propertyName="PumpDisplacement"             typeName="string" displayLabel="Pump Displacement" description="A displacement that is the volumetric amount a positive displacement pump is delivering per one revolution of the pump shaft." category="DESIGN_PARAMETERS" priority="96"/>
+    </ECEntityClass>
+    
+    
+    <ECEntityClass typeName="ReciprocatingPump" displayLabel="Reciprocating Pump">
+        <BaseClass>PositiveDisplacementPump</BaseClass>
+        <ECProperty propertyName="DiaphragmMaterial"            typeName="string" displayLabel="Diaphragm Material" />
+        <ECProperty propertyName="DiaphragmType"                typeName="string" displayLabel="Diaphragm Type"/>
+    </ECEntityClass>
+    
+    
+    <ECEntityClass typeName="Tank" description="A recepatacle, container or part of a structure designed and manufactured to keep solids or liquids.">
+        <BaseClass>Vessel</BaseClass>
+        <ECProperty propertyName="TrueVaporPressure"            typeName="double" displayLabel="True Vapor Pressure"                                                                                    category="DESIGN_CONDITIONS" priority="96"      kindOfQuantity="AECU:PROCESS_PIPING_PRESSURE"/>
+    </ECEntityClass>
+    
+    <ECEntityClass typeName="Tower" description="A recepatacle, container or part of a structure designed and manufactured to keep solids or liquids.">
+        <BaseClass>Vessel</BaseClass>
+        <ECProperty propertyName="AmbientOperatingTemperature"  typeName="double" displayLabel="Ambient Operating Temperature"  description="ambient operating temperature"                             category="DESIGN_CONDITIONS" priority="97"      kindOfQuantity="AECU:PROCESS_PIPING_TEMPERATURE"/>
+        <ECProperty propertyName="CapacityVolumeFlowRate"       typeName="double" displayLabel="Capacity Volume Flow Rate"      description="vapacity volume flow rate"                                 category="DESIGN_CONDITIONS" priority="98"      kindOfQuantity="AECU:PROCESS_PIPING_FLOW"/>
+        <ECProperty propertyName="DesignPressure"               typeName="double" displayLabel="Design Pressure"                description="a pressure which an object is designed to withstand"       category="DESIGN_CONDITIONS" priority="99"      kindOfQuantity="AECU:PROCESS_PIPING_PRESSURE"/>
+        <ECProperty propertyName="DesignTemperature"            typeName="double" displayLabel="Design Temperature"             description="a temperature which an object is designed to withstand"    category="DESIGN_CONDITIONS" priority="100"     kindOfQuantity="AECU:PROCESS_PIPING_TEMPERATURE"/>
+        <ECProperty propertyName="InsideSurfaceArea"            typeName="double" displayLabel="Inside Surface Area"            description="the surface area inside the tower storage volume"          category="DESIGN_CONDITIONS" priority="104"     kindOfQuantity="AECU:AREA"/>
+        <ECProperty propertyName="LowerLimitOperatingPressure"  typeName="double" displayLabel="Lower Limit Operating Pressure" description="lower limit operating pressure"                            category="DESIGN_CONDITIONS" priority="108"     kindOfQuantity="AECU:PROCESS_PIPING_PRESSURE"/>
+        <ECProperty propertyName="OutletPressure"               typeName="double" displayLabel="Outlet Pressure"                description="pressure at the tower outlet"                              category="DESIGN_CONDITIONS" priority="112"     kindOfQuantity="AECU:PROCESS_PIPING_PRESSURE"/>
+        <ECProperty propertyName="SteamRating"                  typeName="string" displayLabel="Steam Rating"                   description="steam rating"                                              category="DESIGN_CONDITIONS" priority="116"  />
+        <ECProperty propertyName="TrueVaporPressure"            typeName="double" displayLabel="True Vapor Pressure"            description="true vapor pressure"                                       category="DESIGN_CONDITIONS" priority="120"     kindOfQuantity="AECU:PROCESS_PIPING_PRESSURE"/>
+    </ECEntityClass>
+</ECSchema>
