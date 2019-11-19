@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ECSchema schemaName="ProcessPipingPhysical" alias="ppipe" version="01.00.00" displayLabel="Process Piping Physical" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.1">
+    <ECSchemaReference name="Bentley_Standard_CustomAttributes" version="01.00.13" alias="bsca"/>
+    <ECSchemaReference name="EditorCustomAttributes" version="01.00.03" alias="beca"/>
+    <ECSchemaReference name="ECDbMap" version="02.00.00" alias="ecdbmap"/>
+    <ECSchemaReference name="BisCore" version="01.00.00" alias="bis"/>
+    <ECSchemaReference name="CoreCustomAttributes" version="01.00.00" alias="CoreCA"/>
+    <ECEnumeration typeName="Bolt_BoltType" backingTypeName="int" isStrict="true">
+        <ECEnumerator value="1" displayLabel="Machine"/>
+        <ECEnumerator value="2" displayLabel="Stud"/>
+        <ECEnumerator value="3" displayLabel="Mechanical"/>
+        <ECEnumerator value="4" displayLabel="Wafer"/>
+    </ECEnumeration>
+    <ECEnumeration typeName="PipeElbow_RadiusType" backingTypeName="int" isStrict="true">
+        <ECEnumerator value="1" displayLabel="Long"/>
+        <ECEnumerator value="2" displayLabel="Short"/>
+        <ECEnumerator value="3" displayLabel="3r"/>
+    </ECEnumeration>
+    <ECEntityClass typeName="Fastener">
+        <BaseClass>bis:PhysicalElement</BaseClass>
+        <ECProperty propertyName="Grade" typeName="string"/>
+        <ECProperty propertyName="OrderNumber" typeName="string" description="order number " displayLabel="Order Number"/>
+        <ECProperty propertyName="P1X" typeName="double"/>
+        <ECProperty propertyName="P1Y" typeName="double"/>
+        <ECProperty propertyName="P1Z" typeName="double"/>
+        <ECProperty propertyName="ShopField" typeName="string" displayLabel="Shop Field"/>
+        <ECProperty propertyName="ShortDescription" typeName="string" displayLabel="Short Description"/>
+        <ECProperty propertyName="StockNumber" typeName="string" displayLabel="Stock Number"/>
+    </ECEntityClass>
+    <ECEntityClass typeName="Bolt">
+        <BaseClass>Fastener</BaseClass>
+        <ECProperty propertyName="BoltDiameter" typeName="double" description="Maximum bolt diameter along ts threaded length" displayLabel="Bolt Diameter"/>
+        <ECProperty propertyName="BoltExtensionLength" typeName="double" displayLabel="Bolt Extension Length"/>
+        <ECProperty propertyName="BoltIncrementLength" typeName="double" displayLabel="Bolt Increment Length"/>
+        <ECProperty propertyName="BoltLength" typeName="double" description="A length that is the axial length from the lower edge of the bolt head to the end face of the threaded end" displayLabel="Bolt Length"/>
+        <ECProperty propertyName="Diameter" typeName="double" description="intercept made by the circumference on a straight line through the centre of a circle."/>
+        <ECProperty propertyName="Facing" typeName="string" description="type of facing of a flanged end"/>
+        <ECProperty propertyName="Length" typeName="double"/>
+        <ECProperty propertyName="NominalDiameter" typeName="double" description="a diameter which is an expected (theoretical/as designed) diameter.        " displayLabel="Nominal Diameter"/>
+        <ECProperty propertyName="NumberOfBolts" typeName="int" description="Quantity of bolts required for a single Pipe bolted joint" displayLabel="Number Of Bolts"/>
+        <ECProperty propertyName="NutLength" typeName="double" displayLabel="Nut Length"/>
+        <ECProperty propertyName="Rating" typeName="string"/>
+        <ECProperty propertyName="Schedule" typeName="string"/>
+        <ECProperty propertyName="Standard" typeName="string"/>
+        <ECProperty propertyName="BoltType" typeName="Bolt_BoltType"/>
+    </ECEntityClass>
+    <ECStructClass typeName="Port" description="Describes end preparation for any component">
+        <ECProperty propertyName="CenterToPortLength" typeName="double" displayLabel="Center To Port Length"/>
+        <ECProperty propertyName="DirectionX" typeName="double" displayLabel="Direction X"/>
+        <ECProperty propertyName="DirectionY" typeName="double" displayLabel="Direction Y"/>
+        <ECProperty propertyName="DirectionZ" typeName="double" displayLabel="Direction Z"/>
+        <ECProperty propertyName="EndPreparation" typeName="string" description="eprep" displayLabel="End Preparation"/>
+        <ECProperty propertyName="EndPreparationType" typeName="string" displayLabel="End Preparation Type"/>
+        <ECProperty propertyName="IgnoreFasteners" typeName="boolean" displayLabel="Ignore Fasteners"/>
+        <ECProperty propertyName="InsideDiameter" typeName="double" displayLabel="Inside Diameter"/>
+        <ECProperty propertyName="IsFemale" typeName="boolean" displayLabel="Is Female"/>
+        <ECProperty propertyName="LocationX" typeName="double" displayLabel="Location X"/>
+        <ECProperty propertyName="LocationY" typeName="double" displayLabel="Location Y"/>
+        <ECProperty propertyName="LocationZ" typeName="double" displayLabel="Location Z"/>
+        <ECProperty propertyName="NutDiameter" typeName="double" displayLabel="Nut Diameter"/>
+        <ECProperty propertyName="NutLength" typeName="double" displayLabel="Nut Length"/>
+        <ECProperty propertyName="OrientationX" typeName="double" displayLabel="Orientation X"/>
+        <ECProperty propertyName="OrientationZ" typeName="double" displayLabel="Orientation Z"/>
+        <ECProperty propertyName="OrientationY" typeName="double"/>
+        <ECProperty propertyName="PortSequenceNumber" typeName="int" displayLabel="Port Sequence Number"/>
+        <ECProperty propertyName="StubinLength" typeName="double" displayLabel="Stubin Length"/>
+    </ECStructClass>
+    <ECStructClass typeName="FluidPort" displayLabel="Fluid Port">
+        <BaseClass>Port</BaseClass>
+        <ECProperty propertyName="ClampedEndDiameter" typeName="double" description="Diameter of clamped end of piping component" displayLabel="Clamped End Diameter"/>
+        <ECProperty propertyName="ClampedEndWidth" typeName="double" description="Length of clamped end of piping component" displayLabel="Clamped End Width"/>
+        <ECProperty propertyName="ExternalThreadMajorDiameter" typeName="double" description="An outside diameter of an external thread" displayLabel="External Thread Major Diameter"/>
+        <ECProperty propertyName="Facing" typeName="string" description="type of facing of a flanged end"/>
+        <ECProperty propertyName="NominalDiameter" typeName="double" displayLabel="Nominal Diameter"/>
+        <ECProperty propertyName="OutsideDiameter" typeName="double" description="a diameter which is across the outside cross section of a circular object." displayLabel="Outside Diameter"/>
+        <ECProperty propertyName="OutsideDiameterOfFlangedEnd" typeName="double" description="an outside diameter of a flanged end." displayLabel="Outside Diameter Of Flanged End"/>
+        <ECProperty propertyName="OutsideDiameterOfSocketEnd" typeName="double" description="Outer diameter of socket welded end" displayLabel="Outside Diameter Of Socket End"/>
+        <ECProperty propertyName="OutsideDiameterOfThreadedSocketEnd" typeName="double" description="Out side diameter of internally threaded socket of female threaded end" displayLabel="Outside Diameter Of Threaded Socket End"/>
+        <ECProperty propertyName="PipeFlangeThickness" typeName="double" description="A thickness that is the thickness of the plate of a flanged piping end, excluding the standout for a raised face end." displayLabel="Pipe Flange Thickness"/>
+        <ECProperty propertyName="SocketDepth" typeName="double" description="Socket depth of socket welded end" displayLabel="Socket Depth"/>
+        <ECProperty propertyName="ThreadedLength" typeName="double" description="A length that is the axial length of the screw or bolt surface that has been furnished with threads" displayLabel="Threaded Length"/>
+        <ECProperty propertyName="WallThickness" typeName="double" description="a thickness which is the thickness of the part of an object normally called wall:  - wall thickness of a pipe,   - thickness of a building wall, etc.        " displayLabel="Wall Thickness"/>
+    </ECStructClass>
+    <ECEntityClass typeName="PipingComponent" displayLabel="Piping Component" modifier="Abstract">
+        <BaseClass>bis:PhysicalElement</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.01.00"/>
+        </ECCustomAttributes>
+        <ECProperty propertyName="State" typeName="string" displayLabel="Component State"/>
+        <ECProperty propertyName="DesignLengthCenterToBranchEndEffective" typeName="double" displayLabel="Design Length Center To Branch End Effective"/>
+        <ECProperty propertyName="DesignLengthCenterToOutletEndEffective" typeName="double" displayLabel="Design Length Center To Outlet End Effective"/>
+        <ECProperty propertyName="DesignLengthCenterToRunEndEffective" typeName="double" displayLabel="Design Length Center To Run End Effective"/>
+        <ECProperty propertyName="LengthEffective" typeName="double" displayLabel="Length Effective"/>
+        <ECProperty propertyName="NominalDiameterRunEnd" typeName="double" description="Nominal diameter of the Run Port." displayLabel="Nominal Diameter Run End"/>
+        <ECProperty propertyName="SpoolId" typeName="string" displayLabel="Spool Id"/>
+        <ECProperty propertyName="SpoolNumber" typeName="int" displayLabel="Spool Number"/>
+        <ECProperty propertyName="WallThickness" typeName="double" description="a thickness which is the thickness of the part of an object normally called wall:  - wall thickness of a pipe,   - thickness of a building wall, etc.        " displayLabel="Wall Thickness"/>
+        <ECProperty propertyName="NominalDiameter" typeName="double" description="a diameter which is an expected (theoretical/as designed) diameter.        " displayLabel="Nominal Diameter"/>
+        <ECProperty propertyName="OutsideDiameter" typeName="double" description="a diameter which is across the outside cross section of a circular object.                " displayLabel="Outside Diameter"/>
+        <ECProperty propertyName="CreateTime" typeName="dateTime" description="Date/Time when object was created" displayLabel="Create Time" readOnly="true"/>
+        <ECProperty propertyName="CreatedBy" typeName="string" description="ID of a user created this object" displayLabel="Created By" readOnly="true"/>
+        <ECProperty propertyName="DesignState" typeName="string" displayLabel="Design State"/>
+        <ECProperty propertyName="IsParametric" typeName="boolean" description="Determines if graphics are generated using a parametric script" displayLabel="Is Parametric"/>
+        <ECProperty propertyName="ModifiedBy" typeName="string" description="ID of a user modified this object" displayLabel="Modified By"/>
+        <ECProperty propertyName="OrderNumber" typeName="string" description="order number " displayLabel="Order Number"/>
+        <ECProperty propertyName="StockNumber" typeName="string" displayLabel="Stock Number"/>
+        <ECStructProperty propertyName="Ports" typeName="FluidPort"/>
+        <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Temporary property used to hold OpenPlant class name used for round tripping."/>
+    </ECEntityClass>
+    <ECEntityClass typeName="Valve" description="a fluid regulator that can be used to control (i.e. permit, obstruct, regulate or divert) a fluid stream.">
+        <BaseClass>PipingComponent</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="ControlValve" description="a valve that can be used to modify (regulate)  the fluid flow rate in a process control system. it usually includes an actuator, which responds to a signal from the controlling system and changes the position of the flow controlling element in the valve.">
+        <BaseClass>Valve</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="ValveOperatingDevice" description="A physical object that is an external means of operating a valve." displayLabel="Valve Operating Device" modifier="Abstract">
+        <BaseClass>bis:PhysicalElement</BaseClass>
+        <ECProperty propertyName="Angle" typeName="double"/>
+        <ECProperty propertyName="Diameter" typeName="double" description="intercept made by the circumference on a straight line through the centre of a circle."/>
+        <ECProperty propertyName="Length" typeName="double"/>
+        <ECProperty propertyName="NominalDiameter" typeName="double" description="a diameter which is an expected (theoretical/as designed) diameter." displayLabel="Nominal Diameter"/>
+        <ECProperty propertyName="Specification" typeName="string"/>
+        <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Temporary property used to hold OpenPlant class name used for round tripping."/>
+    </ECEntityClass>
+    <ECEntityClass typeName="DiaphragmOperator" description="Diaphragm Operator" displayLabel="Diaphragm Operator">
+        <BaseClass>ValveOperatingDevice</BaseClass>
+        <ECProperty propertyName="BaseCylinderDiameter" typeName="double" description="Base Cylinder Diameter" displayLabel="Base Cylinder Diameter"/>
+        <ECProperty propertyName="TopCylinderDiameter" typeName="double" description="Top Cylinder Diameter" displayLabel="Top Cylinder Diameter"/>
+        <ECProperty propertyName="TopCylinderHeight" typeName="double" description="Top Cylinder Height" displayLabel="Top Cylinder Height"/>
+        <ECProperty propertyName="TotalHeight" typeName="double" description="Total Height" displayLabel="Total Height"/>
+    </ECEntityClass>
+    <ECEntityClass typeName="PipeBranch" description="base class for all piping branches. not in rdl. " displayLabel="Pipe Branch">
+        <BaseClass>PipingComponent</BaseClass>
+        <ECProperty propertyName="BranchAngle" typeName="double" displayLabel="Branch Angle"/>
+        <ECProperty propertyName="OutsideDiameterBranchEnd" typeName="double" displayLabel="Outside Diameter Branch End"/>
+        <ECProperty propertyName="OutsideDiameterRunEnd" typeName="double" displayLabel="Outside Diameter Run End"/>
+        <ECProperty propertyName="NominalDiameterReducingEnd" typeName="double" displayLabel="Nominal Diameter Reducing End"/>
+        <ECProperty propertyName="NominalDiameterBranchEnd" typeName="double" displayLabel="Nominal Diameter Branch End"/>
+        <ECProperty propertyName="DesignLengthCenterToRunEnd" typeName="double" displayLabel="Design Length Center To Run End"/>
+        <ECProperty propertyName="DesignLengthCenterToOutletEnd" typeName="double" displayLabel="Design Length Center To Outlet End"/>
+        <ECProperty propertyName="DesignLengthCenterToBranchEnd" typeName="double" displayLabel="Design Length Center To Branch End"/>
+    </ECEntityClass>
+    <ECEntityClass typeName="PipeTee" description="an artefact with 3 piping ends in t-shape, including a branch at 90 degrees">
+        <BaseClass>PipeBranch</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="EqualPipeTee" description="a piping tee where all 3 ends have the same nominal pipe size." displayLabel="Equal Pipe Tee">
+        <BaseClass>PipeTee</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="Gasket" description="a seal which is one or more closed loops of deformable material used between mating surfaces which have only very limited movement relative to each other. the material is deformable in order to effect the seal between surfaces which have irregularities or&#10;">
+        <BaseClass>bis:PhysicalElement</BaseClass>
+        <ECProperty propertyName="Diameter" typeName="double" description="intercept made by the circumference on a straight line through the centre of a circle."/>
+        <ECProperty propertyName="FabricationCategory" typeName="string" displayLabel="Fabrication Category"/>
+        <ECProperty propertyName="GasketType" typeName="string" displayLabel="Gasket Type"/>
+        <ECProperty propertyName="Length" typeName="double"/>
+        <ECProperty propertyName="NominalDiameter" typeName="double" description="a diameter which is an expected (theoretical/as designed) diameter.        " displayLabel="Nominal Diameter"/>
+        <ECProperty propertyName="Rating" typeName="string"/>
+        <ECProperty propertyName="ShortDescription" typeName="string" description="short description of unit." displayLabel="Short Description"/>
+        <ECProperty propertyName="Standard" typeName="string"/>
+        <ECProperty propertyName="Thickness" typeName="double" description="thickness of section "/>
+    </ECEntityClass>
+    <ECEntityClass typeName="InlineInstrument" displayLabel="Inline Instrument">
+        <BaseClass>PipingComponent</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="Joint" description="Indicates two ports are connected">
+        <BaseClass>bis:SpatialLocationElement</BaseClass>
+        <ECProperty propertyName="Type" typeName="string"/>
+        <ECProperty propertyName="Port1Index" typeName="int" description="Index of the port on the connected Piping Component" displayLabel="Port 1 Index"/>
+        <ECProperty propertyName="Port2Index" typeName="int" description="Index of the port on the connected Piping Component" displayLabel="Port 2 Index"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="JointConnectsToPipingComponents" displayLabel="Joint Connects To Piping Components" modifier="None" strength="referencing">
+        <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <ECProperty propertyName="PortID" typeName="string"/>
+        <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Temporary property used to hold OpenPlant class name used for round tripping."/>
+        <Source multiplicity="(0..1)" roleLabel="Joint Connect to Piping Component" polymorphic="true">
+            <Class class="Joint"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="Piping Component connects to Joint" polymorphic="true">
+            <Class class="PipingComponent"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="JointGroupsFasteners" displayLabel="Joint Groups Fasteners" modifier="None" strength="referencing">
+        <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Temporary property used to hold OpenPlant class name used for round tripping."/>
+        <Source multiplicity="(0..1)" roleLabel="Joint Groups Fasteners" polymorphic="true">
+            <Class class="Joint"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="Fasteners belong to Joint" polymorphic="true">
+            <Class class="Fastener"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="Nozzle" description="an artefact that is a fluid connection which is a protruding part through which a stream of fluid is directed.">
+        <BaseClass>PipingComponent</BaseClass>
+        <ECProperty propertyName="ParamA" typeName="double" description="Parameter for computing location wrt datum" displayLabel="A"/>
+        <ECProperty propertyName="ParamB" typeName="double" description="Parameter for computing location wrt datum" displayLabel="B"/>
+        <ECProperty propertyName="ParamC" typeName="double" description="Parameter for computing location wrt datum" displayLabel="C"/>
+        <ECProperty propertyName="ParamD" typeName="double" description="Parameter for computing location wrt datum" displayLabel="D"/>
+        <ECProperty propertyName="Datum" typeName="string" description="Item placed relative to this named coordinate system"/>
+        <ECProperty propertyName="ParamE" typeName="double" description="Parameter for computing location wrt datum" displayLabel="E"/>
+        <ECProperty propertyName="Grade" typeName="string"/>
+        <ECProperty propertyName="Length" typeName="double" description="Length of nozzle (1st leg of elbow)" displayLabel="L"/>
+        <ECProperty propertyName="OutsideDiameter1" typeName="double" displayLabel="Outside Diameter"/>
+        <ECProperty propertyName="Projection" typeName="double" description="Projection from reference to port-end of nozzle" displayLabel="P"/>
+        <ECProperty propertyName="PlacementType" typeName="string" displayLabel="Placement Type"/>
+        <ECProperty propertyName="ParamR" typeName="double" description="Parameter for computing location wrt datum" displayLabel="R"/>
+        <ECProperty propertyName="ShopField" typeName="string" displayLabel="Shop Field"/>
+        <ECProperty propertyName="Standard" typeName="string"/>
+        <ECProperty propertyName="NozmgrStatus" typeName="int" description="State (new, changed, up-to-date) of nozzle within nozzle manager sessionUsed to show state within Nozzle Manager session (new, changed, up-to-date)" displayLabel="State"/>
+        <ECProperty propertyName="ParamT" typeName="double" description="Length of 2nd leg of nozzle (elbow only)" displayLabel="T"/>
+        <ECProperty propertyName="TypeForDatum" typeName="string" description="Name of rules for calculating location" displayLabel="Type (w.r.t. datum)"/>
+    </ECEntityClass>
+    <ECEntityClass typeName="Pipe" description="an artefact which is a long tube or hollow body intended for conducting liquid, gaseous or finely divided solid material or for structural purposes.">
+        <BaseClass>PipingComponent</BaseClass>
+        <ECProperty propertyName="Weight" typeName="double"/>
+    </ECEntityClass>
+    <ECEntityClass typeName="PipeElbow" description="an artefact which is a discrete component intended to make a change in the direction of a pipe run between 0 and 135 degrees." displayLabel="Pipe Elbow">
+        <BaseClass>PipingComponent</BaseClass>
+        <ECProperty propertyName="Angle" typeName="double"/>
+        <ECProperty propertyName="DesignLengthCenterToOutletEnd" typeName="double" displayLabel="Design Length Center To Outlet End"/>
+        <ECProperty propertyName="DesignLengthCenterToRunEnd" typeName="double" displayLabel="Design Length Center To Run End"/>
+        <ECProperty propertyName="MajorRadius" typeName="double" displayLabel="Major Radius"/>
+        <ECProperty propertyName="MinorRadius" typeName="double" displayLabel="Minor Radius"/>
+        <ECProperty propertyName="RadiusType" typeName="PipeElbow_RadiusType"/>
+    </ECEntityClass>
+    <ECEntityClass typeName="PipeFlange" description="an artefact where one of the ends, namely the flanged end,  has the shape of a circular plate with holes to make a bolted connection." displayLabel="Pipe Flange">
+        <BaseClass>PipingComponent</BaseClass>
+        <ECProperty propertyName="BoltTp" typeName="string" displayLabel="Bolt Tp"/>
+        <ECProperty propertyName="DesignThicknessOfFlangedEnd" typeName="double" description="a thickness which is an expected (theoretical/as designed) thickness of a flanged end." displayLabel="Design Thickness Of Flanged End"/>
+        <ECProperty propertyName="Direction" typeName="string"/>
+        <ECProperty propertyName="EndToEndLength" typeName="double" description="a straight linear distance between extreme ends." displayLabel="End To End Length"/>
+        <ECProperty propertyName="OutsideDiameterOfFlangedEnd" typeName="double" description="an outside diameter of a flanged end." displayLabel="Outside Diameter Of Flanged End"/>
+        <ECProperty propertyName="Series" typeName="string"/>
+    </ECEntityClass>
+    <ECStructClass typeName="TapPort" displayLabel="Tap Port">
+        <BaseClass>Port</BaseClass>
+        <ECProperty propertyName="NominalDiameter" typeName="double" displayLabel="Nominal Diameter"/>
+        <ECProperty propertyName="OriginX" typeName="double" displayLabel="Origin X"/>
+        <ECProperty propertyName="OriginY" typeName="double" displayLabel="Origin Y"/>
+        <ECProperty propertyName="OriginZ" typeName="double" displayLabel="Origin Z"/>
+        <ECProperty propertyName="OutsideDiameter" typeName="double" displayLabel="Outside Diameter"/>
+    </ECStructClass>
+    <ECEntityClass typeName="Weld">
+        <BaseClass>Fastener</BaseClass>
+        <ECProperty propertyName="Length" typeName="double" displayLabel="Field Length"/>
+        <ECProperty propertyName="NominalDiameter" typeName="double" description="a diameter which is an expected (theoretical/as designed) diameter.        " displayLabel="Nominal Diameter"/>
+        <ECProperty propertyName="P2X" typeName="double"/>
+        <ECProperty propertyName="P2Y" typeName="double"/>
+        <ECProperty propertyName="P2Z" typeName="double"/>
+        <ECProperty propertyName="SpoolId" typeName="string" displayLabel="Spool Id"/>
+        <ECProperty propertyName="SpoolNumber" typeName="int" displayLabel="Spool Number"/>
+        <ECProperty propertyName="Type" typeName="string"/>
+    </ECEntityClass>
+    <ECEntityClass typeName="WeldNeckFlange" description="a piping flange where the non-flanged end is a hub or neck with a butt welding end." displayLabel="Weld Neck Flange">
+        <BaseClass>PipeFlange</BaseClass>
+        <ECProperty propertyName="HubAngle" typeName="double" displayLabel="Hub Angle"/>
+        <ECProperty propertyName="HubAngleUpperLimit" typeName="double" description="a hub angle which is the largest acceptable." displayLabel="Hub Angle Upper Limit"/>
+        <ECProperty propertyName="HubCylinderLength" typeName="double" displayLabel="Hub Cylinder Length"/>
+        <ECProperty propertyName="LengthPipingFlangeHub" typeName="double" description="a straight linear distance which is the length of a hub of a piping flange from the back of the flanged end to the face of the other end.       " displayLabel="Length Piping Flange Hub"/>
+        <ECProperty propertyName="LengthPipingFlangeHubCylinder" typeName="double" description="a straight linear distance which is the length of the cylindrical part of the hub of a welding neck flange from the top of the bevel along the outside." displayLabel="Length Piping Flange Hub Cylinder"/>
+        <ECProperty propertyName="LengthPipingFlangeHubCylinderLowerLimit" typeName="double" description="a length piping flange hub cylinder which is the shortest acceptable." displayLabel="Length Piping Flange Hub Cylinder Lower Limit"/>
+        <ECProperty propertyName="LengthPipingFlangeHubCylinderUpperLimit" typeName="double" description="a length piping flange hub cylinder which is the longest acceptable." displayLabel="Length Piping Flange Hub Cylinder Upper Limit"/>
+        <ECProperty propertyName="NominalOutsideDiameterOfHub" typeName="double" displayLabel="Nominal Outside Diameter Of Hub"/>
+        <ECProperty propertyName="OutsideDiameterOfHub" typeName="double" description="an outside diameter of the large end ot the hub of a piping flange, i.e. at the transition between the hub and the flanged end.        " displayLabel="Outside Diameter Of Hub"/>
+        <ECProperty propertyName="OutsideDiameterOfHubDesign" typeName="double" description="an outside diameter of hub which is the intended/as designed." displayLabel="Outside Diameter Of Hub Design"/>
+        <ECProperty propertyName="TaperAngle" typeName="double" displayLabel="Taper Angle"/>
+    </ECEntityClass>
+</ECSchema>
