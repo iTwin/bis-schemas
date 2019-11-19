@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ECSchema schemaName="ProcessPipingFunctional" alias="ppipef" version="01.00.00" displayLabel="Process Piping Functional" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.1">
+    <ECSchemaReference name="ProcessEquipmentFunctional" version="01.00.00" alias="pequipf"/>
+    <ECSchemaReference name="Bentley_Standard_CustomAttributes" version="01.00.13" alias="bsca"/>
+    <ECSchemaReference name="EditorCustomAttributes" version="01.00.03" alias="beca"/>
+    <ECSchemaReference name="ECDbMap" version="02.00.00" alias="ecdbmap"/>
+    <ECSchemaReference name="BisCore" version="01.00.00" alias="bis"/>
+    <ECSchemaReference name="Functional" version="01.00.00" alias="func"/>
+    <ECSchemaReference name="CoreCustomAttributes" version="01.00.00" alias="CoreCA"/>
+    <ECSchemaReference name="ProcessPipingPhysical" version="01.00.00" alias="ppipe"/>
+    <ECEnumeration typeName="PipeRunConnectsToPipingComponents_PipeEnd" backingTypeName="int" isStrict="true">
+        <ECEnumerator value="1" displayLabel="Head"/>
+        <ECEnumerator value="2" displayLabel="Tail"/>
+    </ECEnumeration>
+    <ECEntityClass typeName="PipingComponent" displayLabel="Piping Component" modifier="Abstract">
+        <BaseClass>pequipf:ProcessComponent</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.01.00"/>
+        </ECCustomAttributes>
+        <ECProperty propertyName="NormalOperatingPressure" typeName="double" displayLabel="Normal Operating Pressure"/>
+        <ECProperty propertyName="FabricationCategory" typeName="string" displayLabel="Fabrication Category"/>
+        <ECProperty propertyName="Grade" typeName="string"/>
+        <ECProperty propertyName="HubDepth" typeName="double" displayLabel="Hub Depth"/>
+        <ECProperty propertyName="HubWidth" typeName="double" displayLabel="Hub Width"/>
+        <ECProperty propertyName="InsideDiameter" typeName="double" displayLabel="Inside Diameter"/>
+        <ECProperty propertyName="Insulation" typeName="string" description="A device which is a non-conductor or low-conductor capable of separate conducting bodies to prevent transfer of electricity, heat, or sound." displayLabel="Insulation Material"/>
+        <ECProperty propertyName="InsulationThickness" typeName="double" description="A thickness of an insulation layer." displayLabel="Insulation Thickness"/>
+        <ECProperty propertyName="Length" typeName="double"/>
+        <ECProperty propertyName="OrderNumber" typeName="string" description="order number " displayLabel="Order Number"/>
+        <ECProperty propertyName="OutsideDiameter" typeName="double" description="a diameter which is across the outside cross section of a circular object." displayLabel="Outside Diameter"/>
+        <ECProperty propertyName="PipeFlangeType" typeName="string" description="type of flange fitted to pipe or piping component" displayLabel="Pipe Flange Type"/>
+        <ECProperty propertyName="Rating" typeName="string"/>
+        <ECProperty propertyName="Schedule" typeName="string"/>
+        <ECProperty propertyName="ShopField" typeName="string" displayLabel="Shop Field"/>
+        <ECProperty propertyName="ShortDescription" typeName="string" description="short description of unit." displayLabel="Short Description"/>
+        <ECProperty propertyName="Standard" typeName="string"/>
+        <ECProperty propertyName="StockNumber" typeName="string" displayLabel="Stock Number"/>
+        <ECProperty propertyName="Suffix" typeName="string" description="tag suffix"/>
+        <ECProperty propertyName="Tracing" typeName="string"/>
+        <ECProperty propertyName="Specification" typeName="string"/>
+        <ECProperty propertyName="SequenceNumberInRun" typeName="double" description="The sequnce number of the item as it appears in the owning run" displayLabel="Sequence Number In Run" readOnly="true"/>
+    </ECEntityClass>
+    <ECEntityClass typeName="Valve" description="a fluid regulator that can be used to control (i.e. permit, obstruct, regulate or divert) a fluid stream." modifier="Abstract">
+        <BaseClass>PipingComponent</BaseClass>
+        <ECProperty propertyName="OperatingTemperatureRange" typeName="double" description="a range which is a range between an upper and a lower temperature limit under which an artefact is approved to operate." displayLabel="Operating Temperature Range"/>
+        <ECProperty propertyName="DesignPressure" typeName="double" description="a pressure which an object is designed to withstand." displayLabel="Design Pressure"/>
+        <ECProperty propertyName="DesignTemperature" typeName="double" description="a temperature which an object is designed to withstand." displayLabel="Design Temperature"/>
+        <ECProperty propertyName="OperatingTemperature" typeName="double" description="a temperature under which an object is expected to operate." displayLabel="Operating Temperature"/>
+        <ECProperty propertyName="Operator" typeName="string"/>
+        <ECProperty propertyName="Direction" typeName="string"/>
+        <ECProperty propertyName="FlowRate" typeName="double" description="A flow of substance pr unit time." displayLabel="Flow Rate"/>
+        <ECProperty propertyName="Function" typeName="string"/>
+        <ECProperty propertyName="MaterialMark" typeName="string" displayLabel="Material Mark"/>
+        <ECProperty propertyName="Pattern" typeName="string"/>
+        <ECProperty propertyName="PieceMark" typeName="string" displayLabel="Piece Mark"/>
+        <ECProperty propertyName="Type" typeName="string"/>
+        <ECProperty propertyName="UpperLimitOperatingPressure" typeName="double" displayLabel="Upper Limit Operating Pressure"/>
+        <ECProperty propertyName="WallThickness" typeName="double" description="a thickness which is the thickness of the part of an object normally called wall:  - wall thickness of a pipe,   - thickness of a building wall, etc.        " displayLabel="Wall Thickness"/>
+        <ECProperty propertyName="Weight" typeName="double" description="the weight of a body in a specific reference system is the force which, when applied to the body, would give it an acceleration equal to free fall in that reference system"/>
+        <ECProperty propertyName="FailMode" typeName="string" description="operator fail mode" displayLabel="Fail Mode"/>
+    </ECEntityClass>
+    <ECEntityClass typeName="ControlValve" description="a valve that can be used to modify (regulate)  the fluid flow rate in a process control system. it usually includes an actuator, which responds to a signal from the controlling system and changes the position of the flow controlling element in the valve." displayLabel="Control Valve">
+        <BaseClass>Valve</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="Nozzle" description="A physical object that has potruding part through which a stream of fluid is directed.">
+        <BaseClass>PipingComponent</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.01.00"/>
+        </ECCustomAttributes>
+        <ECProperty propertyName="FlowDirection" typeName="string" description="From / To " displayLabel="Flow Direction"/>
+        <ECProperty propertyName="Height" typeName="double"/>
+        <ECProperty propertyName="WallThickness" typeName="double" description="a thickness which is the thickness of the part of an object normally called wall:  - wall thickness of a pipe,   - thickness of a building wall, etc." displayLabel="Wall Thickness"/>
+        <ECProperty propertyName="Weight" typeName="double"/>
+        <ECProperty propertyName="ComponentClassification" typeName="string" description="KKS only for tagging, Driver, Nozzle, Tie In," displayLabel="Component Classification"/>
+        <ECProperty propertyName="ComponentNumber" typeName="string" description="KKS only for tagging, Driver, Nozzle, Tie In," displayLabel="Component Number"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="EquipmentOwnsNozzles" displayLabel="Equipment Owns Nozzles" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="Equiment owns Nozzles" polymorphic="true">
+            <Class class="pequipf:Equipment"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="Nozzle owned by Equipment" polymorphic="true">
+            <Class class="Nozzle"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="GateControlValve" description="A control valve that is a gate valve with corresponding actuator intended to manipulate a stream of fluid in the response to a difference between a signal from an external sensing element and a set point and with input of energy from an external source." displayLabel="Gate Control Valve">
+        <BaseClass>ControlValve</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="GateValve" description="a valve that is a valve where the closure member is a gate or disc with a linear motion parallel, or nearly parallel, to the plane of flat seats, which are transverse to the direction of flow." displayLabel="Gate Valve">
+        <BaseClass>Valve</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="ThreeWayValve" description="a multi way valve that is made with three separate paths of flow." displayLabel="Three Way Valve">
+        <BaseClass>Valve</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="PipeReducer" description="an artefact with different nominal pipe size at the two ends, intended to connect pipes or piping components." displayLabel="Pipe Reducer">
+        <BaseClass>PipingComponent</BaseClass>
+        <ECProperty propertyName="NominalDiameterReducingEnd" typeName="string" displayLabel="Nominal Diameter Reducing End"/>
+    </ECEntityClass>
+    <ECEntityClass typeName="ConcentricPipeReducer" description="a piping reducer where the center lines of the two ends are in line." displayLabel="Concentric Pipe Reducer">
+        <BaseClass>PipeReducer</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="EccentricPipeReducer" description="a piping reducer where the centerlines of the two ends have an offset." displayLabel="Eccentric Pipe Reducer">
+        <BaseClass>PipeReducer</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="PipeRun" description="The piping limited by a Node and a Break, Node and Connector, two Nodes, two Breaks, two Connectors or a Break and a Connector. The last five providing there are no Breaks or Connectors in between. In the last three cases the Segment will coincide with a Piping Branch." displayLabel="Pipe Run">
+        <BaseClass>func:FunctionalBreakdownElement</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.01.00"/>
+        </ECCustomAttributes>
+        <ECProperty propertyName="Alias" typeName="string" description="alias of unit name."/>
+        <ECProperty propertyName="Description" typeName="string" description="description of unit."/>
+        <ECProperty propertyName="DesignPressure" typeName="double" displayLabel="Design Pressure"/>
+        <ECProperty propertyName="FlowRate" typeName="double" description="A flow of substance pr unit time." displayLabel="Flow Rate"/>
+        <ECProperty propertyName="Insulation" typeName="string" description="A device which is a non-conductor or low-conductor capable of separate conducting bodies to prevent transfer of electricity, heat, or sound." displayLabel="Insulation Material"/>
+        <ECProperty propertyName="InsulationThickness" typeName="double" description="A thickness of an insulation layer." displayLabel="Insulation Thickness"/>
+        <ECProperty propertyName="MaximumPressure" typeName="double" displayLabel="Maximum Pressure"/>
+        <ECProperty propertyName="MinimumOperatingTemperature" typeName="double" displayLabel="Minimum Operating Temperature"/>
+        <ECProperty propertyName="NominalDesignTemperature" typeName="double" displayLabel="Nominal Design Temperature"/>
+        <ECProperty propertyName="NominalDiameter" typeName="double" description="a diameter which is an expected (theoretical/as designed) diameter.        " displayLabel="Nominal Diameter"/>
+        <ECProperty propertyName="NormalOperatingPressure" typeName="double" displayLabel="Normal Operating Pressure"/>
+        <ECProperty propertyName="NormalOperatingTemperature" typeName="double" displayLabel="Normal Operating Temperature"/>
+        <ECProperty propertyName="Number" typeName="string"/>
+        <ECProperty propertyName="Schedule" typeName="string" description="A list that is an inventory of elements put in sequence"/>
+        <ECProperty propertyName="Tracing" typeName="string"/>
+        <ECProperty propertyName="UpperLimitOperatingPressure" typeName="double" displayLabel="Upper Limit Operating Pressure"/>
+        <ECProperty propertyName="WallThickness" typeName="double" description="a thickness which is the thickness of the part of an object normally called wall:  - wall thickness of a pipe,   - thickness of a building wall, etc.        " displayLabel="Wall Thickness"/>
+        <ECProperty propertyName="InsideDiameter" typeName="double" displayLabel="Inside Diameter"/>
+        <ECProperty propertyName="NominalDesignPressure" typeName="double" displayLabel="Nominal Design Pressure"/>
+        <ECProperty propertyName="NominalLength" typeName="double" displayLabel="Nominal Length"/>
+        <ECProperty propertyName="NominalPressure" typeName="double" displayLabel="Nominal Pressure"/>
+        <ECProperty propertyName="TestPressure" typeName="double" displayLabel="Test Pressure"/>
+        <ECProperty propertyName="Specification" typeName="string"/>
+        <ECProperty propertyName="DesignSize" typeName="string" displayLabel="Design Size"/>
+        <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Temporary property used to hold OpenPlant class name used for round tripping."/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="PipeRunConnectsToPipingComponents" displayLabel="Pipe Run Connects To Piping Components" modifier="None" strength="referencing">
+        <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <ECProperty propertyName="PipeEnd" typeName="PipeRunConnectsToPipingComponents_PipeEnd"/>
+        <Source multiplicity="(0..1)" roleLabel="PipeRun connect to PipingComponent" polymorphic="true">
+            <Class class="PipeRun"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="Piping Component connects to PipeRun" polymorphic="true">
+            <Class class="PipingComponent"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="PipeRunGroupsPhysicalPipingComponents" displayLabel="Pipe Run Groups Physical Piping Components" modifier="None" strength="referencing">
+        <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Temporary property used to hold OpenPlant class name used for round tripping."/>
+        <Source multiplicity="(0..1)" roleLabel="PipeRun Groups Physical Piping Components" polymorphic="true">
+            <Class class="PipeRun"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="Physical Piping component belong to PipeRun" polymorphic="true">
+            <Class class="ppipe:PipingComponent"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="PipeRunOwnsFunctionalPipingComponents" displayLabel="Pipe Run Owns Functional Piping Components" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="PipeRun owns Funstional Piping Components" polymorphic="true">
+            <Class class="PipeRun"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="Functional Piping Components are owned by PipRun" polymorphic="true">
+            <Class class="PipingComponent"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="Pipeline" description="A fluid system of interconnected piping network branches limited by Unit Operation Inlet/Outlet and Piping Network Terminators.">
+        <BaseClass>func:FunctionalBreakdownElement</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.01.00"/>
+        </ECCustomAttributes>
+        <ECProperty propertyName="AdditionalCode" typeName="string" displayLabel="Additional Code"/>
+        <ECProperty propertyName="Alias" typeName="string" description="alias of unit name."/>
+        <ECProperty propertyName="Description" typeName="string" description="description of unit."/>
+        <ECProperty propertyName="DesignPressure" typeName="double" displayLabel="Design Pressure"/>
+        <ECProperty propertyName="DesignSize" typeName="string" displayLabel="Design Size"/>
+        <ECProperty propertyName="FlowRate" typeName="double" description="A flow of substance pr unit time." displayLabel="Flow Rate"/>
+        <ECProperty propertyName="InsideDiameter" typeName="double" displayLabel="Inside Diameter"/>
+        <ECProperty propertyName="Insulation" typeName="string" description="A device which is a non-conductor or low-conductor capable of separate conducting bodies to prevent transfer of electricity, heat, or sound." displayLabel="Insulation Material"/>
+        <ECProperty propertyName="InsulationThickness" typeName="double" description="A thickness of an insulation layer." displayLabel="Insulation Thickness"/>
+        <ECProperty propertyName="MaximumPressure" typeName="double" displayLabel="Maximum Pressure"/>
+        <ECProperty propertyName="NominalDesignPressure" typeName="double" displayLabel="Nominal Design Pressure"/>
+        <ECProperty propertyName="NominalDesignTemperature" typeName="double" displayLabel="Nominal Design Temperature"/>
+        <ECProperty propertyName="NominalDiameter" typeName="double" description="a diameter which is an expected (theoretical/as designed) diameter." displayLabel="Nominal Diameter"/>
+        <ECProperty propertyName="NominalLength" typeName="double" displayLabel="Nominal Length"/>
+        <ECProperty propertyName="NominalPressure" typeName="double" displayLabel="Nominal Pressure"/>
+        <ECProperty propertyName="NormalOperatingPressure" typeName="double" displayLabel="Normal Operating Pressure"/>
+        <ECProperty propertyName="NormalOperatingTemperature" typeName="double" displayLabel="Normal Operating Temperature"/>
+        <ECProperty propertyName="Number" typeName="string" description="(bentley added property) for allocating serial numbers to components"/>
+        <ECProperty propertyName="TagCode" typeName="string" description="used by KKS" displayLabel="Tag Code"/>
+        <ECProperty propertyName="TestPressure" typeName="double" displayLabel="Test Pressure"/>
+        <ECProperty propertyName="Tracing" typeName="string"/>
+        <ECProperty propertyName="WallThickness" typeName="double" description="a thickness which is the thickness of the part of an object normally called wall:  - wall thickness of a pipe,   - thickness of a building wall, etc.        " displayLabel="Wall Thickness"/>
+        <ECProperty propertyName="Specification" typeName="string"/>
+        <ECProperty propertyName="OpenPlantTypeName" typeName="string" description="Temporary property used to hold OpenPlant class name used for round tripping."/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="PipelineOwnsPipeRuns" displayLabel="Pipeline Owns Pipe Runs" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="Pipeline own PipeRuns" polymorphic="true">
+            <Class class="Pipeline"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="PipeRun is owned by Pipeline" polymorphic="true">
+            <Class class="PipeRun"/>
+        </Target>
+    </ECRelationshipClass>
+</ECSchema>
