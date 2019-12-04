@@ -3,12 +3,11 @@
 * Licensed under the MIT License. See LICENSE.md in the project root for license terms.
 *--------------------------------------------------------------------------------------------*/
 
-// This tool is designed validate all schemas in the bis-schema repository.
+// This tool is designed to validate all schemas in the bis-schema repository.
 
 "use strict";
 
 const path = require("path");
-const fs = require("fs");
 const readdirp = require("readdirp");
 const argv = require("yargs").argv;
 const exec = require('child_process').exec
@@ -32,15 +31,19 @@ async function validateSchemas() {
 }
 
 function buildValidationCommand(schema, refPaths) {
-  const command = `schema-validator -i ${schema.fullPath} ${refPaths} -o ${argv.OutDir}`;
+  const validaterPath = argv.ValidaterPath ? "node " + argv.ValidaterPath : "schema-validator";
+  const command = `${validaterPath} -i ${schema.fullPath} ${refPaths} -o ${argv.OutDir}`;
   return command; 
 }
 
 function executeValidation(command) {
   exec(command, (err, stdout, stderr) => {
-    console.log(stdout);
-    console.log(err);
-    console.log(stderr);
+    if (stdout) 
+      console.log(stdout);
+    if (err) 
+      console.log(err);
+    if (stderr) 
+      console.log(stderr);
   })
 }
 
