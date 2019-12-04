@@ -1,67 +1,84 @@
-workspace:
-  clean: all
-
 trigger:
   branches:
     include:
-     - master
+      - master
   paths:
     include:
-     - '*.ecschema.xml'
-     - '*.remarks.md'
+      - '*.ecschema.xml'
+
+workspace:
+  clean: all
 
 pool:
   name: iModelTechCI
   demands:
   - Agent.OS -equals Windows_NT
   - npm
+  
 variables:
-  - group: 
   - name: validationOut
     value: '$(Agent.BuildDirectory)/ValidationResults'
+  - name: validaterPath
+    value: '$(Build.Repository.LocalPath)/node_modules/@bentley/schema-validator/bin/index.js'
 
 steps:
-  - task: NodeTool@0
-    displayName: 'Use Node 10.15.0'
-    inputs:
-      versionSpec: 10.15.0
-  - checkout: self
-    clean: true
+- task: NodeTool@0
+  displayName: 'Use Node 10.15.0'
+  inputs:
+    versionSpec: 10.15.0
+- checkout: self
+  clean: true
 
    
-  - powershell: |
-      $npmrcDir = "$(Build.Repository.LocalPath)"
-      
-      if(!(Test-Path -Path $npmrcDir)){
-          mkdir $npmrcDir
-      }
-      
-      $npmrcFile = $npmrcDir + "/.npmrc"
-      
-      Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "@bentley:registry=/"
-      
-      Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "////_packaging/Packages/npm/registry/:username=Packages" -Append
-      Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "////_packaging/Packages/npm/registry/:_password=$()" -Append
-      Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "////_packaging/Packages/npm/registry/:email=npm requires email to be set but doesn't use the value" -Append
-      Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "////_packaging/Packages/npm/:username=Packages" -Append
-      Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "////_packaging/Packages/npm/:_password=$()" -Append
-      Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "////_packaging/Packages/npm/:email=npm requires email to be set but doesn't use the value" -Append
+- powershell: |
+    $npmrcDir = "$(Build.Repository.LocalPath)"
+    
+    if(!(Test-Path -Path $npmrcDir)){
+        mkdir $npmrcDir
+    }
+    
+    $npmrcFile = $npmrcDir + "/.npmrc"
+    
+    Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "@bentley:registry=/"
+    
+    Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "////_packaging/Packages/npm/registry/:username=Packages" -Append
+    Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "////_packaging/Packages/npm/registry/:_password=$()" -Append
+    Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "////_packaging/Packages/npm/registry/:email=npm requires email to be set but doesn't use the value" -Append
+    Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "////_packaging/Packages/npm/:username=Packages" -Append
+    Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "////_packaging/Packages/npm/:_password=$()" -Append
+    Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "////_packaging/Packages/npm/:email=npm requires email to be set but doesn't use the value" -Append
 
-   
+ 
 
-  - script: npm install -g @bentley/schema-validator
-    displayName: 'Install schema-validator'
-  - script: node ./tools/validation/SchemaValidationRunner.js --BisRoot --OutDir $(validationOut)
-    displayName: Perform BIS Schema Validation
+- script: npm install @bentley/schema-validator@latest
+  displayName: 'Install schema-validator'
 
-  - task: ArchiveFiles@2
-    inputs:
-      rootFolderOrFile: $(validationOut) 
-      includeRootFolder: false 
-      archiveType: 7z
-      archiveFile: '$(Build.ArtifactStagingDirectory)/ValidationResults_$(Build.BuildId).zip' 
-      replaceExistingArchive: true 
+- task: Npm@1
+  displayName: 'npm install'
+  inputs:
+    command: install
 
-    #- publish: $(validationOut)
-    #  artifact: bis-schema-validation-logs
-    #  displayName: 'Publish BIS Schema Validation Results'
+- script: | 
+    mkdir "%validationOut%"
+    echo Schema Validation Ouput Dir= %validationOut%
+  displayName: 'Create Validation Output Directory'
+
+- script: node ./tools/SchemaValidation/SchemaValidationRunner.js --BisRoot . --OutDir $(validationOut) --ValidaterPath $(validaterPath)
+  workingDirectory: 
+  displayName: Perform BIS Schema Validation
+
+- task: ArchiveFiles@2
+  inputs:
+    rootFolderOrFile: $(validationOut) 
+    includeRootFolder: false 
+    archiveType: 7z
+    archiveFile: '$(Build.ArtifactStagingDirectory)/ValidationResults-$(Build.BuildId).zip' 
+    replaceExistingArchive: true 
+
+- publish: $(validationOut)
+  artifact: bis-schema-validation-logs
+  displayName: 'Publish BIS Schema Validation Results'
+
+- script: node ./tools/SchemaValidation/SchemaValidationReporter.js --LogDir $(validationOut)
+  workingDirectory: 
+  displayName: Report Schema Validation Results
