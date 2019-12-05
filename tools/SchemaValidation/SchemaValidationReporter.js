@@ -19,7 +19,6 @@ process.on("unhandledRejection", err => {
 });
 
 async function reportValidationResults() {
-  await parseValidationLogs();
   const hasErrors = await parseValidationLogs();
   if (hasErrors)
     throw new Error("Schema rule violations reported.");
@@ -62,13 +61,11 @@ function parseValidationLog(path) {
 }
 
 function reportError(message) {
-  const cmd = `Write-Host \"##vso[task.logissue type=error]${message}\"`;
-  console.log(`${cmd}`);
+  console.log(`\"##vso[task.logissue type=error]${message}\"`);
 }
 
 function reportWarning(message) {
-  const cmd = `Write-Host \"##vso[task.logissue type=warning]${message}\"`;
-  console.log(`${cmd}`);
+  console.log(`\"##vso[task.logissue type=warning]${message}\"`);
 }
 
 reportValidationResults();
