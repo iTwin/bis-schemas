@@ -14,12 +14,16 @@ pool:
   demands:
   - Agent.OS -equals Windows_NT
   - npm
-  
+
 variables:
   - name: validationOut
     value: '$(Agent.BuildDirectory)/ValidationResults'
   - name: validaterPath
     value: '$(Build.Repository.LocalPath)/node_modules/@bentley/schema-validator/bin/index.js'
+  - name: comparisonOut
+    value: '$(Agent.BuildDirectory)/ComparisonResults'
+  - name: schemaComparerPath
+    value: '$(Build.Repository.LocalPath)/node_modules/@bentley/schema-comparer'
 
 steps:
 - task: NodeTool@0
@@ -53,10 +57,13 @@ steps:
 - script: npm install @bentley/schema-validator@latest
   displayName: 'Install schema-validator'
 
+- script: npm install @bentley/schema-comparer@latest
+  displayName: 'Install schema-comparer'
+
 - task: Npm@1
   displayName: 'npm install'
   inputs:
-    command: install
+    command: install   
 
 - script: | 
     mkdir "%validationOut%"
@@ -68,6 +75,7 @@ steps:
   displayName: Perform BIS Schema Validation
 
 - task: ArchiveFiles@2
+  displayName: 'ArchiveFiles - Validation Results'
   inputs:
     rootFolderOrFile: $(validationOut) 
     includeRootFolder: false 
@@ -75,10 +83,36 @@ steps:
     archiveFile: '$(Build.ArtifactStagingDirectory)/ValidationResults-$(Build.BuildId).zip' 
     replaceExistingArchive: true 
 
-- publish: $(validationOut)
+- publish: '$(Build.ArtifactStagingDirectory)/ValidationResults-$(Build.BuildId).zip'
   artifact: bis-schema-validation-logs
   displayName: 'Publish BIS Schema Validation Results'
 
 - script: node ./tools/SchemaValidation/SchemaValidationReporter.js --LogDir $(validationOut)
   workingDirectory: 
   displayName: Report Schema Validation Results
+
+- script: | 
+    mkdir "%comparisonOut%"
+    echo Schema Comparison Ouput Dir= %comparisonOut%
+  condition: succeededOrFailed()
+  displayName: 'Create Schema Comparison Output Directory'
+
+- script: node ./tools/SchemaDifference/SchemaDifferenceRunner.js --BisRoot . --OutDir $(comparisonOut) --SchemaComparerPath $(schemaComparerPath)
+  workingDirectory: 
+  condition: succeededOrFailed()
+  displayName: Perform BIS Schema Comparison
+
+- task: ArchiveFiles@2
+  condition: succeededOrFailed()
+  displayName: 'ArchiveFiles - Comparison Results'
+  inputs:
+    rootFolderOrFile: $(comparisonOut) 
+    includeRootFolder: false 
+    archiveType: 7z
+    archiveFile: '$(Build.ArtifactStagingDirectory)/ComparisonResults-$(Build.BuildId).zip' 
+    replaceExistingArchive: true 
+
+- publish: '$(Build.ArtifactStagingDirectory)/ComparisonResults-$(Build.BuildId).zip'
+  condition: succeededOrFailed()  
+  artifact: bis-schema-comparison-logs
+  displayName: 'Publish BIS Schema Comparison Results'
