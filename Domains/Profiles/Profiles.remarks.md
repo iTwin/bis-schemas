@@ -57,11 +57,13 @@ In addition such Profiles bounding box is at the center of the coordinate system
   - must be less than ninety degrees
   - `FlangeSlopeHeight` must be less or equal to half of `WebInnerEdgeLength`
 
-[TODO Examples]()
+![CShape (only mandatory properties)](media/ProfilePictures/CShape1.png)
+![CShape (all properties)](media/ProfilePictures/CShape2.png)
 
 ### **AsymmetricIShapeProfile**
 
-[TODO Examples]()
+![AsymmetricIShape (only mandatory properties)](media/ProfilePictures/AsymmetricIShape1.png)
+![AsymmetricIShape (all properties)](media/ProfilePictures/AsymmetricIShape2.png)
 
 ### **IShapeProfile**
 **Derivative properties:**
@@ -91,7 +93,8 @@ In addition such Profiles bounding box is at the center of the coordinate system
   - must be less than ninety degrees
   - `FlangeSlopeHeight` must be less or equal to half `WebEdgeLegth`
 
-[TODO Examples]()
+![IShape (only mandatory properties)](media/ProfilePictures/IShape1.png)
+![IShape (all properties)](media/ProfilePictures/IShape2.png)
 
 ### **TShapeProfile**
 **Derivative properties:**
@@ -130,7 +133,8 @@ In addition such Profiles bounding box is at the center of the coordinate system
   - must be less than ninety degrees
   - `WebSlopeHeight` must be less or equal to half `FlangeInnerEdgeLength`
 
-[TODO Examples]()
+![TShape (all properties)](media/ProfilePictures/TShape2.png)
+![TShape (only mandatory properties)](media/ProfilePictures/TShape1.png)
 
 ### **LShapeProfile**
 **Derivative properties:**
@@ -161,7 +165,8 @@ In addition such Profiles bounding box is at the center of the coordinate system
   - `HorizontalLegSlopeHeight` must be less or equal to half `VerticalLegInnerEdgeLength`
   - `VerticalLegSlopeHeight` must be less or equal to half `HorizontalLegInnerEdgeLength`
 
-[TODO Examples]()
+![LShape (all properties)](media/ProfilePictures/LShape2.png)
+![LShape (only mandatory properties)](media/ProfilePictures/LShape1.png)
 
 ### **TTShapeProfile**
 **Derivative properties:**
@@ -206,7 +211,8 @@ In addition such Profiles bounding box is at the center of the coordinate system
   - `WebOuterSlopeHeight` must be less or equal to half `FlangeInnerFaceLength`
   - `WebInnerSlopeHeight` must be less or equal to half `WebSpacing`
 
-[TODO Examples]()
+![TTShape (only mandatory properties)](media/ProfilePictures/TTShape1.png)
+![TTShape (all properties)](media/ProfilePictures/TTShape2.png)
 
 ### **SchifflerizedLShapeProfile**
 **Constraints:**
@@ -225,7 +231,8 @@ In addition such Profiles bounding box is at the center of the coordinate system
   - must be less or equal to `Thickness`
   - must be less or equal to `LegLength` minus `LegBendOffset` minus `Thickness` multiplied by the tangent of fifteen degrees
 
-[TODO Examples]()
+![Schifflerized (only mandatory properties)](media/ProfilePictures/Schifflerized1.png)
+![Schifflerized (all properties)](media/ProfilePictures/Schifflerized2.png)
 
 ### **ZShapeProfile**
 **Derivative properties:**
@@ -255,7 +262,8 @@ In addition such Profiles bounding box is at the center of the coordinate system
   - must be less than ninety degrees
   - `FlangeSlopeHeight` must be less or equal to half `WebEdgeLength`
 
-[TODO Examples]()
+![ZShape (only mandatory properties)](media/ProfilePictures/ZShape1.png)
+![ZShape (all properties)](media/ProfilePictures/ZShape2.png)
 
 ### **DerivedProfile**
 
@@ -263,7 +271,7 @@ In addition such Profiles bounding box is at the center of the coordinate system
 
 Note that deletion of the referenced [SinglePerimeterProfile](#singleperimeterprofile) will be prohibited if there are [DerivedProfiles](#derivedprofile) that reference it (foreign key constraint).
 
-[TODO Examples]()
+![DerivedProfile)](media/ProfilePictures/DerivedProfile.png)
 
 ### **CenterLineCShapeProfile**
 **Constraints:**
@@ -281,7 +289,8 @@ Note that deletion of the referenced [SinglePerimeterProfile](#singleperimeterpr
   - must be greater or equal to `WallThickness` plus `FilletRadius`
   - must be less than half `Depth`
 
-[TODO Examples]()
+![CenterLineCShape (only mandatory properties)](media/ProfilePictures/CenterCShape1.png)
+![CenterLineCShape (all properties)](media/ProfilePictures/CenterCShape2.png)
 
 ### **CenterLineLShapeProfile**
 **Constraints:**
@@ -299,7 +308,8 @@ Note that deletion of the referenced [SinglePerimeterProfile](#singleperimeterpr
   - must be greater than `WallThickness` plus `FilletRadius`
   - must be less than `Depth` minus `WallThickness`
 
-[TODO Examples]()
+![CenterLineLShape (only mandatory properties)](media/ProfilePictures/CenterLShape1.png)
+![CenterLineLShape (all properties)](media/ProfilePictures/CenterLShape2.png)
 
 ### **CenterLineZShapeProfile**
 **Constraints:**
@@ -317,7 +327,8 @@ Note that deletion of the referenced [SinglePerimeterProfile](#singleperimeterpr
 - `Girth` (if set):
   - must be greater than `WallThickness`
 
-[TODO Examples]()
+![CenterLineZShape (only mandatory properties)](media/ProfilePictures/CenterZShape1.png)
+![CenterLineZShape (all properties)](media/ProfilePictures/CenterZShape2.png)
 
 ### **BentPlateProfile**
 **Derivative properties:**
@@ -338,7 +349,7 @@ Note that deletion of the referenced [SinglePerimeterProfile](#singleperimeterpr
   - must be greater than zero
   - must be less or equal to half `MaximumWallThickness` minus half `WallThickness`
 
-[TODO Examples]()
+![BentPlate](media/ProfilePictures/BentPlate.png)
 
 ### **CompositeProfile**
 
@@ -370,7 +381,8 @@ Note that deletion of the referenced [LShapeProfile](#lshapeprofile) will be pro
 **Constraints:**
 - `Spacing` must be equal or greater than zero
 
-[TODO Examples]()
+![DoubleLShape (DoubleLLongLegs)](media/ProfilePictures/DoubleLLongLegs.png)
+![DoubleLShape (DoubleLShortLegs)](media/ProfilePictures/DoubleLShortLegs.png)
 
 ### **DoubleCShapeProfile**
 
@@ -381,7 +393,7 @@ Note that deletion of the referenced [CShapeProfile](#cshapeprofile) will be pro
 **Constraints:**
 - `Spacing` must be equal or greater than zero
 
-[TODO Examples]()
+![DoubleCShape (DoubleLShortLegs)](media/ProfilePictures/DoubleCShape.png)
 
 ### **ArbitraryShapeProfile**
 
@@ -412,13 +424,13 @@ Extended [ArbitraryShapeProfile](#arbitraryshapeprofile) with an aditional const
 - `XRadius` must be greater tan zero
 - `YRadius` must be greater tan zero
 
-[TODO Examples]()
+![Ellipse](media/ProfilePictures/Ellipse.png)
 
 ### **CircleProfile**
 **Constraints:**
 - `Radius` must be greater tan zero
 
-[TODO Examples]()
+![Circle](media/ProfilePictures/Circle.png)
 
 ### **HollowCircleProfile**
 **Constraints:**
@@ -427,14 +439,14 @@ Extended [ArbitraryShapeProfile](#arbitraryshapeprofile) with an aditional const
   - must be greater than zero
   - must be less than `Radius`
 
-[TODO Examples]()
+![HollowCircle](media/ProfilePictures/HollowCircle.png)
 
 ### **RectangleProfile**
 **Constraints:**
 - `Width` must be greater than zero
 - `Depth` must be greater than zero
 
-[TODO Examples]()
+![Rectangle](media/ProfilePictures/Rectangle.png)
 
 ### **RoundedRectangleProfile**
 **Constraints:**
@@ -445,7 +457,7 @@ Extended [ArbitraryShapeProfile](#arbitraryshapeprofile) with an aditional const
   - must be less than half `Width`
   - must be less than half `Depth`
 
-[TODO Examples]()
+![RoundedRectangle](media/ProfilePictures/RoundedRectangle.png)
 
 ### **HollowRectangleProfile**
 **Constraints:**
@@ -465,7 +477,8 @@ Extended [ArbitraryShapeProfile](#arbitraryshapeprofile) with an aditional const
   - must be less or equal to half `Depth`
   - must be greater than `InnerFilletRadius` plus `WallThickness` multiplied by `2 * Sqrt(2)`
 
-[TODO Examples]()
+![HollowRectangle (only mandatory properties)](media/ProfilePictures/HollowRectangle1.png)
+![HollowRectangle (all properties)](media/ProfilePictures/HollowRectangle2.png)
 
 ### **TrapeziumProfile**
 **Constraints:**
@@ -473,14 +486,14 @@ Extended [ArbitraryShapeProfile](#arbitraryshapeprofile) with an aditional const
 - `BottomWidth` must be greater than zero
 - `Depth` must be greater than zero
 
-[TODO Examples]()
+![Trapezium](media/ProfilePictures/Trapezium.png)
 
 ### **RegularPolygonProfile**
 **Constraints:**
 - `SideCount` must be greater or equal to `3` and less or equal to `32`
 - `SideLength` must be greater than zero
 
-[TODO Examples]()
+![RegularPolygon (all properties)](media/ProfilePictures/RegularPolygon.png)
 
 ### **CapsuleProfile**
 **Constraints:**
@@ -489,17 +502,13 @@ Extended [ArbitraryShapeProfile](#arbitraryshapeprofile) with an aditional const
   - must be greater than zero
   - must not equal to `Width`
 
-[TODO Examples]()
-
-
+![Capsule](media/ProfilePictures/Capsule.png)
 
 ## **Mixin Classes**
 
 ### **ICenterLineProfile**
 
 Mixin class used to define [Profiles](#profile) with a non self intersecting centerline and a constant thcikness. These [Profiles](#profile) are often used to model cold-formed sections. See [CenterLineCShapeProfile](#centerlinecshapeprofile), [CenterLineLShapeProfile](#centerlinelshapeprofile), [CenterLineZShapeProfile](#centerlinezshapeprofile).
-
-
 
 ## **Struct Classes**
 
@@ -508,6 +517,7 @@ Mixin class used to define [Profiles](#profile) with a non self intersecting cen
 All [Profiles](#profile) have an array of CardinalPoints containing 19 predefined standard cardinal points. In addition users may define their own custom cardinal points and append them to the end of the array - in such case the name of the custom CardinalPoint must not clash with names of standard cardinal points.
 
 Standard Cardinal points are:
+
 - **BottomLeft** - Bottom left corner of the profiles bounding box
 - **BottomCenter** - Middle point of bottom line of the profiles bounding box
 - **BottomRight** - Bottom right corner of the profiles bounding box
@@ -527,8 +537,6 @@ Standard Cardinal points are:
 - **LeftInLineWithShearCenter** - Most left point of the profiles geometry thats in-line with **ShearCenter**
 - **RightInLineWithShearCenter** - Most right point of the profiles geometry thats in-line with **ShearCenter**
 - **TopInLineWithShearCenter** - Most top point of the profiles geometry thats in-line with **ShearCenter**
-
-
 
 ## **Enumerations**
 
