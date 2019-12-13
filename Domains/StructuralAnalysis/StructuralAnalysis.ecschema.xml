@@ -2,6 +2,7 @@
 <ECSchema schemaName="StructuralAnalysis" alias="sa" version="01.00.00" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" displayLabel="Structural Analysis" description="Structural Analysis Schema.">
     <ECSchemaReference name="BisCore" version="01.00.00" alias="bis" />
     <ECSchemaReference name="Profiles" version="01.00.00" alias="prf" />
+    <ECSchemaReference name="Analytical" version="01.00.00" alias="anlyt" />
 
     <ECEnumeration typeName="CardinalPoint" backingTypeName="int" description="Default standard cardinal points.">
         <ECEnumerator value="0" name="BottomLeft" displayLabel="Bottom Left" description="Most bottom left Profile's bounding box point." />
@@ -65,9 +66,18 @@
         <ECEnumerator value="2" name="Bottom" displayLabel="Bottom" description="Topology defines boundary at the bottom of a Surface." />
     </ECEnumeration>
 
+    <ECEntityClass typeName="StructuralAnalysisModel" modifier="None" displayLabel="Structural Analysis Model" description="Model containing all StructuralAnalysis elements." >
+        <BaseClass>anlyt:AnalyticalModel</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="StructuralAnalysisPartition" modifier="None" displayLabel="Structural Analysis Partition" 
+        description="StructuralAnalysisPartition element indicates that there is a specialized StructuralAnalysis perspective within the overall information hierarchy." >
+        <BaseClass>anlyt:AnalyticalPartition</BaseClass>
+    </ECEntityClass>
+
     <!-- Topology classes -->
     <ECEntityClass typeName="TopologyElement" modifier="Abstract" displayLabel="Topology Element" description="Abstract class for all topology-related classes to derive from.">
-        <BaseClass>bis:SpatialLocationElement</BaseClass>
+        <BaseClass>anlyt:AnalyticalElement</BaseClass>
     </ECEntityClass>
 
     <ECEntityClass typeName="SharedTopologyElement" modifier="Abstract" displayLabel="Shared Topology Element"
@@ -461,13 +471,8 @@
     </ECRelationshipClass>
 
     <!-- Member classes -->
-
-    <ECEntityClass typeName="AnalysisElement" modifier="Abstract" displayLabel="Analysis Element" description="Base class for analysis elements to derive from." >
-        <BaseClass>bis:SpatialElement</BaseClass>
-    </ECEntityClass>
-
     <ECEntityClass typeName="StructuralAnalysisElement" modifier="Abstract" displayLabel="Structural Analysis Element" description="Abstract class for all StructuralAnalysisElement classes to descend from.">
-        <BaseClass>AnalysisElement</BaseClass>
+        <BaseClass>anlyt:AnalyticalElement</BaseClass>
     </ECEntityClass>
 
     <ECEntityClass typeName="Support" modifier="Abstract" displayLabel="Support" description="Abstract class for all support classes to descend from.">
