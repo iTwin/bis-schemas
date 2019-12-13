@@ -1,0 +1,66 @@
+workspace:
+  clean: all
+
+trigger:
+  branches:
+    include:
+     - master
+
+pool:
+  name: 
+  demands:
+  - Agent.OS -equals Windows_NT
+  - npm
+
+variables:
+  - group: 
+
+steps:
+  - task: NodeTool@0
+    displayName: 'Use Node 10.15.0'
+    inputs:
+      versionSpec: 10.15.0
+  - checkout: self
+    clean: true
+
+  - task: NuGetCommand@2
+    displayName: 'NuGet install'
+    inputs:
+      command: custom
+      arguments: 'install  -OutputDirectory $(System.DefaultWorkingDirectory) -Source http:///nuget/Default/'
+
+  - powershell: |
+      $dir = Get-ChildItem $(System.DefaultWorkingDirectory) | Where-Object {$_.name -like "*"}
+   
+      Write-Host "SignoffToolPath=$(System.DefaultWorkingDirectory)\$dir\lib\native\"
+      Write-Host "##vso[task.setvariable variable=SignoffToolPath]$(System.DefaultWorkingDirectory)\$dir\lib\native\"
+    failOnStderr: true
+    displayName: 'Get C++ based Signoff Tool Path'
+    env:
+      rootDir: $(System.DefaultWorkingDirectory)
+      packageName: 
+
+    
+  - powershell: |
+      $npmrcDir = "$(Build.Repository.LocalPath)"
+      
+      if(!(Test-Path -Path $npmrcDir)){
+          mkdir $npmrcDir
+      }
+      
+      $npmrcFile = $npmrcDir + "/.npmrc"
+      
+      Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "@bentley:registry=/"
+      
+      Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "////_packaging/Packages/npm/registry/:username=Packages" -Append
+      Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "////_packaging/Packages/npm/registry/:_password=$()" -Append
+      Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "////_packaging/Packages/npm/registry/:email=npm requires email to be set but doesn't use the value" -Append
+      Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "////_packaging/Packages/npm/:username=Packages" -Append
+      Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "////_packaging/Packages/npm/:_password=$()" -Append
+      Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "////_packaging/Packages/npm/:email=npm requires email to be set but doesn't use the value" -Append
+
+    displayName: 'Seed npmrc'
+
+  - script: npm install -g @bentley/imodel-schema-validator
+    displayName: 'Install imodel-schema-validator'
+     
