@@ -104,6 +104,27 @@
         <BaseClass>IPathsOwner</BaseClass>
     </ECEntityClass>
 
+    <ECRelationshipClass typeName="FaceOwnsBoundaryLoop" strength="embedding" modifier="Sealed" description="A relationship that indicates that a Face owns a Loop which describes it's outer boundary.">
+        <BaseClass>ILoopOwnerOwnsLoop</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="owns" polymorphic="false">
+            <Class class="Face"/>
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="Loop"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="FaceOwnsInnerPaths" strength="embedding" modifier="Sealed" 
+        description="A relationship that indicates that a Face owns a Path which should describe it's inner connectivity with other StructuralAnalysis Elements.">
+        <BaseClass>IPathsOwnerOwnsPaths</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="owns" polymorphic="false">
+            <Class class="Face"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="true">
+            <Class class="Path"/>
+        </Target>
+    </ECRelationshipClass>
+
     <ECEntityClass typeName="OrientedFaceAspect" modifier="Sealed" displayLabel="Oriented Face Aspect" description="This Aspect stores the Faces (and related data) for a FaceSet.">
         <BaseClass>bis:ElementMultiAspect</BaseClass>
         <ECProperty propertyName="IsForwardDirection" typeName="boolean" displayLabel="Is Forward Direction" description="Shows if direction matches Face direction." />
@@ -145,7 +166,7 @@
         </ECCustomAttributes>
     </ECEntityClass>
 
-    <ECRelationshipClass typeName="ISheetOwnerOwnsSheet" strength="embedding" modifier="None" description="A relationship that indicates that an Element owns Sheet.">
+    <ECRelationshipClass typeName="ISheetOwnerOwnsSheet" strength="embedding" modifier="Abstract" description="A relationship that indicates that an Element owns Sheet.">
         <BaseClass>bis:ElementOwnsChildElements</BaseClass>
         <Source multiplicity="(0..1)" roleLabel="owns" polymorphic="true">
             <Class class="ISheetOwner"/>
@@ -199,7 +220,7 @@
         </ECCustomAttributes>
     </ECEntityClass>
 
-    <ECRelationshipClass typeName="ILoopOwnerOwnsLoop" strength="embedding" modifier="None" description="A relationship that indicates that an Element owns Loop.">
+    <ECRelationshipClass typeName="ILoopOwnerOwnsLoop" strength="embedding" modifier="Abstract" description="A relationship that indicates that an Element owns Loop.">
         <BaseClass>bis:ElementOwnsChildElements</BaseClass>
         <Source multiplicity="(0..1)" roleLabel="owns" polymorphic="true">
             <Class class="ILoopOwner"/>
@@ -221,7 +242,7 @@
         </ECCustomAttributes>
     </ECEntityClass>
 
-    <ECRelationshipClass typeName="IWireOwnerOwnsWire" strength="embedding" modifier="None" description="A relationship that indicates that an Element owns Wire.">
+    <ECRelationshipClass typeName="IWireOwnerOwnsWire" strength="embedding" modifier="Abstract" description="A relationship that indicates that an Element owns Wire.">
         <BaseClass>bis:ElementOwnsChildElements</BaseClass>
         <Source multiplicity="(0..1)" roleLabel="owns" polymorphic="true">
             <Class class="IWireOwner"/>
@@ -496,6 +517,17 @@
             description="Defines how support behaves at it's location." />
     </ECEntityClass>
 
+    <ECRelationshipClass typeName="CurveSupportOwnsLocationWire" strength="embedding" modifier="Sealed" 
+        description="A relationship that indicates that a CurveSupport owns a Wire which should describe it's Location.">
+        <BaseClass>IWireOwnerOwnsWire</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="owns" polymorphic="false">
+            <Class class="CurveSupport"/>
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="Wire"/>
+        </Target>
+    </ECRelationshipClass>
+
     <ECEntityClass typeName="SurfaceSupport" modifier="Sealed" displayLabel="Surface Support" description="Support which is located in a surface.">
         <BaseClass>Support</BaseClass>
         <BaseClass>ISheetOwner</BaseClass>
@@ -503,6 +535,17 @@
         <ECNavigationProperty propertyName="Behavior" relationshipName="SurfaceSupportRefersToSurfaceSupportBehavior" direction="Forward" displayLabel="Behavior"
             description="Defines how support behaves at it's location." />
     </ECEntityClass>
+
+    <ECRelationshipClass typeName="SurfaceSupportOwnsLocationSheet" strength="embedding" modifier="Sealed" 
+        description="A relationship that indicates that a SurfaceSupport owns a Sheet which should describe it's Location.">
+        <BaseClass>ISheetOwnerOwnsSheet</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="owns" polymorphic="false">
+            <Class class="SurfaceSupport"/>
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="Sheet"/>
+        </Target>
+    </ECRelationshipClass>
 
     <ECRelationshipClass typeName="SurfaceSupportRefersToSurfaceSupportBehavior" strength="referencing" modifier="Sealed">
         <Source multiplicity="(0..*)" roleLabel="has" polymorphic="false">
@@ -609,10 +652,30 @@
         <ECProperty propertyName="Classification" typeName="SurfaceMemberClassificationType" displayLabel="Classification" description="The use case for this Surface Member." />
     </ECEntityClass>
 
+    <ECRelationshipClass typeName="SurfaceMemberOwnsLocationSheet" strength="embedding" modifier="Sealed" description="A relationship that indicates that a SurfaceMember owns a Sheet.">
+        <BaseClass>ISheetOwnerOwnsSheet</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="owns" polymorphic="false">
+            <Class class="SurfaceMember"/>
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="Sheet"/>
+        </Target>
+    </ECRelationshipClass>
+
     <ECEntityClass typeName="SurfaceMemberRegion" modifier="Abstract" displayLabel="Surface Member Region" description="Defines a region of a SurfaceMember that has different behavior (or is an opening).">
         <BaseClass>StructuralAnalysisElement</BaseClass>
         <BaseClass>ISheetOwner</BaseClass>
     </ECEntityClass>
+
+    <ECRelationshipClass typeName="SurfaceMemberRegionOwnsLocationSheet" strength="embedding" modifier="Sealed" description="A relationship that indicates that a SurfaceMemberRegion owns a Sheet.">
+        <BaseClass>ISheetOwnerOwnsSheet</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="owns" polymorphic="false">
+            <Class class="SurfaceMember"/>
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="Sheet"/>
+        </Target>
+    </ECRelationshipClass>
 
     <ECRelationshipClass typeName="SurfaceMemberOwnsRegions" strength="embedding" strengthDirection="Forward" modifier="Sealed">
         <BaseClass>bis:ElementOwnsChildElements</BaseClass>
