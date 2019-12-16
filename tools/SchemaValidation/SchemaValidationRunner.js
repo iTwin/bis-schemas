@@ -11,6 +11,7 @@ const path = require("path");
 const readdirp = require("readdirp");
 const argv = require("yargs").argv;
 const exec = require('child_process').exec
+const fs = require("fs");
 
 // Makes the script crash on unhandled rejections instead of silently
 // ignoring them. In the future, promise rejections that are not handled will
@@ -20,10 +21,14 @@ process.on("unhandledRejection", err => {
 });
 
 async function validateSchemas() {
+  const excludeSchemas = getExcludeSchemaList();
   const schemas = await getAllSchemas();
   const allRefPaths = getRefpaths(schemas, false);
   const releasedRefPaths = getRefpaths(schemas, true);
+
   for (const schema of schemas) {
+    if (shouldExcludeSchema(schema, excludeSchemas))
+      continue;
     const refPaths = schema.released ? releasedRefPaths : allRefPaths;
     const command = buildValidationCommand(schema, refPaths);
     executeValidation(command);
@@ -80,6 +85,36 @@ async function getAllSchemas() {
     }
   }
 
+  return schemas;
+}
+
+function shouldExcludeSchema(schema, excludeList) {
+  if (!excludeList)
+    return false;
+
+  const matches = excludeList.filter((s) => s.name === schema.name);
+  if (matches.length === 0)
+    return false;
+
+  if (matches.some((s) => s.version === "*"))
+    return true;
+
+  if (!schema.version)
+    return true;
+
+  if (matches.some((s) => s.version === schema.version))
+    return true;
+
+  return false;
+}
+
+function getExcludeSchemaList() {
+  const fullPath = path.resolve(__dirname, "ignoreSchemaList.json")
+  if (!fs.existsSync(fullPath))
+    return;
+
+  let rawdata = fs.readFileSync(fullPath);
+  let schemas = JSON.parse(rawdata);
   return schemas;
 }
 
