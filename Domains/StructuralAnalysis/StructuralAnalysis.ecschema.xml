@@ -492,6 +492,7 @@
     </ECRelationshipClass>
 
     <!-- Member classes -->
+
     <ECEntityClass typeName="StructuralAnalysisElement" modifier="Abstract" displayLabel="Structural Analysis Element" description="Abstract class for all StructuralAnalysisElement classes to descend from.">
         <BaseClass>anlyt:AnalyticalElement</BaseClass>
     </ECEntityClass>
@@ -604,40 +605,37 @@
             </IsMixin>
         </ECCustomAttributes>
         <ECProperty propertyName="PlacementPoint" typeName="SurfaceAlignmentType" displayLabel="Placement point"
-            description="Sheet defines area location for ISurface, the height of ISurface is defined by thickness (provided by related SurfaceSystem) which extrudes location area by that thickness.
+            description="Sheet defines area location for ISurface, the height of ISurface is defined by thickness (provided by related SurfaceType) which extrudes location area by that thickness.
                 PlacementPoint allows to define how location area should be interpreted for extrusion - ether as start, end or center.
                 These are the most common used cases. More flexibility is achieved by using Offset property." />
         <ECProperty propertyName="Offset" typeName="double" displayLabel="Offset"
             description="PlacementPoint provides only a few cases for how to interpret the location area (Sheet).
                 Offset provides more flexibility for less common cases, where it provides additional offset along the normal of ISurface. Both PlacementPoint and Offset properties can be used at the same time." />
-        <ECNavigationProperty propertyName="SurfaceSystem" relationshipName="SurfaceRefersToSurfaceSystem" direction="Forward" displayLabel="Surface System"
-            description="ISurface instances might have some repeated properties (e.g. Multiple walls spanning in different stories with same thickness, material, etc.).
-                Surface System should provide a system with shared properties for such group of ISurfaces.
-                Surface Member instance and its' Surface Member Modifier instances can (an usually should) belong to different Surface Systems." />
     </ECEntityClass>
 
-    <ECRelationshipClass typeName="SurfaceRefersToSurfaceSystem" strength="referencing" modifier="Sealed">
+    <ECRelationshipClass typeName="SurfaceRefersToSurfaceType" strength="referencing" modifier="Sealed">
+        <BaseClass>anlyt:AnalyticalElementIsOfType</BaseClass>
         <Source multiplicity="(0..*)" roleLabel="references" polymorphic="true">
             <Class class="ISurface" />
         </Source>
         <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="true">
-            <Class class="SurfaceSystem" />
+            <Class class="SurfaceType" />
         </Target>
     </ECRelationshipClass>
 
-    <ECEntityClass typeName="SurfaceSystem" modifier="Abstract" displayLabel="Surface System" description="Defines a Surface System.">
-        <BaseClass>bis:DefinitionElement</BaseClass>
+    <ECEntityClass typeName="SurfaceType" modifier="Abstract" displayLabel="Surface Type" description="Defines a Surface Type for ISurface.">
+        <BaseClass>anlyt:AnalyticalType</BaseClass>
     </ECEntityClass>
 
-    <ECEntityClass typeName="SimpleSurfaceSystem" modifier="Sealed" description="Simple Surface System.">
-        <BaseClass>SurfaceSystem</BaseClass>
-        <ECProperty propertyName="Thickness" typeName="double" description="Thickness of all ISurfaces in a system." />
-        <ECNavigationProperty propertyName="Material" relationshipName="SimpleSurfaceSystemRefersToMaterial" direction="Forward" displayLabel="Material" description="Material of all ISurfaces in a system." />
+    <ECEntityClass typeName="SimpleSurfaceType" modifier="Sealed" description="Simple Surface Type.">
+        <BaseClass>SurfaceType</BaseClass>
+        <ECProperty propertyName="Thickness" typeName="double" description="Thickness of ISurfaces." />
+        <ECNavigationProperty propertyName="Material" relationshipName="SimpleSurfaceTypeRefersToMaterial" direction="Forward" displayLabel="Material" description="Material of all ISurfaces with this type." />
     </ECEntityClass>
 
-    <ECRelationshipClass typeName="SimpleSurfaceSystemRefersToMaterial" strength="referencing" strengthDirection="Forward" modifier="Sealed">
+    <ECRelationshipClass typeName="SimpleSurfaceTypeRefersToMaterial" strength="referencing" strengthDirection="Forward" modifier="Sealed">
         <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="true">
-            <Class class="SimpleSurfaceSystem" />
+            <Class class="SimpleSurfaceType" />
         </Source>
         <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="true">
             <Class class="bis:PhysicalMaterial"/>
@@ -721,8 +719,6 @@
             Rigid zone specifies that the Curve Member is immune deformation at that zone. Common case would be where curve member overlaps with other member, overlapping area would be define das rigid zone." />
         <ECProperty propertyName="Offset" typeName="point2d" displayLabel="Offset"
             description="2d offset defined in local coordinate system, where first coordinate variable shows offset along binormal and second along Orientation." />
-        <ECNavigationProperty propertyName="CurveMemberSystem" relationshipName="CurveMemberRefersToCurveMemberSystem" direction="Forward" displayLabel="Curve Member System"
-            description="System to which this Curve Member belongs." />
     </ECEntityClass>
 
     <ECRelationshipClass typeName="CurveMemberOwnsLocationWire" strength="embedding" modifier="Sealed" description="A relationship that indicates that an Element owns Wire.">
@@ -735,12 +731,13 @@
         </Target>
     </ECRelationshipClass>
 
-    <ECRelationshipClass typeName="CurveMemberRefersToCurveMemberSystem" strength="referencing" modifier="Sealed">
-        <Source multiplicity="(0..*)" roleLabel="has" polymorphic="false">
+    <ECRelationshipClass typeName="CurveMemberIsOfCurveMemberType" strength="referencing" modifier="Sealed">
+        <BaseClass>anlyt:AnalyticalElementIsOfType</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="is of" polymorphic="false">
             <Class class="CurveMember" />
         </Source>
-        <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="true">
-            <Class class="CurveMemberSystem" />
+        <Target multiplicity="(1..1)" roleLabel="defines" polymorphic="true">
+            <Class class="CurveMemberType" />
         </Target>
     </ECRelationshipClass>
 
@@ -774,24 +771,24 @@
         </Target>
     </ECRelationshipClass>
 
-    <!-- CurveMemberSystem -->
-    <ECEntityClass typeName="CurveMemberSystem" modifier="Abstract" displayLabel="Curve Member System" description="System grouping Curve Members." >
-        <BaseClass>bis:DefinitionElement</BaseClass>
+    <!-- CurveMemberType -->
+    <ECEntityClass typeName="CurveMemberType" modifier="Abstract" displayLabel="Curve Member Type" description="Type grouping Curve Members." >
+        <BaseClass>anlyt:AnalyticalType</BaseClass>
     </ECEntityClass>
 
-    <ECEntityClass typeName="SingleCurveMemberSystem" modifier="Abstract" displayLabel="Single Curve Member System">
-        <BaseClass>CurveMemberSystem</BaseClass>
+    <ECEntityClass typeName="SingleCurveMemberType" modifier="Abstract" displayLabel="Single Curve Member Type">
+        <BaseClass>CurveMemberType</BaseClass>
     </ECEntityClass>
 
-    <ECEntityClass typeName="MaterialProfileSystem" modifier="Sealed" displayLabel="Material Profile System"
-        description="Curve Member system with shared Material and Profile." >
-        <BaseClass>SingleCurveMemberSystem</BaseClass>
-        <ECNavigationProperty propertyName="MaterialProfile" relationshipName="MaterialProfileSystemHasMaterialProfile" direction="Forward" displayLabel="Material Profile" description="Material Profile." />
+    <ECEntityClass typeName="MaterialProfileType" modifier="Sealed" displayLabel="Material Profile Type"
+        description="Curve Member Type with shared Material and Profile." >
+        <BaseClass>SingleCurveMemberType</BaseClass>
+        <ECNavigationProperty propertyName="MaterialProfile" relationshipName="MaterialProfileTypeHasMaterialProfile" direction="Forward" displayLabel="Material Profile" description="Material Profile." />
     </ECEntityClass>
 
-    <ECRelationshipClass typeName="MaterialProfileSystemHasMaterialProfile" strength="referencing" modifier="Sealed">
+    <ECRelationshipClass typeName="MaterialProfileTypeHasMaterialProfile" strength="referencing" modifier="Sealed">
         <Source multiplicity="(0..*)" roleLabel="has" polymorphic="true">
-            <Class class="MaterialProfileSystem" />
+            <Class class="MaterialProfileType" />
         </Source>
         <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="false">
             <Class class="MaterialProfile" />
