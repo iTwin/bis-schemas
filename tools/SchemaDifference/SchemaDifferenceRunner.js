@@ -78,30 +78,28 @@ async function compareSchemas() {
 }
 
 function processResults(releasedSchema, schema, results) {
-  let hasErrors = false;
   if (!results || (results.length === 2) && results[1].resultType === ComparisonResultType.Message) {
     console.log("Schema comparison succeeded. No differences found.");
-    return;
+    return false;
   }
 
   const errors = results.filter((value) => value.resultType === ComparisonResultType.Error);
   if (errors.length > 0) {
-    hasErrors = true;
     reportError("An error occured comparing schemas. Please see logs for details.");
     errors.forEach((error) => {
       reportError(error.resultText);
     });
-    return;
+    return true;
   }
 
   reportWarning("Schema differences were found. Please see logs for details");
 
   if (0 <= versionCompare(schema.version, releasedSchema.version)) {
-    hasErrors = true;
     reportError(`Schema version ${schema.version} must be greater than the latest release version ${releasedSchema.version}`);
+    return true;
   }
 
-  return hasErrors;
+  return false;
 }
 
 function reportError(message) {
