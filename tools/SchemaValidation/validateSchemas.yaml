@@ -19,7 +19,7 @@ variables:
   - name: validationOut
     value: '$(Agent.BuildDirectory)/ValidationResults'
   - name: validaterPath
-    value: '$(Build.Repository.LocalPath)/node_modules/@bentley/schema-validator/bin/index.js'
+    value: '$(Build.Repository.LocalPath)/node_modules/@bentley/schema-validator'
   - name: comparisonOut
     value: '$(Agent.BuildDirectory)/ComparisonResults'
   - name: schemaComparerPath
@@ -75,6 +75,7 @@ steps:
   displayName: Perform BIS Schema Validation
 
 - task: ArchiveFiles@2
+  condition: succeededOrFailed()
   displayName: 'ArchiveFiles - Validation Results'
   inputs:
     rootFolderOrFile: $(validationOut) 
@@ -84,12 +85,9 @@ steps:
     replaceExistingArchive: true 
 
 - publish: '$(Build.ArtifactStagingDirectory)/ValidationResults-$(Build.BuildId).zip'
+  condition: succeededOrFailed()
   artifact: bis-schema-validation-logs
   displayName: 'Publish BIS Schema Validation Results'
-
-- script: node ./tools/SchemaValidation/SchemaValidationReporter.js --LogDir $(validationOut)
-  workingDirectory: 
-  displayName: Report Schema Validation Results
 
 - script: | 
     mkdir "%comparisonOut%"
