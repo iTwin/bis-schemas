@@ -256,7 +256,7 @@ Connectivity between CurveMember and other elements are defined through [Edges](
 
 Not all properties of CurveMember are defined in CurveMember class. There are two additional types of properties that can be assigned to a CurveMember:
 
-- Mandatory CurveMember properties, that can be repeated in multiple CurveMembers are grouped by a [CurveMemberSystem](#curvemembersystem), these could include material, thickness, etc
+- Mandatory CurveMember properties, that can be repeated in multiple CurveMembers are grouped by a [CurveMemberType](#curvemembertype), these could include material, thickness, etc
 - Optional properties, that define some more unique behavior for that CurveMember that might not exist at all. These behaviors are assigned by [MemberBehaviorAspect](#memberbehavioraspect) instances. A single CurveMember might have multiple different type behavior aspects assigned but only one of each kind.
 
 ### SurfaceMember
@@ -280,7 +280,7 @@ SurfaceMember's analytical location is defined by a child [Sheet](#sheet). Surfa
 
 Not all properties of SurfaceMember are defined in SurfaceMember class. There are two additional types of properties that can be assigned to a SurfaceMember:
 
-- Mandatory SurfaceMember properties, that can be repeated in multiple SurfaceMembers are grouped by a [SurfaceSystem](#surfacesystem), these could include material, thickness, etc.
+- Mandatory SurfaceMember properties, that can be repeated in multiple SurfaceMembers are grouped by a [SurfaceType](#surfacetype), these could include material, thickness, etc.
 - Optional properties, that define unique behavior for that SurfaceMember that might not exist at all. These behaviors are assigned by [MemberBehaviorAspect](#memberbehavioraspect) instances. A single SurfaceMember might have multiple different type behavior aspects assigned but only one of each kind
 
 Complex SurfaceMembers are defined using three different classes:
@@ -297,7 +297,7 @@ SurfaceMemberRegion has a single child [Sheet](#sheet) to define its area. Each 
 
 ### SurfaceMemberModifier
 
-Defines [SurfaceMember's](#surfacemember) region which has different structural properties than the rest of the surface. SurfaceMemberModifier can belong to different [SurfaceSystem](#surfacesystem) and have different material, thickness than the parent SurfaceMember.
+Defines [SurfaceMember's](#surfacemember) region which has different structural properties than the rest of the surface. SurfaceMemberModifier can belong to different [SurfaceType](#surfacetype) and have different material, thickness than the parent SurfaceMember.
 
 Multiple SurfaceMemberModifiers might overlap at some parts of SurfaceMember. **Priority** property allows to determine which SurfaceMemberModifier should be used for determining properties of intersecting volume. Higher value of this property means that SurfaceMemberModifier has higher priority over other lower valued SurfaceMemberModifiers. Only a single SurfaceMemberModifier at the intersecting volume can define that SurfaceMembers region.
 
@@ -305,34 +305,34 @@ Multiple SurfaceMemberModifiers might overlap at some parts of SurfaceMember. **
 
 Cuts [SurfaceMember](#surfacemember) and all of its [SurfaceMemberModifiers](#surfacemembermodifier) along the [Sheet](#sheet) which is assigned to this [SurfaceMemberOpening](#surfacememberopening). SurfaceMemberOpenings can intersect, however that does not make difference how the SurfaceMember is cut.
 
-### CurveMemberSystem
+### CurveMemberType
 
-Multiple [CurveMember](#curvemember) properties might be grouped to a single entity/system. This entity is a CurveMemberSystem which holds all repeating properties for that system's CurveMembers. Each CurveMember must belong to a CurveMemberSystem. Materials, Profiles and Tapering (CurveMember's profile change along the length) can be defined in this way.
+Multiple [CurveMember](#curvemember) properties might be grouped by a single entity/type. This entity is a CurveMemberType which holds all repeating properties for the  CurveMembers. Each CurveMember must have a CurveMemberType set. Materials, Profiles and Tapering (CurveMember's profile change along the length) can be defined in this way.
 
-Available CurveMemberSystems:
+Available CurveMemberTypes:
 
-- [SingleCurveMemberSystem](#singlecurvemembersystem) - all CurveMembers have same Material and profile which are constant or change linearly along the length
-- [SegmentedCurveMemberSystem](#segmentedcurvemembersystem) (future) - all CurveMembers are segmented, each segment might have different material and profiles
+- [SingleCurveMemberType](#singlecurvemembertype) - all CurveMembers have same Material and profile which are constant or change linearly along the length
+- [SegmentedCurveMemberType](#segmentedcurvemembertype) (future) - all CurveMembers are segmented, each segment might have different material and profiles
 
-### SingleCurveMemberSystem
+### SingleCurveMemberType
 
-[CurveMemberSystem](#curvemembersystem) which defines a system where all [CurveMembers](#curvemember) are not segmented. Structural properties for a CurveMember change linearly or do not change at all.
+[CurveMemberType](#curvemembertype) which defines a type where all [CurveMembers](#curvemember) are not segmented. Structural properties for a CurveMember change linearly or do not change at all.
 
-### MaterialProfileSystem
+### MaterialProfileType
 
-[CurveMemberSystem](#curvemembersystem) which defines a single Material and Profile for all CurveMembers in the system. CurveMember structural properties are constant along the length of each CurveMember.
+[CurveMemberType](#curvemembertype) which defines a single Material and Profile for all CurveMembers of that type. CurveMember structural properties are constant along the length of each CurveMember.
 
-### SurfaceSystem
+### SurfaceType
 
-[ISurfaces](#isurface) ([SurfaceMembers](#surfacemember) and [SurfaceMemberModifiers](#surfacemembermodifier)) might have some shared properties in a structure: thickness, material, etc... SurfaceSystem groups these ISurface instances to a single group and provides shared properties for the whole group-system.
+[ISurfaces](#isurface) ([SurfaceMembers](#surfacemember) and [SurfaceMemberModifiers](#surfacemembermodifier)) might have some shared properties in a structure: thickness, material, etc... SurfaceType groups these ISurface instances to a single group and provides shared properties for the whole group-system.
 
-Available SurfaceSystems:
+Available SurfaceTypes:
 
-- [SimpleSurfaceSystem](#simplesurfacesystem) defines constant thickness and material for whole surface
+- [SimpleSurfaceType](#simplesurfacetype) defines constant thickness and material for whole surface
 
-### SimpleSurfaceSystem
+### SimpleSurfaceType
 
-Most common [SurfaceSystem](#surfacesystem). Should be assigned to most walls, slabs which do not have any varying thickness, material layers. Simple Surface System provides constant material and thickness for each [ISurface](#isurface) in a system.
+Most common [SurfaceType](#surfacetype). Should be assigned to most walls, slabs which do not have any varying thickness, material layers. Simple Surface Type provides constant material and thickness for each [ISurface](#isurface).
 
 ### Load
 
