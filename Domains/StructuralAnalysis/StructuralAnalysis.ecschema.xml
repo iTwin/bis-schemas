@@ -2,6 +2,7 @@
 <ECSchema schemaName="StructuralAnalysis" alias="sa" version="01.00.00" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" displayLabel="Structural Analysis" description="Structural Analysis Schema.">
     <ECSchemaReference name="BisCore" version="01.00.00" alias="bis" />
     <ECSchemaReference name="Profiles" version="01.00.00" alias="prf" />
+    <ECSchemaReference name="Analytical" version="01.00.00" alias="anlyt" />
 
     <ECEnumeration typeName="CardinalPoint" backingTypeName="int" description="Default standard cardinal points.">
         <ECEnumerator value="0" name="BottomLeft" displayLabel="Bottom Left" description="Most bottom left Profile's bounding box point." />
@@ -59,15 +60,24 @@
         <ECEnumerator value="6" name="Wall" displayLabel="Wall" />
     </ECEnumeration>
 
-    <ECEnumeration typeName="PlacementPoint" backingTypeName="int" isStrict="true" description="Used for setting Surface location.">
+    <ECEnumeration typeName="SurfaceAlignmentType" backingTypeName="int" isStrict="true" description="Used for setting Surface location.">
         <ECEnumerator value="0" name="Top" displayLabel="Top" description="Topology defines top boundary of a Surface." />
         <ECEnumerator value="1" name="Middle" displayLabel="Middle" description="Topology defines boundary at the mid depth of a Surface." />
         <ECEnumerator value="2" name="Bottom" displayLabel="Bottom" description="Topology defines boundary at the bottom of a Surface." />
     </ECEnumeration>
 
+    <ECEntityClass typeName="StructuralAnalysisModel" modifier="None" displayLabel="Structural Analysis Model" description="Model containing all StructuralAnalysis elements." >
+        <BaseClass>anlyt:AnalyticalModel</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="StructuralAnalysisPartition" modifier="None" displayLabel="Structural Analysis Partition" 
+        description="StructuralAnalysisPartition element indicates that there is a specialized StructuralAnalysis perspective within the overall information hierarchy." >
+        <BaseClass>anlyt:AnalyticalPartition</BaseClass>
+    </ECEntityClass>
+
     <!-- Topology classes -->
     <ECEntityClass typeName="TopologyElement" modifier="Abstract" displayLabel="Topology Element" description="Abstract class for all topology-related classes to derive from.">
-        <BaseClass>bis:SpatialLocationElement</BaseClass>
+        <BaseClass>anlyt:AnalyticalElement</BaseClass>
     </ECEntityClass>
 
     <ECEntityClass typeName="SharedTopologyElement" modifier="Abstract" displayLabel="Shared Topology Element"
@@ -93,6 +103,27 @@
         <BaseClass>ILoopOwner</BaseClass>
         <BaseClass>IPathsOwner</BaseClass>
     </ECEntityClass>
+
+    <ECRelationshipClass typeName="FaceOwnsBoundaryLoop" strength="embedding" modifier="Sealed" description="A relationship that indicates that a Face owns a Loop which describes it's outer boundary.">
+        <BaseClass>ILoopOwnerOwnsLoop</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="owns" polymorphic="false">
+            <Class class="Face"/>
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="Loop"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="FaceOwnsInnerPaths" strength="embedding" modifier="Sealed" 
+        description="A relationship that indicates that a Face owns a Path which should describe it's inner connectivity with other StructuralAnalysis Elements.">
+        <BaseClass>IPathsOwnerOwnsPaths</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="owns" polymorphic="false">
+            <Class class="Face"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="true">
+            <Class class="Path"/>
+        </Target>
+    </ECRelationshipClass>
 
     <ECEntityClass typeName="OrientedFaceAspect" modifier="Sealed" displayLabel="Oriented Face Aspect" description="This Aspect stores the Faces (and related data) for a FaceSet.">
         <BaseClass>bis:ElementMultiAspect</BaseClass>
@@ -331,14 +362,139 @@
         <ECProperty propertyName="TAxisRotational" typeName="double" displayLabel="T Axis Rotational" description="Stiffness about local TAxis." />
     </ECEntityClass>
 
-    <!-- Member classes -->
+    <!-- Release Aspect classes -->
 
-    <ECEntityClass typeName="AnalysisElement" modifier="Abstract" displayLabel="Analysis Element" description="Base class for analysis elements to derive from." >
-        <BaseClass>bis:SpatialElement</BaseClass>
+    <ECEnumeration typeName="ReleaseType" backingTypeName="int" isStrict="true" description="Used for specifying the type of Release.">
+        <ECEnumerator value="0" displayLabel="Unspecified" name="Unspecified"  />
+        <ECEnumerator value="1" displayLabel="Released" name="Released" />
+        <ECEnumerator value="2" displayLabel="Fixed" name="Fixed" />
+    </ECEnumeration>
+
+    <ECEntityClass typeName="ReleaseAspect" modifier="Abstract" displayLabel="Release" description="Release of a Member." >
+        <BaseClass>bis:ElementMultiAspect</BaseClass>
     </ECEntityClass>
 
+    <ECEntityClass typeName="VertexReleaseAspect" modifier="Abstract" displayLabel="Vertex Release" description="Vertex Release of a Member." >
+        <BaseClass>ReleaseAspect</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="PathReleaseAspect" modifier="Abstract" displayLabel="Path Release" description="Path Release of a Member." >
+        <BaseClass>ReleaseAspect</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="SheetReleaseAspect" modifier="Abstract" displayLabel="Sheet Release" description="Sheet Release of a Member." >
+        <BaseClass>ReleaseAspect</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="LogicalVertexReleaseAspect" modifier="Sealed" displayLabel="Logical Vertex Release" description="Vertex Release of a Member." >
+        <BaseClass>VertexReleaseAspect</BaseClass>
+        <ECNavigationProperty propertyName="Vertex" relationshipName="LogicalVertexReleaseAspectRefersToVertex" direction="Forward" displayLabel="Vertex" />
+        <ECProperty propertyName="TranslationalRAxis" typeName="ReleaseType" displayLabel="Translational R Axis" description="Release for Translational R Axis." />
+        <ECProperty propertyName="TranslationalSAxis" typeName="ReleaseType" displayLabel="Translational S Axis" description="Release for Translational S Axis." />
+        <ECProperty propertyName="TranslationalTAxis" typeName="ReleaseType" displayLabel="Translational T Axis" description="Release for Translational T Axis." />
+        <ECProperty propertyName="RotationalRAxis" typeName="ReleaseType" displayLabel="Rotational R Axis" description="Release for Rotational R Axis." />
+        <ECProperty propertyName="RotationalSAxis" typeName="ReleaseType" displayLabel="Rotational S Axis" description="Release for Rotational S Axis." />
+        <ECProperty propertyName="RotationalTAxis" typeName="ReleaseType" displayLabel="Rotational T Axis" description="Release for Rotational T Axis." />
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="LogicalVertexReleaseAspectRefersToVertex" strength="referencing" modifier="Sealed">
+        <Source multiplicity="(0..*)" roleLabel="references" polymorphic="false">
+            <Class class="LogicalVertexReleaseAspect" />
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="false">
+            <Class class="Vertex" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="LogicalPathReleaseAspect" modifier="Sealed" displayLabel="Logical Path Release" description="Path Release of a Member." >
+        <BaseClass>PathReleaseAspect</BaseClass>
+        <ECNavigationProperty propertyName="Path" relationshipName="LogicalPathReleaseAspectRefersToPath" direction="Forward" displayLabel="Path" />
+        <ECProperty propertyName="TranslationalRAxis" typeName="ReleaseType" displayLabel="Translational R Axis" description="Release for Translational R Axis." />
+        <ECProperty propertyName="TranslationalSAxis" typeName="ReleaseType" displayLabel="Translational S Axis" description="Release for Translational S Axis." />
+        <ECProperty propertyName="TranslationalTAxis" typeName="ReleaseType" displayLabel="Translational T Axis" description="Release for Translational T Axis." />
+        <ECProperty propertyName="RotationalRAxis" typeName="ReleaseType" displayLabel="Rotational R Axis" description="Release for Rotational R Axis." />
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="LogicalPathReleaseAspectRefersToPath" strength="referencing" modifier="Sealed">
+        <Source multiplicity="(0..*)" roleLabel="references" polymorphic="false">
+            <Class class="LogicalPathReleaseAspect" />
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="true">
+            <Class class="Path" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="LogicalSheetReleaseAspect" modifier="Sealed" displayLabel="Logical Sheet Release" description="Sheet Release of a Member." >
+        <BaseClass>SheetReleaseAspect</BaseClass>
+        <ECNavigationProperty propertyName="Sheet" relationshipName="LogicalSheetReleaseAspectRefersToSheet" direction="Forward" displayLabel="Sheet" />
+        <ECProperty propertyName="TranslationalRAxis" typeName="ReleaseType" displayLabel="Translational R Axis" description="Release for Translational R Axis." />
+        <ECProperty propertyName="TranslationalSAxis" typeName="ReleaseType" displayLabel="Translational S Axis" description="Release for Translational S Axis." />
+        <ECProperty propertyName="TranslationalTAxis" typeName="ReleaseType" displayLabel="Translational T Axis" description="Release for Translational T Axis." />
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="LogicalSheetReleaseAspectRefersToSheet" strength="referencing" modifier="Sealed">
+        <Source multiplicity="(0..*)" roleLabel="references" polymorphic="false">
+            <Class class="LogicalSheetReleaseAspect" />
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="false">
+            <Class class="Sheet" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="CurveMemberOwnsLogicalVertexReleaseAspects" strength="embedding" modifier="Sealed">
+        <BaseClass>bis:ElementOwnsMultiAspects</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="CurveMember"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="false">
+            <Class class="LogicalVertexReleaseAspect" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="CurveMemberOwnsLogicalPathReleaseAspects" strength="embedding" modifier="Sealed">
+        <BaseClass>bis:ElementOwnsMultiAspects</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="CurveMember"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="LogicalPathReleaseAspect" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="SurfaceMemberOwnsLogicalVertexReleaseAspects" strength="embedding" modifier="Sealed">
+        <BaseClass>bis:ElementOwnsMultiAspects</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="SurfaceMember"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="false">
+            <Class class="LogicalVertexReleaseAspect" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="SurfaceMemberOwnsLogicalPathReleaseAspects" strength="embedding" modifier="Sealed">
+        <BaseClass>bis:ElementOwnsMultiAspects</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="SurfaceMember"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="false">
+            <Class class="LogicalPathReleaseAspect" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="SurfaceMemberOwnsLogicalSheetReleaseAspects" strength="embedding" modifier="Sealed">
+        <BaseClass>bis:ElementOwnsMultiAspects</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="SurfaceMember"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="LogicalSheetReleaseAspect" />
+        </Target>
+    </ECRelationshipClass>
+
+    <!-- Member classes -->
+
     <ECEntityClass typeName="StructuralAnalysisElement" modifier="Abstract" displayLabel="Structural Analysis Element" description="Abstract class for all StructuralAnalysisElement classes to descend from.">
-        <BaseClass>AnalysisElement</BaseClass>
+        <BaseClass>anlyt:AnalyticalElement</BaseClass>
     </ECEntityClass>
 
     <ECEntityClass typeName="Support" modifier="Abstract" displayLabel="Support" description="Abstract class for all support classes to descend from.">
@@ -362,6 +518,17 @@
             description="Defines how support behaves at it's location." />
     </ECEntityClass>
 
+    <ECRelationshipClass typeName="CurveSupportOwnsLocationWire" strength="embedding" modifier="Sealed" 
+        description="A relationship that indicates that a CurveSupport owns a Wire which should describe it's Location.">
+        <BaseClass>IWireOwnerOwnsWire</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="owns" polymorphic="false">
+            <Class class="CurveSupport"/>
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="Wire"/>
+        </Target>
+    </ECRelationshipClass>
+
     <ECEntityClass typeName="SurfaceSupport" modifier="Sealed" displayLabel="Surface Support" description="Support which is located in a surface.">
         <BaseClass>Support</BaseClass>
         <BaseClass>ISheetOwner</BaseClass>
@@ -369,6 +536,17 @@
         <ECNavigationProperty propertyName="Behavior" relationshipName="SurfaceSupportRefersToSurfaceSupportBehavior" direction="Forward" displayLabel="Behavior"
             description="Defines how support behaves at it's location." />
     </ECEntityClass>
+
+    <ECRelationshipClass typeName="SurfaceSupportOwnsLocationSheet" strength="embedding" modifier="Sealed" 
+        description="A relationship that indicates that a SurfaceSupport owns a Sheet which should describe it's Location.">
+        <BaseClass>ISheetOwnerOwnsSheet</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="owns" polymorphic="false">
+            <Class class="SurfaceSupport"/>
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="Sheet"/>
+        </Target>
+    </ECRelationshipClass>
 
     <ECRelationshipClass typeName="SurfaceSupportRefersToSurfaceSupportBehavior" strength="referencing" modifier="Sealed">
         <Source multiplicity="(0..*)" roleLabel="has" polymorphic="false">
@@ -426,41 +604,38 @@
                 <AppliesToEntityClass>StructuralAnalysisElement</AppliesToEntityClass>
             </IsMixin>
         </ECCustomAttributes>
-        <ECProperty propertyName="PlacementPoint" typeName="PlacementPoint" displayLabel="Placement point"
-            description="Sheet defines area location for ISurface, the height of ISurface is defined by thickness (provided by related SurfaceSystem) which extrudes location area by that thickness.
+        <ECProperty propertyName="PlacementPoint" typeName="SurfaceAlignmentType" displayLabel="Placement point"
+            description="Sheet defines area location for ISurface, the height of ISurface is defined by thickness (provided by related SurfaceType) which extrudes location area by that thickness.
                 PlacementPoint allows to define how location area should be interpreted for extrusion - ether as start, end or center.
                 These are the most common used cases. More flexibility is achieved by using Offset property." />
         <ECProperty propertyName="Offset" typeName="double" displayLabel="Offset"
             description="PlacementPoint provides only a few cases for how to interpret the location area (Sheet).
                 Offset provides more flexibility for less common cases, where it provides additional offset along the normal of ISurface. Both PlacementPoint and Offset properties can be used at the same time." />
-        <ECNavigationProperty propertyName="SurfaceSystem" relationshipName="SurfaceRefersToSurfaceSystem" direction="Forward" displayLabel="Surface System"
-            description="ISurface instances might have some repeated properties (e.g. Multiple walls spanning in different stories with same thickness, material, etc.).
-                Surface System should provide a system with shared properties for such group of ISurfaces.
-                Surface Member instance and its' Surface Member Modifier instances can (an usually should) belong to different Surface Systems." />
     </ECEntityClass>
 
-    <ECRelationshipClass typeName="SurfaceRefersToSurfaceSystem" strength="referencing" modifier="Sealed">
+    <ECRelationshipClass typeName="SurfaceRefersToSurfaceType" strength="referencing" modifier="Sealed">
+        <BaseClass>anlyt:AnalyticalElementIsOfType</BaseClass>
         <Source multiplicity="(0..*)" roleLabel="references" polymorphic="true">
             <Class class="ISurface" />
         </Source>
         <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="true">
-            <Class class="SurfaceSystem" />
+            <Class class="SurfaceType" />
         </Target>
     </ECRelationshipClass>
 
-    <ECEntityClass typeName="SurfaceSystem" modifier="Abstract" displayLabel="Surface System" description="Defines a Surface System.">
-        <BaseClass>bis:DefinitionElement</BaseClass>
+    <ECEntityClass typeName="SurfaceType" modifier="Abstract" displayLabel="Surface Type" description="Defines a Surface Type for ISurface.">
+        <BaseClass>anlyt:AnalyticalType</BaseClass>
     </ECEntityClass>
 
-    <ECEntityClass typeName="SimpleSurfaceSystem" modifier="Sealed" description="Simple Surface System.">
-        <BaseClass>SurfaceSystem</BaseClass>
-        <ECProperty propertyName="Thickness" typeName="double" description="Thickness of all ISurfaces in a system." />
-        <ECNavigationProperty propertyName="Material" relationshipName="SimpleSurfaceSystemRefersToMaterial" direction="Forward" displayLabel="Material" description="Material of all ISurfaces in a system." />
+    <ECEntityClass typeName="SimpleSurfaceType" modifier="Sealed" description="Simple Surface Type.">
+        <BaseClass>SurfaceType</BaseClass>
+        <ECProperty propertyName="Thickness" typeName="double" description="Thickness of ISurfaces." />
+        <ECNavigationProperty propertyName="Material" relationshipName="SimpleSurfaceTypeRefersToMaterial" direction="Forward" displayLabel="Material" description="Material of all ISurfaces with this type." />
     </ECEntityClass>
 
-    <ECRelationshipClass typeName="SimpleSurfaceSystemRefersToMaterial" strength="referencing" strengthDirection="Forward" modifier="Sealed">
-        <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="false">
-            <Class class="SimpleSurfaceSystem" />
+    <ECRelationshipClass typeName="SimpleSurfaceTypeRefersToMaterial" strength="referencing" strengthDirection="Forward" modifier="Sealed">
+        <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="true">
+            <Class class="SimpleSurfaceType" />
         </Source>
         <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="true">
             <Class class="bis:PhysicalMaterial"/>
@@ -475,10 +650,30 @@
         <ECProperty propertyName="Classification" typeName="SurfaceMemberClassificationType" displayLabel="Classification" description="The use case for this Surface Member." />
     </ECEntityClass>
 
+    <ECRelationshipClass typeName="SurfaceMemberOwnsLocationSheet" strength="embedding" modifier="Sealed" description="A relationship that indicates that a SurfaceMember owns a Sheet.">
+        <BaseClass>ISheetOwnerOwnsSheet</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="owns" polymorphic="false">
+            <Class class="SurfaceMember"/>
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="Sheet"/>
+        </Target>
+    </ECRelationshipClass>
+
     <ECEntityClass typeName="SurfaceMemberRegion" modifier="Abstract" displayLabel="Surface Member Region" description="Defines a region of a SurfaceMember that has different behavior (or is an opening).">
         <BaseClass>StructuralAnalysisElement</BaseClass>
         <BaseClass>ISheetOwner</BaseClass>
     </ECEntityClass>
+
+    <ECRelationshipClass typeName="SurfaceMemberRegionOwnsLocationSheet" strength="embedding" modifier="Sealed" description="A relationship that indicates that a SurfaceMemberRegion owns a Sheet.">
+        <BaseClass>ISheetOwnerOwnsSheet</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="owns" polymorphic="false">
+            <Class class="SurfaceMember"/>
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="Sheet"/>
+        </Target>
+    </ECRelationshipClass>
 
     <ECRelationshipClass typeName="SurfaceMemberOwnsRegions" strength="embedding" strengthDirection="Forward" modifier="Sealed">
         <BaseClass>bis:ElementOwnsChildElements</BaseClass>
@@ -492,7 +687,7 @@
 
     <ECRelationshipClass typeName="SurfaceMemberOwnsBendingBehaviorAspect" modifier="Sealed" strength="embedding">
         <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
-        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
             <Class class="SurfaceMember" />
         </Source>
         <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
@@ -524,13 +719,11 @@
             Rigid zone specifies that the Curve Member is immune deformation at that zone. Common case would be where curve member overlaps with other member, overlapping area would be define das rigid zone." />
         <ECProperty propertyName="Offset" typeName="point2d" displayLabel="Offset"
             description="2d offset defined in local coordinate system, where first coordinate variable shows offset along binormal and second along Orientation." />
-        <ECNavigationProperty propertyName="CurveMemberSystem" relationshipName="CurveMemberRefersToCurveMemberSystem" direction="Forward" displayLabel="Curve Member System"
-            description="System to which this Curve Member belongs." />
     </ECEntityClass>
 
     <ECRelationshipClass typeName="CurveMemberOwnsLocationWire" strength="embedding" modifier="Sealed" description="A relationship that indicates that an Element owns Wire.">
         <BaseClass>IWireOwnerOwnsWire</BaseClass>
-        <Source multiplicity="(0..1)" roleLabel="owns" polymorphic="false">
+        <Source multiplicity="(0..1)" roleLabel="owns" polymorphic="true">
             <Class class="CurveMember"/>
         </Source>
         <Target multiplicity="(1..1)" roleLabel="is owned by" polymorphic="false">
@@ -538,18 +731,19 @@
         </Target>
     </ECRelationshipClass>
 
-    <ECRelationshipClass typeName="CurveMemberRefersToCurveMemberSystem" strength="referencing" modifier="Sealed">
-        <Source multiplicity="(0..*)" roleLabel="has" polymorphic="false">
+    <ECRelationshipClass typeName="CurveMemberIsOfCurveMemberType" strength="referencing" modifier="Sealed">
+        <BaseClass>anlyt:AnalyticalElementIsOfType</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="is of" polymorphic="false">
             <Class class="CurveMember" />
         </Source>
-        <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="true">
-            <Class class="CurveMemberSystem" />
+        <Target multiplicity="(1..1)" roleLabel="defines" polymorphic="true">
+            <Class class="CurveMemberType" />
         </Target>
     </ECRelationshipClass>
 
     <ECRelationshipClass typeName="CurveMemberOwnsCamberBehaviorAspect" modifier="Sealed" strength="embedding">
         <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
-        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
             <Class class="CurveMember" />
         </Source>
         <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
@@ -577,24 +771,24 @@
         </Target>
     </ECRelationshipClass>
 
-    <!-- CurveMemberSystem -->
-    <ECEntityClass typeName="CurveMemberSystem" modifier="Abstract" displayLabel="Curve Member System" description="System grouping Curve Members." >
-        <BaseClass>bis:DefinitionElement</BaseClass>
+    <!-- CurveMemberType -->
+    <ECEntityClass typeName="CurveMemberType" modifier="Abstract" displayLabel="Curve Member Type" description="Type grouping Curve Members." >
+        <BaseClass>anlyt:AnalyticalType</BaseClass>
     </ECEntityClass>
 
-    <ECEntityClass typeName="SingleCurveMemberSystem" modifier="Abstract" displayLabel="Single Curve Member System">
-        <BaseClass>CurveMemberSystem</BaseClass>
+    <ECEntityClass typeName="SingleCurveMemberType" modifier="Abstract" displayLabel="Single Curve Member Type">
+        <BaseClass>CurveMemberType</BaseClass>
     </ECEntityClass>
 
-    <ECEntityClass typeName="MaterialProfileSystem" modifier="Sealed" displayLabel="Material Profile System"
-        description="Curve Member system with shared Material and Profile." >
-        <BaseClass>SingleCurveMemberSystem</BaseClass>
-        <ECNavigationProperty propertyName="MaterialProfile" relationshipName="MaterialProfileSystemHasMaterialProfile" direction="Forward" displayLabel="Material Profile" description="Material Profile." />
+    <ECEntityClass typeName="MaterialProfileType" modifier="Sealed" displayLabel="Material Profile Type"
+        description="Curve Member Type with shared Material and Profile." >
+        <BaseClass>SingleCurveMemberType</BaseClass>
+        <ECNavigationProperty propertyName="MaterialProfile" relationshipName="MaterialProfileTypeHasMaterialProfile" direction="Forward" displayLabel="Material Profile" description="Material Profile." />
     </ECEntityClass>
 
-    <ECRelationshipClass typeName="MaterialProfileSystemHasMaterialProfile" strength="referencing" modifier="Sealed">
+    <ECRelationshipClass typeName="MaterialProfileTypeHasMaterialProfile" strength="referencing" modifier="Sealed">
         <Source multiplicity="(0..*)" roleLabel="has" polymorphic="true">
-            <Class class="MaterialProfileSystem" />
+            <Class class="MaterialProfileType" />
         </Source>
         <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="false">
             <Class class="MaterialProfile" />
@@ -737,7 +931,7 @@
         <BaseClass>RelativePointLocationAspect</BaseClass>
         <ECProperty propertyName="Location" typeName="Point2d" displayLabel="Location" description="Location is defined in 2d coordinate system defined by host r and s axis."/>
         <ECProperty propertyName="Offset" typeName="double" displayLabel="Offset" />
-        <ECProperty propertyName="P" typeName="PlacementPoint" displayLabel="Surface Alignment" description="Surface Alignment."/>
+        <ECProperty propertyName="PlacementPoint" typeName="SurfaceAlignmentType" displayLabel="Surface Alignment" description="Surface Alignment."/>
         <ECNavigationProperty propertyName="ReferenceSurface" relationshipName="PointRelativeToSurfaceAspectRefersToIDefinedSurface" direction="Forward" displayLabel="Reference surface" />
     </ECEntityClass>
 
@@ -778,7 +972,7 @@
         <ECProperty propertyName="Location" typeName="Bentley.Geometry.Common.IGeometry" displayLabel="Location" description="Curve which describes load location on a host surface."/>
         <ECProperty propertyName="Offset" typeName="double" displayLabel="Offset"
             description="Distance from the surface, along the normal. Can be both positive and negative." />
-        <ECProperty propertyName="SurfaceAlignmentType" typeName="PlacementPoint" displayLabel="Surface Alignment Type"
+        <ECProperty propertyName="PlacementPoint" typeName="SurfaceAlignmentType" displayLabel="Surface Alignment Type"
             description="Surface alignment at which load is applied."/>
         <ECNavigationProperty propertyName="ReferenceSurface" relationshipName="CurveRelativeToSurfaceAspectRefersToIDefinedSurface" direction="Forward" displayLabel="Reference surface"
             description="Host surface in which Curve Load is located." />
@@ -801,7 +995,7 @@
         <BaseClass>RelativeSurfaceLocationAspect</BaseClass>
         <ECProperty propertyName="Location" typeName="Bentley.Geometry.Common.IGeometry" displayLabel="Location" />
         <ECProperty propertyName="Offset" typeName="double" displayLabel="Offset" />
-        <ECProperty propertyName="SurfaceAlignmentType" typeName="PlacementPoint" displayLabel="SurfaceAlignmentType" />
+        <ECProperty propertyName="PlacementPoint" typeName="SurfaceAlignmentType" displayLabel="Placement Point" />
         <ECNavigationProperty propertyName="ReferenceSurface" relationshipName="SurfaceRelativeToSurfaceAspectRefersToIDefinedSurface" direction="Forward" displayLabel="Reference surface" />
     </ECEntityClass>
 
@@ -1009,11 +1203,13 @@
     </ECRelationshipClass>
 
     <!-- Load Value Aspect Classes -->
+    <!-- TODO: This is not complete according to the IFC documentation -->
     <ECEnumeration typeName="CurveVariationType" backingTypeName="int" description="Enumeration of Curve Load Variation types.">
         <ECEnumerator value="0" name="Linear" displayLabel="Linear" description="Forces at curve points vary linearly along the host curve." />
         <ECEnumerator value="1" name="Parabola" displayLabel="Parabola" description="Forces at point vary parabolically along the host curve."/>
     </ECEnumeration>
 
+    <!-- TODO: This is not complete according to the IFC documentation -->
     <ECEnumeration typeName="SurfaceVariationType" backingTypeName="int" description="Enumeration of Surface Load Variation types.">
         <ECEnumerator value="0" name="Plane" displayLabel="Plane" description="Force at plane points vary linearly from some specific point in the plane." />
         <ECEnumerator value="1" name="Parabola" displayLabel="Parabola" description="Force at plane points vary parabolically from some specific point in the plane." />
@@ -1066,7 +1262,7 @@
     <ECEntityClass typeName="ForcePointLoadValueAspect" modifier="Sealed" displayLabel="Point Force value data"
         description="Defines a force for a point load.">
         <BaseClass>PointLoadValueAspect</BaseClass>
-        <ECStructProperty propertyName="PointForce" typeName="PointForce" displayLabel="Point force" description="Force value." />
+        <ECStructProperty propertyName="Force" typeName="PointForce" displayLabel="Point force" description="Force value." />
     </ECEntityClass>
 
     <!-- Curves -->
