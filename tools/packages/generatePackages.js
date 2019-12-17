@@ -8,9 +8,9 @@
 // Use the option --skipBetaPackages to generate only released packages.
 // Use the option --alwaysGen to generate packages even if they are already published. NOTE: Does not create beta packages for already released schemas
 // Usage:
-// node generatePackages.js --template <pathToPackageJsonTemplate> --outDir <pathToDirectoryToBuildPackages> --inventory <pathToSchemaInventory> [--skipBetaPackages] [--alwaysGen]
+// node generatePackages.js --template <pathToPackageJsonTemplate> --outDir <pathToDirectoryToBuildPackages> --inventory <pathToSchemaInventory> --skipList <pathToSchemaSkipList> [--skipBetaPackages] [--alwaysGen]
 // Example:
-//    node ./tools/packages/generatePackages.js --inventory ./SchemaInventory.json --outDir ./packageOut --template ./tools/packages/package.json.template
+//    node ./tools/packages/generatePackages.js --inventory ./SchemaInventory.json --skipList ./ignoreSchemaList.json --outDir ./packageOut --template ./tools/packages/package.json.template
 
 "use strict";
 const argv = require("yargs").argv;
@@ -23,4 +23,4 @@ process.on("unhandledRejection", err => {
   throw err;
 });
 
-pkgGen.createPackages(argv.inventory, argv.outDir, argv.template, undefined !== argv.skipBetaPackages, undefined !== argv.alwaysGen);
+pkgGen.createPackages(argv.inventory, argv.skipList, argv.outDir, argv.template, undefined !== argv.skipBetaPackages, undefined !== argv.alwaysGen);
