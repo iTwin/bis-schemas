@@ -175,7 +175,7 @@ function shouldExcludeSchema(schema, excludeList) {
 }
 
 function getExcludeSchemaList() {
-  const fullPath = path.resolve(__dirname, "ignoreSchemaList.json")
+  const fullPath = path.resolve(__dirname, "../../ignoreSchemaList.json")
   if (!fs.existsSync(fullPath))
     return;
 
