@@ -102,7 +102,7 @@ function getNextBetaVersion(schemaInfo, publishedVersions, alwaysGen) {
   return versionInfo;
 }
 
-async function createPackages(inventoryPath, outDir, packageTemplatePath, skipBetaPackages, alwaysGen) {
+async function createPackages(inventoryPath, skipListPath, outDir, packageTemplatePath, skipBetaPackages, alwaysGen) {
   if (skipBetaPackages) console.log("Skipping beta packages because the '--skipBetaPackages' flag is set");
 
   // Always create the package output directory so we have something to publish.
@@ -112,9 +112,14 @@ async function createPackages(inventoryPath, outDir, packageTemplatePath, skipBe
   if (null === schemaInventory || undefined == schemaInventory)
     throw Error (`Could not load schema invetory file from '${inventoryPath}'`);
   
-  const packageJsonTemplate = fs.readFileSync(packageTemplatePath, {encoding: 'utf8'});
+  const packageJsonTemplate = fs.readFileSync(packageTemplatePath, { encoding: 'utf8' });
+  const skipList = skipListPath ? JSON.parse(fs.readFileSync(skipListPath, { encoding: 'utf8' })) : [];
 
   for (const [name, schemaInfoList] of Object.entries(schemaInventory)) {
+    if (skipList.find((schemaToSkip) => { return schemaToSkip.name === name })) {
+      console.log(`Skipping ${name} because it is on the skip list`);
+      continue;
+    }
     const packageName = `@bentley/${name.toLowerCase()}-schema`;
     console.log(`Looking for packages published with the name ${packageName} for schema ${name}`);
     const publishedVersions = getPublishedSchemas(packageName);
