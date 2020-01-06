@@ -34,7 +34,6 @@
     <ECEntityClass typeName="OverallTypicalSectionPortion" displayLabel="Reference to one or more Typical Section Recipes in context of an Overall Typical Section" modifier="Sealed">
         <BaseClass>bis:GeometricElement2d</BaseClass>
         <ECNavigationProperty propertyName="Alignment" relationshipName="OverallTypicalSectionPortionRefersToAlignment" direction="Forward"/>
-        <ECProperty propertyName="LeftToRightOrder" typeName="int" />
     </ECEntityClass>
     <ECRelationshipClass typeName="OverallTypicalSectionPortionRefersToRecipes" strength="referencing" strengthDirection="Forward" modifier="Sealed">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
@@ -87,22 +86,6 @@
         <BaseClass>bis:GeometricElement2d</BaseClass>
         <ECNavigationProperty propertyName="SpatialSubCategory" relationshipName="TypicalSectionComponentRefersToSubCategory" direction="Forward" description="The Spatial SubCategory to be referenced by Spatial elements generated from a Typical Section Component"/>
     </ECEntityClass>
-    <ECEntityClass typeName="TypicalSectionComponentType" displayLabel="Typical Section Component Type" modifier="Abstract">
-        <BaseClass>bis:TypeDefinitionElement</BaseClass>
-        <ECProperty propertyName="RealizableFullClassName" typeName="string" />
-        <ECProperty propertyName="RealizableTypeFullBaseClassName" typeName="string" />
-        <ECNavigationProperty propertyName="RealizableTypeCodeSpec" relationshipName="CodeSpecSpecifiedForRealizableTypeCode" direction="Backward" />
-        <ECProperty propertyName="RealizableTypeCodeValue" typeName="string" />
-        <ECNavigationProperty propertyName="SpatialSubCategory" relationshipName="TypicalSectionComponentTypeRefersToSubCategory" direction="Forward" description="The Spatial SubCategory to be referenced by Spatial elements generated from a Typical Section Component"/>
-    </ECEntityClass>
-    <ECRelationshipClass typeName="CodeSpecSpecifiedForRealizableTypeCode" strength="referencing" modifier="Sealed">
-        <Source multiplicity="(0..1)" roleLabel="code is specified by" polymorphic="true">
-            <Class class="bis:CodeSpec"/>
-        </Source>
-        <Target multiplicity="(0..*)" roleLabel="specified code for" polymorphic="true">
-            <Class class="TypicalSectionComponentType"/>
-        </Target>
-    </ECRelationshipClass>
     <ECRelationshipClass typeName="TypicalSectionComponentRefersToSubCategory" strength="referencing" strengthDirection="Forward" modifier="Sealed">
         <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="true">
             <Class class="TypicalSectionComponentElement" />
@@ -111,33 +94,17 @@
             <Class class="bis:SubCategory"/>
         </Target>
     </ECRelationshipClass>
-    <ECRelationshipClass typeName="TypicalSectionComponentTypeRefersToSubCategory" strength="referencing" strengthDirection="Forward" modifier="Sealed">
-        <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="true">
-            <Class class="TypicalSectionComponentType" />
-        </Source>
-        <Target multiplicity="(0..1)" roleLabel="is referenced by" polymorphic="false">
-            <Class class="bis:SubCategory"/>
-        </Target>
-    </ECRelationshipClass>
+    <ECEntityClass typeName="TypicalSectionComponentType" displayLabel="Typical Section Component Type" modifier="None">
+        <BaseClass>bis:TypeDefinitionElement</BaseClass>
+        <ECProperty propertyName="RealizableFullClassName" typeName="string" />
+    </ECEntityClass>
     <ECEntityClass typeName="TravelwayComponent" displayLabel="Travelway Component" modifier="None">
         <BaseClass>TypicalSectionComponentElement</BaseClass>
         <ECNavigationProperty propertyName="FunctionalType" relationshipName="TravelwayComponentRefersToFunctionalType" direction="Forward"/>
     </ECEntityClass>
-    <ECEntityClass typeName="TravelwayComponentType" displayLabel="Travelway Component Type" modifier="Sealed">
-        <BaseClass>TypicalSectionComponentType</BaseClass>
-        <ECNavigationProperty propertyName="FunctionalType" relationshipName="TravelwayComponentTypeRefersToFunctionalType" direction="Forward"/>
-    </ECEntityClass>
     <ECRelationshipClass typeName="TravelwayComponentRefersToFunctionalType" strength="referencing" strengthDirection="Forward" modifier="Sealed">
         <Source multiplicity="(0..*)" polymorphic="true" roleLabel="refers to">
             <Class class="TravelwayComponent"/>
-        </Source>
-        <Target multiplicity="(0..1)" polymorphic="true" roleLabel="is referenced by">
-            <Class class="bis:TypeDefinitionElement"/>
-        </Target>
-    </ECRelationshipClass>
-    <ECRelationshipClass typeName="TravelwayComponentTypeRefersToFunctionalType" strength="referencing" strengthDirection="Forward" modifier="Sealed">
-        <Source multiplicity="(0..*)" polymorphic="true" roleLabel="refers to">
-            <Class class="TravelwayComponentType"/>
         </Source>
         <Target multiplicity="(0..1)" polymorphic="true" roleLabel="is referenced by">
             <Class class="bis:TypeDefinitionElement"/>
@@ -151,27 +118,6 @@
     <ECEntityClass typeName="TypicalSectionPhysicalComponent" displayLabel="Physical Component" modifier="None">
         <BaseClass>TypicalSectionPhysicalComponentElement</BaseClass>
     </ECEntityClass>
-    <ECEntityClass typeName="TypicalSectionPhysicalComponentType" displayLabel="Physical Component Type" modifier="None">
-        <BaseClass>TypicalSectionComponentType</BaseClass>
-        <ECNavigationProperty propertyName="RenderMaterial" relationshipName="TypicalSectionPhysicalComponentTypeRefersToRenderMaterial" direction="Forward"/>
-        <ECNavigationProperty propertyName="PhysicalType" relationshipName="TypicalSectionPhysicalComponentTypeRefersToPhysicalType" direction="Forward"/>
-    </ECEntityClass>
-    <ECRelationshipClass typeName="TypicalSectionPhysicalComponentTypeRefersToRenderMaterial" strength="referencing" strengthDirection="Forward" modifier="Sealed">
-        <Source multiplicity="(0..*)" polymorphic="true" roleLabel="refers to">
-            <Class class="TypicalSectionPhysicalComponentType"/>
-        </Source>
-        <Target multiplicity="(0..1)" polymorphic="false" roleLabel="is referenced by">
-            <Class class="bis:RenderMaterial"/>
-        </Target>
-    </ECRelationshipClass>
-    <ECRelationshipClass typeName="TypicalSectionPhysicalComponentTypeRefersToPhysicalType" strength="referencing" strengthDirection="Forward" modifier="Sealed">
-        <Source multiplicity="(0..*)" polymorphic="true" roleLabel="refers to">
-            <Class class="TypicalSectionPhysicalComponentType"/>
-        </Source>
-        <Target multiplicity="(0..1)" polymorphic="true" roleLabel="is referenced by">
-            <Class class="bis:PhysicalType"/>
-        </Target>
-    </ECRelationshipClass>
     <ECRelationshipClass typeName="TypicalSectionPhysicalComponentRefersToRenderMaterial" strength="referencing" strengthDirection="Forward" modifier="Sealed">
         <Source multiplicity="(0..*)" polymorphic="true" roleLabel="refers to">
             <Class class="TypicalSectionPhysicalComponentElement"/>
