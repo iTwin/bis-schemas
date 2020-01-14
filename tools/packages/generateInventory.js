@@ -34,7 +34,7 @@ function createVersion(vRead, vWrite, vPatch) {
 }
 
 async function getReleasedSchemas() {
-  const allSchemas = await readdirp.promise(argv.BisRoot, {fileFilter: "*.ecschema.xml", directoryFilter: ["!docs", "!node_modules", "!tools", "!.vscode", "!cmaps", "!packageOut"]});
+  const allSchemas = await readdirp.promise(argv.BisRoot, {fileFilter: "*.ecschema.xml", directoryFilter: ["!docs", "!node_modules", "!tools", "!.vscode", "!cmaps", "!packageOut", "!Deprecated"]});
 
   // Create base inventory based on schema files in the bis-schemas repo
   const schemaInventory = {};
