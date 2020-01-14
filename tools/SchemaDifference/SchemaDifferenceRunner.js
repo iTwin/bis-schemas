@@ -9,8 +9,8 @@ const SchemaComparison = require(argv.SchemaComparerPath).SchemaComparison
 const CompareOptions = require(argv.SchemaComparerPath).CompareOptions
 const ComparisonResultType = require(argv.SchemaComparerPath).ComparisonResultType
 
+// Add the name(s) of schemas that should be skipped from schema differencing.
 const excludedSchemaNames = [
-  "ECv3ConversionAttributes", // New EC2 Standard Schema
 ];
 
 
