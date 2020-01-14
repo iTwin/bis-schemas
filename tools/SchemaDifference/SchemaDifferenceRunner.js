@@ -9,26 +9,8 @@ const SchemaComparison = require(argv.SchemaComparerPath).SchemaComparison
 const CompareOptions = require(argv.SchemaComparerPath).CompareOptions
 const ComparisonResultType = require(argv.SchemaComparerPath).ComparisonResultType
 
-const standardSchemaNames = [
-  "Bentley_Standard_CustomAttributes",
-  "Bentley_Standard_Classes",
-  "Bentley_ECSchemaMap",
-  "EditorCustomAttributes",
-  "Bentley_Common_Classes",
-  "Dimension_Schema",
-  "iip_mdb_customAttributes",
-  "KindOfQuantity_Schema",
-  "rdl_customAttributes",
-  "SIUnitSystemDefaults",
-  "Unit_Attributes",
-  "Units_Schema",
-  "USCustomaryUnitSystemDefaults",
-  "ECDbMap",
-  "CoreCustomAttributes", // New EC3 Standard Schema
+const excludedSchemaNames = [
   "ECv3ConversionAttributes", // New EC2 Standard Schema
-  "SchemaLocalizationCustomAttributes", // New EC3 Standard Schema
-  "Units", // New EC3 Standard Schema
-  "Formats", // New EC3 Standard Schema
 ];
 
 
@@ -50,11 +32,11 @@ async function compareSchemas() {
     if (schema.released)
       continue;
 
-    console.log(`***** Schema ${schema.name} Comparision Results *****`);
+    console.log(`***** Schema ${schema.name} Comparison Results *****`);
     console.log(`Schema file path: ${schema.fullPath}`);
 
-    if (isStandardSchema(schema.name)) {
-      console.log(`Skipping standard schema.`);
+    if (isExcludeSchema(schema.name)) {
+      console.log(`Skipping excluded schema.`);
       continue;
     }
 
@@ -127,7 +109,7 @@ function getRefpaths(schemas) {
 }
 
 async function getAllSchemas() {
-  const allSchemas = await readdirp.promise(argv.BisRoot, {fileFilter: "*.ecschema.xml", directoryFilter: ["!docs", "!node_modules", "!tools", "!.vscode", "!cmaps"]});
+  const allSchemas = await readdirp.promise(argv.BisRoot, {fileFilter: "*.ecschema.xml", directoryFilter: ["!docs", "!node_modules", "!tools", "!.vscode", "!cmaps", "!Deprecated"]});
 
   const schemas = new Set();
   for (const entry of allSchemas) {
@@ -183,11 +165,11 @@ function versionCompare(version1, version2) {
   return dMinor;
 }
 
-function isStandardSchema(schemaName) {
+function isExcludeSchema(schemaName) {
   const match = schemaName.match(/\w+/);
   const name = match ? match[0] : "";
 
-  return standardSchemaNames.includes(name);
+  return excludedSchemaNames.includes(name);
 }
 
 compareSchemas();
