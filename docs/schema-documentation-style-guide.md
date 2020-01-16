@@ -15,12 +15,8 @@ Goal of the schema documentation is to clarify:
 ## Schema diagrams
 
 1. Add .cmap in media folder
-1. Create screenshot of cmap at 150%
-1. Add legend (Bis section, Abstract (dashed line), Mixin (square box), Sealed)
-1. Color yellow:spatial location, green:functional, grey:definition
-1. Class is shown in rounded rectangle.
-1. Relationships are shown as arrows.
-1. Clean up the diagram make vertical lines vertical, horizontal lines horizontal.
+1. Export .cmap as .png file
+1. .cmap style guide and examples can be found [here](.\schema-cmap-style-guide.md)
 
 ## Guidelines for Elements
 
