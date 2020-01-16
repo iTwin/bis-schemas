@@ -1,0 +1,715 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ECSchema schemaName="CorridorModeler" alias="cm" version="01.00.00" description="Input classes for the Corridor Modeler engine." xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
+    <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
+    <ECSchemaReference name="BisCore" version="01.00.08" alias="bis"/>
+    <ECSchemaReference name="LinearReferencing" version="02.00.01" alias="lr"/>
+    <ECSchemaReference name="RoadRailUnits" version="01.00.00" alias="rru"/>
+
+    <ECCustomAttributes>
+        <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
+            <SupportedUse>NotForProduction</SupportedUse>
+        </ProductionStatus>
+    </ECCustomAttributes>
+
+    <ECEntityClass typeName="OverallTypicalSection" modifier="Sealed" displayLabel="Overall Typical Section">
+        <BaseClass>bis:TemplateRecipe2d</BaseClass>
+        <ECNavigationProperty propertyName="MainAlignment" relationshipName="OverallTypicalSectionRefersToMainAlignment" direction="Forward"/>
+    </ECEntityClass>
+    <ECEntityClass typeName="OverallTypicalSectionBreakDownModel" description="Model breaking down an entire Typical-section of a Pathway">
+        <BaseClass>bis:GeometricModel2d</BaseClass>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="OverallTypicalSectionRefersToMainAlignment" strength="referencing" modifier="Sealed">
+        <Source multiplicity="(0..*)" polymorphic="false" roleLabel="refers to main">
+            <Class class="OverallTypicalSection"/>
+        </Source>
+        <Target multiplicity="(0..1)" polymorphic="false" roleLabel="is referenced by">
+            <Class class="OverallTypicalSectionAlignment"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="OverallTypicalSectionAlignment" displayLabel="Alignment location in context of an Overall Typical Section" modifier="Sealed">
+        <BaseClass>bis:GeometricElement2d</BaseClass>
+        <BaseClass>ITypicalSectionConstrainingPoint</BaseClass>
+        <BaseClass>ITypicalSectionConstrainedPoint</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="OverallTypicalSectionPortion" displayLabel="Reference to one or more Typical Section Recipes in context of an Overall Typical Section" modifier="Sealed">
+        <BaseClass>bis:GeometricElement2d</BaseClass>
+        <ECNavigationProperty propertyName="Alignment" relationshipName="OverallTypicalSectionPortionRefersToAlignment" direction="Forward"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="OverallTypicalSectionPortionRefersToRecipes" strength="referencing" strengthDirection="Forward" modifier="Sealed">
+        <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <Source multiplicity="(0..*)" polymorphic="false" roleLabel="refers to">
+            <Class class="OverallTypicalSectionPortion"/>
+        </Source>
+        <Target multiplicity="(0..*)" polymorphic="true" roleLabel="is referenced by">
+            <Class class="TypicalSectionRecipeElement"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="OverallTypicalSectionPortionRefersToAlignment" strength="referencing" strengthDirection="Forward" modifier="Sealed">
+        <Source multiplicity="(0..*)" polymorphic="false" roleLabel="refers to">
+            <Class class="OverallTypicalSectionPortion"/>
+        </Source>
+        <Target multiplicity="(0..1)" polymorphic="true" roleLabel="is referenced by">
+            <Class class="OverallTypicalSectionAlignment"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="TypicalSectionRecipeElement" modifier="None" description="Base class representing the recipe of a segment in a Corridor Portion.">
+        <BaseClass>bis:TemplateRecipe2d</BaseClass>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="TypicalSectionRecipeRefersToOriginPoint" strength="referencing" modifier="Sealed">
+        <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <Source multiplicity="(1..1)" polymorphic="true" roleLabel="refers to">
+            <Class class="TypicalSectionRecipeElement"/>
+        </Source>
+        <Target multiplicity="(0..1)" polymorphic="false" roleLabel="is referenced by">
+            <Class class="TypicalSectionPoint"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="TravelwayRecipeElement" displayLabel="Travelway Recipe" modifier="None" description="Base class for recipes of Travelways">
+        <BaseClass>TypicalSectionRecipeElement</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="TypicalSectionRecipeBreakDownModel" description="Model breaking down a Typical-section Recipe">
+        <BaseClass>bis:GeometricModel2d</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="RoadTravelwayRecipe" displayLabel="Road Travelway Recipe" modifier="Sealed">
+        <BaseClass>TravelwayRecipeElement</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="RailTravelwayRecipe" displayLabel="Rail Travelway Recipe" modifier="Sealed">
+        <BaseClass>TravelwayRecipeElement</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="TravelwaySideRecipe" displayLabel="Travelway Side Recipe" description="Recipes for TravelwaySide elements">
+        <BaseClass>TypicalSectionRecipeElement</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="TravelwayStructureRecipe" displayLabel="Travelway Structure Recipe">
+        <BaseClass>TypicalSectionRecipeElement</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="TypicalSectionComponentElement" displayLabel="Component" modifier="Abstract">
+        <BaseClass>bis:GeometricElement2d</BaseClass>
+        <ECNavigationProperty propertyName="SpatialSubCategory" relationshipName="TypicalSectionComponentRefersToSubCategory" direction="Forward" description="The Spatial SubCategory to be referenced by Spatial elements generated from a Typical Section Component"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="TypicalSectionComponentRefersToSubCategory" strength="referencing" strengthDirection="Forward" modifier="Sealed">
+        <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="true">
+            <Class class="TypicalSectionComponentElement" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is referenced by" polymorphic="false">
+            <Class class="bis:SubCategory"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="TypicalSectionComponentType" displayLabel="Typical Section Component Type" modifier="None">
+        <BaseClass>bis:TypeDefinitionElement</BaseClass>
+        <ECProperty propertyName="RealizableFullClassName" typeName="string" />
+    </ECEntityClass>
+    <ECEntityClass typeName="TravelwayComponent" displayLabel="Travelway Component" modifier="None">
+        <BaseClass>TypicalSectionComponentElement</BaseClass>
+        <ECNavigationProperty propertyName="FunctionalType" relationshipName="TravelwayComponentRefersToFunctionalType" direction="Forward"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="TravelwayComponentRefersToFunctionalType" strength="referencing" strengthDirection="Forward" modifier="Sealed">
+        <Source multiplicity="(0..*)" polymorphic="true" roleLabel="refers to">
+            <Class class="TravelwayComponent"/>
+        </Source>
+        <Target multiplicity="(0..1)" polymorphic="true" roleLabel="is referenced by">
+            <Class class="bis:TypeDefinitionElement"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="TypicalSectionPhysicalComponentElement" modifier="Abstract">
+        <BaseClass>TypicalSectionComponentElement</BaseClass>
+        <ECNavigationProperty propertyName="RenderMaterial" relationshipName="TypicalSectionPhysicalComponentRefersToRenderMaterial" direction="Forward"/>
+        <ECNavigationProperty propertyName="PhysicalType" relationshipName="TypicalSectionPhysicalComponentRefersToPhysicalType" direction="Forward"/>
+    </ECEntityClass>
+    <ECEntityClass typeName="TypicalSectionPhysicalComponent" displayLabel="Physical Component" modifier="None">
+        <BaseClass>TypicalSectionPhysicalComponentElement</BaseClass>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="TypicalSectionPhysicalComponentRefersToRenderMaterial" strength="referencing" strengthDirection="Forward" modifier="Sealed">
+        <Source multiplicity="(0..*)" polymorphic="true" roleLabel="refers to">
+            <Class class="TypicalSectionPhysicalComponentElement"/>
+        </Source>
+        <Target multiplicity="(0..1)" polymorphic="false" roleLabel="is referenced by">
+            <Class class="bis:RenderMaterial"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="TypicalSectionPhysicalComponentRefersToPhysicalType" strength="referencing" strengthDirection="Forward" modifier="Sealed">
+        <Source multiplicity="(0..*)" polymorphic="true" roleLabel="refers to">
+            <Class class="TypicalSectionPhysicalComponentElement"/>
+        </Source>
+        <Target multiplicity="(0..1)" polymorphic="true" roleLabel="is referenced by">
+            <Class class="bis:PhysicalType"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="SideSlopeConditionComponent" displayLabel="End-Condition Component" modifier="Sealed">
+        <BaseClass>TypicalSectionPhysicalComponentElement</BaseClass>
+        <ECProperty propertyName="ProcessingOrder" typeName="int" displayLabel="Condition Processing Order"/>
+        <ECProperty propertyName="BenchingCount" typeName="int" displayLabel="Benching Count"/>
+        <ECProperty propertyName="IsInfiniteLength" typeName="boolean" displayLabel="Is Infinite?"/>
+    </ECEntityClass>
+    <ECEnumeration typeName="TypicalSectionPointDefinition_Type" backingTypeName="int" isStrict="true">
+        <ECEnumerator value="0" name="Generic" displayLabel="Generic Point Definition"/>
+        <ECEnumerator value="1" name="Travelway" displayLabel="Travelway Point Definition"/>
+        <ECEnumerator value="2" name="TravelwayStructure" displayLabel="Travelway Structure Point Definition"/>
+        <ECEnumerator value="3" name="TravelwaySide" displayLabel="Travelway Side Point Definition"/>
+    </ECEnumeration>
+    <ECEntityClass typeName="TypicalSectionPointDefinition" displayLabel="Typical Section Point Definition" modifier="None" description="Point constructs in a TypicalSection portion definition.">
+        <BaseClass>bis:DefinitionElement</BaseClass>   
+        <ECProperty propertyName="Type" typeName="TypicalSectionPointDefinition_Type" />
+        <ECProperty propertyName="IsSignificantPoint" typeName="boolean" displayLabel="Is Significant Point?"/>
+        <ECProperty propertyName="Generate3dLinear" typeName="boolean" displayLabel="Generate 3D Linear?"/>
+        <ECNavigationProperty propertyName="SpatialSubCategory" relationshipName="TypicalSectionPointDefinitionRefersToSubCategory" direction="Forward" description="The default Spatial SubCategory to be referenced by the 3D Linear generated from a Typical Section Point associated with a Typical Section Point Definition"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="TypicalSectionPointDefinitionRefersToSubCategory" strength="referencing" strengthDirection="Forward" modifier="Sealed">
+        <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="true">
+            <Class class="TypicalSectionPointDefinition" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is referenced by" polymorphic="false">
+            <Class class="bis:SubCategory"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="TypicalSectionPointControlElement" displayLabel="Typical Section Point Control" modifier="Abstract" description="">
+        <BaseClass>lr:LinearlyLocatedAttribution</BaseClass>
+        <ECNavigationProperty propertyName="TypicalSectionPointDef" relationshipName="ControlledTypicalSectionPointIsOfDefinition" direction="Forward"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ControlledTypicalSectionPointIsOfDefinition" strength="referencing" strengthDirection="Forward" modifier="Sealed">
+        <Source multiplicity="(0..*)" polymorphic="true" roleLabel="refers to">
+            <Class class="TypicalSectionPointControlElement"/>
+        </Source>
+        <Target multiplicity="(0..1)" polymorphic="true" roleLabel="is referenced by">
+            <Class class="TypicalSectionPointDefinition"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="LinearTypicalSectionPointControl" displayLabel="Linear Typical Section Point Control" modifier="Sealed" description="">
+        <BaseClass>TypicalSectionPointControlElement</BaseClass>
+        <ECNavigationProperty propertyName="TargetLinearElement" relationshipName="TypicalSectionPointControlledAlongLinearElement" direction="Forward"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="TypicalSectionPointControlledAlongLinearElement" strength="referencing" strengthDirection="Forward" modifier="Sealed">
+        <Source multiplicity="(0..*)" polymorphic="false" roleLabel="refers to">
+            <Class class="LinearTypicalSectionPointControl"/>
+        </Source>
+        <Target multiplicity="(0..1)" polymorphic="true" roleLabel="is referenced by">
+            <Class class="lr:ILinearElement"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="ITypicalSectionConstrainingPoint" description="Interface to be mixed-in by point classes that can constrain other points." modifier="Abstract">
+        <ECCustomAttributes>
+            <IsMixin xmlns='CoreCustomAttributes.01.00.00'>
+                <AppliesToEntityClass>bis:Element</AppliesToEntityClass>
+            </IsMixin>
+        </ECCustomAttributes>        
+    </ECEntityClass>
+    <ECEntityClass typeName="ITypicalSectionConstrainedPoint" description="Interface to be mixed-in by classes that can be constrained by other points." modifier="Abstract">
+        <ECCustomAttributes>
+            <IsMixin xmlns='CoreCustomAttributes.01.00.00'>
+                <AppliesToEntityClass>bis:Element</AppliesToEntityClass>
+            </IsMixin>
+        </ECCustomAttributes>
+    </ECEntityClass>
+    <ECEntityClass typeName="TypicalSectionPointElement" description="Base class for Point constructs in a TypicalSection recipe" modifier="Abstract">
+        <BaseClass>bis:GeometricElement2d</BaseClass>
+        <BaseClass>ITypicalSectionConstrainingPoint</BaseClass>
+        <ECNavigationProperty propertyName="Definition" relationshipName="TypicalSectionPointElementRefersToDefinition" direction="Forward"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="TypicalSectionPointElementRefersToDefinition" strength="referencing" strengthDirection="Forward" modifier="Sealed">
+        <Source multiplicity="(0..*)" polymorphic="true" roleLabel="refers to">
+            <Class class="TypicalSectionPointElement"/>
+        </Source>
+        <Target multiplicity="(0..1)" polymorphic="true" roleLabel="is referenced by">
+            <Class class="TypicalSectionPointDefinition"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="TypicalSectionPoint" displayLabel="Point" description="Point construct in a TypicalSection definition" modifier="Sealed">
+        <BaseClass>TypicalSectionPointElement</BaseClass>
+        <BaseClass>ITypicalSectionConstrainedPoint</BaseClass>
+    </ECEntityClass>
+    <ECEnumeration typeName="TypicalSectionProxyPoint_SignificantPointContext" backingTypeName="int" isStrict="true">
+        <ECEnumerator value="0" name="Same" displayLabel="Same Corridor Portion as Proxy-Point"/>
+        <ECEnumerator value="1" name="Left" displayLabel="Corridor Portion on Left-side"/>
+        <ECEnumerator value="2" name="Right" displayLabel="Corridor Portion on Right-side"/>
+    </ECEnumeration>
+    <ECEntityClass typeName="TypicalSectionProxyPoint" displayLabel="External Point" description="Proxy for a point that is external to the current recipe and, thus, will be resolved while generating meshes" modifier="Sealed">
+        <BaseClass>TypicalSectionPointElement</BaseClass>
+        <ECProperty propertyName="SignificantPointContext" typeName="TypicalSectionProxyPoint_SignificantPointContext" displayLabel="Significant Point Context"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="TypicalSectionComponentGroupsPoints" strength="referencing" modifier="Sealed">
+        <BaseClass>bis:ElementGroupsMembers</BaseClass>
+        <Source multiplicity="(0..*)" polymorphic="true" roleLabel="groups">
+            <Class class="TypicalSectionComponentElement"/>
+        </Source>
+        <Target multiplicity="(0..*)" polymorphic="true" roleLabel="is grouped by">
+            <Class class="TypicalSectionPointElement"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="TypicalSectionConstraintSource" modifier="Abstract">
+        <BaseClass>bis:InformationRecordElement</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="TypicalSectionConstraintComposite" modifier="Sealed">
+        <BaseClass>bis:InformationRecordElement</BaseClass>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="TypicalSectionConstraintCompositeOwnsSources" strength="embedding" modifier="Sealed">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(0..1)" polymorphic="false" roleLabel="owns">
+            <Class class="TypicalSectionConstraintComposite"/>
+        </Source>
+        <Target multiplicity="(0..*)" polymorphic="true" roleLabel="is owned by">
+            <Class class="TypicalSectionConstraintSource"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="ITypicalSectionConstrainedPointOwnsComposites" strength="embedding" modifier="Sealed">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(0..1)" polymorphic="true" roleLabel="owns">
+            <Class class="ITypicalSectionConstrainedPoint"/>
+        </Source>
+        <Target multiplicity="(0..*)" polymorphic="false" roleLabel="is owned by">
+            <Class class="TypicalSectionConstraintComposite"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="TypicalSectionConstraintWithOffset" modifier="Abstract">
+        <BaseClass>TypicalSectionConstraintSource</BaseClass>
+        <ECNavigationProperty propertyName="PointRef" relationshipName="TypicalSectionConstraintWithOffsetRefersToPointRef" direction="Forward"/>
+        <ECNavigationProperty propertyName="Offset" relationshipName="TypicalSectionConstraintRefersToOffset" direction="Forward"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="TypicalSectionConstraintWithOffsetRefersToPointRef" strength="referencing" strengthDirection="Forward" modifier="Sealed">
+        <Source multiplicity="(0..*)" polymorphic="true" roleLabel="refers to">
+            <Class class="TypicalSectionConstraintWithOffset"/>
+        </Source>
+        <Target multiplicity="(0..1)" polymorphic="true" roleLabel="is referenced by">
+            <Class class="ITypicalSectionConstrainingPoint"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="TypicalSectionConstraintRefersToOffset" strength="referencing" strengthDirection="Forward" modifier="Sealed">
+        <Source multiplicity="(0..*)" polymorphic="true" roleLabel="refers to">
+            <Class class="TypicalSectionConstraintWithOffset"/>
+        </Source>
+        <Target multiplicity="(0..1)" polymorphic="true" roleLabel="is referenced by">
+            <Class class="TypicalSectionConstraintOffset"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="TypicalSectionConstraintOwnsOffset" strength="embedding" modifier="Sealed">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(0..1)" polymorphic="true" roleLabel="owns">
+            <Class class="TypicalSectionConstraintWithOffset"/>
+        </Source>
+        <Target multiplicity="(0..1)" polymorphic="true" roleLabel="is owned by">
+            <Class class="TypicalSectionConstraintOffset"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="TypicalSectionHorizontalConstraint" displayLabel="Horizontal" modifier="Sealed">
+        <BaseClass>TypicalSectionConstraintWithOffset</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="TypicalSectionVerticalConstraint" displayLabel="Vertical" modifier="Sealed">
+        <BaseClass>TypicalSectionConstraintWithOffset</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="TypicalSectionConstraintWithTwoPointsAndOffset" modifier="Abstract">
+        <BaseClass>TypicalSectionConstraintWithOffset</BaseClass>
+        <ECNavigationProperty propertyName="OtherPointRef" relationshipName="TypicalSectionConstraintWithOffsetRefersToOtherPointRef" direction="Forward"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="TypicalSectionConstraintWithOffsetRefersToOtherPointRef" strength="referencing" strengthDirection="Forward" modifier="Sealed">
+        <Source multiplicity="(0..*)" polymorphic="true" roleLabel="refers to">
+            <Class class="TypicalSectionConstraintWithTwoPointsAndOffset"/>
+        </Source>
+        <Target multiplicity="(0..1)" polymorphic="true" roleLabel="is referenced by">
+            <Class class="ITypicalSectionConstrainingPoint"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="TypicalSectionVectorOffsetConstraint" displayLabel="Vector-Offset Constraint" modifier="Sealed">
+        <BaseClass>TypicalSectionConstraintWithTwoPointsAndOffset</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="TypicalSectionAngleOffsetConstraint" displayLabel="Angle Distance Constraint" modifier="Sealed">
+        <BaseClass>TypicalSectionConstraintWithTwoPointsAndOffset</BaseClass>
+        <ECNavigationProperty propertyName="Angle" relationshipName="TypicalSectionConstraintRefersToAngle" direction="Forward"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="TypicalSectionConstraintRefersToAngle" strength="referencing" strengthDirection="Forward" modifier="Sealed">
+        <Source multiplicity="(0..*)" polymorphic="true" roleLabel="refers to">
+            <Class class="TypicalSectionAngleOffsetConstraint"/>
+        </Source>
+        <Target multiplicity="(0..1)" polymorphic="true" roleLabel="is referenced by">
+            <Class class="TypicalSectionConstraintAngle"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="TypicalSectionHorizontalMaxConstraint" displayLabel="Horizontal Maximum" modifier="Sealed">
+        <BaseClass>TypicalSectionConstraintWithTwoPointsAndOffset</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="TypicalSectionHorizontalMinConstraint" displayLabel="Horizontal Minimum" modifier="Sealed">
+        <BaseClass>TypicalSectionConstraintWithTwoPointsAndOffset</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="TypicalSectionVerticalMaxConstraint" displayLabel="Vertical Maximum" modifier="Sealed">
+        <BaseClass>TypicalSectionConstraintWithTwoPointsAndOffset</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="TypicalSectionVerticalMinConstraint" displayLabel="Vertical Minimum" modifier="Sealed">
+        <BaseClass>TypicalSectionConstraintWithTwoPointsAndOffset</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="TypicalSectionSlopeConstraint" displayLabel="Slope Constraint" modifier="Sealed">
+        <BaseClass>TypicalSectionConstraintSource</BaseClass>
+        <ECNavigationProperty propertyName="PointRef" relationshipName="TypicalSectionSlopeConstraintRefersToPointRef" direction="Forward"/>
+        <ECNavigationProperty propertyName="Slope" relationshipName="TypicalSectionConstraintRefersToSlope" direction="Forward"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="TypicalSectionSlopeConstraintRefersToPointRef" strength="referencing" strengthDirection="Forward" modifier="Sealed">
+        <Source multiplicity="(0..*)" polymorphic="true" roleLabel="refers to">
+            <Class class="TypicalSectionSlopeConstraint"/>
+        </Source>
+        <Target multiplicity="(0..1)" polymorphic="true" roleLabel="is referenced by">
+            <Class class="ITypicalSectionConstrainingPoint"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="TypicalSectionConstraintRefersToSlope" strength="referencing" strengthDirection="Forward" modifier="Sealed">
+        <Source multiplicity="(0..*)" polymorphic="false" roleLabel="refers to">
+            <Class class="TypicalSectionSlopeConstraint"/>
+        </Source>
+        <Target multiplicity="(0..1)" polymorphic="true" roleLabel="is referenced by">
+            <Class class="TypicalSectionConstraintSlope"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="TypicalSectionConstraintOwnsSlope" strength="embedding" modifier="Sealed">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(0..1)" polymorphic="true" roleLabel="owns">
+            <Class class="TypicalSectionSlopeConstraint"/>
+        </Source>
+        <Target multiplicity="(0..1)" polymorphic="true" roleLabel="is owned by">
+            <Class class="TypicalSectionConstraintSlope"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="TypicalSectionConstraintOffset" modifier="Abstract">
+        <BaseClass>bis:InformationRecordElement</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="TypicalSectionConstraintOffsetValue" modifier="Abstract">
+        <BaseClass>TypicalSectionConstraintOffset</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="TypicalSectionConstraintConstantOffset" displayLabel="Offset" modifier="Sealed">
+        <BaseClass>TypicalSectionConstraintOffsetValue</BaseClass>
+        <ECProperty propertyName="Value" typeName="double" displayLabel="Value" kindOfQuantity="rru:LENGTH"/>
+    </ECEntityClass>
+    <ECEntityClass typeName="TypicalSectionConstraintPointsDifference" modifier="Abstract">
+        <BaseClass>TypicalSectionConstraintOffsetValue</BaseClass>
+        <ECProperty propertyName="Multiplier" typeName="double" displayLabel="Multiplier" kindOfQuantity="rru:LENGTH"/>
+        <ECNavigationProperty propertyName="MinuendPointRef" relationshipName="TypicalSectionConstraintDifferenceRefersToMinuend" direction="Forward"/>
+        <ECNavigationProperty propertyName="SubtrahendPointRef" relationshipName="TypicalSectionConstraintDifferenceRefersToSubtrahend" direction="Forward"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="TypicalSectionConstraintDifferenceRefersToMinuend" strength="referencing" strengthDirection="Forward" modifier="Sealed">
+        <Source multiplicity="(0..*)" polymorphic="true" roleLabel="refers to">
+            <Class class="TypicalSectionConstraintPointsDifference"/>
+        </Source>
+        <Target multiplicity="(0..1)" polymorphic="true" roleLabel="is referenced by">
+            <Class class="ITypicalSectionConstrainingPoint"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="TypicalSectionConstraintDifferenceRefersToSubtrahend" strength="referencing" strengthDirection="Forward" modifier="Sealed">
+        <Source multiplicity="(0..*)" polymorphic="true" roleLabel="refers to">
+            <Class class="TypicalSectionConstraintPointsDifference"/>
+        </Source>
+        <Target multiplicity="(0..1)" polymorphic="true" roleLabel="is referenced by">
+            <Class class="ITypicalSectionConstrainingPoint"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="TypicalSectionConstraintHorizontalDifference" displayLabel="Horizontal difference" modifier="Sealed">
+        <BaseClass>TypicalSectionConstraintPointsDifference</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="TypicalSectionConstraintVerticalDifference" displayLabel="Vertical difference" modifier="Sealed">
+        <BaseClass>TypicalSectionConstraintPointsDifference</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="TypicalSectionConstraintParametricOffset" displayLabel="Parametric Offset" modifier="Sealed">
+        <BaseClass>TypicalSectionConstraintOffset</BaseClass>
+        <ECNavigationProperty propertyName="Parameter" relationshipName="TypicalSectionConstraintOffsetRefersToParameter" direction="Forward"/>
+        <ECNavigationProperty propertyName="DefaultValue" relationshipName="TypicalSectionConstraintOffsetRefersToDefaultValue" direction="Forward"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="TypicalSectionConstraintOffsetRefersToParameter" strength="referencing" strengthDirection="Forward" modifier="Sealed">
+        <Source multiplicity="(0..*)" polymorphic="false" roleLabel="refers to">
+            <Class class="TypicalSectionConstraintParametricOffset"/>
+        </Source>
+        <Target multiplicity="(0..1)" polymorphic="false" roleLabel="is referenced by">
+            <Class class="TypicalSectionOffsetParameter"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="TypicalSectionConstraintOffsetRefersToDefaultValue" strength="referencing" strengthDirection="Forward" modifier="Sealed">
+        <Source multiplicity="(0..*)" polymorphic="false" roleLabel="refers to">
+            <Class class="TypicalSectionConstraintParametricOffset"/>
+        </Source>
+        <Target multiplicity="(0..1)" polymorphic="true" roleLabel="is referenced by">
+            <Class class="TypicalSectionConstraintOffsetValue"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="TypicalSectionConstraintSlope" modifier="Abstract">
+        <BaseClass>bis:InformationRecordElement</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="TypicalSectionConstraintSlopeValue" modifier="Abstract">
+        <BaseClass>TypicalSectionConstraintSlope</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="TypicalSectionConstraintConstantSlope" displayLabel="Slope" modifier="Sealed">
+        <BaseClass>TypicalSectionConstraintSlopeValue</BaseClass>
+        <ECProperty propertyName="Value" typeName="double" displayLabel="Value" kindOfQuantity="rru:SLOPE"/>
+    </ECEntityClass>
+    <ECEntityClass typeName="TypicalSectionConstraintComputedSlope" displayLabel="Computed Slope" modifier="Sealed">
+        <BaseClass>TypicalSectionConstraintSlopeValue</BaseClass>
+        <ECProperty propertyName="Multiplier" typeName="double" displayLabel="Multiplier" kindOfQuantity="rru:LENGTH"/>
+        <ECNavigationProperty propertyName="PointDef1" relationshipName="TypicalSectionConstraintSlopeRefersToPoint1" direction="Forward"/>
+        <ECNavigationProperty propertyName="PointDef2" relationshipName="TypicalSectionConstraintSlopeRefersToPoint2" direction="Forward"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="TypicalSectionConstraintSlopeRefersToPoint1" strength="referencing" strengthDirection="Forward" modifier="Sealed">
+        <Source multiplicity="(0..*)" polymorphic="false" roleLabel="refers to">
+            <Class class="TypicalSectionConstraintComputedSlope"/>
+        </Source>
+        <Target multiplicity="(0..1)" polymorphic="false" roleLabel="is referenced by">
+            <Class class="ITypicalSectionConstrainingPoint"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="TypicalSectionConstraintSlopeRefersToPoint2" strength="referencing" strengthDirection="Forward" modifier="Sealed">
+        <Source multiplicity="(0..*)" polymorphic="false" roleLabel="refers to">
+            <Class class="TypicalSectionConstraintComputedSlope"/>
+        </Source>
+        <Target multiplicity="(0..1)" polymorphic="false" roleLabel="is referenced by">
+            <Class class="ITypicalSectionConstrainingPoint"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="TypicalSectionConstraintParametricSlope" displayLabel="Parametric Slope" modifier="Sealed">
+        <BaseClass>TypicalSectionConstraintSlope</BaseClass>
+        <ECNavigationProperty propertyName="Parameter" relationshipName="TypicalSectionConstraintSlopeRefersToParameter" direction="Forward"/>
+        <ECNavigationProperty propertyName="DefaultValue" relationshipName="TypicalSectionConstraintSlopeRefersToDefaultValue" direction="Forward"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="TypicalSectionConstraintSlopeRefersToDefaultValue" strength="referencing" strengthDirection="Forward" modifier="Sealed">
+        <Source multiplicity="(0..*)" polymorphic="false" roleLabel="refers to">
+            <Class class="TypicalSectionConstraintParametricSlope"/>
+        </Source>
+        <Target multiplicity="(0..1)" polymorphic="true" roleLabel="is referenced by">
+            <Class class="TypicalSectionConstraintSlopeValue"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="TypicalSectionConstraintSlopeRefersToParameter" strength="referencing" strengthDirection="Forward" modifier="Sealed">
+        <Source multiplicity="(0..*)" polymorphic="false" roleLabel="refers to">
+            <Class class="TypicalSectionConstraintParametricSlope"/>
+        </Source>
+        <Target multiplicity="(0..1)" polymorphic="false" roleLabel="is referenced by">
+            <Class class="TypicalSectionSlopeParameter"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="TypicalSectionConstraintAngle" modifier="Abstract">
+        <BaseClass>bis:InformationRecordElement</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="TypicalSectionConstraintAngleValue" modifier="Abstract">
+        <BaseClass>TypicalSectionConstraintAngle</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="TypicalSectionConstraintConstantAngle" displayLabel="Angle" modifier="Sealed">
+        <BaseClass>TypicalSectionConstraintAngleValue</BaseClass>
+        <ECProperty propertyName="Value" typeName="double" displayLabel="Value" kindOfQuantity="rru:ANGLE"/>
+    </ECEntityClass>
+    <ECEntityClass typeName="TypicalSectionConstraintParametricAngle" displayLabel="Parametric Angle" modifier="Sealed">
+        <BaseClass>TypicalSectionConstraintAngle</BaseClass>
+        <ECNavigationProperty propertyName="Parameter" relationshipName="TypicalSectionConstraintAngleRefersToParameter" direction="Forward"/>
+        <ECNavigationProperty propertyName="DefaultValue" relationshipName="TypicalSectionConstraintAngleRefersToDefaultValue" direction="Forward"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="TypicalSectionConstraintAngleRefersToParameter" strength="referencing" strengthDirection="Forward" modifier="Sealed">
+        <Source multiplicity="(0..*)" polymorphic="false" roleLabel="refers to">
+            <Class class="TypicalSectionConstraintParametricAngle"/>
+        </Source>
+        <Target multiplicity="(0..1)" polymorphic="false" roleLabel="is referenced by">
+            <Class class="TypicalSectionAngleParameter"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="TypicalSectionConstraintAngleRefersToDefaultValue" strength="referencing" strengthDirection="Forward" modifier="Sealed">
+        <Source multiplicity="(0..*)" polymorphic="false" roleLabel="refers to">
+            <Class class="TypicalSectionConstraintParametricAngle"/>
+        </Source>
+        <Target multiplicity="(0..1)" polymorphic="true" roleLabel="is referenced by">
+            <Class class="TypicalSectionConstraintAngleValue"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="TypicalSectionPointConstraint" displayLabel="Point Constraint" strength="referencing" strengthDirection="Forward" modifier="Sealed">
+        <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <ECProperty propertyName="ProcessingOrder" typeName="int" displayLabel="Constraint Processing Order"/>
+        <Source multiplicity="(0..*)" polymorphic="false" roleLabel="constrains">
+            <Class class="TypicalSectionConstraintComposite"/>
+        </Source>
+        <Target multiplicity="(1..1)" polymorphic="true" roleLabel="is constrained by">
+            <Class class="ITypicalSectionConstrainedPoint"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="TypicalSectionParameter" displayLabel="Parameter" modifier="Abstract">
+        <BaseClass>bis:DefinitionElement</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="TypicalSectionAngleParameter" displayLabel="Angle Parameter" modifier="Sealed">
+        <BaseClass>TypicalSectionParameter</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="TypicalSectionOffsetParameter" displayLabel="Offset Parameter" modifier="Sealed">
+        <BaseClass>TypicalSectionParameter</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="TypicalSectionSlopeParameter" displayLabel="Slope Parameter" modifier="Sealed">
+        <BaseClass>TypicalSectionParameter</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="ITypicalSectionRecipeSegment" description="Mix-in to be supported by segments with a constant TypicalSection recipe." modifier="Abstract">
+        <ECCustomAttributes>
+            <IsMixin xmlns='CoreCustomAttributes.01.00.00'>
+                <AppliesToEntityClass>lr:LinearlyLocatedAttribution</AppliesToEntityClass>
+            </IsMixin>
+        </ECCustomAttributes>
+        <ECNavigationProperty propertyName="Recipe" relationshipName="ITypicalSectionRecipeSegmentRefersToRecipe" direction="Forward"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ITypicalSectionRecipeSegmentRefersToRecipe" strength="referencing" strengthDirection="Backward" modifier="Abstract">
+        <Source multiplicity="(0..*)" polymorphic="true" roleLabel="refers to">
+            <Class class="ITypicalSectionRecipeSegment"/>
+        </Source>
+        <Target multiplicity="(0..1)" polymorphic="true" roleLabel="is referenced by">
+            <Class class="TypicalSectionRecipeElement"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="ITypicalSectionRecipeTransition" description="Mix-in to be supported by segments transitioning between TypicalSections recipes." modifier="Abstract">
+        <ECCustomAttributes>
+            <IsMixin xmlns='CoreCustomAttributes.01.00.00'>
+                <AppliesToEntityClass>lr:LinearlyLocatedAttribution</AppliesToEntityClass>
+            </IsMixin>
+        </ECCustomAttributes>
+        <ECNavigationProperty propertyName="LocalRecipe" relationshipName="ITypicalSectionRecipeTransitionRefersToLocalRecipe" direction="Forward"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ITypicalSectionRecipeTransitionRefersToLocalRecipe" strength="referencing" strengthDirection="Backward" modifier="Abstract">
+        <Source multiplicity="(0..*)" polymorphic="true" roleLabel="refers to">
+            <Class class="ITypicalSectionRecipeTransition"/>
+        </Source>
+        <Target multiplicity="(0..1)" polymorphic="true" roleLabel="is referenced by">
+            <Class class="TypicalSectionRecipeElement"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEnumeration typeName="TypicalSectionPointMappingAspect_PointDefContinuity" backingTypeName="int" isStrict="true">
+        <ECEnumerator value="0" name="SamePointDefAlongTransition" displayLabel="SamePointDefAlongTransition"/>
+        <ECEnumerator value="1" name="ToPointDefStartsWithTransition" displayLabel="ToPointDefStartsWithTransition"/>
+        <ECEnumerator value="2" name="ToPointDefStartsAfterTransition" displayLabel="ToPointDefStartsAfterTransition"/>
+    </ECEnumeration>
+    <ECEntityClass typeName="TypicalSectionPointMappingAspect" modifier="Sealed" description="MultiAspect to be applied to ITransitionPathwaySegments, optionally specifying mapping between TypicalSectionPoint definitions locally to that segment.">
+        <BaseClass>bis:ElementMultiAspect</BaseClass>
+        <ECNavigationProperty propertyName="FromPointDef" relationshipName="TypicalSectionPointMappingRefersToSourcePointDef" direction="Forward"/>
+        <ECNavigationProperty propertyName="ToPointDef" relationshipName="TypicalSectionPointMappingRefersToTargetPointDef" direction="Forward"/>
+        <ECProperty propertyName="PointDefContinuity" typeName="TypicalSectionPointMappingAspect_PointDefContinuity"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ITypicalSectionRecipeTransitionOwnsMappingAspects" strength="embedding" strengthDirection="Forward" modifier="Sealed">
+        <BaseClass>bis:ElementOwnsMultiAspects</BaseClass>
+        <Source multiplicity="(1..1)" polymorphic="true" roleLabel="owns">
+            <Class class="ITypicalSectionRecipeTransition"/>
+        </Source>
+        <Target multiplicity="(0..*)" polymorphic="true" roleLabel="is owned by">
+            <Class class="TypicalSectionPointMappingAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="TypicalSectionPointMappingRefersToSourcePointDef" strength="referencing" strengthDirection="Forward" modifier="Sealed">
+        <Source multiplicity="(0..*)" polymorphic="false" roleLabel="refers to">
+            <Class class="TypicalSectionPointMappingAspect"/>
+        </Source>
+        <Target multiplicity="(0..1)" polymorphic="true" roleLabel="is referenced by">
+            <Class class="TypicalSectionPointDefinition"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="TypicalSectionPointMappingRefersToTargetPointDef" strength="referencing" strengthDirection="Forward" modifier="Sealed">
+        <Source multiplicity="(0..*)" polymorphic="false" roleLabel="refers to">
+            <Class class="TypicalSectionPointMappingAspect"/>
+        </Source>
+        <Target multiplicity="(0..1)" polymorphic="true" roleLabel="is referenced by">
+            <Class class="TypicalSectionPointDefinition"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="TravelwaySegmentElement" modifier="Abstract" description="Base class for segments of a Travelway, which is the contiguous spatial portion of a Pathway in direct contact with the moving objects." >
+        <BaseClass>lr:LinearlyLocatedAttribution</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="TravelwaySegment" modifier="Sealed" description="Travelway segment with a constant Travelway recipe." >
+        <BaseClass>TravelwaySegmentElement</BaseClass>
+        <BaseClass>ITypicalSectionRecipeSegment</BaseClass>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="TravelwaySegmentRefersToRecipe" strength="referencing" strengthDirection="Backward" modifier="Sealed">
+        <BaseClass>ITypicalSectionRecipeSegmentRefersToRecipe</BaseClass>
+        <Source multiplicity="(0..*)" polymorphic="false" roleLabel="refers to">
+            <Class class="TravelwaySegment"/>
+        </Source>
+        <Target multiplicity="(0..1)" polymorphic="true" roleLabel="is referenced by">
+            <Class class="TravelwayRecipeElement"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="TravelwayTransition" modifier="Sealed" description="Travelway segment with a variable Travelway recipe.">
+        <BaseClass>TravelwaySegmentElement</BaseClass>
+        <BaseClass>ITypicalSectionRecipeTransition</BaseClass>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="TravelwayTransitionRefersToLocalRecipe" strength="referencing" strengthDirection="Backward" modifier="Sealed">
+        <BaseClass>ITypicalSectionRecipeTransitionRefersToLocalRecipe</BaseClass>
+        <Source multiplicity="(0..*)" polymorphic="false" roleLabel="refers to">
+            <Class class="TravelwayTransition"/>
+        </Source>
+        <Target multiplicity="(0..1)" polymorphic="true" roleLabel="is referenced by">
+            <Class class="TravelwayRecipeElement"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="TravelwayStructureSegmentElement" modifier="Abstract" description="Base class for a set of physical layers providing structural support to the Travelway." >
+        <BaseClass>lr:LinearlyLocatedAttribution</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="TravelwayStructureSegment" modifier="None" description="A segment of a Travelway structure with a constant TravelwayStructure recipe." >
+        <BaseClass>TravelwayStructureSegmentElement</BaseClass>
+        <BaseClass>ITypicalSectionRecipeSegment</BaseClass>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="TravelwayStructureSegmentRefersToRecipe" strength="referencing" strengthDirection="Backward" modifier="Sealed">
+        <BaseClass>ITypicalSectionRecipeSegmentRefersToRecipe</BaseClass>
+        <Source multiplicity="(0..*)" polymorphic="false" roleLabel="refers to">
+            <Class class="TravelwayStructureSegment"/>
+        </Source>
+        <Target multiplicity="(0..1)" polymorphic="false" roleLabel="is referenced by">
+            <Class class="TravelwayStructureRecipe"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="TravelwayStructureTransition" modifier="Sealed" description="Travelway Structure segment with a variable Travelway Structure recipe.">
+        <BaseClass>TravelwayStructureSegmentElement</BaseClass>
+        <BaseClass>ITypicalSectionRecipeTransition</BaseClass>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="TravelwayStructureTransitionRefersToLocalRecipe" strength="referencing" strengthDirection="Backward" modifier="Sealed">
+        <BaseClass>ITypicalSectionRecipeTransitionRefersToLocalRecipe</BaseClass>
+        <Source multiplicity="(0..*)" polymorphic="false" roleLabel="refers to">
+            <Class class="TravelwayStructureTransition"/>
+        </Source>
+        <Target multiplicity="(0..1)" polymorphic="false" roleLabel="is referenced by">
+            <Class class="TravelwayStructureRecipe"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="TravelwaySideSegmentElement" modifier="Abstract" description="Base class for a Set of physical elements, with their corresponding structural layers, along the side of a Travelway, providing different purposes (e.g. separation, safety, connections to existing terrain, etc)." >
+        <BaseClass>lr:LinearlyLocatedAttribution</BaseClass>
+        <ECProperty propertyName="TravelwaySideIndex" typeName="int"/>
+    </ECEntityClass>
+    <ECEntityClass typeName="TravelwaySideSegment" modifier="Sealed" description="Generic class for Road/Rail end-condition elements." >
+        <BaseClass>TravelwaySideSegmentElement</BaseClass>
+        <BaseClass>ITypicalSectionRecipeSegment</BaseClass>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="TravelwaySideSegmentRefersToRecipe" strength="referencing" strengthDirection="Backward" modifier="Sealed">
+        <BaseClass>ITypicalSectionRecipeSegmentRefersToRecipe</BaseClass>
+        <Source multiplicity="(0..*)" polymorphic="false" roleLabel="refers to">
+            <Class class="TravelwaySideSegment"/>
+        </Source>
+        <Target multiplicity="(0..1)" polymorphic="true" roleLabel="is referenced by">
+            <Class class="TravelwaySideRecipe"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="TravelwaySideTransition" modifier="Sealed" description="Travelway segment with a variable Travelway recipe.">
+        <BaseClass>TravelwaySideSegmentElement</BaseClass>
+        <BaseClass>ITypicalSectionRecipeTransition</BaseClass>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="TravelwaySideTransitionRefersToLocalRecipe" strength="referencing" strengthDirection="Backward" modifier="Sealed">
+        <BaseClass>ITypicalSectionRecipeTransitionRefersToLocalRecipe</BaseClass>
+        <Source multiplicity="(0..*)" polymorphic="false" roleLabel="refers to">
+            <Class class="TravelwaySideTransition"/>
+        </Source>
+        <Target multiplicity="(0..1)" polymorphic="false" roleLabel="is referenced by">
+            <Class class="TravelwaySideRecipe"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="TravelwaySideTransitionConnectsToExternalSide" strength="referencing" strengthDirection="Forward" modifier="Abstract">
+        <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <ECProperty propertyName="ExternalTravelwaySideIndex" typeName="int"/>
+        <Source multiplicity="(0..1)" polymorphic="false" roleLabel="refers to">
+            <Class class="TravelwaySideTransition"/>
+        </Source>
+        <Target multiplicity="(0..1)" polymorphic="true" roleLabel="is referenced by">
+            <Class class="lr:ILinearElement"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="TravelwaySideTransitionsFromExternalSide" strength="referencing" strengthDirection="Forward" modifier="Sealed">
+        <BaseClass>TravelwaySideTransitionConnectsToExternalSide</BaseClass>
+        <Source multiplicity="(0..1)" polymorphic="false" roleLabel="refers to">
+            <Class class="TravelwaySideTransition"/>
+        </Source>
+        <Target multiplicity="(0..1)" polymorphic="true" roleLabel="is referenced by">
+            <Class class="lr:ILinearElement"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="TravelwaySideTransitionsToExternalSide" strength="referencing" strengthDirection="Forward" modifier="Sealed">
+        <BaseClass>TravelwaySideTransitionConnectsToExternalSide</BaseClass>
+        <Source multiplicity="(0..1)" polymorphic="false" roleLabel="refers to">
+            <Class class="TravelwaySideTransition"/>
+        </Source>
+        <Target multiplicity="(0..1)" polymorphic="true" roleLabel="is referenced by">
+            <Class class="lr:ILinearElement"/>
+        </Target>
+    </ECRelationshipClass>
+</ECSchema>

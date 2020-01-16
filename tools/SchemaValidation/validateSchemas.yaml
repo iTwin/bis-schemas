@@ -1,0 +1,116 @@
+trigger:
+  branches:
+    include:
+      - master
+  paths:
+    include:
+      - '*.ecschema.xml'
+
+workspace:
+  clean: all
+
+pool:
+  name: 
+  demands:
+  - Agent.OS -equals Windows_NT
+  - npm
+
+variables:
+  - name: validationOut
+    value: '$(Agent.BuildDirectory)/ValidationResults'
+  - name: validaterPath
+    value: '$(Build.Repository.LocalPath)/node_modules/@bentley/schema-validator'
+  - name: comparisonOut
+    value: '$(Agent.BuildDirectory)/ComparisonResults'
+  - name: schemaComparerPath
+    value: '$(Build.Repository.LocalPath)/node_modules/@bentley/schema-comparer'
+
+steps:
+- task: NodeTool@0
+  displayName: 'Use Node 10.15.0'
+  inputs:
+    versionSpec: 10.15.0
+- checkout: self
+  clean: true
+
+   
+- powershell: |
+    $npmrcDir = "$(Build.Repository.LocalPath)"
+    
+    if(!(Test-Path -Path $npmrcDir)){
+        mkdir $npmrcDir
+    }
+    
+    $npmrcFile = $npmrcDir + "/.npmrc"
+    
+    Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "@bentley:registry=/"
+    
+    Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "////_packaging/Packages/npm/registry/:username=Packages" -Append
+    Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "////_packaging/Packages/npm/registry/:_password=$()" -Append
+    Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "////_packaging/Packages/npm/registry/:email=npm requires email to be set but doesn't use the value" -Append
+    Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "////_packaging/Packages/npm/:username=Packages" -Append
+    Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "////_packaging/Packages/npm/:_password=$()" -Append
+    Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "////_packaging/Packages/npm/:email=npm requires email to be set but doesn't use the value" -Append
+
+ 
+
+- script: npm install @bentley/schema-validator@latest
+  displayName: 'Install schema-validator'
+
+- script: npm install @bentley/schema-comparer@latest
+  displayName: 'Install schema-comparer'
+
+- task: Npm@1
+  displayName: 'npm install'
+  inputs:
+    command: install   
+
+- script: | 
+    mkdir "%validationOut%"
+    echo Schema Validation Ouput Dir= %validationOut%
+  displayName: 'Create Validation Output Directory'
+
+- script: node ./tools/SchemaValidation/SchemaValidationRunner.js --BisRoot . --OutDir $(validationOut) --ValidaterPath $(validaterPath)
+  workingDirectory: 
+  displayName: Perform BIS Schema Validation
+
+- task: ArchiveFiles@2
+  condition: succeededOrFailed()
+  displayName: 'ArchiveFiles - Validation Results'
+  inputs:
+    rootFolderOrFile: $(validationOut) 
+    includeRootFolder: false 
+    archiveType: 7z
+    archiveFile: '$(Build.ArtifactStagingDirectory)/ValidationResults-$(Build.BuildId).zip' 
+    replaceExistingArchive: true 
+
+- publish: '$(Build.ArtifactStagingDirectory)/ValidationResults-$(Build.BuildId).zip'
+  condition: succeededOrFailed()
+  artifact: bis-schema-validation-logs
+  displayName: 'Publish BIS Schema Validation Results'
+
+- script: | 
+    mkdir "%comparisonOut%"
+    echo Schema Comparison Ouput Dir= %comparisonOut%
+  condition: succeededOrFailed()
+  displayName: 'Create Schema Comparison Output Directory'
+
+- script: node ./tools/SchemaDifference/SchemaDifferenceRunner.js --BisRoot . --OutDir $(comparisonOut) --SchemaComparerPath $(schemaComparerPath)
+  workingDirectory: 
+  condition: succeededOrFailed()
+  displayName: Perform BIS Schema Comparison
+
+- task: ArchiveFiles@2
+  condition: succeededOrFailed()
+  displayName: 'ArchiveFiles - Comparison Results'
+  inputs:
+    rootFolderOrFile: $(comparisonOut) 
+    includeRootFolder: false 
+    archiveType: 7z
+    archiveFile: '$(Build.ArtifactStagingDirectory)/ComparisonResults-$(Build.BuildId).zip' 
+    replaceExistingArchive: true 
+
+- publish: '$(Build.ArtifactStagingDirectory)/ComparisonResults-$(Build.BuildId).zip'
+  condition: succeededOrFailed()  
+  artifact: bis-schema-comparison-logs
+  displayName: 'Publish BIS Schema Comparison Results'

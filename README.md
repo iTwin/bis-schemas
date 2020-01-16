@@ -10,12 +10,12 @@ List of current BIS Schemas in this repository as SSOT:
 - Building\BuildingPhysicalSchema
 - BuildingSpatial
 - ClassificationSystems
+- Construction
 - Core\Analytical
 - Core\Asset
 - Core\BisCore
 - Core\Functional
 - Core\Generic
-- Core\Markup
 - Core\PhysicalMaterial
 - Earthwork
 - ECObjects

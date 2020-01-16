@@ -6,40 +6,40 @@
 |  $Copyright: (c) 2019 Bentley Systems, Incorporated. All rights reserved. $
 |
 ======================================================================================= -->
-<ECSchema schemaName="Site" alias="SITE" version="01.00.00" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.1">
+<ECSchema schemaName="Site" alias="Site" version="01.00.00" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.1">
     <ECSchemaReference name="BisCore" version="01.00.01" alias="bis" />
     <ECSchemaReference name="BuildingSpacePlanning" version="01.00.00" alias="bsp"/>
     <ECSchemaReference name="AecUnits" version="01.00.01" alias="AECU"/>
-    <ECSchemaReference name="SpatialComposition" version="01.00" alias="spcomp"/>
+    <ECSchemaReference name="SpatialComposition" version="01.00.00" alias="spcomp"/>
 
-    <ECEntityClass typeName="Site" displayLabel="Site">
+    <ECEntityClass typeName="Site" displayLabel="Site" description="A spatial element defining the legal boundary">
         <BaseClass>spcomp:CompositeElement</BaseClass>
         <BaseClass>spcomp:ICompositeBoundary</BaseClass>
         <BaseClass>bis:ISubModeledElement</BaseClass>
         <BaseClass>bsp:IEntity</BaseClass>
         <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00" />
+            <ClassHasHandler xmlns="BisCore.01.00.02" />
         </ECCustomAttributes>
     </ECEntityClass>
 
-    <ECEntityClass typeName="SiteObject">
+    <ECEntityClass typeName="SiteObject" description="an element tieing different aspects of a site together">
         <BaseClass>bsp:ObjectDefinitionElement</BaseClass>
         <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00.00" />
+            <ClassHasHandler xmlns="BisCore.01.00.02" />
         </ECCustomAttributes>
     </ECEntityClass>
 
-    <ECEntityClass typeName="BuildableVolume" displayLabel="BuildableVolume">
+    <ECEntityClass typeName="BuildableVolume" displayLabel="BuildableVolume" description="a spatial element defining the volume in the site that the user is allowed to build in">
         <BaseClass>bis:SpatialLocationElement</BaseClass>
         <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00" />
+            <ClassHasHandler xmlns="BisCore.01.00.02" />
         </ECCustomAttributes>
     </ECEntityClass>
 
-    <ECRelationshipClass typeName="BuildableVolumeConstrainsBuilding" strength="referencing" modifier="sealed">
+    <ECRelationshipClass typeName="BuildableVolumeConstrainsBuilding" strength="referencing" modifier="sealed" description="Buildable volume spatially constrains the Building">
         <BaseClass>bis:ElementDrivesElement</BaseClass>
         <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00"/>
+            <ClassHasHandler xmlns="BisCore.01.00.02"/>
         </ECCustomAttributes>
         <Source polymorphic="true" roleLabel="contstrains" multiplicity="(0..1)">
             <Class class="BuildableVolume"/>
@@ -49,62 +49,62 @@
         </Target>
     </ECRelationshipClass>
 
-    <ECEntityClass typeName="ParkingArea" displayLabel="ParkingArea">
+    <ECEntityClass typeName="ParkingArea" displayLabel="ParkingArea" description="An element element indicating where vehicles are allowed to be parked">
         <BaseClass>bis:SpatialLocationElement</BaseClass>
         <BaseClass>bis:ISubModeledElement</BaseClass>
         <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00" />
+            <ClassHasHandler xmlns="BisCore.01.00.02" />
         </ECCustomAttributes>
-        <ECProperty propertyName="Area" displayLabel="Area" typeName="double" kindOfQuantity="AECU:AREA"/>
-        <ECProperty propertyName="Lots" displayLabel="Lots" typeName="int"/>
-        <ECProperty propertyName="Spaces" displayLabel="Spaces" typeName="int"/>
-        <ECProperty propertyName="Islands" displayLabel="Islands" typeName="int"/>
-        <ECProperty propertyName="ParkingAngle" displayLabel="Parking Angle" typeName="double" kindOfQuantity="AECU:Angle"/>
-        <ECProperty propertyName="BayCurbRadius" displayLabel="Bay Curb Radius" typeName="double" kindOfQuantity="AECU:LENGTH"/>
-        <ECProperty propertyName="IslandCurbRadius" displayLabel="Island Curb Radius" typeName="double" kindOfQuantity="AECU:LENGTH"/>
-        <ECProperty propertyName="AisleWidth" displayLabel="Aisle Width" typeName="double" kindOfQuantity="AECU:LENGTH"/>
-        <ECProperty propertyName="ParkingDepth" displayLabel="Parking Depth" typeName="double" kindOfQuantity="AECU:LENGTH"/>
-        <ECProperty propertyName="ParkingWidth" displayLabel="Parking Width" typeName="double" kindOfQuantity="AECU:LENGTH"/>
-        <ECProperty propertyName="ParkingPerIsland" displayLabel="Parking per Island" typeName="int"/>
+        <ECProperty propertyName="Area" displayLabel="Area" typeName="double" kindOfQuantity="AECU:AREA" description="total area of the element"/>
+        <ECProperty propertyName="Lots" displayLabel="Lots" typeName="int" description="number of ParkingLots contained"/>
+        <ECProperty propertyName="Spaces" displayLabel="Spaces" typeName="int" description="number of ParkingSpaces contained"/>
+        <ECProperty propertyName="Islands" displayLabel="Islands" typeName="int" description="number of PaskingIslands contained"/>
+        <ECProperty propertyName="ParkingAngle" displayLabel="Parking Angle" typeName="double" kindOfQuantity="AECU:Angle" description="the angle for the parking spaces"/>
+        <ECProperty propertyName="BayCurbRadius" displayLabel="Bay Curb Radius" typeName="double" kindOfQuantity="AECU:LENGTH" description="curb radius for the bay"/>
+        <ECProperty propertyName="IslandCurbRadius" displayLabel="Island Curb Radius" typeName="double" kindOfQuantity="AECU:LENGTH" description="curb radius for the parking islands"/>
+        <ECProperty propertyName="AisleWidth" displayLabel="Aisle Width" typeName="double" kindOfQuantity="AECU:LENGTH" description="Width for all aisles"/>
+        <ECProperty propertyName="ParkingDepth" displayLabel="Parking Depth" typeName="double" kindOfQuantity="AECU:LENGTH" description="depth parameter for the parking"/>
+        <ECProperty propertyName="ParkingWidth" displayLabel="Parking Width" typeName="double" kindOfQuantity="AECU:LENGTH" description="width parameter for the parking"/>
+        <ECProperty propertyName="ParkingPerIsland" displayLabel="Parking per Island" typeName="int" description="parking per island"/>
     </ECEntityClass>
 
-    <ECEntityClass typeName="ParkingLot" displayLabel="ParkingLot">
+    <ECEntityClass typeName="ParkingLot" displayLabel="ParkingLot" description="a subset of a PArkingArea - usually a row of parking spaces">
         <BaseClass>bis:SpatialLocationElement</BaseClass>
         <BaseClass>bis:ISubModeledElement</BaseClass>
         <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00" />
+            <ClassHasHandler xmlns="BisCore.01.00.02" />
         </ECCustomAttributes>
     </ECEntityClass>
 
-    <ECEntityClass typeName="ParkingIsland" displayLabel="ParkingIsland">
+    <ECEntityClass typeName="ParkingIsland" displayLabel="ParkingIsland" description="an area of space in the parkingArea acting as an inner loop constraint">
         <BaseClass>bis:SpatialLocationElement</BaseClass>
         <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00" />
+            <ClassHasHandler xmlns="BisCore.01.00.02" />
         </ECCustomAttributes>
     </ECEntityClass>
 
-    <ECEntityClass typeName="UserDefinedParkingIsland" displayLabel="User defined parking island">
+    <ECEntityClass typeName="UserDefinedParkingIsland" displayLabel="User defined parking island" description="a ParkingIsland that is placed by user">
         <BaseClass>bis:SpatialLocationElement</BaseClass>
         <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00" />
+            <ClassHasHandler xmlns="BisCore.01.00.02" />
         </ECCustomAttributes>
     </ECEntityClass>
 
-    <ECEntityClass typeName="ParkingSpace" displayLabel="ParkingSpace">
+    <ECEntityClass typeName="ParkingSpace" displayLabel="ParkingSpace" description="a space to park a single vehicle">
         <BaseClass>bis:SpatialLocationElement</BaseClass>
         <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00" />
+            <ClassHasHandler xmlns="BisCore.01.00.02" />
         </ECCustomAttributes>
     </ECEntityClass>
 
-    <ECEntityClass typeName="SpaceDivider" displayLabel="Space divider">
+    <ECEntityClass typeName="SpaceDivider" displayLabel="Space divider" description="Line element delimiting 2 Parking Spaces">
         <BaseClass>bis:SpatialLocationElement</BaseClass>
         <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00" />
+            <ClassHasHandler xmlns="BisCore.01.00.02" />
         </ECCustomAttributes>
     </ECEntityClass>
 
-    <ECRelationshipClass typeName="SpaceDividerBoundsParkingSpace" strength="referencing" modifier="sealed">
+    <ECRelationshipClass typeName="SpaceDividerBoundsParkingSpace" strength="referencing" modifier="sealed" description="indicates that a SpaceDivider is at either Side of the ParkingSpace">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <Source polymorphic="false" roleLabel="bounds" multiplicity="(1..*)">
             <Class class="SpaceDivider"/>
@@ -114,11 +114,11 @@
         </Target>
     </ECRelationshipClass>
 
-    <ECEntityClass typeName="SiteRequirement" displayLabel="Site">
+    <ECEntityClass typeName="SiteRequirement" displayLabel="Site Requirement" description="an element collecting requirements for the Site">
         <BaseClass>bsp:AllocationRequirement</BaseClass>
         <BaseClass>bsp:IEntity</BaseClass>
         <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00"/>
+            <ClassHasHandler xmlns="BisCore.01.00.02"/>
         </ECCustomAttributes>
     </ECEntityClass>
 </ECSchema>
