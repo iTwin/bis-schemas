@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ECSchema schemaName="BridgeStructuralPhysical" alias="bphys" version="01.00.00" description="Base schema for Physical Bridges." xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.1">
+    <ECSchemaReference name="ECDbMap" version="02.00.00" alias="ecdbmap"/>
+    <ECSchemaReference name="BisCore" version="01.00.00" alias="bis"/>
+    <ECSchemaReference name="LinearReferencing" version="01.00.00" alias="lr"/>
+    <ECSchemaReference name="StructuralPhysical" alias="sp" version="01.00.00" />
+    <KindOfQuantity typeName="PLANE_ANGLE" displayLabel="PLANE_ANGLE" persistenceUnit="RAD" relativeError="1e-2" />
+
+    <!-- BEGIN Bridge Items -->
+    <ECEntityClass typeName="Bridge" modifier="Sealed" description="Physical bridge supporting a segment of a road or rail." >
+        <BaseClass>bis:PhysicalElement</BaseClass>
+        <BaseClass>lr:ILinearElement</BaseClass>
+        <BaseClass>lr:ILinearlyLocatedElement</BaseClass>
+        <BaseClass>bis:ISubModeledElement</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.01.00.00"/>
+        </ECCustomAttributes>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="PhysicalModelBreaksDownBridgeElement" strength="embedding" strengthDirection="Backward" modifier="Sealed" description="Relationship enabling break-down of an Physical Bridge Element into its constituent components">
+        <BaseClass>bis:ModelModelsElement</BaseClass>
+        <Source multiplicity="(0..1)" polymorphic="false" roleLabel="breaks down">
+            <Class class="bis:PhysicalModel"/>
+        </Source>
+        <Target multiplicity="(1..1)" polymorphic="false" roleLabel="is broken down by">
+            <Class class="Bridge"/>
+        </Target>
+    </ECRelationshipClass>
+    <!-- END Bridge Items -->
+    <!-- BEGIN SubstructureElements-->
+    <ECEntityClass typeName="SubstructureElement" modifier="Abstract" description="Base class for physical elements describing substructures of a bridge." >
+        <BaseClass>bis:PhysicalElement</BaseClass>
+        <BaseClass>lr:ILinearlyLocatedElement</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.01.00.00"/>
+        </ECCustomAttributes>
+        <ECProperty propertyName="Skew" typeName="double" kindOfQuantity="PLANE_ANGLE" displayLabel="Skew" description="Skew angle of substructure element relative to alignment perpendicular (0 is perpendicular to alignment)" />
+    </ECEntityClass>
+    <ECEntityClass typeName="GenericSubstructureElement" description="Generic Substructure Element that is composed of its constituent structural components" >
+        <BaseClass>SubstructureElement</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.01.00.00"/>
+        </ECCustomAttributes>
+    </ECEntityClass>
+    <!-- END SubstructureElements -->
+    <!-- BEGIN Superstructure Elements -->
+    <ECEntityClass typeName="SuperstructureElement" modifier="Abstract" description="Abstract Base class for the element describing a Bridge superstructure component" >
+        <BaseClass>bis:PhysicalElement</BaseClass>
+        <BaseClass>lr:ILinearlyLocatedElement</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.01.00"/>
+
+        </ECCustomAttributes>
+    </ECEntityClass>
+    <ECEntityClass typeName="GenericSuperstructureElement" description="Generic Superstructure Element that is composed of its constituent structural components" >
+        <BaseClass>SuperstructureElement</BaseClass>
+        <ECCustomAttributes>
+            <ClassHasHandler xmlns="BisCore.01.00.00"/>
+            <!--
+            <IsMixin xmlns='CoreCustomAttributes.01.00'>
+                <AppliesToEntityClass>bis:Element</AppliesToEntityClass>
+            </IsMixin>
+            -->
+        </ECCustomAttributes>
+    </ECEntityClass>        
+    <!-- END BridgeSuperstructure Elements -->
+    <!-- BEGIN BridgeSuperstructure Relationships -->
+    <ECRelationshipClass typeName="SubstructureElementAssemblesStructuralMembers" strength="embedding" modifier="None">
+        <BaseClass>bis:PhysicalElementAssemblesElements</BaseClass>
+        <Source multiplicity="(0..1)" polymorphic="false" roleLabel="assembles">
+            <Class class="SubstructureElement"/>
+        </Source>
+        <Target multiplicity="(0..*)" polymorphic="true" roleLabel="is assembled by">
+            <Class class="sp:StructuralMember"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="SuperstructureElementAssemblesStructuralMembers" strength="embedding" modifier="None">
+        <BaseClass>bis:PhysicalElementAssemblesElements</BaseClass>
+        <Source multiplicity="(0..1)" polymorphic="false" roleLabel="assembles">
+            <Class class="SuperstructureElement"/>
+        </Source>
+        <Target multiplicity="(0..*)" polymorphic="true" roleLabel="is assembled by">
+            <Class class="sp:StructuralMember"/>
+        </Target>
+    </ECRelationshipClass>
+    <!-- END BridgeSuperstructure Relationships -->
+</ECSchema>
