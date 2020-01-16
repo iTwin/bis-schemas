@@ -1,15 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ECSchema schemaName="LinearReferencing" alias="lr" version="02.00.00" description="Base schema for Linear Referencing." xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
-    <ECSchemaReference name="BisCore" version="01.00.00" alias="bis"/>
+<ECSchema schemaName="LinearReferencing" alias="lr" version="02.00.01" description="Base schema for Linear Referencing." xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
+    <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
+    <ECSchemaReference name="BisCore" version="01.00.08" alias="bis"/>
     <ECSchemaReference name="Formats" version="01.00.00" alias="f"/>
     <ECSchemaReference name="Units" version="01.00.00" alias="u"/>
+
+    <ECCustomAttributes>
+        <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
+            <SupportedUse>FieldTesting</SupportedUse>
+        </ProductionStatus>
+    </ECCustomAttributes>
 
     <KindOfQuantity typeName="LENGTH" displayLabel="Linear Referencing Length" persistenceUnit="u:M" presentationUnits="f:DefaultRealU(2)[u:M];f:DefaultRealU(2)[u:FT]" relativeError="0.0001"/>
 
     <ECEntityClass typeName="ILinearElement" description="Mix-in to be supported by Element-subclasses meant to play the role of Linear-Elements." modifier="Abstract">
         <ECCustomAttributes>
             <IsMixin xmlns='CoreCustomAttributes.01.00.00'>
-                <AppliesToEntityClass>bis:SpatialElement</AppliesToEntityClass>
+                <AppliesToEntityClass>bis:GeometricElement3d</AppliesToEntityClass>
             </IsMixin>
         </ECCustomAttributes>
         <ECProperty propertyName="StartValue" typeName="double" kindOfQuantity="LENGTH" displayLabel="Start Value" description="Distance along value at the start of the Linear-Element, measured from an absolute zero."/>
@@ -19,7 +26,7 @@
     <ECEntityClass typeName="ILinearElementSource" description="Mix-in to be supported by Element-subclasses meant to provide Linear-Elements." modifier="Abstract">
         <ECCustomAttributes>
             <IsMixin xmlns='CoreCustomAttributes.01.00.00'>
-                <AppliesToEntityClass>bis:SpatialElement</AppliesToEntityClass>
+                <AppliesToEntityClass>bis:GeometricElement3d</AppliesToEntityClass>
             </IsMixin>
         </ECCustomAttributes>
     </ECEntityClass>
@@ -34,7 +41,7 @@
     <ECEntityClass typeName="ILinearlyLocated" modifier="Abstract" description="Base mix-in for Elements to be linearly-referenced along Linear-Elements.">
         <ECCustomAttributes>
             <IsMixin xmlns='CoreCustomAttributes.01.00.00'>
-                <AppliesToEntityClass>bis:SpatialElement</AppliesToEntityClass>
+                <AppliesToEntityClass>bis:GeometricElement3d</AppliesToEntityClass>
             </IsMixin>
         </ECCustomAttributes>
     </ECEntityClass>
@@ -51,7 +58,7 @@
         <BaseClass>ILinearlyLocated</BaseClass>
         <ECCustomAttributes>
             <IsMixin xmlns='CoreCustomAttributes.01.00.00'>
-                <AppliesToEntityClass>bis:SpatialElement</AppliesToEntityClass>
+                <AppliesToEntityClass>bis:GeometricElement3d</AppliesToEntityClass>
             </IsMixin>
         </ECCustomAttributes>
         <ECNavigationProperty propertyName="AttributedElement" relationshipName="ILinearlyLocatedAttributesElement" direction="Forward" displayLabel="Attributed Element" description="Element being attributed."/>
@@ -61,21 +68,18 @@
             <Class class="ILinearlyLocatedAttribution"/>
         </Source>
         <Target multiplicity="(0..1)" polymorphic="true" roleLabel="is attributed by">
-            <Class class="ILinearElementSource"/>
+            <Class class="bis:GeometricElement3d"/>
         </Target>
     </ECRelationshipClass>
     <ECEntityClass typeName="LinearlyLocatedAttribution" description="Base class for ILinearlyLocatedAttribution-implementations that are Spatial Location Elements." modifier="Abstract">
         <BaseClass>bis:SpatialLocationElement</BaseClass>
         <BaseClass>ILinearlyLocatedAttribution</BaseClass>
-        <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00.00"/>
-        </ECCustomAttributes>
     </ECEntityClass>
     <ECEntityClass typeName="ILinearLocationElement" description="Mix-in to be supported by Element-subclasses located along a Linear-Element provided by a Linear-Element-Source." modifier="Abstract">
         <BaseClass>ILinearlyLocated</BaseClass>
         <ECCustomAttributes>
             <IsMixin xmlns='CoreCustomAttributes.01.00.00'>
-                <AppliesToEntityClass>bis:SpatialElement</AppliesToEntityClass>
+                <AppliesToEntityClass>bis:GeometricElement3d</AppliesToEntityClass>
             </IsMixin>
         </ECCustomAttributes>
     </ECEntityClass>
@@ -91,52 +95,37 @@
     <ECEntityClass typeName="LinearLocationElement" description="Base class for ILinearLocationElement-implementations that are subclasses of bis:SpatialLocationElement." modifier="Abstract">
         <BaseClass>bis:SpatialLocationElement</BaseClass>
         <BaseClass>ILinearLocationElement</BaseClass>
-        <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00.00"/>
-        </ECCustomAttributes>
     </ECEntityClass>
     <ECEntityClass typeName="LinearLocation" description="ILinearLocationElement-implementation attaching Linear Referencing Location to a bis:Element not inherently Linearly-Referenced." modifier="Sealed">
         <BaseClass>LinearLocationElement</BaseClass>
-        <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00.00"/>
-        </ECCustomAttributes>
     </ECEntityClass>
     <ECEntityClass typeName="LinearPhysicalElement" description="Base class for ILinearLocationElement-implementations that are subclasses of bis:PhysicalElement." modifier="Abstract">
         <BaseClass>bis:PhysicalElement</BaseClass>
         <BaseClass>ILinearLocationElement</BaseClass>
-        <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00.00"/>
-        </ECCustomAttributes>
     </ECEntityClass>
     <ECEntityClass typeName="IReferent" description="Mix-in to be supported by Element-subclasses that can play the role of a Referent (known location along a Linear-Element)." modifier="Abstract">
         <BaseClass>ILinearlyLocated</BaseClass>
         <ECCustomAttributes>
             <IsMixin xmlns='CoreCustomAttributes.01.00.00'>
-                <AppliesToEntityClass>bis:SpatialElement</AppliesToEntityClass>
+                <AppliesToEntityClass>bis:GeometricElement3d</AppliesToEntityClass>
             </IsMixin>
         </ECCustomAttributes>
         <ECNavigationProperty propertyName="ReferencedElement" relationshipName="IReferentReferencesElement" direction="Forward"/>
     </ECEntityClass>
-    <ECRelationshipClass typeName="IReferentReferencesElement" strength="referencing" modifier="None" description="Relationship indicating the bis:SpatialElement being used as Referent for Linear Referencing purposes.">
+    <ECRelationshipClass typeName="IReferentReferencesElement" strength="referencing" modifier="None" description="Relationship indicating the bis:GeometricElement3d being used as Referent for Linear Referencing purposes.">
         <Source multiplicity="(0..*)" polymorphic="true" roleLabel="references">
             <Class class="IReferent"/>
         </Source>
         <Target multiplicity="(0..1)" polymorphic="true" roleLabel="is referenced by">
-            <Class class="bis:SpatialElement"/>
+            <Class class="bis:GeometricElement3d"/>
         </Target>
     </ECRelationshipClass>
     <ECEntityClass typeName="ReferentElement" description="Base class for IReferent-implementations that are Spatial Location Elements." modifier="Abstract">
         <BaseClass>bis:SpatialLocationElement</BaseClass>
         <BaseClass>IReferent</BaseClass>
-        <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00.00"/>
-        </ECCustomAttributes>
     </ECEntityClass>
-    <ECEntityClass typeName="Referent" description="IReferent-implementation turning any bis:SpatialElement not inherently Linearly-Referenced into a Referent for Linear-Referencing purposes." modifier="Sealed">
+    <ECEntityClass typeName="Referent" description="IReferent-implementation turning any bis:GeometricElement3d not inherently Linearly-Referenced into a Referent for Linear-Referencing purposes." modifier="Sealed">
         <BaseClass>ReferentElement</BaseClass>
-        <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00.00"/>
-        </ECCustomAttributes>
     </ECEntityClass>
     <ECEntityClass typeName="LinearlyReferencedLocation" modifier="Abstract" description="Base class for multi-aspects carrying linearly-referenced locations.">
         <BaseClass>bis:ElementMultiAspect</BaseClass>
@@ -167,17 +156,11 @@
     </ECStructClass>
     <ECEntityClass typeName="LinearlyReferencedAtLocation" modifier="Sealed" description="Concrete multi-aspect class carrying 'at' linearly-referenced positions along a Linear-Element.">
         <BaseClass>LinearlyReferencedLocation</BaseClass>
-        <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00.00"/>
-        </ECCustomAttributes>
         <ECStructProperty propertyName="AtPosition" typeName="DistanceExpression"/>
         <ECNavigationProperty propertyName="FromReferent" relationshipName="LinearlyReferencedAtPositionRefersToReferent" direction="Forward"/>
     </ECEntityClass>
     <ECEntityClass typeName="LinearlyReferencedFromToLocation" modifier="Sealed" description="Concrete multi-aspect class carrying 'from/to' linearly-referenced positions along a Linear-Element.">
         <BaseClass>LinearlyReferencedLocation</BaseClass>
-        <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00.00"/>
-        </ECCustomAttributes>
         <ECStructProperty propertyName="FromPosition" typeName="DistanceExpression"/>
         <ECNavigationProperty propertyName="FromPositionFromReferent" relationshipName="LinearlyReferencedFromPositionRefersToReferent" direction="Forward"/>
         <ECStructProperty propertyName="ToPosition" typeName="DistanceExpression"/>

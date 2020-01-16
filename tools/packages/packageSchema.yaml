@@ -3,6 +3,7 @@ trigger:
 
 stages:
 - stage: Build
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
   jobs:
   - job: build_packages
     displayName: Build Packages
@@ -11,77 +12,63 @@ stages:
       demands:
       - Cmd
 
+    workspace:
+      clean: all
     variables:
-      bbSrcRoot: $(Agent.BuildDirectory)/bbsrc
-      bbStream: bim0200
-      buildStrategy: BisSchemasPackaging
-      architecture: x64
-      verbosity: 6
-      system.debug: true
+    - group: azure-artifacts-npm-token
+    - name: pkgOut
+      value: '$(Agent.BuildDirectory)/Packages'
 
     steps:
+      - task: NodeTool@0
+        displayName: 'Use Node 10.15.0'
+        inputs:
+          versionSpec: 10.15.0
       - checkout: self
         clean: true
-      - task: PythonScript@0
-        displayName: Setup Environment
+
+      #Your build pipeline references a secret variable named ‘artifactsRegistryToken’. This variable is pulled from the 'arzure-artifacts-npm-token' variable group.  You must authorize this build to use that group: https://docs.microsoft.com/en-us/azure/devops/pipelines/library/variable-groups?view=azure-devops&tabs=yaml#use-a-variable-group
+      - powershell: |
+          $npmrcDir = "$(Build.Repository.LocalPath)"
+          
+          if(!(Test-Path -Path $npmrcDir)){
+              mkdir $npmrcDir
+          }
+          
+          $npmrcFile = $npmrcDir + "/.npmrc"
+          
+          Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "@bentley:registry=/"
+          Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "always-auth=true" -Append
+          Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "///bentleycs/_packaging/Packages/npm/registry/:username=Packages" -Append
+          Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "///bentleycs/_packaging/Packages/npm/registry/:_password=$(artifactsRegistryToken)" -Append
+          Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "///bentleycs/_packaging/Packages/npm/registry/:email=npm requires email to be set but doesn't use the value" -Append
+          Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "///bentleycs/_packaging/Packages/npm/:username=Packages" -Append
+          Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "///bentleycs/_packaging/Packages/npm/:_password=$(artifactsRegistryToken)" -Append
+          Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "///bentleycs/_packaging/Packages/npm/:email=npm requires email to be set but doesn't use the value" -Append
+
+        displayName: 'Seed npmrc'
+      - task: Npm@1
+        displayName: 'npm install'
         inputs:
-          scriptSource: inline
-          script: |
-            import os, sys
-            def set_vsts_env(key, value): print(key + ' = ' + value + '\n##vso[task.setvariable variable={0}]{1}'.format(key, value))
-            
-            set_vsts_env('PYTHONUNBUFFERED', '1')
-            set_vsts_env('BsiSrc', os.environ['bbSrcRoot'].replace('/', os.path.sep) + os.path.sep)
-            set_vsts_env('BsiOut', os.environ['BUILD_BINARIESDIRECTORY'] + os.path.sep)
+          command: install
+      - script: |
+          SET PYENV_NAME=pyenv
 
-      - task: bentleybootstrap@0
-        displayName: BentleyBootstrap
-        inputs:
-          streamname: '$(bbStream)'
-          srcroot: '$(bbSrcRoot)'
+          virtualenv %PYENV_NAME%
 
-      - task: PythonScript@0
-        displayName: 'Link Repo'
-        inputs:
-          scriptSource: inline
-          script: |
-            import os, sys
-            
-            if os.name == 'nt':
-                import win32file
-                def createDirLink(target, link):
-                    win32file.CreateSymbolicLink(link, target, 1)
-            elif os.name == 'posix':
-                def createDirLink(target, link):
-                    os.symlink(target, link)
-            else:
-                sys.stderr.write('Unknown OS name "' + os.name + '".\n')
-                sys.exit(-1)
-            
-            link = os.path.join(sys.argv[1], 'BisSchemas')
-            target = os.environ['BUILD_SOURCESDIRECTORY']
-            if not os.path.exists(link):
-                createDirLink(target, link)
+          $(System.DefaultWorkingDirectory)\pyenv\Scripts\pip.exe install python-ntlm
+          $(System.DefaultWorkingDirectory)\pyenv\Scripts\pip.exe install pywin32==224
+          $(System.DefaultWorkingDirectory)\pyenv\Scripts\pip.exe install lxml
 
-          arguments: '$(bbSrcRoot)'
+        displayName: 'Setup python environment'
+      - script: $(System.DefaultWorkingDirectory)\pyenv\Scripts\python.exe tools/signoff/signoff.py --getLaunchCodes --dumpjson
+        displayName: Get Launch codes (temp)
+      - script: node ./tools/packages/generateInventory.js --BisRoot .
+        displayName: Build Schema Inventory (temp)
+      - script: node ./tools/packages/generatePackages.js --inventory ./SchemaInventory.json --outDir $(pkgOut) --template ./tools/packages/package.json.template
+        displayName: Generate Packages
 
-      - task: BatchScript@1
-        displayName: 'Shared Shell'
-        inputs:
-          filename: '$(bbSrcRoot)\bsicommon\shell\SharedShellEnv.bat'
-          modifyEnvironment: true
-
-      - script: bb -v$(verbosity) -s $(buildStrategy) -a $(architecture) pull
-        displayName: bb pull
-
-      - script: bb -v$(verbosity) -s $(buildStrategy) -a $(architecture) build --tmrbuild --noprompt
-        displayName: bb build
-
-      # - task: PublishPipelineArtifact@1
-      #   inputs:
-      #     path: $(BsiOut)\Winx64\packages
-      #     artifact: bis-schemas-packages
-      - publish: $(BsiOut)\Winx64\packages
+      - publish: $(pkgOut)
         artifact: bis-schemas-packages
         displayName: 'Publish Pipeline Artifact'
 
@@ -90,93 +77,40 @@ stages:
   dependsOn: Build
   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
   jobs:
-  - job: publish_ProGet
-    displayName: Publish npm packages to ProGet
+  - job: publish
+    displayName: Publish npm packages to Azure Artifacts
     steps:
-      - checkout: none
+      - checkout: self
+        clean: true
+      - task: NodeTool@0
+        displayName: 'Use Node 10.15.0'
+        inputs:
+          versionSpec: 10.15.0
+      - task: Npm@1
+        displayName: 'npm install'
+        inputs:
+          command: install
       - download: current
         artifact: bis-schemas-packages
-      - task: Npm@1
-        displayName: 'Publish Core'
-        inputs:
-          command: publish
-          workingDir: '$(Pipeline.Workspace)/bis-schemas-packages/Core'
-          verbose: false
-          publishEndpoint: 'ProGet npm.bentley.com publish token'
-      - task: Npm@1
-        displayName: 'Publish Standard'
-        inputs:
-          command: publish
-          workingDir: '$(Pipeline.Workspace)/bis-schemas-packages/Standard'
-          verbose: false
-          publishEndpoint: 'ProGet npm.bentley.com publish token'
-      - task: Npm@1
-        displayName: 'Publish Grids'
-        inputs:
-          command: publish
-          workingDir: '$(Pipeline.Workspace)/bis-schemas-packages/Grids'
-          verbose: false
-          publishEndpoint: 'ProGet npm.bentley.com publish token'
-      - task: Npm@1
-        displayName: 'Publish Structural'
-        inputs:
-          command: publish
-          workingDir: '$(Pipeline.Workspace)/bis-schemas-packages/Structural'
-          verbose: false
-          publishEndpoint: 'ProGet npm.bentley.com publish token'
-      - task: Npm@1
-        displayName: 'Publish RealityModeling'
-        inputs:
-          command: publish
-          workingDir: '$(Pipeline.Workspace)/bis-schemas-packages/RealityModeling'
-          verbose: false
-          publishEndpoint: 'ProGet npm.bentley.com publish token'
-      - task: Npm@1
-        displayName: 'Publish RoadRailAlignment'
-        inputs:
-          command: publish
-          workingDir: '$(Pipeline.Workspace)/bis-schemas-packages/RoadRailAlignment'
-          verbose: false
-          publishEndpoint: 'ProGet npm.bentley.com publish token'
-      - task: Npm@1
-        displayName: 'Publish RoadRailPhysical'
-        inputs:
-          command: publish
-          workingDir: '$(Pipeline.Workspace)/bis-schemas-packages/RoadRailPhysical'
-          verbose: false
-          publishEndpoint: 'ProGet npm.bentley.com publish token'
-      - task: Npm@1
-        displayName: 'Publish ClassificationSystems'
-        inputs:
-          command: publish
-          workingDir: '$(Pipeline.Workspace)/bis-schemas-packages/ClassificationSystems'
-          verbose: false
-          publishEndpoint: 'ProGet npm.bentley.com publish token'
-      - task: Npm@1
-        displayName: 'Publish SpatialComposition'
-        inputs:
-          command: publish
-          workingDir: '$(Pipeline.Workspace)/bis-schemas-packages/SpatialComposition'
-          verbose: false
-          publishEndpoint: 'ProGet npm.bentley.com publish token'
-      - task: Npm@1
-        displayName: 'Publish BuildingSpatial'
-        inputs:
-          command: publish
-          workingDir: '$(Pipeline.Workspace)/bis-schemas-packages/BuildingSpatial'
-          verbose: false
-          publishEndpoint: 'ProGet npm.bentley.com publish token'
-      - task: Npm@1
-        displayName: 'Publish ECObjects'
-        inputs:
-          command: publish
-          workingDir: '$(Pipeline.Workspace)/bis-schemas-packages/ECObjects'
-          verbose: false
-          publishEndpoint: 'ProGet npm.bentley.com publish token'
-      - task: Npm@1
-        displayName: 'Publish Earthwork'
-        inputs:
-          command: publish
-          workingDir: '$(Pipeline.Workspace)/bis-schemas-packages/Earthwork'
-          verbose: false
-          publishEndpoint: 'ProGet npm.bentley.com publish token'
+      #Your build pipeline references a secret variable named ‘artifactsRegistryToken’. Create or edit the build pipeline for this YAML file, define the variable on the Variables tab, and then select the option to make it secret. See https://go.microsoft.com/fwlink/?linkid=865972
+      - powershell: |
+          $npmrcDir = "$(Build.Repository.LocalPath)"
+          
+          if(!(Test-Path -Path $npmrcDir)){
+              mkdir $npmrcDir
+          }
+          
+          $npmrcFile = $npmrcDir + "/.npmrc"
+          
+          Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "@bentley:registry=/"
+          Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "always-auth=true" -Append
+          Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "///bentleycs/_packaging/Packages/npm/registry/:username=Packages" -Append
+          Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "///bentleycs/_packaging/Packages/npm/registry/:_password=$(artifactsRegistryToken)" -Append
+          Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "///bentleycs/_packaging/Packages/npm/registry/:email=npm requires email to be set but doesn't use the value" -Append
+          Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "///bentleycs/_packaging/Packages/npm/:username=Packages" -Append
+          Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "///bentleycs/_packaging/Packages/npm/:_password=$(artifactsRegistryToken)" -Append
+          Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "///bentleycs/_packaging/Packages/npm/:email=npm requires email to be set but doesn't use the value" -Append
+
+        displayName: 'Seed npmrc'
+      - script: node ./tools/packages/publishPackages.js --packages $(Pipeline.Workspace)/bis-schemas-packages --isRealRun
+        displayName: Publish packages
