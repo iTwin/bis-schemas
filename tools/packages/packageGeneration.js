@@ -25,13 +25,17 @@ function parseVersionString(versionString, time) {
   return undefined;
 }
 
+function versionToNumber(version) {
+  return(version.read * 1000000) + (version.write * 10000) + (version.patch * 100) + +version.beta;
+}
+
 function parseNpmOutputAndSort(npmOutput) {
   let publishedVersions = [];
   for (const [v,time] of Object.entries(npmOutput)) {
     const pv = parseVersionString(v, time);
     if (pv) publishedVersions.push(pv);
     }
-  return publishedVersions.sort((a, b) => (b.read<<3 | b.write<<2 | b.patch<<1 | b.beta ) - (a.read<<3 | a.write<<2 | a.patch<<1 | a.beta));
+  return publishedVersions.sort((a, b) => (versionToNumber(b) - versionToNumber(a)));
 }
 
 function getPublishedSchemas (packageName) {
