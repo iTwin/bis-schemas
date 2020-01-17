@@ -102,6 +102,31 @@ function getNextBetaVersion(schemaInfo, publishedVersions, alwaysGen) {
   return versionInfo;
 }
 
+function shouldPublish(schemaInfo, versionInfo) {
+  if(schemaInfo.released) {
+    // verify sha1 actually matches what is in the inventory
+    if (schemaInfo.sha1 === undefined || schemaInfo.sha1 === null || schemaInfo.sha1 === "" || schemaInfo.sha1.length != 40) {
+      console.log ("Sha1 not valid.");
+      return false;
+    }
+    if (!/yes/i.test(schemaInfo.approved)) {
+      console.log("Schema not marked as approved");
+      return false;
+    }
+    if (versionInfo.isBeta) {
+      console.log("version info says schema is beta but schema info says it should be released as non-beta");
+      return false;
+    }
+  return true;
+  }
+  
+  if (!versionInfo.isBeta) {
+    console.log("version info says schema is not beta but schema info says it should released as beta");
+    return false;
+  }
+  return true;
+}
+
 async function createPackages(inventoryPath, skipListPath, outDir, packageTemplatePath, skipBetaPackages, alwaysGen) {
   if (skipBetaPackages) console.log("Skipping beta packages because the '--skipBetaPackages' flag is set");
 
@@ -138,12 +163,15 @@ async function createPackages(inventoryPath, skipListPath, outDir, packageTempla
       }
     
       if (versionInfo.needToPublish) {
-          versionInfo.packageName = packageName;
-          versionInfo.packageVersion = formatPackageVersion(versionInfo);
-          buildPackage(outDir, packageJsonTemplate, versionInfo, schemaInfo);
-      }
+        if(false === shouldPublish(schemaInfo, versionInfo)) {
+          console.log(`Skipping package generation for ${schemaInfo.name}.${schemaInfo.version} because it is not valid.`);
+          continue;
+        }
+        versionInfo.packageName = packageName;
+        versionInfo.packageVersion = formatPackageVersion(versionInfo);
+        buildPackage(outDir, packageJsonTemplate, versionInfo, schemaInfo);      }
     }
   }
 }
 
-module.exports = {parseNpmOutputAndSort, formatPackageVersion, createPackages};
+module.exports = {parseNpmOutputAndSort, formatPackageVersion, createPackages, shouldPublish};
