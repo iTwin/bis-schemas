@@ -27,5 +27,40 @@ describe('Package Generation', function() {
       chai.expect(pkgGen.formatPackageVersion(publishedVersions[0])).to.equal("1.0.1-beta.1");
     });
   });
+  describe('Schema inventory attributes are checked', function() {
+    it('sha1 must be set to publish released schema', function() {
+      const schemaInfo = {
+        released: true,
+        approved: 'yes',
+      };
+      const versionInfo = {
+        isBeta: false
+      }
+      chai.expect(pkgGen.shouldPublish(schemaInfo, versionInfo)).to.be.false;
+      schemaInfo.sha1 = null;
+      chai.expect(pkgGen.shouldPublish(schemaInfo, versionInfo)).to.be.false;
+      schemaInfo.sha1 = "42";
+      chai.expect(pkgGen.shouldPublish(schemaInfo, versionInfo)).to.be.false;
+      schemaInfo.sha1 = "f61b2ba6b58723aafac9d066a37b40e228ff4f1d";
+      chai.expect(pkgGen.shouldPublish(schemaInfo, versionInfo)).to.be.true;
+    });
+    it('isBeta and released must be set correctly', function() {
+      const schemaInfo = {
+        sha1: "f61b2ba6b58723aafac9d066a37b40e228ff4f1d",
+        released: true,
+        approved: 'yes',
+      };
+      const versionInfo = {
+        isBeta: false
+      }
+      chai.expect(pkgGen.shouldPublish(schemaInfo, versionInfo)).to.be.true;
+      versionInfo.isBeta = true;
+      chai.expect(pkgGen.shouldPublish(schemaInfo, versionInfo)).to.be.false;
+      schemaInfo.released = false;
+      chai.expect(pkgGen.shouldPublish(schemaInfo, versionInfo)).to.be.true;
+      versionInfo.isBeta = false;
+      chai.expect(pkgGen.shouldPublish(schemaInfo, versionInfo)).to.be.false;
+    });
+  });
 
 });
