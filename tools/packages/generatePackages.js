@@ -6,7 +6,8 @@
 // This tool creates an npm package for each schema.  Released released schemas should be 
 // published with the latest tag and beta schemas are released with the next tag.  
 // Use the option --skipBetaPackages to generate only released packages.
-// Use the option --alwaysGen to generate packages even if they are already published. NOTE: Does not create beta packages for already released schemas
+// Use the option --alwaysGen to generate packages even if they are already published. 
+//    NOTE: Does not create beta packages for already released schemas or generate packages that do not meet publish criteria
 // Usage:
 // node generatePackages.js --template <pathToPackageJsonTemplate> --outDir <pathToDirectoryToBuildPackages> --inventory <pathToSchemaInventory> --skipList <pathToSchemaSkipList> [--skipBetaPackages] [--alwaysGen]
 // Example:
