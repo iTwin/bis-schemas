@@ -255,3 +255,14 @@ See [ViewDefinition.DisplayStyle ECNavigationProperty](#ViewDefinition) ECNaviga
 ### CustomHandledProperty
 
 See [CustomHandledPropertyStatementType](#CustomHandledPropertyStatementType).
+
+### ChannelParentAspect
+
+*iModel Bridges* use the `ChannelParentAspect` to specify the portions of the overall iModel hierarchy owned by each *bridge*.
+A *channel* begins at the identified Element and recursively descends down through `ElementOwnsChildElements` and `ModelModelsElement` relationships to include all of the child elements and sub-models.
+
+### DefinitionSet
+
+### DefinitionGroup
+
+### DefinitionContainer
