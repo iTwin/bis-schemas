@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ECSchema schemaName="BisCore" alias="bis" version="01.00.09" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.1" displayLabel="BIS Core" description="The BIS core schema contains classes that all other domain schemas extend.">
+<ECSchema schemaName="BisCore" alias="bis" version="01.00.10" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.1" displayLabel="BIS Core" description="The BIS core schema contains classes that all other domain schemas extend.">
 
     <ECSchemaReference name="CoreCustomAttributes" version="01.00.01" alias="CoreCA"/>
     <ECSchemaReference name="ECDbMap" version="02.00.00" alias="ecdbmap"/>
@@ -572,6 +572,27 @@
             </ECCustomAttributes>
         </ECProperty>
     </ECEntityClass>
+
+    <ECEntityClass typeName="DefinitionSet" modifier="Abstract" displayLabel="Definition Set" description="This abstract class unifies DefinitionGroup and DefinitionContainer for relationship endpoint purposes.">
+        <!-- NOTE: Only DefinitionGroup and DefinitionContainer should subclass DefinitionSet -->
+        <BaseClass>DefinitionElement</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="DefinitionContainer" displayLabel="Definition Container" description="A set of DefinitionElements that are exclusively owned by the DefinitionContainer and contained within its sub-model.">
+        <BaseClass>DefinitionSet</BaseClass>
+        <BaseClass>ISubModeledElement</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="DefinitionGroup" displayLabel="Definition Group" description="Identifies a non-exclusive set of DefinitionElements using the DefinitionGroupGroupsDefinitions relationship.">
+        <BaseClass>DefinitionSet</BaseClass>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="DefinitionGroupGroupsDefinitions" strength="referencing" modifier="None" description="A relationship used to identify the DefinitionsElements that are members of a DefinitionGroup.">
+        <BaseClass>ElementGroupsMembers</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="groups" polymorphic="true">
+            <Class class="DefinitionGroup"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is grouped by" polymorphic="true">
+            <Class class="DefinitionElement"/>
+        </Target>
+    </ECRelationshipClass>
 
     <ECEntityClass typeName="TypeDefinitionElement" modifier="Abstract" displayLabel="Type Definition" description="Defines a shared set of properties (the 'type') that can be associated with a bis:Element.">
         <BaseClass>DefinitionElement</BaseClass>
@@ -1445,6 +1466,20 @@
         </Source>
         <Target multiplicity="(0..*)" roleLabel="is scoped by" polymorphic="true">
             <Class class="ExternalSourceAspect"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="ChannelParentAspect" displayLabel="Channel Parent Aspect" modifier="Sealed" description="A bis:ElementUniqueAspect that identifies a bis:Element as the parent of a *channel* which is a subset of the overall iModel hierarchy that is independently maintained.">
+        <BaseClass>ElementUniqueAspect</BaseClass>
+		<ECProperty propertyName="Owner" typeName="string" description="The owner of the channel"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsChannelParentAspect" strength="embedding" modifier="None">
+        <BaseClass>ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="Element"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="ChannelParentAspect"/>
         </Target>
     </ECRelationshipClass>
 
