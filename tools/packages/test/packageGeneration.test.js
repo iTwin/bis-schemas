@@ -26,6 +26,54 @@ describe('Package Generation', function() {
       chai.expect(publishedVersions.length).to.equal(3);
       chai.expect(pkgGen.formatPackageVersion(publishedVersions[0])).to.equal("1.0.1-beta.1");
     });
+    it('patch version does not interfer with beta version', function () {
+      const npmOutput = {
+        "created": "2019-11-13T18:43:34.8337986Z",
+        "modified": "2020-01-09T14:55:39.5625934Z",
+        "1.0.0": "2019-11-13T18:43:34.8337986Z",
+        "2.0.0": "2019-11-13T18:43:37.119937Z",
+        "2.0.1-beta.1": "2019-11-13T19:03:48.6000968Z",
+        "2.0.1-beta.2": "2020-01-09T14:55:39.5625934Z"
+      };
+      const publishedVersions = pkgGen.parseNpmOutputAndSort(npmOutput);
+      chai.expect(publishedVersions.length).to.equal(4);
+      chai.expect(pkgGen.formatPackageVersion(publishedVersions[0])).to.equal("2.0.1-beta.2");
+    });
+  });
+  describe('Schema inventory attributes are checked', function() {
+    it('sha1 must be set to publish released schema', function() {
+      const schemaInfo = {
+        released: true,
+        approved: 'yes',
+      };
+      const versionInfo = {
+        isBeta: false
+      }
+      chai.expect(pkgGen.shouldPublish(schemaInfo, versionInfo)).to.be.false;
+      schemaInfo.sha1 = null;
+      chai.expect(pkgGen.shouldPublish(schemaInfo, versionInfo)).to.be.false;
+      schemaInfo.sha1 = "42";
+      chai.expect(pkgGen.shouldPublish(schemaInfo, versionInfo)).to.be.false;
+      schemaInfo.sha1 = "f61b2ba6b58723aafac9d066a37b40e228ff4f1d";
+      chai.expect(pkgGen.shouldPublish(schemaInfo, versionInfo)).to.be.true;
+    });
+    it('isBeta and released must be set correctly', function() {
+      const schemaInfo = {
+        sha1: "f61b2ba6b58723aafac9d066a37b40e228ff4f1d",
+        released: true,
+        approved: 'yes',
+      };
+      const versionInfo = {
+        isBeta: false
+      }
+      chai.expect(pkgGen.shouldPublish(schemaInfo, versionInfo)).to.be.true;
+      versionInfo.isBeta = true;
+      chai.expect(pkgGen.shouldPublish(schemaInfo, versionInfo)).to.be.false;
+      schemaInfo.released = false;
+      chai.expect(pkgGen.shouldPublish(schemaInfo, versionInfo)).to.be.true;
+      versionInfo.isBeta = false;
+      chai.expect(pkgGen.shouldPublish(schemaInfo, versionInfo)).to.be.false;
+    });
   });
 
 });
