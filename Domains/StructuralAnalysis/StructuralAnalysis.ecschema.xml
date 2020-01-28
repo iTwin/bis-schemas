@@ -6,7 +6,7 @@
 
     <ECEnumeration typeName="CardinalPoint" backingTypeName="int" isStrict="true" description="Default standard cardinal points.">
         <ECEnumerator value="0" name="BottomLeft" displayLabel="Bottom Left" description="Most bottom left Profile's bounding box point." />
-        <ECEnumerator value="1" name="BottomCenter" displayLabel="BottomCenter" description="Center of Profile's BoundingBox." />
+        <ECEnumerator value="1" name="BottomCenter" displayLabel="BottomCenter" description="Most bottom center profile BoundingBox point." />
         <ECEnumerator value="2" name="BottomRight" displayLabel="BottomRight" description="Most bottom right Profile BoundingBox point." />
         <ECEnumerator value="3" name="MinDepthLeft" displayLabel="MinDepthLeft" description="Most left point at the horizontal middle height line of Profile BoundingBox." />
         <ECEnumerator value="4" name="MinDepthCenter" displayLabel="MinDepthCenter" description="Profile's BoundingBox center point." />
@@ -137,6 +137,16 @@
         </Source>
         <Target multiplicity="(1..1)" roleLabel="has" polymorphic="false">
             <Class class="Face" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="FaceRefersToInnerVertices" strength="referencing" modifier="Sealed">
+        <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="false">
+            <Class class="Face" />
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is referenced by" polymorphic="false">
+            <Class class="Vertex" />
         </Target>
     </ECRelationshipClass>
 
@@ -668,7 +678,7 @@
     <ECRelationshipClass typeName="SurfaceMemberRegionOwnsLocationSheet" strength="embedding" modifier="Sealed" description="A relationship that indicates that a SurfaceMemberRegion owns a Sheet.">
         <BaseClass>ISheetOwnerOwnsSheet</BaseClass>
         <Source multiplicity="(0..1)" roleLabel="owns" polymorphic="false">
-            <Class class="SurfaceMember"/>
+            <Class class="SurfaceMemberRegion"/>
         </Source>
         <Target multiplicity="(1..1)" roleLabel="is owned by" polymorphic="false">
             <Class class="Sheet"/>
@@ -1237,6 +1247,9 @@
         <ECProperty propertyName="FX" typeName="double" description="Force per unit area in X axis." />
         <ECProperty propertyName="FY" typeName="double" description="Force per unit area in Y axis." />
         <ECProperty propertyName="FZ" typeName="double" description="Force per unit area in Z axis." />
+        <ECProperty propertyName="MX" typeName="double" description="Moment per unit area about X axis." />
+        <ECProperty propertyName="MY" typeName="double" description="Moment per unit area about Y axis." />
+        <ECProperty propertyName="MZ" typeName="double" description="Moment per unit area about Z axis." />
     </ECStructClass>
 
     <ECEntityClass typeName="LoadValueAspect" modifier="Abstract" displayLabel="Load value data" description="A value that must be applied to a Load.">
@@ -1298,7 +1311,7 @@
 
     <ECEntityClass typeName="VaryingForceCurveLoadValueAspect" modifier="Sealed" displayLabel="Varying Curve Force value data" description="A VaryingCurveLoadValueAspect for Force.">
         <BaseClass>VaryingCurveLoadValueAspect</BaseClass>
-        <ECStructArrayProperty propertyName="Forces" typeName="LinearForce" displayLabel="Curve forces" description="Force values." />
+        <ECStructArrayProperty propertyName="Forces" typeName="PointForce" displayLabel="Curve forces" description="Force values." />
     </ECEntityClass>
 
     <!-- Surfaces -->
@@ -1333,7 +1346,7 @@
 
     <ECEntityClass typeName="VaryingForceSurfaceLoadValueAspect" modifier="Sealed" displayLabel="Curve Force value data" description="A VaryingSurfaceLoadValueAspect for Force.">
         <BaseClass>VaryingSurfaceLoadValueAspect</BaseClass>
-        <ECStructArrayProperty propertyName="Forces" typeName="AreaForce" displayLabel="Surface forces" description="Force values." />
+        <ECStructArrayProperty propertyName="Forces" typeName="PointForce" displayLabel="Surface forces" description="Force values." />
     </ECEntityClass>
 
     <!-- Supports / Support behaviors -->
