@@ -263,6 +263,27 @@ A *channel* begins at the identified Element and recursively descends down throu
 
 ### DefinitionSet
 
+`DefinitionSet` represents a set of `DefinitionElement`s. The set may be exclusive (`DefinitionContainer` owns its `DefinitionElement`s) or may be non-exclusive (`DefinitionGroup` does not own its `DefinitionElement`s). `DefinitionSet` should *only* be *directly* subclassed by `DefinitionGroup` and `DefinitionContainer`. `DefinitionGroup` and `DefinitionContainer` may be further subclassed.
+
+References to `DefinitionSet`s will generally treat the `DefinitionSet`s recursively. If *`DefinitionSet` A* contains *`DefinitionSet` B* and *`DefinitionSet` C*, the members of *`DefinitionSet` B* and *`DefinitionSet` C* will be considered to be first class members of *`DefinitionSet` A* (effectively they will be considered as peers of the `DefinitionElement`s that are directly contained in *`DefinitionSet` A*). This recursive interpretation extends through the full depth of nested `DefinitionSet`s.
+
 ### DefinitionGroup
 
+`DefinitionGroup` is intended for defining non-exclusive sets of `DefinitionElement`s (a `DefinitionElement` may be in multiple `DefinitionGroup`s). `DefinitionGroup` holds its `DefinitionElement`s through the `DefinitionGroupGroupsDefinitions` relationship. The referenced `DefinitionElement`s may be contained in the same `DefinitionModel` as the `DefinitionGroup` or may be contained in other `DefinitionModel`s.
+
+See `DefinitionSet` documentation for recursive interpretations of `DefinitionSet`s  containing `DefinitionSet`s.
+
+Care must be taken to avoid circular references.  Note that even a single `DefinitionGroup` can create circular references in two cases:
+
+- The `DefinitionGroup` directly contains itself.
+- The `DefinitionGroup` contains a `DefinitionContainer` that directly or indirectly contains the `DefinitionGroup`.
+
 ### DefinitionContainer
+
+`DefinitionContainer` represents a `DefinitionSet` that exclusively owns its `DefinitionElement`s. The exclusivity is only effective relative to other `DefinitionContainer`s (or similar `DefinitionElement`s that have sub-models); the `DefinitionElement`s that are contained in a `DefinitionContainer` may also be in one or more `DefinitionGroup`s.
+
+See `DefinitionSet` documentation for recursive interpretations of `DefinitionSet`s containing `DefinitionSet`s.
+
+### DefinitionGroupGroupsDefinitions
+
+A `DefinitionGroup` may not be both the source and the target of the same relationship instance.
