@@ -258,8 +258,8 @@ See [CustomHandledPropertyStatementType](#CustomHandledPropertyStatementType).
 
 ### ChannelRootAspect
 
-An *iModel Bridge* uses the `ChannelRootAspect` to specify the *channel* or portion of the overall iModel hierarchy owned by each *bridge*.
-A *channel* begins at the identified Element and recursively descends down through `ElementOwnsChildElements` and `ModelModelsElement` relationships to include all of the child elements and sub-models.
+An *iModel Bridge* uses the `ChannelRootAspect` to indicate ownership of a *channel*.
+A *channel* is a portion of the iModel's hierarchy that begins at the specified Element and recursively descends down through `ElementOwnsChildElements` and `ModelModelsElement` relationships to include all of the child elements and sub-models.
 
 ### DefinitionSet
 
