@@ -256,9 +256,9 @@ See [ViewDefinition.DisplayStyle ECNavigationProperty](#ViewDefinition) ECNaviga
 
 See [CustomHandledPropertyStatementType](#CustomHandledPropertyStatementType).
 
-### ChannelParentAspect
+### ChannelRootAspect
 
-*iModel Bridges* use the `ChannelParentAspect` to specify the portions of the overall iModel hierarchy owned by each *bridge*.
+An *iModel Bridge* uses the `ChannelRootAspect` to specify the *channel* or portion of the overall iModel hierarchy owned by each *bridge*.
 A *channel* begins at the identified Element and recursively descends down through `ElementOwnsChildElements` and `ModelModelsElement` relationships to include all of the child elements and sub-models.
 
 ### DefinitionSet
