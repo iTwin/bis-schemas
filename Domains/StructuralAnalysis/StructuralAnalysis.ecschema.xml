@@ -4,36 +4,6 @@
     <ECSchemaReference name="Profiles" version="01.00.00" alias="prf" />
     <ECSchemaReference name="Analytical" version="01.00.00" alias="anlyt" />
 
-    <ECEnumeration typeName="CardinalPoint" backingTypeName="int" isStrict="true" description="Default standard cardinal points.">
-        <ECEnumerator value="0" name="BottomLeft" displayLabel="Bottom Left" description="Most bottom left Profile's bounding box point." />
-        <ECEnumerator value="1" name="BottomCenter" displayLabel="BottomCenter" description="Most bottom center profile BoundingBox point." />
-        <ECEnumerator value="2" name="BottomRight" displayLabel="BottomRight" description="Most bottom right Profile BoundingBox point." />
-        <ECEnumerator value="3" name="MinDepthLeft" displayLabel="MinDepthLeft" description="Most left point at the horizontal middle height line of Profile BoundingBox." />
-        <ECEnumerator value="4" name="MinDepthCenter" displayLabel="MinDepthCenter" description="Profile's BoundingBox center point." />
-        <ECEnumerator value="5" name="MinDepthRight" displayLabel="MinDepthRight" description="Most right point at the horizontal middle height line of Profile BoundingBox." />
-        <ECEnumerator value="6" name="TopLeft" displayLabel="TopLeft" description="Most top left profile BoundingBox point." />
-        <ECEnumerator value="7" name="TopCenter" displayLabel="TopCenter" description="Most top center profile BoundingBox point." />
-        <ECEnumerator value="8" name="TopRight" displayLabel="TopRight" description="Most top right profile BoundingBox point." />
-        <ECEnumerator value="9" name="GeometricCentroid" displayLabel="GeometricCentroid" description="Point at which a cutout of the shape could be perfectly balanced." />
-        <ECEnumerator value="10" name="BottomInLineWithGeometricCentroid" displayLabel="BottomInLineWithGeometricCentroid"
-            description="Point on the most bottom horizontal line, most close to GeometricCentroid." />
-        <ECEnumerator value="11" name="LeftInLineWithGeometricCentroid" displayLabel="LeftInLineWithGeometricCentroid"
-            description="Point on the most left vertical line, most close to GeometricCentroid." />
-        <ECEnumerator value="12" name="RightInLineWithGeometricCentroid" displayLabel="RightInLineWithGeometricCentroid"
-            description="Point on the most right vertical line, most close to GeometricCentroid." />
-        <ECEnumerator value="13" name="TopInLineWithGeometricCentroid" displayLabel="TopInLineWithGeometricCentroid"
-            description="Point on the most top horizontal line, most close to GeometricCentroid." />
-        <ECEnumerator value="14" name="ShearCentre" displayLabel="ShearCentre" description="Point at which applied external force does not twist Profile." />
-        <ECEnumerator value="15" name="BottomInLineWithShearCentroid" displayLabel="BottomInLineWithShearCentroid"
-            description="Point on the most bottom horizontal line, most close to ShearCentre." />
-        <ECEnumerator value="16" name="LeftInLineWithShearCentroid" displayLabel="LeftInLineWithShearCentroid"
-            description="Point on the most left vertical line, most close to ShearCentre." />
-        <ECEnumerator value="17" name="RightInLineWithShearCentroid" displayLabel="RightInLineWithShearCentroid"
-            description="Point on the most right vertical line, most close to ShearCentre." />
-        <ECEnumerator value="18" name="TopInLineWithShearCentroid" displayLabel="TopInLineWithShearCentroid"
-            description="Point on the most top horizontal line, most close to ShearCentre." />
-    </ECEnumeration>
-
     <ECEnumeration typeName="CurveMemberClassificationType" backingTypeName="int" isStrict="true" description="Used for setting classification for CurveMember.">
         <ECEnumerator value="0" name="Unset" displayLabel="Unset" description="Classification undefined." />
         <ECEnumerator value="1" name="Beam" displayLabel="Beam" description="Structural element that primarily resists loads applied laterally to the beam's length." />
@@ -60,7 +30,7 @@
         <ECEnumerator value="6" name="Wall" displayLabel="Wall" />
     </ECEnumeration>
 
-    <ECEnumeration typeName="SurfaceAlignmentType" backingTypeName="int" isStrict="true" description="Used for setting Surface location.">
+    <ECEnumeration typeName="PlacementSurface" backingTypeName="int" isStrict="true" description="Used for setting Surface location.">
         <ECEnumerator value="0" name="Top" displayLabel="Top" description="Topology defines top boundary of a Surface." />
         <ECEnumerator value="1" name="Middle" displayLabel="Middle" description="Topology defines boundary at the mid depth of a Surface." />
         <ECEnumerator value="2" name="Bottom" displayLabel="Bottom" description="Topology defines boundary at the bottom of a Surface." />
@@ -614,13 +584,8 @@
                 <AppliesToEntityClass>StructuralAnalysisElement</AppliesToEntityClass>
             </IsMixin>
         </ECCustomAttributes>
-        <ECProperty propertyName="PlacementPoint" typeName="SurfaceAlignmentType" displayLabel="Placement point"
-            description="Sheet defines area location for ISurface, the height of ISurface is defined by thickness (provided by related SurfaceType) which extrudes location area by that thickness.
-                PlacementPoint allows to define how location area should be interpreted for extrusion - ether as start, end or center.
-                These are the most common used cases. More flexibility is achieved by using Offset property." />
-        <ECProperty propertyName="Offset" typeName="double" displayLabel="Offset"
-            description="PlacementPoint provides only a few cases for how to interpret the location area (Sheet).
-                Offset provides more flexibility for less common cases, where it provides additional offset along the normal of ISurface. Both PlacementPoint and Offset properties can be used at the same time." />
+        <ECProperty propertyName="PlacementSurface" typeName="PlacementSurface" displayLabel="PlacementSurface" description="Sheet defines area location for ISurface, the height of ISurface is defined by thickness(provided by related SurfaceType) which extrudes location area by that thickness. PlacementSurface allows to define how location area should be interpreted for extrusion - ether as start, end or center. These are the most common used cases. More flexibility is achieved by using Offset property." />
+        <ECProperty propertyName="Offset" typeName="double" displayLabel="Offset" description="PlacementSurface provides only a few cases for how to interpret the location area (Sheet). Offset provides more flexibility for less common cases, where it provides additional offset along the normal of ISurface. Both PlacementSurface and Offset properties can be used at the same time." />
     </ECEntityClass>
 
     <ECRelationshipClass typeName="SurfaceRefersToSurfaceType" strength="referencing" modifier="Sealed">
@@ -924,7 +889,7 @@
         <BaseClass>RelativePointLocationAspect</BaseClass>
         <ECProperty propertyName="Location" typeName="double" displayLabel="Location" description="Fractional parameter (0.0 - 1.0) on a curve defining a point." />
         <ECProperty propertyName="Offset" typeName="Point2d" displayLabel="Offset" description="Offset in a plane defined by normal and binormal of location curve." />
-        <ECProperty propertyName="CardinalPoint" typeName="CardinalPoint" displayLabel="Cardinal point" description="Offset in a plane defined by normal and binormal of location curve." />
+        <ECProperty propertyName="PlacementPoint" typeName="prf:CardinalPoint" displayLabel="Placement point" description="Placement Point on a Host where load is located. Should only be used with host that have a non point profile (CurveMember). This property should be set to null for hosts that do not have a 'real world' profile - CurveSupport." />
         <ECNavigationProperty propertyName="ReferenceCurve" relationshipName="PointRelativeToCurveAspectRefersToIDefinedCurve" direction="Forward" displayLabel="Reference curve" />
     </ECEntityClass>
 
@@ -941,7 +906,7 @@
         <BaseClass>RelativePointLocationAspect</BaseClass>
         <ECProperty propertyName="Location" typeName="Point2d" displayLabel="Location" description="Location is defined in 2d coordinate system defined by host r and s axis."/>
         <ECProperty propertyName="Offset" typeName="double" displayLabel="Offset" />
-        <ECProperty propertyName="PlacementPoint" typeName="SurfaceAlignmentType" displayLabel="Surface Alignment" description="Surface Alignment."/>
+        <ECProperty propertyName="PlacementSurface" typeName="PlacementSurface" displayLabel="Surface Alignment" description="Defines a Alignment on Surface Host for this load. For 0-thickness hosts (SurfaceSupport) this should be set to null."/>
         <ECNavigationProperty propertyName="ReferenceSurface" relationshipName="PointRelativeToSurfaceAspectRefersToIDefinedSurface" direction="Forward" displayLabel="Reference surface" />
     </ECEntityClass>
 
@@ -963,9 +928,8 @@
         <ECProperty propertyName="Start" typeName="double" displayLabel="Start of range" description="Fractional parameter on a host curve ('0.0' - start of the curve, 1.0 - end)." />
         <ECProperty propertyName="End" typeName="double" displayLabel="End of range" description="Fractional parameter on a host curve. ('0.0' - start of the curve, 1.0 - end)" />
         <ECProperty propertyName="Offset" typeName="Point2d" displayLabel="Offset" description="Offset in a plane, defined by a host curve's normal and binormal." />
-        <ECProperty propertyName="CardinalPoint" typeName="CardinalPoint" displayLabel="Cardinal point" description="Cardinal point on a profile that is associated with the host curve." />
-        <ECNavigationProperty propertyName="ReferenceCurve" relationshipName="CurveRelativeToCurveAspectRefersToIDefineCurve" direction="Forward" displayLabel="Reference curve."
-            description="Reference/Host curve in which curve load is located." />
+        <ECProperty propertyName="PlacementPoint" typeName="prf:CardinalPoint" displayLabel="Placement point" description="Placement point on a profile that is associated with the host curve. PlacementPoint should be only used with host that have non point profile (CurveMember). This property should be set to null for hosts that do not have a 'real world' profile - CurveSupport" />
+        <ECNavigationProperty propertyName="ReferenceCurve" relationshipName="CurveRelativeToCurveAspectRefersToIDefineCurve" direction="Forward" displayLabel="Reference curve" description="Reference/Host curve in which curve load is located." />
     </ECEntityClass>
 
     <ECRelationshipClass typeName="CurveRelativeToCurveAspectRefersToIDefineCurve" strength="referencing" strengthDirection="Forward" modifier="Sealed">
@@ -980,12 +944,9 @@
     <ECEntityClass typeName="CurveRelativeToSurfaceAspect" modifier="Sealed" displayLabel="Curve relative to surface location data" description="Curve relative to surface.">
         <BaseClass>RelativeCurveLocationAspect</BaseClass>
         <ECProperty propertyName="Location" typeName="Bentley.Geometry.Common.IGeometry" displayLabel="Location" description="Curve which describes load location on a host surface."/>
-        <ECProperty propertyName="Offset" typeName="double" displayLabel="Offset"
-            description="Distance from the surface, along the normal. Can be both positive and negative." />
-        <ECProperty propertyName="PlacementPoint" typeName="SurfaceAlignmentType" displayLabel="Surface Alignment Type"
-            description="Surface alignment at which load is applied."/>
-        <ECNavigationProperty propertyName="ReferenceSurface" relationshipName="CurveRelativeToSurfaceAspectRefersToIDefinedSurface" direction="Forward" displayLabel="Reference surface"
-            description="Host surface in which Curve Load is located." />
+        <ECProperty propertyName="Offset" typeName="double" displayLabel="Offset" description="Distance from the surface, along the normal. Can be both positive and negative." />
+        <ECProperty propertyName="PlacementSurface" typeName="PlacementSurface" displayLabel="Placement Surface" description="Placement Surface at which load is applied. For 0-thickness hosts (SurfaceSupport) this should be set to null."/>
+        <ECNavigationProperty propertyName="ReferenceSurface" relationshipName="CurveRelativeToSurfaceAspectRefersToIDefinedSurface" direction="Forward" displayLabel="Reference surface" description="Host surface in which Curve Load is located." />
     </ECEntityClass>
 
     <ECRelationshipClass typeName="CurveRelativeToSurfaceAspectRefersToIDefinedSurface" strength="referencing" strengthDirection="Forward" modifier="Sealed">
@@ -1005,7 +966,7 @@
         <BaseClass>RelativeSurfaceLocationAspect</BaseClass>
         <ECProperty propertyName="Location" typeName="Bentley.Geometry.Common.IGeometry" displayLabel="Location" />
         <ECProperty propertyName="Offset" typeName="double" displayLabel="Offset" />
-        <ECProperty propertyName="PlacementPoint" typeName="SurfaceAlignmentType" displayLabel="Placement Point" />
+        <ECProperty propertyName="PlacementSurface" typeName="PlacementSurface" displayLabel="Placement Surface" description="Placement Surface at which load is applied. For 0-thickness hosts (SurfaceSupport) this should be set to null." />
         <ECNavigationProperty propertyName="ReferenceSurface" relationshipName="SurfaceRelativeToSurfaceAspectRefersToIDefinedSurface" direction="Forward" displayLabel="Reference surface" />
     </ECEntityClass>
 
