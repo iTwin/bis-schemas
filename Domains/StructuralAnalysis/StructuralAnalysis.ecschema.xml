@@ -924,7 +924,7 @@
         <BaseClass>RelativePointLocationAspect</BaseClass>
         <ECProperty propertyName="Location" typeName="double" displayLabel="Location" description="Fractional parameter (0.0 - 1.0) on a curve defining a point." />
         <ECProperty propertyName="Offset" typeName="Point2d" displayLabel="Offset" description="Offset in a plane defined by normal and binormal of location curve." />
-        <ECProperty propertyName="CardinalPoint" typeName="CardinalPoint" displayLabel="Cardinal point" description="Offset in a plane defined by normal and binormal of location curve." />
+        <ECProperty propertyName="CardinalPoint" typeName="CardinalPoint" displayLabel="Cardinal point" description="Offset in a plane defined by normal and binormal of location curve. CardinalPoint should be only used with host that have non point profile (CurveMember). This property should be set to null for hosts that do not have a 'real world' profile - CurveSupport." />
         <ECNavigationProperty propertyName="ReferenceCurve" relationshipName="PointRelativeToCurveAspectRefersToIDefinedCurve" direction="Forward" displayLabel="Reference curve" />
     </ECEntityClass>
 
@@ -941,7 +941,7 @@
         <BaseClass>RelativePointLocationAspect</BaseClass>
         <ECProperty propertyName="Location" typeName="Point2d" displayLabel="Location" description="Location is defined in 2d coordinate system defined by host r and s axis."/>
         <ECProperty propertyName="Offset" typeName="double" displayLabel="Offset" />
-        <ECProperty propertyName="PlacementPoint" typeName="SurfaceAlignmentType" displayLabel="Surface Alignment" description="Surface Alignment."/>
+        <ECProperty propertyName="PlacementPoint" typeName="SurfaceAlignmentType" displayLabel="Surface Alignment" description="Defines a Alignment on Surface Host for this load. For 0-thickness hosts (SurfaceSupport) this should be set to null."/>
         <ECNavigationProperty propertyName="ReferenceSurface" relationshipName="PointRelativeToSurfaceAspectRefersToIDefinedSurface" direction="Forward" displayLabel="Reference surface" />
     </ECEntityClass>
 
@@ -963,9 +963,8 @@
         <ECProperty propertyName="Start" typeName="double" displayLabel="Start of range" description="Fractional parameter on a host curve ('0.0' - start of the curve, 1.0 - end)." />
         <ECProperty propertyName="End" typeName="double" displayLabel="End of range" description="Fractional parameter on a host curve. ('0.0' - start of the curve, 1.0 - end)" />
         <ECProperty propertyName="Offset" typeName="Point2d" displayLabel="Offset" description="Offset in a plane, defined by a host curve's normal and binormal." />
-        <ECProperty propertyName="CardinalPoint" typeName="CardinalPoint" displayLabel="Cardinal point" description="Cardinal point on a profile that is associated with the host curve." />
-        <ECNavigationProperty propertyName="ReferenceCurve" relationshipName="CurveRelativeToCurveAspectRefersToIDefineCurve" direction="Forward" displayLabel="Reference curve."
-            description="Reference/Host curve in which curve load is located." />
+        <ECProperty propertyName="CardinalPoint" typeName="CardinalPoint" displayLabel="Cardinal point" description="Cardinal point on a profile that is associated with the host curve. CardinalPoint should be only used with host that have non point profile (CurveMember). This property should be set to null for hosts that do not have a 'real world' profile - CurveSupport" />
+        <ECNavigationProperty propertyName="ReferenceCurve" relationshipName="CurveRelativeToCurveAspectRefersToIDefineCurve" direction="Forward" displayLabel="Reference curve" description="Reference/Host curve in which curve load is located." />
     </ECEntityClass>
 
     <ECRelationshipClass typeName="CurveRelativeToCurveAspectRefersToIDefineCurve" strength="referencing" strengthDirection="Forward" modifier="Sealed">
@@ -980,12 +979,9 @@
     <ECEntityClass typeName="CurveRelativeToSurfaceAspect" modifier="Sealed" displayLabel="Curve relative to surface location data" description="Curve relative to surface.">
         <BaseClass>RelativeCurveLocationAspect</BaseClass>
         <ECProperty propertyName="Location" typeName="Bentley.Geometry.Common.IGeometry" displayLabel="Location" description="Curve which describes load location on a host surface."/>
-        <ECProperty propertyName="Offset" typeName="double" displayLabel="Offset"
-            description="Distance from the surface, along the normal. Can be both positive and negative." />
-        <ECProperty propertyName="PlacementPoint" typeName="SurfaceAlignmentType" displayLabel="Surface Alignment Type"
-            description="Surface alignment at which load is applied."/>
-        <ECNavigationProperty propertyName="ReferenceSurface" relationshipName="CurveRelativeToSurfaceAspectRefersToIDefinedSurface" direction="Forward" displayLabel="Reference surface"
-            description="Host surface in which Curve Load is located." />
+        <ECProperty propertyName="Offset" typeName="double" displayLabel="Offset" description="Distance from the surface, along the normal. Can be both positive and negative." />
+        <ECProperty propertyName="PlacementPoint" typeName="SurfaceAlignmentType" displayLabel="Surface Alignment Type" description="Surface alignment at which load is applied. For 0-thickness hosts (SurfaceSupport) this should be set to null."/>
+        <ECNavigationProperty propertyName="ReferenceSurface" relationshipName="CurveRelativeToSurfaceAspectRefersToIDefinedSurface" direction="Forward" displayLabel="Reference surface" description="Host surface in which Curve Load is located." />
     </ECEntityClass>
 
     <ECRelationshipClass typeName="CurveRelativeToSurfaceAspectRefersToIDefinedSurface" strength="referencing" strengthDirection="Forward" modifier="Sealed">
@@ -1005,7 +1001,7 @@
         <BaseClass>RelativeSurfaceLocationAspect</BaseClass>
         <ECProperty propertyName="Location" typeName="Bentley.Geometry.Common.IGeometry" displayLabel="Location" />
         <ECProperty propertyName="Offset" typeName="double" displayLabel="Offset" />
-        <ECProperty propertyName="PlacementPoint" typeName="SurfaceAlignmentType" displayLabel="Placement Point" />
+        <ECProperty propertyName="PlacementPoint" typeName="SurfaceAlignmentType" displayLabel="Placement Point" description="Surface alignment at which load is applied. For 0-thickness hosts (SurfaceSupport) this should be set to null." />
         <ECNavigationProperty propertyName="ReferenceSurface" relationshipName="SurfaceRelativeToSurfaceAspectRefersToIDefinedSurface" direction="Forward" displayLabel="Reference surface" />
     </ECEntityClass>
 
