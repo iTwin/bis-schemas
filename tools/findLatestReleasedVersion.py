@@ -19,7 +19,6 @@ import glob
 def findLastestReleasedVersion(inputSchema, schemaDir):
   schemaFiles = [os.path.basename(filename) for filename in glob.glob(schemaDir + '/'+ inputSchema +'.*.ecschema.xml')]
   schemaVersions = [ filename.lower().split(inputSchema+".")[1].split(".ecschema.xml")[0] for filename in schemaFiles ]
-  schemaVersions.sort(reverse=True)
 
   if not schemaVersions:
     print "No schema found similar to the schema name provided in input argument."
