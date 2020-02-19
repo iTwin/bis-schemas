@@ -1,7 +1,7 @@
 #!Python
 #--------------------------------------------------------------------------------------
 #
-#     $Source: tools/SchemaBuildReporter.py $
+#  $Source: tools/SchemaBuildReporter.py $
 #
 #  $Copyright: (c) 2019 Bentley Systems, Incorporated. All rights reserved. $
 #
@@ -12,8 +12,8 @@ import sys
 import glob
 
 #-------------------------------------------------------------------------------------------
-# Function to find out the latest released version of a schema
-# bsimethod                 Naveed.Khan             02/2020
+#  Function to find out the latest released version of a schema
+#  bsimethod                 Naveed.Khan             02/2020
 #-------------------------------------------------------------------------------------------
 
 def findLastestReleasedVersion(inputSchema, schemaDir):
@@ -30,7 +30,7 @@ def findLastestReleasedVersion(inputSchema, schemaDir):
   print latest
 
 #-------------------------------------------------------------------------------------------
-# bsimethod                 Naveed.Khan             02/2020
+#  bsimethod                 Naveed.Khan             02/2020
 #-------------------------------------------------------------------------------------------
 def main():
   if (len (sys.argv) > 3):
