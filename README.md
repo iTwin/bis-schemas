@@ -152,6 +152,12 @@ The iModel Schema Validation tool imports each individual schema in the bis-sche
 
 See the iModel Schema Validation -- sample build definition for an example.
 
+ 
+
+
+
+If you need to consume WIP version of all schema's then set an environment variable WIP_VERSION (e.g set WIP_VERSION=1).
+
 ## Schema Packaging - *WIP*
 
 See [Schema Release Proposal](./docs/schema-release-process.md)
