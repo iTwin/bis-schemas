@@ -158,6 +158,8 @@ See the iModel Schema Validation -- sample build definition for an example.
 
 If you need to consume WIP version of all schema's then set an environment variable WIP_VERSION (e.g set WIP_VERSION=1).
 
+findSchemaPath.mke is responsible all this process. That takes two inputs SCHEMA_MATCHER and WIP_VERSION and find out the absolute path of schema as output. For more information [see](./README.md).
+
 ## Schema Packaging - *WIP*
 
 See [Schema Release Proposal](./docs/schema-release-process.md)
