@@ -20,12 +20,9 @@
     %error SCHEMA_MATCHER must be defined to find the absolute path of schema that needs to be consumed,  (Example: SCHEMA_MATCHER = $(_MakeFilePath)Released\AecUnits*.ecschema.xml)
 %endif
 
-%message checking error ....................................................
 releasedDir = $[@dir $[@subst *., ., $(SCHEMA_MATCHER)]]
 getLatestReleasedVersion = python -c "import glob; items = glob.glob('$(SCHEMA_MATCHER)'); items.sort(reverse=True); print items[0] if items else 'notFound'"
-%message checking error ....................................................
 getWIPVersion = $[@subst Released, \/, $(getLatestReleasedVersion)]
-%message checking error ....................................................
 
 %if exists ($(releasedDir)) && !defined(WIP_VERSION)
   schemaPath = $[@readstdout $(getLatestReleasedVersion)]
