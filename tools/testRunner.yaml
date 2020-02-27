@@ -1,0 +1,42 @@
+trigger:
+  branches:
+    include:
+      - master
+  paths:
+    include:
+      - tools/*
+
+workspace:
+  clean: all
+
+pool:
+  name: Hosted VS2017
+  demands:
+  - npm
+
+steps:
+- task: NodeTool@0
+  displayName: 'Use Node 10.15.0'
+  inputs:
+    versionSpec: 10.15.0
+
+- checkout: self
+  clean: true
+
+- task: Npm@1
+  displayName: 'npm install'
+  inputs:
+    command: install
+
+- task: Npm@1
+  displayName: 'Schema Package Generation Tests'
+  inputs:
+    command: custom
+    customCommand: run testPkgGen
+
+- task: Npm@1
+  displayName: 'Schema Inventory Generation Tests'
+  inputs:
+    command: custom
+    customCommand: run testInvGen
+
