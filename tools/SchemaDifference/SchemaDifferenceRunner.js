@@ -48,7 +48,7 @@ async function compareSchemas() {
 
     console.log(`Found latest ${schema.name} schema at ${releasedSchema.fullPath}.`)
 
-    const options = new CompareOptions(releasedSchema.fullPath, schema.fullPath, refPaths, argv.OutDir);
+    const options = new CompareOptions(releasedSchema.fullPath, schema.fullPath, refPaths, refPaths, argv.OutDir);
     const results = await SchemaComparison.compare(options);
     if (processResults(releasedSchema, schema, results))
       hasErrors = true;

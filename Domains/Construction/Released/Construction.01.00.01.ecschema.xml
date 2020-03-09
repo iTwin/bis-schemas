@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ECSchema schemaName="Construction" alias="constr" version="01.00.02" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" description="Base schema for the Construction domain.">
+<ECSchema schemaName="Construction" alias="constr" version="01.00.01" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" description="Base schema for the Construction domain.">
     <ECSchemaReference name="BisCore" version="01.00.06" alias="bis" />
     <ECSchemaReference name="Formats" version="01.00.00" alias="f"/>
     <ECSchemaReference name="Units" version="01.00.01" alias="u"/>
@@ -21,7 +21,7 @@
         <ECProperty propertyName="EndStation" displayLabel="End Station" typeName="double" kindOfQuantity="STATION" description="Station end point."/>
     </ECStructClass>
 
-    <ECEntityClass typeName="ConstructionDetailingElement" displayLabel="Construction Detailing Element" description="Identifies a portion of real-world physical object that is suitable for construction.">
+    <ECEntityClass typeName="ConstructionDetailingElement" displayLabel="Construction Detailing Element" modifier="Sealed" description="Identifies a portion of real-world physical object that is suitable for construction.">
         <BaseClass>bis:SpatialLocationElement</BaseClass>
         <ECProperty propertyName="SlopedArea" displayLabel="Sloped Area" typeName="double" kindOfQuantity="AREA" description="Total sloped area."/>
         <ECProperty propertyName="SurfaceArea" displayLabel="Surface Area" typeName="double" kindOfQuantity="AREA" description="Total surface area."/>
@@ -29,16 +29,12 @@
         <ECStructProperty propertyName="StationRange" displayLabel="Station Range" typeName="StationRange" description="Well-known location of the element defined by the station range."/>
     </ECEntityClass>
 
-    <ECEntityClass typeName="WorkAreaDetailingElement" displayLabel="Work Area Detailing Element" description="Identifies a portion of real-world physical object that got split because it crossed construction work area boundary.">
-        <BaseClass>ConstructionDetailingElement</BaseClass>
-    </ECEntityClass>
-
     <ECRelationshipClass typeName="ConstructionDetailingElementSplitsGeometricElement3d" strength="referencing" strengthDirection="Forward" modifier="Sealed" description="Relationship enabling splitup of bis:GeometricElement3d elements into the smaller pieces.">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
-        <Source multiplicity="(0..*)" roleLabel="is portion of" polymorphic="true">
+        <Source multiplicity="(0..*)" roleLabel="splits up" polymorphic="false">
             <Class class="ConstructionDetailingElement"/>
         </Source>
-        <Target multiplicity="(0..2)" roleLabel="is split into" polymorphic="true">
+        <Target multiplicity="(0..1)" roleLabel="is split into" polymorphic="true">
             <Class class="bis:GeometricElement3d"/>
         </Target>
     </ECRelationshipClass>
@@ -54,20 +50,6 @@
         </Source>
         <Target multiplicity="(0..*)" roleLabel="is constructed by" polymorphic="true">
             <Class class="bis:GeometricElement3d"/>
-        </Target>
-    </ECRelationshipClass>
-
-    <ECEntityClass typeName="ConstructionWorkArea" displayLabel="Construction Work Area" description="Represents geographically identifiable area which encompasses all disciplines that will execute work within that area.">
-        <BaseClass>bis:SpatialLocationElement</BaseClass>
-    </ECEntityClass>
-
-    <ECRelationshipClass typeName="ElementBelongsToConstructionWorkArea" strength="referencing" strengthDirection="Forward" modifier="Sealed" description="Relates a bis:Element to the constr:ConstructionWorkArea that it belongs to.">
-        <BaseClass>bis:ElementRefersToElements</BaseClass>
-        <Source multiplicity="(0..*)" roleLabel="belongs to" polymorphic="true">
-            <Class class="bis:Element"/>
-        </Source>
-        <Target multiplicity="(0..1)" roleLabel="is referenced" polymorphic="false">
-            <Class class="ConstructionWorkArea"/>
         </Target>
     </ECRelationshipClass>
 
