@@ -11,9 +11,10 @@
 #                    Example: SCHEMA_MATCHER = $(_MakeFilePath)Released\AecUnits.*ecschema.xml
 #
 #      WIP_SCHEMAS - Set this environment variable, when you need to consume WIP version of schema's.
-#                     This is a semi-colon delimited list of schema names.
+#                    This is a semi-colon delimited list of schema names. To include all WIP schemas 
+#                    use the character '*'. 
 #                    Example: set WIP_SCHEMAS=BisCore;Generic;etc.
-# Output:
+#   Output:
 #       schemaPath - Absolute path of schema file.
 #-------------------------------------------------------------------------------------------------+
 
@@ -30,10 +31,17 @@ wipVersion = $[@readstdout $(getWIPVersion)]
 useWIPVersionCmd =  python -c "import os; schemaFullName = os.path.basename(r'$(wipVersion)');\
                       schemaName = schemaFullName.split('.')[0];\
                       print(1) if schemaName in '$(WIP_SCHEMAS)' else 0"
-useWIPVersion = $[@readstdout $(useWIPVersionCmd)]
 
-%if defined(WIP_SCHEMAS) && $(useWIPVersion) == "1"
-  %message "Using WIP version"
+%if defined(WIP_SCHEMAS) 
+  %if $(WIP_SCHEMAS) == "*"
+    useWIPVersion = "1"
+  %else
+    useWIPVersion = $[@readstdout $(useWIPVersionCmd)]
+  %endif
+%endif
+
+%if $(useWIPVersion) == "1"))
+  %message Using WIP version
   schemaPath = $(wipVersion)
 %elif exists ($(releasedDir))
   schemaPath = $[@readstdout $(getLatestReleasedVersion)]
@@ -44,4 +52,4 @@ useWIPVersion = $[@readstdout $(useWIPVersionCmd)]
   schemaPath = $(wipVersion)
 %endif
 
-
+%message "Schema Path: $(schemaPath)"
