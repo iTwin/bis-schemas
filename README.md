@@ -156,9 +156,9 @@ See the iModel Schema Validation -- sample build definition for an example.
 
 
 
-If you need to consume WIP version of all schema's then set an environment variable WIP_VERSION (e.g set WIP_VERSION=1).
+If you need to consume a WIP version of one or more schema's then set an environment variable WIP_SCHEMAS with a semi-colon delimited list of schema names (e.g set WIP_SCHEMAS=BisCore;Generic;etc.).
 
-findSchemaPath.mke is responsible all this process. It takes two inputs SCHEMA_MATCHER and WIP_VERSION and find out the absolute path of schema as output. For more information [see](./findSchemaPath.mke).
+findSchemaPath.mke is responsible for this process. It takes two inputs SCHEMA_MATCHER and WIP_SCHEMAS and find out the absolute path of schema as output. For more information [see](./findSchemaPath.mke).
 
 ## Schema Packaging - *WIP*
 
