@@ -41,12 +41,11 @@ useWIPVersionCmd =  python -c "import os; schemaFullName = os.path.basename(r'$(
 %endif
 
 %if $(useWIPVersion) == "1"))
-  %message Using WIP version
   schemaPath = $(wipVersion)
 %elif exists ($(releasedDir))
   schemaPath = $[@readstdout $(getLatestReleasedVersion)]
   %if $(schemaPath) == "notFound"
-    schemaPath = $(wipVersion)
+    %error Lastest released schema version not found for SCHEMA_MATCHER '$(SCHEMA_MATCHER)'
   %endif
 %else
   schemaPath = $(wipVersion)
