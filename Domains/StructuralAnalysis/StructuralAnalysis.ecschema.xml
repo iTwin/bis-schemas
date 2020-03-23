@@ -58,6 +58,33 @@
         <ECEnumerator value="2" name="Bottom" displayLabel="Bottom" description="Topology defines boundary at the bottom of a Surface." />
     </ECEnumeration>
 
+    <ECEntityClass typeName="Structure" modifier="None" displayLabel="Structure" description="Used to store an entire structure, and refers to a definition set">
+        <BaseClass>StructuralAnalysisElement</BaseClass>
+        <BaseClass>bis:ISubModeledElement</BaseClass>
+        <ECProperty propertyName="DefinitionSet" typeName="bis:DefinitionSet" displayLabel="Definition Set"
+            description="Definition set used by structure." />
+    </ECEntityClass>
+    <ECRelationshipClass typeName="StructuralAnalysisModelModelsStructure" strength="embedding" modifier="Sealed" 
+        description="A relationship that indicates that a Structural Analysis Model models a Structure.">
+        <BaseClass>bis:ModelModelsElement</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="models" polymorphic="false">
+            <Class class="StructuralAnalysisModel"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is modeled by" polymorphic="false">
+            <Class class="Structure" />
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="StructureRefersToDefinitionSet" strength="referencing" modifier="Sealed" 
+        description="A relationship that indicates that a Structure refers to a Definition Set.">
+        <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="refers to" polymorphic="false">
+            <Class class="Structure"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is referenced by" polymorphic="false">
+            <Class class="bis:DefinitionSet"/>
+        </Target>
+    </ECRelationshipClass>
+
     <ECEntityClass typeName="StructuralAnalysisModel" modifier="None" displayLabel="Structural Analysis Model" description="Model containing all StructuralAnalysis elements." >
         <BaseClass>anlyt:AnalyticalModel</BaseClass>
     </ECEntityClass>
