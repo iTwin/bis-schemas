@@ -29,7 +29,11 @@ getWIPVersion = $[@subst Released, \/, $(getLatestReleasedVersion)]
 wipVersion = $[@readstdout $(getWIPVersion)]
 useWIPVersion = 0
 
+%warn SCHEMA_MATCHER = $(SCHEMA_MATCHER)
+%warn WIP_SCHEMAS = $(WIP_SCHEMAS)
+
 %if defined(WIP_SCHEMAS)
+  %warn WIP_SCHEMAS defined
   %if "*" == $(WIP_SCHEMAS)
     useWIPVersion = "1"
   %else
@@ -38,6 +42,8 @@ useWIPVersion = 0
                       print(1) if schemaName in '$(WIP_SCHEMAS)' else 0"       
     useWIPVersion = $[@readstdout $(useWIPVersionCmd)]
   %endif
+  %else
+    %warn WIP_SCHEMAS undefined
 %endif
 
 %if "1" == $(useWIPVersion)
