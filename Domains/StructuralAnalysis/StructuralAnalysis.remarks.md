@@ -183,6 +183,10 @@ AnalysisElements use [TopologyElements](#topologyelement) to define their locati
 
 Derives from [AnalysisElement](#analysiselement) and provides base class for structural elements.
 
+### Structure
+
+A class that represents an entire structure and is sub-modeled by [StructuralAnalysisModel](#stucturalanalysismodel), derives from [StructuralAnalysisElement](#structuralanalysiselement). Has a single property to represent the definition set that is referred to by the structure.
+
 ### Support
 
 A support member in StructuralAnalysis represents a [StructuralAnalysisElement](#structuralanalysiselement) that is an analytical support. Currently, StructuralAnalysis schema includes [PointSupports](#pointsupport), [CurveSupports](#curvesupport) and [SurfaceSupports](#surfacesupport). Support elements have no direct physical meaning, they are interpreted by some applications to represent some type of support. Support connects to (supports) to elements that share same connectivity ([SharedTopologyElements](#sharedtopologyelements)). Each Support should refer to [SupportBehavior](#supportbehavior) which define how support behaves at specific connectivity.
@@ -240,7 +244,7 @@ There are two types of members in StructuralAnalysisSchema:
 
 CurveMember represents a [Member](#member) that is primarily linear in nature. CurveMember's purpose is to hold the structure by providing resistance from both lateral and gravity loads. Some examples are beams, columns, piles and cables.
 
-CurveMember's analytical location is defined by its child [Wire](#wire) and [CurveMemberOwnsLocationWore](#curvememberownslocationwire) relationship. CurveMember has a direction which is defined by its location Wire.
+CurveMember's analytical location is defined by its child [Wire](#wire) and [CurveMemberOwnsLocationWire](#curvememberownslocationwire) relationship. CurveMember has a direction which is defined by its location Wire.
 
 CurveMember has local coordinate system (RST):
 
