@@ -28,14 +28,13 @@ getLatestReleasedVersion = python -c "import glob; items = glob.glob(r'$(SCHEMA_
 getWIPVersion = $[@subst Released, \/, $(getLatestReleasedVersion)]
 wipVersion = $[@readstdout $(getWIPVersion)]
 
-useWIPVersionCmd =  python -c "import os; schemaFullName = os.path.basename(r'$(wipVersion)');\
-                      schemaName = schemaFullName.split('.')[0];\
-                      print(1) if schemaName in '$(WIP_SCHEMAS)' else 0"
-
 %ifdef WIP_SCHEMAS
   %if $(WIP_SCHEMAS) == "*"
     useWIPVersion = "1"
   %else
+    useWIPVersionCmd =  python -c "import os; schemaFullName = os.path.basename(r'$(wipVersion)');\
+                      schemaName = schemaFullName.split('.')[0];\
+                      print(1) if schemaName in '$(WIP_SCHEMAS)' else 0"       
     useWIPVersion = $[@readstdout $(useWIPVersionCmd)]
   %endif
 %endif
