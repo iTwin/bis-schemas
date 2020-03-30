@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ECSchema schemaName="StructuralDesignConcrete" alias="sdconc" version="01.00.00" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" displayLabel="Structural Concrete Design" description="Concrete Design Schema.">
+  <ECSchemaReference name="BisCore" version="01.00.00" alias="bis" />
+  <ECSchemaReference name="StructuralAnalysis" version="01.00.00" alias="sa" />
+
+  <ECEntityClass typeName="ConcreteDesignModel" modifier="None" displayLabel="Concrete Design Model" description="Model for the concrete design perspective " >
+    <BaseClass>sa:StructuralAnalysisModel</BaseClass>
+  </ECEntityClass>
+
+  <ECEntityClass typeName="ConcreteDesignPartition" modifier="None" displayLabel="Concrete Design Partition" description="ConcreteDesignPartition element indicates that there is a specialized ConcretDesign perspective within the overall information hierarchy." >
+    <BaseClass>sa:StructuralAnalysisPartition</BaseClass>
+  </ECEntityClass>
+
+  <!-- ***************************************** Common enumerations *****************************************  -->
+
+  <ECEnumeration typeName="ConstructionMode" backingTypeName="int" isStrict="true" description="Specifies the mode/method of construction of a concrete Member.">
+    <ECEnumerator value="0" name="CastInsitu" displayLabel="Cast Insitu" description="The member is constructed on site." />
+    <ECEnumerator value="1" name="PreCast" displayLabel="Pre cast" description="The member is pre-cast off site and assmebled on site" />
+  </ECEnumeration>
+
+  <ECEnumeration typeName="RebarFunction" backingTypeName="int" isStrict="true" description="Specifies whether a Rebar is meant to be longitudinal bars that resist flexure or transverse bars that resist shear.">
+    <ECEnumerator value="0" name="LongitudinalBar" displayLabel="Longitudinal Bars" description="The bars placed on the primary bending plane, along the direction of the normal stresses." />
+    <ECEnumerator value="1" name="TransverseBar" displayLabel="Transverse Bars" description="The bars (links) that primarily resist shear (and/or torsion)." />
+  </ECEnumeration>
+
+  <ECEnumeration typeName="RebarPattern" backingTypeName="int" isStrict="true" description="Specifies the reinforcing pattern to be used when designing the member (E.g: Mesh or Individual bars).">
+    <ECEnumerator value="0" name="IndividualReBar" displayLabel="Individual Rebar" description="Indicates that the member is to be reinforced using individual bars." />
+    <ECEnumerator value="1" name="MeshRebar" displayLabel="Mesh Rebar" description="Indicates that the member is to be reinforced using a mesh ( E.g: In a 2 way slab)." />
+    <ECEnumerator value="2" name="MixedRebar" displayLabel="Mixed Rebar" description="Indicates that the member is to be reinforced using a mesh, but with individual bars added where necessary." />
+    <ECEnumerator value="3" name="BundledRebar" displayLabel="Bundled Rebar" description="A bundel of individual bars touching each other." />
+  </ECEnumeration>
+
+  <!--NOTE : Positioned With reference to the center of the bounding box of the cross section-->
+  <ECEnumeration typeName="RebarPosition" backingTypeName="int" isStrict="true" description="Indicates a reference position of the bar in the cross-section of a member. To be used when designing and detailing the bars in a member.">
+    <ECEnumerator value="0" name="Top" displayLabel="Top" description="The bars placed near the top layer of a cross section." />
+    <ECEnumerator value="1" name="Bottom" displayLabel="Bottom" description="The bars placed near the bottom edge of a cross section." />
+    <ECEnumerator value="2" name="Right" displayLabel="Right" description="The bars placed near the left edge of a cross section." />
+    <ECEnumerator value="3" name="Left" displayLabel="Left" description="The bars placed near the right layer of a cross section." />
+    <ECEnumerator value="4" name="TopNearFace" displayLabel="Top Near Face" description="Top bars near the outer edge of the cross section." />
+    <ECEnumerator value="5" name="TopFarFace" displayLabel="Top Far Face" description="Top bars near the far edge of the cross section like for locating the bars on the bottom of the flange of a T-beam." />
+    <!-- Add others -->
+  </ECEnumeration>
+
+  <ECEnumeration typeName="ReferenceDirection" backingTypeName="int" isStrict="true" description="Indicates the  reference direction for a given design element or action. E.g: Bars along the X-direction, or Force along the X-direction.">
+    <ECEnumerator value="0" name="X" displayLabel="Local X-direction" description="Indicates the direction along the member's local X-axis (r?)." />
+    <ECEnumerator value="1" name="Y" displayLabel="Local Y-direction" description="Indicates the direction along the member's local Y-axis (s?)." />
+    <ECEnumerator value="2" name="Z" displayLabel="Local Z-direction" description="Indicates the direction along the member's local Z-axis (t?)." />
+    <ECEnumerator value="3" name="AtAngleToX" displayLabel="At Angle to X" description="A direction that is at angle to the local X-axis, measured anticlockwise." />
+  </ECEnumeration>
+
+  <ECEnumeration typeName="StructureType" backingTypeName="int" isStrict="true" description="Specifies the type of the structure">
+    <ECEnumerator value="0" name="General" displayLabel="General" description="A general default structure that is a collectino of sub structures." />
+    <ECEnumerator value="1" name="LateralLoadResistingFrame" displayLabel="Lateral Load Resisting Frame" description="A frame formed of beams and columns to resist lateral loads." />
+    <ECEnumerator value="2" name="MatFoundationWithLiftPit" displayLabel="Mat Foundation With Lift Pit" description="A MatFoundation with a lift pit." />
+  </ECEnumeration>
+
+  <!-- ************* Mixins  *************************************************-->
+  <ECEntityClass typeName="ISubStructure" modifier="Abstract" displayLabel="ISubStructure" description="A portion of the primary Structure">
+    <ECCustomAttributes>
+      <IsMixin xmlns="CoreCustomAttributes.01.00.00">
+        <AppliesToEntityClass>Design</AppliesToEntityClass>
+      </IsMixin>
+    </ECCustomAttributes>
+    <ECNavigationProperty propertyName="SubStructureCriteria" relationshipName="SubStructureRefersToSubStructureCriteria" direction="Forward" displayLabel="SubStructure Criteria" description="The design criteria." />
+  </ECEntityClass>
+
+  <ECEntityClass typeName="ISubStructureCriteria" modifier="Abstract" displayLabel="ISubStructure Criteria" description="A portion of the primary Structure">
+    <ECCustomAttributes>
+      <IsMixin xmlns="CoreCustomAttributes.01.00.00">
+        <AppliesToEntityClass>DesignCriteria</AppliesToEntityClass>
+      </IsMixin>
+    </ECCustomAttributes>
+  </ECEntityClass>
+
+  <ECEntityClass typeName="IReinforcement" modifier="Abstract" displayLabel="IReinforcement" description="A representation of the reinforcement within an element.">
+    <ECCustomAttributes>
+      <IsMixin xmlns="CoreCustomAttributes.01.00.00">
+        <AppliesToEntityClass>Rebar</AppliesToEntityClass>
+      </IsMixin>
+    </ECCustomAttributes>
+  </ECEntityClass>
+
+<!-- This should probably be defined in StructuralAnalysis schema -->
+  <ECEntityClass typeName="IDesign" modifier="Abstract" displayLabel="IDesign" description="A designed representation of the analytical element">
+    <ECCustomAttributes>
+      <IsMixin xmlns="CoreCustomAttributes.01.00.00">
+        <AppliesToEntityClass>bis:Element</AppliesToEntityClass>
+      </IsMixin>
+    </ECCustomAttributes>
+    <ECProperty propertyName="MaxDemandCapacityRatio" typeName="double" displayLabel="Max Demand Capacity Ratio" description="Maximum demand/capacity ratio for the design run of the element." />
+  </ECEntityClass>
+
+  <!-- ********************************************** The primary CDS classes **************************************** -->
+  <ECEntityClass typeName="DesignResult" modifier="Abstract" displayLabel="Design Result" description="The design result">
+    <BaseClass>bis:InformationRecordElement</BaseClass>
+    <BaseClass>bis:IParentElement</BaseClass>
+  </ECEntityClass>
+
+  <ECEntityClass typeName="Design" modifier="Abstract" displayLabel="Design" description="A Design entity within CDC which can be a linear element, a surface element or an independent entity such as a corbel / connection">
+    <BaseClass>bis:InformationRecordElement</BaseClass>
+    <BaseClass>bis:IParentElement</BaseClass>
+    <BaseClass>IDesign</BaseClass>
+    <BaseClass>ISubStructure</BaseClass>
+    <ECProperty propertyName="TopOfConcrete" typeName="double" displayLabel="Top of Concrete" description="The top of concrete level for the given element or entity." />
+    <ECNavigationProperty propertyName="DesignCriteria" relationshipName="DesignRefersToDesignCriteria" direction="Forward" displayLabel="Desgin Criteria" description="The design criteria." />
+  </ECEntityClass>
+
+  <ECEntityClass typeName="Structure" modifier="Sealed" displayLabel="Structure" description="A collection of sub structures or structures">
+    <BaseClass>Design</BaseClass>
+    <ECProperty propertyName="Name" typeName="string" displayLabel="Name" description="The name of the structure." />
+    <ECProperty propertyName="StructureType" typeName="StructureType" displayLabel="Structure Type" description="The element that represents an entity that can be designed." />
+  </ECEntityClass>
+
+  <ECEntityClass typeName="ShellElement" modifier="Sealed" displayLabel="Shell" description="">
+    <BaseClass>bis:InformationRecordElement</BaseClass>
+    <ECNavigationProperty propertyName="Face" relationshipName="ShellElementRefersToFace" direction="Forward" displayLabel="Surface Member Opening" description="" />
+  </ECEntityClass>
+
+  <ECEntityClass typeName="CurveMemberDesign" modifier="Sealed" displayLabel="Curve Member Design" description="A Design entity for a curve member within CDC.">
+    <BaseClass>Design</BaseClass>
+  </ECEntityClass>
+
+  <ECEntityClass typeName="SurfaceDesign" modifier="Abstract" displayLabel="Surface Design" description="A Design entity for a surface within CDC.">
+    <BaseClass>Design</BaseClass>
+    <ECProperty propertyName="SurfaceMemberType" typeName="sa:SurfaceMemberClassificationType" displayLabel="Surface Member Type" description="The type of Surface being designed." />
+  </ECEntityClass>
+
+  <ECEntityClass typeName="SurfaceModifierDesign" modifier="Sealed" displayLabel="Surface Modifier Design" description="A Design entity for a Surface Modifier within CDC.">
+    <BaseClass>SurfaceDesign</BaseClass>
+    <ECNavigationProperty propertyName="SurfaceMemberModifier" relationshipName="SurfaceModifierDesignReferstoSurfaceMemberModifier" direction="Forward" displayLabel="Surface Member Opening" description="" />
+  </ECEntityClass>
+
+  <ECEntityClass typeName="SurfaceOpening" modifier="Sealed" displayLabel="Surface Opening" description="">
+    <BaseClass>bis:InformationRecordElement</BaseClass>
+    <ECNavigationProperty propertyName="SurfaceMemberOpening" relationshipName="SurfaceOpeningReferstoSurfaceMemberOpening" direction="Forward" displayLabel="Surface Member Opening" description="" />
+  </ECEntityClass>
+
+  <ECEntityClass typeName="SurfaceMemberDesign" modifier="Sealed" displayLabel="Surface Member Design" description="A Design entity for a Surface member within CDC.">
+    <BaseClass>SurfaceDesign</BaseClass>
+    <ECNavigationProperty propertyName="SurfaceMember" relationshipName="SurfaceMemberDesignReferstoSurfaceMember" direction="Forward" displayLabel="Surface Member Opening" description="" />
+  </ECEntityClass>
+
+  <ECEntityClass typeName="DesignCriteria" modifier="Abstract" displayLabel="Design Criteria" description="A Design criteria within CDC.">
+    <BaseClass>bis:InformationRecordElement</BaseClass>
+    <BaseClass>ISubStructureCriteria</BaseClass>
+    <ECProperty propertyName="Name" typeName="string" displayLabel="Name" description="A name to group the criteria." />
+    <ECProperty propertyName="RebarPattern" typeName="RebarPattern" displayLabel="Rebar Pattern" description="The rebar pattern to be used for design" />
+    <ECProperty propertyName="NominalCover" typeName="double" displayLabel="Nominal Cover" description="Nominal cover to the outermost rebars." />
+  </ECEntityClass>
+
+  <ECEntityClass typeName="CurveMemberDesignCriteria" modifier="Sealed" displayLabel="Curve Member Design Criteria" description="A design criteria for a curve member in CDC.">
+    <BaseClass>DesignCriteria</BaseClass>
+  </ECEntityClass>
+
+  <ECEntityClass typeName="SurfaceDesignCriteria" modifier="Sealed" displayLabel="Surface Design Criteria" description="A design criteria for a surface in CDC.">
+    <BaseClass>DesignCriteria</BaseClass>
+    <ECProperty propertyName="OuterLayerRebarDirection" typeName="ReferenceDirection" displayLabel="Outer Layer Rebar Direction" description="The primary direction of bars in the outermost layer " />
+  </ECEntityClass>
+
+  <ECEntityClass typeName="StructureCriteria" modifier="Sealed" displayLabel="Structure Criteria" description="A set for criteria for the structure as a whole.">
+    <BaseClass>DesignCriteria</BaseClass>
+    <BaseClass>ISubStructureCriteria</BaseClass>
+  </ECEntityClass>
+
+  <ECEntityClass typeName="Rebar" modifier="Abstract" displayLabel="Rebar" description="A rebar within CDC">
+    <BaseClass>bis:InformationRecordElement</BaseClass>
+    <BaseClass>IReinforcement</BaseClass>
+    <ECProperty propertyName="RebarSize" typeName="int" displayLabel="Rebar Size" description="The diameter of the rebar." />
+    <ECProperty propertyName="RebarType" typeName="int" displayLabel="Rebar Type" description="The type of the rebar." />
+    <ECProperty propertyName="XPosition" typeName="double" displayLabel="X Position" description="The x coordinate of the c.g of bar with respect to the centre of the bounding box of a given profile." />
+    <ECProperty propertyName="YPosition" typeName="double" displayLabel="Y Position" description="The y coordinate of the c.g of the bar with respect to the centre of the bounding box of a given profile." />
+  </ECEntityClass>
+
+  <ECEntityClass typeName="IndividualRebar" modifier="Sealed" displayLabel="Individual Rebar" description="An individual rebar within CDC.">
+    <BaseClass>Rebar</BaseClass>
+    <ECProperty propertyName="Length" typeName="double" displayLabel="Length" description="The length of the individual bar." />
+  </ECEntityClass>
+
+  <ECEntityClass typeName="RebarGroup" modifier="Sealed" displayLabel="Rebar Group" description="A group of rebars to be considered as a group (E.g. 4-#8 bars @2 inch crs) and spaced evenly">
+    <BaseClass>Rebar</BaseClass>
+    <ECProperty propertyName="BarCount" typeName="int" displayLabel="Bar Count" description="The number of rebars within the group." />
+    <ECProperty propertyName="BarSpacing" typeName="double" displayLabel="Bar Spacing" description="The number of rebars within the group." />
+  </ECEntityClass>
+
+  <ECEntityClass typeName="RebarBundle" modifier="Sealed" displayLabel="Rebar Bundle" description="A group of rebars to be considered as a bundle (E.g. 4-#8 bars) ">
+    <BaseClass>Rebar</BaseClass>
+    <ECProperty propertyName="BarCount" typeName="int" displayLabel="Bar Count" description="The number of rebars within the group." />
+  </ECEntityClass>
+
+  <ECEntityClass typeName="RebarMesh" modifier="Sealed" displayLabel="Rebar Mesh" description="A mesh of rebars">
+    <BaseClass>Rebar</BaseClass>
+    <ECProperty propertyName="BarSpacing" typeName="double" displayLabel="Bar Spacing" description="The spacing of rebars within the mesh." />
+  </ECEntityClass>
+
+  <!-- *********************** Relationships *************************************-->
+  <ECRelationshipClass typeName="SubStructureRefersToSubStructureCriteria" strength="referencing" modifier="Sealed" description="A relationship that indicates that a SubStructure refers to the SubStructureCriteria instance.">
+    <Source multiplicity="(0..*)" roleLabel="references" polymorphic="true">
+      <Class class="ISubStructure" />
+    </Source>
+    <Target multiplicity="(0..1)" roleLabel="is referenced by" polymorphic="true">
+      <Class class="ISubStructureCriteria" />
+    </Target>
+  </ECRelationshipClass>
+
+  <ECRelationshipClass typeName="DesignRefersToDesignCriteria" strength="referencing" modifier="Sealed" description="A relationship that indicates that a Design refers to a Criteria instance.">
+    <Source multiplicity="(0..*)" roleLabel="references" polymorphic="true">
+      <Class class="Design" />
+    </Source>
+    <Target multiplicity="(0..1)" roleLabel="is referenced by" polymorphic="true">
+      <Class class="DesignCriteria" />
+    </Target>
+  </ECRelationshipClass>
+
+  <ECRelationshipClass typeName="ShellElementRefersToFace" strength="referencing" modifier="Sealed" description="">
+    <!-- Theoretically source multiplicity should be '(0..1)', but ECDb has a bug where having such multiplicity produces an error.
+    This can be fixed by adding strengthDirection="Backward", but it doesn't make sense for our use case. -->
+    <Source multiplicity="(0..*)" roleLabel="references" polymorphic="false">
+      <Class class="ShellElement" />
+    </Source>
+    <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="false">
+      <Class class="sa:Face" />
+    </Target>
+  </ECRelationshipClass>
+
+  <ECRelationshipClass typeName="SurfaceMemberDesignReferstoSurfaceMember" strength="referencing" modifier="Sealed" description="">
+    <!-- Theoretically source multiplicity should be '(0..1)', but ECDb has a bug where having such multiplicity produces an error.
+    This can be fixed by adding strengthDirection="Backward", but it doesn't make sense for our use case. -->
+    <Source multiplicity="(0..*)" roleLabel="references" polymorphic="false">
+      <Class class="SurfaceMemberDesign" />
+    </Source>
+    <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="false">
+      <Class class="sa:SurfaceMember" />
+    </Target>
+  </ECRelationshipClass>
+
+  <ECRelationshipClass typeName="SurfaceOpeningReferstoSurfaceMemberOpening" strength="referencing" modifier="Sealed" description="">
+    <!-- Theoretically source multiplicity should be '(0..1)', but ECDb has a bug where having such multiplicity produces an error.
+    This can be fixed by adding strengthDirection="Backward", but it doesn't make sense for our use case. -->
+    <Source multiplicity="(0..*)" roleLabel="references" polymorphic="false">
+      <Class class="SurfaceOpening" />
+    </Source>
+    <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="false">
+      <Class class="sa:SurfaceMemberOpening" />
+    </Target>
+  </ECRelationshipClass>
+
+  <ECRelationshipClass typeName="SurfaceModifierDesignReferstoSurfaceMemberModifier" strength="referencing" modifier="Sealed" description="">
+    <Source multiplicity="(0..*)" roleLabel="references" polymorphic="false">
+      <Class class="SurfaceModifierDesign" />
+    </Source>
+    <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="false">
+      <Class class="sa:SurfaceMemberModifier" />
+    </Target>
+  </ECRelationshipClass>
+
+  <ECRelationshipClass typeName="SurfaceMemberDesignOwnsSurfaceModifierDesign" strength="embedding" modifier="Sealed">
+    <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+    <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+      <Class class="SurfaceMemberDesign" />
+    </Source>
+    <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="false">
+      <Class class="SurfaceModifierDesign" />
+    </Target>
+  </ECRelationshipClass>
+
+  <ECRelationshipClass typeName="StructureOwnsDesigns" strength="embedding" modifier="Sealed">
+    <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+    <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+      <Class class="Structure" />
+    </Source>
+    <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="true">
+      <Class class="Design" />
+    </Target>
+  </ECRelationshipClass>
+
+  <ECRelationshipClass typeName="DesignOwnsDesignResult" strength="embedding" modifier="Sealed" description="A relationship that indicates that a Design owns the Designresult.">
+    <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+    <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+      <Class class="Design" />
+    </Source>
+    <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="true">
+      <Class class="DesignResult" />
+    </Target>
+  </ECRelationshipClass>
+
+  <ECRelationshipClass typeName="DesignResultOwnsReinforcements" strength="embedding" modifier="Sealed" description="A relationship that indicates that a DesignResult owns the Rebar instances.">
+    <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+    <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+      <Class class="DesignResult" />
+    </Source>
+    <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="false">
+      <Class class="IReinforcement" />
+    </Target>
+  </ECRelationshipClass>
+
+</ECSchema>
