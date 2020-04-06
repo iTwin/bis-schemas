@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ECSchema schemaName="StructuralAnalysis" alias="sa" version="01.00.00" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" displayLabel="Structural Analysis" description="Structural Analysis Schema.">
-    <ECSchemaReference name="BisCore" version="01.00.00" alias="bis" />
+    <ECSchemaReference name="BisCore" version="01.00.10" alias="bis" />
     <ECSchemaReference name="Profiles" version="01.00.00" alias="prf" />
     <ECSchemaReference name="Analytical" version="01.00.00" alias="anlyt" />
 
@@ -30,16 +30,11 @@
         <ECEnumerator value="0" name="Unset" displayLabel="Unset" description="Classification undefined." />
         <ECEnumerator value="1" name="Beam" displayLabel="Beam" description="Structural element that primarily resists loads applied laterally to the beam's length." />
         <ECEnumerator value="2" name="Column" displayLabel="Column" description="Structural element that primarily resists load applied along the beam's length." />
-        <ECEnumerator value="3" name="HorizontalBrace" displayLabel="HorizontalBrace"
-            description="Structural system commonly used in structures subject to lateral loads such as wind and seismic pressure.
-                The bracing at each floor (in horizontal planes) provides load paths for the transference of horizontal forces to the planes of vertical bracing." />
-        <ECEnumerator value="4" name="StripFooting" displayLabel="StripFooting"
-            description="Structural element that provides a continuous, level (or sometimes stepped) strip of base to a wall or closely-spaced rows of columns built centrally above them." />
+        <ECEnumerator value="3" name="HorizontalBrace" displayLabel="HorizontalBrace" description="Structural system commonly used in structures subject to lateral loads such as wind and seismic pressure. The bracing at each floor (in horizontal planes) provides load paths for the transference of horizontal forces to the planes of vertical bracing." />
+        <ECEnumerator value="4" name="StripFooting" displayLabel="StripFooting" description="Structural element that provides a continuous, level (or sometimes stepped) strip of base to a wall or closely-spaced rows of columns built centrally above them." />
         <ECEnumerator value="5" name="Pedestal" displayLabel="Pedestal" description="Base on which a column is mounted." />
         <ECEnumerator value="6" name="Pile" displayLabel="Pile" description="Vertical structural element of a deep foundation, driven or drilled deep into the ground at the building site." />
-        <ECEnumerator value="7" name="VerticalBrace" displayLabel="VerticalBrace"
-            description="Structural system commonly used in structures subject to lateral loads such as wind and seismic pressure.
-                Bracing between column lines (in vertical planes) provides load paths for the transference of horizontal forces to ground level." />
+        <ECEnumerator value="7" name="VerticalBrace" displayLabel="VerticalBrace" description="Structural system commonly used in structures subject to lateral loads such as wind and seismic pressure. Bracing between column lines (in vertical planes) provides load paths for the transference of horizontal forces to ground level." />
     </ECEnumeration>
 
     <ECEnumeration typeName="SurfaceMemberClassificationType" backingTypeName="int" isStrict="true" description="Used for setting classification for SurfaceMember.">
@@ -58,36 +53,46 @@
         <ECEnumerator value="2" name="Bottom" displayLabel="Bottom" description="Topology defines boundary at the bottom of a Surface." />
     </ECEnumeration>
 
-    <ECEntityClass typeName="StructuralAnalysisModel" modifier="None" displayLabel="Structural Analysis Model" description="Model containing all StructuralAnalysis elements." >
+    <ECEntityClass typeName="StructuralAnalysisModel" modifier="Sealed" displayLabel="Structural Analysis Model" description="Model containing all StructuralAnalysis elements." >
         <BaseClass>anlyt:AnalyticalModel</BaseClass>
     </ECEntityClass>
 
-    <ECEntityClass typeName="StructuralAnalysisPartition" modifier="None" displayLabel="Structural Analysis Partition" 
-        description="StructuralAnalysisPartition element indicates that there is a specialized StructuralAnalysis perspective within the overall information hierarchy." >
+    <ECEntityClass typeName="StructuralAnalysisPartition" modifier="Sealed" displayLabel="Structural Analysis Partition" description="StructuralAnalysisPartition element indicates that there is a specialized StructuralAnalysis perspective within the overall information hierarchy." >
         <BaseClass>anlyt:AnalyticalPartition</BaseClass>
     </ECEntityClass>
+
+    <ECEntityClass typeName="Structure" modifier="Sealed" displayLabel="Structure" description="Used to store an entire structure.">
+        <BaseClass>StructuralAnalysisElement</BaseClass>
+        <BaseClass>bis:ISubModeledElement</BaseClass>
+        <ECNavigationProperty propertyName="DefaultDefinitionSet" relationshipName="StructureRefersToDefinitionSet" direction="Forward" displayLabel="Default Definition Set" description="Default location for definition elements. (Optional)" />
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="StructureRefersToDefinitionSet" strength="referencing" modifier="Sealed" description="A relationship that indicates that a Structure refers to a Definition Set.">
+        <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="false">
+            <Class class="Structure"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is referenced by" polymorphic="true">
+            <Class class="bis:DefinitionSet"/>
+        </Target>
+    </ECRelationshipClass>
 
     <!-- Topology classes -->
     <ECEntityClass typeName="TopologyElement" modifier="Abstract" displayLabel="Topology Element" description="Abstract class for all topology-related classes to derive from.">
         <BaseClass>anlyt:AnalyticalElement</BaseClass>
     </ECEntityClass>
 
-    <ECEntityClass typeName="SharedTopologyElement" modifier="Abstract" displayLabel="Shared Topology Element"
-        description="Abstract topology class that can be shared by multiple other Elements. Sharing defines connectivity of the topological network.
-            Each subclass is also the lowest level concept for a particular dimensionality (Face is the lowest 2D concept).">
+    <ECEntityClass typeName="SharedTopologyElement" modifier="Abstract" displayLabel="Shared Topology Element" description="Abstract topology class that can be shared by multiple other Elements. Sharing defines connectivity of the topological network. Each subclass is also the lowest level concept for a particular dimensionality (Face is the lowest 2D concept).">
         <BaseClass>TopologyElement</BaseClass>
     </ECEntityClass>
 
-    <ECEntityClass typeName="PrivateTopologyElement" modifier="Abstract" displayLabel="Private Topology Element"
-        description="Abstract class as a common parent class for each  topology type that is not shared. Each subclass represents a direct or indirect collection of the shared topology.
-            Each subclass is also a collection of the topology of the same dimensionality.">
+    <ECEntityClass typeName="PrivateTopologyElement" modifier="Abstract" displayLabel="Private Topology Element" description="Abstract class as a common parent class for each  topology type that is not shared. Each subclass represents a direct or indirect collection of the shared topology. Each subclass is also a collection of the topology of the same dimensionality.">
         <BaseClass>TopologyElement</BaseClass>
     </ECEntityClass>
 
     <ECEntityClass typeName="Vertex" modifier="Sealed" displayLabel="Vertex" description="An identified location in 3D space.">
         <BaseClass>SharedTopologyElement</BaseClass>
-        <ECProperty propertyName="Point" typeName="point3d" displayLabel="Vertex placement point"
-            description="Describes Vertex location. Point is only set on Vertex creation and cannot be modified." />
+        <BaseClass>IDefinedPoint</BaseClass>
+        <ECProperty propertyName="Point" typeName="point3d" displayLabel="Vertex placement point" description="Describes Vertex location. Point is only set on Vertex creation and cannot be modified." />
     </ECEntityClass>
 
     <ECEntityClass typeName="Face" modifier="Sealed" displayLabel="Face" description="A surface bounded by Loops.">
@@ -106,8 +111,7 @@
         </Target>
     </ECRelationshipClass>
 
-    <ECRelationshipClass typeName="FaceOwnsInnerPaths" strength="embedding" modifier="Sealed" 
-        description="A relationship that indicates that a Face owns a Path which should describe it's inner connectivity with other StructuralAnalysis Elements.">
+    <ECRelationshipClass typeName="FaceOwnsInnerPaths" strength="embedding" modifier="Sealed" description="A relationship that indicates that a Face owns a Path which should describe it's inner connectivity with other StructuralAnalysis Elements.">
         <BaseClass>IPathsOwnerOwnsPaths</BaseClass>
         <Source multiplicity="(0..1)" roleLabel="owns" polymorphic="false">
             <Class class="Face"/>
@@ -258,8 +262,7 @@
         <BaseClass>SharedTopologyElement</BaseClass>
         <ECNavigationProperty propertyName="StartVertex" relationshipName="EdgeHasStartVertex" direction="Forward" displayLabel="Start Vertex" description="Start Vertex (Point)." />
         <ECNavigationProperty propertyName="EndVertex" relationshipName="EdgeHasEndVertex" direction="Forward" displayLabel="End Vertex" description="End Vertex (Point)." />
-        <ECProperty propertyName="Curve" typeName="Bentley.Geometry.Common.IGeometry" displayLabel="Location Curve"
-            description="A non self-intersecting curve defining Edge's location." />
+        <ECProperty propertyName="Curve" typeName="Bentley.Geometry.Common.IGeometry" displayLabel="Location Curve" description="A non self-intersecting curve defining Edge's location." />
     </ECEntityClass>
 
     <ECEntityClass typeName="OrientedEdgeAspect" modifier="Sealed" displayLabel="Oriented Edge Aspect" description="This Aspect stores Edges (and related data) for a Path." >
@@ -325,8 +328,7 @@
         <BaseClass>bis:ElementUniqueAspect</BaseClass>
     </ECEntityClass>
 
-    <ECEntityClass typeName="SurfaceMemberBehaviorAspect" modifier="Abstract" displayLabel="Surface Member Behavior Aspect"
-        description="Structural behavior for a Surface Member.">
+    <ECEntityClass typeName="SurfaceMemberBehaviorAspect" modifier="Abstract" displayLabel="Surface Member Behavior Aspect" description="Structural behavior for a Surface Member.">
         <BaseClass>MemberBehaviorAspect</BaseClass>
     </ECEntityClass>
 
@@ -505,8 +507,8 @@
 
     <ECEntityClass typeName="PointSupport" modifier="Sealed" displayLabel="Point Support" description="Support which is located at a single point.">
         <BaseClass>Support</BaseClass>
-        <ECNavigationProperty propertyName="Vertex" relationshipName="PointSupportRefersToVertex" direction="Forward" displayLabel="Vertex"
-            description="Vertex at which this instance supports." />
+        <BaseClass>IDefinedPoint</BaseClass>
+        <ECNavigationProperty propertyName="Vertex" relationshipName="PointSupportRefersToVertex" direction="Forward" displayLabel="Vertex" description="Vertex at which this instance supports." />
         <ECNavigationProperty propertyName="Behavior" relationshipName="PointSupportRefersToPointSupportBehavior" direction="Forward" displayLabel="Behavior" description="Point Support Behavior." />
         <ECProperty propertyName="RAxis" typeName="point3d" displayLabel="RAxis" description="RAxis of local coordinate system." />
         <ECProperty propertyName="SAxis" typeName="point3d" displayLabel="SAxis" description="SAxis of local coordinate system." />
@@ -516,12 +518,10 @@
         <BaseClass>Support</BaseClass>
         <BaseClass>IWireOwner</BaseClass>
         <BaseClass>IDefinedCurve</BaseClass>
-        <ECNavigationProperty propertyName="Behavior" relationshipName="CurveSupportRefersToCurveSupportBehavior" direction="Forward" displayLabel="Behavior"
-            description="Defines how support behaves at it's location." />
+        <ECNavigationProperty propertyName="Behavior" relationshipName="CurveSupportRefersToCurveSupportBehavior" direction="Forward" displayLabel="Behavior" description="Defines how support behaves at it's location." />
     </ECEntityClass>
 
-    <ECRelationshipClass typeName="CurveSupportOwnsLocationWire" strength="embedding" modifier="Sealed" 
-        description="A relationship that indicates that a CurveSupport owns a Wire which should describe it's Location.">
+    <ECRelationshipClass typeName="CurveSupportOwnsLocationWire" strength="embedding" modifier="Sealed" description="A relationship that indicates that a CurveSupport owns a Wire which should describe it's Location.">
         <BaseClass>IWireOwnerOwnsWire</BaseClass>
         <Source multiplicity="(0..1)" roleLabel="owns" polymorphic="false">
             <Class class="CurveSupport"/>
@@ -535,12 +535,10 @@
         <BaseClass>Support</BaseClass>
         <BaseClass>ISheetOwner</BaseClass>
         <BaseClass>IDefinedSurface</BaseClass>
-        <ECNavigationProperty propertyName="Behavior" relationshipName="SurfaceSupportRefersToSurfaceSupportBehavior" direction="Forward" displayLabel="Behavior"
-            description="Defines how support behaves at it's location." />
+        <ECNavigationProperty propertyName="Behavior" relationshipName="SurfaceSupportRefersToSurfaceSupportBehavior" direction="Forward" displayLabel="Behavior" description="Defines how support behaves at it's location." />
     </ECEntityClass>
 
-    <ECRelationshipClass typeName="SurfaceSupportOwnsLocationSheet" strength="embedding" modifier="Sealed" 
-        description="A relationship that indicates that a SurfaceSupport owns a Sheet which should describe it's Location.">
+    <ECRelationshipClass typeName="SurfaceSupportOwnsLocationSheet" strength="embedding" modifier="Sealed" description="A relationship that indicates that a SurfaceSupport owns a Sheet which should describe it's Location.">
         <BaseClass>ISheetOwnerOwnsSheet</BaseClass>
         <Source multiplicity="(0..1)" roleLabel="owns" polymorphic="false">
             <Class class="SurfaceSupport"/>
@@ -708,14 +706,9 @@
         <BaseClass>IDefinedCurve</BaseClass>
         <ECProperty propertyName="PlacementPoint" typeName="string" displayLabel="Placement Point" description="Point at which Curve Member's topology intersects with Profile." />
         <ECProperty propertyName="Classification" typeName="CurveMemberClassificationType" displayLabel="Classification" description="The use case for this Curve Member." />
-        <ECProperty propertyName="StartRigidZoneLength" typeName="double" displayLabel="Start Rigid Zone Length"
-            description="Defines the length of Rigid Zone at the start of Curve Member.
-                Rigid zone specifies that the Curve Member is immune deformation at that zone. Common case would be where curve member overlaps with other member, overlapping area would be define das rigid zone." />
-        <ECProperty propertyName="EndRigidZoneLength" typeName="double" displayLabel="End Rigid Zone Length"
-            description="Defines the length of Rigid Zone at the end of Curve Member.
-            Rigid zone specifies that the Curve Member is immune deformation at that zone. Common case would be where curve member overlaps with other member, overlapping area would be define das rigid zone." />
-        <ECProperty propertyName="Offset" typeName="point2d" displayLabel="Offset"
-            description="2d offset defined in local coordinate system, where first coordinate variable shows offset along bi-normal and second along Orientation." />
+        <ECProperty propertyName="StartRigidZoneLength" typeName="double" displayLabel="Start Rigid Zone Length" description="Defines the length of Rigid Zone at the start of Curve Member. Rigid zone specifies that the Curve Member is immune deformation at that zone. Common case would be where curve member overlaps with other member, overlapping area would be define das rigid zone." />
+        <ECProperty propertyName="EndRigidZoneLength" typeName="double" displayLabel="End Rigid Zone Length" description="Defines the length of Rigid Zone at the end of Curve Member. Rigid zone specifies that the Curve Member is immune deformation at that zone. Common case would be where curve member overlaps with other member, overlapping area would be define das rigid zone." />
+        <ECProperty propertyName="Offset" typeName="point2d" displayLabel="Offset" description="2d offset defined in local coordinate system, where first coordinate variable shows offset along bi-normal and second along Orientation." />
     </ECEntityClass>
 
     <ECRelationshipClass typeName="CurveMemberOwnsLocationWire" strength="embedding" modifier="Sealed" description="A relationship that indicates that an Element owns Wire.">
@@ -777,8 +770,7 @@
         <BaseClass>CurveMemberType</BaseClass>
     </ECEntityClass>
 
-    <ECEntityClass typeName="MaterialProfileType" modifier="Sealed" displayLabel="Material Profile Type"
-        description="Curve Member Type with shared Material and Profile." >
+    <ECEntityClass typeName="MaterialProfileType" modifier="Sealed" displayLabel="Material Profile Type" description="Curve Member Type with shared Material and Profile." >
         <BaseClass>SingleCurveMemberType</BaseClass>
         <ECNavigationProperty propertyName="MaterialProfile" relationshipName="MaterialProfileTypeHasMaterialProfile" direction="Forward" displayLabel="Material Profile" description="Material Profile." />
     </ECEntityClass>
@@ -892,8 +884,7 @@
         <BaseClass>RelativeLocationAspect</BaseClass>
     </ECEntityClass>
 
-    <ECEntityClass typeName="PointRelativeToPointAspect" modifier="Sealed" displayLabel="Point relative to point location data"
-        description="Point relative to point.">
+    <ECEntityClass typeName="PointRelativeToPointAspect" modifier="Sealed" displayLabel="Point relative to point location data" description="Point relative to point.">
         <BaseClass>RelativePointLocationAspect</BaseClass>
         <ECNavigationProperty propertyName="ReferencePoint" relationshipName="PointRelativeToPointAspectRefersToIDefinedPoint" direction="Forward" displayLabel="Reference point" />
     </ECEntityClass>
@@ -1002,8 +993,7 @@
     </ECRelationshipClass>
 
     <!-- Mixins -->
-    <ECEntityClass typeName="IDefinedPoint" modifier="Abstract" displayLabel="Point location definition"
-        description="An Element that directly or indirectly defines a point in 3D space.">
+    <ECEntityClass typeName="IDefinedPoint" modifier="Abstract" displayLabel="Point location definition" description="An Element that directly or indirectly defines a point in 3D space.">
         <ECCustomAttributes>
             <IsMixin xmlns="CoreCustomAttributes.01.00.00">
                 <AppliesToEntityClass>bis:Element</AppliesToEntityClass>
@@ -1011,9 +1001,7 @@
         </ECCustomAttributes>
     </ECEntityClass>
 
-    <ECEntityClass typeName="IDefinedCurve" modifier="Abstract" displayLabel="Curve location definition"
-        description="An Element that directly or indirectly defines a curve location and a clear coordinate system with the z-axis along the curve.
-            The Element may have cardinal points defined; if not all the cardinal points should be considered to lie on the z-axis.">
+    <ECEntityClass typeName="IDefinedCurve" modifier="Abstract" displayLabel="Curve location definition" description="An Element that directly or indirectly defines a curve location and a clear coordinate system with the z-axis along the curve. The Element may have cardinal points defined; if not all the cardinal points should be considered to lie on the z-axis.">
         <ECCustomAttributes>
             <IsMixin xmlns="CoreCustomAttributes.01.00.00">
                 <AppliesToEntityClass>bis:Element</AppliesToEntityClass>
@@ -1022,18 +1010,14 @@
         <ECProperty propertyName="Orientation" typeName="Point3d" displayLabel="Orientation" description="Orientation (normal) vector of the curve." />
     </ECEntityClass>
 
-    <ECEntityClass typeName="IDefinedSurface" modifier="Abstract" displayLabel="Surface location definition"
-        description="An Element that directly or indirectly defines a surface location and a clear coordinate system with the x and y axes in the surface.
-            The Element may have a top, bottom and center defined; if not, the top and bottom and center should be considered to lie on the surface.">
+    <ECEntityClass typeName="IDefinedSurface" modifier="Abstract" displayLabel="Surface location definition" description="An Element that directly or indirectly defines a surface location and a clear coordinate system with the x and y axes in the surface. The Element may have a top, bottom and center defined; if not, the top and bottom and center should be considered to lie on the surface.">
         <ECCustomAttributes>
             <IsMixin xmlns="CoreCustomAttributes.01.00.00">
                 <AppliesToEntityClass>bis:Element</AppliesToEntityClass>
             </IsMixin>
         </ECCustomAttributes>
-        <ECProperty propertyName="SurfaceOrigin" typeName="Point3d" displayLabel="Surface Origin"
-            description="Point on the surface defining the start of its local coordinate system." />
-        <ECProperty propertyName="RAxis" typeName="Point3d" displayLabel="RAxis"
-            description="First vector defining the local coordinate system. This vector should be from tangent plane at the origin point of the surface." />
+        <ECProperty propertyName="SurfaceOrigin" typeName="Point3d" displayLabel="Surface Origin" description="Point on the surface defining the start of its local coordinate system." />
+        <ECProperty propertyName="RAxis" typeName="Point3d" displayLabel="RAxis" description="First vector defining the local coordinate system. This vector should be from tangent plane at the origin point of the surface." />
     </ECEntityClass>
 
     <!-- Load groups -->
@@ -1047,8 +1031,7 @@
         <ECEnumerator value="6" name="DeadConstruction" displayLabel="DeadConstruction" description="Dead load from other-than-structure in place only during construction." />
         <ECEnumerator value="7" name="EarthPressureUnspecified" displayLabel="EarthPressureUnspecified" description="Earth pressure at some unspecified design level." />
         <ECEnumerator value="8" name="EarthPressureService" displayLabel="EarthPressureService" description="Loads due to earth pressure at service limit level." />
-        <ECEnumerator value="9" name="EarthPressureUltimate" displayLabel="EarthPressureUltimate"
-            description="Load caused by lateral pressure of soil, usually affecting a retaining wall." />
+        <ECEnumerator value="9" name="EarthPressureUltimate" displayLabel="EarthPressureUltimate" description="Load caused by lateral pressure of soil, usually affecting a retaining wall." />
         <ECEnumerator value="10" name="Equipment" displayLabel="Equipment" description="Loads due to earth pressure at ultimate limit level."/>
         <ECEnumerator value="11" name="FloorUnspecified" displayLabel="FloorUnspecified" description="Floor loads with out further specification." />
         <ECEnumerator value="12" name="FloorConstruction" displayLabel="FloorConstruction" description="Floor loads in place only during construction." />
@@ -1078,7 +1061,7 @@
         <ECEnumerator value="36" name="RoofSnowUnspecified" displayLabel="RoofSnowUnspecified" description="Roof loads due to snow with no further specification." />
         <ECEnumerator value="37" name="RoofSnowUniform" displayLabel="RoofSnowUniform" description="Roof loads due to uniform snow loads. Note that this is typically used as an alternate to RoofSnowDrift." />
         <ECEnumerator value="38" name="RoofSnowDrift" displayLabel="RoofSnowDrift" description="Roof loads due to drifted snow loads Note that this is typically used as an alternate to RoofSnowUniform." />
-        <ECEnumerator value="39" name="SeismicUnspecified" displayLabel="SeismicUnspecified"  description="Seismic loads at some unspecified loading level." />
+        <ECEnumerator value="39" name="SeismicUnspecified" displayLabel="SeismicUnspecified" description="Seismic loads at some unspecified loading level." />
         <ECEnumerator value="40" name="SeismicService" displayLabel="SeismicService" description="Seismic loads at service levels." />
         <ECEnumerator value="41" name="SeismicUltimate" displayLabel="SeismicUltimate" description="Seismic loads at service levels." />
         <ECEnumerator value="42" name="Settlement" displayLabel="Settlement" description="Loads due to support settlement." />
@@ -1159,8 +1142,7 @@
         </Target>
     </ECRelationshipClass>
 
-    <ECEntityClass typeName="FactoredLoadConditionAspect" modifier="Abstract" displayLabel="Factored Load Condition Aspect"
-        description="Adds a factor to a specified LoadCondition.">
+    <ECEntityClass typeName="FactoredLoadConditionAspect" modifier="Abstract" displayLabel="Factored Load Condition Aspect" description="Adds a factor to a specified LoadCondition.">
         <BaseClass>bis:ElementMultiAspect</BaseClass>
         <ECProperty propertyName="Factor" typeName="double" description="Factor to be applied to the group." />
         <ECProperty propertyName="LoadCombinationType" typeName="LoadCombinationType" description="Type of load combination." />
@@ -1182,8 +1164,7 @@
 
     <ECEntityClass typeName="FactoredLoadCombinationAspect" modifier="Sealed" displayLabel="Factored Load Combination Aspect" description="Adds a factor to a specified LoadCase.">
         <BaseClass>FactoredLoadConditionAspect</BaseClass>
-        <ECNavigationProperty propertyName="LoadCombination" relationshipName="FactoredLoadCombinationAspectRefersToLoadCombination" direction="Forward" displayLabel="Load Combination"
-            description="Load Combination."/>
+        <ECNavigationProperty propertyName="LoadCombination" relationshipName="FactoredLoadCombinationAspectRefersToLoadCombination" direction="Forward" displayLabel="Load Combination" description="Load Combination."/>
     </ECEntityClass>
 
     <ECRelationshipClass typeName="FactoredLoadCombinationAspectRefersToLoadCombination" strength="referencing" strengthDirection="Forward" modifier="Sealed">
@@ -1240,8 +1221,7 @@
     </ECEntityClass>
 
     <!-- Points -->
-    <ECEntityClass typeName="PointLoadValueAspect" modifier="Abstract" displayLabel="Point load value data"
-        description="Base class for defining Point Load properties.">
+    <ECEntityClass typeName="PointLoadValueAspect" modifier="Abstract" displayLabel="Point load value data" description="Base class for defining Point Load properties.">
         <BaseClass>LoadValueAspect</BaseClass>
     </ECEntityClass>
 
@@ -1255,15 +1235,13 @@
         </Target>
     </ECRelationshipClass>
 
-    <ECEntityClass typeName="ForcePointLoadValueAspect" modifier="Sealed" displayLabel="Point Force value data"
-        description="Defines a force for a point load.">
+    <ECEntityClass typeName="ForcePointLoadValueAspect" modifier="Sealed" displayLabel="Point Force value data" description="Defines a force for a point load.">
         <BaseClass>PointLoadValueAspect</BaseClass>
         <ECStructProperty propertyName="Force" typeName="PointForce" displayLabel="Point force" description="Force value." />
     </ECEntityClass>
 
     <!-- Curves -->
-    <ECEntityClass typeName="CurveLoadValueAspect" modifier="Abstract" displayLabel="Curve load value data"
-        description="A LoadValueAspect that can be assigned to a CurveLoad.">
+    <ECEntityClass typeName="CurveLoadValueAspect" modifier="Abstract" displayLabel="Curve load value data" description="A LoadValueAspect that can be assigned to a CurveLoad.">
         <BaseClass>LoadValueAspect</BaseClass>
     </ECEntityClass>
 
@@ -1345,44 +1323,30 @@
 
     <ECEntityClass typeName="PointSupportBehavior" modifier="Sealed" displayLabel="Point Support Behavior" description="Defines fixity behavior for a Point Support.">
         <BaseClass>SupportBehavior</BaseClass>
-        <ECNavigationProperty propertyName="TranslationalRAxis" relationshipName="PointSupportBehaviorRefersToPointTranslationalBehaviorRAxis" direction="Forward"
-            displayLabel="Translational R axis" description="Translational Fixity behavior along R Axis." />
-        <ECNavigationProperty propertyName="TranslationalSAxis" relationshipName="PointSupportBehaviorRefersToPointTranslationalBehaviorSAxis" direction="Forward"
-            displayLabel="Translational S axis" description="Translational Fixity behavior along S Axis." />
-        <ECNavigationProperty propertyName="TranslationalTAxis" relationshipName="PointSupportBehaviorRefersToPointTranslationalBehaviorTAxis" direction="Forward"
-            displayLabel="Translational T axis" description="Translational Fixity behavior along T Axis." />
-        <ECNavigationProperty propertyName="RotationalRAxis" relationshipName="PointSupportBehaviorRefersToPointRotationalBehaviorRAxis" direction="Forward"
-            displayLabel="Rotational R axis" description="Rotational Fixity behavior about R Axis." />
-        <ECNavigationProperty propertyName="RotationalSAxis" relationshipName="PointSupportBehaviorRefersToPointRotationalBehaviorSAxis" direction="Forward"
-            displayLabel="Rotational S axis" description="Rotational Fixity behavior about S Axis." />
-        <ECNavigationProperty propertyName="RotationalTAxis" relationshipName="PointSupportBehaviorRefersToPointRotationalBehaviorTAxis" direction="Forward"
-            displayLabel="Rotational T axis" description="Rotational Fixity behavior about T Axis." />
+        <ECNavigationProperty propertyName="TranslationalRAxis" relationshipName="PointSupportBehaviorRefersToPointTranslationalBehaviorRAxis" direction="Forward" displayLabel="Translational R axis" description="Translational Fixity behavior along R Axis." />
+        <ECNavigationProperty propertyName="TranslationalSAxis" relationshipName="PointSupportBehaviorRefersToPointTranslationalBehaviorSAxis" direction="Forward" displayLabel="Translational S axis" description="Translational Fixity behavior along S Axis." />
+        <ECNavigationProperty propertyName="TranslationalTAxis" relationshipName="PointSupportBehaviorRefersToPointTranslationalBehaviorTAxis" direction="Forward" displayLabel="Translational T axis" description="Translational Fixity behavior along T Axis." />
+        <ECNavigationProperty propertyName="RotationalRAxis" relationshipName="PointSupportBehaviorRefersToPointRotationalBehaviorRAxis" direction="Forward" displayLabel="Rotational R axis" description="Rotational Fixity behavior about R Axis." />
+        <ECNavigationProperty propertyName="RotationalSAxis" relationshipName="PointSupportBehaviorRefersToPointRotationalBehaviorSAxis" direction="Forward" displayLabel="Rotational S axis" description="Rotational Fixity behavior about S Axis." />
+        <ECNavigationProperty propertyName="RotationalTAxis" relationshipName="PointSupportBehaviorRefersToPointRotationalBehaviorTAxis" direction="Forward" displayLabel="Rotational T axis" description="Rotational Fixity behavior about T Axis." />
     </ECEntityClass>
 
     <ECEntityClass typeName="CurveSupportBehavior" modifier="Sealed" displayLabel="Curve Support Behavior" description="Defines fixity behaviors for Curve Support.">
         <BaseClass>SupportBehavior</BaseClass>
-        <ECNavigationProperty propertyName="TranslationalRAxis" relationshipName="CurveSupportBehaviorRefersToCurveTranslationalBehaviorRAxis" direction="Forward"
-            displayLabel="Translational R axis" description="Translational Fixity behavior along R Axis." />
-        <ECNavigationProperty propertyName="TranslationalSAxis" relationshipName="CurveSupportBehaviorRefersToCurveTranslationalBehaviorSAxis" direction="Forward"
-            displayLabel="Translational S axis" description="Translational Fixity behavior along S Axis." />
-        <ECNavigationProperty propertyName="TranslationalTAxis" relationshipName="CurveSupportBehaviorRefersToCurveTranslationalBehaviorTAxis" direction="Forward"
-            displayLabel="Translational T axis" description="Translational Fixity behavior along T Axis." />
-        <ECNavigationProperty propertyName="RotationalRAxis" relationshipName="CurveSupportBehaviorRefersToCurveRotationalBehaviorRAxis" direction="Forward"
-            displayLabel="Rotational R axis" description="Rotational Fixity behavior about R Axis."/>
+        <ECNavigationProperty propertyName="TranslationalRAxis" relationshipName="CurveSupportBehaviorRefersToCurveTranslationalBehaviorRAxis" direction="Forward" displayLabel="Translational R axis" description="Translational Fixity behavior along R Axis." />
+        <ECNavigationProperty propertyName="TranslationalSAxis" relationshipName="CurveSupportBehaviorRefersToCurveTranslationalBehaviorSAxis" direction="Forward" displayLabel="Translational S axis" description="Translational Fixity behavior along S Axis." />
+        <ECNavigationProperty propertyName="TranslationalTAxis" relationshipName="CurveSupportBehaviorRefersToCurveTranslationalBehaviorTAxis" direction="Forward" displayLabel="Translational T axis" description="Translational Fixity behavior along T Axis." />
+        <ECNavigationProperty propertyName="RotationalRAxis" relationshipName="CurveSupportBehaviorRefersToCurveRotationalBehaviorRAxis" direction="Forward" displayLabel="Rotational R axis" description="Rotational Fixity behavior about R Axis."/>
     </ECEntityClass>
 
     <ECEntityClass typeName="SurfaceSupportBehavior" modifier="Sealed" displayLabel="Surface Support Behavior" description="Defines Surface behaviors for a Surface Support.">
         <BaseClass>SupportBehavior</BaseClass>
-        <ECNavigationProperty propertyName="TranslationalRAxis" relationshipName="SurfaceSupportBehaviorRefersToSurfaceTranslationalBehaviorRAxis" direction="Forward"
-            displayLabel="Translational R axis" description="Fixity behavior along R Axis." />
-        <ECNavigationProperty propertyName="TranslationalSAxis" relationshipName="SurfaceSupportBehaviorRefersToSurfaceTranslationalBehaviorSAxis" direction="Forward"
-            displayLabel="Translational S axis" description="Fixity behavior along S Axis." />
-        <ECNavigationProperty propertyName="TranslationalTAxis" relationshipName="SurfaceSupportBehaviorRefersToSurfaceTranslationalBehaviorTAxis" direction="Forward"
-            displayLabel="Translational T axis" description="Fixity behavior along T Axis." />
+        <ECNavigationProperty propertyName="TranslationalRAxis" relationshipName="SurfaceSupportBehaviorRefersToSurfaceTranslationalBehaviorRAxis" direction="Forward" displayLabel="Translational R axis" description="Fixity behavior along R Axis." />
+        <ECNavigationProperty propertyName="TranslationalSAxis" relationshipName="SurfaceSupportBehaviorRefersToSurfaceTranslationalBehaviorSAxis" direction="Forward" displayLabel="Translational S axis" description="Fixity behavior along S Axis." />
+        <ECNavigationProperty propertyName="TranslationalTAxis" relationshipName="SurfaceSupportBehaviorRefersToSurfaceTranslationalBehaviorTAxis" direction="Forward" displayLabel="Translational T axis" description="Fixity behavior along T Axis." />
     </ECEntityClass>
 
-    <ECEntityClass typeName="PointTranslationalBehavior" modifier="Abstract" displayLabel="Point Translational Behavior"
-        description="Defines fixity behavior along a single local coordinate axis of a Point Support.">
+    <ECEntityClass typeName="PointTranslationalBehavior" modifier="Abstract" displayLabel="Point Translational Behavior" description="Defines fixity behavior along a single local coordinate axis of a Point Support.">
         <BaseClass>bis:DefinitionElement</BaseClass>
     </ECEntityClass>
 
@@ -1427,8 +1391,7 @@
         <ECProperty propertyName="Stiffness" typeName="double" displayLabel="Stiffness" description="Stiffness." />
     </ECEntityClass>
 
-    <ECEntityClass typeName="PointRotationalBehavior" modifier="Abstract" displayLabel="Vertex Rotational Behavior"
-        description="Describes connection about some specific axis." >
+    <ECEntityClass typeName="PointRotationalBehavior" modifier="Abstract" displayLabel="Vertex Rotational Behavior" description="Describes connection about some specific axis." >
         <BaseClass>bis:DefinitionElement</BaseClass>
     </ECEntityClass>
 
@@ -1472,8 +1435,7 @@
         <ECProperty propertyName="Stiffness" typeName="double" displayLabel="Stiffness" description="Stiffness." />
     </ECEntityClass>
 
-    <ECEntityClass typeName="CurveTranslationalBehavior" modifier="Abstract" displayLabel="Curve Translational Behavior"
-        description="Describes connection along some specific axis.">
+    <ECEntityClass typeName="CurveTranslationalBehavior" modifier="Abstract" displayLabel="Curve Translational Behavior" description="Describes connection along some specific axis.">
         <BaseClass>bis:DefinitionElement</BaseClass>
     </ECEntityClass>
 
@@ -1504,8 +1466,7 @@
         </Target>
     </ECRelationshipClass>
 
-    <ECEntityClass typeName="FixedCurveTranslationalBehavior" modifier="Sealed" displayLabel="Fixed Curve Translational Behavior"
-        description="Fix curve translational behavior.">
+    <ECEntityClass typeName="FixedCurveTranslationalBehavior" modifier="Sealed" displayLabel="Fixed Curve Translational Behavior" description="Fix curve translational behavior.">
         <BaseClass>CurveTranslationalBehavior</BaseClass>
     </ECEntityClass>
 
@@ -1513,15 +1474,13 @@
         <BaseClass>CurveTranslationalBehavior</BaseClass>
     </ECEntityClass>
 
-    <ECEntityClass typeName="LinearSpringCurveTranslationalBehavior" modifier="Sealed" displayLabel="Linear Spring Curve Translational Behavior"
-        description="Linear Spring Curve Translational Behavior.">
+    <ECEntityClass typeName="LinearSpringCurveTranslationalBehavior" modifier="Sealed" displayLabel="Linear Spring Curve Translational Behavior" description="Linear Spring Curve Translational Behavior.">
         <BaseClass>CurveTranslationalBehavior</BaseClass>
         <ECProperty propertyName="SpringType" typeName="SpringBehaviorType" displayLabel="SpringType" description="Spring Type." />
         <ECProperty propertyName="Stiffness" typeName="double" displayLabel="Stiffness" description="Stiffness." />
     </ECEntityClass>
 
-    <ECEntityClass typeName="CurveRotationalBehavior" modifier="Abstract" displayLabel="Curve Rotational Behavior"
-        description="Describes connection about some specific axis.">
+    <ECEntityClass typeName="CurveRotationalBehavior" modifier="Abstract" displayLabel="Curve Rotational Behavior" description="Describes connection about some specific axis.">
         <BaseClass>bis:DefinitionElement</BaseClass>
     </ECEntityClass>
 
@@ -1534,18 +1493,15 @@
         </Target>
     </ECRelationshipClass>
 
-    <ECEntityClass typeName="FixedCurveRotationalBehavior" modifier="Sealed" displayLabel="Fixed Curve Rotational Behavior"
-        description="Curve has fixed rotational behavior.">
+    <ECEntityClass typeName="FixedCurveRotationalBehavior" modifier="Sealed" displayLabel="Fixed Curve Rotational Behavior" description="Curve has fixed rotational behavior.">
         <BaseClass>CurveRotationalBehavior</BaseClass>
     </ECEntityClass>
 
-    <ECEntityClass typeName="ReleasedCurveRotationalBehavior" modifier="Sealed" displayLabel="Released Curve Rotational Behavior"
-        description="Released Curve Rotational Behavior.">
+    <ECEntityClass typeName="ReleasedCurveRotationalBehavior" modifier="Sealed" displayLabel="Released Curve Rotational Behavior" description="Released Curve Rotational Behavior.">
         <BaseClass>CurveRotationalBehavior</BaseClass>
     </ECEntityClass>
 
-    <ECEntityClass typeName="LinearSpringCurveRotationalBehavior" modifier="Sealed" displayLabel="Linear Spring Curve Rotational Behavior"
-        description="Defines Linear Spring Curve Rotational Behavior for Curve Support.">
+    <ECEntityClass typeName="LinearSpringCurveRotationalBehavior" modifier="Sealed" displayLabel="Linear Spring Curve Rotational Behavior" description="Defines Linear Spring Curve Rotational Behavior for Curve Support.">
         <BaseClass>CurveRotationalBehavior</BaseClass>
         <ECProperty propertyName="Stiffness" typeName="double" displayLabel="Stiffness" description="Stiffness." />
     </ECEntityClass>
