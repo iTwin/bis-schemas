@@ -340,7 +340,7 @@ Most common [SurfaceType](#surfacetype). Should be assigned to most walls, slabs
 
 ### Load
 
-Structure loads represent forces, deformations that are applied to [StructuralMembers](#member) or [Supports](#support). Properties for load affected elements are calculated by assessing these Loads.
+Structure loads represent forces, deformations that are applied to [StructuralMembers](#member), [Supports](#support) or [Vertices](#vertex). Properties for load affected elements are calculated by assessing these Loads.
 
 When multiple loads overlap (regardless of the Load Type) the result is always additive.
 
@@ -356,7 +356,7 @@ Loads are subclassed by the area they affect:
 
 ### PointLoad
 
-[Load](#load) which affects such a small area that it can be contracted to a single spatial point. PointLoad can be placed on any [Member](#member), [Support](#support) and even [Vertex](#vertex).
+[Load](#load) which affects such a small area that it can be contracted to a single spatial point. PointLoad should be placed on any [Member](#member), [Support](#support). However, because some applications are used to placing PointLoads on Vertices/Nodes - PointLoad has exception and can be placed on a [Vertex](#vertex).
 
 Two aspects must always be assigned to a PointLoad:
 
