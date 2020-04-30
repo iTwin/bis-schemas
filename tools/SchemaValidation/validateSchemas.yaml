@@ -12,10 +12,7 @@ jobs:
     clean: all
 
   pool:
-    name: iModelTechCI
-    demands:
-    - Agent.OS -equals Windows_NT
-    - npm
+    vmImage: windows-latest
 
   variables:
     - group: 
@@ -37,24 +34,15 @@ jobs:
     clean: true
 
      
-  - powershell: |
-      $npmrcDir = "$(Build.Repository.LocalPath)"
-      
-      if(!(Test-Path -Path $npmrcDir)){
-          mkdir $npmrcDir
-      }
-      
-      $npmrcFile = $npmrcDir + "/.npmrc"
-      
-      Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "@bentley:registry=/"
-      
-      Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "////_packaging/Packages/npm/registry/:username=Packages" -Append
-      Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "////_packaging/Packages/npm/registry/:_password=$()" -Append
-      Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "////_packaging/Packages/npm/registry/:email=npm requires email to be set but doesn't use the value" -Append
-      Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "////_packaging/Packages/npm/:username=Packages" -Append
-      Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "////_packaging/Packages/npm/:_password=$()" -Append
-      Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "////_packaging/Packages/npm/:email=npm requires email to be set but doesn't use the value" -Append
-
+   
+   
+   
+   
+   
+   
+   
+   
+   
    
 
   - script: npm install @bentley/schema-validator@latest
@@ -117,6 +105,59 @@ jobs:
     condition: succeededOrFailed()  
     artifact: bis-schema-comparison-logs
     displayName: 'Publish BIS Schema Comparison Results'
+
+- job: VerifyReleasedSchemas
+  workspace:
+    clean: all
+
+  pool:
+    vmImage: windows-latest
+
+  variables:
+    - group: 
+
+  steps:
+  - task: NodeTool@0
+    displayName: 'Use Node 12.16.0'
+    inputs:
+      versionSpec: 12.16.0
+  - checkout: self
+  - checkout: git:///bis-schema-validation
+    clean: true
+
+     
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+
+  - task: NuGetCommand@2
+    displayName: 'Download Nuget of Signoff Tool'
+    inputs:
+      command: custom
+      arguments: 'install  -OutputDirectory $(System.DefaultWorkingDirectory) -Source _packaging/Packages/nuget/v3/index.json'
+
+  - powershell: |
+      $dir = Get-ChildItem $(System.DefaultWorkingDirectory) | Where-Object {$_.name -like "*"}
+
+      Write-Host "SignoffToolPath=$(System.DefaultWorkingDirectory)\$dir\lib\native\"
+      Write-Host "##vso[task.setvariable variable=SignoffToolPath]$(System.DefaultWorkingDirectory)\$dir\lib\native\"
+    failOnStderr: true
+    displayName: 'Set Env for Signoff Tool Path'
+
+  - script: npm install
+    displayName: npm install
+    workingDirectory: $(Build.SourcesDirectory)/bis-schema-validation/imodel-schema-validator
+
+  - script: npm run tests:ValidateReleasedBisSchemas
+    displayName: npm run tests:ValidateReleasedBisSchemas
+    workingDirectory: $(Build.SourcesDirectory)/bis-schema-validation/imodel-schema-validator
 
 - job: SchemaInventory
   dependsOn: Validation
