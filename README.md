@@ -111,7 +111,7 @@ The Team is owned by the schema owner, which gives them the ability to add/remov
 
 ## Schema Validation
 
-A build is set up to validate schemas against a set of [validation rules](https://imodeljs.github.io/iModelJs-docs-output/bis/intro/bis-schema-validation/). Additionally, it performs a difference audit of all schemas against their latest released version, if one exists. The validation and difference logs are published as build artifacts and made accessible.
+A build is setup to validate schemas against a set of [validation rules](https://imodeljs.github.io/iModelJs-docs-output/bis/intro/bis-schema-validation/). Additionally, it performs a difference audit of all schemas against their latest released version, if one exists. It also validates these latest released versions by first importing them into an imodel and then validating them using [imodel-schema-validator](#imodel-schema-validation). The validation and difference logs are published as build artifacts and made accessible.
 
 
 
@@ -125,10 +125,10 @@ Please invite the certification team of your bridge to verify the checksums of y
 
 
 
-1. Set up a new iModel Schema Validation job.
+
     - See [iModel Schema Validation](#imodel-schema-validation) for details on how to do this.
-2. Run the new build job on a fresh iModel you published to iModelHub.
-3. Any verification errors should be filed as a TR to the lead developer as a showstopper. This version of the bridge should NOT be used in production.
+
+3. Any verification errors should be filed as a TR to the lead developer as a showstopper. This version of the bridge should NOT be used in production..
 
 
 
@@ -137,21 +137,35 @@ Please invite the certification team of your bridge to verify the checksums of y
 
 ### iModel Schema Validation
 
-The iModel Schema Validation tool imports each individual schema in the bis-schema repository (along with schema references) into an local snapshot iModel. The schemas are then exported to a temp directory in order to perform the required validations. 
+A new TypeScript based tool **imodel-schema-validator** is now available to validate the schemas within an iModel. It downloads the briefcase of the given iModel and export all the schemas within it, then it performs following 4 validations against these exported schemas: 
+
+- **BIS-Rules Validation:** All schemas are validated against [BIS-Rules](https://www.imodeljs.org/bis/intro/bis-schema-validation/).
+- **Comparison Validation:** All schemas are compared with their similar (exact version match) released schemas within bis-schemas.
+- **Sha1 Hash Validation:** Sha1 Hash is generated for each exported schema and compared against the set of hashes of released schemas present in [SchemaInventory](https://github.com/iTwin/bis-schemas/blob/master/SchemaInventory.json).
+- **Approval Validation:** Approval status of each schema is checked from [SchemaInventory](https://github.com/iTwin/bis-schemas/blob/master/SchemaInventory.json).
 
 
 
 
-2. Add the 'BIS - Verify iModel Schemas' task and fill out the following parameters:
+ 
 
-- iModelName
-- hubProjectID
-- hubEnvironment
-- hubUserName
-- hubPassWord
-  - It is recommended that you use a Secret variable for the password. Under the 'Variables' section, add a new variable and select the lock icon to make it secret. In the hubPassWord field, you can then use the variable like this: `$(variableName)`
 
-See the iModel Schema Validation -- sample build definition for an example.
+   
+
+  
+
+  
+  
+   
+  
+    
+
+  
+
+
+
+
+To setup and use this tool locally, follow the instructions in [imodel-schema-validator readme.md](https://github.com/iTwin/bis-schema-validation/tree/master/imodel-schema-validator).
 
 ## Schema Packaging - *WIP*
 
