@@ -165,45 +165,28 @@ jobs:
     clean: all
 
   pool:
-    name: 
-    demands:
-    - Agent.OS -equals Windows_NT
-    - npm
+    vmImage: windows-latest
 
   steps: 
   - checkout: self
     clean: true
-    
-  - script: |
-      SET PYENV_NAME=pyenv
 
-      virtualenv %PYENV_NAME%
-
-      $(System.DefaultWorkingDirectory)\pyenv\Scripts\pip.exe install python-ntlm
-      $(System.DefaultWorkingDirectory)\pyenv\Scripts\pip.exe install pywin32==224
-      $(System.DefaultWorkingDirectory)\pyenv\Scripts\pip.exe install lxml
-
-    displayName: 'Setup python environment'
-
-  - script: |
-      git checkout master
-      git status
-      git pull
-      git status
-    displayName: 'Switching to master'
+  - script: 'git config --local user.email imodeljsbot@users.noreply.github.com'
+    displayName: 'git config email'
+  - script: 'git config --local user.name iModeljsBot'
+    displayName: 'git config name'
+  - script: 'git checkout --track origin/master'
+    displayName: 'Switching to master '
 
   - task: Npm@1
     displayName: 'npm install'
     inputs:
       command: install   
 
-  - script: $(System.DefaultWorkingDirectory)\pyenv\Scripts\python.exe tools/signoff/signoff.py --getLaunchCodes --dumpjson
-    displayName: Get Launch codes (temp)
-
-  - script: node ./tools/signoff/generateInventory.js --BisRoot . --OutDir . --ChecksumDumpDir .
+  - script: node ./tools/signoff/generateInventory.js --BisRoot . --OutDir .
     displayName: Build Schema Inventory
 
   - powershell: |
       git commit -m "Automated SchemaInventory Commit [skip ci]" -- $(System.DefaultWorkingDirectory)\SchemaInventory.json
-      git push origin master -q
+      git -c http.extraheader="AUTHORIZATION: bearer $(token)" push origin master -q --follow-tags
     displayName: Checkin SchemaInventory  
