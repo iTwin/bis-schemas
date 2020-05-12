@@ -97,6 +97,45 @@ The addition of the new BIS Schemas will be at the discretion of the owner of th
 
 Given that all pull requests outside of a domain group directory require a repository owner to review, they are required to review any new domains added. The domain must follow the directory structure, and then identify a person who is designated as the domain owner(s), who will handle all future pull requests.
 
+### CheckSum Information
+
+### When adding a new schema
+
+1. **WIP Schema:**
+A new entry will automatically be added to the SchemaInventory.json (at the root of bis-schemas), when a PR build occurs.
+
+2. **Released Schema:**
+Following are the steps:
+     - Find the WIP schema in [SchemaInventory.json](https://github.com/iTwin/bis-schemas/blob/master/SchemaInventory.json) file.  
+
+      - A new entry for the released schema needs to be added in [SchemaInventory.json](https://github.com/iTwin/bis-schemas/blob/master/SchemaInventory.json) file.  If the new schema is the first released version of the WIP schema then add the new section after the WIP schema, otherwise add the entry after the **latest released version**.
+
+     - Sample new section:
+     `
+        {
+        "name": "testSchema",
+        "path": "Domains\\testSchema\\Released\\testSchema.01.00.04.ecschema.xml",
+        "released": true,
+        "version": "01.00.04",
+        "comment": "",
+        "sha1": "put the sha1 hash value here",
+        "author": "FirstName.LastName",
+        "approved": "Yes",
+        "date": "MM/DD/YYYY",
+        "dynamic": "No"
+        },
+
+     - Provide accurate values for all the keys in this new section otherwise schema validation can fail.
+     - You should have these inventory changes in the same **Pull Request** where you have your new schema XML file. 
+
+     **Note:** This manual step for released schemas will soon be replaced with a developer tool that will add the new entry, along with a generated checksum by itself.
+`
+### When updating an existing schema
+When an already added schema is changed, you can update its Sha1 Hash and the other information in [SchemaInventory.json](https://github.com/iTwin/bis-schemas/blob/master/SchemaInventory.json) file:  
+- Locate the entry by schema name and version in [SchemaInventory.json](https://github.com/iTwin/bis-schemas/blob/master/SchemaInventory.json) e.g `SchemaName.version.ecschema.xml`. You will see a section, having some key,value pairs containing the information about that schema.
+- Verify and update any necessary fields.
+- Any schema inventory changes should be in the same **Pull Request** as the schema XML file changes.
+
 ### Managing permissions to BIS Schema
 
 Every BIS Schema within the repository has an associated owner. The owner is in charge of managing Pull Requests and permissions to the BIS Schema(s).
@@ -127,8 +166,6 @@ Please invite the certification team of your bridge to verify the checksums of y
 
 
     - See [iModel Schema Validation](#imodel-schema-validation) for details on how to do this.
-
-3. Any verification errors should be filed as a TR to the lead developer as a showstopper. This version of the bridge should NOT be used in production..
 
 
 
