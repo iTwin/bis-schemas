@@ -16,7 +16,7 @@ Goal of the schema documentation is to clarify:
 
 1. Add .cmap in media folder
 1. Export .cmap as .png file
-1. .cmap style guide and examples can be found [here](.\schema-cmap-style-guide.md)
+1. .cmap style guide and examples can be found [here](schema-cmap-style-guide.md)
 
 ## Guidelines for Elements
 
