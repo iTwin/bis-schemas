@@ -12,21 +12,21 @@ This page provides the recommended style guidelines for creating CMAPs that repr
 ## **Guidelines**
 
 - **Class diagram**
-  - [Guidelines](.\schema-cmap-class-style-guide)
-  - [Example](.\cmap-example\example-class.cmap)
-  - [Template](.\cmap-example\template-class.cmap)
+  - [Guidelines](schema-cmap-class-style-guide)
+  - [Example](cmap-example\example-class.cmap)
+  - [Template](cmap-example\template-class.cmap)
 - **Instance diagram**
-  - [Guidelines](.\schema-cmap-instance-style-guide)
-  - [Example](.\cmap-example\example-instance.cmap)
-  - [Template](.\cmap-example\template-instance.cmap)
+  - [Guidelines](schema-cmap-instance-style-guide)
+  - [Example](cmap-example\example-instance.cmap)
+  - [Template](cmap-example\template-instance.cmap)
 
 ## **CMAP Tips**
 - **"Named styles"** are provided with the template CMAPs, but are not visible by default. To enable them open the main ("Views - CmapTools") window -> Edit -> Preferences -> Cmap Editing -> Show Named styles in the Style Palette (check).
 
-![styles settings](.\cmap-example\media\styles-settings.gif)
-![styles ui](.\cmap-example\media\styles-ui.gif)
+![styles settings](cmap-example\media\styles-settings.gif)
+![styles ui](cmap-example\media\styles-ui.gif)
 
 - To draw arrows/links between nodes with no labels: <kbd>**Ctrl**</kbd>+<kbd>**Drag**</kbd>.
 - To create a "nested node": select multiple nodes -> context menu -> Nested Node -> Create
 
-![nested node](.\cmap-example\media\nested-node.gif)
+![nested node](cmap-example\media\nested-node.gif)
