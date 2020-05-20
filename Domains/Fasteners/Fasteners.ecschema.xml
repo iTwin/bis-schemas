@@ -1,31 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ECSchema schemaName="Fasteners" description="The classes and relationships required for the physical representation of a fasteners such as bolts and welds." alias="fst" version="01.00.00" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.1">
+<ECSchema schemaName="Fasteners" description="The classes and relationships required for the physical representation of a fasteners such as bolts and welds." alias="fst" version="01.00.00" 
+    xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.1">
     <ECSchemaReference name="BisCore" version="01.00.00" alias="bis" />
     <ECSchemaReference name="StructuralPhysicalInterop" version="01.00.00" alias="spi" />
-    <ECEntityClass typeName="FastenerComponent" displayLabel="Fastener Component"  description="A fastener component is an individual element belonging to a fastener assembly.">
+    <ECEntityClass typeName="FastenerComponent" displayLabel="Fastener Component" description="A fastener component is an individual element belonging to a fastener assembly.">
         <BaseClass>bis:PhysicalElement</BaseClass>
         <BaseClass>spi:IStructuralComponent</BaseClass>
     </ECEntityClass>
-    <ECEntityClass typeName="Bolt" displayLabel="Bolt"  description="A bolt is a threaded fastener">
+    <ECEntityClass typeName="Bolt" displayLabel="Bolt" description="A bolt is a threaded fastener">
         <BaseClass>FastenerComponent</BaseClass>
     </ECEntityClass>
-    <ECEntityClass typeName="Rod" displayLabel="Rod"  description="A rod is a threaded fastener">
+    <ECEntityClass typeName="Rod" displayLabel="Rod" description="A rod is a threaded fastener">
         <BaseClass>FastenerComponent</BaseClass>
     </ECEntityClass>
-    <ECEntityClass typeName="FastenerComponentType" displayLabel="Fastener Component Type"  description="The fastener component type designnates the type of fastener component e.g. mechanical or firmly bonded">
+    <ECEntityClass typeName="FastenerComponentType" displayLabel="Fastener Component Type" description="The fastener component type designnates the type of fastener component e.g. mechanical or firmly bonded">
         <BaseClass>bis:PhysicalType</BaseClass>
     </ECEntityClass>
-    <ECEntityClass typeName="MechanicalFastenerType" displayLabel="Mechanical Fastener Type"  description="Types of mechanical fasteners">
+    <ECEntityClass typeName="MechanicalFastenerType" displayLabel="Mechanical Fastener Type" description="Types of mechanical fasteners">
         <BaseClass>FastenerComponentType</BaseClass>
     </ECEntityClass>
-    <ECEntityClass typeName="FirmlyBondedFastenerType" displayLabel="Firmly Bonded Fastener Type"  description="Types of firmly bonded fasteners e.g. weld or adhesive">
+    <ECEntityClass typeName="FirmlyBondedFastenerType" displayLabel="Firmly Bonded Fastener Type" description="Types of firmly bonded fasteners e.g. weld or adhesive">
         <BaseClass>FastenerComponentType</BaseClass>
     </ECEntityClass>
-    <ECEntityClass typeName="ThreadedFastenerType" displayLabel="Threaded Fastener Type"  description="Type of threaded fastener e.g. bolt, rod, washer or nut">
+    <ECEntityClass typeName="ThreadedFastenerType" displayLabel="Threaded Fastener Type" description="Type of threaded fastener e.g. bolt, rod, washer or nut">
         <BaseClass>MechanicalFastenerType</BaseClass>
     </ECEntityClass>
-    <ECRelationshipClass typeName="FastenerComponentIsOfFastenerComponentType" displayLabel="Fastener Component is of Fastener Component Type"  description="Relates a fastener component to its type" modifier="None" strength="referencing">
-        <Source multiplicity="(0..1)" roleLabel="FastenerComponentIsOfFastenerComponentType" polymorphic="true">
+    <ECRelationshipClass typeName="FastenerComponentIsOfFastenerComponentType" displayLabel="Fastener Component is of Fastener Component Type" description="Relates a fastener component to its type" modifier="None" strength="referencing">
+        <BaseClass>bis:PhysicalElementIsOfType</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="FastenerComponentIsOfFastenerComponentType" polymorphic="true">
             <Class class="FastenerComponent"/>
         </Source>
         <Target multiplicity="(0..1)" roleLabel="FastenerComponentIsOfFastenerComponentType (Reversed)" polymorphic="true">
@@ -43,7 +45,7 @@
     </ECEntityClass>
     <ECRelationshipClass typeName="BoltIsOfBoltType" displayLabel="Bolt is of Bolt Type" description="Relates a fastener component to its sub-type" modifier="None" strength="referencing">
         <BaseClass>FastenerComponentIsOfFastenerComponentType</BaseClass>
-        <Source multiplicity="(0..1)" roleLabel="BoltIsOfBoltType" polymorphic="true">
+        <Source multiplicity="(0..*)" roleLabel="BoltIsOfBoltType" polymorphic="true">
             <Class class="Bolt"/>
         </Source>
         <Target multiplicity="(0..1)" roleLabel="BoltIsOfBoltType (Reversed)" polymorphic="true">
@@ -55,7 +57,7 @@
     </ECEntityClass>
     <ECEntityClass typeName="BoltAssemblyType" displayLabel="Bolt Assembly Type" description="Specifies the bolt assembly's type">
         <BaseClass>MechanicalFastenerType</BaseClass>
-    </ECEntityClass>    
+    </ECEntityClass>
     <ECEntityClass typeName="FastenerArray" displayLabel="Fastener Array" description="A grouping of fasteners described by regular, repeated pattern such as a grid or linear layout if bolts">
         <BaseClass>bis:PhysicalElement</BaseClass>
         <BaseClass>spi:IStructuralElement</BaseClass>
@@ -76,7 +78,7 @@
             <Class class="FastenerAssembly"/>
         </Target>
     </ECRelationshipClass>
-    <ECRelationshipClass typeName="FastenerAssemblyOwnsFastenerComponent" displayLabel="Fastener Assembly owns Fastener Components" description="The relationship between a fastener assembly and the individual components the make up the assembly" modifier="Abstract" strength="embedding">
+    <ECRelationshipClass typeName="FastenerAssemblyOwnsFastenerComponent" displayLabel="Fastener Assembly owns Fastener Components" description="The relationship between a fastener assembly and the individual components the make up the assembly" modifier="None" strength="embedding">
         <BaseClass>spi:StructuralAssemblyOwnsStructuralComponents</BaseClass>
         <Source multiplicity="(0..1)" roleLabel="FastenerAssemblyOwnsFastenerComponent" polymorphic="true">
             <Class class="FastenerAssembly"/>
@@ -93,7 +95,7 @@
     </ECEntityClass>
     <ECRelationshipClass typeName="NutIsOfNutType" displayLabel="Nut is of Nut Type" description="Relates a fastener component to its sub-type" modifier="None" strength="referencing">
         <BaseClass>FastenerComponentIsOfFastenerComponentType</BaseClass>
-        <Source multiplicity="(0..1)" roleLabel="FastenerComponentIsOfFastenerComponentType" polymorphic="true">
+        <Source multiplicity="(0..*)" roleLabel="FastenerComponentIsOfFastenerComponentType" polymorphic="true">
             <Class class="Nut"/>
         </Source>
         <Target multiplicity="(0..1)" roleLabel="FastenerComponentIsOfFastenerComponentType (Reversed)" polymorphic="true">
@@ -108,7 +110,7 @@
     </ECEntityClass>
     <ECRelationshipClass typeName="WasherIsOfWasherType" displayLabel="Washer is of Washer Type" description="Relates a fastener component to its sub-type" modifier="None" strength="referencing">
         <BaseClass>FastenerComponentIsOfFastenerComponentType</BaseClass>
-        <Source multiplicity="(0..1)" roleLabel="FastenerComponentIsOfFastenerComponentType" polymorphic="true">
+        <Source multiplicity="(0..*)" roleLabel="FastenerComponentIsOfFastenerComponentType" polymorphic="true">
             <Class class="Washer"/>
         </Source>
         <Target multiplicity="(0..1)" roleLabel="FastenerComponentIsOfFastenerComponentType (Reversed)" polymorphic="true">
@@ -129,7 +131,7 @@
     </ECEntityClass>
     <ECRelationshipClass typeName="WeldIsOfWeldType" displayLabel="Weld is of Weld Type" description="Relates a fastener component to its sub-type" modifier="None" strength="referencing">
         <BaseClass>FastenerComponentIsOfFastenerComponentType</BaseClass>
-        <Source multiplicity="(0..1)" roleLabel="FastenerComponentIsOfFastenerComponentType" polymorphic="true">
+        <Source multiplicity="(0..*)" roleLabel="FastenerComponentIsOfFastenerComponentType" polymorphic="true">
             <Class class="Weld"/>
         </Source>
         <Target multiplicity="(0..1)" roleLabel="FastenerComponentIsOfFastenerComponentType (Reversed)" polymorphic="true">
