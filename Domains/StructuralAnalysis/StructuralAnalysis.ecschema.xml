@@ -3,6 +3,7 @@
     <ECSchemaReference name="BisCore" version="01.00.10" alias="bis" />
     <ECSchemaReference name="Profiles" version="01.00.00" alias="prf" />
     <ECSchemaReference name="Analytical" version="01.00.00" alias="anlyt" />
+    <ECSchemaReference name="AecUnits" version="01.00.03" alias="AECU" />
 
     <ECEnumeration typeName="PlacementPoint" backingTypeName="int" isStrict="true" description="Default standard placement points.">
         <ECEnumerator value="0" name="LeftBottom" displayLabel="Left Bottom" description="Most bottom left Profile's bounding box point." />
@@ -92,7 +93,7 @@
     <ECEntityClass typeName="Vertex" modifier="Sealed" displayLabel="Vertex" description="An identified location in 3D space.">
         <BaseClass>SharedTopologyElement</BaseClass>
         <BaseClass>IDefinedPoint</BaseClass>
-        <ECProperty propertyName="Point" typeName="point3d" displayLabel="Vertex placement point" description="Describes Vertex location. Point is only set on Vertex creation and cannot be modified." />
+        <ECProperty propertyName="Point" typeName="point3d" displayLabel="Vertex placement point" description="Describes Vertex location. Point is only set on Vertex creation and cannot be modified." kindOfQuantity="AECU:LENGTH" />
     </ECEntityClass>
 
     <ECEntityClass typeName="Face" modifier="Sealed" displayLabel="Face" description="A surface bounded by Loops.">
@@ -352,7 +353,7 @@
 
     <ECEntityClass typeName="CamberBehaviorAspect" modifier="Sealed" displayLabel="Camber Behavior Aspect" description="Provides camber behavior for CurveMember.">
         <BaseClass>CurveMemberBehaviorAspect</BaseClass>
-        <ECProperty propertyName="CamberValue" typeName="double" displayLabel="Camber value" description="Camber value for the behavior." />
+        <ECProperty propertyName="CamberValue" typeName="double" displayLabel="Camber value" description="Camber value for the behavior." kindOfQuantity="AECU:LENGTH_SHORT" />
     </ECEntityClass>
 
     <ECEntityClass typeName="AxialBehaviorAspect" modifier="Sealed" displayLabel="Axial Behavior Type" description="Defines member as having a particular axial structural behavior.">
@@ -362,12 +363,12 @@
 
     <ECEntityClass typeName="StiffnessBehaviorAspect" modifier="Sealed" displayLabel="Stiffness Behavior Aspect" description="Stiffness behavior for curve member.">
         <BaseClass>CurveMemberBehaviorAspect</BaseClass>
-        <ECProperty propertyName="RAxisTranslational" typeName="double" displayLabel="R Axis Translational" description="Stiffness along local RAxis." />
-        <ECProperty propertyName="SAxisTranslational" typeName="double" displayLabel="S Axis Translational" description="Stiffness along local SAxis." />
-        <ECProperty propertyName="TAxisTranslational" typeName="double" displayLabel="T Axis Translational" description="Stiffness along local TAxis." />
-        <ECProperty propertyName="RAxisRotational" typeName="double" displayLabel="R Axis Rotational" description="Stiffness about local RAxis." />
-        <ECProperty propertyName="SAxisRotational" typeName="double" displayLabel="S Axis Rotational" description="Stiffness about local SAxis." />
-        <ECProperty propertyName="TAxisRotational" typeName="double" displayLabel="T Axis Rotational" description="Stiffness about local TAxis." />
+        <ECProperty propertyName="RAxisTranslational" typeName="double" displayLabel="R Axis Translational" description="Stiffness along local RAxis." kindOfQuantity="AECU:SPRING_CONSTANT" />
+        <ECProperty propertyName="SAxisTranslational" typeName="double" displayLabel="S Axis Translational" description="Stiffness along local SAxis." kindOfQuantity="AECU:SPRING_CONSTANT" />
+        <ECProperty propertyName="TAxisTranslational" typeName="double" displayLabel="T Axis Translational" description="Stiffness along local TAxis." kindOfQuantity="AECU:SPRING_CONSTANT" />
+        <ECProperty propertyName="RAxisRotational" typeName="double" displayLabel="R Axis Rotational" description="Stiffness about local RAxis." kindOfQuantity="AECU:ROTATIONAL_SPRING_CONSTANT" />
+        <ECProperty propertyName="SAxisRotational" typeName="double" displayLabel="S Axis Rotational" description="Stiffness about local SAxis." kindOfQuantity="AECU:ROTATIONAL_SPRING_CONSTANT" />
+        <ECProperty propertyName="TAxisRotational" typeName="double" displayLabel="T Axis Rotational" description="Stiffness about local TAxis." kindOfQuantity="AECU:ROTATIONAL_SPRING_CONSTANT" />
     </ECEntityClass>
 
     <!-- Release Aspect classes -->
@@ -514,8 +515,8 @@
         <BaseClass>IDefinedPoint</BaseClass>
         <ECNavigationProperty propertyName="Vertex" relationshipName="PointSupportRefersToVertex" direction="Forward" displayLabel="Vertex" description="Vertex at which this instance supports." />
         <ECNavigationProperty propertyName="Behavior" relationshipName="PointSupportRefersToPointSupportBehavior" direction="Forward" displayLabel="Behavior" description="Point Support Behavior." />
-        <ECProperty propertyName="RAxis" typeName="point3d" displayLabel="RAxis" description="RAxis of local coordinate system." />
-        <ECProperty propertyName="SAxis" typeName="point3d" displayLabel="SAxis" description="SAxis of local coordinate system." />
+        <ECProperty propertyName="RAxis" typeName="point3d" displayLabel="RAxis" description="RAxis of local coordinate system." kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="SAxis" typeName="point3d" displayLabel="SAxis" description="SAxis of local coordinate system." kindOfQuantity="AECU:LENGTH" />
     </ECEntityClass>
 
     <ECEntityClass typeName="CurveSupport" modifier="Sealed" displayLabel="Curve Support" description="Support which is located in a curve.">
@@ -609,7 +610,7 @@
             </IsMixin>
         </ECCustomAttributes>
         <ECProperty propertyName="PlacementSurface" typeName="PlacementSurface" displayLabel="PlacementSurface" description="Sheet defines area location for ISurface, the height of ISurface is defined by thickness(provided by related SurfaceType) which extrudes location area by that thickness. PlacementSurface allows to define how location area should be interpreted for extrusion - ether as start, end or center. These are the most common used cases. More flexibility is achieved by using Offset property." />
-        <ECProperty propertyName="Offset" typeName="double" displayLabel="Offset" description="PlacementSurface provides only a few cases for how to interpret the location area (Sheet). Offset provides more flexibility for less common cases, where it provides additional offset along the normal of ISurface. Both PlacementSurface and Offset properties can be used at the same time." />
+        <ECProperty propertyName="Offset" typeName="double" displayLabel="Offset" description="PlacementSurface provides only a few cases for how to interpret the location area (Sheet). Offset provides more flexibility for less common cases, where it provides additional offset along the normal of ISurface. Both PlacementSurface and Offset properties can be used at the same time." kindOfQuantity="AECU:LENGTH_SHORT" />
     </ECEntityClass>
 
     <ECRelationshipClass typeName="SurfaceRefersToSurfaceType" strength="referencing" modifier="Sealed">
@@ -628,7 +629,7 @@
 
     <ECEntityClass typeName="SimpleSurfaceType" modifier="Sealed" description="Simple Surface Type.">
         <BaseClass>SurfaceType</BaseClass>
-        <ECProperty propertyName="Thickness" typeName="double" description="Thickness of ISurfaces." />
+        <ECProperty propertyName="Thickness" typeName="double" description="Thickness of ISurfaces." kindOfQuantity="AECU:LENGTH_SHORT" />
         <ECNavigationProperty propertyName="Material" relationshipName="SimpleSurfaceTypeRefersToMaterial" direction="Forward" displayLabel="Material" description="Material of all ISurfaces with this type." />
     </ECEntityClass>
 
@@ -711,9 +712,9 @@
         <BaseClass>IDefinedCurve</BaseClass>
         <ECProperty propertyName="PlacementPoint" typeName="string" displayLabel="Placement Point" description="Point at which Curve Member's topology intersects with Profile." />
         <ECProperty propertyName="Classification" typeName="CurveMemberClassificationType" displayLabel="Classification" description="The use case for this Curve Member." />
-        <ECProperty propertyName="StartRigidZoneLength" typeName="double" displayLabel="Start Rigid Zone Length" description="Defines the length of Rigid Zone at the start of Curve Member. Rigid zone specifies that the Curve Member is immune deformation at that zone. Common case would be where curve member overlaps with other member, overlapping area would be define das rigid zone." />
-        <ECProperty propertyName="EndRigidZoneLength" typeName="double" displayLabel="End Rigid Zone Length" description="Defines the length of Rigid Zone at the end of Curve Member. Rigid zone specifies that the Curve Member is immune deformation at that zone. Common case would be where curve member overlaps with other member, overlapping area would be define das rigid zone." />
-        <ECProperty propertyName="Offset" typeName="point2d" displayLabel="Offset" description="2d offset defined in local coordinate system, where first coordinate variable shows offset along bi-normal and second along Orientation." />
+        <ECProperty propertyName="StartRigidZoneLength" typeName="double" displayLabel="Start Rigid Zone Length" description="Defines the length of Rigid Zone at the start of Curve Member. Rigid zone specifies that the Curve Member is immune deformation at that zone. Common case would be where curve member overlaps with other member, overlapping area would be define das rigid zone." kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="EndRigidZoneLength" typeName="double" displayLabel="End Rigid Zone Length" description="Defines the length of Rigid Zone at the end of Curve Member. Rigid zone specifies that the Curve Member is immune deformation at that zone. Common case would be where curve member overlaps with other member, overlapping area would be define das rigid zone." kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="Offset" typeName="point2d" displayLabel="Offset" description="2d offset defined in local coordinate system, where first coordinate variable shows offset along bi-normal and second along Orientation." kindOfQuantity="AECU:LENGTH_SHORT" />
         <ECProperty propertyName="IsProfileMirrored" typeName="boolean" displayLabel="Is Profile mirrored" description="Specifies if profile should be mirrored about orientation." />
     </ECEntityClass>
 
@@ -907,7 +908,7 @@
     <ECEntityClass typeName="PointRelativeToCurveAspect" modifier="Sealed" displayLabel="Point relative to curve location data" description="Point relative to curve.">
         <BaseClass>RelativePointLocationAspect</BaseClass>
         <ECProperty propertyName="Location" typeName="double" displayLabel="Location" description="Fractional parameter (0.0 - 1.0) on a curve defining a point." />
-        <ECProperty propertyName="Offset" typeName="Point2d" displayLabel="Offset" description="Offset in a plane defined by normal and bi-normal of location curve." />
+        <ECProperty propertyName="Offset" typeName="Point2d" displayLabel="Offset" description="Offset in a plane defined by normal and bi-normal of location curve." kindOfQuantity="AECU:LENGTH_SHORT" />
         <ECProperty propertyName="PlacementPoint" typeName="PlacementPoint" displayLabel="Placement point" description="Placement Point on a Host where load is located. Should only be used with host that have a non point profile (CurveMember). This property should be set to null for hosts that do not have a 'real world' profile - CurveSupport." />
         <ECNavigationProperty propertyName="ReferenceCurve" relationshipName="PointRelativeToCurveAspectRefersToIDefinedCurve" direction="Forward" displayLabel="Reference curve" />
     </ECEntityClass>
@@ -924,7 +925,7 @@
     <ECEntityClass typeName="PointRelativeToSurfaceAspect" modifier="Sealed" displayLabel="Point relative to surface location data" description="Point relative to surface.">
         <BaseClass>RelativePointLocationAspect</BaseClass>
         <ECProperty propertyName="Location" typeName="Point2d" displayLabel="Location" description="Location is defined in 2d coordinate system defined by host r and s axis."/>
-        <ECProperty propertyName="Offset" typeName="double" displayLabel="Offset" />
+        <ECProperty propertyName="Offset" typeName="double" displayLabel="Offset" kindOfQuantity="AECU:LENGTH_SHORT" />
         <ECProperty propertyName="PlacementSurface" typeName="PlacementSurface" displayLabel="Surface Alignment" description="Defines a Alignment on Surface Host for this load. For 0-thickness hosts (SurfaceSupport) this should be set to null."/>
         <ECNavigationProperty propertyName="ReferenceSurface" relationshipName="PointRelativeToSurfaceAspectRefersToIDefinedSurface" direction="Forward" displayLabel="Reference surface" />
     </ECEntityClass>
@@ -946,7 +947,7 @@
         <BaseClass>RelativeCurveLocationAspect</BaseClass>
         <ECProperty propertyName="Start" typeName="double" displayLabel="Start of range" description="Fractional parameter on a host curve ('0.0' - start of the curve, 1.0 - end)." />
         <ECProperty propertyName="End" typeName="double" displayLabel="End of range" description="Fractional parameter on a host curve. ('0.0' - start of the curve, 1.0 - end)" />
-        <ECProperty propertyName="Offset" typeName="Point2d" displayLabel="Offset" description="Offset in a plane, defined by a host curve's normal and bi-normal." />
+        <ECProperty propertyName="Offset" typeName="Point2d" displayLabel="Offset" description="Offset in a plane, defined by a host curve's normal and bi-normal." kindOfQuantity="AECU:LENGTH_SHORT" />
         <ECProperty propertyName="PlacementPoint" typeName="PlacementPoint" displayLabel="Placement point" description="Placement point on a profile that is associated with the host curve. PlacementPoint should be only used with host that have non point profile (CurveMember). This property should be set to null for hosts that do not have a 'real world' profile - CurveSupport" />
         <ECNavigationProperty propertyName="ReferenceCurve" relationshipName="CurveRelativeToCurveAspectRefersToIDefineCurve" direction="Forward" displayLabel="Reference curve" description="Reference/Host curve in which curve load is located." />
     </ECEntityClass>
@@ -963,7 +964,7 @@
     <ECEntityClass typeName="CurveRelativeToSurfaceAspect" modifier="Sealed" displayLabel="Curve relative to surface location data" description="Curve relative to surface.">
         <BaseClass>RelativeCurveLocationAspect</BaseClass>
         <ECProperty propertyName="Location" typeName="Bentley.Geometry.Common.IGeometry" displayLabel="Location" description="Curve which describes load location on a host surface."/>
-        <ECProperty propertyName="Offset" typeName="double" displayLabel="Offset" description="Distance from the surface, along the normal. Can be both positive and negative." />
+        <ECProperty propertyName="Offset" typeName="double" displayLabel="Offset" description="Distance from the surface, along the normal. Can be both positive and negative." kindOfQuantity="AECU:LENGTH_SHORT" />
         <ECProperty propertyName="PlacementSurface" typeName="PlacementSurface" displayLabel="Placement Surface" description="Placement Surface at which load is applied. For 0-thickness hosts (SurfaceSupport) this should be set to null."/>
         <ECNavigationProperty propertyName="ReferenceSurface" relationshipName="CurveRelativeToSurfaceAspectRefersToIDefinedSurface" direction="Forward" displayLabel="Reference surface" description="Host surface in which Curve Load is located." />
     </ECEntityClass>
@@ -984,7 +985,7 @@
     <ECEntityClass typeName="SurfaceRelativeToSurfaceAspect" modifier="Sealed" displayLabel="Surface relative to surface location data" description="Surface relative to surface.">
         <BaseClass>RelativeSurfaceLocationAspect</BaseClass>
         <ECProperty propertyName="Location" typeName="Bentley.Geometry.Common.IGeometry" displayLabel="Location" />
-        <ECProperty propertyName="Offset" typeName="double" displayLabel="Offset" />
+        <ECProperty propertyName="Offset" typeName="double" displayLabel="Offset" kindOfQuantity="AECU:LENGTH_SHORT" />
         <ECProperty propertyName="PlacementSurface" typeName="PlacementSurface" displayLabel="Placement Surface" description="Placement Surface at which load is applied. For 0-thickness hosts (SurfaceSupport) this should be set to null." />
         <ECNavigationProperty propertyName="ReferenceSurface" relationshipName="SurfaceRelativeToSurfaceAspectRefersToIDefinedSurface" direction="Forward" displayLabel="Reference surface" />
     </ECEntityClass>
@@ -1022,7 +1023,7 @@
                 <AppliesToEntityClass>bis:Element</AppliesToEntityClass>
             </IsMixin>
         </ECCustomAttributes>
-        <ECProperty propertyName="SurfaceOrigin" typeName="Point3d" displayLabel="Surface Origin" description="Point on the surface defining the start of its local coordinate system." />
+        <ECProperty propertyName="SurfaceOrigin" typeName="Point3d" displayLabel="Surface Origin" description="Point on the surface defining the start of its local coordinate system." kindOfQuantity="AECU:LENGTH" />
         <ECProperty propertyName="RAxis" typeName="Point3d" displayLabel="RAxis" description="First vector defining the local coordinate system. This vector should be from tangent plane at the origin point of the surface." />
     </ECEntityClass>
 
@@ -1197,30 +1198,30 @@
     </ECEnumeration>
 
     <ECStructClass typeName="PointForce" description="Force at a point." modifier="Sealed">
-        <ECProperty propertyName="FX" typeName="double" description="Force in X axis." />
-        <ECProperty propertyName="FY" typeName="double" description="Force in Y axis." />
-        <ECProperty propertyName="FZ" typeName="double" description="Force in Z axis." />
-        <ECProperty propertyName="MX" typeName="double" description="Moment about X axis." />
-        <ECProperty propertyName="MY" typeName="double" description="Moment about Y axis." />
-        <ECProperty propertyName="MZ" typeName="double" description="Moment about Z axis." />
+        <ECProperty propertyName="FX" typeName="double" description="Force in X axis." kindOfQuantity="AECU:FORCE" />
+        <ECProperty propertyName="FY" typeName="double" description="Force in Y axis." kindOfQuantity="AECU:FORCE" />
+        <ECProperty propertyName="FZ" typeName="double" description="Force in Z axis." kindOfQuantity="AECU:FORCE" />
+        <ECProperty propertyName="MX" typeName="double" description="Moment about X axis." kindOfQuantity="AECU:MOMENT" />
+        <ECProperty propertyName="MY" typeName="double" description="Moment about Y axis." kindOfQuantity="AECU:MOMENT" />
+        <ECProperty propertyName="MZ" typeName="double" description="Moment about Z axis." kindOfQuantity="AECU:MOMENT" />
     </ECStructClass>
 
     <ECStructClass typeName="LinearForce" description="Force per unit length." modifier="Sealed">
-        <ECProperty propertyName="FX" typeName="double" description="Force per unit length in X axis." />
-        <ECProperty propertyName="FY" typeName="double" description="Force per unit length in Y axis." />
-        <ECProperty propertyName="FZ" typeName="double" description="Force per unit length in Z axis." />
-        <ECProperty propertyName="MX" typeName="double" description="Moment per unit length about X axis." />
-        <ECProperty propertyName="MY" typeName="double" description="Moment per unit length about Y axis." />
-        <ECProperty propertyName="MZ" typeName="double" description="Moment per unit length about Z axis." />
+        <ECProperty propertyName="FX" typeName="double" description="Force per unit length in X axis." kindOfQuantity="AECU:LINEAR_FORCE" />
+        <ECProperty propertyName="FY" typeName="double" description="Force per unit length in Y axis." kindOfQuantity="AECU:LINEAR_FORCE" />
+        <ECProperty propertyName="FZ" typeName="double" description="Force per unit length in Z axis." kindOfQuantity="AECU:LINEAR_FORCE" />
+        <ECProperty propertyName="MX" typeName="double" description="Moment per unit length about X axis." kindOfQuantity="AECU:LINEAR_MOMENT" />
+        <ECProperty propertyName="MY" typeName="double" description="Moment per unit length about Y axis." kindOfQuantity="AECU:LINEAR_MOMENT" />
+        <ECProperty propertyName="MZ" typeName="double" description="Moment per unit length about Z axis." kindOfQuantity="AECU:LINEAR_MOMENT" />
     </ECStructClass>
 
     <ECStructClass typeName="AreaForce" description="Force per unit area." modifier="Sealed">
-        <ECProperty propertyName="FX" typeName="double" description="Force per unit area in X axis." />
-        <ECProperty propertyName="FY" typeName="double" description="Force per unit area in Y axis." />
-        <ECProperty propertyName="FZ" typeName="double" description="Force per unit area in Z axis." />
-        <ECProperty propertyName="MX" typeName="double" description="Moment per unit area about X axis." />
-        <ECProperty propertyName="MY" typeName="double" description="Moment per unit area about Y axis." />
-        <ECProperty propertyName="MZ" typeName="double" description="Moment per unit area about Z axis." />
+        <ECProperty propertyName="FX" typeName="double" description="Force per unit area in X axis." kindOfQuantity="AECU:AREA_FORCE" />
+        <ECProperty propertyName="FY" typeName="double" description="Force per unit area in Y axis." kindOfQuantity="AECU:AREA_FORCE" />
+        <ECProperty propertyName="FZ" typeName="double" description="Force per unit area in Z axis." kindOfQuantity="AECU:AREA_FORCE" />
+        <ECProperty propertyName="MX" typeName="double" description="Moment per unit area about X axis." kindOfQuantity="AECU:AREA_MOMENT" />
+        <ECProperty propertyName="MY" typeName="double" description="Moment per unit area about Y axis." kindOfQuantity="AECU:AREA_MOMENT" />
+        <ECProperty propertyName="MZ" typeName="double" description="Moment per unit area about Z axis." kindOfQuantity="AECU:AREA_MOMENT" />
     </ECStructClass>
 
     <ECEntityClass typeName="LoadValueAspect" modifier="Abstract" displayLabel="Load value data" description="A value that must be applied to a Load.">
@@ -1274,7 +1275,7 @@
     <ECEntityClass typeName="VaryingCurveLoadValueAspect" modifier="Abstract" displayLabel="Varying Curve load value data" description="A CurveLoadValueAspect that varies in intensity along the curve length.">
         <BaseClass>CurveLoadValueAspect</BaseClass>
         <ECProperty propertyName="CurveVariationType" typeName="CurveVariationType" displayLabel="Variation" description="Defines how loads change along the location curve." />
-        <ECArrayProperty propertyName="Locations" typeName="double" displayLabel="Locations" />
+        <ECArrayProperty propertyName="Locations" typeName="double" displayLabel="Locations" kindOfQuantity="AECU:LENGTH" />
     </ECEntityClass>
 
     <ECEntityClass typeName="VaryingForceCurveLoadValueAspect" modifier="Sealed" displayLabel="Varying Curve Force value data" description="A VaryingCurveLoadValueAspect for Force.">
@@ -1309,7 +1310,7 @@
     <ECEntityClass typeName="VaryingSurfaceLoadValueAspect" modifier="Abstract" displayLabel="Varying Surface load value data" description="A SurfaceLoadValueAspect that varies in intensity across the application area.">
         <BaseClass>SurfaceLoadValueAspect</BaseClass>
         <ECProperty propertyName="SurfaceVariationType" typeName="SurfaceVariationType" displayLabel="Variation" />
-        <ECArrayProperty propertyName="Locations" typeName="Point2d" displayLabel="Locations" />
+        <ECArrayProperty propertyName="Locations" typeName="Point2d" displayLabel="Locations" kindOfQuantity="AECU:LENGTH" />
     </ECEntityClass>
 
     <ECEntityClass typeName="VaryingForceSurfaceLoadValueAspect" modifier="Sealed" displayLabel="Curve Force value data" description="A VaryingSurfaceLoadValueAspect for Force.">
@@ -1395,7 +1396,7 @@
     <ECEntityClass typeName="LinearSpringPointTranslationalBehavior" modifier="Sealed" displayLabel="Linear Spring Point Translational Behavior" description="Linear SpringPoint Translational Behavior.">
         <BaseClass>PointTranslationalBehavior</BaseClass>
         <ECProperty propertyName="SpringType" typeName="SpringBehaviorType" displayLabel="SpringType" description="Spring Type." />
-        <ECProperty propertyName="Stiffness" typeName="double" displayLabel="Stiffness" description="Stiffness." />
+        <ECProperty propertyName="Stiffness" typeName="double" displayLabel="Stiffness" description="Stiffness." kindOfQuantity="AECU:LINEAR_SPRING_CONSTANT" />
     </ECEntityClass>
 
     <ECEntityClass typeName="PointRotationalBehavior" modifier="Abstract" displayLabel="Vertex Rotational Behavior" description="Describes connection about some specific axis." >
@@ -1439,7 +1440,7 @@
 
     <ECEntityClass typeName="LinearSpringPointRotationalBehavior" modifier="Sealed" displayLabel="Linear Spring Point Rotational Behavior" description="linear spring point rotational behavior.">
         <BaseClass>PointRotationalBehavior</BaseClass>
-        <ECProperty propertyName="Stiffness" typeName="double" displayLabel="Stiffness" description="Stiffness." />
+        <ECProperty propertyName="Stiffness" typeName="double" displayLabel="Stiffness" description="Stiffness." kindOfQuantity="AECU:LINEAR_SPRING_CONSTANT" />
     </ECEntityClass>
 
     <ECEntityClass typeName="CurveTranslationalBehavior" modifier="Abstract" displayLabel="Curve Translational Behavior" description="Describes connection along some specific axis.">
@@ -1484,7 +1485,7 @@
     <ECEntityClass typeName="LinearSpringCurveTranslationalBehavior" modifier="Sealed" displayLabel="Linear Spring Curve Translational Behavior" description="Linear Spring Curve Translational Behavior.">
         <BaseClass>CurveTranslationalBehavior</BaseClass>
         <ECProperty propertyName="SpringType" typeName="SpringBehaviorType" displayLabel="SpringType" description="Spring Type." />
-        <ECProperty propertyName="Stiffness" typeName="double" displayLabel="Stiffness" description="Stiffness." />
+        <ECProperty propertyName="Stiffness" typeName="double" displayLabel="Stiffness" description="Stiffness." kindOfQuantity="AECU:LINEAR_SPRING_CONSTANT" />
     </ECEntityClass>
 
     <ECEntityClass typeName="CurveRotationalBehavior" modifier="Abstract" displayLabel="Curve Rotational Behavior" description="Describes connection about some specific axis.">
@@ -1555,6 +1556,6 @@
     <ECEntityClass typeName="LinearSpringSurfaceTranslationalBehavior" modifier="Sealed" displayLabel="Linear Spring Surface Translational Behavior" description="Linear Spring Surface Translational Behavior.">
         <BaseClass>SurfaceTranslationalBehavior</BaseClass>
         <ECProperty propertyName="SpringType" typeName="SpringBehaviorType" displayLabel="SpringType" description="Spring Type." />
-        <ECProperty propertyName="Stiffness" typeName="double" displayLabel="Stiffness" description="Stiffness." />
+        <ECProperty propertyName="Stiffness" typeName="double" displayLabel="Stiffness" description="Stiffness." kindOfQuantity="AECU:LINEAR_SPRING_CONSTANT" />
     </ECEntityClass>
 </ECSchema>
