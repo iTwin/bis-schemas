@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ECSchema schemaName="NetworkTopology" alias="net" version="01.00.00" description="Base schema for Network Topology." xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
+    <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
+    <ECSchemaReference name="BisCore" version="01.00.10" alias="bis"/>
+    <ECSchemaReference name="LinearReferencing" version="02.00.02" alias="lr"/>
+
+    <ECCustomAttributes>
+        <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
+            <SupportedUse>NotForProduction</SupportedUse>
+        </ProductionStatus>
+    </ECCustomAttributes>
+
+    <ECEntityClass typeName="INetwork" modifier="Abstract" description="Interface that can be mixed-into a bis:Element to indicate that it can be treated as a graph consisting of nodes and edges. INetwork can optionally group other graphs at the same granularity.">
+        <ECCustomAttributes>
+            <IsMixin xmlns='CoreCustomAttributes.01.00.00'>
+                <AppliesToEntityClass>bis:Element</AppliesToEntityClass>
+            </IsMixin>
+        </ECCustomAttributes>
+    </ECEntityClass>
+    <ECEntityClass typeName="NetworkElement" modifier="Abstract" description="Base class for implementations of INetwork as InformationRecord">
+      <BaseClass>bis:InformationRecordElement</BaseClass>
+      <BaseClass>INetwork</BaseClass>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="NetworkGroupsNetworks" strength="referencing" modifier="None" description="Relationship used to group other INetworks at the same level of granularity.">
+        <BaseClass>bis:ElementGroupsMembers</BaseClass>
+        <Source multiplicity="(0..1)" polymorphic="true" roleLabel="groups">
+            <Class class="INetwork"/>
+        </Source>
+        <Target multiplicity="(0..*)" polymorphic="true" roleLabel="is grouped by">
+            <Class class="INetwork"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="ITopologyElement" modifier="Abstract" description="Base interface for other interfaces meant to be mixed-into a bis:Element to indicate topology semantics. It is not meant to be mixed-in directly by classes in other schemas.">
+        <ECCustomAttributes>
+            <IsMixin xmlns='CoreCustomAttributes.01.00.00'>
+                <AppliesToEntityClass>bis:Element</AppliesToEntityClass>
+            </IsMixin>
+        </ECCustomAttributes>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="NetworkConsistsOfTopologyElements" strength="referencing" modifier="None" description="Relationship used to associate the ITopologyElements that an INetwork consists of.">
+        <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <Source multiplicity="(0..1)" polymorphic="true" roleLabel="consists of">
+            <Class class="INetwork"/>
+        </Source>
+        <Target multiplicity="(0..*)" polymorphic="true" roleLabel="is part of">
+            <Class class="ITopologyElement"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="INode" modifier="Abstract" description="Interface that can be mixed-into a bis:Element to indicate that it can be treated as a Vertex in a graph, defining edge end-points.">
+        <BaseClass>ITopologyElement</BaseClass>
+        <ECCustomAttributes>
+            <IsMixin xmlns='CoreCustomAttributes.01.00.00'>
+                <AppliesToEntityClass>bis:Element</AppliesToEntityClass>
+            </IsMixin>
+        </ECCustomAttributes>
+    </ECEntityClass>
+    <ECEntityClass typeName="NodeElement" modifier="Abstract" description="Base class for implementations of INode as InformationRecord">
+      <BaseClass>bis:InformationRecordElement</BaseClass>
+      <BaseClass>INode</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="IEdge" modifier="Abstract" description="Interface that can be mixed-into a bis:Element to indicate that it can be treated as a link in a graph, with two end-points. ">
+        <BaseClass>ITopologyElement</BaseClass>
+        <ECCustomAttributes>
+            <IsMixin xmlns='CoreCustomAttributes.01.00.00'>
+                <AppliesToEntityClass>bis:Element</AppliesToEntityClass>
+            </IsMixin>
+        </ECCustomAttributes>
+    </ECEntityClass>
+    <ECEntityClass typeName="EdgeElement" modifier="Abstract" description="Base class for implementations of IEdge as InformationRecord">
+      <BaseClass>bis:InformationRecordElement</BaseClass>
+      <BaseClass>IEdge</BaseClass>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="EdgeConnectsToNode" strength="referencing" modifier="Abstract" description="Base relationship used to indicate connectivity of an ITopologyElement to an INode.">
+        <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <Source multiplicity="(0..*)" polymorphic="true" roleLabel="connects to">
+            <Class class="IEdge"/>
+        </Source>
+        <Target multiplicity="(0..1)" polymorphic="true" roleLabel="connects to">
+            <Class class="INode"/>
+        </Target>
+    </ECRelationshipClass>    
+    <ECRelationshipClass typeName="EdgeStartsAtNode" strength="referencing" modifier="None" description="Relationship used to indicate connectivity between the start of an IEdge and an INode.">
+        <BaseClass>EdgeConnectsToNode</BaseClass>
+        <Source multiplicity="(0..*)" polymorphic="true" roleLabel="starts at">
+            <Class class="IEdge"/>
+        </Source>
+        <Target multiplicity="(0..1)" polymorphic="true" roleLabel="connects to">
+            <Class class="INode"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="EdgeEndsAtNode" strength="referencing" modifier="None" description="Relationship used to indicate connectivity between the end of an IEdge and an INode.">
+        <BaseClass>EdgeConnectsToNode</BaseClass>
+        <Source multiplicity="(0..*)" polymorphic="true" roleLabel="ends at">
+            <Class class="IEdge"/>
+        </Source>
+        <Target multiplicity="(0..1)" polymorphic="true" roleLabel="connects to">
+            <Class class="INode"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="IEdgeInnerConnection" modifier="Abstract" description="Interface that can be mixed-into a bis:Element to indicate a linearly-located connection between an INode and an IEdge, without splitting it.">
+        <BaseClass>lr:ILinearLocationElement</BaseClass>
+        <ECCustomAttributes>
+            <IsMixin xmlns='CoreCustomAttributes.01.00.00'>
+                <AppliesToEntityClass>bis:Element</AppliesToEntityClass>
+            </IsMixin>
+        </ECCustomAttributes>
+    </ECEntityClass>
+    <ECEntityClass typeName="EdgeInnerConnectionElement" modifier="Abstract" description="Base class for implementations of IEdgeInnerConnection as InformationRecord">
+      <BaseClass>bis:InformationRecordElement</BaseClass>
+      <BaseClass>IEdgeInnerConnection</BaseClass>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="EdgeInnerConnectsToNode" strength="referencing" modifier="None" description="Relationship indicating the INode an IEdgeInnerConnection is connected to.">
+        <BaseClass>lr:ILinearLocationLocatesElement</BaseClass>
+        <Source multiplicity="(0..*)" polymorphic="true" roleLabel="connects to">
+            <Class class="IEdgeInnerConnection"/>
+        </Source>
+        <Target multiplicity="(0..1)" polymorphic="true" roleLabel="connects to">
+            <Class class="INode"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="EdgeInnerConnectsAlongILinearElementEdge" strength="referencing" modifier="None" description="Relationship indicating the edge, mixing-in lr:ILinearElement, an IEdgeInnerConnection is connected along. The target end-point element of this relationship is expected to be an IEdge.">
+        <BaseClass>lr:ILinearlyLocatedAlongILinearElement</BaseClass>
+        <Source multiplicity="(0..*)" polymorphic="true" roleLabel="connects along">
+            <Class class="IEdgeInnerConnection"/>
+        </Source>
+        <Target multiplicity="(0..1)" polymorphic="true" roleLabel="is linear axis for">
+            <Class class="lr:ILinearElement"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="AttachedNodeElement" modifier="Abstract" description="Base class for implementations of an AttachedNode as InformationRecord">
+      <BaseClass>NodeElement</BaseClass>
+      <BaseClass>IEdgeInnerConnection</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="LinearElementEdge" modifier="Abstract" description="Base class for implementations of IEdge supporting lr:ILinearElement as InformationRecord">
+      <BaseClass>bis:InformationRecordElement</BaseClass>
+      <BaseClass>IEdge</BaseClass>
+      <BaseClass>lr:ILinearElement</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="IDirectedNode" modifier="Abstract" description="Interface that can be mixed-into a bis:Element to indicate that it can be treated as a Vertex in a graph, with flow directed towards one outgoing link.">
+        <BaseClass>INode</BaseClass>
+        <ECCustomAttributes>
+            <IsMixin xmlns='CoreCustomAttributes.01.00.00'>
+                <AppliesToEntityClass>bis:Element</AppliesToEntityClass>
+            </IsMixin>
+        </ECCustomAttributes>
+        <ECNavigationProperty propertyName="OutputEdge" relationshipName="DirectedNodeOutputsToEdge" direction="Forward" displayLabel="Output Edge" description="IEdge flow is directed towards."/>
+    </ECEntityClass>
+    <ECEntityClass typeName="DirectedNodeElement" modifier="Abstract" description="Base class for implementations of IDirectedNode as InformationRecord">
+      <BaseClass>bis:InformationRecordElement</BaseClass>
+      <BaseClass>IDirectedNode</BaseClass>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="DirectedNodeOutputsToEdge" strength="referencing" modifier="None" description="Relationship indicating the Edge used to direct flow towards from an IDirectedNode.">
+        <Source multiplicity="(0..*)" polymorphic="true" roleLabel="outputs to">
+            <Class class="IDirectedNode"/>
+        </Source>
+        <Target multiplicity="(0..1)" polymorphic="true" roleLabel="outputs into">
+            <Class class="IEdge"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="TopologyElementAssociatedWithElement" strength="referencing" modifier="None" description="Relationship that can optionally be used by ITopologyElements in order to state topological associations with other bis:Element instances.">
+        <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <Source multiplicity="(0..*)" polymorphic="true" roleLabel="topologically associated">
+            <Class class="ITopologyElement"/>
+        </Source>
+        <Target multiplicity="(0..*)" polymorphic="true" roleLabel="topologically associated">
+            <Class class="bis:Element"/>
+        </Target>
+    </ECRelationshipClass>
+</ECSchema>
