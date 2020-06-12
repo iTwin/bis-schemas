@@ -51,20 +51,7 @@ stages:
         displayName: 'npm install'
         inputs:
           command: install
-      - script: |
-          SET PYENV_NAME=pyenv
 
-          virtualenv %PYENV_NAME%
-
-          $(System.DefaultWorkingDirectory)\pyenv\Scripts\pip.exe install python-ntlm
-          $(System.DefaultWorkingDirectory)\pyenv\Scripts\pip.exe install pywin32==224
-          $(System.DefaultWorkingDirectory)\pyenv\Scripts\pip.exe install lxml
-
-        displayName: 'Setup python environment'
-      - script: $(System.DefaultWorkingDirectory)\pyenv\Scripts\python.exe tools/signoff/signoff.py --getLaunchCodes --dumpjson
-        displayName: Get Launch codes (temp)
-      - script: node ./tools/packages/generateInventory.js --BisRoot .
-        displayName: Build Schema Inventory (temp)
       - script: node ./tools/packages/generatePackages.js --inventory ./SchemaInventory.json --outDir $(pkgOut) --template ./tools/packages/package.json.template
         displayName: Generate Packages
 

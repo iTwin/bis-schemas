@@ -51,10 +51,18 @@ jobs:
   - script: npm install @bentley/schema-comparer@latest
     displayName: 'Install schema-comparer'
 
+  - task: CmdLine@2
+    displayName: 'NPM CONFIGURATION'
+    inputs:
+      script: 'npm config list' 
+
   - task: Npm@1
     displayName: 'npm install'
     inputs:
       command: install   
+
+  - script: node ./tools/SchemaInventory/validateSchemaInventory.js
+    displayName: Validate Schema Inventory
 
   - script: | 
       mkdir "%validationOut%"
@@ -158,35 +166,3 @@ jobs:
   - script: npm run tests:ValidateReleasedBisSchemas
     displayName: npm run tests:ValidateReleasedBisSchemas
     workingDirectory: $(Build.SourcesDirectory)/bis-schema-validation/imodel-schema-validator
-
-- job: SchemaInventory
-  dependsOn: Validation
-  workspace:
-    clean: all
-
-  pool:
-    vmImage: windows-latest
-
-  steps: 
-  - checkout: self
-    clean: true
-
-  - script: 'git config --local user.email imodeljsbot@users.noreply.github.com'
-    displayName: 'git config email'
-  - script: 'git config --local user.name iModeljsBot'
-    displayName: 'git config name'
-  - script: 'git checkout --track origin/master'
-    displayName: 'Switching to master '
-
-  - task: Npm@1
-    displayName: 'npm install'
-    inputs:
-      command: install   
-
-  - script: node ./tools/signoff/generateInventory.js --BisRoot . --OutDir .
-    displayName: Build Schema Inventory
-
-  - powershell: |
-      git commit -m "Automated SchemaInventory Commit [skip ci]" -- $(System.DefaultWorkingDirectory)\SchemaInventory.json
-      git -c http.extraheader="AUTHORIZATION: bearer $(System.AccessToken)" push origin master -q --follow-tags
-    displayName: Checkin SchemaInventory  
