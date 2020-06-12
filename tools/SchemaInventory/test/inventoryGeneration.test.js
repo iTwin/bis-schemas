@@ -2,7 +2,7 @@ const chai = require('chai');
 const sinon = require('sinon');
 const fs = require("fs-extra");
 const path = require("path");
-const invGen = require('../inventoryGeneration.js');
+const inventoryHandler = require('../../SchemaInventory/schemaInventoryHandler.js');
 chai.use(require('chai-as-promised'))
 
 describe('Inventory Generation', function() {
@@ -61,10 +61,10 @@ describe('Inventory Generation', function() {
 
   describe('generateInventory tests', function() {
     it("BIS checksum dump specified, inventory file created properly", async function() {
-      await invGen.generateInventory(assetsDir, outDir, assetsDir);
+      await inventoryHandler.generateInventory(assetsDir, outDir, assetsDir);
       const inventory = JSON.parse(fs.readFileSync(inventoryFile));
       
-      chai.expect(Object.keys(inventory).length).to.equal(2);
+      chai.expect(Object.keys(inventory).length).to.equal(3);
       chai.expect(inventory["SchemaA"]).to.not.be.undefined;
       chai.expect(inventory["SchemaA"].length).to.equal(3);
       chai.expect(inventory["SchemaA"][0].version).to.equal("01.01.02");  
@@ -105,14 +105,26 @@ describe('Inventory Generation', function() {
       chai.expect(inventory["SchemaB"][2].verifier).to.equal("VerifierD");
       chai.expect(inventory["SchemaB"][2].author).to.equal("AuthorD");
 
+      chai.expect(inventory["SchemaC"]).to.not.be.undefined;
+      chai.expect(inventory["SchemaC"].length).to.equal(1);
+      chai.expect(inventory["SchemaC"][0].version).to.equal("03.00.00");  
+      chai.expect(inventory["SchemaC"][0].released).to.be.true;
+      chai.expect(inventory["SchemaC"][0].comment).to.equal("");  
+      chai.expect(inventory["SchemaC"][0].approved).to.equal("No");  
+      chai.expect(inventory["SchemaC"][0].author).to.equal("");  
+      chai.expect(inventory["SchemaC"][0].comment).to.equal("");  
+      chai.expect(inventory["SchemaC"][0].date).to.equal("Unknown");
+      chai.expect(inventory["SchemaC"][0].dynamic).to.equal("No");  
+      chai.expect(inventory["SchemaC"][0].name).to.equal("SchemaC");
+      chai.expect(inventory["SchemaC"][0].sha1).to.equal("");
     });
 
     it("Merge existing inventory, inventory file created properly", async function() {
       fs.copyFileSync(assetsInventoryFile, inventoryFile);
-      await invGen.generateInventory(assetsDir, outDir);
+      await inventoryHandler.generateInventory(assetsDir, outDir);
       const inventory = JSON.parse(fs.readFileSync(inventoryFile));
       
-      chai.expect(Object.keys(inventory).length).to.equal(2);
+      chai.expect(Object.keys(inventory).length).to.equal(3);
       chai.expect(inventory["SchemaA"]).to.not.be.undefined;
       chai.expect(inventory["SchemaA"].length).to.equal(3);
       chai.expect(inventory["SchemaA"][0].version).to.equal("01.01.02");  
@@ -148,30 +160,27 @@ describe('Inventory Generation', function() {
       chai.expect(inventory["SchemaB"][2].date).to.equal("01/04/2020");
       chai.expect(inventory["SchemaB"][2].verifier).to.equal("VerifierD");
       chai.expect(inventory["SchemaB"][2].author).to.equal("AuthorD");
-    });
 
-    it("Merge existing inventory, existing inventory file does not exist, throws", async function() {
-      await chai.expect(invGen.generateInventory(assetsDir, outDir)).to.be.rejectedWith(`An existing SchemaInventory.json could not be found in the provided output directory.`);
-    });
-
-    it("Bis checksum path specified, dump file not found, throws", async function() {
-      await chai.expect(invGen.generateInventory(assetsDir, outDir, "doesNotExist")).to.be.rejectedWith(`The BisChecksumDump.json file could not be found in the provided path.`);
-    });
-
-    it("Specified output directory does not exist, throws", async function() {
-      await chai.expect(invGen.generateInventory(assetsDir, "doesNotExist", assetsDir)).to.be.rejectedWith(`The specified output directory does not exist.`);
-    });
-
-    it("Specified BIS root directory does not exist, throws", async function() {
-      await chai.expect(invGen.generateInventory("doesNotExist", outDir, assetsDir)).to.be.rejectedWith(`The specified bis root directory does not exist.`);
+      chai.expect(inventory["SchemaC"]).to.not.be.undefined;
+      chai.expect(inventory["SchemaC"].length).to.equal(1);
+      chai.expect(inventory["SchemaC"][0].version).to.equal("03.00.00");  
+      chai.expect(inventory["SchemaC"][0].released).to.be.true;
+      chai.expect(inventory["SchemaC"][0].comment).to.equal("");  
+      chai.expect(inventory["SchemaC"][0].approved).to.equal("No");  
+      chai.expect(inventory["SchemaC"][0].author).to.equal("");  
+      chai.expect(inventory["SchemaC"][0].comment).to.equal("");  
+      chai.expect(inventory["SchemaC"][0].date).to.equal("Unknown");
+      chai.expect(inventory["SchemaC"][0].dynamic).to.equal("No");  
+      chai.expect(inventory["SchemaC"][0].name).to.equal("SchemaC");
+      chai.expect(inventory["SchemaC"][0].sha1).to.equal("");
     });
   });
 
   describe('createBaseInventory tests', function() {
     it("Schema info loaded properly", async function() {
-      const inventory = await invGen.createBaseInventory(assetsDir);
+      const inventory = await inventoryHandler.createRepositoryInventory(assetsDir);
 
-      chai.expect(Object.keys(inventory).length).to.equal(2);
+      chai.expect(Object.keys(inventory).length).to.equal(3);
       chai.expect(inventory["SchemaA"]).to.not.be.undefined;
       chai.expect(inventory["SchemaA"].length).to.equal(2);
       chai.expect(inventory["SchemaA"][0].version).to.equal("01.01.02");  
@@ -189,6 +198,19 @@ describe('Inventory Generation', function() {
       chai.expect(inventory["SchemaB"][1].version).to.equal("02.02.01");  
       chai.expect(inventory["SchemaA"][1].released).to.be.true;
       chai.expect(inventory["SchemaA"][1].comment).to.be.undefined;
+
+      chai.expect(inventory["SchemaC"]).to.not.be.undefined;
+      chai.expect(inventory["SchemaC"].length).to.equal(1);
+      chai.expect(inventory["SchemaC"][0].name).to.equal("SchemaC");
+      chai.expect(inventory["SchemaC"][0].version).to.equal("03.00.00");  
+      chai.expect(inventory["SchemaC"][0].released).to.be.true;
+      chai.expect(inventory["SchemaC"][0].comment).to.equal(undefined);  
+      chai.expect(inventory["SchemaC"][0].approved).to.equal(undefined);  
+      chai.expect(inventory["SchemaC"][0].author).to.equal(undefined);  
+      chai.expect(inventory["SchemaC"][0].comment).to.equal(undefined);  
+      chai.expect(inventory["SchemaC"][0].date).to.equal(undefined);
+      chai.expect(inventory["SchemaC"][0].dynamic).to.equal(undefined);  
+      chai.expect(inventory["SchemaC"][0].sha1).to.equal(undefined);
     });
 
     it("Schema version does not match file version, throws", async function () {
@@ -196,7 +218,7 @@ describe('Inventory Generation', function() {
       const stub = sinon.stub(fs, "readFileSync");
       stub.withArgs(schemaPath).returns(`<ECSchema schemaName="SchemaA" alias="a" version="01.01.00"`);
       stub.callThrough();
-      await chai.expect(invGen.createBaseInventory(assetsDir)).to.be.rejectedWith(`The version in the file for schema Released\\SchemaA.01.01.01.ecschema.xml 01.01.00 doesn't match the version recorded in the inventory 01.01.01.`);
+      await chai.expect(inventoryHandler.createRepositoryInventory(assetsDir)).to.be.rejectedWith(`The version in the file for schema Released\\SchemaA.01.01.01.ecschema.xml 01.01.00 doesn't match the version recorded in the inventory 01.01.01.`);
     });
 
     it("Schema version not found in schema xml, throws", async function () {
@@ -204,7 +226,7 @@ describe('Inventory Generation', function() {
       const stub = sinon.stub(fs, "readFileSync");
       stub.withArgs(schemaPath).returns(`<ECSchema schemaName="SchemaA" alias="a" version=""`);
       stub.callThrough();
-      await chai.expect(invGen.createBaseInventory(assetsDir)).to.be.rejectedWith(`Could not find version in schema xml for file SchemaA.ecschema.xml`);
+      await chai.expect(inventoryHandler.createRepositoryInventory(assetsDir)).to.be.rejectedWith(`Could not find version in schema xml for file SchemaA.ecschema.xml`);
     });
 
     it("Schema minor version not set in schema xml, full version properly set in inventory", async function () {
@@ -212,7 +234,7 @@ describe('Inventory Generation', function() {
       const stub = sinon.stub(fs, "readFileSync");
       stub.withArgs(schemaPath).returns(`<ECSchema schemaName="SchemaA" alias="a" version="01.01"`);
       stub.callThrough();
-      const inventory = await invGen.createBaseInventory(assetsDir);
+      const inventory = await inventoryHandler.createRepositoryInventory(assetsDir);
       chai.expect(inventory["SchemaA"][0].version).to.equal("01.00.01");
     });
   });
@@ -221,7 +243,7 @@ describe('Inventory Generation', function() {
     it("Schema not found in inventory, schema added", function() {
       const repoInventory = {};
 
-      invGen.mergeExistingInventoryIntoRepoInventory(repoInventory, existingInventory);
+      inventoryHandler.mergeExistingInventoryIntoRepoInventory(repoInventory, existingInventory);
       chai.expect(repoInventory["TestSchema"]).to.not.be.undefined;
       chai.expect(repoInventory["TestSchema"][0]).to.not.be.undefined;
       chai.expect(repoInventory["TestSchema"][0].name).to.equal("TestSchema");
@@ -247,7 +269,7 @@ describe('Inventory Generation', function() {
         ]
       };
 
-      invGen.mergeExistingInventoryIntoRepoInventory(repoInventory, existingInventory);
+      inventoryHandler.mergeExistingInventoryIntoRepoInventory(repoInventory, existingInventory);
       chai.expect(repoInventory["TestSchema"]).to.not.be.undefined;
       chai.expect(repoInventory["TestSchema"][0]).to.not.be.undefined;
       chai.expect(repoInventory["TestSchema"][0].name).to.equal("TestSchema");
@@ -274,7 +296,7 @@ describe('Inventory Generation', function() {
       ]
     };
     existingInventory["TestSchema"][0].released = false;
-    invGen.mergeExistingInventoryIntoRepoInventory(repoInventory, existingInventory);
+    inventoryHandler.mergeExistingInventoryIntoRepoInventory(repoInventory, existingInventory);
     chai.expect(repoInventory["TestSchema"]).to.not.be.undefined;
     chai.expect(repoInventory["TestSchema"][0]).to.not.be.undefined;
     chai.expect(repoInventory["TestSchema"][0].name).to.equal("TestSchema");
@@ -299,7 +321,7 @@ describe('Inventory Generation', function() {
         }
       ]
     };
-    invGen.mergeExistingInventoryIntoRepoInventory(repoInventory, existingInventory);
+    inventoryHandler.mergeExistingInventoryIntoRepoInventory(repoInventory, existingInventory);
     chai.expect(repoInventory["TestSchema"]).to.not.be.undefined;
     chai.expect(repoInventory["TestSchema"][0]).to.not.be.undefined;
     chai.expect(repoInventory["TestSchema"][0].name).to.equal("TestSchema");
@@ -317,103 +339,6 @@ describe('Inventory Generation', function() {
     chai.expect(repoInventory["TestSchema"][1].dynamic).to.equal("No");
   });
 
-  describe('mergeBisChecksumDump tests', function() {
-    it("Schema not found in inventory, schema added", function() {
-      const inventory = {};
-
-      invGen.mergeBisChecksumDump(inventory, checksumDump);
-      chai.expect(inventory["TestSchema"]).to.not.be.undefined;
-      chai.expect(inventory["TestSchema"][0]).to.not.be.undefined;
-      chai.expect(inventory["TestSchema"][0].name).to.equal("TestSchema");
-      chai.expect(inventory["TestSchema"][0].comment).to.equal("");
-      chai.expect(inventory["TestSchema"][0].version).to.equal("01.01.01");
-      chai.expect(inventory["TestSchema"][0].released).to.equal(true);
-      chai.expect(inventory["TestSchema"][0].sha1).to.equal("testsha1");
-      chai.expect(inventory["TestSchema"][0].author).to.equal("AuthorName");
-      chai.expect(inventory["TestSchema"][0].approved).to.equal("Yes");
-      chai.expect(inventory["TestSchema"][0].date).to.equal("01/01/2020");
-      chai.expect(inventory["TestSchema"][0].dynamic).to.equal("No");
-    });
-
-    it("Version not defined in checksum comment, version set properly", function() {
-      const inventory = {};
-      checksumDump.schemas[0].comment = "";
-      invGen.mergeBisChecksumDump(inventory, checksumDump);
-      chai.expect(inventory["TestSchema"][0].version).to.equal("01.00.00");
-    });
-
-    it("Comment defined after version, version/comment set properly", function() {
-      const inventory = {};
-      checksumDump.schemas[0].comment = "01.01.01 Test Comment";
-      invGen.mergeBisChecksumDump(inventory, checksumDump);
-      chai.expect(inventory["TestSchema"][0].version).to.equal("01.01.01");
-      chai.expect(inventory["TestSchema"][0].comment).to.equal(" Test Comment");
-    });
-
-    it("Comment defined without version, version/comment set properly", function() {
-      const inventory = {};
-      checksumDump.schemas[0].comment = "Test Comment";
-      invGen.mergeBisChecksumDump(inventory, checksumDump);
-      chai.expect(inventory["TestSchema"][0].version).to.equal("01.00.00");
-      chai.expect(inventory["TestSchema"][0].comment).to.equal("Test Comment");
-    });
-
-    it("Existing released Schema, info merged into inventory", function() {
-      const inventory = {
-        TestSchema: [
-          {
-            name: "TestSchema",
-            path: "test-path",
-            version: "01.01.01",
-            released: true
-          }
-        ]
-      };
-
-      invGen.mergeBisChecksumDump(inventory, checksumDump);
-      chai.expect(inventory["TestSchema"]).to.not.be.undefined;
-      chai.expect(inventory["TestSchema"][0]).to.not.be.undefined;
-      chai.expect(inventory["TestSchema"][0].name).to.equal("TestSchema");
-      chai.expect(inventory["TestSchema"][0].comment).to.equal("");
-      chai.expect(inventory["TestSchema"][0].version).to.equal("01.01.01");
-      chai.expect(inventory["TestSchema"][0].released).to.equal(true);
-      chai.expect(inventory["TestSchema"][0].sha1).to.equal("testsha1");
-      chai.expect(inventory["TestSchema"][0].author).to.equal("AuthorName");
-      chai.expect(inventory["TestSchema"][0].approved).to.equal("Yes");
-      chai.expect(inventory["TestSchema"][0].date).to.equal("01/01/2020");
-      chai.expect(inventory["TestSchema"][0].dynamic).to.equal("No");
-    });
-  });
-
-  it("Existing non-released Schema, info added into inventory", function() {
-    const inventory = {
-      TestSchema: [
-        {
-          name: "TestSchema",
-          path: "test-path",
-          version: "01.01.01",
-          released: false
-        }
-      ]
-    };
-    invGen.mergeBisChecksumDump(inventory, checksumDump);
-    chai.expect(inventory["TestSchema"]).to.not.be.undefined;
-    chai.expect(inventory["TestSchema"][0]).to.not.be.undefined;
-    chai.expect(inventory["TestSchema"][0].name).to.equal("TestSchema");
-    chai.expect(inventory["TestSchema"][0].comment).to.be.undefined;
-    chai.expect(inventory["TestSchema"][0].version).to.equal("01.01.01");
-    chai.expect(inventory["TestSchema"][0].released).to.equal(false);
-    chai.expect(inventory["TestSchema"][1].name).to.equal("TestSchema");
-    chai.expect(inventory["TestSchema"][1].comment).to.equal("");
-    chai.expect(inventory["TestSchema"][1].version).to.equal("01.01.01");
-    chai.expect(inventory["TestSchema"][1].released).to.equal(true);
-    chai.expect(inventory["TestSchema"][1].sha1).to.equal("testsha1");
-    chai.expect(inventory["TestSchema"][1].author).to.equal("AuthorName");
-    chai.expect(inventory["TestSchema"][1].approved).to.equal("Yes");
-    chai.expect(inventory["TestSchema"][1].date).to.equal("01/01/2020");
-    chai.expect(inventory["TestSchema"][1].dynamic).to.equal("No");
-  });
-
   describe('cleanupInventoryEntries tests', function() {
     it("No path, no comment, not approved, comment set to 'Known Bad'", function() {
       const inventory = {
@@ -424,7 +349,7 @@ describe('Inventory Generation', function() {
         ]
       };
 
-      invGen.cleanupInventoryEntries(inventory);
+      inventoryHandler.cleanupInventoryEntries(inventory);
       chai.expect(inventory["TestSchema"][0].comment).to.equal("Known Bad");
     });
 
@@ -439,7 +364,7 @@ describe('Inventory Generation', function() {
       };
       sinon.stub(fs, 'readFileSync').returns(`<ECSchema schemaName="TestSchema" alias="ts" version="01.01.01"`);
 
-      invGen.cleanupInventoryEntries(inventory);
+      inventoryHandler.cleanupInventoryEntries(inventory);
       chai.expect(inventory["TestSchema"][0].comment).to.equal("");
       chai.expect(inventory["TestSchema"][0].sha1).to.equal("");
       chai.expect(inventory["TestSchema"][0].author).to.equal("");
