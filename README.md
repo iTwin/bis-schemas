@@ -204,6 +204,14 @@ A new TypeScript based tool **imodel-schema-validator** is now available to vali
 
 To setup and use this tool locally, follow the instructions in [imodel-schema-validator readme.md](https://github.com/iTwin/bis-schema-validation/tree/master/imodel-schema-validator).
 
+### Schema Inventory
+
+The SchemaInventory.json file at the root of the bis-schemas repository contains an up-to-date inventory of all schemas in the bis-schemas repository. The schema inventory must be updated using the npm task 'updateSchemaInventory', defined in the bis-schemas package.json, for all pull-requests that define new schemas.  This includes a new version of a work-in-progress schema or a new released schema. Missing schemas will cause the `Bis Schemas - TS Validation (Github)` build to fail during pull-requests builds of the bis-schemas repository.
+
+#### New Released Schemas
+
+The 'updateSchemaInventory' task will also add new Schema entries found in release folders with the added step of generating a Sha1 hash for the new schema. You must manually update the 'approved' and 'verified' fields of the new schema entry in SchemaInventory.json or the validation (noted above) will fail during pull-request builds.
+
 ## Schema Packaging - *WIP*
 
 See [Schema Release Proposal](./docs/schema-release-process.md)
