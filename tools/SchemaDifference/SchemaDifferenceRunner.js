@@ -3,11 +3,12 @@
 "use strict";
 
 const path = require("path");
+const fs = require("fs");
 const readdirp = require("readdirp");
 const argv = require("yargs").argv;
-const SchemaComparison = require(argv.SchemaComparerPath).SchemaComparison
-const CompareOptions = require(argv.SchemaComparerPath).CompareOptions
-const ComparisonResultType = require(argv.SchemaComparerPath).ComparisonResultType
+const SchemaComparison = require("@bentley/schema-comparer").SchemaComparison;
+const CompareOptions = require("@bentley/schema-comparer").CompareOptions;
+const ComparisonResultType = require("@bentley/schema-comparer").ComparisonResultType;
 
 // Add the name(s) of schemas that should be skipped from schema differencing.
 const excludedSchemaNames = [
@@ -26,7 +27,8 @@ async function compareSchemas() {
   const refPaths = getRefpaths(schemas)
   let hasErrors = false;
 
-  console.log("Schema Comparison logs will be generated under " + argv.OutDir);
+  const outputPath = getOutputPath();
+  console.log("Schema Comparison logs will be generated under " + outputPath);
   
   for (const schema of schemas) {
     if (schema.released)
@@ -48,7 +50,8 @@ async function compareSchemas() {
 
     console.log(`Found latest ${schema.name} schema at ${releasedSchema.fullPath}.`)
 
-    const options = new CompareOptions(releasedSchema.fullPath, schema.fullPath, refPaths, refPaths, argv.OutDir);
+    
+    const options = new CompareOptions(releasedSchema.fullPath, schema.fullPath, refPaths, refPaths, outputPath);
     const results = await SchemaComparison.compare(options);
     if (processResults(releasedSchema, schema, results))
       hasErrors = true;
@@ -109,7 +112,8 @@ function getRefpaths(schemas) {
 }
 
 async function getAllSchemas() {
-  const allSchemas = await readdirp.promise(argv.BisRoot, {fileFilter: "*.ecschema.xml", directoryFilter: ["!docs", "!node_modules", "!tools", "!.vscode", "!cmaps", "!Deprecated"]});
+  const bisRoot = getBisRootPath();
+  const allSchemas = await readdirp.promise(bisRoot, {fileFilter: "*.ecschema.xml", directoryFilter: ["!docs", "!node_modules", "!tools", "!.vscode", "!cmaps", "!Deprecated"]});
 
   const schemas = new Set();
   for (const entry of allSchemas) {
@@ -170,6 +174,32 @@ function isExcludeSchema(schemaName) {
   const name = match ? match[0] : "";
 
   return excludedSchemaNames.includes(name);
+}
+
+function getBisRootPath() {
+  const bisRootPath = argv.BisRoot || path.join(__dirname, "../../");
+
+  if (!fs.existsSync(bisRootPath)) {
+    throw Error("Could not find BIS root path.")
+  }
+
+  return bisRootPath;
+}
+
+function getOutputPath() {
+  let outputPath = argv.OutDir;
+  
+  if (!outputPath) {
+    outputPath = path.join(__dirname, "../../", "testOut", "ComparisonResults");
+    if (!fs.existsSync(outputPath))
+      fs.mkdirSync(outputPath, { recursive: true });
+  }
+
+  if (!fs.existsSync(outputPath)) {
+    throw Error("Could not find schema comparison results output path.");
+  }
+
+  return outputPath;
 }
 
 compareSchemas();
