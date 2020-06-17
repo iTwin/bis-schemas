@@ -10,11 +10,10 @@
 const path = require("path");
 const readdirp = require("readdirp");
 const argv = require("yargs").argv;
-const exec = require('child_process').exec
 const fs = require("fs");
-const ValidationOptions = require(argv.ValidaterPath).ValidationOptions
-const ValidationResultType = require(argv.ValidaterPath).ValidationResultType
-const SchemaValidator = require(argv.ValidaterPath).SchemaValidator
+const ValidationOptions = require("@bentley/schema-validator").ValidationOptions;
+const ValidationResultType = require("@bentley/schema-validator").ValidationResultType;
+const SchemaValidator = require("@bentley/schema-validator").SchemaValidator;
 
 const standardSchemaNames = [
   "Bentley_Standard_CustomAttributes",
@@ -62,7 +61,8 @@ async function validateSchemas() {
 
     const refPaths = schema.released ? releasedRefPaths : allRefPaths;
 
-    const options = new ValidationOptions(schema.fullPath, refPaths, false, argv.OutDir);
+    const outputPath = getOutputPath();
+    const options = new ValidationOptions(schema.fullPath, refPaths, false, outputPath);
     const results = await SchemaValidator.validate(options);
 
     if (processResults(results))
@@ -129,7 +129,8 @@ function getRefpaths(schemas, releasedOnly) {
 
 
 async function getAllSchemas() {
-  const allSchemas = await readdirp.promise(argv.BisRoot, {fileFilter: "*.ecschema.xml", directoryFilter: ["!docs", "!node_modules", "!tools", "!.vscode", "!cmaps", "!Deprecated"]});
+  const bisRoot = getBisRootPath();
+  const allSchemas = await readdirp.promise(bisRoot, {fileFilter: "*.ecschema.xml", directoryFilter: ["!docs", "!node_modules", "!tools", "!.vscode", "!cmaps", "!Deprecated"]});
 
   const schemas = new Set();
   for (const entry of allSchemas) {
@@ -172,6 +173,32 @@ function shouldExcludeSchema(schema, excludeList) {
     return true;
 
   return false;
+}
+
+function getBisRootPath() {
+  const bisRootPath = argv.BisRoot || path.join(__dirname, "../../");
+
+  if (!fs.existsSync(bisRootPath)) {
+    throw Error("Could not find BIS root path.")
+  }
+
+  return bisRootPath;
+}
+
+function getOutputPath() {
+  let outputPath = argv.OutDir;
+  
+  if (!outputPath) {
+    outputPath = path.join(__dirname, "../../", "testOut", "ValidationResults");
+    if (!fs.existsSync(outputPath))
+      fs.mkdirSync(outputPath, { recursive: true });
+  }
+
+  if (!fs.existsSync(outputPath)) {
+    throw Error("Could not find schema validation output path.");
+  }
+
+  return outputPath;
 }
 
 function getExcludeSchemaList() {
