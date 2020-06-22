@@ -48,8 +48,10 @@ stages:
 
 
         
-      - script: npm install
+      - task: Npm@1
         displayName: 'npm install'
+        inputs:
+          command: install
 
       - script: node ./tools/packages/generatePackages.js --inventory ./SchemaInventory.json --outDir $(pkgOut) --template ./tools/packages/package.json.template
         displayName: Generate Packages
@@ -74,10 +76,6 @@ stages:
         displayName: 'Use Node 10.15.0'
         inputs:
           versionSpec: 10.15.0
-      - task: Npm@1
-        displayName: 'npm install'
-        inputs:
-          command: install
       - download: current
         artifact: bis-schemas-packages
 
@@ -100,5 +98,11 @@ stages:
           Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "////_packaging/Packages/npm/:email=npm requires email to be set but doesn't use the value" -Append
 
 
+
+      - task: Npm@1
+        displayName: 'npm install'
+        inputs:
+          command: install
+          
 
 
