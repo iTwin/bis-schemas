@@ -48,8 +48,10 @@ stages:
 
         displayName: 'Seed npmrc'
         
-      - script: npm install
+      - task: Npm@1
         displayName: 'npm install'
+        inputs:
+          command: install
 
       - script: node ./tools/packages/generatePackages.js --inventory ./SchemaInventory.json --outDir $(pkgOut) --template ./tools/packages/package.json.template
         displayName: Generate Packages
@@ -74,10 +76,6 @@ stages:
         displayName: 'Use Node 10.15.0'
         inputs:
           versionSpec: 10.15.0
-      - task: Npm@1
-        displayName: 'npm install'
-        inputs:
-          command: install
       - download: current
         artifact: bis-schemas-packages
       #Your build pipeline references a secret variable named ‘’. Create or edit the build pipeline for this YAML file, define the variable on the Variables tab, and then select the option to make it secret. See https://go.microsoft.com/fwlink/?linkid=865972
@@ -100,5 +98,11 @@ stages:
           Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "////_packaging/Packages/npm/:email=npm requires email to be set but doesn't use the value" -Append
 
         displayName: 'Seed npmrc'
+
+      - task: Npm@1
+        displayName: 'npm install'
+        inputs:
+          command: install
+          
       - script: node ./tools/packages/publishPackages.js --packages $(Pipeline.Workspace)/bis-schemas-packages --isRealRun
         displayName: Publish packages
