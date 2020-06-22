@@ -76,25 +76,17 @@ stages:
           versionSpec: 10.15.0
       - download: current
         artifact: bis-schemas-packages
+      
       #Your build pipeline references a secret variable named ‘artifactsRegistryToken’. Create or edit the build pipeline for this YAML file, define the variable on the Variables tab, and then select the option to make it secret. See https://go.microsoft.com/fwlink/?linkid=865972
-      - powershell: |
-          $npmrcDir = "$(Build.Repository.LocalPath)"
-          
-          if(!(Test-Path -Path $npmrcDir)){
-              mkdir $npmrcDir
-          }
-          
-          $npmrcFile = $npmrcDir + "/.npmrc"
-          
-          Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "@bentley:registry=/"
-          Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "always-auth=true" -Append
-          Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "///bentleycs/_packaging/Packages/npm/registry/:username=Packages" -Append
-          Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "///bentleycs/_packaging/Packages/npm/registry/:_password=$(artifactsRegistryToken)" -Append
-          Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "///bentleycs/_packaging/Packages/npm/registry/:email=npm requires email to be set but doesn't use the value" -Append
-          Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "///bentleycs/_packaging/Packages/npm/:username=Packages" -Append
-          Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "///bentleycs/_packaging/Packages/npm/:_password=$(artifactsRegistryToken)" -Append
-          Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "///bentleycs/_packaging/Packages/npm/:email=npm requires email to be set but doesn't use the value" -Append
-
+      - bash: |
+          npm config set @bentley:registry /
+          npm config set always-auth=true
+          npm config set ///bentleycs/_packaging/Packages/npm/registry/:username=bentleycs
+          npm config set ///bentleycs/_packaging/Packages/npm/registry/:_password=$(artifactsRegistryToken)
+          npm config set ///bentleycs/_packaging/Packages/npm/registry/:email="not used"
+          npm config set ///bentleycs/_packaging/Packages/npm/:username=bentleycs
+          npm config set ///bentleycs/_packaging/Packages/npm/:_password=$(artifactsRegistryToken)
+          npm config set ///bentleycs/_packaging/Packages/npm/:email="not used"
         displayName: 'Seed npmrc'
 
       - script: npm install
