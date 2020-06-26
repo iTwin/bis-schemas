@@ -150,6 +150,12 @@ The Team is owned by the schema owner, which gives them the ability to add/remov
 
 ## Schema Validation
 
+### Local Development Environment
+There are several npm tasks defined in the package.json of the bis-schemas repository that can be run via the command line. 
+- Run the npm task 'validateSchemas' (*npm run validateSchemas*), to validate schemas against a set of [validation rules](https://imodeljs.github.io/iModelJs-docs-output/bis/intro/bis-schema-validation/). 
+- Run the npm task 'compareSchemas' (*npm run compareSchemas*), to perform a difference audit of all schemas against their latest released version.
+
+
 A build is setup to validate schemas against a set of [validation rules](https://imodeljs.github.io/iModelJs-docs-output/bis/intro/bis-schema-validation/). Additionally, it performs a difference audit of all schemas against their latest released version, if one exists. It also validates these latest released versions by first importing them into an imodel and then validating them using [imodel-schema-validator](#imodel-schema-validation). The validation and difference logs are published as build artifacts and made accessible.
 
 
