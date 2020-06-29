@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ECSchema schemaName="CifHydraulicResults" alias="cifhydrs" version="01.00.00" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" description="iModel Bridge schema containing aspect classes with result properties from Subsurface Utilities Design and Analysis.">
+<ECSchema schemaName="CifHydraulicResults" alias="cifhydrs" version="01.00.00" description="iModel Bridge schema containing aspect classes with result properties from Subsurface Utilities Design and Analysis." xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
     <ECSchemaReference name="BisCore" version="01.00.11" alias="bis"/>
     <ECSchemaReference name="CifCommon" version="01.00.00" alias="cifcmn"/>
     <ECSchemaReference name="CifUnits" version="01.00.00" alias="cifu"/>
@@ -299,6 +299,11 @@
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
         <ECProperty propertyName="DerivedConduitSizeResults_CatalogPipeSize" typeName="string" displayLabel="Size (Display)" category="Physical_Hydraulic_Analysis_Physical_Hydraulic_Analysis" priority="0"/>
     </ECEntityClass>
+    <ECEntityClass typeName="DerivedDropDepthResultsAspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="DerivedDropDepthResults_HasDropStandpipe" typeName="boolean" displayLabel="Has Drop Standpipe?" category="Results_Profile_Hydraulic_Analysis_Results_Profile_Hydraulic_Analysis" priority="0"/>
+        <ECProperty propertyName="DerivedDropDepthResults_DropObservation" typeName="double" displayLabel="Backdrop Height" category="Results_Profile_Hydraulic_Analysis_Results_Profile_Hydraulic_Analysis" priority="0" kindOfQuantity="cifu:DEPTH_LARGE"/>
+    </ECEntityClass>
     <ECEntityClass typeName="DerivedLinkResultsAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
         <ECProperty propertyName="DerivedLinkResults_UnifiedLength" typeName="double" displayLabel="Length (Unified)" category="Physical_Hydraulic_Analysis_Physical_Hydraulic_Analysis" priority="0" kindOfQuantity="cifu:LENGTH"/>
@@ -595,6 +600,15 @@
         </Source>
         <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
             <Class class="DerivedConduitSizeResultsAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="ElementOwnsDerivedDropDepthResultsAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="DerivedDropDepthResultsAspect"/>
         </Target>
     </ECRelationshipClass>
     <ECRelationshipClass typeName="ElementOwnsDerivedLinkResultsAspect" modifier="None" strength="embedding">
@@ -981,6 +995,7 @@
         <ECProperty propertyName="GVFConduitResults_FroudeNumber" typeName="double" displayLabel="Froude Number (Normal)" category="Results_Hydraulic_Summary_Hydraulic_Analysis_Results_Hydraulic_Summary_Hydraulic_Analysis" priority="0" kindOfQuantity="cifu:COEFFICIENT"/>
         <ECProperty propertyName="GVFConduitResults_FrictionSlope" typeName="double" displayLabel="Friction Slope" category="Results_Hydraulic_Summary_Hydraulic_Analysis_Results_Hydraulic_Summary_Hydraulic_Analysis" priority="0" kindOfQuantity="cifu:SLOPE"/>
         <ECProperty propertyName="GVFConduitResults_NormalDepthOverRise" typeName="double" displayLabel="Depth (Normal) / Rise" category="Results_Hydraulic_Summary_Hydraulic_Analysis_Results_Hydraulic_Summary_Hydraulic_Analysis" priority="0" kindOfQuantity="cifu:PERCENT"/>
+        <ECProperty propertyName="GVFConduitResults_CriticalVelocity" typeName="double" displayLabel="Velocity (Critical)" category="Results_Hydraulic_Summary_Hydraulic_Analysis_Results_Hydraulic_Summary_Hydraulic_Analysis" priority="0" kindOfQuantity="cifu:FLOW_VELOCITY"/>
     </ECEntityClass>
     <ECRelationshipClass typeName="ElementOwnsGVFConduitResultsAspect" modifier="None" strength="embedding">
         <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
@@ -1696,6 +1711,19 @@
             <Class class="LinkStorageResultsAspect"/>
         </Target>
     </ECRelationshipClass>
+    <ECEntityClass typeName="LinkSurchargeResultsAspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="LinkSurchargeResults_SurchargeDepth" typeName="double" displayLabel="Depth (Surcharged)" category="Results_Hydraulic_Analysis_Results_Hydraulic_Analysis" priority="0" kindOfQuantity="cifu:DEPTH"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsLinkSurchargeResultsAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="LinkSurchargeResultsAspect"/>
+        </Target>
+    </ECRelationshipClass>
     <ECEntityClass typeName="LocalInflowResultsAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
         <ECProperty propertyName="LocalInflowResults_MaximumLocalInflow" typeName="double" displayLabel="Local Inflow (Maximum)" category="Results_Hydraulic_Analysis_Results_Hydraulic_Analysis" priority="0" kindOfQuantity="cifu:FLOW"/>
@@ -2019,7 +2047,7 @@
     </ECRelationshipClass>
     <ECEntityClass typeName="RatioResultsAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
-        <ECProperty propertyName="RatioResults_MaxFlowPipeFullRatio" typeName="double" displayLabel="Flow(Maximum)/Full Flow" category="Results_Maximum_Values_Hydraulic_Analysis_Results_Maximum_Values_Hydraulic_Analysis" priority="0" kindOfQuantity="cifu:PERCENT"/>
+        <ECProperty propertyName="RatioResults_MaxFlowPipeFullRatio" typeName="double" displayLabel="Flow (Maximum) / Full Flow" category="Results_Maximum_Values_Hydraulic_Analysis_Results_Maximum_Values_Hydraulic_Analysis" priority="0" kindOfQuantity="cifu:PERCENT"/>
         <ECProperty propertyName="RatioResults_AdjustedLengthActualLengthRatio" typeName="double" displayLabel="Adjusted Length / Actual Length" category="Results_Flow_Classification_Hydraulic_Analysis_Results_Flow_Classification_Hydraulic_Analysis" priority="0" kindOfQuantity="cifu:PERCENT"/>
     </ECEntityClass>
     <ECRelationshipClass typeName="ElementOwnsRatioResultsAspect" modifier="None" strength="embedding">
