@@ -97,46 +97,7 @@ The addition of the new BIS Schemas will be at the discretion of the owner of th
 
 Given that all pull requests outside of a domain group directory require a repository owner to review, they are required to review any new domains added. The domain must follow the directory structure, and then identify a person who is designated as the domain owner(s), who will handle all future pull requests.
 
-### CheckSum Information
-
-### When adding a new schema
-
-1. **WIP Schema:**
-A new entry will automatically be added to the SchemaInventory.json (at the root of bis-schemas), when a PR build occurs.
-
-2. **Released Schema:**
-Following are the steps:
-     - Find the WIP schema in [SchemaInventory.json](https://github.com/iTwin/bis-schemas/blob/master/SchemaInventory.json) file.  
-
-      - A new entry for the released schema needs to be added in [SchemaInventory.json](https://github.com/iTwin/bis-schemas/blob/master/SchemaInventory.json) file.  If the new schema is the first released version of the WIP schema then add the new section after the WIP schema, otherwise add the entry after the **latest released version**.
-
-     - Sample new section:
-     `
-        {
-        "name": "testSchema",
-        "path": "Domains\\testSchema\\Released\\testSchema.01.00.04.ecschema.xml",
-        "released": true,
-        "version": "01.00.04",
-        "comment": "",
-        "sha1": "put the sha1 hash value here",
-        "author": "FirstName.LastName",
-        "approved": "Yes",
-        "date": "MM/DD/YYYY",
-        "dynamic": "No"
-        },
-
-     - Provide accurate values for all the keys in this new section otherwise schema validation can fail.
-     - You should have these inventory changes in the same **Pull Request** where you have your new schema XML file. 
-
-     **Note:** This manual step for released schemas will soon be replaced with a developer tool that will add the new entry, along with a generated checksum by itself.
-`
-### When updating an existing schema
-When an already added schema is changed, you can update its Sha1 Hash and the other information in [SchemaInventory.json](https://github.com/iTwin/bis-schemas/blob/master/SchemaInventory.json) file:  
-- Locate the entry by schema name and version in [SchemaInventory.json](https://github.com/iTwin/bis-schemas/blob/master/SchemaInventory.json) e.g `SchemaName.version.ecschema.xml`. You will see a section, having some key,value pairs containing the information about that schema.
-- Verify and update any necessary fields.
-- Any schema inventory changes should be in the same **Pull Request** as the schema XML file changes.
-
-### Managing permissions to BIS Schema
+## Managing permissions to BIS Schema
 
 Every BIS Schema within the repository has an associated owner. The owner is in charge of managing Pull Requests and permissions to the BIS Schema(s).
 
@@ -144,19 +105,137 @@ Permissions for an individual domain schema, or a domain group are managed throu
 
 The Team is owned by the schema owner, which gives them the ability to add/remove people from that team. A given team can be setup as a required reviewer for Schema(s) it owns. Anyone within that team can review/approve pull requests to the schemas. (Note: If you are within the team and you make a pull request you will still need at least one additional reviewer.)
 
-#
 
 
 
-## Schema Validation
 
-### Local Development Environment
-There are several npm tasks defined in the package.json of the bis-schemas repository that can be run via the command line. 
-- Run the npm task 'validateSchemas' (*npm run validateSchemas*), to validate schemas against a set of [validation rules](https://imodeljs.github.io/iModelJs-docs-output/bis/intro/bis-schema-validation/). 
-- Run the npm task 'compareSchemas' (*npm run compareSchemas*), to perform a difference audit of all schemas against their latest released version.
+## BIS Schema Tools
+
+There are set of tools exposed as npm tasks to assist schema authors in managing new or modified schemas.
+
+### Environment Setup
+
+To successfully run the tools described in this section, follow the steps below to setup your environment.
 
 
-A build is setup to validate schemas against a set of [validation rules](https://imodeljs.github.io/iModelJs-docs-output/bis/intro/bis-schema-validation/). Additionally, it performs a difference audit of all schemas against their latest released version, if one exists. It also validates these latest released versions by first importing them into an imodel and then validating them using [imodel-schema-validator](#imodel-schema-validation). The validation and difference logs are published as build artifacts and made accessible.
+
+     
+    The steps provided in the link above should have added several lines to your .npmrc file (found in your user folder, %UserProfile%).    
+
+2. Via the command line, navigate to the root of the bis-schemas repository.  If you have VS Code installed, open the bis-schemas folder, and open a new Terminal (Terminal -> New Terminal in the menu, or use the shortcut (Ctrl-Shift-`).  
+
+3. Run the command 'npm install'.
+
+### Update Schema Inventory
+
+The [SchemaInventory.json](https://github.com/iTwin/bis-schemas/blob/master/SchemaInventory.json) file at the root of the bis-schemas repository contains an up-to-date inventory of all schemas in the bis-schemas repository. The schema inventory must be updated using the npm task 'updateSchemaInventory', defined in the bis-schemas package.json, for all pull-requests that define new schemas. This includes a new version of a work-in-progress schema or a new released schema.
+
+*Missing schemas will cause the `Bis Schemas - TS Validation (Github)` build to fail during pull-requests builds of the bis-schemas repository.
+
+````usage: npm run updateSchemaInventory````
+
+To run the updateSchemaInventory script, follow these steps:
+
+1. Navigate to the bis-schemas folder from the command line or VS Code Terminal
+2. Run 'npm run updateSchemaInventory'
+3. Verify that the modified SchemaInventory.json contains the new schema entries, and include the modified file in the pull-request along with the schema changes.
+    - **New Released Schemas**: New Schema entries will contain an automatically generated Sha1 hash for the new schema. You must manually update the 'approved' and 'verified' fields of the new schema entry in SchemaInventory.json or the validation (noted above) will fail during pull-request builds.
+
+### BIS Rule Validation
+
+BIS rule validation consists of checking all schemas in the bis-schemas repository against a set of [validation rules](https://imodeljs.github.io/iModelJs-docs-output/bis/intro/bis-schema-validation/). The npm script 'validateSchemas' uses the npm package `@bentley/schema-validator` to perform the validation.
+
+````usage: npm run validateSchemas [--] [--name SCHEMA-NAME]````
+
+Example:  
+````npm run validateSchemas -- --name BisCore````
+
+|Optional argument | Description |
+|------------------|-------------|
+| --               | This argument instructs npm to pass subsequent arguments (i.e --name SCHEMA_NAME) to the invoked script, rather than to the npm command itself. Required only if --name SCHEMA_NAME is specified |  
+| --name SCHEMA_NAME | If this flag is specified, only the schema(s) with the given name will be validated |
+
+To run the 'validateSchemas' script, follow these steps:
+
+1. Navigate to the bis-schemas folder from the command line or VS Code Terminal
+2. Issue the command as described above.
+
+### Schema Differencing
+
+The Schema Differencing tool performs a difference audit of all schemas in the bis-schemas against their latest released version, if one exists. The npm script 'compareSchemas' uses the npm package `@bentley/schema-comparer` to perform the difference audit.
+
+````usage: npm run compareSchemas [--] [--name SCHEMA-NAME]````
+
+Example:  
+````npm run compareSchemas -- --name BisCore````
+
+|Optional argument | Description |
+|------------------|-------------|
+| --               | This argument instructs npm to pass subsequent arguments (i.e --name SCHEMA_NAME) to the invoked script, rather than to the npm command itself. Required only if --name SCHEMA_NAME is specified |
+| --name SCHEMA_NAME | If this flag is specified, only the schema(s) with the given name will be validated. |
+
+To run the 'compareSchemas' script, follow these steps:
+
+1. Navigate to the bis-schemas folder from the command line or VS Code Terminal
+2. Issue the command as described above.
+
+### iModel Schema Validation
+
+The iModel Schema Validation tool imports each individual schema in the bis-schema repository (along with schema references) into an local snapshot iModel. The schemas are then exported to a temp directory in order to perform the required validations. The following checks are performed:
+
+- **BIS-Rules Validation:** All schemas are validated against [BIS-Rules](https://www.imodeljs.org/bis/intro/bis-schema-validation/) using the `@bentley/schema-validator` package.
+- **Comparison Validation:** All schemas are compared with their similar (exact version match) released schemas within bis-schemas using the `@bentley/schema-comparer` package.
+- **Sha1 Hash Validation:** Sha1 Hash is generated for each exported schema and compared against the set of hashes of released schemas present in [SchemaInventory](https://github.com/iTwin/bis-schemas/blob/master/SchemaInventory.json).
+- **Approval Validation:** Approval status of each schema is checked from [SchemaInventory](https://github.com/iTwin/bis-schemas/blob/master/SchemaInventory.json).  
+
+The npm script 'iModelSchemaValidation' uses the npm package [@bentley/imodel-schema-validater](https://www.npmjs.com/package/@bentley/imodel-schema-validator) to perform the validation.
+
+````usage: npm run iModelSchemaValidation [--] [--wip [SCHEMA-NAME]] [--released [SCHEMA-NAME]]````
+
+Example:  
+````npm run iModelSchemaValidation -- --released BisCore````
+
+|Optional argument | Description |
+|------------------|-------------|
+| --               | This argument instructs npm to pass subsequent arguments (i.e --released) to the invoked script, rather than to the npm command itself. Required only if one of the optional flags are specified |
+| --wip [SCHEMA_NAME] | If this flag is specified, only work-in-progress schemas will be validated. If a schema name is specified, only the WIP schema(s) with the given name will be validated. |
+ --released [SCHEMA_NAME] | If this flag is specified, only released schemas will be validated. If a schema name is specified, only released schema(s) with the given name will be validated. |
+
+Running 'npm run iModelSchemaValidation' will validate ALL schemas in the bis-schemas repository.
+
+To run the 'iModelSchemaValidation' script, follow these steps:
+
+1. Navigate to the bis-schemas folder from the command line or VS Code Terminal
+2. Issue the command as described above.
+
+**NOTE:** The Asset schema is currently skipped when validating all WIP schemas due to known failures.  Specify 'Asset' explicitly using the --wip flag to validate the Asset schema.  
+````npm run iModelSchemaValidation -- --wip Asset````
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+ 
+- **environment:** The environment where imodel is present. This tool supports three environments: DEV, QA and PROD.
+
+- **iModelName:** Name of the imodel present in the project mentioned in projectid.
+
+
+ 
+
+  
+
+
 
 
 
@@ -171,52 +250,12 @@ Please invite the certification team of your bridge to verify the checksums of y
 
 
 
-    - See [iModel Schema Validation](#imodel-schema-validation) for details on how to do this.
 
 
 
 
 
 
-### iModel Schema Validation
-
-A new TypeScript based tool **imodel-schema-validator** is now available to validate the schemas within an iModel. It downloads the briefcase of the given iModel and export all the schemas within it, then it performs following 4 validations against these exported schemas: 
-
-- **BIS-Rules Validation:** All schemas are validated against [BIS-Rules](https://www.imodeljs.org/bis/intro/bis-schema-validation/).
-- **Comparison Validation:** All schemas are compared with their similar (exact version match) released schemas within bis-schemas.
-- **Sha1 Hash Validation:** Sha1 Hash is generated for each exported schema and compared against the set of hashes of released schemas present in [SchemaInventory](https://github.com/iTwin/bis-schemas/blob/master/SchemaInventory.json).
-- **Approval Validation:** Approval status of each schema is checked from [SchemaInventory](https://github.com/iTwin/bis-schemas/blob/master/SchemaInventory.json).
-
-
-
-
- 
-
-
-   
-
-  
-
-  
-  
-   
-  
-    
-
-  
-
-
-
-
-To setup and use this tool locally, follow the instructions in [imodel-schema-validator readme.md](https://github.com/iTwin/bis-schema-validation/tree/master/imodel-schema-validator).
-
-### Schema Inventory
-
-The SchemaInventory.json file at the root of the bis-schemas repository contains an up-to-date inventory of all schemas in the bis-schemas repository. The schema inventory must be updated using the npm task 'updateSchemaInventory', defined in the bis-schemas package.json, for all pull-requests that define new schemas.  This includes a new version of a work-in-progress schema or a new released schema. Missing schemas will cause the `Bis Schemas - TS Validation (Github)` build to fail during pull-requests builds of the bis-schemas repository.
-
-#### New Released Schemas
-
-The 'updateSchemaInventory' task will also add new Schema entries found in release folders with the added step of generating a Sha1 hash for the new schema. You must manually update the 'approved' and 'verified' fields of the new schema entry in SchemaInventory.json or the validation (noted above) will fail during pull-request builds.
 
 ## Schema Packaging - *WIP*
 
