@@ -1,6 +1,6 @@
 const path = require("path");
-const ecSchemaOpsLib = require("@bentley/ecschema-ops").NativeLibrary;
-const ECSchemaOpsNative = ecSchemaOpsLib.load();
+const ECSchemaOpsNativeLibrary = require("@bentley/ecschema-ops").ECSchemaOpsNativeLibrary;
+const ECSchemaOpsNative = ECSchemaOpsNativeLibrary.load();
 const schemaOps = new ECSchemaOpsNative.ECSchemaOps();
 
 module.exports = function (schema, bisRootDir, schemaDirectories) {
