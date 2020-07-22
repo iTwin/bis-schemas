@@ -4,6 +4,6 @@ remarksTarget: CifRoads.ecschema.md
 
 # CifRoads
 
-iModelBridge schema used by the CivilBridge, containing aspect classes aimed to provide a similar user-experience as OpenRoads Designer with respect to properties.
+iModelBridge schema used by the Civil iModel Bridge while publishing OpenRoads Designer (ORD) datasets. The aspect classes contained within this schema aim to provide a similar user-experience with respect to ORD properties, as well as make its data available for re-purposing. 
 
-NOTE: Currently under development. This schema should not be used for production workflows. Data created using this schema is not supported and may not be upgradable.
+This schema should not be considered the aligned BIS schema for the Road domain.
