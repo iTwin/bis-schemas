@@ -1,9 +1,9 @@
 ---
-remarksTarget: CifRoads.ecschema.md
+remarksTarget: CifSubsurfaceConflictAnalysis.ecschema.md
 ---
 
-# CifRoads
+# CifSubsurfaceConflictAnalysis
 
-iModelBridge schema used by the CivilBridge, containing aspect classes aimed to provide a similar user-experience as Subsurface Utilities Engineering with respect to properties.
+iModelBridge schema used by the Civil iModel Bridge while publishing datasets containing Subsurface Utilities Engineering information. The aspect classes contained within this schema aim to provide a similar user-experience with respect to the source application properties, as well as make its data available for re-purposing. 
 
-NOTE: Currently under development. This schema should not be used for production workflows. Data created using this schema is not supported and may not be upgradable.
+This schema should not be considered the aligned BIS schema for any domain.
