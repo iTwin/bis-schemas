@@ -4,6 +4,6 @@ remarksTarget: CifGeometricRules.ecschema.md
 
 # CifGeometricRules
 
-iModelBridge schema used by the CivilBridge, containing common classes applicable to all Civil Infrastructure Framework-based applications. They aim to provide a similar user-experience with respect to properties as them.
+iModelBridge schema used by the Civil iModel Bridge while publishing datasets from any Civil Infrastructure Framework (CIF)-based application. The aspect classes contained within this schema aim to provide a similar user-experience with respect to properties in the source CIF application, as well as make its data available for re-purposing. 
 
-NOTE: Currently under development. This schema should not be used for production workflows. Data created using this schema is not supported and may not be upgradable.
+This schema should not be considered the aligned BIS schema for any particular domain.

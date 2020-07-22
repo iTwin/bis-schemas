@@ -4,6 +4,6 @@ remarksTarget: CifBridge.ecschema.md
 
 # CifBridge
 
-iModelBridge schema used by the CivilBridge, containing OpenBridge Modeler CE-related classes applicable to all Civil Infrastructure Framework-based applications. They aim to provide a similar user-experience with respect to properties as them.
+iModelBridge schema used by the Civil iModel Bridge while publishing OpenBridge Modeler (OBM) datasets. The aspect classes contained within this schema aim to provide a similar user-experience with respect to OBM properties, as well as make its data available for re-purposing. 
 
-NOTE: Currently under development. This schema should not be used for production workflows. Data created using this schema is not supported and may not be upgradable.
+This schema should not be considered the aligned BIS schema for the Bridge domain.
