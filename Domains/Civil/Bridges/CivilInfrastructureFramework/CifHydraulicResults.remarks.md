@@ -2,8 +2,8 @@
 remarksTarget: CifHydraulicResults.ecschema.md
 ---
 
-# CifRoads
+# CifHydraulicResults
 
-iModelBridge schema used by the CivilBridge, containing aspect classes aimed to provide a similar user-experience as Subsurface Utilities Design & Analysis with respect to result properties.
+iModelBridge schema used by the Civil iModel Bridge while publishing datasets containing Subsurface Utilities Design & Analysis information. The aspect classes contained within this schema, which focuses on the result properties of such module for a single scenario and time-step (typically the active ones in a dataset), aim to provide a similar user-experience with respect to the source application properties, as well as make its data available for re-purposing. 
 
-NOTE: Currently under development. This schema should not be used for production workflows. Data created using this schema is not supported and may not be upgradable.
+This schema should not be considered the aligned BIS schema for any domain.
