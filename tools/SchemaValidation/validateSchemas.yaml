@@ -18,12 +18,10 @@ jobs:
     - group: 
     - name: validationOut
       value: '$(Agent.BuildDirectory)/ValidationResults'
-    - name: validaterPath
-      value: '$(Build.Repository.LocalPath)/node_modules/@bentley/schema-validator'
     - name: comparisonOut
       value: '$(Agent.BuildDirectory)/ComparisonResults'
-    - name: schemaComparerPath
-      value: '$(Build.Repository.LocalPath)/node_modules/@bentley/schema-comparer'
+    - name: imodelValidationOut
+      value: '$(Agent.BuildDirectory)/IModelValidationResults'
 
   steps:
   - task: NodeTool@0
@@ -45,31 +43,20 @@ jobs:
    
    
 
-  - script: npm install @bentley/schema-validator@latest
-    displayName: 'Install schema-validator'
-
-  - script: npm install @bentley/schema-comparer@latest
-    displayName: 'Install schema-comparer'
-
   - task: CmdLine@2
     displayName: 'NPM CONFIGURATION'
     inputs:
       script: 'npm config list' 
 
-  - task: Npm@1
-    displayName: 'npm install'
-    inputs:
-      command: install   
-
-  - script: node ./tools/SchemaInventory/validateSchemaInventory.js
-    displayName: Validate Schema Inventory
+  - script: npm install
+    displayName: npm install
 
   - script: | 
       mkdir "%validationOut%"
       echo Schema Validation Ouput Dir= %validationOut%
     displayName: 'Create Validation Output Directory'
 
-  - script: node ./tools/SchemaValidation/SchemaValidationRunner.js --BisRoot . --OutDir $(validationOut) --ValidaterPath $(validaterPath)
+  - script: npm run validateSchemas -- --BisRoot . --OutDir $(validationOut)
     workingDirectory: 
     displayName: Perform BIS Schema Validation
 
@@ -94,7 +81,7 @@ jobs:
     condition: succeededOrFailed()
     displayName: 'Create Schema Comparison Output Directory'
 
-  - script: node ./tools/SchemaDifference/SchemaDifferenceRunner.js --BisRoot . --OutDir $(comparisonOut) --SchemaComparerPath $(schemaComparerPath)
+  - script: npm run compareSchemas -- --BisRoot . --OutDir $(comparisonOut)
     workingDirectory: 
     condition: succeededOrFailed()
     displayName: Perform BIS Schema Comparison
@@ -114,58 +101,29 @@ jobs:
     artifact: bis-schema-comparison-logs
     displayName: 'Publish BIS Schema Comparison Results'
 
-- job: VerifyReleasedSchemas
-  workspace:
-    clean: all
+  - script: | 
+      mkdir "%imodelValidationOut%"
+      echo Schema Validation Ouput Dir= %imodelValidationOut%
+    displayName: 'Create iModel Validation Output Directory'
 
-  pool:
-    vmImage: windows-latest
+  - script: npm run iModelSchemaValidation -- --released --OutDir $(imodelValidationOut)
+    displayName: ValidateReleasedSchemas
 
-  variables:
-    - group: 
-
-  steps:
-  - task: NodeTool@0
-    displayName: 'Use Node 12.16.0'
+  - task: ArchiveFiles@2
+    condition: succeededOrFailed()
+    displayName: 'ArchiveFiles - iModel Validation Results'
     inputs:
-      versionSpec: 12.16.0
-  - checkout: self
-  - checkout: git:///bis-schema-validation
-    clean: true
+      rootFolderOrFile: $(imodelValidationOut) 
+      includeRootFolder: false 
+      archiveType: 7z
+      archiveFile: '$(Build.ArtifactStagingDirectory)/IModelValidationResults-$(Build.BuildId).zip' 
+      replaceExistingArchive: true 
 
-     
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
+  - publish: '$(Build.ArtifactStagingDirectory)/IModelValidationResults-$(Build.BuildId).zip'
+    condition: succeededOrFailed()  
+    artifact: released-schema-validation-logs
+    displayName: 'Publish Released Schema Validation Results'
 
-  - task: NuGetCommand@2
-    displayName: 'Download Nuget of Signoff Tool'
-    inputs:
-      command: custom
-      arguments: 'install  -OutputDirectory $(System.DefaultWorkingDirectory) -Source _packaging/Packages/nuget/v3/index.json'
+  - script: npm run validateSchemaInventory
+    displayName: Validate Schema Inventory
 
-  - powershell: |
-      $dir = Get-ChildItem $(System.DefaultWorkingDirectory) | Where-Object {$_.name -like "*"}
-
-      Write-Host "SignoffToolPath=$(System.DefaultWorkingDirectory)\$dir\lib\native\"
-      Write-Host "##vso[task.setvariable variable=SignoffToolPath]$(System.DefaultWorkingDirectory)\$dir\lib\native\"
-    failOnStderr: true
-    displayName: 'Set Env for Signoff Tool Path'
-
-  - script: set BisSchemaRepo=$(Build.SourcesDirectory)/bis-schemas
-    displayName: set bis-schemas repo path
-
-  - script: npm install
-    displayName: npm install
-    workingDirectory: $(Build.SourcesDirectory)/bis-schema-validation/imodel-schema-validator
-
-  - script: npm run tests:ValidateReleasedBisSchemas
-    displayName: npm run tests:ValidateReleasedBisSchemas
-    workingDirectory: $(Build.SourcesDirectory)/bis-schema-validation/imodel-schema-validator
