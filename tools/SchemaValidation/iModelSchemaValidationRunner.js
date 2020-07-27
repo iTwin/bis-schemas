@@ -57,7 +57,7 @@ async function validateReleasedSchemas(ignoreList, singleSchemaName) {
     const schemaName = getVerifiedSchemaName(key.name, schemaPath);
     const schemaVersion = getVersionString(key.readVersion, key.writeVersion, key.minorVersion);
 
-    if (singleSchemaName) {
+    if (singleSchemaName && singleSchemaName !== true) {
       if (singleSchemaName !== schemaName)
         continue;
     } else if (excludeSchema(schemaName, schemaVersion, ignoreList)) {
@@ -68,7 +68,8 @@ async function validateReleasedSchemas(ignoreList, singleSchemaName) {
 
     await importAndExportSchema(schemaPath, schemaDirectories);
 
-    const result = await verifyIModelSchema(exportDir, path.basename(schemaPath), false, bisSchemaRepo, outputDir);
+    const output = getOutputPath();
+    const result = await verifyIModelSchema(exportDir, path.basename(schemaPath), false, bisSchemaRepo, output);
     results.push(result);
   }
 
@@ -90,7 +91,7 @@ async function validateWipSchemas(ignoreList, singleSchemaName) {
     const schemaName = getVerifiedSchemaName(key.name, schemaPath);
     const schemaVersion = getVersionString(key.readVersion, key.writeVersion, key.minorVersion);
 
-    if (singleSchemaName) {
+    if (singleSchemaName && singleSchemaName !== true) {
       if (singleSchemaName !== schemaName)
         continue;
     } else if (excludeSchema(schemaName, schemaVersion, ignoreList)) {
@@ -103,7 +104,8 @@ async function validateWipSchemas(ignoreList, singleSchemaName) {
 
     const schemaXMLFile = generateSchemaXMLName(schemaName, schemaVersion);
     const validationResult = { name: schemaName, version: "" };
-    await validateSchema(path.join(exportDir, schemaXMLFile), schemaDirectories, validationResult, outputDir);
+    const output = getOutputPath();
+    await validateSchema(path.join(exportDir, schemaXMLFile), schemaDirectories, validationResult, output);
     schemaDirectories = fixSchemaValidatorIssue(exportDir, schemaDirectories);
     if (validationResult.validator === iModelValidationResultTypes.Failed || validationResult.validator === iModelValidationResultTypes.Error) {
       results.push(validationResult);
@@ -330,6 +332,19 @@ function fixSchemaValidatorIssue(exportDir, releasedFolders) {
   const index = releasedFolders.indexOf(exportDir);
   if (index !== -1) { releasedFolders.splice(index, 1); }
   return releasedFolders;
+}
+
+/**
+ * Returns the output path for logs
+ */
+function getOutputPath() {
+  let outputPath = argv.OutDir;
+  
+  if (!fs.existsSync(outputPath)) {
+    throw Error("Could not find schema validation output path.");
+  }
+
+  return outputPath;
 }
 
 validateIModelSchemas();
