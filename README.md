@@ -193,13 +193,18 @@ The npm script 'iModelSchemaValidation' uses the npm package [@bentley/imodel-sc
 ````usage: npm run iModelSchemaValidation [--] [--wip [SCHEMA-NAME]] [--released [SCHEMA-NAME]]````
 
 Example:  
-````npm run iModelSchemaValidation -- --released BisCore````
+ - Command 1: ````npm run iModelSchemaValidation -- --released BisCore````
+
+ - Command 2: ````npm run iModelSchemaValidation -- --released````
+
+The first command will validate the latest released version of BisCore and the second command will validate the latest released versions of all released schemas in bis-schemas repository.
 
 |Optional argument | Description |
 |------------------|-------------|
 | --               | This argument instructs npm to pass subsequent arguments (i.e --released) to the invoked script, rather than to the npm command itself. Required only if one of the optional flags are specified |
 | --wip [SCHEMA_NAME] | If this flag is specified, only work-in-progress schemas will be validated. If a schema name is specified, only the WIP schema(s) with the given name will be validated. |
  --released [SCHEMA_NAME] | If this flag is specified, only released schemas will be validated. If a schema name is specified, only released schema(s) with the given name will be validated. |
+ --OutDir | This flag can be used to provide the desired output directory for logs. Default is ````C:\Users\username\AppData\Local\Temp\SchemaValidation\Briefcases\validation````. |
 
 Running 'npm run iModelSchemaValidation' will validate ALL schemas in the bis-schemas repository.
 
