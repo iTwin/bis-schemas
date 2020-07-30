@@ -19,7 +19,7 @@ const SchemaGraphUtil = require("@bentley/ecschema-metadata").SchemaGraphUtil;
 const validateSchema = require("@bentley/imodel-schema-validator").validateSchema;
 const verifyIModelSchema = require("@bentley/imodel-schema-validator").verifyIModelSchema;
 const iModelValidationResultTypes = require("@bentley/imodel-schema-validator").iModelValidationResultTypes;
-const displayResults = require("@bentley/imodel-schema-validator").displayResults;
+const getResults = require("@bentley/imodel-schema-validator").getResults;
 const StubSchemaXmlFileLocater = require("@bentley/ecschema-locaters").StubSchemaXmlFileLocater;
 const SnapshotDb = require("@bentley/imodeljs-backend").SnapshotDb;
 const IModelHost = require("@bentley/imodeljs-backend").IModelHost;
@@ -34,23 +34,29 @@ const outputDir = path.join(iModelDir, iModelName, "logs");
 const ignoreFile = path.join(bisSchemaRepo, "ignoreSchemaList.json");
 
 async function validateIModelSchemas() {
+  const dir = path.join(iModelDir, iModelName);
+  if (fs.existsSync(dir))
+    rimraf.sync(dir);
+  
+  const output = getOutputPath();  
   let ignoreList = JSON.parse(fs.readFileSync(ignoreFile).toString());
   Logger.initializeToConsole();
   Logger.setLevelDefault(LogLevel.Error);
 
   if (argv.released || !argv.wip)
-    await validateReleasedSchemas(ignoreList, argv.released);
+    await validateReleasedSchemas(ignoreList, argv.released, output);
   
   if (argv.wip || !argv.released)
-    await validateWipSchemas(ignoreList, argv.wip);
+    await validateWipSchemas(ignoreList, argv.wip, output);
 }
 
-async function validateReleasedSchemas(ignoreList, singleSchemaName) {
+async function validateReleasedSchemas(ignoreList, singleSchemaName, output) {
   console.log(chalk.default.yellow("\nPerforming iModel Schema Validation on Released Schemas"));
 
   const results = [];
   const schemaDirectories = await generateSchemaDirectoryList(bisSchemaRepo);
   const schemaList = await generateReleasedSchemasList(bisSchemaRepo);
+  const outputLogs = path.join(output, "released");
 
   for (const schemaPath of schemaList) {
     const key = getSchemaInfo(schemaPath);
@@ -68,20 +74,20 @@ async function validateReleasedSchemas(ignoreList, singleSchemaName) {
 
     await importAndExportSchema(schemaPath, schemaDirectories);
 
-    const output = getOutputPath();
-    const result = await verifyIModelSchema(exportDir, path.basename(schemaPath), false, bisSchemaRepo, output);
+    const result = await verifyIModelSchema(exportDir, path.basename(schemaPath), false, bisSchemaRepo, outputLogs);
     results.push(result);
   }
 
-  displayResults(results, bisSchemaRepo);
+  getResults(results, bisSchemaRepo, outputLogs);
 }
 
-async function validateWipSchemas(ignoreList, singleSchemaName) {
+async function validateWipSchemas(ignoreList, singleSchemaName, output) {
   console.log(chalk.default.yellow("\nPerforming iModel Schema Validation on Work In Progress Schemas"));
 
   const results = [];
   let schemaList = await generateWIPSchemasList(bisSchemaRepo);
   let schemaDirectories = await generateSchemaDirectoryList(bisSchemaRepo);
+  const outputLogs = path.join(output, "wip");
 
   // Add WIP schema folders
   schemaDirectories = schemaDirectories.concat(schemaList.map((schemaPath) => path.dirname(schemaPath)));
@@ -104,8 +110,7 @@ async function validateWipSchemas(ignoreList, singleSchemaName) {
 
     const schemaXMLFile = generateSchemaXMLName(schemaName, schemaVersion);
     const validationResult = { name: schemaName, version: "" };
-    const output = getOutputPath();
-    await validateSchema(path.join(exportDir, schemaXMLFile), schemaDirectories, validationResult, output);
+    await validateSchema(schemaName, "wip", path.join(exportDir, schemaXMLFile), schemaDirectories, validationResult, outputLogs);
     schemaDirectories = fixSchemaValidatorIssue(exportDir, schemaDirectories);
     if (validationResult.validator === iModelValidationResultTypes.Failed || validationResult.validator === iModelValidationResultTypes.Error) {
       results.push(validationResult);
@@ -147,16 +152,21 @@ async function importAndExportSchema(schemaPath, schemaSearchPaths) {
 function prepareOutputFile() {
   const outputDir = path.join(iModelDir, iModelName);
   const exportSchemaDir = path.join(outputDir, "exported");
-  const logs = path.join(outputDir, "logs");
+  const wipLogs = path.join(outputDir, "logs", "wip");
+  const releasedLogs = path.join(outputDir, "logs", "released");
+  const outputFile = path.join(outputDir, iModelName + ".bim");
 
-  if (fs.existsSync(outputDir)) {
-    rimraf.sync(outputDir);
+  if (!fs.existsSync(outputDir)) {
+    fs.mkdirSync(outputDir, { recursive: true });
+    fs.mkdirSync(exportSchemaDir);
+    fs.mkdirSync(wipLogs, { recursive: true });
+    fs.mkdirSync(releasedLogs, { recursive: true });
   }
 
-  fs.mkdirSync(outputDir, { recursive: true });
-  fs.mkdirSync(exportSchemaDir);
-  fs.mkdirSync(logs);
-  const outputFile = path.join(outputDir, iModelName + ".bim");
+  if (fs.existsSync(outputFile)) {
+    rimraf.sync(outputFile);
+  }
+
   return outputFile;
 }
 
@@ -298,19 +308,6 @@ function getVersionString(readVersion, writeVersion, minorVersion) {
 }
 
 /**
- * Remove schemas having issues from all releasedSchemas list
- * @return Updated releasedSchemas list
- * This function will be removed as soon as we decide some solution for Fasteners and Asset schemas
- */
-function removeSchemasFromList(allSchemas, schemasToBeRemoved) {
-  schemasToBeRemoved.forEach((issueFile) => {
-    const schemaKeyRegex = new RegExp(issueFile);
-    allSchemas = allSchemas.filter((schema) => !schemaKeyRegex.test(schema));
-  });
-  return allSchemas;
-}
-
-/**
  * Generate schema xml filename with extension
  * @param schemaName Name of schema
  * @param version Version string of schema
@@ -338,12 +335,25 @@ function fixSchemaValidatorIssue(exportDir, releasedFolders) {
  * Returns the output path for logs
  */
 function getOutputPath() {
-  let outputPath = argv.OutDir;
-  
-  if (!fs.existsSync(outputPath)) {
-    throw Error("Could not find schema validation output path.");
-  }
+  let outputPath;
+  if (argv.OutDir){
+    outputPath = argv.OutDir;
+    if (!fs.existsSync(outputPath)) {
+      throw Error("Could not find schema validation output path.");
+    } 
 
+    if(argv.wip){
+      const wipLogsDir = path.join(outputPath, "wip");
+      fs.mkdirSync(wipLogsDir, { recursive: true });
+    }
+
+    if(argv.released){
+      const releasedLogsDir = path.join(outputPath, "released");
+      fs.mkdirSync(releasedLogsDir, { recursive: true });
+    }
+  } else {
+    outputPath = outputDir;
+  }
   return outputPath;
 }
 
