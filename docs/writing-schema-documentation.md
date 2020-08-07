@@ -70,7 +70,7 @@ For more information visit the [Schema documentation style guide](./schema-docum
 
 ## Publishing Schema Documentation
 
-The schema documentation is not published anywhere by default.  To have it included in the [BIS section](https://imodeljs.github.io/iModelJs-docs-output/bis/) of the [iModel.js](imodeljs.org) documentation the schema has to be added to the `schemaPaths` variable in the [Docs Generation Build](../tools/MarkdownGeneration/generate-docs.yaml).
+Markdown files are generated and published as an artifact for every released schema by default (see [Docs Generation Build](../tools/MarkdownGeneration/generate-docs.yaml)).  This artifact is published automatically as part of the iModel.js doc build.  To make the schema visible in the iModel.js docs you must add it to the domains index page (docs/bis/domains/index.md) in the iModel.js repo
 
 > WARNING:  When the documentation is added to the iModel.js docs it will be published publicly for anyone to see, so you will need to consider if that's what you want for your domain.
 
