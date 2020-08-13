@@ -21,7 +21,7 @@ BIS Schemas can be consumed via automatically published npm packages which is th
 
 ### Non-released/pre-release Schemas
 
-Pre-release schemas can be new versions of a schema that are still undergoing testing and development, or a completely new schema that is being developed. 
+Pre-release schemas can be new versions of a schema that are still undergoing testing and development, or a completely new schema that is being developed.
 
 - A new prerelease version will be automatically generated every time the working version of a schema is merged into master.
 - Pre-release flags are used to handle unreleased schemas
