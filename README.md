@@ -2,47 +2,6 @@
 
 This repository is the single-source-of-truth (SSOT) for all BIS schemas.
 
-List of current BIS Schemas in this repository as SSOT:
-
-- AecUnits
-- Building\ArchitecturalPhysicalSchema
-- Building\BuildingDataGroupBase
-- Building\BuildingPhysicalSchema
-- BuildingSpatial
-- ClassificationSystems
-- Construction
-- Core\Analytical
-- Core\Asset
-- Core\BisCore
-- Core\Functional
-- Core\Generic
-- Core\PhysicalMaterial
-- Earthwork
-- ECObjects
-- Egress
-- FederatedDocumentStore
-- Grids
-- QuantityTakeoffsAspects
-- PresentationRules
-- Profiles
-- DgnV8OpenRoadsDesigner
-- LinearReferencing
-- RoadRailAlignment
-- RoadRailPhysical
-- RealityModeling\DataCaptureSchema
-- RealityModeling\PointCloudSchema
-- RealityModeling\RasterSchema
-- RealityModeling\ScalableMeshSchema
-- RealityModeling\ThreeMxSchema
-- Simulation4DResults
-- SpatialComposition
-- Structural
-- Structural\PhysicalRebar
-- StructuralAnalysis
-- StructuralDesignConcrete
-
-Weekly merges of all other BIS schemas are done from their current location into this repository, preserving change history. A side affect is all BIS schemas that reside elsewhere are read-only in this repository. This is enforced by not approving any pull request (see [Contributing](#contributing)) that contains a change to one of these schemas.
-
 ## Directory Structure
 
 The repository is split up into two main parts; the tooling, used to process and validate the schemas, and the BIS Schemas.
@@ -64,40 +23,58 @@ Example:
 
 All contributions to this repository will be done via [pull requests](https://docs.github.com/en/github/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests) to the master branch.
 
-Each BIS Schema will have an owner, or owners. The owner(s) of a given BIS Schema will have to approve all pull requests before they are merged into the master branch. The owner will automatically be added as a required reviewer to a pull request if it corresponds with their domain group directory (see [directory structure](#directory-structure)).
+Each BIS Schema must have an owner, or owners. The owner(s) of a given BIS Schema have to approve all pull requests before they are merged into the master branch. The owner will automatically be added as a required reviewer to a pull request if it corresponds with their domain group directory (see [directory structure](#directory-structure)).
 
 All other changes made outside of a domain group directory will require review by a repository owner(s). The repository owner(s) will be added as optional reviewer(s) to all pull requests that are created within domain group directories.
 
 ### Adding a new BIS Schema to the repository
 
-#### Moving a schema from Mercurial to the Git as SSOT
+1. Create a branch of the bis-schemas repo to make all of your changes.
+1. Identify the owner of the Schema and decide what domain group it goes into.
+    .
 
-An owner of a BIS Schema can move their Schema from Mercurial to this repository being the new Single-Source-Of-Truth with a few simple steps,
 
-1. Ensure all consumers of the current Part delivering the Schema has Git installed. This proactively avoids not being able to successfully pull/build.
-    - Update all PRG/Firebug Product builds to add Git as a build dependency
-2. 
-
-    - 
     
-3. Identify the owner of the Schema and request the appropriate permissions.
-    - See [Schema Permissions](#managing-permissions-to-bis-schema) for more information.
-  
-4. Request a final merge from Mercurial to Git.
-    - Remove [file map](tools/hg2git/all_bis/filemaps) for individual Schema. 
-5. 
-6. Remove schemas from Mercurial.
-7. Your BIS Schema is now officially moved!
+    
+    
+1. [Update the Schema Inventory](#update-schema-inventory)
+1. Run [Bis Rule Validation](#bis-rule-validation) and [iModel Schema Validation](#imodel-schema-validation) on your new schema and make sure they pass.
+1. Create a PR to merge your branch into master
 
-#### Addition/modifications to existing domain Schema
+> NOTE: When your schema is checked into master it will automatically be published as an npm package see [Schema Packaging](#schema-packaging) for more information
 
-The addition of the new BIS Schemas will be at the discretion of the owner of the domain group directory to which it is to be added. The BIS Schema must follow the [directory structure](#directory-structure) of this repository to be added.
+### **Releasing a Bis Schema**
 
-#### Add a new domain
+> NOTE: You will need someone from the 'BIS Release Admins' Group to approve your PR.  For new schemas this generally requires some review of the schema by the BIS Working Group so coordinate with them early in the process to avoid delays and reworking when you are trying to release.
 
-Given that all pull requests outside of a domain group directory require a repository owner to review, they are required to review any new domains added. The domain must follow the directory structure, and then identify a person who is designated as the domain owner(s), who will handle all future pull requests.
+1. Create a branch of the bis-schemas repo to make all of your changes.
+1. Copy the schema to the Released directory for that domain group and change the file name to include the version
+    - e.g. copy `\Domains\Core\BisCore.ecschema.xml` to `\Domains\Core\Released\BisCore.01.00.42.ecschema.xml`
+1. [Update the Schema Inventory](#update-schema-inventory)
+1. Find the new entry added by the update schema inventory script it should look something like this:
 
-## Managing permissions to BIS Schema
+    ```json
+    {
+    "name": "BisCore",
+    "path": "Domains\\Core\\Released\\BisCore.01.00.42.ecschema.xml",
+    "released": true,
+    "version": "01.00.42",
+    "comment": "Answers the question",
+    "verifier": "<First.Last of the BIS Release Admin responsible for verifying this version of the schema",
+    "sha1": "<sha1 hash>",
+    "verified": "<Yes/No>", # Set to Yes when the verifier is OK with release
+    "author": "<First.Last of the person responsible for this version of the schema>",
+    "date": "<MM/DD/YYYY Date for the schemas release>",
+    "dynamic": "<Yes/No>", # Set to Yes if programmatically generated, else No (No is most common)
+    "approved": "<Yes/No>" # Set to Yes by the author when they are OK with release
+    },
+    ```
+
+1. Update entry to fill out all fields correctly, the only optional field is 'comment'.
+1. Run [Bis Rule Validation](#bis-rule-validation) and [iModel Schema Validation](#imodel-schema-validation) on your new schema and make sure they pass.
+1. Create a PR to merge your branch into master
+
+### Managing permissions for BIS Schemas
 
 Every BIS Schema within the repository has an associated owner. The owner is in charge of managing Pull Requests and permissions to the BIS Schema(s).
 
@@ -109,77 +86,59 @@ The Team is owned by the schema owner, which gives them the ability to add/remov
 
 
 
-## BIS Schema Tools
+## Local BIS Schema Tools
 
 There are set of tools exposed as npm tasks to assist schema authors in managing new or modified schemas.
 
-### Environment Setup
+### **Environment Setup**
 
 To successfully run the tools described in this section, follow the steps below to setup your environment.
 
 
 
      
-    The steps provided in the link above should have added several lines to your .npmrc file (found in your user folder, %UserProfile%).    
+    
 
-2. Via the command line, navigate to the root of the bis-schemas repository.  If you have VS Code installed, open the bis-schemas folder, and open a new Terminal (Terminal -> New Terminal in the menu, or use the shortcut (Ctrl-Shift-`).  
+1. Via the command line, navigate to the root of the bis-schemas repository.  If you have VS Code installed, open the bis-schemas folder, and open a new Terminal (Terminal -> New Terminal in the menu, or use the shortcut (Ctrl-Shift-`).  
 
-3. Run the command 'npm install'.
+1. Run the command `npm install`.
 
-### Update Schema Inventory
+### **Update Schema Inventory**
 
 The [SchemaInventory.json](https://github.com/iTwin/bis-schemas/blob/master/SchemaInventory.json) file at the root of the bis-schemas repository contains an up-to-date inventory of all schemas in the bis-schemas repository. The schema inventory must be updated using the npm task 'updateSchemaInventory', defined in the bis-schemas package.json, for all pull-requests that define new schemas. This includes a new version of a work-in-progress schema or a new released schema.
 
-*Missing schemas will cause the `Bis Schemas - TS Validation (Github)` build to fail during pull-requests builds of the bis-schemas repository.
+ > Missing schemas will cause the `Bis Schemas - TS Validation (Github)` build to fail during pull-requests builds of the bis-schemas repository.
 
-````usage: npm run updateSchemaInventory````
-
-To run the updateSchemaInventory script, follow these steps:
+To run the 'updateSchemaInventory' script, follow these steps:
 
 1. Navigate to the bis-schemas folder from the command line or VS Code Terminal
-2. Run 'npm run updateSchemaInventory'
-3. Verify that the modified SchemaInventory.json contains the new schema entries, and include the modified file in the pull-request along with the schema changes.
-    - **New Released Schemas**: New Schema entries will contain an automatically generated Sha1 hash for the new schema. You must manually update the 'approved' and 'verified' fields of the new schema entry in SchemaInventory.json or the validation (noted above) will fail during pull-request builds.
+1. Run `npm run updateSchemaInventory`
+1. Verify that the modified SchemaInventory.json contains the new schema entries, and include the modified file in the pull-request along with the schema changes.
+    - **New Released Schemas**: New Schema entries will contain an automatically generated Sha1 hash for the new schema. You must manually update the `approved` and `verified` fields of the new schema entry in SchemaInventory.json or the validation (noted above) will fail during pull-request builds.
 
-### BIS Rule Validation
+### **BIS Rule Validation**
 
 BIS rule validation consists of checking all schemas in the bis-schemas repository against a set of [validation rules](https://imodeljs.github.io/iModelJs-docs-output/bis/intro/bis-schema-validation/). The npm script 'validateSchemas' uses the npm package `@bentley/schema-validator` to perform the validation.
 
-````usage: npm run validateSchemas [--] [--name SCHEMA-NAME]````
-
-Example:  
-````npm run validateSchemas -- --name BisCore````
-
-|Optional argument | Description |
-|------------------|-------------|
-| --               | This argument instructs npm to pass subsequent arguments (i.e --name SCHEMA_NAME) to the invoked script, rather than to the npm command itself. Required only if --name SCHEMA_NAME is specified |  
-| --name SCHEMA_NAME | If this flag is specified, only the schema(s) with the given name will be validated |
-
-To run the 'validateSchemas' script, follow these steps:
+To run the 'validateSchemas' script follow these steps:
 
 1. Navigate to the bis-schemas folder from the command line or VS Code Terminal
-2. Issue the command as described above.
+1. Run `npm run validateSchemas`
+    - To validate a single schema use this syntax: `npm run validateSchemas -- --name SCHEMA-NAME`
+        - For example to validate BisCore: `npm run validateSchemas -- --name BisCore`
 
-### Schema Differencing
+### **Schema Differencing**
 
 The Schema Differencing tool performs a difference audit of all schemas in the bis-schemas against their latest released version, if one exists. The npm script 'compareSchemas' uses the npm package `@bentley/schema-comparer` to perform the difference audit.
-
-````usage: npm run compareSchemas [--] [--name SCHEMA-NAME]````
-
-Example:  
-````npm run compareSchemas -- --name BisCore````
-
-|Optional argument | Description |
-|------------------|-------------|
-| --               | This argument instructs npm to pass subsequent arguments (i.e --name SCHEMA_NAME) to the invoked script, rather than to the npm command itself. Required only if --name SCHEMA_NAME is specified |
-| --name SCHEMA_NAME | If this flag is specified, only the schema(s) with the given name will be validated. |
 
 To run the 'compareSchemas' script, follow these steps:
 
 1. Navigate to the bis-schemas folder from the command line or VS Code Terminal
-2. Issue the command as described above.
+1. Run `npm run compareSchemas`
+    - To difference a single schema use this syntax: `npm run compareSchemas -- --name SCHEMA-NAME`
+        - For example to compare the wip of BisCore to the latest released version: `npm run compareSchemas -- --name BisCore`
 
-### iModel Schema Validation
+### **iModel Schema Validation**
 
 The iModel Schema Validation tool imports each individual schema in the bis-schema repository (along with schema references) into an local snapshot iModel. The schemas are then exported to a temp directory in order to perform the required validations. The following checks are performed:
 
@@ -188,33 +147,25 @@ The iModel Schema Validation tool imports each individual schema in the bis-sche
 - **Sha1 Hash Validation:** Sha1 Hash is generated for each exported schema and compared against the set of hashes of released schemas present in [SchemaInventory](https://github.com/iTwin/bis-schemas/blob/master/SchemaInventory.json).
 - **Approval Validation:** Approval status of each schema is checked from [SchemaInventory](https://github.com/iTwin/bis-schemas/blob/master/SchemaInventory.json).  
 
-The npm script 'iModelSchemaValidation' uses the npm package [@bentley/imodel-schema-validater](https://www.npmjs.com/package/@bentley/imodel-schema-validator) to perform the validation.
-
-````usage: npm run iModelSchemaValidation [--] [--wip [SCHEMA-NAME]] [--released [SCHEMA-NAME]]````
-
-Example:  
- - Command 1: ````npm run iModelSchemaValidation -- --released BisCore````
-
- - Command 2: ````npm run iModelSchemaValidation -- --released````
-
-The first command will validate the latest released version of BisCore and the second command will validate the latest released versions of all released schemas in bis-schemas repository.
-
-|Optional argument | Description |
-|------------------|-------------|
-| --               | This argument instructs npm to pass subsequent arguments (i.e --released) to the invoked script, rather than to the npm command itself. Required only if one of the optional flags are specified |
-| --wip [SCHEMA_NAME] | If this flag is specified, only work-in-progress schemas will be validated. If a schema name is specified, only the WIP schema(s) with the given name will be validated. |
- --released [SCHEMA_NAME] | If this flag is specified, only released schemas will be validated. If a schema name is specified, only released schema(s) with the given name will be validated. |
- --OutDir | This flag can be used to provide the desired output directory for logs. Default is ````C:\Users\username\AppData\Local\Temp\SchemaValidation\Briefcases\validation````. |
-
-Running 'npm run iModelSchemaValidation' will validate ALL schemas in the bis-schemas repository.
+> The npm script 'iModelSchemaValidation' uses the npm package [@bentley/imodel-schema-validater](https://www.npmjs.com/package/@bentley/imodel-schema-validator) to perform the validation.
 
 To run the 'iModelSchemaValidation' script, follow these steps:
 
 1. Navigate to the bis-schemas folder from the command line or VS Code Terminal
-2. Issue the command as described above.
+1. Run `npm run iModelSchemaValidation`
+    - To validate only released schemas: `npm run iModelSchemaValidation -- --released`
+    - To validate a single released schema: `npm run iModelSchemaValidation -- --released SCHEMA-NAME`
+        - For example to validate the released BisCore: `npm run iModelSchemaValidation -- --released BisCore`
+    - To validate only wip schemas: `npm run iModelSchemaValidation -- --wip`
+    - To validate a single wip schema: `npm run iModelSchemaValidation -- --wip SCHEMA-NAME`
+        - For example to validate the wip BisCore: `npm run iModelSchemaValidation -- --wip BisCore`
+    - To save the output logs to a custom location: `npm run iModelSchemaValidation -- --OutDir SOME-DIR`
+        - This command can be combined with any other command
+        - The default log output directory is: `C:\Users\username\AppData\Local\Temp\SchemaValidation\Briefcases\validation`
 
-**NOTE:** The Asset schema is currently skipped when validating all WIP schemas due to known failures.  Specify 'Asset' explicitly using the --wip flag to validate the Asset schema.  
-````npm run iModelSchemaValidation -- --wip Asset````
+> **NOTE:** Schemas listed in the [ignore schema](https://github.com/iTwin/bis-schemas/blob/master/ignoreSchemaList.json) list are skipped when validating all schemas. To run validation against these schemas use a command like `npm run iModelSchemaValidation -- --wip Asset`
+
+
 
 
 
@@ -236,9 +187,6 @@ To run the 'iModelSchemaValidation' script, follow these steps:
 - **iModelName:** Name of the imodel present in the project mentioned in projectid.
 
 
- 
-
-  
 
 
 
@@ -250,7 +198,6 @@ To run the 'iModelSchemaValidation' script, follow these steps:
 
 
 
-Please invite the certification team of your bridge to verify the checksums of your published iModel schemas againt the latest approved checksums.
 
 
 
@@ -262,9 +209,13 @@ Please invite the certification team of your bridge to verify the checksums of y
 
 
 
-## Schema Packaging - *WIP*
 
-See [Schema Release Proposal](./docs/schema-release-process.md)
+
+
+
+## Schema Packaging
+
+See [Schema Release Process](./docs/schema-release-process.md)
 
 ## Schema Documentation
 
