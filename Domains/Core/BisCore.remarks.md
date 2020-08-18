@@ -287,3 +287,9 @@ See `DefinitionSet` documentation for recursive interpretations of `DefinitionSe
 ### DefinitionGroupGroupsDefinitions
 
 A `DefinitionGroup` may not be both the source and the target of the same relationship instance.
+
+### PhysicalSystem
+
+A non-exclusive set of `SpatialElements` grouped using the `PhysicalSystemGroupsMembers` relationship. A `SpatialElement` can be a member of multiple `PhysicalSystems`.
+
+The primary contents of the `PhysicalSystem` are `PhysicalElements`, but `SpatialLocationElements` can be included, as well.
