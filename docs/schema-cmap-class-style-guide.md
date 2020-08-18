@@ -1,6 +1,7 @@
 # **Schema CMAP class diagram style guide**
 
 ## **Introduction**
+
 This page provides the recommended style guidelines for creating class diagrams for Schemas using CMAP tools. For more details about CMAP see the [main page](schema-cmap-style-guide) of these guidelines.
 
 - Example CMAP can be found [here](cmap-example\example-class.cmap).
@@ -8,9 +9,11 @@ This page provides the recommended style guidelines for creating class diagrams 
 - CMAP with more examples and situational markings can be found [here](cmap-example\situational-markings.cmap).
 
 ## **Colors**
+
 Colors of nodes are determined by the type of the class/entity. This style guide provides a default set of colors to use, but they **can be overridden in different contexts** if needed - in such cases the legend must be updated.
 
 Bellow are listed default colors by class/entity type (all colors can be picked from the defaults provided in the CMAP tools):
+
 - `Elements\Models`
   - `Definition` - light cyan (#EDF4F6)
   - `Physical` - light blue (#96C8FF)
@@ -24,6 +27,7 @@ Bellow are listed default colors by class/entity type (all colors can be picked 
 ![Colors](cmap-example\media\class\colors.png)
 
 ## **Shapes, outlines and Class name style**
+
 All entity classes have **rectangle** shape with **margin 8**.
 Outline and class name style of nodes are determined by the class modifier:
 |Modifier            |Class name style|Line style|Line thickness|
@@ -35,7 +39,9 @@ Outline and class name style of nodes are determined by the class modifier:
 ![Shapes](cmap-example\media\class\shapes.png)
 
 ## **Inheritance/Relationships**
+
 Arrows should be **straight, solid lines** (can have break points) with line **thickness 1**. Note that existence of a label on the arrow indicates that this is a relationship and not inheritance.
+
 - `Inheritance` - arrow pointing from derived class to base class with **no label** (CMAP shortcut: <kbd>Ctrl</kbd>+<kbd>Drag</kbd>). You should always aim to put the base class above the derived class.
 - `Relationship` - arrow pointing from source to target end point, with a **required label** describing the relationship. Good practice is to include the strength and UML like multiplicity ([link](https://www.uml-diagrams.org/multiplicity.html)) of the relationship, but this may be in free form.
 
@@ -46,8 +52,10 @@ Relationships can be detailed by linking the label to the relationship class def
 ![Association classes](cmap-example\media\class\relationships-details.png)
 
 ## **Content**
+
 The following style guide applies to all definitions: classes, structs, relationships etc. All text in a node should be **left aligned**.
 Class contents in order:
+
 - `Stereotype` - (optional) see [Stereotypes](#stereotypes) for more details
 - `Class name` - **bold text**, first line if stereotype is not present
 - `Description` - (optional) right after class name, **italic text**
@@ -64,6 +72,7 @@ Class contents in order:
 ![Content](cmap-example\media\class\content-elements.png)
 
 `Source` and `Target` properties of relationship classes can be defined in the form: `'- <endPoint>: <multiplicity>, <class>, [polymorphic]'` where:
+
 - `endPoint` - relationship end point, either "Source" or "Target"
 - `multiplicity` - UML like multiplicity ([link](https://www.uml-diagrams.org/multiplicity.html)) of the relationship in the form (x..y)
 - `class` - class name of the relationship end point
@@ -78,6 +87,7 @@ UML like **stereotypes** (profile classes) can be optionally added for nodes to 
 Stereotypes should be defined in the form: `'<<Name>>'`, should be placed as the first line in a node and start with an upper-case letter.
 
 Following stereotypes **must** be added for:
+
 - `Relationship class` - **&lt;&lt;Relationship>>**
 - `Aspect class` - **&lt;&lt;Aspect>>**
 - `Mixin class` - **&lt;&lt;Mixin>>**
@@ -87,15 +97,18 @@ Following stereotypes **must** be added for:
 ![Stereotypes](cmap-example\media\class\stereotypes.png)
 
 ## **Example**
+
 Full CMAP containing below shown example can be found [here](cmap-example\example-class.cmap).
 
 ![Example](cmap-example\media\class\example.png)
 
 ## **Additional guidelines**
+
 - Classes referenced from other schemas should be prefixed with schema alias in the form: `'<alias>:<name>'` e.g. "bis:DefinitionElement"
 - In class diagrams you should always aim to put the base class above the derived class.
 
 ## **Situational examples**
+
 Full CMAP containing below shown examples can be found [here](cmap-example\situational-markings.cmap).
 
 - In bigger cmaps placing inheritance/relationship arrows might be
