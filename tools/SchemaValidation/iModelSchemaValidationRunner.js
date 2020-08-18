@@ -43,11 +43,52 @@ async function validateIModelSchemas() {
   Logger.initializeToConsole();
   Logger.setLevelDefault(LogLevel.Error);
 
-  if (argv.released || !argv.wip)
-    await validateReleasedSchemas(ignoreList, argv.released, output);
+  if (argv.schemaUpgradeTesting) {
+    let checkAllVersions = false;
+    if (argv.checkAllVersions)
+      checkAllVersions = argv.checkAllVersions;
+
+    await schemaUpgradeTest(ignoreList, output, checkAllVersions);
+  } else {
+    if (argv.released || !argv.wip)
+      await validateReleasedSchemas(ignoreList, argv.released, output);
   
-  if (argv.wip || !argv.released)
-    await validateWipSchemas(ignoreList, argv.wip, output);
+    if (argv.wip || !argv.released)
+      await validateWipSchemas(ignoreList, argv.wip, output);
+  }
+}
+
+async function schemaUpgradeTest(ignoreList, output, checkAllVersions) {
+  deleteOldLogFile(output);
+  const releasedSchemas = await generateReleasedSchemasList(bisSchemaRepo);
+  const wipSchemas = await generateWIPSchemasList(bisSchemaRepo);
+  const testSchemas = getShortListedVersions(releasedSchemas.reverse(), wipSchemas, output, checkAllVersions);
+
+  let schemaDirs = await generateSchemaDirectoryList(bisSchemaRepo);
+  schemaDirs = schemaDirs.concat(wipSchemas.map((schemaPath) => path.dirname(schemaPath)));
+
+  let imodel;
+  let previousSchema;
+
+  for (const releasedSchema of testSchemas) {
+    await IModelHost.startup();
+    console.log("\nSchema: " + releasedSchema);
+    writeLogsToFile(`\nSchema:  ${releasedSchema}\n`, output);
+  
+    const key = getSchemaInfo(releasedSchema);
+    const schemaName = getVerifiedSchemaName(key.name, releasedSchema);
+    const schemaVersion = getVersionString(key.readVersion, key.writeVersion, key.minorVersion);
+
+    if (excludeSchema(schemaName, schemaVersion, ignoreList)) {
+      await IModelHost.shutdown();
+      continue;
+    }
+
+    imodel = await importAndExportSchemaToIModel(schemaName, previousSchema, releasedSchema, schemaDirs, imodel, output);
+    console.log("-> ", chalk.default.green(`${schemaName}.${schemaVersion} successfully imported.`));
+    writeLogsToFile(`-> ${schemaName}.${schemaVersion} successfully imported.\n\n`, output);
+    previousSchema = schemaName;
+  }
 }
 
 async function validateReleasedSchemas(ignoreList, singleSchemaName, output) {
@@ -55,7 +96,7 @@ async function validateReleasedSchemas(ignoreList, singleSchemaName, output) {
 
   const results = [];
   const schemaDirectories = await generateSchemaDirectoryList(bisSchemaRepo);
-  const schemaList = await generateReleasedSchemasList(bisSchemaRepo);
+  const schemaList = findLatestReleasedVersion(await generateReleasedSchemasList(bisSchemaRepo));
   const outputLogs = path.join(output, "released");
 
   for (const schemaPath of schemaList) {
@@ -216,7 +257,7 @@ async function generateSchemaDirectoryList(schemaDirectory) {
 async function generateReleasedSchemasList(schemaDirectory) {
   const filter = { fileFilter: "*.ecschema.xml", directoryFilter: ["!node_modules", "!.vscode", "!tools", "!Deprecated"] };
   const allSchemaDirs = (await readdirp.promise(schemaDirectory, filter)).map((schemaPath) => schemaPath.fullPath);
-  return findLatestReleasedVersion(Array.from(new Set(allSchemaDirs.filter((schemaDir) => /released/i.test(schemaDir))).keys()).sort());
+  return Array.from(new Set(allSchemaDirs.filter((schemaDir) => /released/i.test(schemaDir))).keys()).sort()
 }
 
 function getBisRootPath() {
@@ -355,6 +396,121 @@ function getOutputPath() {
     outputPath = outputDir;
   }
   return outputPath;
+}
+
+/**
+ * Check if the latest released version of schema is equilent to WIP schema version
+ */
+function checkIfWipSchemaRequired(previousSchema, latestReleasedVersion, wipSchemas, shortListedVersions, output) {
+  const wipSchema = wipSchemas.filter((schema) => schema.endsWith("\\" + previousSchema + ".ecschema.xml"));
+  if (wipSchema.length !== 0) {
+    const wipSchemaInfo = getSchemaInfo(wipSchema[0]);
+    const wipVersion = wipSchemaInfo.version.toString();
+    if (wipVersion !== latestReleasedVersion)
+      shortListedVersions.push(wipSchema[0]);
+    else {
+      console.log("-> ", chalk.default.yellow(`${wipSchemaInfo.name}.${wipVersion} wip schema is skipped.`));
+      writeLogsToFile(`-> ${wipSchemaInfo.name}.${wipVersion} wip schema is skipped.\n`, output);
+    }
+  }
+}
+
+/**
+ * Shortlist schema versions for schema upgrate test
+ * @param releasedSchemas List of released schemas
+ * @param wipSchemas List of WIP schemas
+ * @param checkAllVersions Check to limit the test to read compatible versions or not
+ * @returns List of shortlisted schemas that will be tested for schema upgrade.
+ */
+function getShortListedVersions(releasedSchemas, wipSchemas, output, checkAllVersions) {
+  let check = true;
+  let latestReleasedVersion;
+  let previousSchema;
+  let previousVersion;
+  let previousReadVersion;
+  const shortListedVersions = [];
+
+  for (const releasedSchema of releasedSchemas) {
+    const schemaInfo = getSchemaInfo(releasedSchema);
+    const schemaName = getVerifiedSchemaName(schemaInfo.name, releasedSchema);
+    const schemaVersion = schemaInfo.version.toString();
+
+    if (schemaName !== previousSchema) {
+      checkIfWipSchemaRequired(previousSchema, latestReleasedVersion, wipSchemas, shortListedVersions, output);
+      latestReleasedVersion = "";
+      check = true;
+    }
+
+    if (check) {
+      latestReleasedVersion = schemaVersion;
+      check = false;
+    }
+
+    if (previousSchema === schemaName && previousReadVersion !== schemaInfo.readVersion && !checkAllVersions) {
+      console.log("-> ", chalk.default.yellow(`${schemaName}.${schemaVersion} released schema is skipped.`));
+      writeLogsToFile(`-> ${schemaName}.${schemaVersion} released schema is skipped.\n`, output);
+    } else
+      shortListedVersions.push(releasedSchema);
+
+    previousSchema = schemaName;
+    previousVersion = schemaVersion;
+    previousReadVersion = schemaInfo.readVersion;
+  }
+  return shortListedVersions.sort();
+}
+
+/**
+ * Import and export schema to an imodel for schema upgrade testing
+ */
+async function importAndExportSchemaToIModel(schemaName, previousSchema, releasedSchema, schemaDirs, imodel, output) {
+  const locater = new StubSchemaXmlFileLocater();
+  locater.addSchemaSearchPaths(schemaDirs);
+  const loadedSchema = locater.loadSchema(releasedSchema);
+  const orderedSchemas = SchemaGraphUtil.buildDependencyOrderedSchemaList(loadedSchema);
+  const schemaPaths = orderedSchemas.map((s) => s.schemaKey.fileName);
+
+  const requestContext = new BackendRequestContext();
+  if (schemaName !== previousSchema) {
+    if (imodel)
+      imodel.close();
+    const iModelPath = prepareOutputFile();
+    imodel = SnapshotDb.createEmpty(iModelPath, { rootSubject: { name: "test-imodel" } });
+  }
+
+  let err = "";
+  try{
+    await imodel.importSchemas(requestContext, schemaPaths);
+    imodel.saveChanges();
+    imodel.nativeDb.exportSchemas(exportDir);
+  } catch (error) {
+    err = error;
+    writeLogsToFile(`-> Error: ${err}\n`, output);
+  }
+
+  await IModelHost.shutdown();
+  if (err !== "")
+    throw Error(err);
+  return imodel;
+}
+
+/**
+ * Write logs of a schema to a txt file.
+ * @param logString It is the message for logging.
+ * @param outputDir The directory where output file will go.
+ */
+function writeLogsToFile(logString, outputDir) {
+  const filePath = path.join(outputDir, "SchemaUpgrade-Logs.txt");
+  fs.appendFileSync(filePath, logString);
+}
+
+/**
+ * Delete old log file.
+ * @param outputDir The directory where output file will go.
+ */
+function deleteOldLogFile(outputDir) {
+  const filePath = path.join(outputDir, "SchemaUpgrade-Logs.txt");
+  if(fs.existsSync(filePath))
+    rimraf.sync(filePath);
 }
 
 validateIModelSchemas();
