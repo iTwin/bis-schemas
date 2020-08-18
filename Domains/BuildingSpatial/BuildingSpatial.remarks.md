@@ -16,7 +16,7 @@ A `Building` represents a structure that provides shelter for its occupants or c
 ### Usage
 
 <!-- add notes about usage here. Placement in models. Parent-child issues; ElementAspects, key relationships. --->
-A `Building` is recommended to be placed in the submodel of a `Site`. A `Building` may also compose a `Site`. Decomposes into `Story` or `Space` elements.
+A `Building` is recommended to be placed in the sub-model of a `Site`. A `Building` may also compose a `Site`. Decomposes into `Story` or `Space` elements.
 
 ### Mapping to and from IFC
 
@@ -41,7 +41,7 @@ The `Space` is used to build the spatial structure of a building (that serves as
 
 ### Usage
 
-A `Space` is recommended to be placed in the submodel of a `Story` or another `Space`. `Space` elements compose stories and other spaces, and they may also decompose into spaces.
+A `Space` is recommended to be placed in the sub-model of a `Story` or another `Space`. `Space` elements compose stories and other spaces, and they may also decompose into spaces.
 
 ### Mapping to and from IFC
 
@@ -63,7 +63,7 @@ A `Space` is recommended to be placed in the submodel of a `Story` or another `S
 
 The building `Story` typically represents a (nearly) horizontal aggregation of spaces that are vertically bound.
 
-A story is (if specified) associated to a building. 
+A story is (if specified) associated to a building.
 
 The `Story` is used to build the spatial structure of a building (that serves as the primary project breakdown and is required to be hierarchical). The spatial composition elements are linked together by using the objectified relationship `CompositeComposesSubComposites`.
 
@@ -71,7 +71,7 @@ The `Story` is used to build the spatial structure of a building (that serves as
 
 <!-- add notes about usage here. Placement in models. Parent-child issues; ElementAspects, key relationships. --->
 
-A `Story` is recommended to be placed in the submodel of a `Building`. `Story` elements compose a `Building`, they also decompose into `Space` elements.
+A `Story` is recommended to be placed in the sub-model of a `Building`. `Story` elements compose a `Building`, they also decompose into `Space` elements.
 
 ### Mapping to and from IFC
 
@@ -87,7 +87,7 @@ A `Story` is recommended to be placed in the submodel of a `Building`. `Story` e
 
 <!-- add notes about usage here. Placement in models. Parent-child issues; ElementAspects, key relationships. --->
 
-An `ElevationStory` is recommended to be placed in the submodel of a `Building`. `ElevationStory` elements compose a `Building`, they also decompose into spaces.
+An `ElevationStory` is recommended to be placed in the sub-model of a `Building`. `ElevationStory` elements compose a `Building`, they also decompose into spaces.
 
 ### Mapping to and from IFC
 
@@ -100,7 +100,7 @@ A `RegularStory` is bounded by top and bottom elevations. Typically represents a
 ### Usage
 
 
-An `RegularStory` is recommended to be placed in the submodel of a `Building`. `RegularStory` elements compose a `Building`, they also decompose into spaces.
+An `RegularStory` is recommended to be placed in the sub-model of a `Building`. `RegularStory` elements compose a `Building`, they also decompose into spaces.
 
 ### Mapping to and from IFC
 
@@ -114,4 +114,4 @@ An `RegularStory` is recommended to be placed in the submodel of a `Building`. `
 | --------- | --------- | --------- | --------- |
 | IfcBuildingStorey             | CompositionType == ELEMENT | RegularStory | (none) |
 
-<!-- for CompositionType != ELEMENT, we expect other subclasses of either Story or ElevationStory, i.e. SplitStory for type=PARTIAL. those subclasses would be added in the future versions of the schema. some other subclasses are also controversion, that's why we're leaving them out. i.e. SharedStory @ speedikon -->
+<!-- for CompositionType != ELEMENT, we expect other subclasses of either Story or ElevationStory, i.e. SplitStory for type=PARTIAL. those subclasses would be added in the future versions of the schema. some other subclasses are also controversial, that's why we're leaving them out. i.e. SharedStory @ speedikon -->
