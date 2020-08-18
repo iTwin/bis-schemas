@@ -163,7 +163,13 @@ To run the 'iModelSchemaValidation' script, follow these steps:
         - This command can be combined with any other command
         - The default log output directory is: `C:\Users\username\AppData\Local\Temp\SchemaValidation\Briefcases\validation`
 
-> **NOTE:** Schemas listed in the [ignore schema](https://github.com/iTwin/bis-schemas/blob/master/ignoreSchemaList.json) list are skipped when validating all schemas. To run validation against these schemas use a command like `npm run iModelSchemaValidation -- --wip Asset`
+#### Schema Upgrade Testing
+
+In this testing, we take latest major versions e.g 3.x.x of a schema and try to import them into an iModel to test schema upgrade from oldest to latest e.g 3.0.0 to 3.0.1 to 3.0.2.
+
+````usage: npm run iModelSchemaValidation -- --schemaUpgradeTesting --OutDir D:\dir````
+
+**NOTE:** Schemas listed in the [ignore schema](https://github.com/iTwin/bis-schemas/blob/master/ignoreSchemaList.json) list are skipped when validating all schemas. To run validation against these schemas use a command like `npm run iModelSchemaValidation -- --wip Asset`
 
 
 
