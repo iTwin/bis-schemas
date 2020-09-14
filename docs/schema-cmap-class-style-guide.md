@@ -42,7 +42,7 @@ Outline and class name style of nodes are determined by the class modifier:
 
 Arrows should be **straight, solid lines** (can have break points) with line **thickness 1**. Note that existence of a label on the arrow indicates that this is a relationship and not inheritance.
 
-- `Inheritance` - arrow pointing from derived class to base class with **no label** (CMAP shortcut: <kbd>Ctrl</kbd>+<kbd>Drag</kbd>). You should always aim to put the base class above the derived class.
+- `Inheritance` - arrow pointing from derived class to base class with **no label** (CMAP shortcut: <kbd>Shift</kbd>+<kbd>Drag</kbd>). You should always aim to put the base class above the derived class.
 - `Relationship` - arrow pointing from source to target end point, with a **required label** describing the relationship. Good practice is to include the strength and UML like multiplicity ([link](https://www.uml-diagrams.org/multiplicity.html)) of the relationship, but this may be in free form.
 
 ![Inheritance/Relationships](cmap-example\media\class\relationships.png)
