@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ECSchema schemaName="GeotechnicalInterpretation" alias="GeoInterp" version="01.00.00" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" displayLabel="Geotechnical Interpretation" description="The GeotechnicalInterpretation schema defines classes that represent data for interpreting the earth's subterranean structure based on limited geotechnical exploration.">
+    <ECSchemaReference name="Analytical" version="01.00.00" alias="anlyt" />
+    <ECSchemaReference name="BisCore" version="01.00.10" alias="bis" />
+    <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
+    <ECSchemaReference name="GeotechnicalExploration" version="01.00.00" alias="GeoExp" />
+
+    <ECCustomAttributes>
+        <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
+            <SupportedUse>NotForProduction</SupportedUse>
+        </ProductionStatus>
+    </ECCustomAttributes>
+
+    <!-- CORE HIERARCHY CLASSES -->
+
+    <ECEntityClass typeName="GeotechnicalInterpretationPartition" modifier="Sealed" displayLabel="Geotechnical Interpretation Partition" description="GeotechnicalInterpretationPartition element indicates that there is a specialized Geotechnical Interpretation perspective for the parent Subject. " >
+        <BaseClass>anlyt:AnalyticalPartition</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="GeotechnicalInterpretationModel" modifier="Sealed" displayLabel="Geotechnical Interpretation Model" description="Model containing elements related to Geotechnical Interpretations." >
+        <BaseClass>anlyt:AnalyticalModel</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="GeotechnicalInterpretationElement" modifier="Abstract" displayLabel="Geotechnical Interpretation Element" description="Abstract superclass for all spatially-located Geotechnical Interpretation classes.">
+        <BaseClass>anlyt:AnalyticalElement</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="GeotechnicalInformationElement" modifier="Abstract" displayLabel="Geotechnical Information Element" description="Abstract superclass for all non-spatially-located Geotechnical Interpretation classes.">
+        <BaseClass>bis:InformationRecordElement</BaseClass>
+    </ECEntityClass>
+
+
+    <ECEntityClass typeName="Interpretation" modifier="Sealed" displayLabel="Interpretation" description="A geotechnical interpretation of a region of the earth's subsurface. Interpretations always have a GeotechnicalInterpretationModel submodel.">
+        <BaseClass>GeotechnicalInterpretationElement</BaseClass>
+        <BaseClass>bis:ISubModeledElement</BaseClass>
+        <!-- Add Bounds? -->
+    </ECEntityClass>
+
+
+    <!-- FOR TEMPORARY PERFORMANCE TESTING ONLY-->
+
+    <ECEntityClass typeName="TestSurface" modifier="Abstract" displayLabel="Test Element with Surface Mesh" description="For testing purposes only.">
+        <BaseClass>GeotechnicalInterpretationElement</BaseClass>
+        <ECProperty propertyName="Surface" displayLabel="Surface" typeName="Bentley.Geometry.Common.IGeometry"  description="For testing surface meshes."/>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="TestVolume" modifier="Abstract" displayLabel="Test Element with BREP Volume" description="For testing purposes only.">
+        <BaseClass>GeotechnicalInterpretationElement</BaseClass>
+        <ECProperty propertyName="Volume" displayLabel="Volume" typeName="Bentley.Geometry.Common.IGeometry"  description="For testing BREP volume performance/strategy."/>
+    </ECEntityClass>
+
+    <!-- CORE OPERATION/OPERAND SYSTEM-->
+
+    <ECEntityClass typeName="IOperand" modifier="Abstract" displayLabel="IOperand" description="Element which can be used as input to an Operation and/or may be output from an Operation.">
+        <ECCustomAttributes>
+            <IsMixin xmlns="CoreCustomAttributes.01.00.00">
+                <AppliesToEntityClass>bis:Element</AppliesToEntityClass>
+            </IsMixin>
+        </ECCustomAttributes>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="Operation" modifier="Abstract" displayLabel="Operation" description="Abstract superclass for an operation that takes IOperand inputs and produces an IOperand results.">
+        <BaseClass>GeotechnicalInformationElement</BaseClass>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="OperationHasInput" strength="referencing" modifier="Abstract" description="Connects an Operation with its input IOperands.">
+        <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="has input" polymorphic="true">
+            <Class class="Operation" />
+        </Source>
+        <!-- While an Operation always requires input, some subclasses of this relationship may have optional input, so we need to have 0..* cardinality below-->
+        <Target multiplicity="(0..*)" roleLabel="is input for" polymorphic="true">
+            <Class class="IOperand" />
+        </Target>
+    </ECRelationshipClass>
+
+    <!-- TBD: Should result IOperands be children of the Operation? That would enforce cascading delete behavior (appropriately). -->
+    <!-- TBD: If so, this needs to be a subclass of ElementOwnsChildElements. -->
+    <!-- TBD: Can an Operation have more than 1 result IOperand? How do we handle complex output? -->
+    <ECRelationshipClass typeName="OperationHasOutput" strength="referencing" modifier="Abstract" description="Connects an Operation with its output IOperands.">
+        <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="has output" polymorphic="true">
+            <Class class="Operation" />
+        </Source>
+        <Target multiplicity="(1..*)" roleLabel="is output of" polymorphic="true">
+            <Class class="IOperand" />
+        </Target>
+    </ECRelationshipClass>
+
+    <!-- IOperand Classes -->
+
+    <ECEntityClass typeName="OperationParameters" modifier="Abstract" displayLabel="OperationParameters" description="Parameters that are related to an Operation and are conceptually part of the Operation.">
+        <BaseClass>GeotechnicalInformationElement</BaseClass>
+        <BaseClass>IOperand</BaseClass>
+    </ECEntityClass>
+
+    <!-- TBD: Should this be spatial because it is a reference to spatial things? -->
+    <!-- TBD: Should this refer to GeoExp:GeotechnicalInvestigationBreakdown instead? -->
+
+    <ECEntityClass typeName="InvestigationReference" modifier="Sealed" displayLabel="InvestigationReference" description="A reference to a GeoExp:GeotechnicalInvestigationElement">
+        <BaseClass>GeotechnicalInformationElement</BaseClass>
+        <BaseClass>IOperand</BaseClass>
+    </ECEntityClass>
+
+    <!-- TBD: Is the 1..1 constraint below appropriate? What should happen if the referred-to GeotechnicalInvestigationElement is deleted? -->
+    <ECRelationshipClass typeName="InvestigationReferenceRefersToInvestigation" strength="referencing" modifier="None" description="Connects an InvestigationReference to its GeoExp:GeotechnicalInvestigationElement.">
+        <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="true">
+            <Class class="InvestigationReference" />
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="true">
+            <Class class="GeoExp:GeotechnicalInvestigationElement" />
+        </Target>
+    </ECRelationshipClass>
+
+</ECSchema>
