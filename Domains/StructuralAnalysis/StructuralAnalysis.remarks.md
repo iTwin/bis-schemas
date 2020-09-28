@@ -187,6 +187,21 @@ Derives from [AnalysisElement](#analysiselement) and provides base class for str
 
 A class that represents an entire structure and is sub-modeled by [StructuralAnalysisModel](#stucturalanalysismodel), derives from [StructuralAnalysisElement](#structuralanalysiselement). Has a single property to represent the definition set that is referred to by the structure.
 
+### StructurePart
+
+A class that represents only a part of a Structure.
+Used for grouping [StructuralAnalysisElements](#structuralanalysiselement) that form some specific Structure part. e.g. Story, Frame.
+StructuralPart that defines a part for some specific Structure must be contained in a model that the Structure is broken down into.
+Structure and elements that reference it must be contained in same model.
+
+### Story
+
+Defines an elevation for a [StructuralAnalysisElement](#structuralanalysiselement).
+
+### IStoryAssignable
+
+Indicates that an element can be assigned to a Story.
+
 ### Support
 
 A support member in StructuralAnalysis represents a [StructuralAnalysisElement](#structuralanalysiselement) that is an analytical support. Currently, StructuralAnalysis schema includes [PointSupports](#pointsupport), [CurveSupports](#curvesupport) and [SurfaceSupports](#surfacesupport). Support elements have no direct physical meaning, they are interpreted by some applications to represent some type of support. Support connects to (supports) to elements that share same connectivity ([SharedTopologyElements](#sharedtopologyelements)). Each Support should refer to [SupportBehavior](#supportbehavior) which define how support behaves at specific connectivity.
