@@ -77,6 +77,33 @@
         </Target>
     </ECRelationshipClass>
 
+    <ECEntityClass typeName="StructurePart" modifier="Abstract" displayLabel="Structure Part" description="Groups StructuralAnalysisElements based on some specific condition." >
+        <BaseClass>StructuralAnalysisElement</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="Story" modifier="Sealed" displayLabel="Story" description="Defines elevation space in Structure that elements can reference." >
+        <BaseClass>StructurePart</BaseClass>
+        <ECProperty propertyName="Elevation" typeName="double" displayLabel="Elevation" description="The elevation fo this story." kindOfQuantity="AECU:LENGTH" />
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="IStoryAssignableRefersToStory" strength="referencing" modifier="Sealed" description="A relationship that indicates that an IStoryAssignable element can refer to a Story.">
+        <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="true">
+            <Class class="IStoryAssignable"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is referenced by" polymorphic="false">
+            <Class class="Story"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="IStoryAssignable" modifier="Abstract" displayLabel="IStory Assignable" description="Element which can be assigned to a Story.">
+        <ECCustomAttributes>
+            <IsMixin xmlns="CoreCustomAttributes.01.00.00">
+                <AppliesToEntityClass>StructuralAnalysisElement</AppliesToEntityClass>
+            </IsMixin>
+        </ECCustomAttributes>
+        <ECNavigationProperty propertyName="Story" relationshipName="IStoryAssignableRefersToStory" direction="Forward" displayLabel="Story" description="Story that this element is located in." />
+    </ECEntityClass>
+
     <!-- Topology classes -->
     <ECEntityClass typeName="TopologyElement" modifier="Abstract" displayLabel="Topology Element" description="Abstract class for all topology-related classes to derive from.">
         <BaseClass>anlyt:AnalyticalElement</BaseClass>
@@ -508,6 +535,7 @@
 
     <ECEntityClass typeName="Support" modifier="Abstract" displayLabel="Support" description="Abstract class for all support classes to descend from.">
         <BaseClass>StructuralAnalysisElement</BaseClass>
+        <BaseClass>IStoryAssignable</BaseClass>
     </ECEntityClass>
 
     <ECEntityClass typeName="PointSupport" modifier="Sealed" displayLabel="Point Support" description="Support which is located at a single point.">
@@ -591,6 +619,7 @@
 
     <ECEntityClass typeName="Member" modifier="Abstract" displayLabel="Member" description="Abstract class for all member classes to descend from.">
         <BaseClass>StructuralAnalysisElement</BaseClass>
+        <BaseClass>IStoryAssignable</BaseClass>
     </ECEntityClass>
 
     <ECRelationshipClass typeName="MemberOwnsLoadResistanceBehaviorAspect" modifier="Sealed" strength="embedding">
