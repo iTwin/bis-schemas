@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ECSchema schemaName="OpenPlantExtensions" alias="opext" version="01.00.00" description="OpenPlant Extensions schema" displayLabel="OpenPlant Extension schema" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.1">
+    <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
+    <ECSchemaReference name="BisCore" version="01.00.04" alias="bis"/>
+    <ECSchemaReference name="PlantCustomAttributes" version="01.00.00" alias="PlantCA"/>
+    <ECCustomAttributes>
+        <HiddenSchema xmlns="CoreCustomAttributes.01.03"/>
+    </ECCustomAttributes>
+
+    <ECEntityClass typeName="OpSharedCellDefinition" description="Element that contains the definition of a Shared Cell Definition" displayLabel="OpenPlant Shared Cell Definition">
+        <BaseClass>bis:DefinitionElement</BaseClass>
+        <ECProperty propertyName="Geometry"           typeName="binary"  description="Array property to store Element Byte data as string" displayLabel="Element Geometry"/>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="OpParametricCellModelSettings" description="Element that contains the settings to apply to the Parametric Cell Definition Model" displayLabel="OpenPlant Parametric Cell Model Settings">
+        <BaseClass>bis:DefinitionElement</BaseClass>
+        <ECProperty propertyName="CellName"           typeName="string"     description="Name of the Parametric Cell" displayLabel="Cell Name"/>
+        <ECProperty propertyName="CellModelName"      typeName="string"     description="Name of the Parametric Cell DGN model" displayLabel="Cell Model Name"/>
+        <ECProperty propertyName="UnitNumber"         typeName="int"        description="Internal Unit Number for the Definition Model" displayLabel="Unit Number"/>
+        <ECProperty propertyName="SolidsExtent"       typeName="double"     description="Solids extent for the Definition Model" displayLabel="Solids Extent"/>
+        <ECProperty propertyName="uorsPerStorage"     typeName="double"     description="Uors Per Storage for the Definition Model" displayLabel="Uors Per Storage"/>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="Op106Reference" description="Element to contain XAttribute Aspecs for 106 element" displayLabel="OpenPlant 106 Reference">
+        <BaseClass>bis:PhysicalElement</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="Op107Element" description="This is the class to hold the 107 Element data associated to a 106 element" displayLabel="OpenPlant 107 Element Holder">
+        <BaseClass>bis:PhysicalElement</BaseClass>
+        <ECProperty propertyName="Geometry"           typeName="binary"   description="Array property to store Element Byte data as string" displayLabel="Element Geometry"/>
+        <ECProperty propertyName="OldElementId"       typeName="int"     description="Original Element V8i Element Id" displayLabel="Old Element Id"/>
+        <ECProperty propertyName="TypeId"             typeName="int"      description="An ID assigned to the Element allowing that app to distingush it from other 107 element" displayLabel="Type Id"/>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="OpParamtricCellReference" description="Element to contain XAttribute Aspecs for parametric cell instance element" displayLabel="OpenPlant Parametric Cell Reference">
+        <BaseClass>Op106Reference</BaseClass>
+        <ECProperty propertyName="CellName"           typeName="string"     description="Name of the Parametric Cell" displayLabel="Cell Name"/>
+        <ECProperty propertyName="CellModelName"      typeName="string"     description="Name of the Parametric Cell DGN model" displayLabel="Cell Model Name"/>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="OpParametricCellElementInstance" description="Element to contain definition elements for a Parametric Cell" displayLabel="Parametric Cell Element Instance">
+        <BaseClass>OpSharedCellDefinition</BaseClass>
+        <ECProperty propertyName="OldElementId"           typeName="int"     description="Original Element V8i Element Id" displayLabel="OldElementId"/>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="OpXAttributeMultiAspect" description="An aspect that will store XAttributes that are assigned to the top OP element" displayLabel="OpenPlant XAttribute Multi Aspect">
+        <BaseClass>bis:ElementMultiAspect</BaseClass>
+        <ECProperty propertyName="MajorId"           typeName="int"     description="Major Id of the XAttribute"      displayLabel="Major ID"/>
+        <ECProperty propertyName="MinorId"           typeName="int"     description="Minor ID of the XAttribute"      displayLabel="Minor ID"/>
+        <ECProperty propertyName="AttribId"          typeName="int"     description="Attribute ID of the XAttribute"  displayLabel="Attrib ID"/>
+        <ECProperty propertyName="Stream"            typeName="binary"  description="Stream of the XAttribute"        displayLabel="Element Geometry"/>
+    </ECEntityClass>
+    
+    <ECEntityClass typeName="OpECDXAttributeMultiAspect" description="An aspect that will store ECD type XAttributes that need scheam class mapping" displayLabel="OpenPlant ECD XAttribute Multi Aspect">
+        <BaseClass>OpXAttributeMultiAspect</BaseClass>
+        <ECProperty propertyName="ClsName"           typeName="string"     description="Name of the Class"  displayLabel="Class Name"/>
+        <ECProperty propertyName="SchName"           typeName="string"     description="Name of the Schema" displayLabel="Schema Name"/>
+    </ECEntityClass>
+    
+    
+    <ECRelationshipClass typeName="ElementOwnsOpXAttributeMultiAspect" strength="embedding" modifier="None">
+        <BaseClass>bis:ElementOwnsMultiAspects</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:Element"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="true">
+            <Class class="OpXAttributeMultiAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    
+    <ECRelationshipClass typeName="PhysicalElementOwnsOp106Reference" strength="embedding" modifier="None">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="Bis:PhysicalElement"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="false">
+            <Class class="Op106Reference"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="Op106ElementOwnsOp107Element" strength="embedding" modifier="None">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="Op106Reference"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="false">
+            <Class class="Op107Element"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="OP106HasDefinition" strength="referencing" modifier="None">
+        <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="Op106Reference"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="false">
+            <Class class="OpSharedCellDefinition"/>
+        </Target>
+    </ECRelationshipClass>
+    
+</ECSchema>
+
