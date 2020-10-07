@@ -166,7 +166,7 @@ async function validateWipSchemas(ignoreList, singleSchemaName, output) {
 
 async function importAndExportSchema(schemaPath, schemaSearchPaths) {
   console.log("\nImporting and Exporting Schema: " + schemaPath);
-  IModelHost.startup();
+  await IModelHost.startup();
   const locater = new StubSchemaXmlFileLocater();
   locater.addSchemaSearchPaths(schemaSearchPaths);
   const loadedSchema = locater.loadSchema(schemaPath);
