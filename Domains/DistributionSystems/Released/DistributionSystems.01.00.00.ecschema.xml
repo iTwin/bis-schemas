@@ -1,0 +1,68 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!-- =====================================================================================
+|
+|     $Source: ClassificationSystems.ecschema.xml $
+|
+|  $Copyright: (c) 2019 Bentley Systems, Incorporated. All rights reserved. $
+|
+======================================================================================= -->
+<ECSchema schemaName="DistributionSystems" alias="dsys" version="01.00.00" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.1" description="A schema for defining distribution systems.">
+    <ECSchemaReference name="BisCore" version="01.00.12" alias="bis" />
+    <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
+
+    <ECCustomAttributes>
+        <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
+            <SupportedUse>Production</SupportedUse>
+        </ProductionStatus>
+    </ECCustomAttributes>
+
+    <ECEntityClass typeName="DistributionSystem" modifier="none" displayLabel="Distribution System" description="A network designed to receive, store, maintain, distribute, or control the flow of a distribution media.">
+        <BaseClass>bis:PhysicalSystem</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="IDistributionElement" modifier="Abstract" displayLabel="Distribution Element" description="An interface that can be mixed-into a bis:PhysicalElement to indicate that it can be a member of a DistributionSystem.">
+        <BaseClass>bis:IParentElement</BaseClass>
+        <ECCustomAttributes>
+            <IsMixin xmlns="CoreCustomAttributes.01.00.03">
+                <AppliesToEntityClass>bis:PhysicalElement</AppliesToEntityClass>
+            </IsMixin>
+        </ECCustomAttributes>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="DistributionSystemGroupsDistributionElements" strength="referencing" modifier="None" displayLabel="Distribution System Groups Distribution Elements" description="A relationship used to identify the dsys:IDistributionElements that are members of a DistributionSystem.">
+        <BaseClass>bis:PhysicalSystemGroupsMembers</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="groups" polymorphic="true">
+            <Class class="DistributionSystem"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is grouped by" polymorphic="true">
+            <Class class="IDistributionElement"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="IDistributionControlElement" modifier="Abstract" displayLabel="Distribution Control Element" description="An interface that can be mixed-into a bis:PhysicalElement to indicate that it is an IDistributionElement that controls other elements of a distribution system.">
+        <BaseClass>IDistributionElement</BaseClass>
+        <ECCustomAttributes>
+            <IsMixin xmlns="CoreCustomAttributes.01.00.03">
+                <AppliesToEntityClass>bis:PhysicalElement</AppliesToEntityClass>
+            </IsMixin>
+        </ECCustomAttributes>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="IDistributionSensorElement" modifier="Abstract" displayLabel="Distribution Sensor Element" description="An interface that can be mixed-into a bis:PhysicalElement to indicate that it is an IDistributionElement that observes conditions that affect a distribution system.">
+        <BaseClass>IDistributionElement</BaseClass>
+        <ECCustomAttributes>
+            <IsMixin xmlns="CoreCustomAttributes.01.00.03">
+                <AppliesToEntityClass>bis:PhysicalElement</AppliesToEntityClass>
+            </IsMixin>
+        </ECCustomAttributes>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="IDistributionFlowElement" modifier="Abstract" displayLabel="Distribution Flow Element" description="An interface that can be mixed-into a bis:PhysicalElement to indicate that it is an IDistributionElement that facilitates the distribution of energy or matter, such as air, water or power.">
+        <BaseClass>IDistributionElement</BaseClass>
+        <ECCustomAttributes>
+            <IsMixin xmlns="CoreCustomAttributes.01.00.03">
+                <AppliesToEntityClass>bis:PhysicalElement</AppliesToEntityClass>
+            </IsMixin>
+        </ECCustomAttributes>
+    </ECEntityClass>
+</ECSchema>
