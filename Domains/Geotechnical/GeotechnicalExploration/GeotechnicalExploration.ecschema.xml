@@ -21,6 +21,16 @@
         <BaseClass>bis:IParentElement</BaseClass>
     </ECEntityClass>
 
+    <ECRelationshipClass typeName="BreakdownOwnsInvestigationElement" strength="embedding" modifier="None">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(0..1)" polymorphic="true" roleLabel="owns">
+            <Class class="GeotechnicalInvestigationBreakdown"/>
+        </Source>
+        <Target multiplicity="(0..*)" polymorphic="true" roleLabel="is owned by">
+            <Class class="GeotechnicalInvestigationElement"/>
+        </Target>
+    </ECRelationshipClass>
+
     <!-- ==================== GeotechnicalInvestigation and related classes ==================== -->
 
     <ECEntityClass typeName="GeotechnicalInvestigation" modifier="None" description="A GeotechnicalInvestigationElement that represents an entire geotechnical field and laboratory investigation.">
@@ -39,10 +49,10 @@
     </ECEntityClass>
 
     <ECRelationshipClass typeName="InvestigationHasConfiguration" strength="referencing" modifier="None" description="Relationship to define that a specific GeoExp:GeotechnicalInvestigation has a configuration of GeoExp:GeotechnicalInvestigationConfiguration.">
-        <Source multiplicity="(0..*)" roleLabel="has method" polymorphic="true">
+        <Source multiplicity="(0..*)" roleLabel="has configuration" polymorphic="true">
             <Class class="GeotechnicalInvestigation" />
         </Source>
-        <Target multiplicity="(0..1)" roleLabel="if method of" polymorphic="true">
+        <Target multiplicity="(1..1)" roleLabel="is configuration of" polymorphic="true">
             <Class class="GeotechnicalInvestigationConfiguration"/>
         </Target>
     </ECRelationshipClass>
@@ -57,8 +67,20 @@
         <ECProperty propertyName="Latitude"    typeName="double"   displayLabel="Latitude"     kindOfQuantity="AECU:ANGLE"       description="Latitude at Exploration (corresponds to AGS LOCA_LAT)" />
         <ECProperty propertyName="Longitude"   typeName="double"   displayLabel="Longitude"    kindOfQuantity="AECU:ANGLE"       description="Longitude at Exploration (corresponds to AGS LOCA_LON)"/>
         <ECProperty propertyName="FinalDepth"  typeName="double"   displayLabel="Final Depth"  kindOfQuantity="AECU:LENGTH"      description="Distance from the ground level to the bottom of the Exploration  (corresponds to AGS LOCA_FDEP)." />
-        <ECProperty propertyName="StartDate"   typeName="dateTime" displayLabel="Start Date"                                     description="Date the Exploration was started  (corresponds to AGS LOCA_STAR)." />
-        <ECProperty propertyName="EndDate"     typeName="dateTime" displayLabel="End Date"                                       description="Date the Exploration was completed  (corresponds to AGS LOCA_ENDD)." />
+        <ECProperty propertyName="StartDate"   typeName="dateTime" displayLabel="Start Date"                                     description="Date the Exploration was started  (corresponds to AGS LOCA_STAR)." >
+            <ECCustomAttributes>
+                <DateTimeInfo xmlns="CoreCustomAttributes.01.00.03">
+                    <DateTimeKind>Local</DateTimeKind>
+                </DateTimeInfo>
+            </ECCustomAttributes>
+        </ECProperty>
+        <ECProperty propertyName="EndDate"     typeName="dateTime" displayLabel="End Date"                                       description="Date the Exploration was completed  (corresponds to AGS LOCA_ENDD)." >
+            <ECCustomAttributes>
+                <DateTimeInfo xmlns="CoreCustomAttributes.01.00.03">
+                    <DateTimeKind>Local</DateTimeKind>
+                </DateTimeInfo>
+            </ECCustomAttributes>
+        </ECProperty>
         <ECProperty propertyName="Remarks"     typeName="string"   displayLabel="Remarks"                                        description="Remarks relating to this exploration. (corresponds to AGS LOCA_REM)"/>
 
         <!-- Picklist properties -->
@@ -76,7 +98,7 @@
         <Source multiplicity="(0..*)" roleLabel="has method" polymorphic="true">
             <Class class="ExploratoryLocation" />
         </Source>
-        <Target multiplicity="(0..1)" roleLabel="if method of" polymorphic="true">
+        <Target multiplicity="(0..1)" roleLabel="is method of" polymorphic="true">
             <Class class="ExploratoryLocationMethod"/>
         </Target>
     </ECRelationshipClass>
@@ -106,7 +128,7 @@
 
     <ECRelationshipClass typeName="ExploratoryLocationOwnsDepthRangeInformation" strength="embedding" modifier="None">
         <BaseClass>bis:ElementOwnsChildElements</BaseClass>
-        <Source multiplicity="(0..1)" polymorphic="true" roleLabel="owns">
+        <Source multiplicity="(1..1)" polymorphic="true" roleLabel="owns">
             <Class class="ExploratoryLocation"/>
         </Source>
         <Target multiplicity="(0..*)" polymorphic="true" roleLabel="is owned by">
@@ -125,7 +147,7 @@
 
     <ECRelationshipClass typeName="ExploratoryLocationOwnsDepthInformation" strength="embedding" modifier="None">
         <BaseClass>bis:ElementOwnsChildElements</BaseClass>
-        <Source multiplicity="(0..1)" polymorphic="true" roleLabel="owns">
+        <Source multiplicity="(1..1)" polymorphic="true" roleLabel="owns">
             <Class class="ExploratoryLocation"/>
         </Source>
         <Target multiplicity="(0..*)" polymorphic="true" roleLabel="is owned by">
@@ -159,10 +181,20 @@
         <ECNavigationProperty propertyName="AlternateGeologyCode" relationshipName="FieldGeologicalDescriptionHasAlternateGeologyCode"  direction="Forward" description="Reference to AlternateGeologyCode (corresponds to AGS GEOL_GEO2)"/>
     </ECEntityClass>
 
+    <ECEntityClass typeName="ILithology" modifier="Abstract" displayLabel="Lithology" description="An interface unifies various soil and rock classification classes.">
+        <ECCustomAttributes>
+            <IsMixin xmlns="CoreCustomAttributes.01.00.03">
+                <AppliesToEntityClass>bis:DefinitionElement</AppliesToEntityClass>
+            </IsMixin>
+        </ECCustomAttributes>
+    </ECEntityClass>
+
+
     <!-- LegendCode and associated relationship -->
 
     <ECEntityClass typeName="LegendCode" modifier="None" description="A legend code for use with FieldGeologicalDescription (instances correspond to AGS GEOL_LEG values).">
         <BaseClass>bis:DefinitionElement</BaseClass>   
+        <BaseClass>ILithology</BaseClass>   
     </ECEntityClass>
 
     <ECRelationshipClass typeName="FieldGeologicalDescriptionHasLegendCode" strength="referencing" modifier="None" description="Relationship to define that a specific GeoExp:FieldGeologicalDescription has a legend code of GeoExp:LegendCode (instances correspond to values of AGS GEO_LEG).">
@@ -198,6 +230,7 @@
 
     <ECEntityClass typeName="GeologyCode" modifier="None" description="A custom geologic classification code for use with FieldGeologicalDescription (instances correspond to AGS GEOL_GEOL values).">
         <BaseClass>bis:DefinitionElement</BaseClass>   
+        <BaseClass>ILithology</BaseClass> 
     </ECEntityClass>
 
     <ECRelationshipClass typeName="FieldGeologicalDescriptionHasGeologyCode" strength="referencing" modifier="None" description="Relationship to define that a specific GeoExp:FieldGeologicalDescription has a geology code of GeoExp:GeologyCode.">
@@ -213,6 +246,7 @@
 
     <ECEntityClass typeName="AlternateGeologyCode" modifier="None" description="An alternate custom geologic classification code for use with FieldGeologicalDescription (instances correspond to AGS GEOL_GEO2 values).">
         <BaseClass>bis:DefinitionElement</BaseClass>   
+        <BaseClass>ILithology</BaseClass> 
     </ECEntityClass>
 
     <ECRelationshipClass typeName="FieldGeologicalDescriptionHasAlternateGeologyCode" strength="referencing" modifier="None" description="Relationship to define that a specific GeoExp:FieldGeologicalDescription has an alternate geology code of GeoExp:AlternateGeologyCode.">
@@ -228,8 +262,20 @@
 
     <ECEntityClass typeName="MethodByDepth" modifier="None" description="A DepthRangeInformation that represents the drilling (or more generally excavation) method over a depth range (corresponds to AGS HDPH).">
         <BaseClass>DepthRangeInformation</BaseClass>
-        <ECProperty propertyName="StartDate"   typeName="dateTime" displayLabel="Start Date and Time"   description="Date and time the method was started (in this range)  (corresponds to AGS HDPH_STAR)." />
-        <ECProperty propertyName="EndDate"     typeName="dateTime" displayLabel="End Date and Time"     description="Date and time the method was stopped (in this range)  (corresponds to AGS HDPH_ENDD)." />
+        <ECProperty propertyName="StartDate"   typeName="dateTime" displayLabel="Start Date and Time"   description="Date and time the method was started (in this range)  (corresponds to AGS HDPH_STAR)." >
+            <ECCustomAttributes>
+                <DateTimeInfo xmlns="CoreCustomAttributes.01.00.03">
+                    <DateTimeKind>Local</DateTimeKind>
+                </DateTimeInfo>
+            </ECCustomAttributes>
+        </ECProperty>
+        <ECProperty propertyName="EndDate"     typeName="dateTime" displayLabel="End Date and Time"     description="Date and time the method was stopped (in this range)  (corresponds to AGS HDPH_ENDD)." >
+            <ECCustomAttributes>
+                <DateTimeInfo xmlns="CoreCustomAttributes.01.00.03">
+                    <DateTimeKind>Local</DateTimeKind>
+                </DateTimeInfo>
+            </ECCustomAttributes>
+        </ECProperty>
 
         <!-- Picklist properties -->
         <ECNavigationProperty propertyName="Method"           relationshipName="MethodByDepthHasMethod"   direction="Forward" description="Reference to Method (corresponds to AGS HDPH_TYPE)"/>
@@ -254,7 +300,13 @@
 
     <ECEntityClass typeName="WaterStrike" modifier="None" description="A DepthInformation that represents the border between saturated and unsaturated soil (corresponds to AGS WSTG).">
         <BaseClass>DepthInformation</BaseClass>
-        <ECProperty propertyName="Date"      typeName="dateTime" displayLabel="Date and Time"   description="Date and time of striking water  (corresponds to AGS WSTG_DTIM)." />
+        <ECProperty propertyName="Date"      typeName="dateTime" displayLabel="Date and Time"   description="Date and time of striking water  (corresponds to AGS WSTG_DTIM)." >
+            <ECCustomAttributes>
+                <DateTimeInfo xmlns="CoreCustomAttributes.01.00.03">
+                    <DateTimeKind>Local</DateTimeKind>
+                </DateTimeInfo>
+            </ECCustomAttributes>
+        </ECProperty>
         <ECProperty propertyName="Remarks"   typeName="string"   displayLabel="Remarks"         description="Remarks (corresponds to AGS WSTG_REM)"/>
 
         <!-- "Picklist" properties -->
