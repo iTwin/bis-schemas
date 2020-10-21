@@ -28,13 +28,15 @@ The data defined using the `GeotechnicalExploration` schema tends to be used dow
 
 ### GeotechnicalInvestigationElement
 
-`GeotechnicalInvestigationElement` exists to unify and organize the primary data tree under a `GeotechnicalInvestigation`.
+`GeotechnicalInvestigationElement` exists to unify and organize the primary data tree under a `GeotechnicalInvestigation`. Except for `GeotechnicalInvestigation` (the head of the tree), all `GeotechnicalInvestigationElement`s must have a `GeotechnicalInvestigationBreakdown` as their parent (using the `BreakdownOwnsInvestigationElement` relationship).
 
 Detailed geotechnical data - such as laboratory result or `ExploratoryLocation` details - that is only valid in a particular context may not be `GeotechnicalInvestigationElement`s (other parent classes may be used).
 
 ### GeotechnicalInvestigationBreakdown
 
-`GeotechnicalInvestigationBreakdown` exists to breakdown a `GeotechnicalInvestigation` into a hierarchy. The `GeotechnicalInvestigationBreakdown` can be used directly as a "folder". The only expected subclass is `GeotechnicalInvestigation`, which is effectively the top-level folder.
+`GeotechnicalInvestigationBreakdown` exists to breakdown a `GeotechnicalInvestigation` into a hierarchy. `GeotechnicalInvestigationBreakdown` can be used directly as a "folder". The `BreakdownOwnsInvestigationElement` relationship is used to clarify that `GeotechnicalInvestigationElement`s are children of `GeotechnicalInvestigationBreakdown` (`GeotechnicalInvestigation`, as the head of the tree is the exception).
+
+The only expected subclass is `GeotechnicalInvestigation`, which is effectively the top-level folder.
 
 ### GeotechnicalInvestigation
 
@@ -55,9 +57,9 @@ A `GeotechnicalInvestigation` is the head of a tree formed by parent and child `
       - `ExploratoryLocation`
     - `ExploratoryLocation`
 
-Each `ExploratoryLocation` will have many child `Element`s that are not shown in the tree above.
+Each `ExploratoryLocation` will have many child `Element`s that are not shown in the tree above. While it is possible (but unusual) for a `GeotechnicalInvestigation` to be a child of another `Element`, it should never be the child of a `GeotechnicalInvestigationElement`.
 
-Every `GeotechnicalInvestigation` has a reference to an `InvestigationConfiguration` that provides the settings and parameters used for the investigation.
+Every `GeotechnicalInvestigation` has a reference to an `InvestigationConfiguration` (defined using the `InvestigationHasConfiguration` relationship) that provides the settings and parameters used for the investigation.
 
 The `EastingOffset`, `NorthingOffset` and `ElevationOffset` properties define the distances from the repository (iModel) origin to the `GeotechnicalInvestigation` reference origin. These are only non-zero when the `GeotechnicalInvestigation` information is derived from or synchronized with a repository with a different native origin. See `ExploratoryLocation` for how these properties are applied to calculate locations.
 
@@ -75,6 +77,8 @@ An `ExploratoryLocation` represents both the exploration itself (usually a boreh
 
 While `ExploratoryLocation` is not a sealed class, subclasses of it are not expected. The `Method` relationship (to an `ExploratoryLocationMethod`) is used to determine the method (or methods) used at the `ExploratoryLocation`.
 
+The `StartDate` and `EndDate` properties are defined in the time zone where and when the exploration activity took place.
+
 #### Expected Child Elements
 
 `ExploratoryLocation`s (after the exploration is finished) will generally contain the following child `Elements`:
@@ -87,8 +91,6 @@ If the `Origin` of the `ExploratoryLocation` changes, the `Origin`s of most of i
 #### Geometry and Location
 
 The `Latitude`/`Longitude` and `Easting`/`Northing` properties are effectively duplicate data which must be kept consistent.
-
-***Need future discussion on if we can remove `Easting`, `Northing` ***
 
 The `Easting`, `Northing` and `GroundLevel` properties are defined relative to the owning `GeotechnicalInvestigation`. The table shows the calculation of the coordinate values for an `ExploratoryLocation`:
 
@@ -119,8 +121,8 @@ AGS mappings for the properties (including navigation properties) are:
 | `Latitude`       | LOCA_LAT  |                                                |
 | `Longitude`      | LOCA_LON  |                                                |
 | `FinalDepth`     | LOCA_FDEP |                                                |
-| `StartDate`      | LOCA_STAR |                                                |
-| `EndDate`        | LOCA_ENDD |                                                |
+| `StartDate`      | LOCA_STAR | In local time zone                             |
+| `EndDate`        | LOCA_ENDD | In local time zone                             |
 | `Remarks`        | LOCA_REM  |                                                |
 | `Method`         | LOCA_TYPE | Reference to `ExploratoryLocationMethod`       |
 | `Status`         | LOCA_STAT | Reference to `ExploratoryLocationStatus`       |
@@ -216,6 +218,10 @@ AGS mappings for the properties (including navigation properties) are:
 | `GeologyCode`          | GEOL_GEOL  |                                                    |
 | `AlternateGeologyCode` | GEOL_GEO2 |                                                    |
 
+### ILithology
+
+`ILithology` currently unifies `LegendCode`, `GeologyCode` and `AlternateGeologyCode`. It exist primarily for conceptual clarity in the GeotechnicalInterpretation schema.
+
 ### LegendCode
 
 `LegendCode` instances are always contained in a submodel of a `GeotechnicalInvestigationConfiguration`.
@@ -250,6 +256,8 @@ See `GeotechnicalExplorationConfiguration` for more information on the constrain
 
 `MethodByDepth` instances are always child `Element`s of an `ExploratoryLocation`.
 
+The `StartDate` and `EndDate` properties are defined in the time zone where and when the exploration activity took place.
+
 AGS mappings for the properties (including navigation properties) are:
 
 | Property               | AGS Field  | Remarks                                            |
@@ -257,8 +265,8 @@ AGS mappings for the properties (including navigation properties) are:
 | `Parent`               | LOCA_ID    | Defined in `Element`                               |
 | `DepthTop`             | HDPH_TOP   | Defined in `DepthRangeInformation`                 |
 | `DepthBase`            | HDPH_BASE  | Defined in `DepthRangeInformation`                 |
-| `StartDate`            | HDPH_STAR  |                                                    |
-| `EndDate`              | HDPH_ENDD  |                                                    |
+| `StartDate`            | HDPH_STAR  | In local time zone                                 |
+| `EndDate`              | HDPH_ENDD  | In local time zone                                 |
 | `Method`               | HDPH_TYPE  |                                                    |
 
 ### Method
@@ -273,6 +281,8 @@ See `GeotechnicalExplorationConfiguration` for more information on the constrain
 
 `WaterStrike` instances are always child `Element`s of an `ExploratoryLocation`.
 
+The `Date` property is defined in the time zone where and when the exploration activity took place.
+
 AGS mappings for the properties (including navigation properties) are:
 
 | Property               | AGS Field  | Remarks                                            |
@@ -280,7 +290,7 @@ AGS mappings for the properties (including navigation properties) are:
 | `Parent`               | LOCA_ID    | Defined in `Element`                               |
 | `Depth`                | WSTG_DPTH  | Defined in `DepthInformation`                      |
 | `Remarks`              | WSTG_REM   |                                                    |
-| `Date`                 | WSTG_DTIM  |                                                    |
+| `Date`                 | WSTG_DTIM  | In local time zone                                 |
 
 ### WaterStrikeObservationTime
 
