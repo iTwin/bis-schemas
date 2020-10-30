@@ -26,10 +26,15 @@ The overall structure of the Geotechnical Information hierarchy is:
 - `bis:Subject`, has children
   - 0..1 `GeotechnicalInterpretationPartition`, each with a `GeotechnicalInterpretationModel` sub-model containing:
     - 0..N `Interpretation`s, each with a `GeotechnicalInterpretationModel` sub-model containing:
-      - 0..N `BoreholeSet`s each with
+      - 0..N `BoreholeSource`s each with
         - 0..N `Borehole`s
+      - 0..N `BoreholeGroup`s (referencing `Borehole`s)
       - 0..N `SubsurfaceGeneration`s
       - 0..N `Subsurface`s
+  - 0..1 `DefinitionPartition`, each with a `DefinitionModel` sub-model containing:
+    - 0..N `GeoInterpretationConfiguration`s, each with a `DefinitionModel` sub-model containing:
+      - 0..1 `InvestigationMapping`
+      - 0..N `Material`s
 
 ### GeotechnicalInterpretationModel
 
@@ -95,15 +100,30 @@ In the most complex case where the `Interpretation` is coordinated with multiple
 
 It is desireable - but not required - that all `ILithology`s of the mapped class in a mapped `GeotechnicalInvestigationConfiguration` be mapped to a `Material`
 
-### BoreholeSet
+### IBoreholeCollection
 
-Every `Borehole` must have a parent `BoreholeSet`.
+`IBoreholeCollection` exists to unify `BoreholeSource` (an exclusive collection of `Borehole`s) and `BoreholeGroup` (a non-exclusive collection of `Borehole`s).
+It is not intended for other subclassing. Consumers of `IBoreholeCollection` will need special case logic to access the `Borehole`s in `BoreholeSource` and `BoreholeGroup`,
+as each holds its constituent `Borehole`s using different relationships.
 
-`BoreholeSet`s may optionally be related to a GeoExp:`GeotechnicalInvestigationElement` through the `Represents` navigation property. It is important to remember that the target `GeotechnicalInvestigationElement` may be an individual `ExploratoryLocation`, a `GeotechnicalInvestigationBreakdown`, or an entire `GeotechnicalInvestigation`.
+### BoreholeGroup
+
+The use of `BoreholeGroup` is entirely optional.
+`BoreholeGroup` provides value where a membership concept that is more flexible than that provided by `BoreholeSource` is required.
+
+The `Borehole`s contained in a `BoreholeGroup` (through the `BoreholeGroupIncludesBorehole` relationship) must be contained in the same `GeotechnicalInterpretationModel`
+as the `BoreholeGroup`.
+
+### BoreholeSource
+
+Every `Borehole` must have a parent `BoreholeSource`.
+
+`BoreholeSource`s may optionally be related to a GeoExp:`GeotechnicalInvestigationElement` through the `DerivedFrom` navigation property. It is important to remember that the target `GeotechnicalInvestigationElement` may be an individual `ExploratoryLocation`, a `GeotechnicalInvestigationBreakdown`, or an entire `GeotechnicalInvestigation`.
 
 ### Borehole
 
 Every `Borehole` must have a parent `BoreholeSet`.
+Additionally, each `Borehole` may belong to zero or more `BoreholeGroup`s (through the `BoreholeGroupIncludesBorehole` relationship).
 
 The Origin of a `Borehole` should be the top of the `Borehole`.
 *NEED TO THINK ABOUT THIS....*
