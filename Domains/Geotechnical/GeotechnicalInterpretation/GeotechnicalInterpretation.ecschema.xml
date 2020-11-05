@@ -71,18 +71,42 @@
         </Target>
     </ECRelationshipClass>
 
-    <ECEntityClass typeName="Material" displayLabel="Material" modifier="None" description="A geotechnical material, uniform for the purposes of the interpretation.">
-        <BaseClass>bis:DefinitionElement</BaseClass>   
+    <ECEntityClass typeName="IMaterial" modifier="Abstract" displayLabel="IMaterial" description="A geotechnical material, uniform for the purposes of the interpretation.">
+        <ECCustomAttributes>
+            <IsMixin xmlns="CoreCustomAttributes.01.00.00">
+                <AppliesToEntityClass>bis:DefinitionElement</AppliesToEntityClass>
+            </IsMixin>
+        </ECCustomAttributes>
     </ECEntityClass>
+
+    <ECEntityClass typeName="Material" displayLabel="Material" modifier="Sealed" description="A geotechnical material, from the lithography perspective (boring logs, etc.).">
+        <BaseClass>bis:DefinitionElement</BaseClass>   
+        <BaseClass>IMaterial</BaseClass>   
+    </ECEntityClass>
+
+    <ECEntityClass typeName="AliasMaterial" displayLabel="AliasMaterial" modifier="Sealed" description="An IMaterial that is an alias for a Material.">
+        <BaseClass>bis:DefinitionElement</BaseClass>   
+        <BaseClass>IMaterial</BaseClass>
+
+        <ECNavigationProperty propertyName="AliasFor" relationshipName="AliasMaterialRenamesMaterial" direction="Forward" description="Required reference to the Material being renamed."/>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="AliasMaterialRenamesMaterial" strength="referencing" modifier="Sealed" description="Relates an AliasMaterial to the Material it renames.">
+        <Source multiplicity="(0..*)" roleLabel="renames" polymorphic="false">
+            <Class class="AliasMaterial" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is renamed as" polymorphic="false">
+            <Class class="Material" />
+        </Target>
+    </ECRelationshipClass>
 
     <!-- Abstract Material Mapping Relationship (in case we need it) -->
     <ECRelationshipClass typeName="LithologyMapsToMaterial" strength="referencing" modifier="Abstract" description="Maps GeoExp:ILithology to the GeoInterp:Material that represents that material." >
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <Source multiplicity="(0..*)" roleLabel="maps to" polymorphic="true">
-            <!-- Will change this to GeoExp:ILithology later -->
-            <Class class="bis:DefinitionElement"/>
+            <Class class="GeoExp:ILithology"/>
         </Source>
-        <Target multiplicity="(0..*)" roleLabel="is mapped to" polymorphic="false">
+        <Target multiplicity="(0..*)" roleLabel="is mapped from" polymorphic="false">
             <Class class="Material"/>
         </Target>
     </ECRelationshipClass>
@@ -219,7 +243,7 @@
             <Class class="MaterialDepthRange" />
         </Source>
         <Target multiplicity="(1..1)" roleLabel="is material for" polymorphic="true"> <!-- left polymorphic for expected future change to IMaterial or similar -->
-            <Class class="Material"/>
+            <Class class="IMaterial"/>
         </Target>
     </ECRelationshipClass>
 
