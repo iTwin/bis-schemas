@@ -86,6 +86,15 @@ The `MaterialMappedClass` property defines which `ILithology` subclass (and rela
 | "GeologyCode"          | Map `GeologyCode` to `Material` (use `FieldGeologicDescription.GeologyCode`)             |
 | "AlternateGeologyCode" | Map `AlternateGeologyCode` to `Material` (use `FieldGeologicDescription.AltGeologyCode`) |
 
+### IMaterial
+
+`IMaterial` is a mix-in that is used in classes that can identify the material of a `MaterialDepthRange` of a `Borehole` or the material of a `Stratum`.
+
+There are only expected to be two implementations of `IMaterial`:
+
+- `Material`
+- `AliasMaterial`
+
 ### Material
 
 A `Material` for interpretation purposes may be different than the geotechnical materials/classifications that appear in boring logs. Multiple exploration classifications may correspond (and be mapped to) to a single `Material`.
@@ -99,6 +108,20 @@ In the most common case where the `Interpretation` is coordinated with a single 
 In the most complex case where the `Interpretation` is coordinated with multiple `GeotechnicalInvestigation`s using different `GeotechnicalInvestigationConfiguration`s (and therefore there are multiple `InvestigationMapping`s), Each `Material` may have zero or more relationships to investigation `ILithology`s. Consistency of the `ILithology` subclass that is related to by `Material`s is only required per-`InvestigationMapping` (per-`GeotechnicalInvestigationConfiguration`).
 
 It is desireable - but not required - that all `ILithology`s of the mapped class in a mapped `GeotechnicalInvestigationConfiguration` be mapped to a `Material`
+
+### AliasMaterial
+
+`AliasMaterial` exists solely for the purpose of splitting a single `Material` into one or more additional `IMaterial`s. The need for this splitting is due to limitations of either:
+
+- Engines that consumes `Borehole`s and generate `Subsurface`s
+- Analysis (or other) applications that assume the material in one `Stratum` never appears in another `Stratum`.
+
+The `AliasFor` navigation property must always be set; the `AliasMaterial` must always refer to a real `Material`.
+
+An example of the need for an Alias material is when a borehole log shows *Silty-Sand* from depth 7.2m to 9m and depth 13.4m to 15m. To remove the "duplicate" material, either:
+
+- Two `AliasMaterial`s, *Silty-Sand 1* and *Silty-Sand 2* could be created (and the original *Silty-Sand* would only be used indirectly); or
+- One `AliasMaterial`, *Silty-Sand 2* could be created (and the original *Silty-Sand* Material would be used both directly and indirectly).
 
 ### IBoreholeCollection
 
