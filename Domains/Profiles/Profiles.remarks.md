@@ -6,6 +6,8 @@ remarksTarget: Profiles.ecschema.md
 
 Profiles schema defines classes that represent two dimensional cross sections, used to define geometric shapes. Profiles may be used to extrude structural components like beams and columns.
 
+Most often used Profiles are standard and defined by a specific [Standards Organization](#standardsorganization). Standard Profiles are always shared. Standard profiles should only be deleted in case a mistake was made when creating standard Profile.
+
 ## **Entity Classes**
 
 ### **Profile**
@@ -13,20 +15,17 @@ Profiles schema defines classes that represent two dimensional cross sections, u
 Base class of all profile definitions.
 Profile may be a [SinglePerimeterProfile](#singleperimeterprofile) or [CompositeProfile](#compositeprofile).
 
-### **StandardCatalogCodeAspect**
+### **StandardsOrganization**
 
-Optional aspect that holds required information to reference a catalog (database) entry defining a standard profile.
-Standard catalog profiles are defined by four components:
-- `Name` - Name of the [Profile](#profile) (also called designation) e.g. "W16x40"
-- `Manufacturer` - Name of the manufacturer for the [Profile](#profile). This is usually a country code e.g. "US"
-- `StandardsOrganization` - Name of the standards organization that defines the [Profile](#profile), e.g. "AISC"
-- `Revision` - Name of the edition or version of the standards organization, e.g. "14"
+Defines standard [Profiles](#profile). This should always be sub-modeled by a model which stores all manufacturers that produce the actual structural members defined by profile rules of standard organization.
 
-A Code will automatically be created for [Profiles](#profile) that have this aspect in the form:
-`"<Manufacturer> <StandardsOrganization> <Revision> <Name>"`. Example Code: `"US AISC 14 W16x40"`.
+### **Manufacturer**
 
-Applications will be able to use this information to query detailed properties and geometry of catalog (database) profile.
-Applications that don't have access to catalogs will still be able to render the Profiles as they contain their own geometry constructed from available properties - this geometry may not match the detailed geometry from a catalog.
+Produces structural members defined by a standard [Profile]. Manufacturer is always stored in a model that models [standards organization](#standardsorganization) whichs' rules are used to define profiles. Manufacturer is always sub-modeled and it's model contains revisions for profiles.
+
+### **Revision**
+
+Stores standard [profiles](#profile) that are used to produce structural members by some specific [manufacturer](#manufacturer).
 
 ### **SinglePerimeterProfile**
 
@@ -140,7 +139,7 @@ In addition, such Profiles have a bounding box which is centered at the center o
 - `FlangeEdgeRadius` (if set):
   - must be greater or equal to zero
   - must be less or equal to half `FlangeInnerEdgeLength`
-  - must be less or equal 
+  - must be less or equal
 - `FlangeSlope` (if set):
   - must be greater or equal to zero
   - must be less than ninety degrees
@@ -592,3 +591,17 @@ Standard Cardinal points are:
 ### **DoubleLShapeProfileType**
 
 Enumeration used to specify how [DoubleLShapeProfiles](#doublelshapeprofile) geometry is created - which "legs" of the [LShapeProfile](#lshapeprofile) are placed back to back.
+
+## **Standard Profiles**
+
+Most often used Profiles are standard and defined in a catalog. This is defined by a Profile and Code hierarchy representing four components:
+
+- `StandardsOrganization` - Name of the standards organization that defines the [Profile](#profile), e.g. "AISC"
+- `Manufacturer` - Name of the manufacturer for the [Profile](#profile). This is usually a country code e.g. "US"
+- `Revision` - Name of the edition or version of the standards organization, e.g. "14"
+- `Name` - Name of the [Profile](#profile) (also called designation) e.g. "W16x40"
+
+
+
+Applications will be able to use this information to query detailed properties and geometry of catalog (database) profile.
+Applications that don't have access to catalogs will still be able to render the Profiles as they contain their own geometry constructed from available properties - this geometry may not match the detailed geometry from a catalog.
