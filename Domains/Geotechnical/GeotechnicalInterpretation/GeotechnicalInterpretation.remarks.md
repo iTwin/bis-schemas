@@ -30,7 +30,11 @@ The overall structure of the Geotechnical Information hierarchy is:
         - 0..N `Borehole`s
       - 0..N `BoreholeGroup`s (referencing `Borehole`s)
       - 0..N `SubsurfaceGeneration`s
-      - 0..N `Subsurface`s
+      - 0..N `Subsurface`s **Need to determine if this has a submodel or not**
+        - 1..N `Boundary`s **Need to clarify if 0 is valid**
+        - 1..N `Block`s **Need to clarify if 0 is valid**
+          - 1..N `Stratum`s **Need to clarify if 0 is valid**
+          - 0..N `WaterTable`s
   - 0..1 `DefinitionPartition`, each with a `DefinitionModel` sub-model containing:
     - 0..N `GeoInterpretationConfiguration`s, each with a `DefinitionModel` sub-model containing:
       - 0..1 `InvestigationMapping`
@@ -145,7 +149,7 @@ Every `Borehole` must have a parent `BoreholeSource`.
 
 ### Borehole
 
-Every `Borehole` must have a parent `BoreholeSet`.
+Every `Borehole` must have a parent `BoreholeSource`.
 Additionally, each `Borehole` may belong to zero or more `BoreholeGroup`s (through the `BoreholeGroupIncludesBorehole` relationship).
 
 The Origin of a `Borehole` should be the top of the `Borehole`.
@@ -167,7 +171,62 @@ The `Depth`, of the `WaterTableDepth` should always be set. The `Location` is ef
 
 ### Subsurface
 
-`Subsurface` xxxxxxxxxxx
+`Subsurface` is an `IOperand` that is the result of a subsurface generation operation. `Subsurface` is the head of an Element parent/child tree that looks like this:
+
+- `Subsurface` **Need to determine if this has a submodel or not**
+  - 1..N `Boundary`s **Need to clarify if 0 is valid**
+  - 1..N `Block`s **Need to clarify if 0 is valid**
+    - 1..N `Stratum`s **Need to clarify if 0 is valid**
+    - 0..N `WaterTable`s
+
+### Volume
+
+`Volume` is an abstract concept that exists for future extensibility. Currently, every `Volume` is a `Stratum`, but in the future subclasses to represent tunnels, caves or other items may be added.
+
+The `Volume` property contains a cache of the geometry that can be calculated from the `BoundaryBoundsVolume` relationships.  The mesh has a consistent positive normal direction (by the order of the vertices in each triangular face) that faces outward.
+
+**We need to think about how we handle a `Volume` with one or more interior voids**
+
+### Boundary
+
+`Boundary` currently only bounds `Stratum`s (as `Stratum` is the only concrete `Volume` subclass).
+
+Every `Boundary` must have 1 or 2 `BoundaryBoundsVolumes` relationships, as otherwise the `Boundary` would have no reason for existence (it would bound nothing). Those relationship can be of either of these classes:
+
+- `BoundaryBoundsVolumeOnPositiveSide` (maximum of 1 relationship per `Boundary`)
+- `BoundaryBoundsVolumeOnNegativeSide` (maximum of 1 relationship per `Boundary`)
+
+A `Boundary` that has only one `BoundaryBoundsVolumes` relationship is either:
+
+- Part or all of the bottom surface of the `Subsurface`, or
+- Part or all of the top surface (ground level) of the `Subsurface`, or
+- Part or all of a sidewall of the `Subsurface`.
+
+**Is the above statement strictly true? Short-term is it possible for us to have voids?**
+
+The `Surface` property contains a triangular mesh. The mesh has a consistent positive normal direction (by the order of the vertices in each triangular face). The terms "positive side and "negative side" in the relationships `BoundaryBoundsVolumeOnPositiveSide` and `BoundaryBoundsVolumeOnNegativeSide` refer to this normal.
+
+### Block
+
+`Block`s contain `Stratum`s and `WaterTable`s as child `Element`s. `Block`s do not have geometry of their own. The child `WaterTable`s should be fully contained in the child `Stratum`s.
+
+**Do we need to temper the statement above for cases of surface water (lake,etc) or water in subterranean voids?**
+
+Currently there is only a single `Block` in each `Subsurface`, but this will change with more powerful subsurface generation engines.
+
+### Stratum
+
+`Stratum` is currently the only concrete subclass of `Volume`.
+
+### WaterTable
+
+`WaterTable`s may be inconsistent in adjacent `Block`s as the `Block` border may act as a water conduit or barrier.
+
+**Need to figure out how perched water is modeled. Is there a closed surface in WaterTable.Surface?**
+
+**Need to figure out a strategy for naming/tagging seasonal water table variations....or maybe the date of the info to generate the water table?**
+
+The positive normal of the `Surface` mesh represents the unsaturated soil side of the `Surface`.
 
 ### SubsurfaceGeneration
 
@@ -202,3 +261,10 @@ See [Operation](./GeotechnicalInterpretation.remarks.md#Operation) and [IOperand
 ### OperationHasOutput
 
 See [Operation](./GeotechnicalInterpretation.remarks.md#Operation) and [IResultOperand](./GeotechnicalInterpretation.remarks.md#IOperand).
+
+### BoundaryBoundsVolumes
+
+There are only 2 intended subclasses of `BoundaryBoundsVolumes`:
+
+- `BoundaryBoundsVolumeOnPositiveSide`
+- `BoundaryBoundsVolumeOnNegativeSide`
