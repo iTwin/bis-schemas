@@ -274,7 +274,54 @@
         </Target>
     </ECRelationshipClass>
 
-    <!-- ==================== Subsurface RELATED CLASSES =========================== -->
+    <!-- ==================== GEOMETRIC MIX-INS ================================== -->
+    
+    <ECEntityClass typeName="ISurface" modifier="Abstract" displayLabel="Surface" description="An interface that defines an IIOperand that contains a surface.">
+        <ECCustomAttributes>
+            <IsMixin xmlns="CoreCustomAttributes.01.00.03">
+                <AppliesToEntityClass>GeotechnicalInterpretationElement</AppliesToEntityClass>
+            </IsMixin>
+        </ECCustomAttributes>
+        <BaseClass>IOperand</BaseClass>
+
+        <!-- NEED TO ADD EXTENDED TYPE extendedTypeName="GeometryFlatBuffer" or sim --> 
+        <ECProperty propertyName="Surface" displayLabel="Surface" typeName="binary" description="Contiguous IndexedPolyface defining the geometry of the surface. May be closed."/>
+    </ECEntityClass>
+
+    <!-- 
+    <ECEntityClass typeName="IVolume" modifier="Abstract" displayLabel="Volume" description="An interface that defines an IIOperand that contains a volume.">
+        <ECCustomAttributes>
+            <IsMixin xmlns="CoreCustomAttributes.01.00.03">
+                <AppliesToEntityClass>GeotechnicalInterpretationElement</AppliesToEntityClass>
+            </IsMixin>
+        </ECCustomAttributes>
+        <BaseClass>IOperand</BaseClass>
+
+        < !- - NEED TO ADD EXTENDED TYPE extendedTypeName="GeometryFlatBuffer" or sim - - > 
+        <ECProperty propertyName="Volume" displayLabel="Volume" typeName="binary" description="Contiguous IndexedPolyface defining the geometry of the volume."/>
+    </ECEntityClass>
+  -->
+    <!-- ==================== Terrain Classes ================================== -->
+    
+    <ECEntityClass typeName="ITerrain" modifier="Abstract" displayLabel="Terrain" description="An interface that marks a class as defining terrain (ground level).">
+        <ECCustomAttributes>
+            <IsMixin xmlns="CoreCustomAttributes.01.00.03">
+                <AppliesToEntityClass>GeotechnicalInterpretationElement</AppliesToEntityClass>
+            </IsMixin>
+        </ECCustomAttributes>
+        <BaseClass>IOperand</BaseClass>
+    </ECEntityClass>
+
+    </ECEntityClass>
+        <ECEntityClass typeName="TerrainSurface" modifier="Sealed" displayLabel="Terrain Surface" description="An ITerrain that uses a surface (IndexedPolyface) to approximate ground level.">
+        <BaseClass>GeotechnicalInterpretationElement</BaseClass>
+        <BaseClass>ITerrain</BaseClass>
+        <BaseClass>ISurface</BaseClass>
+
+    </ECEntityClass>
+
+    <!-- ==================== Subsurface RELATED CLASSES ============================== -->
+
 
     <!-- NEED TO DETERMINE IF THIS IS ISUBMODELED OR NOT (currently coded as child elements) -->
     <ECEntityClass typeName="Subsurface" modifier="Sealed" displayLabel="Subsurface" description="A approximation of the structure of the ground at surface level and below.">
@@ -294,7 +341,7 @@
         </Target>
     </ECRelationshipClass>
 
-    <!-- Bounrdaries are always children of Subsurface -->
+    <!-- Boundaries are always children of Subsurface -->
     <ECRelationshipClass typeName="SubsurfaceOwnsBoundaries" strength="embedding" modifier="Sealed">
         <BaseClass>bis:ElementOwnsChildElements</BaseClass>
         <Source multiplicity="(1..1)" polymorphic="false" roleLabel="owns">
@@ -307,16 +354,17 @@
 
     <ECEntityClass typeName="Volume" modifier="Abstract" displayLabel="Volume" description="A contiguous 3D volume that is bounded by Boundaries.">
         <BaseClass>GeotechnicalInterpretationElement</BaseClass>
+        <!-- NEED TO DETERMINE IF THIS IS SHOULD BE AN IVOLUME -->
 
-        <!-- can we use a more explicit property type here? -->
-        <ECProperty propertyName="Volume" displayLabel="Volume" typeName="Bentley.Geometry.Common.IGeometry"  description="A cache of the geometry of the 3D volume."/>
+        <!-- NEED TO ADD EXTENDED TYPE extendedTypeName="GeometryFlatBuffer" or sim --> 
+        <ECProperty propertyName="Volume" displayLabel="Volume" typeName="binary" description="An IndexedPolyface that defines a cache of the geometry of the 3D volume."/>
     </ECEntityClass>
-   
+
+    <!-- We need to determine our strategy for handling complex results before we can determine if
+        Boundary should be an ISurface or should just have a Surface property -->
     <ECEntityClass typeName="Boundary" modifier="Sealed" displayLabel="Boundary" description="A contiguous surface that bounds Volumes. Always a child of Subsurface.">
         <BaseClass>GeotechnicalInterpretationElement</BaseClass>
-
-        <!-- can we use a more explicit property type here? -->
-        <ECProperty propertyName="Surface" displayLabel="Surface" typeName="Bentley.Geometry.Common.IGeometry"  description="Contiguous surface defining the geometry of the Boundary. May be closed."/>
+        <BaseClass>ISurface</BaseClass>
     </ECEntityClass>
    
     <ECRelationshipClass typeName="BoundaryBoundsVolumes" strength="referencing" modifier="Abstract" description="Relationship to define the Volume is bounded by the Boundary.">
@@ -396,8 +444,8 @@
      <ECEntityClass typeName="WaterTable" modifier="Sealed" displayLabel="Water Table" description="A border between saturated and unsaturated soil. Always child of Block.">
         <BaseClass>GeotechnicalInterpretationElement</BaseClass>
 
-        <!-- can we use a more explicit property type here? -->
-        <ECProperty propertyName="Surface" displayLabel="Surface" typeName="Bentley.Geometry.Common.IGeometry"  description="Contiguous surface defining the geometry of the WaterTable. May be closed."/>
+        <!-- NEED TO ADD EXTENDED TYPE extendedTypeName="GeometryFlatBuffer" or sim --> 
+        <ECProperty propertyName="Surface" displayLabel="Surface" typeName="binary" description="Contiguous surface defining the geometry of the WaterTable. May be closed."/>
     </ECEntityClass>
    
     <!-- ==================== SubsurfaceGeneration RELATED CLASSES ==================== -->
@@ -415,6 +463,17 @@
         </Source>
         <Target multiplicity="(0..*)" roleLabel="is input for" polymorphic="true">
             <Class class="IBoreholeCollection" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="SubsurfaceGenerationHasTerrainSurfaceInput" strength="referencing" modifier="Sealed" description="Connects an SubsurfaceGeneration with its input IBoreholeCollections.">
+        <BaseClass>OperationHasInput</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="has input" polymorphic="false">
+            <Class class="SubsurfaceGeneration" />
+        </Source>
+        <!-- NEED TO DETERMINE IF MORE THAN 1 TERRAINSURFACE CAN BE USED FOR INPUT TO A SINGLE GENERATION-->
+        <Target multiplicity="(0..*)" roleLabel="is input for" polymorphic="true">
+            <Class class="TerrainSurface" />
         </Target>
     </ECRelationshipClass>
 
@@ -478,17 +537,18 @@
         <BaseClass>IOperand</BaseClass>
     </ECEntityClass>
 
-
     <!-- ==================== FOR TEMPORARY PERFORMANCE TESTING ONLY ==================== -->
 
     <ECEntityClass typeName="TestSurface" modifier="Abstract" displayLabel="Test Element with Surface Mesh" description="For testing purposes only.">
         <BaseClass>GeotechnicalInterpretationElement</BaseClass>
-        <ECProperty propertyName="Surface" displayLabel="Surface" typeName="Bentley.Geometry.Common.IGeometry"  description="For testing surface meshes."/>
+        <!-- NEED TO ADD EXTENDED TYPE extendedTypeName="GeometryFlatBuffer" or sim -->        
+        <ECProperty propertyName="Surface" displayLabel="Surface" typeName="binary" description="For testing surface meshes."/>
     </ECEntityClass>
 
     <ECEntityClass typeName="TestVolume" modifier="Abstract" displayLabel="Test Element with BREP Volume" description="For testing purposes only.">
         <BaseClass>GeotechnicalInterpretationElement</BaseClass>
-        <ECProperty propertyName="Volume" displayLabel="Volume" typeName="Bentley.Geometry.Common.IGeometry"  description="For testing BREP volume performance/strategy."/>
+        <!-- NEED TO ADD EXTENDED TYPE extendedTypeName="GeometryFlatBuffer" or sim --> 
+        <ECProperty propertyName="Volume" displayLabel="Volume" typeName="binary" description="For testing BREP volume performance/strategy."/>
     </ECEntityClass>
 
 </ECSchema>
