@@ -169,6 +169,28 @@ The `Origin` of a `WaterTableDepth` should be identical to that of its owning `B
 
 The `Depth`, of the `WaterTableDepth` should always be set. The `Location` is effectively a cache that can be calculated from the other `Depth` and the properties in the parent `Borehole`.  The `Depth` property actually defines a "downhole distance".
 
+### ISurface
+
+`ISurface` is used to unify all of the various types that contain surfaces that can be used for downstream consumption (primarily in `Operation`s). Every `ISurface` is also an `IOperand`. 
+
+*Should the Surface property **always** be defined?*
+
+### IVolume
+
+`IVolume` is used to unify all of the various types that contain volumwa that can be used for downstream consumption (primarily in `Operation`s). Every `IVolume` is also an `IOperand`. 
+
+*Should the Volume property **always** be defined?*
+
+### ITerrain
+
+Currently the only `ITerrain` subclass is `TerrainSurface`. In the future it is likely others will be created, such as `TerrainPointCloud` and `TerrainContours`.
+
+### TerrainSurface
+
+`TerrainSurface` is used to unify all of the various types that contain surfaces that can be used for downstream consumption (primarily in `Operation`s). Every `ISurface` is also an `IOperand`. 
+
+*Should the Surface property **always** be defined?*
+
 ### Subsurface
 
 `Subsurface` is an `IOperand` that is the result of a subsurface generation operation. `Subsurface` is the head of an Element parent/child tree that looks like this:
