@@ -25,11 +25,11 @@ Pre-release schemas can be new versions of a schema that are still undergoing te
 
 - A new prerelease version will be automatically generated every time the working version of a schema is merged into master.
 - Pre-release flags are used to handle unreleased schemas
-  - A schema with version 1.0.1 will be published with the package version: `1.0.1-beta.x`
+  - A schema with version 1.0.1 will be published with the package version: `1.0.1-dev.x`
 - To consume a pre-release schema it must be explicitly stated in the npm/nuget dependency that this is desired
   - Gets around accidentally depending on a non-released schema
   - Can always be on the tip of dependent schemas if still in active development of the schema
-  - Example for consuming a pre-release: `~1.0.1-beta.1 <1.0.1` would match any package with version `1.0.1-beta.x` but not match `1.0.1`.
+  - Example for consuming a pre-release: `~1.0.1-dev.1 <1.0.1` would match any package with version `1.0.1-dev.x` but not match `1.0.1`.
 
 ## Implementation
 
