@@ -1,0 +1,52 @@
+trigger:
+  branches:
+    include:
+      - master
+  paths:
+    include:
+      - '/Domains/Core'
+      - '/Standard'
+
+jobs:
+- job: iModelEvolutionTests
+  workspace:
+    clean: all
+
+  pool:
+    name: iModelTechCI
+    demands: Agent.OS -equals Windows_NT
+
+  steps:
+  - checkout: self
+    clean: true
+
+  - task: bentleysystemsinternal.bentley-build-tasks.setupbbenv.setupbbenv@1
+    displayName: 'Set up BB Environment'
+    inputs:
+      systemAccessToken: '$(Parameters.systemAccessToken)'
+      buildStrategy: 'iModelEvolutionTests;buildall'
+      version: '$(Build.BuildNumber)'
+
+  - task: bentleysystemsinternal.bentley-build-tasks.bentleybootstrap.bentleybootstrap@0
+    displayName: 'BentleyBootstrap imodel02'
+    inputs:
+      streamname: imodel02
+
+  - task: bentleysystemsinternal.bentley-build-tasks.bentleybuild.bentleybuild@1
+    displayName: 'bb pull'
+    inputs:
+      command: pull
+      linkRepoToSrcRoot: false
+    env:
+      AZURE_DEVOPS_EXT_PAT: $(System.AccessToken)
+
+  - script: |
+      cd $(Agent.BuildDirectory)/bbsrc/BisSchemas
+      git checkout %SYSTEM_PULLREQUEST_SOURCEBRANCH:refs/heads/=%
+      git branch
+    displayName: 'Set source branch'
+
+  - task: bentleysystemsinternal.bentley-build-tasks.bentleybuild.bentleybuild@1
+    displayName: 'bb build'
+    inputs:
+      command: build
