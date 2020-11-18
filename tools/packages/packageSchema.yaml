@@ -21,9 +21,9 @@ stages:
 
     steps:
       - task: NodeTool@0
-        displayName: 'Use Node 10.15.0'
+        displayName: 'Use Node 12.16.0'
         inputs:
-          versionSpec: 10.15.0
+          versionSpec: 12.16.0
       - checkout: self
         clean: true
 
@@ -51,19 +51,20 @@ stages:
       - script: npm install
         displayName: 'npm install'
 
-      - script: node ./tools/packages/generatePackages.js --inventory ./SchemaInventory.json --outDir $(pkgOut) --template ./tools/packages/package.json.template
+      # Temporarily specify --alwaysGen for initial publish to public npmsjs.
+      - script: node ./tools/packages/generatePackages.js --inventory ./SchemaInventory.json --skipList ./ignoreSchemaList.json --outDir $(pkgOut) --template ./tools/packages/package.json.template --alwaysGen
         displayName: Generate Packages
 
       - publish: $(pkgOut)
         artifact: bis-schemas-packages
         displayName: 'Publish Pipeline Artifact'
 
-- stage: Publish_Packages
-  displayName: Publish Packages
+- stage: Publish_Packages_Internal
+  displayName: Publish Internal Packages
   dependsOn: Build
-  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/publish-npmjs'),  ne(variables['skipInternal'], true))
   jobs:
-  - job: publish
+  - job: PublishInternal
     displayName: Publish npm packages to Azure Artifacts
     variables:
       - group: azure-artifacts-npm-token
@@ -92,5 +93,51 @@ stages:
       - script: npm install
         displayName: 'npm install'
           
-      - script: node ./tools/packages/publishPackages.js --packages $(Pipeline.Workspace)/bis-schemas-packages --isRealRun
+       #- script: node ./tools/packages/publishPackages.js --packages $(Pipeline.Workspace)/bis-schemas-packages --isRealRun
+      - script: node ./tools/packages/publishPackages.js --packages $(Pipeline.Workspace)/bis-schemas-packages
+        displayName: Publish packages
+
+- stage: Publish_Packages_External
+  displayName: Publish Public Packages
+  dependsOn: Publish_Packages_Internal
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/publish-npmjs'),  ne(variables['skipExternal'], true))
+  jobs:
+  - job: PublishExternal
+    displayName: Publish npm packages to npmjs
+    variables:
+      - group: azure-artifacts-npm-token
+      - group: "Caleb - npmjs publish token"
+    steps:
+      - checkout: self
+        clean: true
+      - task: NodeTool@0
+        displayName: 'Use Node 10.15.0'
+        inputs:
+          versionSpec: 10.15.0
+      - download: current
+        artifact: bis-schemas-packages
+
+      #Your build pipeline references a secret variable named ‘artifactsRegistryToken’. Create or edit the build pipeline for this YAML file, define the variable on the Variables tab, and then select the option to make it secret. See https://go.microsoft.com/fwlink/?linkid=865972
+      - bash: |
+          npm config set @bentley:registry /
+          npm config set always-auth=true
+          npm config set ///bentleycs/_packaging/Packages/npm/registry/:username=bentleycs
+          npm config set ///bentleycs/_packaging/Packages/npm/registry/:_password=$(artifactsRegistryToken)
+          npm config set ///bentleycs/_packaging/Packages/npm/registry/:email="not used"
+          npm config set ///bentleycs/_packaging/Packages/npm/:username=bentleycs
+          npm config set ///bentleycs/_packaging/Packages/npm/:_password=$(artifactsRegistryToken)
+          npm config set ///bentleycs/_packaging/Packages/npm/:email="not used"
+        displayName: 'Seed npmrc'
+
+      - script: npm install
+        displayName: 'npm install'
+
+      - bash: |
+          npm config set @bentley:registry=https://registry.npmjs.org/
+          npm config set //registry.npmjs.org/:_authToken=$(artifactsToken)
+          npm config set //registry.npmjs.org/:email='imodel.js@gmail.com'
+          npm config set //registry.npmjs.org/:username='imodeljs'
+        displayName: 'Seed npmrc'
+      
+      - script: node ./tools/packages/publishPackages.js --packages $(Pipeline.Workspace)/bis-schemas-packages --public --isRealRun
         displayName: Publish packages

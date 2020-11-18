@@ -8,9 +8,10 @@
 const fs = require("fs");
 const path = require("path");
 const child_process = require('child_process');
+const createSchemaJson = require("./schemaJsonCreator").createSchemaJson;
 
 function parseVersionString(versionString, time) {
-  const match = versionString.match(/(?<read>\d+)\.(?<write>\d+)\.(?<patch>\d+)(-beta\.(?<betaVersion>\d+))?/);
+  const match = versionString.match(/(?<read>\d+)\.(?<write>\d+)\.(?<patch>\d+)(-dev\.(?<betaVersion>\d+))?/);
   if (match) {
     const parsed = {
       read: parseInt(match.groups.read, 10).toString(), 
@@ -38,6 +39,36 @@ function parseNpmOutputAndSort(npmOutput) {
   return publishedVersions.sort((a, b) => (versionToNumber(b) - versionToNumber(a)));
 }
 
+function getPublishBlackList() {
+  const fullPath = path.resolve(__dirname, "publishBlackList.json")
+  if (!fs.existsSync(fullPath))
+    return;
+
+  let rawdata = fs.readFileSync(fullPath);
+  let schemas = JSON.parse(rawdata);
+  return schemas;
+}
+
+function isBlackListed(schema, blackList) {
+  if (!blackList)
+    return false;
+
+  const matches = blackList.filter((s) => s.name === schema.name);
+  if (matches.length === 0)
+    return false;
+
+  if (matches.some((s) => s.version === "*"))
+    return true;
+
+  if (!schema.version)
+    return true;
+
+  if (matches.some((s) => s.version === schema.version))
+    return true;
+
+  return false;
+}
+
 function getPublishedSchemas (packageName) {
   let npmOutput = {};
   try {
@@ -52,10 +83,10 @@ function getPublishedSchemas (packageName) {
 }
 
 function formatPackageVersion(versionInfo) {
-  return `${versionInfo.read}.${versionInfo.write}.${versionInfo.patch}${versionInfo.isBeta ? "-beta." + versionInfo.beta : ""}`;
+  return `${versionInfo.read}.${versionInfo.write}.${versionInfo.patch}${versionInfo.isBeta ? "-dev." + versionInfo.beta : ""}`;
 }
 
-function buildPackage(outPath, packageJsonTemplate, versionInfo, schemaInfo) {
+async function buildPackage(outPath, packageJsonTemplate, versionInfo, schemaInfo) {
   console.log (`Building package ${versionInfo.packageName}.${versionInfo.packageVersion} for file ${schemaInfo.path}`);
   const packageDir = path.join(outPath, `${schemaInfo.name}.${versionInfo.packageVersion}`);
   if (!fs.existsSync(packageDir)) fs.mkdirSync(packageDir, {recursive: true});
@@ -68,13 +99,21 @@ function buildPackage(outPath, packageJsonTemplate, versionInfo, schemaInfo) {
   const schemaFileName = `${schemaInfo.name}.ecschema.xml`;
   const packageSchemaPath = path.join(packageDir, schemaFileName);
   fs.copyFileSync(schemaInfo.path, packageSchemaPath);
+  fs.copyFileSync(path.resolve("./tools/packages/LICENSE.md"), path.join(packageDir, "LICENSE.md"));
+
+  // create json schema
+  await createSchemaJson(schemaInfo, packageDir);
+  
+  const readmeText = fs.readFileSync(path.resolve("./tools/packages/README.md.template"), 'utf8');
+  var updatedReadme = readmeText.replace(/{package-name}/g, versionInfo.packageName);
+  fs.writeFileSync(path.join(packageDir, "README.md"), updatedReadme);
 }
 
 function getReleaseVersion(schemaInfo, publishedVersions, alwaysGen) {
   const versionInfo = parseVersionString(schemaInfo.version);
   const matchingPublishedVersion = publishedVersions.find((pub) => 
     !pub.isBeta && versionInfo.read === pub.read && versionInfo.write === pub.write && versionInfo.patch === pub.patch);
-  
+
   versionInfo.needToPublish = undefined === matchingPublishedVersion || alwaysGen;
   if (!versionInfo.needToPublish)
     console.log(`Found matching released package for ${schemaInfo.name}.${schemaInfo.version}, skipping package generation`);
@@ -92,7 +131,7 @@ function getNextBetaVersion(schemaInfo, publishedVersions, alwaysGen) {
     console.log(`Found released version of ${schemaInfo.name}.${schemaInfo.version}, skipping beta package generation.`);
     versionInfo.needToPublish = false;
   } else if (undefined === latestPublishedBeta) {
-    console.log (`Did not find any already published versions of ${schemaInfo.name}.${schemaInfo.version}.  Publishing -beta.1`)
+    console.log (`Did not find any already published versions of ${schemaInfo.name}.${schemaInfo.version}.  Publishing -dev.1`)
     versionInfo.isBeta = true;
     versionInfo.beta = 1;
     versionInfo.needToPublish = true;
@@ -143,18 +182,27 @@ async function createPackages(inventoryPath, skipListPath, outDir, packageTempla
   
   const packageJsonTemplate = fs.readFileSync(packageTemplatePath, { encoding: 'utf8' });
   const skipList = skipListPath ? JSON.parse(fs.readFileSync(skipListPath, { encoding: 'utf8' })) : [];
+  const publishBlackList = getPublishBlackList();
 
   for (const [name, schemaInfoList] of Object.entries(schemaInventory)) {
     if (skipList.find((schemaToSkip) => { return schemaToSkip.name === name })) {
       console.log(`Skipping ${name} because it is on the skip list`);
       continue;
     }
-    const packageName = `@bentley/${name.toLowerCase()}-schema`;
+
+    let formattedName = name.replace(/([a-z]|[0-9]+D{0,1})([A-Z])/g, '$1-$2').toLowerCase();
+    
+    const packageName = `@bentley/${formattedName}-schema`;
     console.log(`Looking for packages published with the name ${packageName} for schema ${name}`);
     const publishedVersions = getPublishedSchemas(packageName);
     for (const schemaInfo of schemaInfoList) {
       if(!schemaInfo.path) {
         console.log(`Skipping ${schemaInfo.name}.${schemaInfo.version} because entry has no path defined.`);
+        continue;
+      }
+
+      if (isBlackListed(schemaInfo, publishBlackList)) {
+        console.log(`Skipping ${schemaInfo.name}.${schemaInfo.version} because it has been blacklisted for publishing.`);
         continue;
       }
 
@@ -164,6 +212,9 @@ async function createPackages(inventoryPath, skipListPath, outDir, packageTempla
         versionInfo = getReleaseVersion(schemaInfo, publishedVersions, alwaysGen);
       } else if (!skipBetaPackages) {
         versionInfo = getNextBetaVersion(schemaInfo, publishedVersions, alwaysGen);
+        // Don't publish beta package if it's also in the released folder
+        const released = schemaInfoList.find((info) => info.name === schemaInfo.name && info.version === schemaInfo.version && info.released === true);
+        versionInfo.needToPublish = undefined === released;
       }
     
       if (versionInfo.needToPublish) {
@@ -173,7 +224,7 @@ async function createPackages(inventoryPath, skipListPath, outDir, packageTempla
         }
         versionInfo.packageName = packageName;
         versionInfo.packageVersion = formatPackageVersion(versionInfo);
-        buildPackage(outDir, packageJsonTemplate, versionInfo, schemaInfo);      }
+        await buildPackage(outDir, packageJsonTemplate, versionInfo, schemaInfo);      }
     }
   }
 }

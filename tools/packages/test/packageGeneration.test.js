@@ -7,24 +7,24 @@ describe('Package Generation', function() {
       const npmOutput = {
         "created": "2019-11-15T16:37:19.3660078Z",
         "modified": "2019-12-03T12:36:38.7059581Z",
-        "1.0.0-beta.1": "2019-11-15T16:37:19.3660078Z",
-        "1.0.0-beta.2": "2019-12-03T12:36:38.7059581Z"
+        "1.0.0-dev.1": "2019-11-15T16:37:19.3660078Z",
+        "1.0.0-dev.2": "2019-12-03T12:36:38.7059581Z"
       };
       const publishedVersions = pkgGen.parseNpmOutputAndSort(npmOutput);
       chai.expect(publishedVersions.length).to.equal(2);
-      chai.expect(pkgGen.formatPackageVersion(publishedVersions[0])).to.equal("1.0.0-beta.2");
+      chai.expect(pkgGen.formatPackageVersion(publishedVersions[0])).to.equal("1.0.0-dev.2");
     });
     it('Beta for newest version first', function() {
       const npmOutput = {
         "created": "2019-11-15T16:37:19.3660078Z",
         "modified": "2019-12-03T12:36:38.7059581Z",
-        "1.0.0-beta.1": "2019-11-15T16:37:19.3660078Z",
-        "1.0.1-beta.1": "2019-11-15T16:37:19.3660078Z",
-        "1.0.0-beta.2": "2019-12-03T12:36:38.7059581Z"
+        "1.0.0-dev.1": "2019-11-15T16:37:19.3660078Z",
+        "1.0.1-dev.1": "2019-11-15T16:37:19.3660078Z",
+        "1.0.0-dev.2": "2019-12-03T12:36:38.7059581Z"
       };
       const publishedVersions = pkgGen.parseNpmOutputAndSort(npmOutput);
       chai.expect(publishedVersions.length).to.equal(3);
-      chai.expect(pkgGen.formatPackageVersion(publishedVersions[0])).to.equal("1.0.1-beta.1");
+      chai.expect(pkgGen.formatPackageVersion(publishedVersions[0])).to.equal("1.0.1-dev.1");
     });
     it('patch version does not interfer with beta version', function () {
       const npmOutput = {
@@ -32,12 +32,12 @@ describe('Package Generation', function() {
         "modified": "2020-01-09T14:55:39.5625934Z",
         "1.0.0": "2019-11-13T18:43:34.8337986Z",
         "2.0.0": "2019-11-13T18:43:37.119937Z",
-        "2.0.1-beta.1": "2019-11-13T19:03:48.6000968Z",
-        "2.0.1-beta.2": "2020-01-09T14:55:39.5625934Z"
+        "2.0.1-dev.1": "2019-11-13T19:03:48.6000968Z",
+        "2.0.1-dev.2": "2020-01-09T14:55:39.5625934Z"
       };
       const publishedVersions = pkgGen.parseNpmOutputAndSort(npmOutput);
       chai.expect(publishedVersions.length).to.equal(4);
-      chai.expect(pkgGen.formatPackageVersion(publishedVersions[0])).to.equal("2.0.1-beta.2");
+      chai.expect(pkgGen.formatPackageVersion(publishedVersions[0])).to.equal("2.0.1-dev.2");
     });
   });
   describe('Schema inventory attributes are checked', function() {
