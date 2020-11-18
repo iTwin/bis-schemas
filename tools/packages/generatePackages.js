@@ -3,7 +3,7 @@
 * Licensed under the MIT License. See LICENSE.md in the project root for license terms.
 *--------------------------------------------------------------------------------------------*/
 
-// This tool creates an npm package for each schema.  Released released schemas should be 
+// This tool creates an npm package for each schema.  Released schemas should be 
 // published with the latest tag and beta schemas are released with the next tag.  
 // Use the option --skipBetaPackages to generate only released packages.
 // Use the option --alwaysGen to generate packages even if they are already published. 
