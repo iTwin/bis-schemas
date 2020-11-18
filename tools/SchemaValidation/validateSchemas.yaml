@@ -22,6 +22,8 @@ jobs:
       value: '$(Agent.BuildDirectory)/ComparisonResults'
     - name: imodelValidationOut
       value: '$(Agent.BuildDirectory)/IModelValidationResults'
+    - name: jsonValidationOut
+      value: '$(Agent.BuildDirectory)/JsonValidationResults'
 
   steps:
   - task: NodeTool@0
@@ -123,6 +125,32 @@ jobs:
     condition: succeededOrFailed()  
     artifact: released-schema-validation-logs
     displayName: 'Publish Released Schema Validation Results'
+
+  - script: | 
+      mkdir "%jsonValidationOut%"
+      echo Schema JSON Validation Ouput Dir= %jsonValidationOut%
+    condition: succeededOrFailed()
+    displayName: 'Create Schema JSON Validation Output Directory'
+
+  - script: npm run validateJsonSchemas -- --BisRoot . --OutDir $(jsonValidationOut)
+    workingDirectory: 
+    condition: succeededOrFailed()
+    displayName: Perform BIS Schema JSON creation validation
+
+  - task: ArchiveFiles@2
+    condition: succeededOrFailed()
+    displayName: 'ArchiveFiles - Schema JSON Validation Results'
+    inputs:
+      rootFolderOrFile: $(jsonValidationOut) 
+      includeRootFolder: false 
+      archiveType: 7z
+      archiveFile: '$(Build.ArtifactStagingDirectory)/JsonValidationResults-$(Build.BuildId).zip' 
+      replaceExistingArchive: true 
+
+  - publish: '$(Build.ArtifactStagingDirectory)/JsonValidationResults-$(Build.BuildId).zip'
+    condition: succeededOrFailed()  
+    artifact: bis-schema-json-validation-logs
+    displayName: 'Publish BIS Schema JSON Validation Results'
 
   - script: npm run validateSchemaInventory
     displayName: Validate Schema Inventory

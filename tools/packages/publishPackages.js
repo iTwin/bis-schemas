@@ -34,16 +34,17 @@ async function publishPackages(searchDirectory, isRealRun) {
   });
   const allPackages = allPackageJsons.map((pkgJsonPath) => path.dirname(pkgJsonPath.fullPath)).sort();
   console.log(JSON.stringify(allPackages));
-  const publishCommands = allPackages.map((pkg) => `npm publish ${pkg} --tag ${pkg.includes("-beta")? "beta": "latest"} ${isRealRun? "":"--dry-run"}`);
+  const publishCommands = allPackages.map((pkg) => `npm publish ${pkg} --tag ${pkg.includes("-dev")? "beta": "latest"} --access public ${isRealRun? "":"--dry-run"}`);
   console.log(JSON.stringify(publishCommands));
   let hadFailures = false;
   publishCommands.forEach((command) => {
     let npmOutput = "";
     try {
-      hadFailures = true;
       npmOutput = child_process.execSync(command, {stdio:['inherit'], encoding:'utf8'});
     } catch (e) {
-      if (!e.message.includes("E404")) {
+      hadFailures = true;
+      
+      if (!e.message.includes("E403")) {
         throw e;
       }
       console.log(`Publish command failed: ${command}`);
