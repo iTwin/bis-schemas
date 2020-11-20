@@ -43,6 +43,11 @@ async function validateIModelSchemas() {
   Logger.initializeToConsole();
   Logger.setLevelDefault(LogLevel.Error);
 
+  if (argv.multiSchema) {
+    await validateMultiSchema(output, argv.multiSchema);
+    return;
+  }
+
   if (argv.schemaUpgradeTesting) {
     let checkAllVersions = false;
     if (argv.checkAllVersions)
@@ -511,6 +516,59 @@ function deleteOldLogFile(outputDir) {
   const filePath = path.join(outputDir, "SchemaUpgrade-Logs.txt");
   if(fs.existsSync(filePath))
     rimraf.sync(filePath);
+}
+
+async function validateMultiSchema(output, testJson) {
+  if (fs.existsSync(testJson)) {
+    const testSchemas = require(testJson);
+    await IModelHost.startup();
+    const requestContext = new BackendRequestContext();
+    const iModelPath = prepareOutputFile();
+    const imodel = SnapshotDb.createEmpty(iModelPath, { rootSubject: { name: "test-imodel" } });
+    const schemaList = await generateReleasedSchemasList(bisSchemaRepo);
+  
+    for (const [schemaGroup, schemas] of Object.entries(testSchemas)) {
+      console.log(chalk.default.cyan(`\n Importing Schemas defined in group: ${schemaGroup}`));
+      for(const testSchema of schemas) {
+        const schemaPath = schemaList.find((s) => s.includes(testSchema));
+        if (schemaPath) {
+          console.log(`Importing Schema            : ${testSchema}`);
+          try {
+            await imodel.importSchemas(requestContext, [schemaPath]);
+          } catch (error) {
+            throw new Error( `Failed to import schema ${testSchema} because ${error.toString()}`);
+          }
+          console.log(chalk.default.green(`Import successful for Schema: ${testSchema}\n`));
+          imodel.saveChanges();
+        } else {
+          console.log(chalk.default.red(`No released schema was found with name: ${testSchema}\n`));
+        }
+      }
+    }
+    console.log(chalk.default.cyan(" Exporting all schemas"));
+    imodel.nativeDb.exportSchemas(exportDir);
+    imodel.close();
+    IModelHost.shutdown();
+    console.log(chalk.default.cyan(`\n Results are available at: ${path.dirname(output)}`));
+  } else {
+    const sampleTestSchemas = {
+      "Building schemas": [
+        "BuildingDataGroupBase.01.00.00.ecschema.xml",
+        "BuildingPhysical.01.00.00.ecschema.xml"
+        ],
+      "Civil Rail Schemas": [
+        "LinearReferencing.02.00.01.ecschema.xml",
+        "RoadRailUnits.01.00.00.ecschema.xml",
+        "RoadRailAlignment.02.00.01.ecschema.xml",
+        "RailPhysical.01.00.00.ecschema.xml"
+      ]
+    };
+    console.log(chalk.default.red(`\n Test Json was not specified or unable to locate it: ${testJson}`));
+    console.log(chalk.default.yellow(`Please specify Json with schemas to test e.g. npm run iModelSchemaValidation -- --multiSchema C:\\test.json`));
+    console.log(chalk.default.yellow(`Below is a sample json:`));
+    console.log(JSON.stringify(sampleTestSchemas, undefined, 4));
+    console.log(chalk.default.red(`\n Tests were not executed due to bad arguments.`));
+  }
 }
 
 validateIModelSchemas().then()
