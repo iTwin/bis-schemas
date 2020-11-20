@@ -159,6 +159,9 @@ To run the 'iModelSchemaValidation' script, follow these steps:
     - To validate only wip schemas: `npm run iModelSchemaValidation -- --wip`
     - To validate a single wip schema: `npm run iModelSchemaValidation -- --wip SCHEMA-NAME`
         - For example to validate the wip BisCore: `npm run iModelSchemaValidation -- --wip BisCore`
+    - To validate multiple schemas at once: `npm run iModelSchemaValidation -- --multiSchema JSON-PATH`
+        - For example to validate the wip BisCore: `npm run iModelSchemaValidation -- --multiSchema C:\schemas.json`
+        - The schemas.json can define group of schemas to be imported in order. Each schema group should list schema and reference schemas in correct order. An example json can be viewed by running `npm run iModelSchemaValidation -- --multiSchema`
     - To save the output logs to a custom location: `npm run iModelSchemaValidation -- --OutDir SOME-DIR`
         - This command can be combined with any other command
         - The default log output directory is: `C:\Users\username\AppData\Local\Temp\SchemaValidation\Briefcases\validation`
