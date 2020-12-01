@@ -2,10 +2,11 @@ trigger:
   branches:
     include:
       - master
+
   paths:
     include:
-      - '/Domains/Core'
-      - '/Standard'
+      - /Domains/Core
+      - /Standard
 
 jobs:
 - job: iModelEvolutionTests
@@ -16,27 +17,33 @@ jobs:
     name: iModelTechCI
     demands: Agent.OS -equals Windows_NT
 
+  variables:
+    srcRoot: $(Agent.BuildDirectory)/bbsrc/
+    outRoot: $(Build.BinariesDirectory)/
+    buildStrategy: 'iModelEvolutionTests;buildall'
+    verbosity: '4'
+    architecture: 'x64'
+    language: 'en'
+
   steps:
   - checkout: self
     clean: true
 
-  - task: bentleysystemsinternal.bentley-build-tasks.setupbbenv.setupbbenv@1
-    displayName: 'Set up BB Environment'
-    inputs:
-      systemAccessToken: '$(Parameters.systemAccessToken)'
-      buildStrategy: 'iModelEvolutionTests;buildall'
-      version: '$(Build.BuildNumber)'
-
   - task: bentleysystemsinternal.bentley-build-tasks.bentleybootstrap.bentleybootstrap@0
     displayName: 'BentleyBootstrap imodel02'
     inputs:
-      streamname: imodel02
+      streamname: 'imodel02'
+      srcroot: $(srcRoot)
 
   - task: bentleysystemsinternal.bentley-build-tasks.bentleybuild.bentleybuild@1
     displayName: 'bb pull'
     inputs:
-      command: pull
+      command: 'pull'
+      strategy: $(buildStrategy)
       linkRepoToSrcRoot: false
+      verbosity: $(verbosity)
+      architecture: $(architecture)
+      language: $(language)
     env:
       AZURE_DEVOPS_EXT_PAT: $(System.AccessToken)
 
@@ -50,3 +57,8 @@ jobs:
     displayName: 'bb build'
     inputs:
       command: build
+      strategy: $(buildStrategy)
+      useLocalizedDir: false
+      verbosity: $(verbosity)
+      architecture: $(architecture)
+      language: $(language)
