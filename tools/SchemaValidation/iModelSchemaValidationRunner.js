@@ -530,7 +530,7 @@ async function validateMultiSchema(output, testJson) {
     for (const [schemaGroup, schemas] of Object.entries(testSchemas)) {
       console.log(chalk.default.cyan(`\n Importing Schemas defined in group: ${schemaGroup}`));
       for(const testSchema of schemas) {
-        const schemaPath = schemaList.find((s) => s.includes(testSchema));
+        const schemaPath = schemaList.find((s) => path.basename(s).startsWith(testSchema));
         if (schemaPath) {
           console.log(`Importing Schema            : ${testSchema}`);
           try {
