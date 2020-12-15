@@ -9,7 +9,7 @@ remarksTarget: GeotechnicalInterpretation.ecschema.md
 The `GeotechnicalInterpretation` schema defines classes that represent data for interpreting the earth's subterranean structure based on (always limited) geotechnical exploration. The `GeotechnicalInterpretation` schema is an *analytical* schema as:
 
 - It models one view of reality and not reality itself.
-- There can be multiple interpretations of the same subsurface region.
+- There can be multiple interpretations of the same subterranean region.
 
 In many workflows, the source data upon which to base an interpretation will be modeled using the `GeotechnicalExploration` schema, which is used to model exploratory data such as boreholes (and their logs).
 
@@ -29,8 +29,8 @@ The overall structure of the Geotechnical Information hierarchy is:
       - 0..N `BoreholeSource`s each with
         - 0..N `Borehole`s
       - 0..N `BoreholeGroup`s (referencing `Borehole`s)
-      - 0..N `SubsurfaceGeneration`s
-      - 0..N `Subsurface`s **Need to determine if this has a submodel or not**
+      - 0..N `GroundGeneration`s **Need to think about this**
+      - 0..N `Ground`s **Need to determine if this has a submodel or not**
         - 1..N `Boundary`s **Need to clarify if 0 is valid**
         - 1..N `Block`s **Need to clarify if 0 is valid**
           - 1..N `Stratum`s **Need to clarify if 0 is valid**
@@ -39,6 +39,7 @@ The overall structure of the Geotechnical Information hierarchy is:
     - 0..N `GeoInterpretationConfiguration`s, each with a `DefinitionModel` sub-model containing:
       - 0..1 `InvestigationMapping`
       - 0..N `Material`s
+      - 0..N `AliasMaterial`s
 
 ### GeotechnicalInterpretationModel
 
@@ -53,8 +54,6 @@ See [GeotechnicalInterpretationPartition](./GeotechnicalInterpretation.remarks.m
 
 `GeotechnicalInterpretationElement`s are spatial in nature (they usually have real-world locations) while `GeotechnicalInformationElement`s are used for non-spatial information.
 Almost all `Element`s in `GeotechnicalInterpretationModel`s subclass from these two classes.
-
-**TBD: Should all `GeotechnicalInterpretationElement`s in the same `bis:Model` have the same `Origin`? Probably not...but need to decide.**
 
 ### GeotechnicalInformationElement
 
@@ -117,7 +116,7 @@ It is desireable - but not required - that all `ILithology`s of the mapped class
 
 `AliasMaterial` exists solely for the purpose of splitting a single `Material` into one or more additional `IMaterial`s. The need for this splitting is due to limitations of either:
 
-- Engines that consumes `Borehole`s and generate `Subsurface`s
+- Engines that consumes `Borehole`s and generate `Ground`s
 - Analysis (or other) applications that assume the material in one `Stratum` never appears in another `Stratum`.
 
 The `AliasFor` navigation property must always be set; the `AliasMaterial` must always refer to a real `Material`.
@@ -127,19 +126,18 @@ An example of the need for an Alias material is when a borehole log shows *Silty
 - Two `AliasMaterial`s, *Silty-Sand 1* and *Silty-Sand 2* could be created (and the original *Silty-Sand* would only be used indirectly); or
 - One `AliasMaterial`, *Silty-Sand 2* could be created (and the original *Silty-Sand* Material would be used both directly and indirectly).
 
-### IBoreholeCollection
+### IBoreholeProvider
 
-`IBoreholeCollection` exists to unify `BoreholeSource` (an exclusive collection of `Borehole`s) and `BoreholeGroup` (a non-exclusive collection of `Borehole`s).
-It is not intended for other subclassing. Consumers of `IBoreholeCollection` will need special case logic to access the `Borehole`s in `BoreholeSource` and `BoreholeGroup`,
-as each holds its constituent `Borehole`s using different relationships.
+`IBoreholeProvider` exists to unify `BoreholeSource` (an exclusive collection of `Borehole`s), `BoreholeGroup` (a non-exclusive collection of `Borehole`s) and any future class that is able to produce a set of `Borehole`s (e.g. perhaps in the future there will be a `BoreholeFilter` concept) for downstream processing.
+
+The TypeScript wrapper for each `IBoreholeProvider` subclass is expected to have a XXXX() method.
 
 ### BoreholeGroup
 
-The use of `BoreholeGroup` is entirely optional.
+The use of `BoreholeGroup` in modeling is entirely optional.
 `BoreholeGroup` provides value where a membership concept that is more flexible than that provided by `BoreholeSource` is required.
 
-The `Borehole`s contained in a `BoreholeGroup` (through the `BoreholeGroupIncludesBorehole` relationship) must be contained in the same `GeotechnicalInterpretationModel`
-as the `BoreholeGroup`.
+The `Borehole`s contained in a `BoreholeGroup` (through the `BoreholeInBoreholeGroup` relationship) must be contained in the same `GeotechnicalInterpretationModel` as the `BoreholeGroup`.
 
 ### BoreholeSource
 
@@ -150,64 +148,64 @@ Every `Borehole` must have a parent `BoreholeSource`.
 ### Borehole
 
 Every `Borehole` must have a parent `BoreholeSource`.
-Additionally, each `Borehole` may belong to zero or more `BoreholeGroup`s (through the `BoreholeGroupIncludesBorehole` relationship).
+Additionally, each `Borehole` may belong to zero or more `BoreholeGroup`s (through the `BoreholeInBoreholeGroup` relationship).
 
-The Origin of a `Borehole` should be the top of the `Borehole`.
-*NEED TO THINK ABOUT THIS....*
+The `Origin` of a `Borehole` should be the top of the `Borehole`. XXXX VERIFY XXXX
 
-The `Location` property is a 3D curve with the start point being the top of the Borehole (ground surface). The `Location` property should always be set.
+The `Location` property is a 3D curve with the start point being the top of the Borehole (ground surface). The `Location` property is in global coordinates.
 
 ### MaterialDepthRange
 
-The `Origin` of a `MaterialDepthRange` should be identical to that of its owning `Borehole`.
+The `Origin` of a `MaterialDepthRange` should be identical to that of its owning `Borehole`. XXXXXXXX VERIFY XXXXXXX
 
-The `DepthTop`, `DepthBase` and `Material` of the `MaterialDepthRange` should always be set. The `Location` is effectively a cache that can be calculated from the other `MaterialDepthRange` properties and the properties in the parent `Borehole`. The *depth* values are actually "downhole distances".
+The `DepthTop`, `DepthBase`, `Material` and `Location` of the `MaterialDepthRange` should always be set. The `Location` is effectively a cache that can be calculated from the other `MaterialDepthRange` properties and the properties in the parent `Borehole`. The *depth* values are actually "downhole distances".
+
+The `Location` property is a 3D curve with the start point corresponding to the `DepthTop`. The `Location` property is in global coordinates.
 
 ### WaterTableDepth
 
-The `Origin` of a `WaterTableDepth` should be identical to that of its owning `Borehole`.
+The `Origin` of a `WaterTableDepth` should be identical to that of its owning `Borehole`.  XXXXXXXX VERIFY XXXXXXX
 
-The `Depth`, of the `WaterTableDepth` should always be set. The `Location` is effectively a cache that can be calculated from the other `Depth` and the properties in the parent `Borehole`.  The `Depth` property actually defines a "downhole distance".
+The `Depth` and `Location` of the `WaterTableDepth` should always be set. The `Location` is effectively a cache that can be calculated from the other `Depth` and the properties in the parent `Borehole`.  The `Depth` property actually defines a "downhole distance".
 
-### ISurface
+The `Location` property is in global coordinates.
 
-`ISurface` is used to unify all of the various types that contain surfaces that can be used for downstream consumption (primarily in `Operation`s). Every `ISurface` is also an `IOperand`. 
 
-*Should the Surface property **always** be defined?*
+### ISurfaceProvider
 
-### IVolume
+`ISurfaceProvider` is used to unify all of the various types that can provide surfaces that can be used for downstream consumption (primarily in `Operation`s). Every `ISurfaceProvider` is also an `IOperand`. 
 
-`IVolume` is used to unify all of the various types that contain volumwa that can be used for downstream consumption (primarily in `Operation`s). Every `IVolume` is also an `IOperand`. 
+The TypeScript wrapper for each `ISurfaceProvider` subclass is expected to have a XXXX() method.
 
-*Should the Volume property **always** be defined?*
+### GenericSurface
 
-### ITerrain
+`GenericSurface` is an `ISurfaceProvider` and hence can be used as input to downstream operations that require that type.
 
-Currently the only `ITerrain` subclass is `TerrainSurface`. In the future it is likely others will be created, such as `TerrainPointCloud` and `TerrainContours`.
+The `Surface` property is always defined, and is in global coordinates.
 
-### TerrainSurface
+### IGroundProvider
 
-`TerrainSurface` is used to unify all of the various types that contain surfaces that can be used for downstream consumption (primarily in `Operation`s). Every `ISurface` is also an `IOperand`. 
+`IGroundProvider` is used to unify all of the various types that can provide `Ground` that can be used for downstream consumption (primarily in `Operation`s). Every `IGroundProvider` is also an `IOperand`. 
 
-*Should the Surface property **always** be defined?*
+The TypeScript wrapper for each `IGroundProvider` subclass is expected to have a XXXX() method.
 
-### Subsurface
+Currently the only `IGroundProvider` subclass is `Ground`. 
 
-`Subsurface` is an `IOperand` that is the result of a subsurface generation operation. `Subsurface` is the head of an Element parent/child tree that looks like this:
+### Ground
 
-- `Subsurface` **Need to determine if this has a submodel or not**
+`Ground` is an `IGroundProvider` that is most commonly the result of a ground generation operation. `Ground` is the head of an Element parent/child tree that looks like this:
+
+- `Ground` **Need to determine if this has a submodel or not**
   - 1..N `Boundary`s **Need to clarify if 0 is valid**
   - 1..N `Block`s **Need to clarify if 0 is valid**
     - 1..N `Stratum`s **Need to clarify if 0 is valid**
     - 0..N `WaterTable`s
 
-### Volume
+### GroundVolume
 
-`Volume` is an abstract concept that exists for future extensibility. Currently, every `Volume` is a `Stratum`, but in the future subclasses to represent tunnels, caves or other items may be added.
+`GroundVolume` is an abstract concept that exists for future extensibility. Currently, every `GroundVolume` is a `Stratum`, but in the future subclasses to represent tunnels, caves or other items may be added.
 
-The `Volume` property contains a cache of the geometry that can be calculated from the `BoundaryBoundsVolume` relationships.  The mesh has a consistent positive normal direction (by the order of the vertices in each triangular face) that faces outward.
-
-**We need to think about how we handle a `Volume` with one or more interior voids**
+The `Volume` property contains a cache of the geometry that can be calculated from the `BoundaryBoundsVolumes` relationships.  The mesh has a consistent positive normal direction (by the order of the vertices in each triangular face) that faces outward. The `Volume` may have interior void.
 
 ### Boundary
 
@@ -220,11 +218,9 @@ Every `Boundary` must have 1 or 2 `BoundaryBoundsVolumes` relationships, as othe
 
 A `Boundary` that has only one `BoundaryBoundsVolumes` relationship is either:
 
-- Part or all of the bottom surface of the `Subsurface`, or
-- Part or all of the top surface (ground level) of the `Subsurface`, or
-- Part or all of a sidewall of the `Subsurface`.
-
-**Is the above statement strictly true? Short-term is it possible for us to have voids?**
+- Part or all of the bottom surface of the `Ground`, or
+- Part or all of the top surface (ground level) of the `Ground`, or
+- Part or all of a sidewall of the `Ground`.
 
 The `Surface` property contains a triangular mesh. The mesh has a consistent positive normal direction (by the order of the vertices in each triangular face). The terms "positive side and "negative side" in the relationships `BoundaryBoundsVolumeOnPositiveSide` and `BoundaryBoundsVolumeOnNegativeSide` refer to this normal.
 
@@ -234,41 +230,56 @@ The `Surface` property contains a triangular mesh. The mesh has a consistent pos
 
 **Do we need to temper the statement above for cases of surface water (lake,etc) or water in subterranean voids?**
 
-Currently there is only a single `Block` in each `Subsurface`, but this will change with more powerful subsurface generation engines.
+Currently there is only a single `Block` in each `Ground`, but this will change with more powerful ground generation engines.
 
 ### Stratum
 
-`Stratum` is currently the only concrete subclass of `Volume`.
+`Stratum` is currently the only concrete subclass of `GroundVolume`.
 
 ### WaterTable
 
 `WaterTable`s may be inconsistent in adjacent `Block`s as the `Block` border may act as a water conduit or barrier.
 
-**Need to figure out how perched water is modeled. Is there a closed surface in WaterTable.Surface?**
+**Meaning and naming of WaterTable is still under discussion.**
 
-**Need to figure out a strategy for naming/tagging seasonal water table variations....or maybe the date of the info to generate the water table?**
+The positive normal of the `Surface` mesh represents the unsaturated soil side of the `Surface` (is usually upward).
 
-The positive normal of the `Surface` mesh represents the unsaturated soil side of the `Surface`.
+### GroundGeneration
 
-### SubsurfaceGeneration
-
-`SubsurfaceSubsurfaceGeneration` xxxxxxxxxxx
+`GroundGeneration` output is defined as `IGroundProvider`. In the no error case, the actual output will be `Ground`.
 
 ### IOperand
 
-`IOperand`s are related to their `Operation`s through the `OperationHasInput` and/or `OperationHasOutput` relationships. An `IOperand` may be used as the input for many `Operation`s, but can only be the output of a single `Operation`.
+`IOperand`s are related to their `Operation`s through the `InputDrivesOperation` and/or `OperationHasOutput` relationships. An `IOperand` may be used as the input for many `Operation`s, but can only be the output of a single `Operation`.
 
-`IOperand`s that are the result of an `Operation` should never be directly modified by the user. These `IOperand`s should only be updated by re-running the `Operation`.
+`IOperand`s that are the (direct or indirect) result of an `Operation` should never be directly modified by the user. These `IOperand`s should only be updated by re-running the `Operation`.
 
 `IOperand`s and `Operation`s form a directed acyclic network.
 
-TBD: organization of complex `Operation` output.
+#### IOperand Subclassing
+
+The general pattern of `IOperand` subclassing is:
+
+- Create an `IXxxProvider` whenever `Xxx` is needed for input (e.g. `ISurfaceProvider`)
+- Use *applies-to* `Element` to give implementation flexibility.
+- The TypeScript wrappers for `IXxxProvider` will have a `getXxx()` method. (e.g. `getSurface()`)
+- Add `IxxxProvider` to the base classes for `IUniversalOperand`
+- If there is a specific `Xxx`-related property (or properties) that multiple `IXxxProvider` subclasses will contain, it *may* be useful to create a specialized descendent mixin class, such as `IXxx`. (e.g. `ISurface`).
+- Create concrete classes that (directly or indirectly) incorporate `IXxxProvider`.
+
+#### Complex IOperand Outputs
+
+`Operation`s always create a *single* ouput `IOperand` that is part of the Operation/Operand network. Sometimes the output `IOperand` is too complex to capture in a single `Element`. In those cases, the output `IOperand` is the head `Element` of the complex output.
+
+#### Editability of IOperands
+
+`IOperand`s that are the output of an operation (directly or indirectly) can only be edited by rerunning the operation that created them.
 
 ### Operation
 
 `Operation`s form the nodes in the directed acyclic graph of `Operation`s/`IOperand`s. Every `Operation` has at least one `IOperand` input and at least one `IOperand` output.
 
-The input `IOperand`s are defined through the `OperationHasInput` relationship. The output `IOperand`s are defined through the `OperationHasOutput` relationship.
+The input `IOperand`s are defined through the `InputDrivesOperation` relationship. The output `IOperand`s are defined through the `OperationHasOutput` relationship.
 
 ### OperationParameters
 
@@ -276,13 +287,25 @@ The input `IOperand`s are defined through the `OperationHasInput` relationship. 
 
 ## Relationship Classes
 
-### OperationHasInput
+### BoreholeInBoreholeGroup
 
-See [Operation](./GeotechnicalInterpretation.remarks.md#Operation) and [IOperand](./GeotechnicalInterpretation.remarks.md#IOperand).
+This relationship is followed during Element-Drives-Element dependency tracing to notify the `BoreholeGroup` of changes to the `Borehole`.
 
-### OperationHasOutput
+### BoreholeSourceOwnsBoreholes
 
-See [Operation](./GeotechnicalInterpretation.remarks.md#Operation) and [IResultOperand](./GeotechnicalInterpretation.remarks.md#IOperand).
+This relationship is followed during Element-Drives-Element dependency tracing to notify the `BoreholeSource` of changes to the `Borehole`.
+
+### MaterialDefinesMaterialDepthRange
+
+This relationship is followed during Element-Drives-Element dependency tracing to notify the `MaterialDepthRange` of changes to the `IMaterial`.
+
+### BoreholeOwnsMaterialDepthRanges
+
+This relationship is followed during Element-Drives-Element dependency tracing to notify the `Borehole` of changes to the `MaterialDepthRange`.
+
+### BoreholeOwnsWaterTableDepths
+
+This relationship is followed during Element-Drives-Element dependency tracing to notify the `Borehole` of changes to the `WaterTableDepth`.
 
 ### BoundaryBoundsVolumes
 
@@ -290,3 +313,26 @@ There are only 2 intended subclasses of `BoundaryBoundsVolumes`:
 
 - `BoundaryBoundsVolumeOnPositiveSide`
 - `BoundaryBoundsVolumeOnNegativeSide`
+
+### BoreholeProviderDrivesGroundGeneration
+
+This relationship is followed during Element-Drives-Element dependency tracing to notify the `GroundGeneration` of changes to the `IBoreholeProvider`.
+
+### TerrainSurfaceDrivesGroundGeneration
+
+This relationship is followed during Element-Drives-Element dependency tracing to notify the `GroundGeneration` of changes to the `ISurfaceProvider`.
+
+### InputDrivesOperation
+
+This relationship is followed during Element-Drives-Element dependency tracing to notify the `Operation` of changes to the `IOperand`.
+
+See also [Operation](./GeotechnicalInterpretation.remarks.md#Operation) and [IOperand](./GeotechnicalInterpretation.remarks.md#IOperand).
+
+### OperationHasOutput
+
+See [Operation](./GeotechnicalInterpretation.remarks.md#Operation) and [IResultOperand](./GeotechnicalInterpretation.remarks.md#IOperand).
+
+### OperationOwnsParameters
+
+This relationship is followed during Element-Drives-Element dependency tracing to notify the `Operation` of changes to the `OperationParameters`.
+
