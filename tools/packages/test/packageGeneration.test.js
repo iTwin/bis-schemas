@@ -2,6 +2,26 @@ const chai = require('chai');
 const pkgGen = require('../packageGeneration.js');
 
 describe('Package Generation', function() {
+  describe('Parse version string tests', function() {
+    it('Parse deprecated `beta` package version', function() {
+      const version = "1.2.3-beta.4";
+      const parsed = pkgGen.parseVersionString(version);
+      chai.expect(parsed.read).to.equal("1");
+      chai.expect(parsed.write).to.equal("2");
+      chai.expect(parsed.patch).to.equal("3");
+      chai.expect(parsed.isBeta).to.equal(true);
+      chai.expect(parsed.beta).to.equal("4");
+    });
+    it('Parse `dev` package version', function() {
+      const version = "1.2.3-dev.4";
+      const parsed = pkgGen.parseVersionString(version);
+      chai.expect(parsed.read).to.equal("1");
+      chai.expect(parsed.write).to.equal("2");
+      chai.expect(parsed.patch).to.equal("3");
+      chai.expect(parsed.isBeta).to.equal(true);
+      chai.expect(parsed.beta).to.equal("4");
+    });
+  }),
   describe('npm view output is properly sorted', function() {
     it('Latest beta first', function() {
       const npmOutput = {

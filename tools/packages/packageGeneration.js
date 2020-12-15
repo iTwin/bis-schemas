@@ -11,7 +11,7 @@ const child_process = require('child_process');
 const createSchemaJson = require("./schemaJsonCreator").createSchemaJson;
 
 function parseVersionString(versionString, time) {
-  const match = versionString.match(/(?<read>\d+)\.(?<write>\d+)\.(?<patch>\d+)(-dev\.(?<betaVersion>\d+))?/);
+  const match = versionString.match(/(?<read>\d+)\.(?<write>\d+)\.(?<patch>\d+)((-dev|-beta)\.(?<betaVersion>\d+))?/);
   if (match) {
     const parsed = {
       read: parseInt(match.groups.read, 10).toString(), 
@@ -212,9 +212,10 @@ async function createPackages(inventoryPath, skipListPath, outDir, packageTempla
         versionInfo = getReleaseVersion(schemaInfo, publishedVersions, alwaysGen);
       } else if (!skipBetaPackages) {
         versionInfo = getNextBetaVersion(schemaInfo, publishedVersions, alwaysGen);
-        // Don't publish beta package if it's also in the released folder
+        // Even if needToPublish is true don't publish beta package if it's also in the released folder
         const released = schemaInfoList.find((info) => info.name === schemaInfo.name && info.version === schemaInfo.version && info.released === true);
-        versionInfo.needToPublish = undefined === released;
+        if (versionInfo.needToPublish)
+          versionInfo.needToPublish = undefined === released;
       }
     
       if (versionInfo.needToPublish) {
@@ -229,4 +230,4 @@ async function createPackages(inventoryPath, skipListPath, outDir, packageTempla
   }
 }
 
-module.exports = {parseNpmOutputAndSort, formatPackageVersion, createPackages, shouldPublish};
+module.exports = {parseNpmOutputAndSort, formatPackageVersion, createPackages, shouldPublish, parseVersionString};
