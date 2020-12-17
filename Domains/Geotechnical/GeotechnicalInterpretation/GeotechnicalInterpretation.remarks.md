@@ -262,8 +262,8 @@ The general pattern of `IOperand` subclassing is:
 
 - Create an `IXxxProvider` whenever `Xxx` is needed for input (e.g. `ISurfaceProvider`)
 - Use *applies-to* `Element` to give implementation flexibility.
-- The TypeScript wrappers for `IXxxProvider` will have a `getXxx()` method. (e.g. `getSurface()`)
-- Add `IxxxProvider` to the base classes for `IUniversalOperand`
+- The TypeScript wrappers for `IXxxProvider` will have a `getXxx()` method. (e.g. `getSurface()`) **Karolis - please comment**
+- Add `IxxxProvider` to the base classes for `UniversalOperand`
 - If there is a specific `Xxx`-related property (or properties) that multiple `IXxxProvider` subclasses will contain, it *may* be useful to create a specialized descendent mixin class, such as `IXxx`. (e.g. `ISurface`).
 - Create concrete classes that (directly or indirectly) incorporate `IXxxProvider`.
 
@@ -284,6 +284,25 @@ The input `IOperand`s are defined through the `InputDrivesOperation` relationshi
 ### OperationParameters
 
 `OperationParameter`s is an `Element` (and `IOperand`) separate from the `Operation` so the standard dependency logic of `IOperand`s and `Operation`s can be used to determine when an `Operation` is out of date relative to its parameters.
+
+### UniversalOperand
+
+`UniversalOperand`s is convenient place to gather (union) all of the `IOperand` subclasses that can be the result of an `Operation`.
+Currently, there are only two expected subclasses of `UniversalOperand`: `EmptyOperand` and `ErrorOperand`
+
+### EmptyOperand
+
+`EmptyOperand` roughly corresponds to the *null* an `Operation` might return if its result (due to the particular inputs) was "nothing".
+It is necessary for an `Operation` to return *something* in that condition to keep the network of `Operations` and `IOperands` intact.
+
+You can think of `EmptyOperand` corresponding to an empty cell in a spreadsheet.
+
+### ErrorOperand
+
+`ErrorOperand` roughly corresponds to an exception or error code an `Operation` might throw/return if its inputs were invalid.
+It is necessary for an `Operation` to return *something* in that condition to keep the network of `Operations` and `IOperands` intact.
+
+You can think of `ErrorOperand` corresponding to an error cell (e.g. *#NAME?* or *#REF!* )in a spreadsheet.
 
 ## Relationship Classes
 
