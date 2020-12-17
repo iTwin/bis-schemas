@@ -56,11 +56,11 @@ It defines occurence of any HVAC, electrical, sanitary or other element within a
 
 ### Spatial Containment
 
-The distribution element should be assigned to the finest granularity [SpatialStructureElement](../SpatialComposition/SpatialComposition.remarks.md#SpatialStructureElement) element it is fully contained in.
+The distribution element should be assigned to the finest granularity [SpatialStructureElement](./SpatialComposition.remarks.md#SpatialStructureElement) element it is fully contained in.
 
-- [Space](../BuildingSpatial/BuildingSpatial.remarks.md#Space) is the default container for a distributionElement
-- [Story](../BuildingSpatial/BuildingSpatial.remarks.md#Story) is the container if distribution element spans multiple spaces
-- [Building](../BuildingSpatial/BuildingSpatial.remarks.md#Building) is the default container when a distribution element spans multiple stories.
+- [Space](./BuildingSpatial.remarks.md#Space) is the default container for a distributionElement
+- [Story](./BuildingSpatial.remarks.md#Story) is the container if distribution element spans multiple spaces
+- [Building](./BuildingSpatial.remarks.md#Building) is the default container when a distribution element spans multiple stories.
 
 ## IDistributionFlowElement
 
