@@ -607,18 +607,25 @@
         </Target>
     </ECRelationshipClass>
 
-<!-- **** TEMPORARILY REMOVE AS IT SEEMS IMODEL DB CANNOT HANDLE HAVING MULTIPLE MIXINS AS BASE CLASSES TO A MIXIN 
-    <ECEntityClass typeName="IUniversalOperand" description="An IOperand that can be used as input for all Operations." modifier="Abstract">
+    <ECEntityClass typeName="UniversalOperand" description="An IOperand that can be used as input for all Operations." modifier="Abstract">
+        <BaseClass>GeotechnicalInformationElement</BaseClass>
         <BaseClass>IOperand</BaseClass>
         <BaseClass>IGroundProvider</BaseClass>
-        <! - - ADD ALL IOPERAND MIXINS (THAT CAN BE OPERATION OR FILTER OUTPUT) AS BASE CLASSES - - >
-        <ECCustomAttributes>
-            <IsMixin xmlns='CoreCustomAttributes.01.00.00'>
-                <AppliesToEntityClass>bis:Element</AppliesToEntityClass>
-            </IsMixin>
-        </ECCustomAttributes>
+        <!-- ADD ALL IOperand MIXINS (THAT CAN BE OPERATION OR FILTER OUTPUT) AS BASE CLASSES -->
     </ECEntityClass>
-********* -->
+
+    <ECEntityClass typeName="EmptyOperand" description="A UniversalOperand representing no-results-produced-by-an-Operation." modifier="Sealed">
+        <BaseClass>UniversalOperand</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="InvalidOperand" description="A UniversalOperand representing error-instead-of-results-produced-by-an-Operation." modifier="Sealed">
+        <BaseClass>UniversalOperand</BaseClass>
+
+        <!-- QUESTION: how do we want to record error information? Is localization an issue? -->
+        <ECProperty propertyName="Error"     typeName="string" displayLabel="Error"   description="Information about the error."/>
+
+    </ECEntityClass>
+
 
     <!-- WILL ADD EmptyOperand and InvalidOperand IN THE NEAR FUTURE-->
 
