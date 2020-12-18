@@ -117,7 +117,7 @@ function getRefpaths(schemas) {
 
 async function getAllSchemas() {
   const bisRoot = getBisRootPath();
-  const allSchemas = await readdirp.promise(bisRoot, {fileFilter: "*.ecschema.xml", directoryFilter: ["!docs", "!node_modules", "!tools", "!.vscode", "!cmaps", "!Deprecated"]});
+  const allSchemas = await readdirp.promise(bisRoot, {fileFilter: "*.ecschema.xml", directoryFilter: ["!docs", "!node_modules", "!tools", "!.vscode", "!cmaps", "!Deprecated", "!test"]});
 
   const schemas = new Set();
   for (const entry of allSchemas) {

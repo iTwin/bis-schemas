@@ -29,7 +29,7 @@ process.on("unhandledRejection", err => {
 async function publishPackages(searchDirectory, isRealRun) {
   const allPackageJsons = await readdirp.promise(searchDirectory, {
     fileFilter: "package.json", 
-    directoryFilter: ["!docs", "!node_modules", "!tools", "!.vscode", "!cmaps", "!packageOut", "!Deprecated"],
+    directoryFilter: ["!docs", "!node_modules", "!tools", "!.vscode", "!cmaps", "!packageOut", "!Deprecated", "!test"],
     type: 'files'
   });
   const allPackages = allPackageJsons.map((pkgJsonPath) => path.dirname(pkgJsonPath.fullPath)).sort();
