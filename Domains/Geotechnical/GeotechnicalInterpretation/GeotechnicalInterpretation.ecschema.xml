@@ -46,7 +46,7 @@
     <!-- ========================================================================================== -->
 
     <ECEntityClass typeName="GeotechnicalInterpretationConfiguration" modifier="Sealed" displayLabel="Geotechnical Interpretation Configuration" description="The configuration for one or more GeoExp:Interpretation.">
-        <BaseClass>Bis:DefinitionContainer</BaseClass>
+        <BaseClass>bis:DefinitionContainer</BaseClass>
     </ECEntityClass>
 
     <ECRelationshipClass typeName="InterpretationHasConfiguration" strength="referencing" modifier="Sealed" description="Relationship to define that a specific GeoInterp:Interpretation has a configuration of GeoInterp:GeotechnicalInterpretationConfiguration.">
@@ -79,12 +79,25 @@
     <!-- ========================== Material-related classes ====================================== -->
 
     <ECEntityClass typeName="IMaterial" modifier="Abstract" displayLabel="IMaterial" description="A geotechnical material, uniform for the purposes of the interpretation.">
+        <!-- ********* This triggers schema validation failure ***
+        <BaseClass>bis:IParentElement</BaseClass> <!- - it will own a RenderMaterial - ->
+        ****-->
         <ECCustomAttributes>
             <IsMixin xmlns="CoreCustomAttributes.01.00.00">
                 <AppliesToEntityClass>bis:DefinitionElement</AppliesToEntityClass>
             </IsMixin>
         </ECCustomAttributes>
     </ECEntityClass>
+
+    <ECRelationshipClass typeName="MaterialOwnsRenderMaterial" strength="embedding" modifier="Sealed" description="Every IMaterial owns a ReferenceMaterial.">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(0..1)" polymorphic="false" roleLabel="owns">
+            <Class class="IMaterial"/>
+        </Source>
+        <Target multiplicity="(1..1)" polymorphic="false" roleLabel="is owned by">
+            <Class class="bis:RenderMaterial"/>
+        </Target>
+    </ECRelationshipClass>
 
     <ECEntityClass typeName="Material" displayLabel="Material" modifier="Sealed" description="A geotechnical material, from the lithography perspective (boring logs, etc.).">
         <BaseClass>bis:DefinitionElement</BaseClass>   
@@ -469,6 +482,17 @@
         </Target>
     </ECRelationshipClass>
 
+    <!-- LayerOrder are always children of Blocks -->
+    <ECRelationshipClass typeName="BlockOwnsLayerOrder" strength="embedding" modifier="Sealed">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(1..1)" polymorphic="false" roleLabel="owns">
+            <Class class="Block"/>
+        </Source>
+        <Target multiplicity="(0..1)" polymorphic="false" roleLabel="is owned by">
+            <Class class="LayerOrder"/>
+        </Target>
+    </ECRelationshipClass>
+
     <ECEntityClass typeName="Stratum" modifier="Sealed" displayLabel="Stratum" description="A GroundVolume representing a stratum of constant material. Always child of Block.">
         <BaseClass>GroundVolume</BaseClass>
 
@@ -491,7 +515,24 @@
         <!-- NEED TO ADD EXTENDED TYPE extendedTypeName="GeometryFlatBuffer" or sim --> 
         <ECProperty propertyName="Surface" displayLabel="Surface" typeName="binary" description="Contiguous surface defining the geometry of the WaterTable. May be closed."/>
     </ECEntityClass>
-   
+
+     <ECEntityClass typeName="LayerOrder" modifier="Sealed" displayLabel="Layer Order" description="An Element representing the order of IMaterials in the Block's Stratums. Always child of Block.">
+        <BaseClass>GeotechnicalInformationElement</BaseClass>
+    </ECEntityClass>
+  
+     <ECRelationshipClass typeName="LayerOrderOrdersMaterials" strength="referencing" modifier="Sealed" description="Relationship to define the order of IMaterials in a Block's Stratums.">
+        <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="orders material" polymorphic="false">
+            <Class class="LayerOrder" />
+        </Source>
+        <!-- QUESTION: Can we have a LayerOrder with no layers? (corresponds to no Stratums in a Block?) -->
+        <Target multiplicity="(0..1)" roleLabel="is ordered by" polymorphic="true">
+            <Class class="IMaterial"/> 
+        </Target>
+        <!-- QUESTION: Do we want 1-based indexing or 0-based indexing? -->
+        <ECProperty propertyName="LayerIndex" typeName="int" displayLabel="Layer Index" description="1-based top-to-bottom index of the layer of the IMaterial"/>
+    </ECRelationshipClass>
+
     <!-- ========================================================================================== -->
     <!-- ========================== GroundGeneration-RELATED CLASSES ============================== -->
     <!-- ========================================================================================== -->
