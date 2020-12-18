@@ -92,6 +92,7 @@ The `MaterialMappedClass` property defines which `ILithology` subclass (and rela
 ### IMaterial
 
 `IMaterial` is a mix-in that is used in classes that can identify the material of a `MaterialDepthRange` of a `Borehole` or the material of a `Stratum`.
+Every `IMaterial` has a `RenderMaterial` child element that controls the appearance of items (such as `Stratum`s and `MaterialDepthRange`s) that use the `IMaterial`.
 
 There are only expected to be two implementations of `IMaterial`:
 
@@ -200,6 +201,7 @@ Currently the only `IGroundProvider` subclass is `Ground`.
   - 1..N `Block`s **Need to clarify if 0 is valid**
     - 1..N `Stratum`s **Need to clarify if 0 is valid**
     - 0..N `WaterTable`s
+    - 0..1 `LayerOrder`
 
 ### GroundVolume
 
@@ -239,6 +241,17 @@ Currently there is only a single `Block` in each `Ground`, but this will change 
 ### WaterTable
 
 `WaterTable`s may be inconsistent in adjacent `Block`s as the `Block` border may act as a water conduit or barrier.
+
+### LayerOrder
+
+`LayerOrder` represents the top-down order of `IMaterials` (through its `LayerOrderOrdersMaterials` relationship) in the `Stratums` in a `Block`.
+A `Block` may or may not have a `LayerOrder` child, as a "layer cake" analogy for the `Stratum`s may not be possible.
+
+The following layer constraints must be met:
+
+- No `IMaterial` appears more than once in the layer ordering.
+- At any vertical line in the `Block` the `IMaterial`s of the intersected `Stratum`s must appear in the same order as in the layer ordering.
+  - However, there may be fewer `Stratum`s than ordered `IMaterial`s, so any ordered `IMaterial` may be "missing" at the vertical line. A missing `IMaterial` can be thought of as an infinitely thin `Stratum`.
 
 **Meaning and naming of WaterTable is still under discussion.**
 
@@ -355,3 +368,6 @@ See [Operation](./GeotechnicalInterpretation.remarks.md#Operation) and [IResultO
 
 This relationship is followed during Element-Drives-Element dependency tracing to notify the `Operation` of changes to the `OperationParameters`.
 
+### LayerOrderOrdersMaterials
+
+The `LayerIndex` property must always be set. No gaps may exist in the index values.
