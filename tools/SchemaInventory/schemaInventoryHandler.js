@@ -97,7 +97,7 @@ async function updateSchemaInventory() {
 }
 
 async function createRepositoryInventory(bisRootDir) {
-  const allSchemas = await readdirp.promise(bisRootDir, {fileFilter: "*.ecschema.xml", directoryFilter: ["!docs", "!node_modules", "!tools", "!.vscode", "!cmaps", "!packageOut", "!Deprecated"]});
+  const allSchemas = await readdirp.promise(bisRootDir, {fileFilter: "*.ecschema.xml", directoryFilter: ["!docs", "!node_modules", "!tools", "!.vscode", "!cmaps", "!packageOut", "!Deprecated", "!test"]});
 
   // Create base inventory based on schema files in the bis-schemas repo
   const repoInventory = {};
