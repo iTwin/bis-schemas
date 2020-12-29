@@ -24,6 +24,7 @@ const StubSchemaXmlFileLocater = require("@bentley/ecschema-locaters").StubSchem
 const SnapshotDb = require("@bentley/imodeljs-backend").SnapshotDb;
 const IModelHost = require("@bentley/imodeljs-backend").IModelHost;
 const BackendRequestContext = require("@bentley/imodeljs-backend").BackendRequestContext;
+const DbResult = require("@bentley/bentleyjs-core").DbResult;
 
 const bisSchemaRepo = getBisRootPath();
 const tempDir = process.env.TMP;
@@ -32,6 +33,7 @@ const iModelName = "testimodel";
 const exportDir = path.join(iModelDir, iModelName, "exported");
 const outputDir = path.join(iModelDir, iModelName, "logs");
 const ignoreFile = path.join(bisSchemaRepo, "ignoreSchemaList.json");
+const snapshotJson = path.join(bisSchemaRepo, "snapshotInformation.json");
 
 async function validateIModelSchemas() {
   const dir = path.join(iModelDir, iModelName);
@@ -45,6 +47,17 @@ async function validateIModelSchemas() {
 
   if (argv.multiSchema) {
     await validateMultiSchema(output, argv.multiSchema);
+    return;
+  }
+
+  if (argv.compareSnapshot || argv.generateSnapshot) {
+    if (argv.compareSnapshot) {
+      const snapshot = await prepareSnapshot();
+      await compareSnapshotsInfo(JSON.stringify(snapshot.previousInfo, null, 2), JSON.stringify(snapshot.currentInfo, null, 2));
+    } else {
+      const snapshot = await prepareSnapshot();
+      await createSnapshotJson(JSON.stringify(snapshot.currentInfo, null, 2), bisSchemaRepo);
+    }
     return;
   }
 
@@ -568,6 +581,88 @@ async function validateMultiSchema(output, testJson) {
     console.log(chalk.default.yellow(`Below is a sample json:`));
     console.log(JSON.stringify(sampleTestSchemas, undefined, 4));
     console.log(chalk.default.red(`\n Tests were not executed due to bad arguments.`));
+  }
+}
+
+/**
+ * Prepare the snapshot for the comparison
+ */
+async function prepareSnapshot() {
+  const bisCoreRegex = /\\BisCore.\d\d.\d\d.\d\d.ecschema.xml/;
+  const functionalRegex = /\\Functional.\d\d.\d\d.\d\d.ecschema.xml/;
+  const schemaDirectories = await generateSchemaDirectoryList(bisSchemaRepo);
+  const releasedSchemasList = findLatestReleasedVersion(await generateReleasedSchemasList(bisSchemaRepo));
+  const requiredSchemas = releasedSchemasList.filter((schema) => bisCoreRegex.test(schema) || functionalRegex.test(schema));
+
+  if (requiredSchemas.length === 2) {
+
+    for (const schema of requiredSchemas) {
+      await importAndExportSchema(schema, schemaDirectories);
+    }
+
+    const snapshotIModel = path.join(iModelDir, iModelName, iModelName + ".bim");
+    const currentInfo = await getSnapshotInfo(snapshotIModel);
+    const previousInfo = require(snapshotJson);
+
+    return {previousInfo, currentInfo};
+
+  } else {
+    throw Error ("Snapshot file preparation failed because 'BisCore' or 'Functional' schema not found.");
+  }
+}
+
+/**
+ * Extracts the information from the bim file
+ * @param snapshotIModel Path of bim file
+ * @returns information of the snapshot imodel
+ */
+async function getSnapshotInfo(snapshotIModel) {
+  const snapshotInfo = [];
+  await IModelHost.startup();
+  const imodel = SnapshotDb.openFile(snapshotIModel);
+
+  console.log("\nExtracting information from the snapshot...");
+  imodel.withPreparedSqliteStatement("SELECT name, type, tbl_name, sql FROM sqlite_master ORDER BY name, tbl_name", (stmt) => {
+    while (DbResult.BE_SQLITE_ROW === stmt.step()) {
+      const row = stmt.getRow();
+      snapshotInfo.push({name: row.name, type: row.type, tableName: row.tbl_name, sql: row.sql});
+    }
+  });
+
+  imodel.close();
+  await IModelHost.shutdown();
+  return snapshotInfo;
+}
+
+/**
+ * Creates the json file having snapshot information
+ * @param snapshotInfo Array containing the information
+ * @param jsonDir Directory where json file should be created
+ */
+async function createSnapshotJson(snapshotInfo, jsonDir) {
+
+  const jsonFile = path.join(jsonDir, "snapshotInformation.json");
+  if(fs.existsSync(jsonFile)) 
+    rimraf.sync(jsonFile);
+
+  fs.writeFileSync(jsonFile, snapshotInfo);
+  console.log("New json file successfully created: " + jsonFile);
+}
+
+/**
+ * Compare the two json files
+ * @param previousInfo Old snapshot json information
+ * @param currentInfo New snapshot json information 
+ */
+async function compareSnapshotsInfo(previousInfo, currentInfo) {
+
+  const command = "'npm run iModelSchemaValidation -- --generateSnapshot'";
+  if(previousInfo === currentInfo){
+    console.log(chalk.default.green("Snapshots are same"));
+  } else {
+    console.log(chalk.default.red("Snapshots are different"));
+    console.log(`Command to regenerate snapshot json: ${chalk.default.yellow(`${command}`)}`);
+    throw Error("Snapshot comparison failed");
   }
 }
 
