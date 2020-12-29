@@ -1,0 +1,1159 @@
+[
+  {
+    "name": "be_EmbedFile",
+    "type": "table",
+    "tableName": "be_EmbedFile",
+    "sql": "CREATE TABLE be_EmbedFile (Id INTEGER PRIMARY KEY,Name CHAR NOT NULL COLLATE NOCASE,Descr CHAR,Type CHAR,Size INT,Chunk INT,LastModified TIMESTAMP, CONSTRAINT nameAndType UNIQUE(Name,Type))"
+  },
+  {
+    "name": "be_Local",
+    "type": "table",
+    "tableName": "be_Local",
+    "sql": "CREATE TABLE be_Local (Name CHAR NOT NULL COLLATE NOCASE UNIQUE,Val BLOB)"
+  },
+  {
+    "name": "be_Prop",
+    "type": "table",
+    "tableName": "be_Prop",
+    "sql": "CREATE TABLE be_Prop (Namespace CHAR NOT NULL,Name CHAR NOT NULL,Id INT NOT NULL,SubId INT NOT NULL,TxnMode Int NOT NULL,StrData CHAR,RawSize INT,Data BLOB,PRIMARY KEY(Namespace,Name,Id,SubId))"
+  },
+  {
+    "name": "bis_CodeSpec",
+    "type": "table",
+    "tableName": "bis_CodeSpec",
+    "sql": "CREATE TABLE [bis_CodeSpec]([Id] INTEGER PRIMARY KEY, [Name] TEXT NOT NULL UNIQUE COLLATE NOCASE, [JsonProperties] TEXT)"
+  },
+  {
+    "name": "bis_DefinitionElement",
+    "type": "table",
+    "tableName": "bis_DefinitionElement",
+    "sql": "CREATE TABLE [bis_DefinitionElement]([ElementId] INTEGER PRIMARY KEY, [ECClassId] INTEGER NOT NULL, [IsPrivate] BOOLEAN, [js1] BLOB, [js2] BLOB, [js3] BLOB, [js4] BLOB, [js5] BLOB, [js6] BLOB, [js7] BLOB, [js8] BLOB, [js9] BLOB, [js10] BLOB, [js11] BLOB, [js12] BLOB, [js13] BLOB, [js14] BLOB, [js15] BLOB, [js16] BLOB, [js17] BLOB, [js18] BLOB, [js19] BLOB, FOREIGN KEY([ElementId]) REFERENCES [bis_Element]([Id]) ON DELETE CASCADE)"
+  },
+  {
+    "name": "bis_Document",
+    "type": "table",
+    "tableName": "bis_Document",
+    "sql": "CREATE TABLE [bis_Document]([ElementId] INTEGER PRIMARY KEY, [ECClassId] INTEGER NOT NULL, [js1] BLOB, [js2] BLOB, [js3] BLOB, [js4] BLOB, FOREIGN KEY([ElementId]) REFERENCES [bis_Element]([Id]) ON DELETE CASCADE)"
+  },
+  {
+    "name": "bis_DocumentCarrier",
+    "type": "table",
+    "tableName": "bis_DocumentCarrier",
+    "sql": "CREATE TABLE [bis_DocumentCarrier]([ElementId] INTEGER PRIMARY KEY, [ECClassId] INTEGER NOT NULL, FOREIGN KEY([ElementId]) REFERENCES [bis_Element]([Id]) ON DELETE CASCADE)"
+  },
+  {
+    "name": "bis_DriverBundleElement",
+    "type": "table",
+    "tableName": "bis_DriverBundleElement",
+    "sql": "CREATE TABLE [bis_DriverBundleElement]([ElementId] INTEGER PRIMARY KEY, [ECClassId] INTEGER NOT NULL, FOREIGN KEY([ElementId]) REFERENCES [bis_Element]([Id]) ON DELETE CASCADE)"
+  },
+  {
+    "name": "bis_Element",
+    "type": "table",
+    "tableName": "bis_Element",
+    "sql": "CREATE TABLE [bis_Element]([Id] INTEGER PRIMARY KEY, [ECClassId] INTEGER NOT NULL, [ModelId] INTEGER NOT NULL, [LastMod] TIMESTAMP NOT NULL DEFAULT(julianday('now')), [CodeSpecId] INTEGER NOT NULL, [CodeScopeId] INTEGER NOT NULL, [CodeValue] TEXT COLLATE NOCASE, [UserLabel] TEXT COLLATE NOCASE, [ParentId] INTEGER, [ParentRelECClassId] INTEGER, [FederationGuid] BLOB UNIQUE, [JsonProperties] TEXT, FOREIGN KEY([ModelId]) REFERENCES [bis_Model]([Id]) ON DELETE NO ACTION, FOREIGN KEY([CodeSpecId]) REFERENCES [bis_CodeSpec]([Id]) ON DELETE NO ACTION, FOREIGN KEY([CodeScopeId]) REFERENCES [bis_Element]([Id]) ON DELETE NO ACTION, FOREIGN KEY([ParentId]) REFERENCES [bis_Element]([Id]) ON DELETE NO ACTION)"
+  },
+  {
+    "name": "bis_ElementDrivesElement",
+    "type": "table",
+    "tableName": "bis_ElementDrivesElement",
+    "sql": "CREATE TABLE [bis_ElementDrivesElement]([Id] INTEGER PRIMARY KEY, [ECClassId] INTEGER NOT NULL, [SourceId] INTEGER, [TargetId] INTEGER, [Status] INTEGER, [Priority] INTEGER)"
+  },
+  {
+    "name": "bis_ElementMultiAspect",
+    "type": "table",
+    "tableName": "bis_ElementMultiAspect",
+    "sql": "CREATE TABLE [bis_ElementMultiAspect]([Id] INTEGER PRIMARY KEY, [ECClassId] INTEGER NOT NULL, [ElementId] INTEGER NOT NULL, [ElementRelECClassId] INTEGER NOT NULL, [ps1] BLOB, [ps2] BLOB, [ps3] BLOB, [ps4] BLOB, [ps5] BLOB, [ps6] BLOB, FOREIGN KEY([ElementId]) REFERENCES [bis_Element]([Id]) ON DELETE CASCADE)"
+  },
+  {
+    "name": "bis_ElementRefersToElements",
+    "type": "table",
+    "tableName": "bis_ElementRefersToElements",
+    "sql": "CREATE TABLE [bis_ElementRefersToElements]([Id] INTEGER PRIMARY KEY, [ECClassId] INTEGER NOT NULL, [SourceId] INTEGER, [TargetId] INTEGER, [ps1] BLOB)"
+  },
+  {
+    "name": "bis_ElementUniqueAspect",
+    "type": "table",
+    "tableName": "bis_ElementUniqueAspect",
+    "sql": "CREATE TABLE [bis_ElementUniqueAspect]([Id] INTEGER PRIMARY KEY, [ECClassId] INTEGER NOT NULL, [ElementId] INTEGER NOT NULL, [ElementRelECClassId] INTEGER NOT NULL, [ps1] BLOB, FOREIGN KEY([ElementId]) REFERENCES [bis_Element]([Id]) ON DELETE CASCADE)"
+  },
+  {
+    "name": "bis_Element_CurrentTimeStamp",
+    "type": "trigger",
+    "tableName": "bis_Element",
+    "sql": "CREATE TRIGGER [bis_Element_CurrentTimeStamp] AFTER UPDATE ON [bis_Element] WHEN old.[LastMod]=new.[LastMod] AND old.[LastMod]!=julianday('now') BEGIN UPDATE [bis_Element] SET [LastMod]=julianday('now') WHERE [Id]=new.[Id]; END"
+  },
+  {
+    "name": "bis_GeometricElement2d",
+    "type": "table",
+    "tableName": "bis_GeometricElement2d",
+    "sql": "CREATE TABLE [bis_GeometricElement2d]([ElementId] INTEGER PRIMARY KEY, [ECClassId] INTEGER NOT NULL, [CategoryId] INTEGER NOT NULL, [Origin_X] REAL, [Origin_Y] REAL, [Rotation] REAL, [BBoxLow_X] REAL, [BBoxLow_Y] REAL, [BBoxHigh_X] REAL, [BBoxHigh_Y] REAL, [GeometryStream] BLOB, [TypeDefinitionId] INTEGER, [TypeDefinitionRelECClassId] INTEGER, [js1] BLOB, [js2] BLOB, FOREIGN KEY([ElementId]) REFERENCES [bis_Element]([Id]) ON DELETE CASCADE, FOREIGN KEY([CategoryId]) REFERENCES [bis_Element]([Id]) ON DELETE NO ACTION, FOREIGN KEY([TypeDefinitionId]) REFERENCES [bis_Element]([Id]) ON DELETE SET NULL)"
+  },
+  {
+    "name": "bis_GeometricElement3d",
+    "type": "table",
+    "tableName": "bis_GeometricElement3d",
+    "sql": "CREATE TABLE [bis_GeometricElement3d]([ElementId] INTEGER PRIMARY KEY, [ECClassId] INTEGER NOT NULL, [CategoryId] INTEGER NOT NULL, [InSpatialIndex] BOOLEAN, [Origin_X] REAL, [Origin_Y] REAL, [Origin_Z] REAL, [Yaw] REAL, [Pitch] REAL, [Roll] REAL, [BBoxLow_X] REAL, [BBoxLow_Y] REAL, [BBoxLow_Z] REAL, [BBoxHigh_X] REAL, [BBoxHigh_Y] REAL, [BBoxHigh_Z] REAL, [GeometryStream] BLOB, [TypeDefinitionId] INTEGER, [TypeDefinitionRelECClassId] INTEGER, [js1] BLOB, [js2] BLOB, [js3] BLOB, [js4] BLOB, [js5] BLOB, FOREIGN KEY([ElementId]) REFERENCES [bis_Element]([Id]) ON DELETE CASCADE, FOREIGN KEY([CategoryId]) REFERENCES [bis_Element]([Id]) ON DELETE NO ACTION, FOREIGN KEY([TypeDefinitionId]) REFERENCES [bis_Element]([Id]) ON DELETE SET NULL)"
+  },
+  {
+    "name": "bis_InformationPartitionElement",
+    "type": "table",
+    "tableName": "bis_InformationPartitionElement",
+    "sql": "CREATE TABLE [bis_InformationPartitionElement]([ElementId] INTEGER PRIMARY KEY, [ECClassId] INTEGER NOT NULL, [Description] TEXT, FOREIGN KEY([ElementId]) REFERENCES [bis_Element]([Id]) ON DELETE CASCADE)"
+  },
+  {
+    "name": "bis_InformationRecordElement",
+    "type": "table",
+    "tableName": "bis_InformationRecordElement",
+    "sql": "CREATE TABLE [bis_InformationRecordElement]([ElementId] INTEGER PRIMARY KEY, [ECClassId] INTEGER NOT NULL, FOREIGN KEY([ElementId]) REFERENCES [bis_Element]([Id]) ON DELETE CASCADE)"
+  },
+  {
+    "name": "bis_InformationReferenceElement",
+    "type": "table",
+    "tableName": "bis_InformationReferenceElement",
+    "sql": "CREATE TABLE [bis_InformationReferenceElement]([ElementId] INTEGER PRIMARY KEY, [ECClassId] INTEGER NOT NULL, [js1] BLOB, [js2] BLOB, [js3] BLOB, FOREIGN KEY([ElementId]) REFERENCES [bis_Element]([Id]) ON DELETE CASCADE)"
+  },
+  {
+    "name": "bis_Model",
+    "type": "table",
+    "tableName": "bis_Model",
+    "sql": "CREATE TABLE [bis_Model]([Id] INTEGER PRIMARY KEY, [ECClassId] INTEGER NOT NULL, [ParentModelId] INTEGER, [ModeledElementId] INTEGER, [ModeledElementRelECClassId] INTEGER, [IsPrivate] BOOLEAN, [IsTemplate] BOOLEAN, [JsonProperties] TEXT, [LastMod] TIMESTAMP, [ps1] BLOB, [ps2] BLOB, [ps3] BLOB, FOREIGN KEY([ParentModelId]) REFERENCES [bis_Model]([Id]) ON DELETE NO ACTION, FOREIGN KEY([ModeledElementId]) REFERENCES [bis_Element]([Id]) ON DELETE NO ACTION)"
+  },
+  {
+    "name": "bis_ModelSelectorRefersToModels",
+    "type": "table",
+    "tableName": "bis_ModelSelectorRefersToModels",
+    "sql": "CREATE TABLE [bis_ModelSelectorRefersToModels]([Id] INTEGER PRIMARY KEY, [SourceId] INTEGER, [TargetId] INTEGER)"
+  },
+  {
+    "name": "delete_embeddedFiles",
+    "type": "trigger",
+    "tableName": "be_EmbedFile",
+    "sql": "CREATE TRIGGER delete_embeddedFiles AFTER DELETE ON be_EmbedFile BEGIN DELETE FROM be_Prop WHERE Namespace=\"be_Db\" AND NAME=\"EmbdBlob\" AND Id=OLD.Id; END"
+  },
+  {
+    "name": "dgn_Domain",
+    "type": "table",
+    "tableName": "dgn_Domain",
+    "sql": "CREATE TABLE dgn_Domain (Name TEXT NOT NULL UNIQUE COLLATE NoCase PRIMARY KEY,Description TEXT,Version INTEGER)"
+  },
+  {
+    "name": "dgn_Font",
+    "type": "table",
+    "tableName": "dgn_Font",
+    "sql": "CREATE TABLE dgn_Font (Id INTEGER PRIMARY KEY,Type INT,Name CHAR NOT NULL COLLATE NOCASE,Metadata BLOB,CONSTRAINT names UNIQUE(Type,Name))"
+  },
+  {
+    "name": "dgn_Handler",
+    "type": "table",
+    "tableName": "dgn_Handler",
+    "sql": "CREATE TABLE dgn_Handler (ClassId INTEGER PRIMARY KEY,Domain TEXT NOT NULL COLLATE NoCase REFERENCES dgn_Domain(Name),Name TEXT NOT NULL COLLATE NoCase,Permissions INTEGER,CONSTRAINT names UNIQUE(Domain,Name))"
+  },
+  {
+    "name": "dgn_Rebase",
+    "type": "table",
+    "tableName": "dgn_Rebase",
+    "sql": "CREATE TABLE dgn_Rebase (Id INTEGER PRIMARY KEY AUTOINCREMENT, Rebase BLOB)"
+  },
+  {
+    "name": "dgn_SpatialIndex",
+    "type": "table",
+    "tableName": "dgn_SpatialIndex",
+    "sql": "CREATE VIRTUAL TABLE dgn_SpatialIndex USING rtree(ElementId,MinX,MaxX,MinY,MaxY,MinZ,MaxZ)"
+  },
+  {
+    "name": "dgn_SpatialIndex_node",
+    "type": "table",
+    "tableName": "dgn_SpatialIndex_node",
+    "sql": "CREATE TABLE \"dgn_SpatialIndex_node\"(nodeno INTEGER PRIMARY KEY,data)"
+  },
+  {
+    "name": "dgn_SpatialIndex_parent",
+    "type": "table",
+    "tableName": "dgn_SpatialIndex_parent",
+    "sql": "CREATE TABLE \"dgn_SpatialIndex_parent\"(nodeno INTEGER PRIMARY KEY,parentnode)"
+  },
+  {
+    "name": "dgn_SpatialIndex_rowid",
+    "type": "table",
+    "tableName": "dgn_SpatialIndex_rowid",
+    "sql": "CREATE TABLE \"dgn_SpatialIndex_rowid\"(rowid INTEGER PRIMARY KEY,nodeno)"
+  },
+  {
+    "name": "dgn_Txns",
+    "type": "table",
+    "tableName": "dgn_Txns",
+    "sql": "CREATE TABLE dgn_Txns (Id INTEGER PRIMARY KEY NOT NULL,Deleted BOOLEAN,Grouped BOOLEAN,Operation TEXT,IsSchemaChange BOOLEAN,Time TIMESTAMP DEFAULT(julianday('now')),Change BLOB)"
+  },
+  {
+    "name": "dgn_fts_ad",
+    "type": "trigger",
+    "tableName": "dgn_fts_content",
+    "sql": "CREATE TRIGGER dgn_fts_ad AFTER DELETE ON dgn_fts_content BEGIN INSERT INTO dgn_fts_idx(dgn_fts_idx,rowid,Type,Id,Text) VALUES('delete',old.rowid,old.Type,old.Id,old.Text); END"
+  },
+  {
+    "name": "dgn_fts_ai",
+    "type": "trigger",
+    "tableName": "dgn_fts_content",
+    "sql": "CREATE TRIGGER dgn_fts_ai AFTER INSERT ON dgn_fts_content BEGIN INSERT INTO dgn_fts_idx(rowid,Type,Id,Text) VALUES(new.rowid,new.Type,new.Id,new.Text); END"
+  },
+  {
+    "name": "dgn_fts_au",
+    "type": "trigger",
+    "tableName": "dgn_fts_content",
+    "sql": "CREATE TRIGGER dgn_fts_au AFTER UPDATE ON dgn_fts_content BEGIN INSERT INTO dgn_fts_idx(dgn_fts_idx,rowid,Type,Id,Text) VALUES('delete',old.rowid,old.Type,old.Id,old.Text); INSERT INTO dgn_fts_idx(rowid,Type,Id,Text) VALUES(new.rowid,new.Type,new.Id,new.Text); END"
+  },
+  {
+    "name": "dgn_fts_content",
+    "type": "table",
+    "tableName": "dgn_fts_content",
+    "sql": "CREATE TABLE dgn_fts_content (Type NOT NULL,Id INTEGER NOT NULL,Text NOT NULL,PRIMARY KEY (Type,Id))"
+  },
+  {
+    "name": "dgn_fts_idx",
+    "type": "table",
+    "tableName": "dgn_fts_idx",
+    "sql": "CREATE VIRTUAL TABLE dgn_fts_idx using fts5(Type UNINDEXED,Id UNINDEXED,Text,content=dgn_fts_content,content_rowid=rowid)"
+  },
+  {
+    "name": "dgn_fts_idx_config",
+    "type": "table",
+    "tableName": "dgn_fts_idx_config",
+    "sql": "CREATE TABLE 'dgn_fts_idx_config'(k PRIMARY KEY, v) WITHOUT ROWID"
+  },
+  {
+    "name": "dgn_fts_idx_data",
+    "type": "table",
+    "tableName": "dgn_fts_idx_data",
+    "sql": "CREATE TABLE 'dgn_fts_idx_data'(id INTEGER PRIMARY KEY, block BLOB)"
+  },
+  {
+    "name": "dgn_fts_idx_docsize",
+    "type": "table",
+    "tableName": "dgn_fts_idx_docsize",
+    "sql": "CREATE TABLE 'dgn_fts_idx_docsize'(id INTEGER PRIMARY KEY, sz BLOB)"
+  },
+  {
+    "name": "dgn_fts_idx_idx",
+    "type": "table",
+    "tableName": "dgn_fts_idx_idx",
+    "sql": "CREATE TABLE 'dgn_fts_idx_idx'(segid, term, pgno, PRIMARY KEY(segid, term)) WITHOUT ROWID"
+  },
+  {
+    "name": "dgn_prjrange_del",
+    "type": "trigger",
+    "tableName": "bis_GeometricElement3d",
+    "sql": "CREATE TRIGGER dgn_prjrange_del AFTER DELETE ON bis_GeometricElement3d BEGIN DELETE FROM dgn_SpatialIndex WHERE ElementId=old.ElementId;END"
+  },
+  {
+    "name": "dgn_rtree_ins",
+    "type": "trigger",
+    "tableName": "bis_GeometricElement3d",
+    "sql": "CREATE TRIGGER dgn_rtree_ins AFTER INSERT ON bis_GeometricElement3d WHEN new.Origin_X IS NOT NULL AND  1 = new.InSpatialIndex BEGIN INSERT INTO dgn_SpatialIndex(ElementId,minx,maxx,miny,maxy,minz,maxz) SELECT new.ElementId,DGN_bbox_value(bb,0),DGN_bbox_value(bb,3),DGN_bbox_value(bb,1),DGN_bbox_value(bb,4),DGN_bbox_value(bb,2),DGN_bbox_value(bb,5) FROM (SELECT DGN_placement_aabb(DGN_placement(DGN_point(NEW.Origin_X,NEW.Origin_Y,NEW.Origin_Z),DGN_angles(NEW.Yaw,NEW.Pitch,NEW.Roll),DGN_bbox(NEW.BBoxLow_X,NEW.BBoxLow_Y,NEW.BBoxLow_Z,NEW.BBoxHigh_X,NEW.BBoxHigh_Y,NEW.BBoxHigh_Z))) as bb);END"
+  },
+  {
+    "name": "dgn_rtree_upd",
+    "type": "trigger",
+    "tableName": "bis_GeometricElement3d",
+    "sql": "CREATE TRIGGER dgn_rtree_upd AFTER UPDATE OF Origin_X,Origin_Y,Origin_Z,Yaw,Pitch,Roll,BBoxLow_X,BBoxLow_Y,BBoxLow_Z,BBoxHigh_X,BBoxHigh_Y,BBoxHigh_Z ON bis_GeometricElement3d WHEN new.Origin_X IS NOT NULL AND  1 = new.InSpatialIndex BEGIN INSERT OR REPLACE INTO dgn_SpatialIndex(ElementId,minx,maxx,miny,maxy,minz,maxz) SELECT new.ElementId,DGN_bbox_value(bb,0),DGN_bbox_value(bb,3),DGN_bbox_value(bb,1),DGN_bbox_value(bb,4),DGN_bbox_value(bb,2),DGN_bbox_value(bb,5) FROM (SELECT DGN_placement_aabb(DGN_placement(DGN_point(NEW.Origin_X,NEW.Origin_Y,NEW.Origin_Z),DGN_angles(NEW.Yaw,NEW.Pitch,NEW.Roll),DGN_bbox(NEW.BBoxLow_X,NEW.BBoxLow_Y,NEW.BBoxLow_Z,NEW.BBoxHigh_X,NEW.BBoxHigh_Y,NEW.BBoxHigh_Z))) as bb);END"
+  },
+  {
+    "name": "dgn_rtree_upd1",
+    "type": "trigger",
+    "tableName": "bis_GeometricElement3d",
+    "sql": "CREATE TRIGGER dgn_rtree_upd1 AFTER UPDATE OF Origin_X,Origin_Y,Origin_Z,Yaw,Pitch,Roll,BBoxLow_X,BBoxLow_Y,BBoxLow_Z,BBoxHigh_X,BBoxHigh_Y,BBoxHigh_Z ON bis_GeometricElement3d WHEN OLD.Origin_X IS NOT NULL AND NEW.Origin_X IS NULL BEGIN DELETE FROM dgn_SpatialIndex WHERE ElementId=OLD.ElementId;END"
+  },
+  {
+    "name": "ec_Class",
+    "type": "table",
+    "tableName": "ec_Class",
+    "sql": "CREATE TABLE ec_Class(Id INTEGER PRIMARY KEY,SchemaId INTEGER NOT NULL REFERENCES ec_Schema(Id) ON DELETE CASCADE,Name TEXT NOT NULL COLLATE NOCASE,DisplayLabel TEXT,Description TEXT,Type INTEGER NOT NULL,Modifier INTEGER NOT NULL,RelationshipStrength INTEGER,RelationshipStrengthDirection INTEGER,CustomAttributeContainerType INTEGER)"
+  },
+  {
+    "name": "ec_ClassHasBaseClasses",
+    "type": "table",
+    "tableName": "ec_ClassHasBaseClasses",
+    "sql": "CREATE TABLE ec_ClassHasBaseClasses(Id INTEGER PRIMARY KEY,ClassId INTEGER NOT NULL REFERENCES ec_Class(Id) ON DELETE CASCADE,BaseClassId INTEGER NOT NULL REFERENCES ec_Class(Id) ON DELETE CASCADE,Ordinal INTEGER NOT NULL)"
+  },
+  {
+    "name": "ec_ClassMap",
+    "type": "table",
+    "tableName": "ec_ClassMap",
+    "sql": "CREATE TABLE ec_ClassMap(ClassId INTEGER PRIMARY KEY REFERENCES ec_Class(Id) ON DELETE CASCADE,MapStrategy INTEGER NOT NULL,ShareColumnsMode INTEGER,MaxSharedColumnsBeforeOverflow INTEGER,JoinedTableInfo INTEGER)"
+  },
+  {
+    "name": "ec_Column",
+    "type": "table",
+    "tableName": "ec_Column",
+    "sql": "CREATE TABLE ec_Column(Id INTEGER PRIMARY KEY,TableId INTEGER NOT NULL REFERENCES ec_Table(Id) ON DELETE CASCADE,Name TEXT NOT NULL COLLATE NOCASE,Type INTEGER NOT NULL,IsVirtual BOOLEAN NOT NULL CHECK (IsVirtual IN (0,1)),Ordinal INTEGER NOT NULL,NotNullConstraint BOOLEAN NOT NULL CHECK (NotNullConstraint IN (0,1)),UniqueConstraint BOOLEAN NOT NULL CHECK (UniqueConstraint IN (0,1)),CheckConstraint TEXT COLLATE NOCASE,DefaultConstraint TEXT COLLATE NOCASE,CollationConstraint INTEGER NOT NULL,OrdinalInPrimaryKey INTEGER,ColumnKind INTEGER NOT NULL)"
+  },
+  {
+    "name": "ec_CustomAttribute",
+    "type": "table",
+    "tableName": "ec_CustomAttribute",
+    "sql": "CREATE TABLE ec_CustomAttribute(Id INTEGER PRIMARY KEY,ClassId INTEGER NOT NULL REFERENCES ec_Class(Id) ON DELETE CASCADE,ContainerId INTEGER NOT NULL,ContainerType INTEGER NOT NULL,Ordinal INTEGER NOT NULL,Instance TEXT NOT NULL)"
+  },
+  {
+    "name": "ec_Enumeration",
+    "type": "table",
+    "tableName": "ec_Enumeration",
+    "sql": "CREATE TABLE ec_Enumeration(Id INTEGER PRIMARY KEY,SchemaId INTEGER NOT NULL REFERENCES ec_Schema(Id) ON DELETE CASCADE,Name TEXT NOT NULL COLLATE NOCASE,DisplayLabel TEXT,Description TEXT,UnderlyingPrimitiveType INTEGER NOT NULL,IsStrict BOOLEAN NOT NULL CHECK(IsStrict IN (0,1)),EnumValues TEXT NOT NULL)"
+  },
+  {
+    "name": "ec_Format",
+    "type": "table",
+    "tableName": "ec_Format",
+    "sql": "CREATE TABLE ec_Format(Id INTEGER PRIMARY KEY,SchemaId INTEGER NOT NULL REFERENCES ec_Schema(Id) ON DELETE CASCADE,Name TEXT NOT NULL COLLATE NOCASE,DisplayLabel TEXT,Description TEXT,NumericSpec TEXT,CompositeSpec TEXT)"
+  },
+  {
+    "name": "ec_FormatCompositeUnit",
+    "type": "table",
+    "tableName": "ec_FormatCompositeUnit",
+    "sql": "CREATE TABLE ec_FormatCompositeUnit(Id INTEGER PRIMARY KEY,FormatId INTEGER NOT NULL REFERENCES ec_Format(Id) ON DELETE CASCADE,Label TEXT,UnitId INTEGER REFERENCES ec_Unit(Id) ON DELETE NO ACTION,Ordinal INTEGER NOT NULL)"
+  },
+  {
+    "name": "ec_Index",
+    "type": "table",
+    "tableName": "ec_Index",
+    "sql": "CREATE TABLE ec_Index(Id INTEGER PRIMARY KEY,Name TEXT UNIQUE NOT NULL COLLATE NOCASE,TableId INTEGER NOT NULL REFERENCES ec_Table(Id) ON DELETE CASCADE,IsUnique BOOLEAN NOT NULL CHECK (IsUnique IN (0,1)),AddNotNullWhereExp BOOLEAN NOT NULL CHECK (AddNotNullWhereExp IN (0,1)), IsAutoGenerated BOOLEAN NOT NULL CHECK (IsAutoGenerated IN (0,1)),ClassId INTEGER REFERENCES ec_Class(Id) ON DELETE CASCADE,AppliesToSubclassesIfPartial BOOLEAN NOT NULL CHECK (AppliesToSubclassesIfPartial IN (0,1)))"
+  },
+  {
+    "name": "ec_IndexColumn",
+    "type": "table",
+    "tableName": "ec_IndexColumn",
+    "sql": "CREATE TABLE ec_IndexColumn(Id INTEGER PRIMARY KEY,IndexId INTEGER NOT NULL REFERENCES ec_Index (Id) ON DELETE CASCADE,ColumnId INTEGER NOT NULL REFERENCES ec_Column (Id) ON DELETE CASCADE,Ordinal INTEGER NOT NULL)"
+  },
+  {
+    "name": "ec_KindOfQuantity",
+    "type": "table",
+    "tableName": "ec_KindOfQuantity",
+    "sql": "CREATE TABLE ec_KindOfQuantity(Id INTEGER PRIMARY KEY,SchemaId INTEGER NOT NULL REFERENCES ec_Schema(Id) ON DELETE CASCADE,Name TEXT NOT NULL COLLATE NOCASE,DisplayLabel TEXT,Description TEXT,PersistenceUnit TEXT NOT NULL,RelativeError REAL NOT NULL,PresentationUnits TEXT)"
+  },
+  {
+    "name": "ec_Phenomenon",
+    "type": "table",
+    "tableName": "ec_Phenomenon",
+    "sql": "CREATE TABLE ec_Phenomenon(Id INTEGER PRIMARY KEY,SchemaId INTEGER NOT NULL REFERENCES ec_Schema(Id) ON DELETE CASCADE,Name TEXT NOT NULL COLLATE NOCASE,DisplayLabel TEXT,Description TEXT,Definition TEXT NOT NULL)"
+  },
+  {
+    "name": "ec_Property",
+    "type": "table",
+    "tableName": "ec_Property",
+    "sql": "CREATE TABLE ec_Property(Id INTEGER PRIMARY KEY,ClassId INTEGER NOT NULL REFERENCES ec_Class(Id) ON DELETE CASCADE,Name TEXT NOT NULL COLLATE NOCASE,DisplayLabel TEXT,Description TEXT,IsReadonly BOOLEAN NOT NULL CHECK (IsReadonly IN (0,1)),Priority INTEGER,Ordinal INTEGER NOT NULL,Kind INTEGER NOT NULL,PrimitiveType INTEGER,PrimitiveTypeMinLength INTEGER,PrimitiveTypeMaxLength INTEGER,PrimitiveTypeMinValue NUMERIC,PrimitiveTypeMaxValue NUMERIC,EnumerationId INTEGER REFERENCES ec_Enumeration(Id) ON DELETE CASCADE,StructClassId INTEGER REFERENCES ec_Class(Id) ON DELETE CASCADE,ExtendedTypeName TEXT,KindOfQuantityId INTEGER REFERENCES ec_KindOfQuantity(Id) ON DELETE CASCADE,CategoryId INTEGER REFERENCES ec_PropertyCategory(Id) ON DELETE CASCADE,ArrayMinOccurs INTEGER,ArrayMaxOccurs INTEGER,NavigationRelationshipClassId INTEGER REFERENCES ec_Class(Id) ON DELETE CASCADE,NavigationDirection INTEGER)"
+  },
+  {
+    "name": "ec_PropertyCategory",
+    "type": "table",
+    "tableName": "ec_PropertyCategory",
+    "sql": "CREATE TABLE ec_PropertyCategory(Id INTEGER PRIMARY KEY,SchemaId INTEGER NOT NULL REFERENCES ec_Schema(Id) ON DELETE CASCADE,Name TEXT NOT NULL COLLATE NOCASE,DisplayLabel TEXT,Description TEXT,Priority INTEGER)"
+  },
+  {
+    "name": "ec_PropertyMap",
+    "type": "table",
+    "tableName": "ec_PropertyMap",
+    "sql": "CREATE TABLE ec_PropertyMap(Id INTEGER PRIMARY KEY,ClassId INTEGER NOT NULL REFERENCES ec_ClassMap(ClassId) ON DELETE CASCADE,PropertyPathId INTEGER NOT NULL REFERENCES ec_PropertyPath(Id) ON DELETE CASCADE,ColumnId INTEGER NOT NULL REFERENCES ec_Column(Id) ON DELETE CASCADE)"
+  },
+  {
+    "name": "ec_PropertyPath",
+    "type": "table",
+    "tableName": "ec_PropertyPath",
+    "sql": "CREATE TABLE ec_PropertyPath(Id INTEGER PRIMARY KEY,RootPropertyId INTEGER NOT NULL REFERENCES ec_Property(Id) ON DELETE CASCADE,AccessString TEXT NOT NULL COLLATE NOCASE)"
+  },
+  {
+    "name": "ec_RelationshipConstraint",
+    "type": "table",
+    "tableName": "ec_RelationshipConstraint",
+    "sql": "CREATE TABLE ec_RelationshipConstraint(Id INTEGER PRIMARY KEY,RelationshipClassId INTEGER NOT NULL REFERENCES ec_Class(Id) ON DELETE CASCADE,RelationshipEnd INTEGER NOT NULL,MultiplicityLowerLimit INTEGER NOT NULL,MultiplicityUpperLimit INTEGER,IsPolymorphic BOOLEAN NOT NULL CHECK (IsPolymorphic IN (0,1)),RoleLabel TEXT,AbstractConstraintClassId INTEGER REFERENCES ec_Class(Id) ON DELETE SET NULL)"
+  },
+  {
+    "name": "ec_RelationshipConstraintClass",
+    "type": "table",
+    "tableName": "ec_RelationshipConstraintClass",
+    "sql": "CREATE TABLE ec_RelationshipConstraintClass(Id INTEGER PRIMARY KEY,ConstraintId INTEGER NOT NULL REFERENCES ec_RelationshipConstraint(Id) ON DELETE CASCADE,ClassId INTEGER NOT NULL REFERENCES ec_Class(Id) ON DELETE CASCADE)"
+  },
+  {
+    "name": "ec_Schema",
+    "type": "table",
+    "tableName": "ec_Schema",
+    "sql": "CREATE TABLE ec_Schema(Id INTEGER PRIMARY KEY,Name TEXT UNIQUE NOT NULL COLLATE NOCASE,DisplayLabel TEXT,Description TEXT,Alias TEXT UNIQUE NOT NULL COLLATE NOCASE,VersionDigit1 INTEGER NOT NULL,VersionDigit2 INTEGER NOT NULL,VersionDigit3 INTEGER NOT NULL,OriginalECXmlVersionMajor INTEGER,OriginalECXmlVersionMinor INTEGER)"
+  },
+  {
+    "name": "ec_SchemaReference",
+    "type": "table",
+    "tableName": "ec_SchemaReference",
+    "sql": "CREATE TABLE ec_SchemaReference(Id INTEGER PRIMARY KEY,SchemaId INTEGER REFERENCES ec_Schema(Id) ON DELETE CASCADE,ReferencedSchemaId INTEGER REFERENCES ec_Schema(Id) ON DELETE CASCADE)"
+  },
+  {
+    "name": "ec_Table",
+    "type": "table",
+    "tableName": "ec_Table",
+    "sql": "CREATE TABLE ec_Table(Id INTEGER PRIMARY KEY,ParentTableId INTEGER REFERENCES ec_Table(Id) ON DELETE CASCADE,Name TEXT UNIQUE NOT NULL COLLATE NOCASE,Type INTEGER NOT NULL,ExclusiveRootClassId INTEGER REFERENCES ec_Class(Id) ON DELETE SET NULL,UpdatableViewName TEXT)"
+  },
+  {
+    "name": "ec_Unit",
+    "type": "table",
+    "tableName": "ec_Unit",
+    "sql": "CREATE TABLE ec_Unit(Id INTEGER PRIMARY KEY,SchemaId INTEGER NOT NULL REFERENCES ec_Schema(Id) ON DELETE CASCADE,Name TEXT NOT NULL COLLATE NOCASE,DisplayLabel TEXT,Description TEXT,PhenomenonId INTEGER NOT NULL REFERENCES ec_Phenomenon(Id) ON DELETE NO ACTION,UnitSystemId INTEGER REFERENCES ec_UnitSystem(Id) ON DELETE NO ACTION,Definition TEXT COLLATE NOCASE,Numerator REAL,Denominator REAL,Offset REAL,IsConstant BOOLEAN,InvertingUnitId INTEGER REFERENCES ec_Unit(Id) ON DELETE NO ACTION)"
+  },
+  {
+    "name": "ec_UnitSystem",
+    "type": "table",
+    "tableName": "ec_UnitSystem",
+    "sql": "CREATE TABLE ec_UnitSystem(Id INTEGER PRIMARY KEY,SchemaId INTEGER NOT NULL REFERENCES ec_Schema(Id) ON DELETE CASCADE,Name TEXT NOT NULL COLLATE NOCASE,DisplayLabel TEXT,Description TEXT)"
+  },
+  {
+    "name": "ec_cache_ClassHasTables",
+    "type": "table",
+    "tableName": "ec_cache_ClassHasTables",
+    "sql": "CREATE TABLE ec_cache_ClassHasTables(Id INTEGER PRIMARY KEY,ClassId INTEGER NOT NULL REFERENCES ec_Class(Id) ON DELETE CASCADE,TableId INTEGER NOT NULL REFERENCES ec_Table(Id) ON DELETE CASCADE)"
+  },
+  {
+    "name": "ec_cache_ClassHierarchy",
+    "type": "table",
+    "tableName": "ec_cache_ClassHierarchy",
+    "sql": "CREATE TABLE ec_cache_ClassHierarchy(Id INTEGER PRIMARY KEY,ClassId INTEGER NOT NULL REFERENCES ec_Class(Id) ON DELETE CASCADE,BaseClassId INTEGER NOT NULL REFERENCES ec_Class(Id) ON DELETE CASCADE)"
+  },
+  {
+    "name": "ecdbf_ExternalFileInfo",
+    "type": "table",
+    "tableName": "ecdbf_ExternalFileInfo",
+    "sql": "CREATE TABLE [ecdbf_ExternalFileInfo]([Id] INTEGER PRIMARY KEY, [ECClassId] INTEGER NOT NULL, [Name] TEXT, [Size] INTEGER, [Description] TEXT, [LastModified] TIMESTAMP, [RootFolder] INTEGER, [RelativePath] TEXT)"
+  },
+  {
+    "name": "ecdbf_FileInfoOwnership",
+    "type": "table",
+    "tableName": "ecdbf_FileInfoOwnership",
+    "sql": "CREATE TABLE [ecdbf_FileInfoOwnership]([Id] INTEGER PRIMARY KEY, [OwnerId] INTEGER NOT NULL, [OwnerECClassId] INTEGER NOT NULL, [FileInfoId] INTEGER NOT NULL, [FileInfoECClassId] INTEGER NOT NULL)"
+  },
+  {
+    "name": "ix_bis_DefinitionElement_ecclassid",
+    "type": "index",
+    "tableName": "bis_DefinitionElement",
+    "sql": "CREATE INDEX [ix_bis_DefinitionElement_ecclassid] ON [bis_DefinitionElement]([ECClassId])"
+  },
+  {
+    "name": "ix_bis_DocumentCarrier_ecclassid",
+    "type": "index",
+    "tableName": "bis_DocumentCarrier",
+    "sql": "CREATE INDEX [ix_bis_DocumentCarrier_ecclassid] ON [bis_DocumentCarrier]([ECClassId])"
+  },
+  {
+    "name": "ix_bis_Document_ecclassid",
+    "type": "index",
+    "tableName": "bis_Document",
+    "sql": "CREATE INDEX [ix_bis_Document_ecclassid] ON [bis_Document]([ECClassId])"
+  },
+  {
+    "name": "ix_bis_DriverBundleElement_ecclassid",
+    "type": "index",
+    "tableName": "bis_DriverBundleElement",
+    "sql": "CREATE INDEX [ix_bis_DriverBundleElement_ecclassid] ON [bis_DriverBundleElement]([ECClassId])"
+  },
+  {
+    "name": "ix_bis_ElementDrivesElement_ecclassid",
+    "type": "index",
+    "tableName": "bis_ElementDrivesElement",
+    "sql": "CREATE INDEX [ix_bis_ElementDrivesElement_ecclassid] ON [bis_ElementDrivesElement]([ECClassId])"
+  },
+  {
+    "name": "ix_bis_ElementDrivesElement_target",
+    "type": "index",
+    "tableName": "bis_ElementDrivesElement",
+    "sql": "CREATE INDEX [ix_bis_ElementDrivesElement_target] ON [bis_ElementDrivesElement]([TargetId])"
+  },
+  {
+    "name": "ix_bis_ElementMultiAspect_ElementRelECClassId",
+    "type": "index",
+    "tableName": "bis_ElementMultiAspect",
+    "sql": "CREATE INDEX [ix_bis_ElementMultiAspect_ElementRelECClassId] ON [bis_ElementMultiAspect]([ElementRelECClassId])"
+  },
+  {
+    "name": "ix_bis_ElementMultiAspect_ecclassid",
+    "type": "index",
+    "tableName": "bis_ElementMultiAspect",
+    "sql": "CREATE INDEX [ix_bis_ElementMultiAspect_ecclassid] ON [bis_ElementMultiAspect]([ECClassId])"
+  },
+  {
+    "name": "ix_bis_ElementMultiAspect_fk_bis_ElementOwnsMultiAspects_target",
+    "type": "index",
+    "tableName": "bis_ElementMultiAspect",
+    "sql": "CREATE INDEX [ix_bis_ElementMultiAspect_fk_bis_ElementOwnsMultiAspects_target] ON [bis_ElementMultiAspect]([ElementId])"
+  },
+  {
+    "name": "ix_bis_ElementRefersToElements_ecclassid",
+    "type": "index",
+    "tableName": "bis_ElementRefersToElements",
+    "sql": "CREATE INDEX [ix_bis_ElementRefersToElements_ecclassid] ON [bis_ElementRefersToElements]([ECClassId])"
+  },
+  {
+    "name": "ix_bis_ElementRefersToElements_target",
+    "type": "index",
+    "tableName": "bis_ElementRefersToElements",
+    "sql": "CREATE INDEX [ix_bis_ElementRefersToElements_target] ON [bis_ElementRefersToElements]([TargetId])"
+  },
+  {
+    "name": "ix_bis_ElementUniqueAspect_ElementRelECClassId",
+    "type": "index",
+    "tableName": "bis_ElementUniqueAspect",
+    "sql": "CREATE INDEX [ix_bis_ElementUniqueAspect_ElementRelECClassId] ON [bis_ElementUniqueAspect]([ElementRelECClassId])"
+  },
+  {
+    "name": "ix_bis_ElementUniqueAspect_ecclassid",
+    "type": "index",
+    "tableName": "bis_ElementUniqueAspect",
+    "sql": "CREATE INDEX [ix_bis_ElementUniqueAspect_ecclassid] ON [bis_ElementUniqueAspect]([ECClassId])"
+  },
+  {
+    "name": "ix_bis_ElementUniqueAspect_fk_bis_ElementOwnsUniqueAspect_target",
+    "type": "index",
+    "tableName": "bis_ElementUniqueAspect",
+    "sql": "CREATE INDEX [ix_bis_ElementUniqueAspect_fk_bis_ElementOwnsUniqueAspect_target] ON [bis_ElementUniqueAspect]([ElementId])"
+  },
+  {
+    "name": "ix_bis_Element_Code",
+    "type": "index",
+    "tableName": "bis_Element",
+    "sql": "CREATE UNIQUE INDEX [ix_bis_Element_Code] ON [bis_Element]([CodeSpecId], [CodeScopeId], [CodeValue])"
+  },
+  {
+    "name": "ix_bis_Element_FederationGuid",
+    "type": "index",
+    "tableName": "bis_Element",
+    "sql": "CREATE UNIQUE INDEX [ix_bis_Element_FederationGuid] ON [bis_Element]([FederationGuid]) WHERE ([FederationGuid] IS NOT NULL)"
+  },
+  {
+    "name": "ix_bis_Element_ParentRelECClassId",
+    "type": "index",
+    "tableName": "bis_Element",
+    "sql": "CREATE INDEX [ix_bis_Element_ParentRelECClassId] ON [bis_Element]([ParentRelECClassId]) WHERE ([ParentRelECClassId] IS NOT NULL)"
+  },
+  {
+    "name": "ix_bis_Element_UserLabel",
+    "type": "index",
+    "tableName": "bis_Element",
+    "sql": "CREATE INDEX [ix_bis_Element_UserLabel] ON [bis_Element]([UserLabel]) WHERE ([UserLabel] IS NOT NULL)"
+  },
+  {
+    "name": "ix_bis_Element_ecclassid",
+    "type": "index",
+    "tableName": "bis_Element",
+    "sql": "CREATE INDEX [ix_bis_Element_ecclassid] ON [bis_Element]([ECClassId])"
+  },
+  {
+    "name": "ix_bis_Element_fk_bis_CodeSpecSpecifiesCode_target",
+    "type": "index",
+    "tableName": "bis_Element",
+    "sql": "CREATE INDEX [ix_bis_Element_fk_bis_CodeSpecSpecifiesCode_target] ON [bis_Element]([CodeSpecId])"
+  },
+  {
+    "name": "ix_bis_Element_fk_bis_ElementOwnsChildElements_target",
+    "type": "index",
+    "tableName": "bis_Element",
+    "sql": "CREATE INDEX [ix_bis_Element_fk_bis_ElementOwnsChildElements_target] ON [bis_Element]([ParentId]) WHERE ([ParentId] IS NOT NULL)"
+  },
+  {
+    "name": "ix_bis_Element_fk_bis_ElementScopesCode_target",
+    "type": "index",
+    "tableName": "bis_Element",
+    "sql": "CREATE INDEX [ix_bis_Element_fk_bis_ElementScopesCode_target] ON [bis_Element]([CodeScopeId])"
+  },
+  {
+    "name": "ix_bis_Element_fk_bis_ModelContainsElements_target",
+    "type": "index",
+    "tableName": "bis_Element",
+    "sql": "CREATE INDEX [ix_bis_Element_fk_bis_ModelContainsElements_target] ON [bis_Element]([ModelId])"
+  },
+  {
+    "name": "ix_bis_EmbeddedFileLink_Name",
+    "type": "index",
+    "tableName": "bis_InformationReferenceElement",
+    "sql": "CREATE INDEX [ix_bis_EmbeddedFileLink_Name] ON [bis_InformationReferenceElement]([js1]) WHERE ECClassId=166"
+  },
+  {
+    "name": "ix_bis_ExternalSourceAspect_Identifier",
+    "type": "index",
+    "tableName": "bis_ElementMultiAspect",
+    "sql": "CREATE INDEX [ix_bis_ExternalSourceAspect_Identifier] ON [bis_ElementMultiAspect]([ps2]) WHERE ECClassId=163"
+  },
+  {
+    "name": "ix_bis_ExternalSourceAspect_Source",
+    "type": "index",
+    "tableName": "bis_ElementMultiAspect",
+    "sql": "CREATE INDEX [ix_bis_ExternalSourceAspect_Source] ON [bis_ElementMultiAspect]([ps1], [ps2], [ps3]) WHERE ECClassId=163"
+  },
+  {
+    "name": "ix_bis_GeometricElement2d_TypeDefinitionRelECClassId",
+    "type": "index",
+    "tableName": "bis_GeometricElement2d",
+    "sql": "CREATE INDEX [ix_bis_GeometricElement2d_TypeDefinitionRelECClassId] ON [bis_GeometricElement2d]([TypeDefinitionRelECClassId]) WHERE ([TypeDefinitionRelECClassId] IS NOT NULL)"
+  },
+  {
+    "name": "ix_bis_GeometricElement2d_ecclassid",
+    "type": "index",
+    "tableName": "bis_GeometricElement2d",
+    "sql": "CREATE INDEX [ix_bis_GeometricElement2d_ecclassid] ON [bis_GeometricElement2d]([ECClassId])"
+  },
+  {
+    "name": "ix_bis_GeometricElement2d_fk_bis_GeometricElement2dHasTypeDefinition_source",
+    "type": "index",
+    "tableName": "bis_GeometricElement2d",
+    "sql": "CREATE INDEX [ix_bis_GeometricElement2d_fk_bis_GeometricElement2dHasTypeDefinition_source] ON [bis_GeometricElement2d]([TypeDefinitionId]) WHERE ([TypeDefinitionId] IS NOT NULL)"
+  },
+  {
+    "name": "ix_bis_GeometricElement2d_fk_bis_GeometricElement2dIsInCategory_source",
+    "type": "index",
+    "tableName": "bis_GeometricElement2d",
+    "sql": "CREATE INDEX [ix_bis_GeometricElement2d_fk_bis_GeometricElement2dIsInCategory_source] ON [bis_GeometricElement2d]([CategoryId])"
+  },
+  {
+    "name": "ix_bis_GeometricElement3d_TypeDefinitionRelECClassId",
+    "type": "index",
+    "tableName": "bis_GeometricElement3d",
+    "sql": "CREATE INDEX [ix_bis_GeometricElement3d_TypeDefinitionRelECClassId] ON [bis_GeometricElement3d]([TypeDefinitionRelECClassId]) WHERE ([TypeDefinitionRelECClassId] IS NOT NULL)"
+  },
+  {
+    "name": "ix_bis_GeometricElement3d_ecclassid",
+    "type": "index",
+    "tableName": "bis_GeometricElement3d",
+    "sql": "CREATE INDEX [ix_bis_GeometricElement3d_ecclassid] ON [bis_GeometricElement3d]([ECClassId])"
+  },
+  {
+    "name": "ix_bis_GeometricElement3d_fk_bis_GeometricElement3dHasTypeDefinition_source",
+    "type": "index",
+    "tableName": "bis_GeometricElement3d",
+    "sql": "CREATE INDEX [ix_bis_GeometricElement3d_fk_bis_GeometricElement3dHasTypeDefinition_source] ON [bis_GeometricElement3d]([TypeDefinitionId]) WHERE ([TypeDefinitionId] IS NOT NULL)"
+  },
+  {
+    "name": "ix_bis_GeometricElement3d_fk_bis_GeometricElement3dIsInCategory_source",
+    "type": "index",
+    "tableName": "bis_GeometricElement3d",
+    "sql": "CREATE INDEX [ix_bis_GeometricElement3d_fk_bis_GeometricElement3dIsInCategory_source] ON [bis_GeometricElement3d]([CategoryId])"
+  },
+  {
+    "name": "ix_bis_InformationPartitionElement_ecclassid",
+    "type": "index",
+    "tableName": "bis_InformationPartitionElement",
+    "sql": "CREATE INDEX [ix_bis_InformationPartitionElement_ecclassid] ON [bis_InformationPartitionElement]([ECClassId])"
+  },
+  {
+    "name": "ix_bis_InformationRecordElement_ecclassid",
+    "type": "index",
+    "tableName": "bis_InformationRecordElement",
+    "sql": "CREATE INDEX [ix_bis_InformationRecordElement_ecclassid] ON [bis_InformationRecordElement]([ECClassId])"
+  },
+  {
+    "name": "ix_bis_InformationReferenceElement_ecclassid",
+    "type": "index",
+    "tableName": "bis_InformationReferenceElement",
+    "sql": "CREATE INDEX [ix_bis_InformationReferenceElement_ecclassid] ON [bis_InformationReferenceElement]([ECClassId])"
+  },
+  {
+    "name": "ix_bis_ModelSelectorRefersToModels_source",
+    "type": "index",
+    "tableName": "bis_ModelSelectorRefersToModels",
+    "sql": "CREATE INDEX [ix_bis_ModelSelectorRefersToModels_source] ON [bis_ModelSelectorRefersToModels]([SourceId])"
+  },
+  {
+    "name": "ix_bis_ModelSelectorRefersToModels_target",
+    "type": "index",
+    "tableName": "bis_ModelSelectorRefersToModels",
+    "sql": "CREATE INDEX [ix_bis_ModelSelectorRefersToModels_target] ON [bis_ModelSelectorRefersToModels]([TargetId])"
+  },
+  {
+    "name": "ix_bis_Model_ModeledElementRelECClassId",
+    "type": "index",
+    "tableName": "bis_Model",
+    "sql": "CREATE INDEX [ix_bis_Model_ModeledElementRelECClassId] ON [bis_Model]([ModeledElementRelECClassId]) WHERE ([ModeledElementRelECClassId] IS NOT NULL)"
+  },
+  {
+    "name": "ix_bis_Model_ecclassid",
+    "type": "index",
+    "tableName": "bis_Model",
+    "sql": "CREATE INDEX [ix_bis_Model_ecclassid] ON [bis_Model]([ECClassId])"
+  },
+  {
+    "name": "ix_bis_Model_fk_bis_ModelOwnsSubModel_target",
+    "type": "index",
+    "tableName": "bis_Model",
+    "sql": "CREATE INDEX [ix_bis_Model_fk_bis_ModelOwnsSubModel_target] ON [bis_Model]([ParentModelId]) WHERE ([ParentModelId] IS NOT NULL)"
+  },
+  {
+    "name": "ix_bis_UrlLink_Url",
+    "type": "index",
+    "tableName": "bis_InformationReferenceElement",
+    "sql": "CREATE INDEX [ix_bis_UrlLink_Url] ON [bis_InformationReferenceElement]([js1]) WHERE ECClassId=201 OR ECClassId=202"
+  },
+  {
+    "name": "ix_ec_ClassHasBaseClasses_BaseClassId",
+    "type": "index",
+    "tableName": "ec_ClassHasBaseClasses",
+    "sql": "CREATE INDEX ix_ec_ClassHasBaseClasses_BaseClassId ON ec_ClassHasBaseClasses(BaseClassId)"
+  },
+  {
+    "name": "ix_ec_Class_Name",
+    "type": "index",
+    "tableName": "ec_Class",
+    "sql": "CREATE INDEX ix_ec_Class_Name ON ec_Class(Name)"
+  },
+  {
+    "name": "ix_ec_Class_SchemaId_Name",
+    "type": "index",
+    "tableName": "ec_Class",
+    "sql": "CREATE INDEX ix_ec_Class_SchemaId_Name ON ec_Class(SchemaId,Name)"
+  },
+  {
+    "name": "ix_ec_CustomAttribute_ClassId",
+    "type": "index",
+    "tableName": "ec_CustomAttribute",
+    "sql": "CREATE INDEX ix_ec_CustomAttribute_ClassId ON ec_CustomAttribute(ClassId)"
+  },
+  {
+    "name": "ix_ec_Enumeration_Name",
+    "type": "index",
+    "tableName": "ec_Enumeration",
+    "sql": "CREATE INDEX ix_ec_Enumeration_Name ON ec_Enumeration(Name)"
+  },
+  {
+    "name": "ix_ec_Enumeration_SchemaId",
+    "type": "index",
+    "tableName": "ec_Enumeration",
+    "sql": "CREATE INDEX ix_ec_Enumeration_SchemaId ON ec_Enumeration(SchemaId)"
+  },
+  {
+    "name": "ix_ec_FormatCompositeUnit_UnitId",
+    "type": "index",
+    "tableName": "ec_FormatCompositeUnit",
+    "sql": "CREATE INDEX ix_ec_FormatCompositeUnit_UnitId ON ec_FormatCompositeUnit(UnitId)"
+  },
+  {
+    "name": "ix_ec_Format_Name",
+    "type": "index",
+    "tableName": "ec_Format",
+    "sql": "CREATE INDEX ix_ec_Format_Name ON ec_Format(Name)"
+  },
+  {
+    "name": "ix_ec_Format_SchemaId",
+    "type": "index",
+    "tableName": "ec_Format",
+    "sql": "CREATE INDEX ix_ec_Format_SchemaId ON ec_Format(SchemaId)"
+  },
+  {
+    "name": "ix_ec_IndexColumn_ColumnId",
+    "type": "index",
+    "tableName": "ec_IndexColumn",
+    "sql": "CREATE INDEX ix_ec_IndexColumn_ColumnId ON ec_IndexColumn(ColumnId)"
+  },
+  {
+    "name": "ix_ec_IndexColumn_IndexId_Ordinal",
+    "type": "index",
+    "tableName": "ec_IndexColumn",
+    "sql": "CREATE INDEX ix_ec_IndexColumn_IndexId_Ordinal ON ec_IndexColumn(IndexId,Ordinal)"
+  },
+  {
+    "name": "ix_ec_Index_ClassId",
+    "type": "index",
+    "tableName": "ec_Index",
+    "sql": "CREATE INDEX ix_ec_Index_ClassId ON ec_Index(ClassId)"
+  },
+  {
+    "name": "ix_ec_Index_TableId",
+    "type": "index",
+    "tableName": "ec_Index",
+    "sql": "CREATE INDEX ix_ec_Index_TableId ON ec_Index(TableId)"
+  },
+  {
+    "name": "ix_ec_KindOfQuantity_Name",
+    "type": "index",
+    "tableName": "ec_KindOfQuantity",
+    "sql": "CREATE INDEX ix_ec_KindOfQuantity_Name ON ec_KindOfQuantity(Name)"
+  },
+  {
+    "name": "ix_ec_KindOfQuantity_SchemaId",
+    "type": "index",
+    "tableName": "ec_KindOfQuantity",
+    "sql": "CREATE INDEX ix_ec_KindOfQuantity_SchemaId ON ec_KindOfQuantity(SchemaId)"
+  },
+  {
+    "name": "ix_ec_Phenomenon_Name",
+    "type": "index",
+    "tableName": "ec_Phenomenon",
+    "sql": "CREATE INDEX ix_ec_Phenomenon_Name ON ec_Phenomenon(Name)"
+  },
+  {
+    "name": "ix_ec_Phenomenon_SchemaId",
+    "type": "index",
+    "tableName": "ec_Phenomenon",
+    "sql": "CREATE INDEX ix_ec_Phenomenon_SchemaId ON ec_Phenomenon(SchemaId)"
+  },
+  {
+    "name": "ix_ec_PropertyCategory_Name",
+    "type": "index",
+    "tableName": "ec_PropertyCategory",
+    "sql": "CREATE INDEX ix_ec_PropertyCategory_Name ON ec_PropertyCategory(Name)"
+  },
+  {
+    "name": "ix_ec_PropertyCategory_SchemaId",
+    "type": "index",
+    "tableName": "ec_PropertyCategory",
+    "sql": "CREATE INDEX ix_ec_PropertyCategory_SchemaId ON ec_PropertyCategory(SchemaId)"
+  },
+  {
+    "name": "ix_ec_PropertyMap_ColumnId",
+    "type": "index",
+    "tableName": "ec_PropertyMap",
+    "sql": "CREATE INDEX ix_ec_PropertyMap_ColumnId ON ec_PropertyMap(ColumnId)"
+  },
+  {
+    "name": "ix_ec_PropertyMap_PropertyPathId",
+    "type": "index",
+    "tableName": "ec_PropertyMap",
+    "sql": "CREATE INDEX ix_ec_PropertyMap_PropertyPathId ON ec_PropertyMap(PropertyPathId)"
+  },
+  {
+    "name": "ix_ec_Property_CategoryId",
+    "type": "index",
+    "tableName": "ec_Property",
+    "sql": "CREATE INDEX ix_ec_Property_CategoryId ON ec_Property(CategoryId)"
+  },
+  {
+    "name": "ix_ec_Property_EnumerationId",
+    "type": "index",
+    "tableName": "ec_Property",
+    "sql": "CREATE INDEX ix_ec_Property_EnumerationId ON ec_Property(EnumerationId)"
+  },
+  {
+    "name": "ix_ec_Property_KindOfQuantityId",
+    "type": "index",
+    "tableName": "ec_Property",
+    "sql": "CREATE INDEX ix_ec_Property_KindOfQuantityId ON ec_Property(KindOfQuantityId)"
+  },
+  {
+    "name": "ix_ec_Property_Name",
+    "type": "index",
+    "tableName": "ec_Property",
+    "sql": "CREATE INDEX ix_ec_Property_Name ON ec_Property(Name)"
+  },
+  {
+    "name": "ix_ec_Property_NavigationRelationshipClassId",
+    "type": "index",
+    "tableName": "ec_Property",
+    "sql": "CREATE INDEX ix_ec_Property_NavigationRelationshipClassId ON ec_Property(NavigationRelationshipClassId)"
+  },
+  {
+    "name": "ix_ec_Property_StructClassId",
+    "type": "index",
+    "tableName": "ec_Property",
+    "sql": "CREATE INDEX ix_ec_Property_StructClassId ON ec_Property(StructClassId)"
+  },
+  {
+    "name": "ix_ec_RelationshipConstraintClass_ClassId",
+    "type": "index",
+    "tableName": "ec_RelationshipConstraintClass",
+    "sql": "CREATE INDEX ix_ec_RelationshipConstraintClass_ClassId ON ec_RelationshipConstraintClass(ClassId)"
+  },
+  {
+    "name": "ix_ec_RelationshipConstraint_AbstractConstraintClassId",
+    "type": "index",
+    "tableName": "ec_RelationshipConstraint",
+    "sql": "CREATE INDEX ix_ec_RelationshipConstraint_AbstractConstraintClassId ON ec_RelationshipConstraint(AbstractConstraintClassId)"
+  },
+  {
+    "name": "ix_ec_SchemaReference_ReferencedSchemaId",
+    "type": "index",
+    "tableName": "ec_SchemaReference",
+    "sql": "CREATE INDEX ix_ec_SchemaReference_ReferencedSchemaId ON ec_SchemaReference(ReferencedSchemaId)"
+  },
+  {
+    "name": "ix_ec_Table_ExclusiveRootClassId",
+    "type": "index",
+    "tableName": "ec_Table",
+    "sql": "CREATE INDEX ix_ec_Table_ExclusiveRootClassId ON ec_Table(ExclusiveRootClassId)"
+  },
+  {
+    "name": "ix_ec_Table_ParentTableId",
+    "type": "index",
+    "tableName": "ec_Table",
+    "sql": "CREATE INDEX ix_ec_Table_ParentTableId ON ec_Table(ParentTableId)"
+  },
+  {
+    "name": "ix_ec_UnitSystem_Name",
+    "type": "index",
+    "tableName": "ec_UnitSystem",
+    "sql": "CREATE INDEX ix_ec_UnitSystem_Name ON ec_UnitSystem(Name)"
+  },
+  {
+    "name": "ix_ec_UnitSystem_SchemaId",
+    "type": "index",
+    "tableName": "ec_UnitSystem",
+    "sql": "CREATE INDEX ix_ec_UnitSystem_SchemaId ON ec_UnitSystem(SchemaId)"
+  },
+  {
+    "name": "ix_ec_Unit_InvertingUnitId",
+    "type": "index",
+    "tableName": "ec_Unit",
+    "sql": "CREATE INDEX ix_ec_Unit_InvertingUnitId ON ec_Unit(InvertingUnitId)"
+  },
+  {
+    "name": "ix_ec_Unit_Name",
+    "type": "index",
+    "tableName": "ec_Unit",
+    "sql": "CREATE INDEX ix_ec_Unit_Name ON ec_Unit(Name)"
+  },
+  {
+    "name": "ix_ec_Unit_PhenomenonId",
+    "type": "index",
+    "tableName": "ec_Unit",
+    "sql": "CREATE INDEX ix_ec_Unit_PhenomenonId ON ec_Unit(PhenomenonId)"
+  },
+  {
+    "name": "ix_ec_Unit_SchemaId",
+    "type": "index",
+    "tableName": "ec_Unit",
+    "sql": "CREATE INDEX ix_ec_Unit_SchemaId ON ec_Unit(SchemaId)"
+  },
+  {
+    "name": "ix_ec_Unit_UnitSystemId",
+    "type": "index",
+    "tableName": "ec_Unit",
+    "sql": "CREATE INDEX ix_ec_Unit_UnitSystemId ON ec_Unit(UnitSystemId)"
+  },
+  {
+    "name": "ix_ec_cache_ClassHasTables_ClassId_TableId",
+    "type": "index",
+    "tableName": "ec_cache_ClassHasTables",
+    "sql": "CREATE INDEX ix_ec_cache_ClassHasTables_ClassId_TableId ON ec_cache_ClassHasTables(ClassId)"
+  },
+  {
+    "name": "ix_ec_cache_ClassHasTables_TableId",
+    "type": "index",
+    "tableName": "ec_cache_ClassHasTables",
+    "sql": "CREATE INDEX ix_ec_cache_ClassHasTables_TableId ON ec_cache_ClassHasTables(TableId)"
+  },
+  {
+    "name": "ix_ec_cache_ClassHierarchy_BaseClassId",
+    "type": "index",
+    "tableName": "ec_cache_ClassHierarchy",
+    "sql": "CREATE INDEX ix_ec_cache_ClassHierarchy_BaseClassId ON ec_cache_ClassHierarchy(BaseClassId)"
+  },
+  {
+    "name": "ix_ec_cache_ClassHierarchy_ClassId",
+    "type": "index",
+    "tableName": "ec_cache_ClassHierarchy",
+    "sql": "CREATE INDEX ix_ec_cache_ClassHierarchy_ClassId ON ec_cache_ClassHierarchy(ClassId)"
+  },
+  {
+    "name": "ix_ecdbf_ExternalFileInfo_ecclassid",
+    "type": "index",
+    "tableName": "ecdbf_ExternalFileInfo",
+    "sql": "CREATE INDEX [ix_ecdbf_ExternalFileInfo_ecclassid] ON [ecdbf_ExternalFileInfo]([ECClassId])"
+  },
+  {
+    "name": "ix_ecdbf_fileinfoownership_ownerecclassid",
+    "type": "index",
+    "tableName": "ecdbf_FileInfoOwnership",
+    "sql": "CREATE INDEX [ix_ecdbf_fileinfoownership_ownerecclassid] ON [ecdbf_FileInfoOwnership]([OwnerECClassId])"
+  },
+  {
+    "name": "sqlite_autoindex_be_EmbedFile_1",
+    "type": "index",
+    "tableName": "be_EmbedFile"
+  },
+  {
+    "name": "sqlite_autoindex_be_Local_1",
+    "type": "index",
+    "tableName": "be_Local"
+  },
+  {
+    "name": "sqlite_autoindex_be_Prop_1",
+    "type": "index",
+    "tableName": "be_Prop"
+  },
+  {
+    "name": "sqlite_autoindex_bis_CodeSpec_1",
+    "type": "index",
+    "tableName": "bis_CodeSpec"
+  },
+  {
+    "name": "sqlite_autoindex_bis_Element_1",
+    "type": "index",
+    "tableName": "bis_Element"
+  },
+  {
+    "name": "sqlite_autoindex_dgn_Domain_1",
+    "type": "index",
+    "tableName": "dgn_Domain"
+  },
+  {
+    "name": "sqlite_autoindex_dgn_Font_1",
+    "type": "index",
+    "tableName": "dgn_Font"
+  },
+  {
+    "name": "sqlite_autoindex_dgn_Handler_1",
+    "type": "index",
+    "tableName": "dgn_Handler"
+  },
+  {
+    "name": "sqlite_autoindex_dgn_fts_content_1",
+    "type": "index",
+    "tableName": "dgn_fts_content"
+  },
+  {
+    "name": "sqlite_autoindex_ec_Index_1",
+    "type": "index",
+    "tableName": "ec_Index"
+  },
+  {
+    "name": "sqlite_autoindex_ec_Schema_1",
+    "type": "index",
+    "tableName": "ec_Schema"
+  },
+  {
+    "name": "sqlite_autoindex_ec_Schema_2",
+    "type": "index",
+    "tableName": "ec_Schema"
+  },
+  {
+    "name": "sqlite_autoindex_ec_Table_1",
+    "type": "index",
+    "tableName": "ec_Table"
+  },
+  {
+    "name": "sqlite_sequence",
+    "type": "table",
+    "tableName": "sqlite_sequence",
+    "sql": "CREATE TABLE sqlite_sequence(name,seq)"
+  },
+  {
+    "name": "sqlite_stat1",
+    "type": "table",
+    "tableName": "sqlite_stat1",
+    "sql": "CREATE TABLE sqlite_stat1(tbl,idx,stat)"
+  },
+  {
+    "name": "uix_bis_ElementDrivesElement_sourcetargetclassid",
+    "type": "index",
+    "tableName": "bis_ElementDrivesElement",
+    "sql": "CREATE UNIQUE INDEX [uix_bis_ElementDrivesElement_sourcetargetclassid] ON [bis_ElementDrivesElement]([SourceId], [TargetId], [ECClassId])"
+  },
+  {
+    "name": "uix_bis_ElementRefersToElements_sourcetargetclassid",
+    "type": "index",
+    "tableName": "bis_ElementRefersToElements",
+    "sql": "CREATE UNIQUE INDEX [uix_bis_ElementRefersToElements_sourcetargetclassid] ON [bis_ElementRefersToElements]([SourceId], [TargetId], [ECClassId])"
+  },
+  {
+    "name": "uix_bis_ModelSelectorRefersToModels_sourcetarget",
+    "type": "index",
+    "tableName": "bis_ModelSelectorRefersToModels",
+    "sql": "CREATE UNIQUE INDEX [uix_bis_ModelSelectorRefersToModels_sourcetarget] ON [bis_ModelSelectorRefersToModels]([SourceId], [TargetId])"
+  },
+  {
+    "name": "uix_bis_Model_fk_bis_ModelModelsElement_source",
+    "type": "index",
+    "tableName": "bis_Model",
+    "sql": "CREATE UNIQUE INDEX [uix_bis_Model_fk_bis_ModelModelsElement_source] ON [bis_Model]([ModeledElementId]) WHERE ([ModeledElementId] IS NOT NULL)"
+  },
+  {
+    "name": "uix_ec_ClassHasBaseClasses_ClassId_BaseClassId",
+    "type": "index",
+    "tableName": "ec_ClassHasBaseClasses",
+    "sql": "CREATE UNIQUE INDEX uix_ec_ClassHasBaseClasses_ClassId_BaseClassId ON ec_ClassHasBaseClasses(ClassId,BaseClassId)"
+  },
+  {
+    "name": "uix_ec_ClassHasBaseClasses_ClassId_Ordinal",
+    "type": "index",
+    "tableName": "ec_ClassHasBaseClasses",
+    "sql": "CREATE UNIQUE INDEX uix_ec_ClassHasBaseClasses_ClassId_Ordinal ON ec_ClassHasBaseClasses(ClassId,Ordinal)"
+  },
+  {
+    "name": "uix_ec_Column_TableId_Name",
+    "type": "index",
+    "tableName": "ec_Column",
+    "sql": "CREATE UNIQUE INDEX uix_ec_Column_TableId_Name ON ec_Column(TableId,Name)"
+  },
+  {
+    "name": "uix_ec_Column_TableId_Ordinal",
+    "type": "index",
+    "tableName": "ec_Column",
+    "sql": "CREATE UNIQUE INDEX uix_ec_Column_TableId_Ordinal ON ec_Column(TableId,Ordinal)"
+  },
+  {
+    "name": "uix_ec_CustomAttribute_ContainerId_ContainerType_ClassId",
+    "type": "index",
+    "tableName": "ec_CustomAttribute",
+    "sql": "CREATE UNIQUE INDEX uix_ec_CustomAttribute_ContainerId_ContainerType_ClassId ON ec_CustomAttribute(ContainerId,ContainerType,ClassId)"
+  },
+  {
+    "name": "uix_ec_CustomAttribute_ContainerId_ContainerType_Ordinal",
+    "type": "index",
+    "tableName": "ec_CustomAttribute",
+    "sql": "CREATE UNIQUE INDEX uix_ec_CustomAttribute_ContainerId_ContainerType_Ordinal ON ec_CustomAttribute(ContainerId,ContainerType,Ordinal)"
+  },
+  {
+    "name": "uix_ec_FormatCompositeUnit_FormatId_Ordinal",
+    "type": "index",
+    "tableName": "ec_FormatCompositeUnit",
+    "sql": "CREATE UNIQUE INDEX uix_ec_FormatCompositeUnit_FormatId_Ordinal ON ec_FormatCompositeUnit(FormatId,Ordinal)"
+  },
+  {
+    "name": "uix_ec_IndexColumn_IndexId_ColumnId_Ordinal",
+    "type": "index",
+    "tableName": "ec_IndexColumn",
+    "sql": "CREATE UNIQUE INDEX uix_ec_IndexColumn_IndexId_ColumnId_Ordinal ON ec_IndexColumn(IndexId,ColumnId,Ordinal)"
+  },
+  {
+    "name": "uix_ec_PropertyMap_ClassId_PropertyPathId_ColumnId",
+    "type": "index",
+    "tableName": "ec_PropertyMap",
+    "sql": "CREATE UNIQUE INDEX uix_ec_PropertyMap_ClassId_PropertyPathId_ColumnId ON ec_PropertyMap(ClassId,PropertyPathId,ColumnId)"
+  },
+  {
+    "name": "uix_ec_PropertyPath_RootPropertyId_AccessString",
+    "type": "index",
+    "tableName": "ec_PropertyPath",
+    "sql": "CREATE UNIQUE INDEX uix_ec_PropertyPath_RootPropertyId_AccessString ON ec_PropertyPath(RootPropertyId,AccessString)"
+  },
+  {
+    "name": "uix_ec_Property_ClassId_Name",
+    "type": "index",
+    "tableName": "ec_Property",
+    "sql": "CREATE UNIQUE INDEX uix_ec_Property_ClassId_Name ON ec_Property(ClassId,Name)"
+  },
+  {
+    "name": "uix_ec_Property_ClassId_Ordinal",
+    "type": "index",
+    "tableName": "ec_Property",
+    "sql": "CREATE UNIQUE INDEX uix_ec_Property_ClassId_Ordinal ON ec_Property(ClassId,Ordinal)"
+  },
+  {
+    "name": "uix_ec_RelationshipConstraintClass_ConstraintId_ClassId",
+    "type": "index",
+    "tableName": "ec_RelationshipConstraintClass",
+    "sql": "CREATE UNIQUE INDEX uix_ec_RelationshipConstraintClass_ConstraintId_ClassId ON ec_RelationshipConstraintClass(ConstraintId,ClassId)"
+  },
+  {
+    "name": "uix_ec_RelationshipConstraint_RelationshipClassId_RelationshipEnd",
+    "type": "index",
+    "tableName": "ec_RelationshipConstraint",
+    "sql": "CREATE UNIQUE INDEX uix_ec_RelationshipConstraint_RelationshipClassId_RelationshipEnd ON ec_RelationshipConstraint(RelationshipClassId,RelationshipEnd)"
+  },
+  {
+    "name": "uix_ec_SchemaReference_SchemaId_ReferencedSchemaId",
+    "type": "index",
+    "tableName": "ec_SchemaReference",
+    "sql": "CREATE UNIQUE INDEX uix_ec_SchemaReference_SchemaId_ReferencedSchemaId ON ec_SchemaReference(SchemaId,ReferencedSchemaId)"
+  },
+  {
+    "name": "uix_ecdbf_fileinfoownership_fileinfoid_fileinfoecclassid",
+    "type": "index",
+    "tableName": "ecdbf_FileInfoOwnership",
+    "sql": "CREATE UNIQUE INDEX [uix_ecdbf_fileinfoownership_fileinfoid_fileinfoecclassid] ON [ecdbf_FileInfoOwnership]([FileInfoId], [FileInfoECClassId])"
+  },
+  {
+    "name": "uix_ecdbf_fileinfoownership_ownerid_ownerecclassid",
+    "type": "index",
+    "tableName": "ecdbf_FileInfoOwnership",
+    "sql": "CREATE UNIQUE INDEX [uix_ecdbf_fileinfoownership_ownerid_ownerecclassid] ON [ecdbf_FileInfoOwnership]([OwnerId], [OwnerECClassId])"
+  }
+]
