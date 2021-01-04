@@ -171,6 +171,27 @@ The `Depth` and `Location` of the `WaterTableDepth` should always be set. The `L
 
 The `Location` property is in global coordinates.
 
+### Region
+
+XXXXXXX Need clear definition and usage XXXXX
+
+The `Shape` property is a 2D polygon in global coordinates.
+
+### Section
+
+XXXXXXX Need clear definition and usage XXXXX
+
+The `Line` property is a 2D line segment in global coordinates.
+
+### Plaxis2dLink
+
+XXXXXXX Need clear definition and usage XXXXX
+
+### Plaxis3dLink
+
+XXXXXXX Need clear definition and usage XXXXX
+
+The associated `Region` must have a rectangular shape, but the rectangle may have any orientation about the z-axis.
 
 ### ISurfaceProvider
 
