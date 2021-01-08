@@ -24,6 +24,8 @@ jobs:
       value: '$(Agent.BuildDirectory)/IModelValidationResults'
     - name: jsonValidationOut
       value: '$(Agent.BuildDirectory)/JsonValidationResults'
+    - name: schemaUpgradeValidationOut
+      value: '$(Agent.BuildDirectory)/SchemaUpgradeValidationResults'
 
   steps:
   - task: NodeTool@0
@@ -130,6 +132,29 @@ jobs:
     displayName: 'Publish iModel Schema Validation Results'
 
   - script: | 
+      mkdir "%schemaUpgradeValidationOut%"
+      echo Schema Validation Ouput Dir= %schemaUpgradeValidationOut%
+    displayName: 'Create Schema Upgrade Validation Output Directory'
+
+  - script: npm run iModelSchemaValidation -- --schemaUpgradeTesting --OutDir $(schemaUpgradeValidationOut)
+    displayName: Schema Upgrade Validation
+
+  - task: ArchiveFiles@2
+    condition: succeededOrFailed()
+    displayName: 'ArchiveFiles - Schema Upgrade Validation Results'
+    inputs:
+      rootFolderOrFile: $(schemaUpgradeValidationOut) 
+      includeRootFolder: false 
+      archiveType: 7z
+      archiveFile: '$(Build.ArtifactStagingDirectory)/SchemaUpgradeValidationResults-$(Build.BuildId).zip' 
+      replaceExistingArchive: true 
+
+  - publish: '$(Build.ArtifactStagingDirectory)/SchemaUpgradeValidationResults-$(Build.BuildId).zip'
+    condition: succeededOrFailed()  
+    artifact: schema-upgrade-validation-logs
+    displayName: 'Publish Schema Upgrade Validation Results'
+
+  - script: | 
       mkdir "%jsonValidationOut%"
       echo Schema JSON Validation Ouput Dir= %jsonValidationOut%
     condition: succeededOrFailed()
@@ -154,6 +179,9 @@ jobs:
     condition: succeededOrFailed()  
     artifact: bis-schema-json-validation-logs
     displayName: 'Publish BIS Schema JSON Validation Results'
+
+  - script: npm run iModelSchemaValidation -- --compareSnapshot
+    displayName: Snapshot Comparison
 
   - script: npm run validateSchemaInventory
     displayName: Validate Schema Inventory
