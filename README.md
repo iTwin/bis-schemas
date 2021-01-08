@@ -116,6 +116,16 @@ To run the 'updateSchemaInventory' script, follow these steps:
 1. Verify that the modified SchemaInventory.json contains the new schema entries, and include the modified file in the pull-request along with the schema changes.
     - **New Released Schemas**: New Schema entries will contain an automatically generated Sha1 hash for the new schema. You must manually update the `approved` and `verified` fields of the new schema entry in SchemaInventory.json or the validation (noted above) will fail during pull-request builds.
 
+### **Get Json Schemas**
+
+For getting all released schemas (including all versions) jsons, use following command:
+
+``` npm run generateJsonSchemas -- --allReleasedVersions --OutDir D:\\dir1\\output\\ ```
+
+If you just need json schemas of latest released versions:
+
+``` npm run generateJsonSchemas -- --latestReleasedVersions --OutDir D:\\dir1\\output\\ ```
+
 ### **BIS Rule Validation**
 
 BIS rule validation consists of checking all schemas in the bis-schemas repository against a set of [validation rules](https://imodeljs.github.io/iModelJs-docs-output/bis/intro/bis-schema-validation/). The npm script 'validateSchemas' uses the npm package `@bentley/schema-validator` to perform the validation.
