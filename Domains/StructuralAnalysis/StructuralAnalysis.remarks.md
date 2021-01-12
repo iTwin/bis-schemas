@@ -185,7 +185,9 @@ Derives from [AnalysisElement](#analysiselement) and provides base class for str
 
 ### Structure
 
-A class that represents an entire structure and is sub-modeled by [StructuralAnalysisModel](#stucturalanalysismodel), derives from [StructuralAnalysisElement](#structuralanalysiselement). Has a single property to represent the definition set that is referred to by the structure.
+A class that represents an entire structure and is sub-modeled by [StructuralAnalysisModel](#stucturalanalysismodel), derives from [StructuralAnalysisElement](#structuralanalysiselement).
+Always has a single property to represent the definition container that is referred by the structure.
+The sub-model of the definition container should be used as a default model for storing related DefinitionElements.
 
 ### StructurePart
 
