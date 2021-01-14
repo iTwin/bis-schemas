@@ -13,6 +13,23 @@
     </ECCustomAttributes>
 
     <!-- ========================================================================================== -->
+    <!-- ==================== SCHEMA ORGANIZATION NOTES =========================================== -->
+    <!-- ========================================================================================== -->
+    <!-- Schema files can get large and are difficult to navigate. These Guidelines help define 
+         where to put ECEntityClasses and ECRelationshipClasses in this file. -->
+
+    <!-- 1. Create major blocks (using 3 bar heading style) for each major concept.
+            Examples of major concepts are: "Configuration", "Boreholes", "IOperands and Operations",
+            "Ground", and "Fence Diagrams". Most Operations will qualify as major concepts. -->
+
+    <!-- 2. All the classes that appear in a dependable parent-child Element tree should be lumped
+            into a major block. Examples are: Borehole (and children), Ground (and children) and
+            FenceDiagram (and children). -->
+
+    <!-- 3. Create minor blocks (using 1 bar heading style) for each significant class and related
+            relationships. Parent-Child relationships are usually grouped with the child class. -->
+
+    <!-- ========================================================================================== -->
     <!-- ==================== CORE INFORMATION HIERARCHY CLASSES ================================== -->
     <!-- ========================================================================================== -->
 
@@ -315,6 +332,227 @@
     </ECRelationshipClass>
 
     <!-- ========================================================================================== -->
+    <!-- ========================== Fence Diagrams, Etc. ========================================== -->
+    <!-- ========================================================================================== -->
+
+<!-- QUESTION - We use quite a few "driving" relationships here to keep all the pieces consistent.
+                Is that the best approach? Should we assume some other mechanism instead? -->
+
+    <!-- ========================== IFenceDiagramProvider-related classes ========================= -->
+
+    <!-- This is keeping with our rule that all input IOperands should be "providers" for future flexibility -->
+    <ECEntityClass typeName="IFenceDiagramProvider" modifier="Abstract" displayLabel="FenceDiagram Provider" description="An IOperand that can provide a FenceDiagram.">
+        <ECCustomAttributes>
+            <IsMixin xmlns="CoreCustomAttributes.01.00.03">
+                <AppliesToEntityClass>bis:Element</AppliesToEntityClass>
+            </IsMixin>
+        </ECCustomAttributes>
+        <BaseClass>IOperand</BaseClass>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="GroundGenerationOwnsFenceDiagram" strength="embedding" modifier="None" description="Connects an GroundGeneration with its child input IFenceDiagramProviders.">
+        <BaseClass>OperationOwnsDrivingInput</BaseClass>
+        <Source multiplicity="(1..1)" polymorphic="true" roleLabel="owns and has input">
+            <Class class="GroundGeneration"/>
+        </Source>
+        <Target multiplicity="(0..*)" polymorphic="true" roleLabel="is owned by and is input for">
+            <Class class="IFenceDiagramProvider"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <!-- ========================== FenceDiagram-related classes ================================== -->
+
+    <ECEntityClass typeName="FenceDiagram" modifier="Sealed" displayLabel="Fence Diagram" description="A vertical slice through Ground, that allows display and editing of strata boundaries.">
+        <BaseClass>GeotechnicalInterpretationElement</BaseClass>
+        <BaseClass>IFenceDiagramProvider</BaseClass>
+
+        <ECProperty propertyName="Width" typeName="double" displayLabel="Width" kindOfQuantity="AECU:LENGTH" description="The width (half either side) of the FenceDiagram, for use in finding related Boreholes."/>
+    </ECEntityClass>
+
+    <!-- Note that due to GroundGenerationOwnsFenceDiagram and IFenceDiagramProvider, FenceDiagram is always a child of GroundGeneration -->
+
+    <!-- Note that when a Borehole LOCATES A FencePost (and so there is already a relationship), this relationship should be provided also -->
+
+    <ECRelationshipClass typeName="BoreholeGuidesFenceDiagram" strength="referencing" modifier="Sealed" description="Relationship to define the FenceDiagram is guided by the Borehole.">
+        <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="guides" polymorphic="false">
+            <Class class="Borehole" />
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is guided by" polymorphic="false">
+            <Class class="FenceDiagram"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <!-- ========================== FencePanel-related classes =================================== -->
+
+    <ECEntityClass typeName="FencePanel" modifier="Sealed" displayLabel="Fence Panel" description="A portion of a FenceDiagram, extending between FencePosts. Always child of FenceDiagram.">
+        <BaseClass>GeotechnicalInterpretationElement</BaseClass>
+
+        <!-- QUESTION: Should Index be zero-based or one-based? -->
+        <ECProperty propertyName="Index"  typeName="int"    displayLabel="Index"                               description="The zero-based index of the FencePanel relative to other FencePanels in the FenceDiagram."/>
+        <ECProperty propertyName="Length" typeName="double" displayLabel="Length" kindOfQuantity="AECU:LENGTH" description="A cached value of the distance from the start FencePost to the end FencePost."/>
+    </ECEntityClass>
+
+
+    <!-- Note that FencePanel must notify FenceDiagram of changes (the only relevant change is the change in FencePost location) -->
+    <ECRelationshipClass typeName="FenceDiagramOwnsFencePanel" strength="embedding" modifier="Sealed">
+        <BaseClass>ElementOwnsDrivingChildElements</BaseClass>
+        <Source multiplicity="(1..1)" polymorphic="false" roleLabel="owns">
+            <Class class="FenceDiagram"/>
+        </Source>
+        <Target multiplicity="(0..*)" polymorphic="false" roleLabel="is owned by">
+            <Class class="FencePanel"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <!-- Note that FencePost must notify FencePanel of changes (the only relevant change is a change of location)-->
+    <!-- This is conceptually an abstract class, but we can't create an abstract class that has a non-abstract base class. -->
+    <ECRelationshipClass typeName="FencePanelIsBoundedByFencePost" strength="referencing" modifier="None" description="Relationship to define the FencePanel is bounded by the FencePost.">
+        <BaseClass>bis:ElementDrivesElement</BaseClass>
+        <!-- A FencePost must bound at least 1 FencePanel, but we can't use the 1..* constraint as each subclass is 0..*-->
+        <Source multiplicity="(0..*)" roleLabel="is bounded by" polymorphic="false">
+            <Class class="FencePanel" />
+        </Source>
+        <!-- A FencePanel must have 2 FencePosts, but we can't use the 2..2 constraint as each subclass is 1..1-->
+        <Target multiplicity="(1..2)" roleLabel="bounds" polymorphic="false">
+            <Class class="FencePost"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="FencePanelHasStartFencePost" strength="referencing" modifier="Sealed" description="Relationship to define the FenceVolume is bounded by the left side of the FenceBoundary.">
+        <BaseClass>FencePanelIsBoundedByFencePost</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="has start FencePost" polymorphic="false">
+            <Class class="FencePanel" />
+        </Source>
+        <!-- A FencePanel must have exactly 1 "start" FencePost -->
+        <Target multiplicity="(1..1)" roleLabel="defines start of" polymorphic="true">
+            <Class class="FencePost"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="FencePanelHasEndFencePost" strength="referencing" modifier="Sealed" description="Relationship to define the FenceVolume is bounded by the right side of the Boundary.">
+        <BaseClass>FencePanelIsBoundedByFencePost</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="has end FencePost" polymorphic="false">
+            <Class class="FencePanel" />
+        </Source>
+        <!-- A FencePanel must have exactly 1 "end" FencePost -->
+        <Target multiplicity="(1..1)" roleLabel="defines end of" polymorphic="true">
+            <Class class="FencePost"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <!-- ========================== FencePost-related classes ===================================== -->
+
+    <!-- QUESTION - WE NEED TO UNDERSTAND IF/WHEN A FencePost CAN MOVE. THIS MOVEMENT NEEDS TO BE PASSED ON DOWNSTREAM TO UPDATE THE FencePanels, ETC..-->
+
+    <ECEntityClass typeName="FencePost" modifier="Sealed" displayLabel="Fence Post" description="The start/end location of one or more FencePanels. Conceptually an infinite vertical line.">
+        <BaseClass>GeotechnicalInterpretationElement</BaseClass>
+
+        <ECProperty propertyName="Location" typeName="point2d" displayLabel="Location" kindOfQuantity="AECU:LENGTH" description="The 2D location of this FencePost (in global coordinates)."/>
+    </ECEntityClass>
+
+    <!-- Note that Borehole must notify FencePost of location changes (at ground level) -->
+    <ECRelationshipClass typeName="BoreholeLocatesFencePost" strength="referencing" modifier="Sealed" description="Relationship to define the FencePost is located at a Borehole.">
+        <BaseClass>bis:ElementDrivesElement</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="locates" polymorphic="false">
+            <Class class="Borehole" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="bounds" polymorphic="false">
+            <Class class="FencePost"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <!-- Every Borehole that is Drives a FencePost should guide (BoreholeGuidesFenceDiagram) all FenceDiagrams which contain the FencePost -->
+
+    <!-- ========================== FenceVolume-related classes =================================== -->
+
+    <ECEntityClass typeName="FenceVolume" modifier="Abstract" displayLabel="FenceVolume" description="A contiguous 2D region that is part of a FenceDiagram and is bounded by FenceBoundaries.">
+        <BaseClass>GeotechnicalInterpretationElement</BaseClass>
+
+        <ECProperty propertyName="Shape" displayLabel="Shape" typeName="Bentley.Geometry.Common.IGeometry" description="The shape (a 2D polygon) in FenceDiagram coordinates."/>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="FenceBoundaryBoundsVolumes" strength="referencing" modifier="Abstract" description="Relationship to define the FenceVolume is bounded by the FenceBoundary.">
+        <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <!-- A FenceVolume must be bounded by as least one FenceBoundary, but we can't use the 1..* constraint as each subclass is 0..*-->
+        <Source multiplicity="(0..*)" roleLabel="bounds" polymorphic="false">
+            <Class class="FenceBoundary" />
+        </Source>
+        <!-- A FenceBoundary must bound as least one FenceVolume, but we can't use the 1..2 constraint as each subclass is 0..1-->
+        <Target multiplicity="(0..2)" roleLabel="is bounded by" polymorphic="true">
+            <Class class="FenceVolume"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="FenceBoundaryBoundsVolumeOnLeftSide" strength="referencing" modifier="Sealed" description="Relationship to define the FenceVolume is bounded by the left side of the FenceBoundary.">
+        <BaseClass>FenceBoundaryBoundsVolumes</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="bounds on left side" polymorphic="false">
+            <Class class="FenceBoundary" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is bounded by left side of" polymorphic="true">
+            <Class class="FenceVolume"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="FenceBoundaryBoundsVolumeOnRightSide" strength="referencing" modifier="Sealed" description="Relationship to define the FenceVolume is bounded by the right side of the Boundary.">
+        <BaseClass>FenceBoundaryBoundsVolumes</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="bounds on right side" polymorphic="false">
+            <Class class="FenceBoundary" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is bounded by right side of" polymorphic="true">
+            <Class class="FenceVolume"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <!-- ========================== FenceStratum-related classes ================================== -->
+
+    <ECEntityClass typeName="FenceStratum" modifier="Sealed" displayLabel="Fence Stratum" description="A stratum within a FenceDiagram.">
+        <BaseClass>FenceVolume</BaseClass>
+
+        <!-- note inherited Shape property from FenceVolume -->
+        <ECNavigationProperty propertyName="Material" relationshipName="FenceStratumHasMaterial" direction="Forward" description="Reference to IMaterial of the FenceStratum (required)."/>
+    </ECEntityClass>
+   
+     <ECRelationshipClass typeName="FenceStratumHasMaterial" strength="referencing" modifier="Sealed" description="Relationship to define that a FenceStratum has a material of Material.">
+        <Source multiplicity="(0..*)" roleLabel="has material" polymorphic="false">
+            <Class class="FenceStratum" />
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="is material for" polymorphic="true">
+            <Class class="IMaterial"/> 
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="FenceDiagramOwnsFenceStratum" strength="embedding" modifier="Sealed">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(1..1)" polymorphic="false" roleLabel="owns">
+            <Class class="FenceDiagram"/>
+        </Source>
+        <Target multiplicity="(0..*)" polymorphic="false" roleLabel="is owned by">
+            <Class class="FenceStratum"/>
+        </Target>
+    </ECRelationshipClass>
+ 
+    <!-- ========================== FenceBoundary-related classes ================================= -->
+
+    <ECEntityClass typeName="FenceBoundary" modifier="Sealed" displayLabel="Fence Boundary" description="The boundary of 1 or 2 FenceStratums.">
+        <BaseClass>GeotechnicalInterpretationElement</BaseClass>
+
+        <ECProperty propertyName="Location"      displayLabel="Location"       typeName="Bentley.Geometry.Common.IGeometry" description="A 2D polyline in FenceDiagram coordinates."/>
+        <ECProperty propertyName="UserSpecified" displayLabel="User Specified" typeName="bool"                              description="Was this FenceBoundary specified by the user (and is not just a reflection of the generated Ground)."/>
+    </ECEntityClass>
+
+    <!-- Note that FenceBoundary must notify FenceDiagram of changes -->
+    <ECRelationshipClass typeName="FenceDiagramOwnsFenceBoundary" strength="embedding" modifier="Sealed">
+        <BaseClass>ElementOwnsDrivingChildElements</BaseClass>
+        <Source multiplicity="(1..1)" polymorphic="false" roleLabel="owns">
+            <Class class="FenceDiagram"/>
+        </Source>
+        <Target multiplicity="(0..*)" polymorphic="false" roleLabel="is owned by">
+            <Class class="FenceBoundary"/>
+        </Target>
+    </ECRelationshipClass>
+ 
+    <!-- ========================================================================================== -->
     <!-- ========================== Region, Section, Etc. ========================================= -->
     <!-- ========================================================================================== -->
    
@@ -330,7 +568,7 @@
     <ECEntityClass typeName="Section" modifier="Sealed" displayLabel="Section" description="A 2D (vertical) cross section of interest.">
         <BaseClass>GeotechnicalInterpretationElement</BaseClass>
 
-        <ECProperty propertyName="Line" displayLabel="Shape" typeName="Bentley.Geometry.Common.IGeometry" description="A 2D line segment."/>
+        <ECProperty propertyName="Line" displayLabel="Line" typeName="Bentley.Geometry.Common.IGeometry" description="A 2D line segment."/>
     </ECEntityClass>
 
     <!-- ========================================================================================== -->
@@ -373,7 +611,6 @@
         </Target>
     </ECRelationshipClass>
 
-
     <!-- ========================================================================================== -->
     <!-- ========================== Geometry-RELATED IOperands ==================================== -->
     <!-- ========================================================================================== -->
@@ -395,7 +632,6 @@
         <!-- NEED TO ADD EXTENDED TYPE extendedTypeName="GeometryFlatBuffer" or sim (when platform is ready) -->        
         <ECProperty propertyName="Surface" displayLabel="Surface" typeName="binary" description="Contiguous IndexedPolyface defining the geometry of the surface. May be closed."/>
     </ECEntityClass>
-
 
     <!-- Future IVolumeProvider and GenericVolume here -->
 
@@ -605,6 +841,8 @@
 
     </ECEntityClass>
 
+    <!-- Note that GroundGeneration can also have an IFenceDiagramProvider as an OperationOwnsDrivingInput child -->
+
     <!-- Note that IBoreholeProvider must notify GroundGeneration of changes -->
     <ECRelationshipClass typeName="BoreholeProviderDrivesGroundGeneration" strength="referencing" modifier="Sealed" description="Connects a GroundGeneration with its input IBoreholeProvider.">
         <BaseClass>InputDrivesOperation</BaseClass>
@@ -661,9 +899,10 @@
     </ECEntityClass>
 
     <!-- QUESTION: ARE WE HAPPY WITH THE "DRIVES" TERMINOLOGY? -->
+
     <!-- We can't change the order of EDE, so it has to be InputXxxOperation -->
     <!-- Note that (input) IOperand must notify Operation of changes -->
-    <ECRelationshipClass typeName="InputDrivesOperation" strength="referencing" modifier="None" description="Connects an Operation with its input IOperands.">
+    <ECRelationshipClass typeName="InputDrivesOperation" strength="referencing" modifier="None" description="Connects an Operation with its (non-child) input IOperands.">
         <BaseClass>bis:ElementDrivesElement</BaseClass>
         <!-- While an Operation always requires input, some subclasses of this relationship may have optional input, so we need to have 0..* cardinality below-->
         <Source multiplicity="(0..*)" roleLabel="is input for" polymorphic="true">
@@ -672,6 +911,16 @@
         <!-- IOperand may be input for 0, 1 or many Operations-->
         <Target multiplicity="(0..*)" roleLabel="has input" polymorphic="true">
             <Class class="Operation" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="OperationOwnsDrivingInput" strength="embedding" modifier="None" description="Connects an Operation with its child input IOperands.">
+        <BaseClass>ElementOwnsDrivingChildElements</BaseClass>
+        <Source multiplicity="(1..1)" polymorphic="true" roleLabel="owns and has input">
+            <Class class="Operation"/>
+        </Source>
+        <Target multiplicity="(0..*)" polymorphic="true" roleLabel="is owned by and is input for">
+            <Class class="IOperand"/>
         </Target>
     </ECRelationshipClass>
 
@@ -696,10 +945,9 @@
         <BaseClass>IOperand</BaseClass>
     </ECEntityClass>
 
-    <!-- All OperationParameters are children of their Operation-->
-    <!-- Note that OperationParameters must notify Operation of changes -->
+    <!-- All OperationParameters are (driving input) children of their Operation-->
     <ECRelationshipClass typeName="OperationOwnsParameters" strength="embedding" modifier="None">
-        <BaseClass>ElementOwnsDrivingChildElements</BaseClass>
+        <BaseClass>OperationOwnsDrivingInput</BaseClass>
         <Source multiplicity="(1..1)" polymorphic="true" roleLabel="owns and is driven by">
             <Class class="Operation"/>
         </Source>
@@ -724,7 +972,6 @@
 
         <!-- QUESTION: how do we want to record error information? Is localization an issue? -->
         <ECProperty propertyName="Error"     typeName="string" displayLabel="Error"   description="Information about the error."/>
-
     </ECEntityClass>
 
 
