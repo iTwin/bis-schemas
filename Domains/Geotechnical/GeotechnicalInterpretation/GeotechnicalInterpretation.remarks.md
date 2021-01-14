@@ -29,8 +29,13 @@ The overall structure of the Geotechnical Information hierarchy is:
       - 0..N `BoreholeSource`s each with
         - 0..N `Borehole`s
       - 0..N `BoreholeGroup`s (referencing `Borehole`s)
-      - 0..N `GroundGeneration`s **Need to think about this**
-      - 0..N `Ground`s **Need to determine if this has a submodel or not**
+      - 0..N `FencePost`
+      - 0..N `GroundGeneration`s (exactly 1 for V1)
+        - 0..N `FenceDiagram`
+          - 0..N `FencePanel`
+          - 0..N `FenceBoundary`
+          - 0..N `FenceStratum`
+      - 0..N `Ground`s (exactly 1 for V1) **Need to determine if this has a submodel or not**
         - 1..N `Boundary`s **Need to clarify if 0 is valid**
         - 1..N `Block`s **Need to clarify if 0 is valid**
           - 1..N `Stratum`s **Need to clarify if 0 is valid**
@@ -205,9 +210,129 @@ The TypeScript wrapper for each `ISurfaceProvider` subclass is expected to have 
 
 The `Surface` property is always defined, and is in global coordinates.
 
+### IFenceDiagramProvider
+
+`IFenceDiagramProvider` is an abstract concept that exists for future extensibility. Currently, every `IFenceDiagramProvider` is a `FenceDiagram`.
+
+`IFenceDiagramProvider` is always a child of `GroundGeneration`.
+
+The TypeScript wrapper for each `IFenceDiagramProvider` subclass is expected to have a XXXX() method.
+
+### FenceDiagram
+
+`FenceDiagram` is always a child of `GroundGeneration`. The `GroundGenerationOwnsFenceDiagram` relationship is used. A `FenceDiagram` has a two-way relationship with its owning `GroundGeneration`:
+
+1. It is (`IOperand`) input for the `GroundGeneration`. The user-adjusted `FenceBoundary`s are considered as the input.
+
+2. It displays the sliced output of the `GroundGeneration` (the `Ground` or technically `IGroundProvider`) for `FenceStratum`s and `FenceBoundary`s that are not user-adjusted. When the `GroundGeneration` is rerun, the related `FenceDiagram`s must be updated.
+
+`Borehole`s can be associated to the `FenceDiagram` with the `BoreholeGuidesFenceDiagram` relationship.
+These "guiding" boreholes are used as context for the geotechnical engineer working with the `FenceDiagram`s.
+When the `Width` property changes the `BoreholeGuidesFenceDiagram` relationships must be updated to reflect the new `Width`.
+
+`FenceDiagram`s define a 2-D coordinate system in which their `FenceBoundary` and `FenceStratum` data is defined.
+The x-axis follows the `FencePanel`s and starts at x=0 at the first `FencePost` of the first `FencePanel` and continues along the `FencePanel`s.
+The y-axis is the elevation (equivalent to global-z).
+
+XXX Need to decide what is in the `GeometryStream` (if anything) for `FenceDiagram`s XXXX
+
+For V1, `FenceDiagram`s are constrained to layer-cake representations (conceptual layers can have zero thickness in areas).
+
+See [GeotechnicalInterpretationPartition](./GeotechnicalInterpretation.remarks.md#GeotechnicalInterpretationPartition) for an outline of the overall Geotechnical Interpretation information hierarchy, including the `Fence*` classes.
+
+### FencePanel
+
+`FencePanel` is vertical planar rectangle upon which `FenceStratum`s and `FenceBoundary`s are displayed.
+
+The (2D) start point for the `FencePanel` is defined through the `FencePanelHasStartFencePost` relationship and its target `FencePost`.
+The (2D) end point for the `FencePanel` is defined through the `FencePanelHasStartFencePost` relationship and its target `FencePost`.
+
+The order of `FencePanel`s within a `FenceDiagram` is defined by the `Index` property.
+The end `FencePost` for `FencePanel` *N* is identical to the start `FencePost` for `FencePanel` *N+1*.
+
+XXX Need to determine the code/mechanism for updating `FencePanel` (and `FenceDiagram`) base on moved `FencePost`. XXX
+
+XXX Need to decide what is in the `GeometryStream` (if anything) for `FencePanel`s XXXX
+
+See [GeotechnicalInterpretationPartition](./GeotechnicalInterpretation.remarks.md#GeotechnicalInterpretationPartition) for an outline of the overall Geotechnical Interpretation information hierarchy, including the `Fence*` classes.
+
+### FencePost
+
+`FencePost`s define the start and end points of `FencePanel`s. Wherever two `FencePanel`s intersect, a `FencePost` is inserted
+(splitting the `FencePanel`s in two). `FencePost`s are NOT a user-facing concept and are generally hidden from users.
+There can never be 2 `FencePost`s at the same location
+
+`FencePost`s are NOT owned by `FencePanel`s nor by `FenceDiagram`s; they are top-level `Element`s. However, `FencePost`s that are not
+used by any `FencePanel` should be deleted.
+
+A `FencePost` can be located at a `Borehole` via the `BoreholeLocatesFencePost` relationship.
+That relationship defines that the `FencePost` is located at x-y coordinates of the top of the `Borehole`.
+If the `Borehole` moves the `FencePost` moves with it.
+
+XXX Need to determine the code/mechanism for updating `FencePost` based on a moved `Borehole`. XXX
+
+XXX Need to decide what is in the `GeometryStream` (if anything) for `FencePost`s XXXX
+
+See [GeotechnicalInterpretationPartition](./GeotechnicalInterpretation.remarks.md#GeotechnicalInterpretationPartition) for an outline of the overall Geotechnical Interpretation information hierarchy, including the `Fence*` classes.
+
+### FenceVolume
+
+`FenceVolume` is an abstract concept that exists for future extensibility. Currently, every `FenceVolume` is a `FenceStratum`, but in the future subclasses to represent tunnels, caves or other items that may be added.
+
+`FenceVolume` corresponds to `GroundVolume` in the cut `Ground` (hence the name "FenceVolume" instead of "FenceRegion" or something like that).
+
+Every `FenceVolume` will have at least 2 `FenceBoundary`s.
+Vertical "closure" `FenceBoundary`s are NOT provided at the end of the `FenceDiagram`.
+
+The `Shape` property is effectively a cache of what is defined by the related `FenceBoundary`s
+
+### FenceStratum
+
+`FenceStratum` is currently the only concrete subclass of `FenceVolume`.
+
+`FenceStratum` corresponds to `Stratum` in the cut `Ground`.
+
+The `GeometryStream` of `FenceStratum` contains the `Shape` converted from `FenceDiagram` coordinates to global coordinates, using the appropriate `IMaterial` symbology.
+
+See [GeotechnicalInterpretationPartition](./GeotechnicalInterpretation.remarks.md#GeotechnicalInterpretationPartition) for an outline of the overall Geotechnical Interpretation information hierarchy, including the `Fence*` classes.
+
+### FenceBoundary
+
+`FenceBoundary`s either represent the boundary between two generated `Stratum`s, or the user's desire for the boundary between two generated `Stratum`s; 
+the `UserSpecified` property demarks these two cases.
+When a `FenceDiagram` is updated after a `Ground` generation, the `UserSpecified` property of `FenceBoundary`s must be preserved.
+
+`FenceBoundary` corresponds to `Boundary` in the cut `Ground`. `FenceBoundary`s follow these strict rules:
+
+1. The x-coordinates of `FenceBoundary`.`Location` is limited to the `FenceDiagram` range.
+
+2. `FenceBoundary`.`Location` can only touch the `FenceDiagram` start `FencePost` and end `FencePost` at its (the `FenceBoundary`'s) ends.
+
+3. A `FenceBoundary` cannot cross another `FenceBoundary`.
+
+4. A `FenceBoundary` may intersect another `FenceBoundary` only at a common end point.
+This rule will cause a `FenceBoundary` to be split in two if another `FenceBoundary` attempts to intersect away from an end point.
+
+5. A `FenceBoundary` must start and end either at a intersection with another `FenceBoundary` or at the first or last `FencePost` in the `FenceDiagram`.
+
+6. `FenceBoundary`s must have consistent left/right `FenceVolume`s where they intersect.
+
+For V1, these further constraints apply:
+
+1. `FenceBoundary`.`Location` must have increasing x-coordinates (no vertical or "backward" segments).
+This makes "left" correspond to "up" and "right" correspond to "down".
+
+2. `FenceBoundary`.`Location` cannot be a closed curve (no lenses) (this would violate rule 1 also).
+
+The `GeometryStream` of `FenceBoundary` contains the `Location` converted from `FenceDiagram` coordinates to global coordinates.
+The symbology of the `FenceBoundary` depends upon the value of the `UserSpecified` property.
+
+See [GeotechnicalInterpretationPartition](./GeotechnicalInterpretation.remarks.md#GeotechnicalInterpretationPartition) for an outline of the overall Geotechnical Interpretation information hierarchy, including the `Fence*` classes.
+
 ### IGroundProvider
 
-`IGroundProvider` is used to unify all of the various types that can provide `Ground` that can be used for downstream consumption (primarily in `Operation`s). Every `IGroundProvider` is also an `IOperand`. 
+`IGroundProvider` is used to unify all of the various types that can provide `Ground` that can be used for downstream consumption (primarily in `Operation`s).
+Every `IGroundProvider` is also an `IOperand`. 
 
 The TypeScript wrapper for each `IGroundProvider` subclass is expected to have a XXXX() method.
 
@@ -392,3 +517,7 @@ This relationship is followed during Element-Drives-Element dependency tracing t
 ### LayerOrderOrdersMaterials
 
 The `LayerIndex` property must always be set. No gaps may exist in the index values.
+
+### FencePanelIsBoundedByFencePost
+
+This class is conceptually abstract and should never be used. Use `FencePanelHasStartFencePost` or `FencePanelHasEndFencePost` instead.
