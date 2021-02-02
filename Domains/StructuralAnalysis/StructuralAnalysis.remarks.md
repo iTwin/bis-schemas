@@ -345,7 +345,7 @@ Available CurveMemberTypes:
 
 ### SurfaceType
 
-[ISurfaces](#isurface) ([SurfaceMembers](#surfacemember) and [SurfaceMemberModifiers](#surfacemembermodifier)) might have some shared properties in a structure: thickness, material, etc... SurfaceType groups these ISurface instances to a single group and provides shared properties for the whole group-system.
+[ISolidSurfaces](#ISolidSurface) ([SurfaceMembers](#surfacemember) and [SurfaceMemberModifiers](#surfacemembermodifier)) might have some shared properties in a structure: thickness, material, etc... SurfaceType groups these ISolidSurface instances to a single group and provides shared properties for the whole group-system.
 
 Available SurfaceTypes:
 
@@ -353,7 +353,7 @@ Available SurfaceTypes:
 
 ### SimpleSurfaceType
 
-Most common [SurfaceType](#surfacetype). Should be assigned to most walls, slabs which do not have any varying thickness, material layers. Simple Surface Type provides constant material and thickness for each [ISurface](#isurface).
+Most common [SurfaceType](#surfacetype). Should be assigned to most walls, slabs which do not have any varying thickness, material layers. Simple Surface Type provides constant material and thickness for each [ISolidSurface](#ISolidSurface).
 
 ### Load
 
@@ -434,11 +434,15 @@ Each Edge has a direction from its start Vertex to end Vertex. OrientedEdgeAspec
 
 Each [Face](#face) has a direction (same as normal) which is provided by its bounding [Loop](#loop). IsForwardDirection property can be used when Face needs to have opposite direction to make it compatible with other Faces in a [FaceSet](#faceset).
 
+### BehaviorAspect
+
+Specifies a structural behavior for an element. The behavior is usually optional and unique for that element. Element behavior aspects are never shared. Each Element can have multiple BehaviorAspect, however all aspects should be unique - there should not be any aspect instances of the same class.
+
+Behavior is subclassed by [SurfaceMemberBehaviorAspect](#surfacememberbehavioraspect), [CurveMemberBehaviorAspect](#curvememberbehavioraspect), [MemberBehaviorAspect](#memberbehavioraspect).
+
 ### MemberBehaviorAspect
 
-Specifies a structural behavior for a [Member](#member) element. The behavior is usually optional and unique for that member. Member behavior aspects are never shared. Each Member can have multiple MemberBehaviorAspects, however all aspects should be unique - there should not be any aspect instances of the same class.
-
-Behavior aspects can be more generic that can be applied for all Members - [LoadResistanceBehaviorAspect](#loadresistancebehavioraspect) or more specialized for Member subclasses: [SurfaceMemberBehaviorAspect](#surfacememberbehavioraspect), [CurveMemberBehaviorAspect](#curvememberbehavioraspect).
+Specifies a structural behavior for any [Member](#member). All aspects that inherit MemberBehaviorAspect can be applied on ([CurveMember](#curvemember) and [SurfaceMember](#surfacemember)). For more specialized Behavior Aspects see [SurfaceMemberBehaviorAspect](#surfacememberbehavioraspect) or [CurveMemberBehaviorAspect](#curvememberbehavioraspect).
 
 ### LoadResistanceBehaviorAspect
 
@@ -456,6 +460,7 @@ Behavior specifies that the [CurveMember](#curvemember) is slightly curved or be
 
 Defines behavior for host [CurveMember](#curvemember) when subjected to axial [Loads](#load). see [AxialBehaviorType enum](#axialbehaviortype) for more information about possible values. Applications should not use this aspect unless they can represent multiple Axial Behavior values. Members should not use this aspect if [LoadResistanceBehavior Aspect](#loadresistancebehavioraspect) is already applied.
 
+<!---
 ### StiffnessBehaviorAspect
 
 Defines how [CurveMember](#curvemember) is able to resist deformation when force is applied along or about some specific local coordinate axis.
@@ -465,8 +470,9 @@ Local axes for [CurveMember](#curvemember):
 - TAxis matches CurveMember's orientation
 - RAxis matches CurveMember's direction
 - SAxis matches Cross product of TAxis and RAxis
+--->
 
-### SurfaceBehaviorAspect
+### SurfaceMemberBehaviorAspect
 
 Base aspect class to define behavior for a [SurfaceMember](#surfacemember). Properties which come with derived aspects are optional for SurfaceMember. SurfaceMember might have multiple behavior aspects, however only a single instance of each behavior kind can be assigned. Behavior aspects are [unique](./biscore.ecschema.md#uniqueelementaspect) and cannot be shared.
 
@@ -713,8 +719,8 @@ Indicates that a [SurfaceSupport](#surfacesupport) has a spring behavior along s
 By default all conectivities through [Topology](#topologyelement) are treated as Fixed. ReleaseAspects allow to override these conectivities. Connectivities can be overriden for each [SharedTopologyElement](#sharedtopologyelement):
 
 - [VertexReleaseAspect](#vertexreleaseaspect) overrides [Vertex](#vertex) connectivities
-- [PathReleaseAspect](#pathreleaseaspect) overrides [Edge](#edge) connectivities
-- [SheetReleaseAspect](#sheetreleaseaspect) overrides [Face](#face) connectivities
+- PathReleaseAspect (Future) overrides [Edge](#edge) connectivities
+- SheetReleaseAspect (Future) overrides [Face](#face) connectivities
 
 ### VertexReleaseAspect
 
@@ -724,6 +730,7 @@ Adjusts fixities at [Vertex](#vertex) connectivity.
 
 Indicates **Logical** release at a [Vertex](#vertex). Logical release can be fully released or fully fixed. see [TODO: Add release enum].
 
+<!---
 ### PathReleaseAspect
 
 Adjust fixities for all [Edges](#edge) in a [Path](#path). At the momment fixities can be only fully fixed or fully released: [LogicalPathReleaseAspect](#logicalpathreleaseaspect).
@@ -747,6 +754,7 @@ Indicates **Logical** release for all [Faces](#face) in a [Sheet](#sheet). By de
 (Future) There might be some cases where applications will need to have varying fixities at Faces in a Sheet, for this, elements can use "SubSheets". e.g. [SurfaceMember](#surfaceemmber) always owns a single **location** [Sheet](#sheet) which defines location. Logical Sheet Release Aspect could override all Face fixities in that **location Sheet**, however there might be some Faces that need to have different fixities. This can be achived with **sub Sheets** that share Faces with **location Sheet**. SurfaceMember can have additional aspects that reference sub Sheets. Location Sheet fixities will always override default fixities, sub Sheet fixities will always override location Sheet defined fixities.
 
 Elements should never have multiple release aspects refering to the same Sheet.
+--->
 
 ## Enumerations
 
@@ -804,10 +812,10 @@ Defines parent for a [Loop](#loop). Each class which can have a Loop as a child 
 
 Defines parent for a [Wire](#wire). Each class which can have a Wire as a child should subclass from this mix-in. [TopologyElements](#topologyelement) are smallest part of StructuralAnalysis schema, these classes should not reference directly any more complex entity (e.g. [SurfaceMember](#surfacemember), [PointSupport](#pointsupport)), IWireOwner allows to avoid the need of such direct relationship.
 
-### ISurface
+### ISolidSurface
 
-[SurfaceMember](#surfacemember) and [SurfaceMemberModifier](#surfacemembermodifier) require many of the same properties and behave in similar manners. Because of this similarity, both interfaces implement the same mixing - ISurface.
- ISurface always has a normal, which is provided by some other related element ([Sheet](#sheet)).
+[SurfaceMember](#surfacemember) and [SurfaceMemberModifier](#surfacemembermodifier) require many of the same properties and behave in similar manners. Because of this similarity, both interfaces implement the same mixing - ISolidSurface.
+ ISolidSurface always has a normal, which is provided by some other related element ([Sheet](#sheet)).
 
 ### IDefinedPoint
 
