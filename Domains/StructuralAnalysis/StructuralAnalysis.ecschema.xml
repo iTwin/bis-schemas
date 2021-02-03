@@ -385,7 +385,7 @@
         <BaseClass>BehaviorAspect</BaseClass>
     </ECEntityClass>
 
-    <ECEntityClass typeName="BendingBehaviorAspect" modifier="Sealed" displayLabel="Bending Behavior" description="Assigns analytical behavior for an ISolidSurface when subjected to transverse loads.">
+    <ECEntityClass typeName="BendingBehaviorAspect" modifier="Sealed" displayLabel="Bending Behavior" description="Assigns analytical behavior for an IStructuralSurface when subjected to transverse loads.">
         <BaseClass>SurfaceMemberBehaviorAspect</BaseClass>
         <ECProperty propertyName="BendingBehaviorValue" typeName="BendingBehaviorValue" displayLabel="Bending behavior value" description="Provides value for the behavior." />
     </ECEntityClass>
@@ -613,34 +613,34 @@
         <BaseClass>IStoryAssignable</BaseClass>
     </ECEntityClass>
 
-    <ECEntityClass typeName="ISolidSurface" modifier="Abstract" displayLabel="Solid Surface" description="Element which is defined by a surface and a thickness.">
+    <ECEntityClass typeName="IStructuralSurface" modifier="Abstract" displayLabel="Solid Surface" description="Element which is defined by a surface and a thickness.">
         <ECCustomAttributes>
             <IsMixin xmlns="CoreCustomAttributes.01.00.00">
                 <AppliesToEntityClass>StructuralAnalysisElement</AppliesToEntityClass>
             </IsMixin>
         </ECCustomAttributes>
-        <ECProperty propertyName="PlacementSurface" typeName="PlacementSurface" displayLabel="PlacementSurface" description="Sheet defines area location for ISolidSurface, the height of ISolidSurface is defined by thickness(provided by related SurfaceType) which extrudes location area by that thickness. PlacementSurface allows to define how location area should be interpreted for extrusion - ether as start, end or center. These are the most common used cases. More flexibility is achieved by using Offset property." />
-        <ECProperty propertyName="Offset" typeName="double" displayLabel="Offset" description="PlacementSurface provides only a few cases for how to interpret the location area (Sheet). Offset provides more flexibility for less common cases, where it provides additional offset along the normal of ISolidSurface. Both PlacementSurface and Offset properties can be used at the same time." kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="PlacementSurface" typeName="PlacementSurface" displayLabel="PlacementSurface" description="Sheet defines area location for IStructuralSurface, the height of IStructuralSurface is defined by thickness(provided by related SurfaceType) which extrudes location area by that thickness. PlacementSurface allows to define how location area should be interpreted for extrusion - ether as start, end or center. These are the most common used cases. More flexibility is achieved by using Offset property." />
+        <ECProperty propertyName="Offset" typeName="double" displayLabel="Offset" description="PlacementSurface provides only a few cases for how to interpret the location area (Sheet). Offset provides more flexibility for less common cases, where it provides additional offset along the normal of IStructuralSurface. Both PlacementSurface and Offset properties can be used at the same time." kindOfQuantity="AECU:LENGTH_SHORT" />
     </ECEntityClass>
 
-    <ECRelationshipClass typeName="ISolidSurfaceRefersToSurfaceType" strength="referencing" modifier="Sealed">
+    <ECRelationshipClass typeName="IStructuralSurfaceRefersToSurfaceType" strength="referencing" modifier="Sealed">
         <BaseClass>anlyt:AnalyticalElementIsOfType</BaseClass>
         <Source multiplicity="(0..*)" roleLabel="references" polymorphic="true">
-            <Class class="ISolidSurface" />
+            <Class class="IStructuralSurface" />
         </Source>
         <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="true">
             <Class class="SurfaceType" />
         </Target>
     </ECRelationshipClass>
 
-    <ECEntityClass typeName="SurfaceType" modifier="Abstract" displayLabel="Surface Type" description="Defines a Surface Type for ISolidSurface.">
+    <ECEntityClass typeName="SurfaceType" modifier="Abstract" displayLabel="Surface Type" description="Defines a Surface Type for IStructuralSurface.">
         <BaseClass>anlyt:AnalyticalType</BaseClass>
     </ECEntityClass>
 
     <ECEntityClass typeName="SimpleSurfaceType" modifier="Sealed" description="Simple Surface Type.">
         <BaseClass>SurfaceType</BaseClass>
-        <ECProperty propertyName="Thickness" typeName="double" description="Thickness of ISolidSurfaces." kindOfQuantity="AECU:LENGTH_SHORT" />
-        <ECNavigationProperty propertyName="Material" relationshipName="SimpleSurfaceTypeRefersToMaterial" direction="Forward" displayLabel="Material" description="Material of all ISolidSurfaces with this type." />
+        <ECProperty propertyName="Thickness" typeName="double" description="Thickness of IStructuralSurfaces." kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECNavigationProperty propertyName="Material" relationshipName="SimpleSurfaceTypeRefersToMaterial" direction="Forward" displayLabel="Material" description="Material of all IStructuralSurfaces with this type." />
     </ECEntityClass>
 
     <ECRelationshipClass typeName="SimpleSurfaceTypeRefersToMaterial" strength="referencing" strengthDirection="Forward" modifier="Sealed">
@@ -655,7 +655,7 @@
     <ECEntityClass typeName="SurfaceMember" modifier="Sealed" displayLabel="Surface Member" description="Defines a Member that is located by a Sheet.">
         <BaseClass>Member</BaseClass>
         <BaseClass>ISheetOwner</BaseClass>
-        <BaseClass>ISolidSurface</BaseClass>
+        <BaseClass>IStructuralSurface</BaseClass>
         <BaseClass>IDefinedSurface</BaseClass>
         <BaseClass>bis:IParentElement</BaseClass>
         <ECProperty propertyName="Classification" typeName="SurfaceMemberClassificationType" displayLabel="Classification" description="The use case for this Surface Member." />
@@ -688,10 +688,10 @@
 
     <ECRelationshipClass typeName="SurfaceMemberOwnsSurfaceMemberBehaviorAspect" modifier="Sealed" strength="embedding">
         <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
-        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
             <Class class="SurfaceMember" />
         </Source>
-        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="true">
             <Class class="SurfaceMemberBehaviorAspect" />
         </Target>
     </ECRelationshipClass>
@@ -701,14 +701,14 @@
         <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
             <Class class="Member" />
         </Source>
-        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="true">
             <Class class="MemberBehaviorAspect" />
         </Target>
     </ECRelationshipClass>
 
     <ECEntityClass typeName="SurfaceMemberModifier" modifier="Sealed" displayLabel="Surface Member Modifier" description="Defines a solid region of a SurfaceMember that has different behavior.">
         <BaseClass>SurfaceMemberRegion</BaseClass>
-        <BaseClass>ISolidSurface</BaseClass>
+        <BaseClass>IStructuralSurface</BaseClass>
         <ECProperty propertyName="Priority" typeName="int" displayLabel="Priority" description="Defines priority of SurfaceMemberModifier. Higher the number - higher the priority." />
     </ECEntityClass>
 
@@ -750,10 +750,10 @@
 
     <ECRelationshipClass typeName="CurveMemberOwnsCurveMemberBehaviorAspect" modifier="Sealed" strength="embedding">
         <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
-        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
             <Class class="CurveMember" />
         </Source>
-        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="true">
             <Class class="CurveMemberBehaviorAspect" />
         </Target>
     </ECRelationshipClass>
