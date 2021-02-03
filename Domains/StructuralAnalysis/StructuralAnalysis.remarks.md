@@ -345,7 +345,7 @@ Available CurveMemberTypes:
 
 ### SurfaceType
 
-[ISolidSurfaces](#ISolidSurface) ([SurfaceMembers](#surfacemember) and [SurfaceMemberModifiers](#surfacemembermodifier)) might have some shared properties in a structure: thickness, material, etc... SurfaceType groups these ISolidSurface instances to a single group and provides shared properties for the whole group-system.
+[IStructuralSurfaces](#IStructuralSurface) ([SurfaceMembers](#surfacemember) and [SurfaceMemberModifiers](#surfacemembermodifier)) might have some shared properties in a structure: thickness, material, etc... SurfaceType groups these IStructuralSurface instances to a single group and provides shared properties for the whole group-system.
 
 Available SurfaceTypes:
 
@@ -353,7 +353,7 @@ Available SurfaceTypes:
 
 ### SimpleSurfaceType
 
-Most common [SurfaceType](#surfacetype). Should be assigned to most walls, slabs which do not have any varying thickness, material layers. Simple Surface Type provides constant material and thickness for each [ISolidSurface](#ISolidSurface).
+Most common [SurfaceType](#surfacetype). Should be assigned to most walls, slabs which do not have any varying thickness, material layers. Simple Surface Type provides constant material and thickness for each [IStructuralSurface](#IStructuralSurface).
 
 ### Load
 
@@ -812,10 +812,10 @@ Defines parent for a [Loop](#loop). Each class which can have a Loop as a child 
 
 Defines parent for a [Wire](#wire). Each class which can have a Wire as a child should subclass from this mix-in. [TopologyElements](#topologyelement) are smallest part of StructuralAnalysis schema, these classes should not reference directly any more complex entity (e.g. [SurfaceMember](#surfacemember), [PointSupport](#pointsupport)), IWireOwner allows to avoid the need of such direct relationship.
 
-### ISolidSurface
+### IStructuralSurface
 
-[SurfaceMember](#surfacemember) and [SurfaceMemberModifier](#surfacemembermodifier) require many of the same properties and behave in similar manners. Because of this similarity, both interfaces implement the same mixing - ISolidSurface.
- ISolidSurface always has a normal, which is provided by some other related element ([Sheet](#sheet)).
+[SurfaceMember](#surfacemember) and [SurfaceMemberModifier](#surfacemembermodifier) require many of the same properties and behave in similar manners. Because of this similarity, both interfaces implement the same mixing - IStructuralSurface.
+ IStructuralSurface always has a normal, which is provided by some other related element ([Sheet](#sheet)).
 
 ### IDefinedPoint
 
