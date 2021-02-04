@@ -618,7 +618,7 @@
     <ECEntityClass typeName="ISurfaceProvider" modifier="Abstract" displayLabel="Surface Provider" description="An interface that defines an IOperand that can provide a surface.">
         <ECCustomAttributes>
             <IsMixin xmlns="CoreCustomAttributes.01.00.03">
-                <AppliesToEntityClass>GeotechnicalInterpretationElement</AppliesToEntityClass>
+                <AppliesToEntityClass>bis:Element</AppliesToEntityClass>
             </IsMixin>
         </ECCustomAttributes>
         <BaseClass>IOperand</BaseClass>
@@ -960,6 +960,7 @@
         <BaseClass>GeotechnicalInformationElement</BaseClass>
         <BaseClass>IOperand</BaseClass>
         <BaseClass>IGroundProvider</BaseClass>
+        <BaseClass>ISurfaceProvider</BaseClass>
         <!-- ADD ALL IOperand MIXINS (THAT CAN BE OPERATION OR FILTER OUTPUT) AS BASE CLASSES -->
     </ECEntityClass>
 
@@ -973,11 +974,6 @@
         <!-- QUESTION: how do we want to record error information? Is localization an issue? -->
         <ECProperty propertyName="Error"     typeName="string" displayLabel="Error"   description="Information about the error."/>
     </ECEntityClass>
-
-
-    <!-- WILL ADD EmptyOperand and InvalidOperand IN THE NEAR FUTURE-->
-
-    <!-- WILL ADD SOME "FILTER" CAPABILITY FOR HANDLING COMPLEX RESULTS IN THE NEAR FUTURE -->
 
     <!-- ========================================================================================== -->
     <!-- ========================== TEMPORARY ===================================================== -->
@@ -1010,5 +1006,43 @@
 
         <ECProperty propertyName="Volume" displayLabel="Volume" typeName="binary" description="For testing BREP volume performance/strategy."/>
     </ECEntityClass>
+
+    <!-- ========================================================================================== -->
+    <!-- ========================== SurfaceTransformation-RELATED CLASSES ========================= -->
+    <!-- ========================================================================================== -->
+
+    <!-- THESE CLASSES INTENDED FOR TESTING OF OPERATIONS/IOPERANDS SYSTEM ONLY -->
+
+    <!-- Use GenericSurface for the input and output IOperands in testing -->
+
+
+    <ECEntityClass typeName="SurfaceTransformation" modifier="Sealed" displayLabel="Surface Transformation" description="An Operation that transforms one or more surfaces into another surface">
+        <BaseClass>Operation</BaseClass>
+
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="SurfaceProviderDrivesSurfaceTransformation" strength="referencing" modifier="Sealed" description="Connects a SurfaceTransformation with its input ISurfaceProvider(s).">
+        <BaseClass>InputDrivesOperation</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="is surface input for and drives" polymorphic="true">
+            <Class class="ISurfaceProvider" />
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="has surface input and is driven by" polymorphic="true">
+            <Class class="SurfaceTransformation" />
+        </Target>
+    </ECRelationshipClass>
+
+
+    <ECRelationshipClass typeName="SurfaceTransformationHasSurfaceOutput" strength="referencing" modifier="Sealed" description="Connects a SurfaceTransformation with its output ISurfaceProvider.">
+        <BaseClass>OperationHasOutput</BaseClass>
+        <!-- Every ISurfaceProvider must have come from 0 or 1 SurfaceTransformation -->
+        <Source multiplicity="(0..1)" roleLabel="has output" polymorphic="true">
+            <Class class="SurfaceTransformation" />
+        </Source>
+        <!-- before Operation is run there will not be any result ISurfaceProvider-->
+        <Target multiplicity="(0..1)" roleLabel="is output for" polymorphic="true">
+            <Class class="ISurfaceProvider" />
+        </Target>
+    </ECRelationshipClass>
+
 
 </ECSchema>
