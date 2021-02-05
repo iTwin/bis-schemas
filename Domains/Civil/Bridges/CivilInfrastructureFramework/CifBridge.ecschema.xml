@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ECSchema schemaName="CifBridge" alias="cifbrg" version="01.00.01" description="iModel Bridge schema containing aspect classes with properties from OpenBridge Modeler." xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
+<ECSchema schemaName="CifBridge" alias="cifbrg" version="01.00.02" description="iModel Connector schema containing aspect classes with properties from OpenBridge Modeler." xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
     <ECSchemaReference name="BisCore" version="01.00.12" alias="bis"/>
-    <ECSchemaReference name="CifCommon" version="01.00.00" alias="cifcmn"/>
-    <ECSchemaReference name="CifUnits" version="01.00.00" alias="cifu"/>
+    <ECSchemaReference name="CifCommon" version="01.00.01" alias="cifcmn"/>
+    <ECSchemaReference name="CifUnits" version="01.00.01" alias="cifu"/>
     <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
     <ECCustomAttributes>
         <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
@@ -173,6 +173,7 @@
         <ECEnumerator name="Rect_Bevel" value="4" displayLabel="Rect-Bevel"/>
         <ECEnumerator name="None" value="-1" displayLabel="None"/>
         <ECEnumerator name="Oval" value="6" displayLabel="Oval"/>
+        <ECEnumerator name="Variable" value="7" displayLabel="Variable"/>
     </ECEnumeration>
     <ECEnumeration typeName="PierFootingBaseAspect_Pierfooting_FootingType_Enum" backingTypeName="int" isStrict="true">
         <ECEnumerator name="Rectangular_Isolated" value="0" displayLabel="Rectangular Isolated"/>
@@ -198,6 +199,10 @@
     <ECEnumeration typeName="SegmentalSpanRuleAspect_SegmentalSpanRuleTemplateOrientation_Enum" backingTypeName="int" isStrict="true">
         <ECEnumerator name="Vertical" value="0" displayLabel="Vertical"/>
         <ECEnumerator name="Normal" value="1" displayLabel="Normal"/>
+    </ECEnumeration>
+    <ECEnumeration typeName="ShearConnectorsHolderAspect_ShearConnectorsHolder_ConnectorType_Enum" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="Stud" value="0" displayLabel="Stud"/>
+        <ECEnumerator name="Channel" value="1" displayLabel="Channel"/>
     </ECEnumeration>
     <ECEnumeration typeName="SupportLineBtMidPointRuleAspect_SupportLineBtMidPointRule_DirectionInputMode_Enum" backingTypeName="int" isStrict="true">
         <ECEnumerator name="Skew" value="0" displayLabel="Skew"/>
@@ -683,12 +688,18 @@
         <ECProperty propertyName="CustomObjectByPathRuleStartStation_DistanceAlong" typeName="double" kindOfQuantity="cifu:STATION">
             <ECCustomAttributes>
                 <HiddenProperty xmlns="CoreCustomAttributes.01.00.03"/>
+                <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                    <Description>Unnecessary duplicate-property. Use 'CustomObjectByPathRuleStartStation' directly</Description>
+                </Deprecated>
             </ECCustomAttributes>
         </ECProperty>
         <ECProperty propertyName="CustomObjectByPathRuleEndStation" typeName="double" displayLabel="End Station" category="CustomObjectRuleAttributes_Rule_Property" priority="299988" kindOfQuantity="cifu:STATION"/>
         <ECProperty propertyName="CustomObjectByPathRuleEndStation_DistanceAlong" typeName="double" kindOfQuantity="cifu:STATION">
             <ECCustomAttributes>
                 <HiddenProperty xmlns="CoreCustomAttributes.01.00.03"/>
+                <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                    <Description>Unnecessary duplicate-property. Use 'CustomObjectByPathRuleEndStation' directly</Description>
+                </Deprecated>
             </ECCustomAttributes>
         </ECProperty>
         <ECProperty propertyName="CustomObjectByPathRuleDistance" typeName="double" displayLabel="Distance" category="CustomObjectRuleAttributes_Rule_Property" priority="299987" kindOfQuantity="cifu:LENGTH"/>
@@ -1372,6 +1383,69 @@
             <Class class="ExcavationRuleAspect"/>
         </Target>
     </ECRelationshipClass>
+    <ECEntityClass typeName="FieldSpliceAspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="FieldSplice_Name" typeName="string" displayLabel="Name" category="FieldSpliceProperties_Field_Splice_Properties" priority="300000"/>
+        <ECProperty propertyName="FieldSplice_BoltDiameter" typeName="double" displayLabel="Bolt Diameter" category="FieldSpliceProperties_Field_Splice_Properties" priority="299999" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="FieldSplice_TotalNumberOfBolts" typeName="int" displayLabel="Total Number Of Bolts" category="FieldSpliceProperties_Field_Splice_Properties" priority="299998"/>
+        <ECProperty propertyName="FieldSplice_TopFlangePlateLength" typeName="double" displayLabel="TF Plate Length" category="TopFlangePlatesProperties_Top_Flange_Plates_Properties" priority="299997" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="FieldSplice_TopFlangeOutsidePlateWidth" typeName="double" displayLabel="TF Outside Plate Width" category="TopFlangePlatesProperties_Top_Flange_Plates_Properties" priority="299996" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="FieldSplice_TopFlangeOutsidePlateTickness" typeName="double" displayLabel="TF Outside Plate Thickness" category="TopFlangePlatesProperties_Top_Flange_Plates_Properties" priority="299995" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="FieldSplice_TopFlangeInsidePlateWidth" typeName="double" displayLabel="TF Inside Plate Width" category="TopFlangePlatesProperties_Top_Flange_Plates_Properties" priority="299994" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="FieldSplice_TopFlangeInsidePlateThickness" typeName="double" displayLabel="TF Inside Plate Thickness" category="TopFlangePlatesProperties_Top_Flange_Plates_Properties" priority="299993" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="FieldSplice_TopFlangeBolts" typeName="int" displayLabel="TF Bolts" category="TopFlangePlatesProperties_Top_Flange_Plates_Properties" priority="299992"/>
+        <ECProperty propertyName="FieldSplice_BottomFlangePlateLength" typeName="double" displayLabel="BF Plate Length" category="BottomFlangePlatesProperties_Bottom_Flange_Plates_Properties" priority="299991" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="FieldSplice_BottomFlangeOutsidePlateWidth" typeName="double" displayLabel="BF Outside Plate Width" category="BottomFlangePlatesProperties_Bottom_Flange_Plates_Properties" priority="299990" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="FieldSplice_BottomFlangeOutsidePlateTickness" typeName="double" displayLabel="BF Outside Plate Thickness" category="BottomFlangePlatesProperties_Bottom_Flange_Plates_Properties" priority="299989" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="FieldSplice_BottomFlangeInsidePlateWidth" typeName="double" displayLabel="BF Inside Plate Width" category="BottomFlangePlatesProperties_Bottom_Flange_Plates_Properties" priority="299988" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="FieldSplice_BottomFlangeInsidePlateThickness" typeName="double" displayLabel="BF Inside Plate Thickness" category="BottomFlangePlatesProperties_Bottom_Flange_Plates_Properties" priority="299987" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="FieldSplice_BottomFlangeBolts" typeName="int" displayLabel="BF Bolts" category="BottomFlangePlatesProperties_Bottom_Flange_Plates_Properties" priority="299986"/>
+        <ECProperty propertyName="FieldSplice_WebPlateLength" typeName="double" displayLabel="Web Plate Length" category="WebPlatesbProperties_Web_Plates_Properties" priority="299985" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="FieldSplice_WebOutsidePlateHeight" typeName="double" displayLabel="Web Plate Height" category="WebPlatesbProperties_Web_Plates_Properties" priority="299984" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="FieldSplice_WebOutsidePlateTickness" typeName="double" displayLabel="Web Plate Thickness" category="WebPlatesbProperties_Web_Plates_Properties" priority="299983" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="FieldSplice_WebBolts" typeName="int" displayLabel="Web Bolts" category="WebPlatesbProperties_Web_Plates_Properties" priority="299982"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsFieldSpliceAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="FieldSpliceAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="FieldSpliceComponentAspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="FieldSpliceComponent_Name" typeName="string" displayLabel="Name" category="FieldSpliceComponentProperties_Field_Splice_Component_Properties" priority="299950"/>
+        <ECProperty propertyName="FieldSpliceComponent_Type" typeName="string" displayLabel="Type" category="FieldSpliceComponentProperties_Field_Splice_Component_Properties" priority="299949"/>
+        <ECProperty propertyName="FieldSpliceComponent_Material" typeName="string" displayLabel="Material" category="FieldSpliceComponentProperties_Field_Splice_Component_Properties" priority="299948"/>
+        <ECProperty propertyName="FieldSpliceComponent_Volume" typeName="double" displayLabel="Volume" category="FieldSpliceComponentProperties_Field_Splice_Component_Properties" priority="299946" kindOfQuantity="cifu:VOLUME"/>
+        <ECProperty propertyName="FieldSpliceComponent_Count" typeName="int" displayLabel="Count" category="FieldSpliceComponentProperties_Field_Splice_Component_Properties" priority="299944"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsFieldSpliceComponentAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="FieldSpliceComponentAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="FieldSpliceGroupAspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="FieldSpliceGroup_Name" typeName="string" displayLabel="Name" category="FieldSpliceGroupProperties_Field_Splice_Group" priority="299950"/>
+        <ECProperty propertyName="FieldSpliceGroup_Description" typeName="string" displayLabel="Description" category="FieldSpliceGroupProperties_Field_Splice_Group" priority="299949"/>
+        <ECProperty propertyName="FieldSpliceGroup_LayoutDefinition" typeName="string" displayLabel="Field Splice Placement" category="FieldSpliceGroupProperties_Field_Splice_Group" priority="299930"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsFieldSpliceGroupAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="FieldSpliceGroupAspect"/>
+        </Target>
+    </ECRelationshipClass>
     <ECEntityClass typeName="HaunchBeamSegmentAspect">
         <BaseClass>BeamSegmentBaseAspect</BaseClass>
     </ECEntityClass>
@@ -1974,6 +2048,66 @@
             <Class class="SegmentCollectionAspect"/>
         </Target>
     </ECRelationshipClass>
+    <ECEntityClass typeName="ShearConnectorGroupGroupAspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="ShearConnectorGroupGroup_Name" typeName="string" displayLabel="Name" category="ShearConnectorGroupsProperties_Shear_Studs_Groups_Properties" priority="299950"/>
+        <ECProperty propertyName="ShearConnectorGroupGroup_Description" typeName="string" displayLabel="Description" category="ShearConnectorGroupsProperties_Shear_Studs_Groups_Properties" priority="299940"/>
+        <ECProperty propertyName="ShearConnectorGroupGroup_LayoutDefinition" typeName="string" displayLabel="Shear Studs Placement" category="ShearConnectorGroupsProperties_Shear_Studs_Groups_Properties" priority="299930"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsShearConnectorGroupGroupAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="ShearConnectorGroupGroupAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="ShearConnectorHolderAspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="ShearConnectorHolder_Name" typeName="string" displayLabel="Name" category="ShearConnectorProperties_Shear_Stud_Properties" priority="299999"/>
+        <ECProperty propertyName="ShearConnectorHolder_ShearConnectorArrangementName" typeName="string" displayLabel="Shear Studs Group" category="ShearConnectorProperties_Shear_Stud_Properties" priority="299998"/>
+        <ECProperty propertyName="ShearConnectorHolder_ShearConnectorGroupName" typeName="string" displayLabel="Shear Studs Groups" category="ShearConnectorProperties_Shear_Stud_Properties" priority="299997"/>
+        <ECProperty propertyName="ShearConnectorHolder_Section" typeName="string" displayLabel="Template" category="ShearConnectorProperties_Shear_Stud_Properties" priority="299996"/>
+        <ECProperty propertyName="ShearConnectorHolder_Volume" typeName="double" displayLabel="Volume" category="ShearConnectorProperties_Shear_Stud_Properties" priority="299995" kindOfQuantity="cifu:VOLUME"/>
+        <ECProperty propertyName="ShearConnectorHolder_Weight" typeName="double" displayLabel="Weight" category="ShearConnectorProperties_Shear_Stud_Properties" priority="299994" kindOfQuantity="cifu:LENGTH"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsShearConnectorHolderAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="ShearConnectorHolderAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="ShearConnectorsHolderAspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="ShearConnectorsHolder_Name" typeName="string" displayLabel="Name" category="ConnectorGroupArrangementProperties_Shear_Studs_Group_Properties" priority="299999"/>
+        <ECProperty propertyName="ShearConnectorsHolder_Template" typeName="string" displayLabel="Template" category="ShearConnectorTemplateProperties_Shear_Stud_Template_Properties" priority="299998"/>
+        <ECProperty propertyName="ShearConnectorsHolder_ConnectorType" typeName="ShearConnectorsHolderAspect_ShearConnectorsHolder_ConnectorType_Enum" displayLabel="Shear Connector Type" category="ShearConnectorTemplateProperties_Shear_Stud_Template_Properties" priority="299997"/>
+        <ECProperty propertyName="ShearConnectorsHolder_Section" typeName="string" displayLabel="Section" category="ShearConnectorTemplateProperties_Shear_Stud_Template_Properties" priority="299996"/>
+        <ECProperty propertyName="ShearConnectorsHolder_Material" typeName="string" displayLabel="Material" category="ShearConnectorTemplateProperties_Shear_Stud_Template_Properties" priority="299995"/>
+        <ECProperty propertyName="ShearConnectorsHolder_Height" typeName="double" displayLabel="Total Height" category="ShearConnectorTemplateProperties_Shear_Stud_Template_Properties" priority="299994" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="ShearConnectorsHolder_HeadHeight" typeName="double" displayLabel="Head Height" category="ShearConnectorTemplateProperties_Shear_Stud_Template_Properties" priority="299993" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="ShearConnectorsHolder_Diameter" typeName="double" displayLabel="Stud Diameter" category="ShearConnectorTemplateProperties_Shear_Stud_Template_Properties" priority="299992" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="ShearConnectorsHolder_HeadDiameter" typeName="double" displayLabel="Head Diameter" category="ShearConnectorTemplateProperties_Shear_Stud_Template_Properties" priority="299991" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="ShearConnectorsHolder_Length" typeName="double" displayLabel="&lt;- TotalLength -&gt;" category="ShearConnectorTemplateProperties_Shear_Stud_Template_Properties" priority="299990" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="ShearConnectorsHolder_TotalWeight" typeName="double" displayLabel="Total Components Weight" category="ConnectorGroupArrangementProperties_Shear_Studs_Group_Properties" priority="299988" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="ShearConnectorsHolder_TotalVolume" typeName="double" displayLabel="Total Components Volume" category="ConnectorGroupArrangementProperties_Shear_Studs_Group_Properties" priority="299987" kindOfQuantity="cifu:VOLUME"/>
+        <ECProperty propertyName="ShearConnectorsHolder_LayoutDefinition" typeName="string" displayLabel="Shear Studs Placement" category="ConnectorGroupArrangementProperties_Shear_Studs_Group_Properties" priority="299986"/>
+        <ECProperty propertyName="ShearConnectorsHolder_MainBuildOrder" typeName="int" displayLabel="Shear Studs Build Order" category="BridgeModelerAttributes_BuildOrder_Build_Order" priority="299985"/>
+        <ECProperty propertyName="ShearConnectorsHolder_TotalNumber" typeName="int" displayLabel="Total Studs Number" category="ConnectorGroupArrangementProperties_Shear_Studs_Group_Properties" priority="299989"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsShearConnectorsHolderAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="ShearConnectorsHolderAspect"/>
+        </Target>
+    </ECRelationshipClass>
     <ECRelationshipClass typeName="ElementOwnsSolidByTemplateRuleAspect" modifier="None" strength="embedding">
         <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
         <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
@@ -2050,14 +2184,23 @@
         <ECProperty propertyName="SupportLineBtMidPointRule_Length" typeName="double" displayLabel="Length" category="SupportLineRuleAttributes_SupportLine_Rule" priority="299999" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="SupportLineBtMidPointRule_DirectionInputMode" typeName="SupportLineBtMidPointRuleAspect_SupportLineBtMidPointRule_DirectionInputMode_Enum" displayLabel="Direction Mode" category="SupportLineRuleAttributes_SupportLine_Rule" priority="299997"/>
         <ECProperty propertyName="SupportLineBtMidPointRule_Direction" typeName="double" displayLabel="Direction" category="SupportLineRuleAttributes_SupportLine_Rule" priority="299996" kindOfQuantity="cifu:BEARING"/>
-        <ECProperty propertyName="SupportLineBtMidPointRule_StationAlong" typeName="double" displayLabel="Station" category="SupportLineRuleAttributes_SupportLine_Rule" priority="299998" kindOfQuantity="cifu:STATION"/>
+        <ECProperty propertyName="SupportLineBtMidPointRule_StationAlong" typeName="double" displayLabel="Distance Along" category="SupportLineRuleAttributes_SupportLine_Rule" priority="299998" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="SupportLineBtMidPointRule_StationAlong_DistanceAlong" typeName="double" kindOfQuantity="cifu:STATION">
             <ECCustomAttributes>
                 <HiddenProperty xmlns="CoreCustomAttributes.01.00.03"/>
+                <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                    <Description>Unnecessary duplicate-property. Use 'SupportLineBtMidPointRule_StationAlong' directly</Description>
+                </Deprecated>
             </ECCustomAttributes>
         </ECProperty>
         <ECProperty propertyName="SupportLineBtMidPointRule_Skew" typeName="double" displayLabel="Skew" category="SupportLineRuleAttributes_SupportLine_Rule" priority="299995" kindOfQuantity="cifu:ANGLE"/>
         <ECProperty propertyName="SupportLineBtMidPointRule_TargetLineStartPoint" typeName="point3d" displayLabel="Start Point" category="SupportLineRuleAttributes_SupportLine_Rule" priority="299994"/>
+        <ECProperty propertyName="SupportLineBtMidPointRule_DistanceAlong" typeName="double" displayLabel="&lt;- DistanceAlong -&gt;" category="SupportLineRuleAttributes_SupportLine_Rule" priority="299993" kindOfQuantity="cifu:LENGTH">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03"/>
+            </ECCustomAttributes>
+        </ECProperty>
+        <ECProperty propertyName="SupportLineBtMidPointRule_Station" typeName="double" displayLabel="Station" category="SupportLineRuleAttributes_SupportLine_Rule" priority="299998" kindOfQuantity="cifu:STATION"/>
     </ECEntityClass>
     <ECRelationshipClass typeName="ElementOwnsSupportLineBtMidPointRuleAspect" modifier="None" strength="embedding">
         <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
@@ -2274,21 +2417,22 @@
         <ECProperty propertyName="WingWallByAbutmentRuleVerticalOffset" typeName="double" displayLabel="Vertical Offset" category="AbutmentWingWallRuleAttributes_Abutment_Wingwall_Placement_Rule" priority="299998" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="WingWallByAbutmentRuleAlignWithAbutment" typeName="boolean" displayLabel="Align With Abutment" category="AbutmentWingWallRuleAttributes_Abutment_Wingwall_Placement_Rule" priority="299997"/>
         <ECProperty propertyName="WingWallByAbutmentRuleTransverseOffset" typeName="double" displayLabel="Transverse Offset" category="AbutmentWingWallRuleAttributes_Abutment_Wingwall_Placement_Rule" priority="299996" kindOfQuantity="cifu:LENGTH"/>
-        <ECProperty propertyName="WingWallByAbutmentRuleLongitudinalOffset" typeName="double" displayLabel="Longitudinal Offset" category="AbutmentWingWallRuleAttributes_Abutment_Wingwall_Placement_Rule" priority="299995" kindOfQuantity="cifu:LENGTH"/>
-        <ECProperty propertyName="WingWallByAbutmentRuleParallelToAlignment" typeName="boolean" displayLabel="Parallel To Alignment" category="AbutmentWingWallRuleAttributes_Abutment_Wingwall_Placement_Rule" priority="299994"/>
-        <ECProperty propertyName="WingWallByAbutmentRuleSkewAngle" typeName="double" displayLabel="Skew Angle" category="AbutmentWingWallRuleAttributes_Abutment_Wingwall_Placement_Rule" priority="299993" kindOfQuantity="cifu:ANGLE"/>
-        <ECProperty propertyName="WingWallByAbutmentRuleAdjustHeightToBackwall" typeName="boolean" displayLabel="Adjust Height to Backwall" category="AbutmentWingWallRuleAttributes_Abutment_Wingwall_Placement_Rule" priority="299992"/>
-        <ECProperty propertyName="WingWallByAbutmentRuleComputeLength" typeName="boolean" displayLabel="Compute Length" category="AbutmentWingWallRuleAttributes_Abutment_Wingwall_Placement_Rule" priority="299991"/>
-        <ECProperty propertyName="WingWallByAbutmentRuleFillSlope" typeName="string" displayLabel="Fill Slope" category="AbutmentWingWallRuleAttributes_Abutment_Wingwall_Placement_Rule" priority="299990"/>
-        <ECProperty propertyName="WingWallByAbutmentRuleBermHorizontalOffset" typeName="double" displayLabel="Berm Horizontal Offset" category="AbutmentWingWallRuleAttributes_Abutment_Wingwall_Placement_Rule" priority="299989" kindOfQuantity="cifu:LENGTH"/>
-        <ECProperty propertyName="WingWallByAbutmentRuleBermVerticalOffset" typeName="double" displayLabel="Berm Vertical Offset" category="AbutmentWingWallRuleAttributes_Abutment_Wingwall_Placement_Rule" priority="299988" kindOfQuantity="cifu:LENGTH"/>
-        <ECProperty propertyName="WingWallByAbutmentRuleLengthExtension" typeName="double" displayLabel="Length Extension" category="AbutmentWingWallRuleAttributes_Abutment_Wingwall_Placement_Rule" priority="299987" kindOfQuantity="cifu:LENGTH"/>
-        <ECProperty propertyName="WingWallByAbutmentRuleTemplateXmlFragment" typeName="string" displayLabel="Wingwall Template" category="AbutmentWingWallRuleAttributes_Abutment_Wingwall_Placement_Rule" priority="299986">
+        <ECProperty propertyName="WingWallByAbutmentRuleLongitudinalOffset" typeName="double" displayLabel="Longitudinal Offset" category="AbutmentWingWallRuleAttributes_Abutment_Wingwall_Placement_Rule" priority="299994" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="WingWallByAbutmentRuleParallelToAlignment" typeName="boolean" displayLabel="Parallel To Alignment" category="AbutmentWingWallRuleAttributes_Abutment_Wingwall_Placement_Rule" priority="299993"/>
+        <ECProperty propertyName="WingWallByAbutmentRuleSkewAngle" typeName="double" displayLabel="Skew Angle" category="AbutmentWingWallRuleAttributes_Abutment_Wingwall_Placement_Rule" priority="299992" kindOfQuantity="cifu:ANGLE"/>
+        <ECProperty propertyName="WingWallByAbutmentRuleAdjustHeightToBackwall" typeName="boolean" displayLabel="Adjust Height to Backwall" category="AbutmentWingWallRuleAttributes_Abutment_Wingwall_Placement_Rule" priority="299991"/>
+        <ECProperty propertyName="WingWallByAbutmentRuleComputeLength" typeName="boolean" displayLabel="Compute Length" category="AbutmentWingWallRuleAttributes_Abutment_Wingwall_Placement_Rule" priority="299990"/>
+        <ECProperty propertyName="WingWallByAbutmentRuleFillSlope" typeName="string" displayLabel="Fill Slope" category="AbutmentWingWallRuleAttributes_Abutment_Wingwall_Placement_Rule" priority="299989"/>
+        <ECProperty propertyName="WingWallByAbutmentRuleBermHorizontalOffset" typeName="double" displayLabel="Berm Horizontal Offset" category="AbutmentWingWallRuleAttributes_Abutment_Wingwall_Placement_Rule" priority="299988" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="WingWallByAbutmentRuleBermVerticalOffset" typeName="double" displayLabel="Berm Vertical Offset" category="AbutmentWingWallRuleAttributes_Abutment_Wingwall_Placement_Rule" priority="299987" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="WingWallByAbutmentRuleLengthExtension" typeName="double" displayLabel="Length Extension" category="AbutmentWingWallRuleAttributes_Abutment_Wingwall_Placement_Rule" priority="299986" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="WingWallByAbutmentRuleTemplateXmlFragment" typeName="string" displayLabel="Wingwall Template" category="AbutmentWingWallRuleAttributes_Abutment_Wingwall_Placement_Rule" priority="299985">
             <ECCustomAttributes>
                 <HiddenProperty xmlns="CoreCustomAttributes.01.00.03"/>
             </ECCustomAttributes>
         </ECProperty>
-        <ECProperty propertyName="WingWallByAbutmentRuleTemplateName" typeName="string" displayLabel="Template Name" category="AbutmentWingWallRuleAttributes_Abutment_Wingwall_Placement_Rule" priority="299985"/>
+        <ECProperty propertyName="WingWallByAbutmentRuleTemplateName" typeName="string" displayLabel="Template Name" category="AbutmentWingWallRuleAttributes_Abutment_Wingwall_Placement_Rule" priority="299984"/>
+        <ECProperty propertyName="WingWallByAbutmentRuleAlignWithFrontFaceOfBackWall" typeName="boolean" displayLabel="Align With FFBW" category="AbutmentWingWallRuleAttributes_Abutment_Wingwall_Placement_Rule" priority="299995"/>
     </ECEntityClass>
     <ECRelationshipClass typeName="ElementOwnsWingWallByAbutmentRuleAspect" modifier="None" strength="embedding">
         <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
@@ -2327,6 +2471,7 @@
     <PropertyCategory typeName="BeamGroupProperties_Beam_Group_Properties" description="BeamGroupProperties" displayLabel="Beam Group Properties" priority="300000"/>
     <PropertyCategory typeName="BeamSegmentProperties_Beam_Segment_Properties" description="BeamSegmentProperties" displayLabel="Beam Segment Properties" priority="300000"/>
     <PropertyCategory typeName="BearingRuleAttributes_Rule_Property" description="BearingRuleAttributes" displayLabel="Rule Property" priority="300000"/>
+    <PropertyCategory typeName="BottomFlangePlatesProperties_Bottom_Flange_Plates_Properties" description="BottomFlangePlatesProperties" displayLabel="Bottom Flange Plates Properties" priority="299898"/>
     <PropertyCategory typeName="BridgeModelerAttributes_Abutment" description="BridgeModelerAttributes" displayLabel="Abutment" priority="300000"/>
     <PropertyCategory typeName="BridgeModelerAttributes_Abutment_Wingwall" description="BridgeModelerAttributes" displayLabel="Abutment Wingwall" priority="300000"/>
     <PropertyCategory typeName="BridgeModelerAttributes_Accessory" description="BridgeModelerAttributes" displayLabel="Accessory" priority="300000"/>
@@ -2349,6 +2494,7 @@
     <PropertyCategory typeName="ComponentProperties_Component_Properties" description="ComponentProperties" displayLabel="Component Properties" priority="300000"/>
     <PropertyCategory typeName="ConcreteDiaphragmGroupProperties_Concrete_Diaphragm_Collection" description="ConcreteDiaphragmGroupProperties" displayLabel="Concrete Diaphragm Collection" priority="300000"/>
     <PropertyCategory typeName="ConcreteDiaphragmProperties_Concrete_Diaphragm" description="ConcreteDiaphragmProperties" displayLabel="Concrete Diaphragm" priority="300000"/>
+    <PropertyCategory typeName="ConnectorGroupArrangementProperties_Shear_Studs_Group_Properties" description="ConnectorGroupArrangementProperties" displayLabel="Shear Studs Group Properties" priority="300000"/>
     <PropertyCategory typeName="CrossFrameGroupProperties_Cross_Frame_Group_Properties" description="CrossFrameGroupProperties" displayLabel="Cross-Frame Group Properties" priority="300000"/>
     <PropertyCategory typeName="CrossFrameProperties_Cross_Frame_Properties" description="CrossFrameProperties" displayLabel="Cross-Frame Properties" priority="300000"/>
     <PropertyCategory typeName="CrossFrameTemplateProperties_Cross_Frame_Template_Properties" description="CrossFrameTemplateProperties" displayLabel="Cross-Frame Template Properties" priority="300000"/>
@@ -2356,14 +2502,22 @@
     <PropertyCategory typeName="CustomPierRuleAttributes_Rule_Property" description="CustomPierRuleAttributes" displayLabel="Rule Property" priority="300000"/>
     <PropertyCategory typeName="DeckByMultiTemplateRuleAttributes_Rule_Property" description="DeckByMultiTemplateRuleAttributes" displayLabel="Rule Property" priority="300000"/>
     <PropertyCategory typeName="ExcavationRuleAttributes_Excavation_Rule" description="ExcavationRuleAttributes" displayLabel="Excavation Rule" priority="299999"/>
+    <PropertyCategory typeName="FieldSpliceComponentProperties_Field_Splice_Component_Properties" description="FieldSpliceComponentProperties" displayLabel="Field Splice Component Properties" priority="300000"/>
+    <PropertyCategory typeName="FieldSpliceGroupProperties_Field_Splice_Group" description="FieldSpliceGroupProperties" displayLabel="Field Splice Group" priority="300000"/>
+    <PropertyCategory typeName="FieldSpliceProperties_Field_Splice_Properties" description="FieldSpliceProperties" displayLabel="Field Splice Properties" priority="300000"/>
     <PropertyCategory typeName="PierBySupportLineRuleAttributes_Substructure_Placement_Rule" description="PierBySupportLineRuleAttributes" displayLabel="Substructure Placement Rule" priority="299999"/>
     <PropertyCategory typeName="SegmentalBalancedCategory_Segmental_Cantilever" description="SegmentalBalancedCategory" displayLabel="Segmental Cantilever" priority="300000"/>
     <PropertyCategory typeName="SegmentalSpanCategory_Span_by_Span" description="SegmentalSpanCategory" displayLabel="Span by Span" priority="300000"/>
     <PropertyCategory typeName="SegmentProperties_Segment_Properties" description="SegmentProperties" displayLabel="Segment Properties" priority="300000"/>
+    <PropertyCategory typeName="ShearConnectorGroupsProperties_Shear_Studs_Groups_Properties" description="ShearConnectorGroupsProperties" displayLabel="Shear Studs Groups Properties" priority="300000"/>
+    <PropertyCategory typeName="ShearConnectorProperties_Shear_Stud_Properties" description="ShearConnectorProperties" displayLabel="Shear Stud Properties" priority="300000"/>
+    <PropertyCategory typeName="ShearConnectorTemplateProperties_Shear_Stud_Template_Properties" description="ShearConnectorTemplateProperties" displayLabel="Shear Stud Template Properties" priority="300000"/>
     <PropertyCategory typeName="SolidAttributes_Solid" description="SolidAttributes" displayLabel="Solid" priority="300000"/>
     <PropertyCategory typeName="SolidByTemplateRuleAttributes_Rule_Property" description="SolidByTemplateRuleAttributes" displayLabel="Rule Property" priority="300000"/>
     <PropertyCategory typeName="SupportLineRuleAttributes_SupportLine_Rule" description="SupportLineRuleAttributes" displayLabel="SupportLine Rule" priority="0"/>
     <PropertyCategory typeName="TendonGroupProperties_Tendon_Properties" description="TendonGroupProperties" displayLabel="Tendon Properties" priority="300000"/>
+    <PropertyCategory typeName="TopFlangePlatesProperties_Top_Flange_Plates_Properties" description="TopFlangePlatesProperties" displayLabel="Top Flange Plates Properties" priority="299900"/>
     <PropertyCategory typeName="TransverseStiffenerGroupProperties_Transverse_Stiffener_Group_Properties" description="TransverseStiffenerGroupProperties" displayLabel="Transverse Stiffener Group Properties" priority="300000"/>
     <PropertyCategory typeName="TransverseStiffenerProperties_Transverse_Stiffener_Properties" description="TransverseStiffenerProperties" displayLabel="Transverse Stiffener Properties" priority="300000"/>
+    <PropertyCategory typeName="WebPlatesbProperties_Web_Plates_Properties" description="WebPlatesbProperties" displayLabel="Web Plates Properties" priority="299897"/>
 </ECSchema>
