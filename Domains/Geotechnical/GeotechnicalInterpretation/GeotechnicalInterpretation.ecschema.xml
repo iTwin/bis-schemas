@@ -190,6 +190,66 @@
     </ECRelationshipClass>
 
     <!-- ========================================================================================== -->
+    <!-- ========================== Geologic History RELATED CLASSES ============================== -->
+    <!-- ========================================================================================== -->
+
+    <ECEntityClass typeName="IGeologicalHistoryProvider" modifier="Abstract" displayLabel="Geological History Provider" description="An IOperand that can provide a GeologicalHistory.">
+        <ECCustomAttributes>
+            <IsMixin xmlns="CoreCustomAttributes.01.00.03">
+                <AppliesToEntityClass>bis:Element</AppliesToEntityClass>
+            </IsMixin>
+        </ECCustomAttributes>
+        <BaseClass>IOperand</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="GeologicalHistory" modifier="Sealed" displayLabel="Geological History" description="An Element describing the geological history of the region being interpreted.">
+        <BaseClass>GeotechnicalInformationElement</BaseClass>
+        <BaseClass>IGeologicalHistoryProvider</BaseClass>
+        <BaseClass>bis:IParentElement</BaseClass>
+    </ECEntityClass>
+
+    <!-- ========================== GeologicalHistoryStep-related classes ========================= -->
+
+    <ECEntityClass typeName="GeologicalHistoryStep" modifier="Abstract" displayLabel="Geologic History Step" description="A step in geologic history representing a consistent process that influenced the present geology.">
+        <BaseClass>GeotechnicalInformationElement</BaseClass>
+
+        <ECProperty propertyName="Index"  typeName="int" displayLabel="Index" description="The zero-based index of the step, with zero being the earliest step."/>
+    </ECEntityClass>
+
+    <!-- Note that GeologicalHistoryStep must notify GeologicHistory of changes -->
+    <!-- Note that GeologicHistoryOwnsStep is not subclassed for all the subclasses of GeologicalHistoryStep -->
+    <ECRelationshipClass typeName="GeologicalHistoryOwnsSteps" strength="embedding" modifier="Sealed">
+        <BaseClass>ElementOwnsDrivingChildElements</BaseClass>
+        <Source multiplicity="(1..1)" polymorphic="false" roleLabel="owns">
+            <Class class="GeologicalHistory"/>
+        </Source>
+        <Target multiplicity="(0..*)" polymorphic="true" roleLabel="is owned by">
+            <Class class="GeologicalHistoryStep"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <!-- ========================== AdditiveGeologicalHistoryStep-related classes ============================= -->
+
+    <ECEntityClass typeName="AdditiveGeologicalHistoryStep" modifier="Sealed" displayLabel="Additive Geologic History Step" description="A GeologicalHistoryStep that adds Material to the geology.">
+        <BaseClass>GeologicalHistoryStep</BaseClass>
+
+        <!-- in the future we may add a process field here (e.g. "deposit", "intrusion", etc.)-->
+    </ECEntityClass>
+
+    <!-- Note that AdditiveGeologicalHistoryStep must be notified if this relationship changes -->
+    <ECRelationshipClass typeName="AdditiveGeologicalHistoryStepAddsMaterial" strength="referencing" modifier="Sealed" description="Relationship to define that a AdditiveGeologicalHistoryStep adds a specific Material.">
+        <BaseClass>bis:ElementDrivesElement</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="is added by and drives" polymorphic="true">
+            <Class class="IMaterial" />
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="adds material and is driven by" polymorphic="false"> 
+            <Class class="AdditiveGeologicalHistoryStep"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <!-- ========== (in the future there might be SubtractiveGeologicalHistoryStep here) ========== -->
+
+    <!-- ========================================================================================== -->
     <!-- ========================== IBoreholeProvider-RELATED CLASSES ============================= -->
     <!-- ========================================================================================== -->
 
@@ -388,7 +448,6 @@
     <ECEntityClass typeName="FencePanel" modifier="Sealed" displayLabel="Fence Panel" description="A portion of a FenceDiagram, extending between FencePosts. Always child of FenceDiagram.">
         <BaseClass>GeotechnicalInterpretationElement</BaseClass>
 
-        <!-- QUESTION: Should Index be zero-based or one-based? -->
         <ECProperty propertyName="Index"  typeName="int"    displayLabel="Index"                               description="The zero-based index of the FencePanel relative to other FencePanels in the FenceDiagram."/>
         <ECProperty propertyName="Length" typeName="double" displayLabel="Length" kindOfQuantity="AECU:LENGTH" description="A cached value of the distance from the start FencePost to the end FencePost."/>
     </ECEntityClass>
