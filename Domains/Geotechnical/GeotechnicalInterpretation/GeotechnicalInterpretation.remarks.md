@@ -26,6 +26,8 @@ The overall structure of the Geotechnical Information hierarchy is:
 - `bis:Subject`, has children
   - 0..1 `GeotechnicalInterpretationPartition`, each with a `GeotechnicalInterpretationModel` sub-model containing:
     - 0..N `Interpretation`s, each with a `GeotechnicalInterpretationModel` sub-model containing:
+      - 1..1 `GeologicalHistory` 
+        - 0..N `GeologicalHistoryStep` (currently always `AdditiveGeologicalHistoryStep`)
       - 0..N `BoreholeSource`s each with
         - 0..N `Borehole`s
       - 0..N `BoreholeGroup`s (referencing `Borehole`s)
@@ -131,6 +133,26 @@ An example of the need for an Alias material is when a borehole log shows *Silty
 
 - Two `AliasMaterial`s, *Silty-Sand 1* and *Silty-Sand 2* could be created (and the original *Silty-Sand* would only be used indirectly); or
 - One `AliasMaterial`, *Silty-Sand 2* could be created (and the original *Silty-Sand* Material would be used both directly and indirectly).
+
+### IGeologicalHistoryProvider
+
+`IGeologicalHistoryProvider` exists for future extensibility. Currently the only `IGeologicalHistoryProvider` is `GeologicalHistory`.
+
+### GeologicalHistory
+
+`GeologicalHistory` is a singleton class (there is one instance per `Interpretation`) that heads a tree of `GeologicalHistoryStep`s 
+that describe the geological history of the region being interpreted.
+
+### GeologicalHistoryStep
+
+`GeologicalHistoryStep` represents processes like deposits, erosion, intrusions, etc.. `GeologicalHistoryStep`s always have a `GeologicalHistory` parent.
+
+### AdditiveGeologicalHistoryStep
+
+The (required) related `Material` is defined through the `AdditiveGeologicalHistoryStepAddsMaterial` relationship.
+
+The additive process might technically be one that displaces other `Material` (such as an intrusion).
+In the future, a property will likely be added to specify the specific geological process at work.
 
 ### IBoreholeProvider
 
