@@ -450,7 +450,7 @@ Defines the behavior of a structural [Member](#member) to resist forces caused b
 
 ### CurveMemberBehaviorAspect
 
-Base aspect class to define behavior for a [CurveMember](#curvemember). Properties which come with derived aspects are optional for CurveMember. CurveMember might have multiple behavior aspects, however only a single instance of each behavior subclass can be assigned to a single CurveMember. Behavior aspects are [unique](./biscore.ecschema.md#uniqueelementaspect) and cannot be shared.
+Base aspect class to define behavior for a [CurveMember](#curvemember). Properties which come with derived aspects are optional for CurveMember. CurveMember might have multiple behavior aspects, however only a single instance of each behavior subclass can be assigned to a single CurveMember. Behavior aspects are [unique](./biscore.ecschema.md#ElementUniqueAspect) and cannot be shared.
 
 ### CamberBehaviorAspect
 
@@ -474,7 +474,7 @@ Local axes for [CurveMember](#curvemember):
 
 ### SurfaceMemberBehaviorAspect
 
-Base aspect class to define behavior for a [SurfaceMember](#surfacemember). Properties which come with derived aspects are optional for SurfaceMember. SurfaceMember might have multiple behavior aspects, however only a single instance of each behavior kind can be assigned. Behavior aspects are [unique](./biscore.ecschema.md#uniqueelementaspect) and cannot be shared.
+Base aspect class to define behavior for a [SurfaceMember](#surfacemember). Properties which come with derived aspects are optional for SurfaceMember. SurfaceMember might have multiple behavior aspects, however only a single instance of each behavior kind can be assigned. Behavior aspects are [unique](./biscore.ecschema.md#ElementUniqueAspect) and cannot be shared.
 
 ### BendingBehaviorAspect
 
