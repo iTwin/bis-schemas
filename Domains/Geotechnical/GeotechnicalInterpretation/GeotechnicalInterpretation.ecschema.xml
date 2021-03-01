@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ECSchema schemaName="GeotechnicalInterpretation" alias="GeoInterp" version="01.00.00" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" displayLabel="Geotechnical Interpretation" description="The GeotechnicalInterpretation schema defines classes that represent data for interpreting the earth's subterranean structure based on limited geotechnical exploration.">
+<ECSchema schemaName="GeotechnicalInterpretation" alias="GeoInt" version="01.00.00" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" displayLabel="Geotechnical Interpretation" description="The GeotechnicalInterpretation schema defines classes that represent data for interpreting the earth's subterranean structure based on limited geotechnical exploration.">
     <ECSchemaReference name="AecUnits" version="01.00.03" alias="AECU"/>
     <ECSchemaReference name="Analytical" version="01.00.00" alias="anlyt" />
     <ECSchemaReference name="BisCore" version="01.00.10" alias="bis" />
@@ -631,46 +631,6 @@
     </ECEntityClass>
 
     <!-- ========================================================================================== -->
-    <!-- ========================== Analysis Links ================================================ -->
-    <!-- ========================================================================================== -->
-   
-   <!-- The entities below are placeholders for now. More work is required -->
-
-    <ECEntityClass typeName="Plaxis3dLink" modifier="Sealed" displayLabel="PLAXIS 3D Link" description="A link to a PLAXIS 3D model.">
-        <BaseClass>GeotechnicalInformationElement</BaseClass>
-
-        <!-- Will need properties here in the future -->
-
-        <ECNavigationProperty propertyName="Region" relationshipName="PlaxisLinkSyncsRegion" direction="Forward" description="Reference to the region of the interpretation being linked."/>
-    </ECEntityClass>
-   
-     <ECRelationshipClass typeName="PlaxisLinkSyncsRegion" strength="referencing" modifier="Sealed" description="Relationship to define that a Region is linked by the Plaxis3dLink.">
-        <Source multiplicity="(0..*)" roleLabel="syncs Region" polymorphic="false">
-            <Class class="Plaxis3dLink" />
-        </Source>
-        <Target multiplicity="(1..1)" roleLabel="is Region of interest for" polymorphic="false">
-            <Class class="Region"/> 
-        </Target>
-    </ECRelationshipClass>
-
-    <ECEntityClass typeName="Plaxis2dLink" modifier="Sealed" displayLabel="PLAXIS 2D Link" description="A link to a PLAXIS 2D model.">
-        <BaseClass>GeotechnicalInformationElement</BaseClass>
-
-        <!-- Will need properties here in the future -->
-
-        <ECNavigationProperty propertyName="Section" relationshipName="PlaxisLinkSyncsSection" direction="Forward" description="Reference to the section of the interpretation being linked."/>
-    </ECEntityClass>
-   
-     <ECRelationshipClass typeName="PlaxisLinkSyncsSection" strength="referencing" modifier="Sealed" description="Relationship to define that a Region is linked by the Plaxis3dLink.">
-        <Source multiplicity="(0..*)" roleLabel="syncs Section" polymorphic="false">
-            <Class class="Plaxis2dLink" />
-        </Source>
-        <Target multiplicity="(1..1)" roleLabel="is Section of interest for" polymorphic="false">
-            <Class class="Section"/> 
-        </Target>
-    </ECRelationshipClass>
-
-    <!-- ========================================================================================== -->
     <!-- ========================== Geometry-RELATED IOperands ==================================== -->
     <!-- ========================================================================================== -->
    
@@ -935,6 +895,26 @@
         <!-- before Operation is run there will not be any Subsurface-->
         <Target multiplicity="(0..1)" roleLabel="is output for" polymorphic="true">
             <Class class="IGroundProvider" />
+        </Target>
+    </ECRelationshipClass>
+
+    <!-- GroundGenerationParameters-related classes -->
+
+    <!-- TODO: Eventually we need a way to designate the "active GroundGenerationParameters -->
+    <!-- TODO: Do we need to have an identifier for the Engine, or will the subclass be enough of an identifier? -->
+    <!-- TODO: It is likely for both of these questions that we can procrastinate until we need to support more than 1 engine. -->
+    <ECEntityClass typeName="GroundGenerationParameters" modifier="Abstract" displayLabel="Ground Generation Parameters" description="Parameters that are available to influence the GroundGeneration Operation.">
+        <BaseClass>OperationParameters</BaseClass>
+    </ECEntityClass>
+
+    <!-- GroundGenerationParameters is always a child of GroundGeneration -->
+    <ECRelationshipClass typeName="GroundGenerationOwnsParameters" strength="embedding" modifier="None">
+        <BaseClass>OperationOwnsParameters</BaseClass>
+        <Source multiplicity="(1..1)" polymorphic="false" roleLabel="owns and is driven by">
+            <Class class="GroundGeneration"/>
+        </Source>
+        <Target multiplicity="(1..1)" polymorphic="true" roleLabel="is owned by and drives">
+            <Class class="GroundGenerationParameters"/>
         </Target>
     </ECRelationshipClass>
 
