@@ -32,7 +32,8 @@ The overall structure of the Geotechnical Information hierarchy is:
         - 0..N `Borehole`s
       - 0..N `BoreholeGroup`s (referencing `Borehole`s)
       - 0..N `FencePost`
-      - 0..N `GroundGeneration`s (exactly 1 for V1)
+      - 0..N `GroundGeneration`s (exactly 1 for GeoModeler V1)
+        - 1..N `GroundGenerationParameters` (exactly 1 for GeoModeler V1)
         - 0..N `FenceDiagram`
           - 0..N `FencePanel`
           - 0..N `FenceBoundary`
@@ -428,6 +429,13 @@ The positive normal of the `Surface` mesh represents the unsaturated soil side o
 ### GroundGeneration
 
 `GroundGeneration` output is defined as `IGroundProvider`. In the no error case, the actual output will be `Ground`.
+
+`GroundGeneration` always has at least 1 `GroundGenerationParameters` child.
+
+### GroundGenerationParameters
+
+`GroundGenerationParameters` is always a child of `GroundGeneration`. Each `GroundGeneration` may own multiple `GroundGenerationParameters` (of different subclasses)
+as there may be multiple engines available for use.
 
 ### IOperand
 
