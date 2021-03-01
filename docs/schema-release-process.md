@@ -39,6 +39,24 @@ Pre-release schemas can be new versions of a schema that are still undergoing te
 
 The npm packages published will not have any dependencies, it will be up to the consumer to pull in all required schemas.
 
+### Excluding a package from being published
+Within the tools/packages folder in the BIS-SCHEMA repository is the publishBlacklist.json file. This file is parsed automatically by the publishing scripts. The contents are parsed as a JSON array of objects that have a 'name' and 'version' property. Use a '*' as the version value to exclude all versions of a schema. Simply add a new entry to the collection to exclude a schema.
+
+Example:
+
+```json
+[
+{
+    "name": "TestSchemaA",
+    "version": "*"
+  },
+  {
+    "name": "TestSchemaB",
+    "version": "01.00.00"
+  }
+]
+```
+
 ### Current Issues
 
 - Not enough checks are done when creating the released schema packages.  So be very careful that the schema really should be released before merging into master.  Once an npm package is published for a schema you cannot change or republish it.
