@@ -48,6 +48,7 @@ The overall structure of the Geotechnical Information hierarchy is:
       - 0..1 `InvestigationMapping`
       - 0..N `Material`s
       - 0..N `AliasMaterial`s
+      - 1..1 `UnknownMaterial`
 
 ### GeotechnicalInterpretationModel
 
@@ -134,6 +135,12 @@ An example of the need for an Alias material is when a borehole log shows *Silty
 
 - Two `AliasMaterial`s, *Silty-Sand 1* and *Silty-Sand 2* could be created (and the original *Silty-Sand* would only be used indirectly); or
 - One `AliasMaterial`, *Silty-Sand 2* could be created (and the original *Silty-Sand* Material would be used both directly and indirectly).
+
+### UnknownMaterial
+
+`UnknownMaterial` exists to fill the role of an `IMaterial` when the material is not known.
+For example, if `MaterialDepthRange`s are inserted in gaps of `Borehole` data, there will need to be a material associated with each new `MaterialDepthRange`.
+There is always a single `UnknownMaterial` in any `GeoInterpretationConfiguration` submodel.
 
 ### IGeologicalHistoryProvider
 
