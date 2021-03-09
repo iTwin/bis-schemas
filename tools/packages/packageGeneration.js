@@ -46,6 +46,7 @@ function getPublishBlackList() {
 
   let rawdata = fs.readFileSync(fullPath);
   let schemas = JSON.parse(rawdata);
+  schemas.forEach(element => {if (element.allowInternal === undefined) {element.allowInternal = false};});
   return schemas;
 }
 
@@ -57,16 +58,11 @@ function isBlackListed(schema, blackList) {
   if (matches.length === 0)
     return false;
 
-  if (matches.some((s) => s.version === "*"))
-    return true;
+  const match = matches.find((s) => s.version === "*" || !schema.version || s.version === schema.version);
+  if (!match)
+    return false;
 
-  if (!schema.version)
-    return true;
-
-  if (matches.some((s) => s.version === schema.version))
-    return true;
-
-  return false;
+  return !match.allowInternal;
 }
 
 function getPublishedSchemas (packageName) {
