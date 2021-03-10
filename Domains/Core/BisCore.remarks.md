@@ -232,6 +232,10 @@ Individual colors are stored in JsonProperties
 
 Marked as "Sealed" because JsonProperties will be used to persist data. This allows a single instance to "morph" between a DgnV8 render material and a future PBR material.
 
+### RenderTimeline
+
+This information used to be stored within the `DisplayStyle` but was refactored out as a separate element for efficiency and reuse purposes.
+
 ### SectionLocationUsesCategorySelector
 
 See [SectionLocation.CategorySelector ECNavigationProperty](#SectionLocation) ECNavigationProperty
@@ -284,6 +288,10 @@ Care must be taken to avoid circular references.  Note that even a single `Defin
 
 See `DefinitionSet` documentation for recursive interpretations of `DefinitionSet`s containing `DefinitionSet`s.
 
+A `DefinitionContainer` can conceptually be thought of as a *folder of definitions*.
+A `DefinitionContainer` is recommended when there is a standard set of domain-specific definitions that must be known to domain software applications.
+In this case, the `DefinitionContainer` should be contained by the `DictionaryModel` and found by the software via a known `Code`.
+
 ### DefinitionGroupGroupsDefinitions
 
 A `DefinitionGroup` may not be both the source and the target of the same relationship instance.
@@ -293,3 +301,12 @@ A `DefinitionGroup` may not be both the source and the target of the same relati
 A non-exclusive set of `SpatialElements` grouped using the `PhysicalSystemGroupsMembers` relationship. A `SpatialElement` can be a member of multiple `PhysicalSystems`.
 
 The primary contents of the `PhysicalSystem` are `PhysicalElements`, but `SpatialLocationElements` can be included, as well.
+
+### SynchronizationConfigLink
+
+A Link to the Configuration for a Synchronization Job.  By convention, a unique Id for the SynchronizationConfigLink such as a job Id should be set in the CodeValue property and a name should be set in in the UserLabel property.
+
+### ExternalSourceGroup
+
+If the `ExternalSourceGroup` has a *primary* repository than it should be persisted in the `Repository` property from its base class.
+If the group does not have a *primary* repository than that property should be left as `NULL`.
