@@ -1,0 +1,748 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+
+   $Source: Standard/xsd/ECSchemaXML3.2.xsd $
+
+   $Copyright: (c) Bentley Systems, Incorporated. All rights reserved. $
+
+   This schema is used to validate ECSchemaXML documents.
+-->
+<xsd:schema targetNamespace="http://www.bentley.com/schemas/Bentley.ECXML.3.2" version="1.0" elementFormDefault="qualified"
+            xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" xmlns:ec="http://www.bentley.com/schemas/Bentley.ECXML.3.2"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+
+    <!-- ========================================================================================================== -->
+    <!--
+    EC SCHEMA
+    
+    The ECSchema element is the root element in the ECSchemaXML XML document. When we generate an XML schema (XSD) from 
+    an ECSchema, the name of the XSD will be {schemaName}.{version}, e.g. "MyCompany_HumanResources.01.00.00". The schema
+    name is modeled as ec:nameType and follows the EC naming conventions.
+    -->
+    <xsd:element name="ECSchema" type="ECSchemaType">
+        <xsd:unique name="UniqueClassName">
+            <xsd:selector xpath="ec:ECEntityClass|ec:ECRelationshipClass|ec:ECCustomAttributeClass|ec:ECStructClass|
+                                    ec:KindOfQuantity|ec:ECEnumeration|ec:Unit|ec:Constand|ec:InvertedUnit|ec:Format" />
+            <xsd:field xpath="@typeName" />
+        </xsd:unique>
+    </xsd:element>
+    <xsd:complexType name="ECSchemaType">
+        <xsd:choice minOccurs="0" maxOccurs="unbounded">
+            <xsd:element ref="ec:ECSchemaReference" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element ref="ec:ECCustomAttributes" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:group ref="ec:ECSchemaItems" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:choice>
+
+        <xsd:attribute name="schemaName" type="ec:name" use="required" />
+        <xsd:attribute name="alias" type="ec:schemaAlias" use="required" />
+        <xsd:attribute name="version" type="ec:schemaVersion" use="required" />
+        <xsd:attribute name="description" type="xsd:string" use="optional" />
+        <xsd:attribute name="displayLabel" type="xsd:string" use="optional" />
+    </xsd:complexType>
+
+    <!--
+    EC SCHEMA REFERENCE
+    This allows one ECSchema to refer to others. Circular references are not allowed but can't be detected through
+    XML Schema contraints. Note that name, version and alias follow the EC naming conventions.
+    -->
+    <xsd:element name ="ECSchemaReference" type="ec:ECSchemaReferenceType" />
+    <xsd:complexType name="ECSchemaReferenceType">
+        <xsd:attribute name="name" type="ec:name" />
+        <xsd:attribute name="version" type="ec:schemaVersion" use="required" />
+        <xsd:attribute name="alias" type="ec:schemaAlias" use="required" />
+    </xsd:complexType>
+
+    
+    <!--
+    Specifies a group of the element types that can be used as ECClasses within ECSchemas.
+    -->
+    <xsd:group name="ECClassTypes">
+        <xsd:choice>
+            <xsd:element ref="ec:ECEntityClass" />
+            <xsd:element ref="ec:ECCustomAttributeClass" />
+            <xsd:element ref="ec:ECRelationshipClass" />
+            <xsd:element ref="ec:ECStructClass"/>
+        </xsd:choice>
+    </xsd:group>
+
+    <!--
+    Specifies a group of element types that can be used within an ECSchema.
+    -->
+    <xsd:group name="ECSchemaItems">
+        <xsd:choice>
+            <xsd:group ref="ec:ECClassTypes" />
+            <xsd:element ref="ec:ECEnumeration" />
+            <xsd:element ref="ec:KindOfQuantity" />
+            <xsd:element ref="ec:PropertyCategory" />
+            <xsd:element ref="ec:Format" />
+            <xsd:element ref="ec:UnitSystem" />
+            <xsd:element ref="ec:Unit" />
+            <xsd:element ref="ec:InvertedUnit" />
+            <xsd:element ref="ec:Constant" />
+            <xsd:element ref="ec:Phenomenon" />
+        </xsd:choice>
+    </xsd:group>
+  
+    <!--
+      SchemaItem the base for all Schema items
+      -->
+    <xsd:complexType name="SchemaItemType">
+        <xsd:attribute name="typeName" type="ec:name" use="required" />
+        <xsd:attribute name="description" type="xsd:string" use="optional" />
+        <xsd:attribute name="displayLabel" type="xsd:string" use="optional" />
+    </xsd:complexType>
+
+    <!--
+    EC CLASS
+    Defines the class of a business object, including any desired metadata about the class of business objects, via 
+    ECCustomAttributes. ECClasses support inheritance. There is a constraint added that there can't be multiple
+    ECProperties with the same name.
+    -->
+    <xsd:complexType name="ECClassType">
+        <xsd:complexContent>
+            <xsd:extension base="ec:SchemaItemType">
+                <xsd:choice minOccurs="0" maxOccurs="unbounded">
+                    <xsd:element name="BaseClass" type="ec:mockName" minOccurs="0" maxOccurs="unbounded" />
+                    <xsd:element ref="ec:ECCustomAttributes" minOccurs="0" maxOccurs="unbounded" />
+                    <xsd:group ref="ec:ECPropertyTypes" minOccurs="0" maxOccurs="unbounded" />
+                </xsd:choice>
+                <xsd:attribute name="modifier" use="optional">
+                    <xsd:simpleType>
+                        <xsd:restriction base="xsd:string">
+                            <xsd:annotation>
+                                <xsd:documentation>None, Abstract, Sealed</xsd:documentation>
+                            </xsd:annotation>
+                            <xsd:enumeration value="None" />
+                            <xsd:enumeration value="Abstract" />
+                            <xsd:enumeration value="Sealed" />
+                        </xsd:restriction>
+                    </xsd:simpleType>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <!--
+     ECEntityClass
+    -->
+    <xsd:element name="ECEntityClass" type="ec:ECClassType">
+        <!-- The property uniqueness is copied for each ECClassType since it can only be placed on a xsd:element not a xsd:complexType. -->
+        <xsd:unique name="UniqueEntityPropertyNames">
+            <xsd:selector xpath="ec:ECProperty|ec:ECArrayProperty|ec:ECStructProperty|ec:ECStructArrayProperty|ec:ECNavigationProperty" />
+            <xsd:field xpath="@propertyName" />
+        </xsd:unique>
+    </xsd:element>
+  
+    <!--
+    EC STRUCT CLASS defines a struct which is a simple set of data
+    -->
+    <xsd:element name="ECStructClass" type="ec:ECClassType">
+        <!-- The property uniqueness is copied for each ECClassType since it can only be placed on a xsd:element not a xsd:complexType. -->
+        <xsd:unique name="UniqueStructPropertyNames">
+            <xsd:selector xpath="ec:ECProperty|ec:ECArrayProperty|ec:ECStructProperty|ec:ECStructArrayProperty|ec:ECNavigationProperty" />
+            <xsd:field xpath="@propertyName" />
+        </xsd:unique>
+    </xsd:element>
+
+    <!-- It's not possible yet to specify multiple enum values separated by | for the appliesTo attribute -->
+    <xsd:element name="ECCustomAttributeClass" type="ECCustomAttributeClassType" >
+        <!-- The property uniqueness is copied for each ECClassType since it can only be placed on a xsd:element not a xsd:complexType. -->
+        <xsd:unique name="UniqueCAPropertyNames">
+            <xsd:selector xpath="ec:ECProperty|ec:ECArrayProperty|ec:ECStructProperty|ec:ECStructArrayProperty|ec:ECNavigationProperty" />
+            <xsd:field xpath="@propertyName" />
+        </xsd:unique>
+    </xsd:element>
+
+    <xsd:complexType name="ECCustomAttributeClassType">
+        <xsd:complexContent>
+            <xsd:extension base="ec:ECClassType">
+                <xsd:attribute name="appliesTo" use="required">
+                    <xsd:simpleType>
+                        <xsd:restriction base="xsd:string">
+                            <xsd:annotation>
+                                <xsd:documentation>Schema, EntityClass, CustomAttributeClass, StructClass, RelationshipClass, AnyClass, PrimitiveProperty, StructProperty, ArrayProperty, StructArrayProperty, NavigationProperty, AnyProperty, SourceRelationshipConstraint, TargetRelationshipConstraint, AnyRelationshipConstraint, Any</xsd:documentation>
+                            </xsd:annotation>
+                            <xsd:pattern value="(Schema|EntityClass|CustomAttributeClass|StructClass|RelationshipClass|AnyClass|PrimitiveProperty|StructProperty|ArrayProperty|StructArrayProperty|NavigationProperty|AnyProperty|SourceRelationshipConstraint|TargetRelationshipConstraint|AnyRelationshipConstraint|Any)(\s*,\s*(Schema|EntityClass|CustomAttributeClass|StructClass|RelationshipClass|AnyClass|PrimitiveProperty|StructProperty|ArrayProperty|StructArrayProperty|NavigationProperty|AnyProperty|SourceRelationshipConstraint|TargetRelationshipConstraint|AnyRelationshipConstraint|Any))*"/>
+                        </xsd:restriction>
+                    </xsd:simpleType>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <!-- ========================================================================================================== -->
+
+    <xsd:simpleType name="ECRelationshipDirectionType">
+        <xsd:restriction base="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>forward, backward</xsd:documentation>
+            </xsd:annotation>
+            <xsd:enumeration value="forward" />
+            <xsd:enumeration value="backward" />
+        </xsd:restriction>
+    </xsd:simpleType>
+    
+    <!--
+    EC RELATIONSHIP CLASS
+    
+    An ECRelationshipClass represents the possibility of (and constraints for) an instance of a relationship between 
+    two business object instances. 
+    -->
+    <xsd:element name="ECRelationshipClass" type="ec:ECRelationshipClassType" >
+        <!-- The property uniqueness is copied for each ECClassType since it can only be placed on a xsd:element not a xsd:complexType. -->
+        <xsd:unique name="UniqueRelationshipPropertyNames">
+            <xsd:selector xpath="ec:ECProperty|ec:ECArrayProperty|ec:ECStructProperty|ec:ECStructArrayProperty|ec:ECNavigationProperty" />
+            <xsd:field xpath="@propertyName" />
+        </xsd:unique>
+    </xsd:element>
+
+    <xsd:complexType name="ECRelationshipClassType">
+        <xsd:complexContent>
+            <xsd:extension base="ec:ECClassType">
+                <xsd:choice minOccurs="2" maxOccurs="unbounded">
+                    <xsd:element name="Source" type="ec:ECRelationshipConstraintType" minOccurs="1" maxOccurs="1" />
+                    <xsd:element name="Target" type="ec:ECRelationshipConstraintType" minOccurs="1" maxOccurs="1" />
+                </xsd:choice>
+
+                <!-- 
+                The strength and strengthDirection are defined as enumerables with a fixed set of values to choose
+                from. Other values aren't supported by ECXML and definition wil be invalid.
+                -->
+                <xsd:attribute name="strength" default="referencing" use="optional">
+                    <xsd:simpleType>
+                        <xsd:restriction base="xsd:string">
+                            <xsd:annotation>
+                                <xsd:documentation>referencing, holding, embedding</xsd:documentation>
+                            </xsd:annotation>
+                            <xsd:enumeration value="referencing" />
+                            <xsd:enumeration value="holding" />
+                            <xsd:enumeration value="embedding" />
+                        </xsd:restriction>
+                    </xsd:simpleType>
+                </xsd:attribute>
+                <xsd:attribute name="strengthDirection" default="forward" use="optional">
+                    <xsd:simpleType>
+                        <xsd:restriction base="xsd:string">
+                            <xsd:annotation>
+                                <xsd:documentation>forward, backward</xsd:documentation>
+                            </xsd:annotation>
+                            <xsd:enumeration value="forward" />
+                            <xsd:enumeration value="backward" />
+                        </xsd:restriction>
+                    </xsd:simpleType>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <!--
+    These contain additional metadata about the source and target ends of the relationship. As there are multiple class 
+    elements supported on Target but only a single class element is supported on source, this is modeled in seperate types.
+    -->
+    <xsd:complexType name="ECRelationshipConstraintType" >
+        <xsd:choice minOccurs="1" maxOccurs="unbounded">
+            <xsd:element ref ="ec:ECCustomAttributes" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="Class" type="ec:ECRelationshipConstraintClassType" minOccurs="1" maxOccurs="unbounded" />
+        </xsd:choice>
+
+        <xsd:attribute name="multiplicity" type="ec:ECRelationshipMultiplicityType" default="(0..*)" use="optional" /> <!-- required if it is not inherited from a base class-->
+        <xsd:attribute name="roleLabel" type="xsd:string" use="optional" /> <!-- required if it is not inherited from a base class -->
+        <xsd:attribute name="polymorphic" type="ec:boolean" use="required"/>
+        <xsd:attribute name="abstractConstraint" type="ec:mockName" use="optional" /> <!-- Required if there is more than one Class on the ECRelationshipConstraint -->
+    </xsd:complexType>
+
+    <!--
+    The ECRelationshipConstraintClassType defines the value an ECRelationshipConstraintType Class element.
+    -->
+    <xsd:complexType name="ECRelationshipConstraintClassType">
+        <xsd:attribute name="class" type="ec:mockName" use="required" />
+    </xsd:complexType>
+
+    <!--
+    Defines the Multiplicity types ECRelationships supports.
+    -->
+    <xsd:simpleType name="ECRelationshipMultiplicityType">
+        <xsd:restriction base="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>(0..*), (0..1), (1..1), (1..*), (x..y) where x >= 0 and y >= x or y = *</xsd:documentation>
+            </xsd:annotation>
+            <xsd:enumeration value="(0..*)" />
+            <xsd:enumeration value="(0..1)" />
+            <xsd:enumeration value="(1..1)" />
+            <xsd:enumeration value="(1..*)" />
+            <xsd:pattern value="\((0|[1-9][0-9]*)\.\.(\*|0|[1-9][0-9]*)\)" />
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <!--
+    ECCustomAttributes are the key aspect of the EC metadata abstractions that allow us to confidently claim that there 
+    is no metadata concept in any system that cannot be represented using the ECSchema abstractions. The 
+    ECCustomAttributes element is the most unusual of the entities in ECSchemaXML, because its actual contains data in 
+    ECInstanceXML format, though it is serving as M2 level metadata. 
+    -->
+    <xsd:element name="ECCustomAttributes" type="ec:ECCustomAttributeType" />
+    <xsd:complexType name="ECCustomAttributeType">
+        <xsd:sequence>
+            <xsd:any minOccurs="0" maxOccurs="unbounded" namespace="##any" processContents="skip" />
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <!-- ========================================================================================================== -->
+
+    <!--
+    PropertyCategory
+    -->
+    <xsd:element name="PropertyCategory" type="ec:PropertyCategoryType"/>
+    <xsd:complexType name="PropertyCategoryType">
+        <xsd:complexContent>
+            <xsd:extension base="ec:SchemaItemType">
+                <xsd:attribute name="priority" type ="xsd:nonNegativeInteger" use="required" />
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <!--
+    ECEnumeration
+    -->
+    <xsd:element name="ECEnumeration" type="ec:ECEnumerationType">
+        <xsd:unique name="UniqueEnumeratorNames">
+            <xsd:selector xpath="ec:ECEnumerator" />
+            <xsd:field xpath="@name" />
+        </xsd:unique>
+        <xsd:unique name="UniqueEnumeratorValues">
+            <xsd:selector xpath="ec:ECEnumerator" />
+            <xsd:field xpath="@value" />
+        </xsd:unique>
+    </xsd:element>
+
+    <xsd:complexType name="ECEnumerationType">
+        <xsd:complexContent>
+            <xsd:extension base="ec:SchemaItemType">
+                <xsd:sequence>
+                    <xsd:element ref="ec:ECEnumerator" minOccurs="0" maxOccurs="unbounded" />
+                </xsd:sequence>
+                <xsd:attribute name="backingTypeName" type="xsd:string" use="required" />
+                <xsd:attribute name="isStrict" type ="ec:boolean" use="optional" />
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <!--
+    ECEnumerator
+    -->
+    <xsd:element name="ECEnumerator" type="ec:ECEnumeratorType"/>
+    <xsd:complexType name="ECEnumeratorType">
+        <xsd:attribute name="name" type="ec:name" use="required"/>
+        <xsd:attribute name="value" type="xsd:string" use="required" />
+        <xsd:attribute name="displayLabel" type="xsd:string" use="optional" />
+        <xsd:attribute name="description" type="xsd:string" use="optional" />
+    </xsd:complexType>
+
+    <!--
+    KindOfQuantity
+    -->
+    <xsd:element name="KindOfQuantity" type="ec:KindOfQuantityType"/>
+    <xsd:complexType name="KindOfQuantityType">
+        <xsd:complexContent>
+            <xsd:extension base="ec:SchemaItemType">
+                <xsd:attribute name="persistenceUnit" type="ec:mockName" use="required" />
+                <xsd:attribute name="presentationUnits" type="ec:formatString" use="optional" />
+                <xsd:attribute name="relativeError" type="ec:positiveDecimal" use="optional" />
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:simpleType name="positiveDecimal">
+        <xsd:restriction base="xsd:string">
+            <xsd:pattern value="(0|[1-9]\d*)(\.\d+)?(e-?(0{0,3}[1-9]\d*))?"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <!--
+      Unit
+      -->
+    <xsd:element name="Unit" type="ec:UnitType"/>
+    <xsd:complexType name="UnitType">
+        <xsd:complexContent>
+            <xsd:extension base="ec:SchemaItemType">
+                <xsd:attribute name="phenomenon" type="ec:mockName" use="required" />
+                <xsd:attribute name="unitSystem" type="ec:mockName" use="required" />
+                <xsd:attribute name="definition" type="xsd:string" use="required" />
+                <xsd:attribute name="numerator" type="xsd:double" default="1.0" use="optional" />
+                <xsd:attribute name="denominator" type="xsd:double" default="1.0" use="optional" />
+                <xsd:attribute name="offset" type="xsd:double" default="0.0" use="optional" />
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <!--
+      InvertedUnit
+      -->
+    <xsd:element name="InvertedUnit" type="ec:InvertedUnitType"/>
+    <xsd:complexType name="InvertedUnitType">
+        <xsd:complexContent>
+            <xsd:extension base="ec:SchemaItemType">
+                <xsd:attribute name="invertsUnit" type="ec:mockName" use="required" />
+                <xsd:attribute name="unitSystem" type="ec:mockName" use="required" />
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <!--
+      Constant
+      -->
+    <xsd:element name="Constant" type="ec:ConstantType"/>
+    <xsd:complexType name="ConstantType">
+        <xsd:complexContent>
+            <xsd:extension base="ec:SchemaItemType">
+                <xsd:attribute name="phenomenon" type="ec:mockName" use="required" />
+                <xsd:attribute name="definition" type="xsd:string" use="required" />
+                <xsd:attribute name="numerator" type="xsd:double" default="1.0" use="optional" />
+                <xsd:attribute name="denominator" type="xsd:double" default="1.0" use="optional" />
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <!--
+      Phenomenon
+      -->
+    <xsd:element name="Phenomenon" type="ec:PhenomenonType"/>
+    <xsd:complexType name="PhenomenonType">
+        <xsd:complexContent>
+            <xsd:extension base="ec:SchemaItemType">
+                <xsd:attribute name="definition" type="xsd:string" use="required" />
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <!--
+      UnitSystem
+      -->
+    <xsd:element name="UnitSystem" type="ec:SchemaItemType"/>
+
+    <!--
+     Composite of a Format
+     -->
+    <xsd:complexType name="Composite">
+        <xsd:sequence>
+            <xsd:element name="Unit" minOccurs="1" maxOccurs="4">
+                <xsd:complexType>
+                    <xsd:simpleContent>
+                        <xsd:extension base="ec:mockName">
+                            <xsd:attribute name="label" type="xsd:string" use="optional"/>
+                        </xsd:extension>
+                    </xsd:simpleContent>
+                </xsd:complexType>
+                
+            </xsd:element>
+        </xsd:sequence>
+
+        <xsd:attribute name="includeZero" type="ec:boolean" use="optional"/>
+        <xsd:attribute name="spacer" type="xsd:string" use="optional"/>
+    </xsd:complexType>
+
+    <!--
+      Format
+      -->
+    <xsd:element name="Format" type="ec:FormatType"/>
+    <xsd:complexType name="FormatType">
+        <xsd:complexContent>
+            <xsd:extension base="ec:SchemaItemType">
+                <xsd:sequence minOccurs="0" maxOccurs="1">
+                    <xsd:element name="Composite" type="ec:Composite" >
+                        <xsd:unique name="UniqueUnits">
+                            <xsd:selector xpath="Unit" />
+                            <xsd:field xpath="."/>
+                        </xsd:unique>
+                    </xsd:element>
+                </xsd:sequence>
+
+                <xsd:attribute name="type" use="optional">
+                    <xsd:simpleType>
+                        <xsd:restriction base="xsd:string">
+                            <xsd:annotation>
+                                <xsd:documentation>Valid types are; Decimal, Fractional, Scientific, Station</xsd:documentation>
+                            </xsd:annotation>
+                            <xsd:enumeration value="decimal" />
+                            <xsd:enumeration value="fractional" />
+                            <xsd:enumeration value="scientific" />
+                            <xsd:enumeration value="station" />
+                        </xsd:restriction>
+                    </xsd:simpleType>
+                </xsd:attribute>
+                <xsd:attribute name="precision" type="xsd:nonNegativeInteger" use="optional" />
+                <xsd:attribute name="roundFactor" type="xsd:double" default="0.0" use="optional" />
+                <xsd:attribute name="minWidth" type="xsd:nonNegativeInteger" default="0" use="optional"/>
+                <xsd:attribute name="showSignOption" use="optional" default="onlyNegative">
+                    <xsd:simpleType>
+                        <xsd:restriction base="xsd:string">
+                            <xsd:annotation>
+                                <xsd:documentation>Valid Sign Options are NoSign, OnlyNegative, SignAlways and NegativeParentheses</xsd:documentation>
+                            </xsd:annotation>
+                            <xsd:enumeration value="noSign" />
+                            <xsd:enumeration value="onlyNegative" />
+                            <xsd:enumeration value="signAlways" />
+                            <xsd:enumeration value="negativeParentheses" />
+                        </xsd:restriction>
+                    </xsd:simpleType>
+                </xsd:attribute>
+                <xsd:attribute name="decimalSeparator" type="xsd:string" use="optional" />
+                <xsd:attribute name="thousandSeparator" type="xsd:string" use="optional" />
+                <xsd:attribute name="uomSeparator" type="xsd:string" use="optional" />
+                <xsd:attribute name="formatTraits" type="xsd:string" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            A list separated by ';', '|', or ','. Valid Format Traits are
+                                trailZeroes,
+                                keepSingleZero,
+                                zeroEmpty,
+                                keepDecimalPoint,
+                                applyRounding,
+                                fractionDash,
+                                showUnitLabel,
+                                prependUnitLabel,
+                                use1000Separator,
+                                exponentOnlyNegative
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="scientificType" use="optional">
+                    <xsd:simpleType>
+                        <xsd:restriction base="xsd:string">
+                            <xsd:annotation>
+                                <xsd:documentation>Valid Scientific Types are normalized and zeroNormalized</xsd:documentation>
+                            </xsd:annotation>
+                            <xsd:enumeration value="normalized" />
+                            <xsd:enumeration value="zeroNormalized" />
+                        </xsd:restriction>
+                    </xsd:simpleType>
+                </xsd:attribute>
+                <xsd:attribute name="stationOffsetSize" type="xsd:nonNegativeInteger" use="optional" />
+                <xsd:attribute name="stationSeparator" type="xsd:string" default="+" use="optional" />
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <!-- ========================================================================================================== -->
+    <!-- ECProperties -->
+    <!-- ========================================================================================================== -->
+
+    <!--
+      ABSTRACT PROPERTY BASE
+
+      The AbstractECPropertyType defines the base attributes that are required on every EC property node. This is the 
+      propertyName which is needed to access the property within an ECClass and the typeName which specifies the ECType 
+      of the property.
+      -->
+    <xsd:complexType name="AbstractECPropertyType">
+        <xsd:sequence>
+            <xsd:element ref="ec:ECCustomAttributes" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
+        <xsd:attribute name="propertyName" type="ec:name" use="required" />
+        <xsd:attribute name="description" type ="xsd:string" use="optional" />
+        <xsd:attribute name="displayLabel" type ="xsd:string" use="optional" />
+        <xsd:attribute name="readOnly" type ="ec:boolean" use="optional" />
+        <xsd:attribute name="kindOfQuantity" type="xsd:string" use="optional"/>
+        <xsd:attribute name="category" type="xsd:string" use="optional"/>
+        <xsd:attribute name="priority" type="xsd:string" use="optional"/>
+    </xsd:complexType>
+
+    <!--
+      ECProperty represents a property with primitive data types. In difference to the other two ECProperty kinds has 
+      this a fixed set of allowed values representing the EC primitive types.
+      -->
+    <xsd:element name="ECProperty" type="ec:ECPropertyType"/>
+    <xsd:complexType name="ECPropertyType">
+        <xsd:complexContent>
+            <xsd:extension base="ec:AbstractECPropertyType">
+                <xsd:attribute name="minimumValue" type ="xsd:string" use="optional" />
+                <xsd:attribute name="maximumValue" type ="xsd:string" use="optional" />
+                <xsd:attribute name="extendedTypeName" type="xsd:string" use="optional" >
+                    <xsd:annotation>
+                        <xsd:documentation>Standard extended types are BeGuid, GeometryStream, JSON and URI</xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="typeName" type="ec:ECPropertyTypeName" use="required"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:simpleType name="ECPropertyTypeName">
+        <xsd:union>
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>Any ECEnumeration name or one of: binary, boolean, datetime, double, int, integer, long, string, point2d, point3d, Bentley.Geometry.Common.IGeometry</xsd:documentation>
+                    </xsd:annotation>
+                    <xsd:enumeration value="binary" />
+                    <xsd:enumeration value="boolean" />
+                    <xsd:enumeration value="datetime" />
+                    <xsd:enumeration value="double" />
+                    <xsd:enumeration value="int" />
+                    <xsd:enumeration value="integer" />
+                    <xsd:enumeration value="long" />
+                    <xsd:enumeration value="string" />
+                    <xsd:enumeration value="point2d"/>
+                    <xsd:enumeration value="point3d"/>
+                    <xsd:enumeration value="Bentley.Geometry.Common.IGeometry"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+            <xsd:simpleType>
+                <xsd:restriction base="ec:mockName"/>
+            </xsd:simpleType>
+        </xsd:union>
+    </xsd:simpleType>
+
+    <!--
+      Represents an array of properties. The minOccurs and maxOccurs attributes indicate dimension of the array.
+      -->
+    <xsd:element name="ECArrayProperty" type="ec:ECArrayPropertyType" />
+    <xsd:complexType name="ECArrayPropertyType">
+        <xsd:complexContent>
+            <xsd:extension base="ec:AbstractECPropertyType">
+                <xsd:attribute name="typeName" type="ec:name" use="required" />
+                <xsd:attribute name="isStruct" type="ec:boolean" use="optional" />
+                <xsd:attribute name="minOccurs" type="xsd:nonNegativeInteger" default="0" use="optional"/>
+                <xsd:attribute name="maxOccurs" type="ec:arrayMaxBound" default="unbounded" use="optional" />
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="ECNavigationProperty" type="ec:ECNavigationPropertyType"/>
+    <xsd:complexType name="ECNavigationPropertyType">
+        <xsd:complexContent>
+            <xsd:extension base="ec:AbstractECPropertyType">
+                <xsd:attribute name="relationshipName"/>
+                <xsd:attribute name="direction" type="ec:ECRelationshipDirectionType" default="forward">
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <!--
+      Represents a struct of properties. A struct is simply an ECStructClass.
+      -->
+    <xsd:element name="ECStructProperty" type="ec:ECStructPropertyType" />
+    <xsd:complexType name="ECStructPropertyType">
+        <xsd:complexContent>
+            <xsd:extension base="ec:AbstractECPropertyType">
+                <xsd:attribute name="typeName" type="ec:mockName" use="required" />
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="ECStructArrayProperty" type="ec:ECStructArrayPropertyType" />
+    <xsd:complexType name="ECStructArrayPropertyType">
+        <xsd:complexContent>
+            <xsd:extension base="ec:ECStructPropertyType">
+                <xsd:attribute name="minOccurs" type="xsd:nonNegativeInteger" default="0" use="optional"/>
+                <xsd:attribute name="maxOccurs" type="ec:arrayMaxBound" default="unbounded" use="optional" />
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <!--
+      Specifies a group of the element types that can be used as ECProperties within ECClasses.
+      -->
+    <xsd:group name="ECPropertyTypes">
+        <xsd:choice>
+            <xsd:element ref="ec:ECProperty" />
+            <xsd:element ref="ec:ECArrayProperty" />
+            <xsd:element ref="ec:ECStructProperty" />
+            <xsd:element ref="ec:ECNavigationProperty"/>
+            <xsd:element ref="ec:ECStructArrayProperty"/>
+        </xsd:choice>
+    </xsd:group>
+  
+
+    <!-- ========================================================================================================== -->
+    <!-- Utility Items -->
+    <!-- ========================================================================================================== -->
+
+    <!-- 
+    ECSchema, ECClass, and ECProperty names must be a valid XML tag name and also cannot contain "-", i.e. the first 
+    letter is alpha or "_" and the rest are alphanumeric or "_". Can be qualified with prefix to other schema.
+    -->
+    <xsd:simpleType name="name">
+        <xsd:restriction base="xsd:QName">
+            <xsd:pattern value="([\w]+:)?([a-zA-Z_.]+[a-zA-Z0-9_.]*)" />
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <!--
+    This type is a workaround to avoid errors generated from validating a schema against this XSD. 
+    For example, if a class specifies a base class "bis:PhysicalElement", QName attempts the resolve the name
+    using namespace "bis". This will fail because there is no "bis" namespace.
+    -->
+    <xsd:simpleType name="mockName">
+        <xsd:restriction base="xsd:string">
+            <xsd:pattern value="([\w]+:)?([a-zA-Z_.]+[a-zA-Z0-9_.]*)" />
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <!--
+    In ECSchemaXML, the <ECSchema> element’s nameSpaceAlias can only contain alphanumeric characters, plus "_" and it 
+    must start with a letter. The nameSpaceAlias expresses the preferred prefix to be used when another ECSchema 
+    references elements from a given ECSchema.
+    -->
+    <xsd:simpleType name="schemaAlias">
+        <xsd:restriction base="xsd:string">
+            <xsd:pattern value="[a-zA-Z]+[a-zA-Z0-9_]*" />
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <!--
+    The "version" is of the form RR.ww.mm (where RR is the read version, ww is the write version and mm is the minor.) Any change to an ECSchema 
+    that doesn’t break backwards write compatibility should increment the minor version. Any change to an ECSchema that doesn't break backwards 
+    read compatiibility but breaks backwards write compatibility should increment the write version. Any change that breaks read compatibility 
+    should increment the read version.
+    -->
+    <xsd:simpleType name="schemaVersion">
+        <xsd:restriction base="xsd:string">
+            <xsd:pattern value="([0-9][0-9]).([0-9][0-9]).([0-9][0-9])" />
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <!--
+    Simple type to specify the maximum bounds of arrays. The type itself is actually non-negative integer but also
+    adds the value unbounded to set the array on a variable length.
+    -->
+    <xsd:simpleType name="arrayMaxBound">
+        <xsd:union memberTypes="xsd:nonNegativeInteger">
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:NMTOKEN">
+                    <xsd:annotation>
+                        <xsd:documentation>unbounded</xsd:documentation>
+                    </xsd:annotation>
+                    <xsd:enumeration value="unbounded"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:union>
+    </xsd:simpleType>
+
+
+     <!--
+    boolean type - for case-insensitive boolean values
+    Note: xsd:boolean is case-sensitive. The style sheet converts this enumeration to a case-insensitive regex pattern
+    -->
+    <xsd:simpleType name="boolean">
+        <xsd:restriction base="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>true, false</xsd:documentation>
+            </xsd:annotation>
+            <xsd:enumeration value="true" />
+            <xsd:enumeration value="false" />
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <!--
+    A Format string takes the form, "formatName(precision)[unitName|unitLabel][unitName|unitLabel][unitName|unitLabel][unitName|unitLabel]"
+    -->
+    <xsd:simpleType name="formatString">
+        <xsd:restriction base="xsd:string">
+            <xsd:pattern value="(([\w_:]+)(\(([^\)]+)\))?(\[([^\|\]]+)([\|])?([^\|\]]+)?\]){0,4};?)*" />
+        </xsd:restriction>
+    </xsd:simpleType>
+
+</xsd:schema>
