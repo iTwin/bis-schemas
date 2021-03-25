@@ -1,6 +1,3 @@
-workspace:
-  clean: all
-
 trigger:
   branches:
     include:
@@ -10,156 +7,196 @@ trigger:
      - 'Domains/'
      - 'Standard/'
 
-pool:
-  name: iModelTechCI
-  demands:
-  - Agent.OS -equals Windows_NT
-  - npm
+resources:
+  repositories:
+    - repository: imodeljs
+      type: github
+      ref: 'refs/heads/build-to-yaml'
+      endpoint: iModelJs
+      name: imodeljs/imodeljs
 
-variables:
-- group: azure-artifacts-npm-token
-- name: ECObjectsToolsPath
-  value: '$(Build.BinariesDirectory)\ECObjectsToolsNuGet_x64'
+jobs:
+- job: Generate_Docs
+  displayName: Generate Docs
+  workspace:
+    clean: all
 
-steps:
-- task: NuGetCommand@2
-  displayName: Install ECObjects Tools
-  inputs:
-    command: custom
-    arguments: install ECObjectsToolsNuGet_x64 -ExcludeVersion -Source _packaging/Packages/nuget/v3/index.json -OutputDirectory $(Build.BinariesDirectory)
+  pool:
+    name: iModelTechCI
+    demands:
+    - Agent.OS -equals Windows_NT
+    - npm
 
-#Your build pipeline references a secret variable named ‘artifactsRegistryToken’. This variable is pulled from the 'arzure-artifacts-npm-token' variable group.  You must authorize this build to use that group: https://docs.microsoft.com/en-us/azure/devops/pipelines/library/variable-groups?view=azure-devops&tabs=yaml#use-a-variable-group
-- powershell: |
-    $npmrcDir = "$(Build.Repository.LocalPath)"
-    
-    if(!(Test-Path -Path $npmrcDir)){
-        mkdir $npmrcDir
-    }
-    
-    $npmrcFile = $npmrcDir + "/.npmrc"
-    
-    Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "@bentley:registry=/"
-    Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "always-auth=true" -Append
-    Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "///bentleycs/_packaging/Packages/npm/registry/:username=Packages" -Append
-    Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "///bentleycs/_packaging/Packages/npm/registry/:_password=$(artifactsRegistryToken)" -Append
-    Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "///bentleycs/_packaging/Packages/npm/registry/:email=npm requires email to be set but doesn't use the value" -Append
-    Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "///bentleycs/_packaging/Packages/npm/:username=Packages" -Append
-    Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "///bentleycs/_packaging/Packages/npm/:_password=$(artifactsRegistryToken)" -Append
-    Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "///bentleycs/_packaging/Packages/npm/:email=npm requires email to be set but doesn't use the value" -Append
+  variables:
+  - group: azure-artifacts-npm-token
+  - name: ECObjectsToolsPath
+    value: '$(Build.BinariesDirectory)\ECObjectsToolsNuGet_x64'
 
-- script: npm install @bentley/ecjson2md@latest
-  displayName: Install ECJson2md
-  workingDirectory: $(Build.BinariesDirectory)
+  steps:
+  - task: NuGetCommand@2
+    displayName: Install ECObjects Tools
+    inputs:
+      command: custom
+      arguments: install ECObjectsToolsNuGet_x64 -ExcludeVersion -Source _packaging/Packages/nuget/v3/index.json -OutputDirectory $(Build.BinariesDirectory)
 
-- task: CopyFiles@2
-  displayName: 'Copy all schemas to staging directory'
-  inputs:
-    SourceFolder: '$(System.DefaultWorkingDirectory)'
-    Contents: '**/*.ecschema.xml'
-    TargetFolder: '$(Build.StagingDirectory)\xml\'
+  #Your build pipeline references a secret variable named ‘artifactsRegistryToken’. This variable is pulled from the 'arzure-artifacts-npm-token' variable group.  You must authorize this build to use that group: https://docs.microsoft.com/en-us/azure/devops/pipelines/library/variable-groups?view=azure-devops&tabs=yaml#use-a-variable-group
+  - powershell: |
+      $npmrcDir = "$(Build.Repository.LocalPath)"
+      
+      if(!(Test-Path -Path $npmrcDir)){
+          mkdir $npmrcDir
+      }
+      
+      $npmrcFile = $npmrcDir + "/.npmrc"
+      
+      Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "@bentley:registry=/"
+      Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "always-auth=true" -Append
+      Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "///bentleycs/_packaging/Packages/npm/registry/:username=Packages" -Append
+      Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "///bentleycs/_packaging/Packages/npm/registry/:_password=$(artifactsRegistryToken)" -Append
+      Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "///bentleycs/_packaging/Packages/npm/registry/:email=npm requires email to be set but doesn't use the value" -Append
+      Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "///bentleycs/_packaging/Packages/npm/:username=Packages" -Append
+      Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "///bentleycs/_packaging/Packages/npm/:_password=$(artifactsRegistryToken)" -Append
+      Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "///bentleycs/_packaging/Packages/npm/:email=npm requires email to be set but doesn't use the value" -Append
 
-- task: PythonScript@0
-  displayName: Run Schema Json Serializer
-  inputs:
-    scriptSource: inline
-    script: |
-     import os, sys, shutil, subprocess
-     from sets import Set
+  - script: npm install @bentley/ecjson2md@latest
+    displayName: Install ECJson2md
+    workingDirectory: $(Build.BinariesDirectory)
 
-     defaultWorkingDir = os.path.realpath(sys.argv[1])
+  - task: CopyFiles@2
+    displayName: 'Copy all schemas to staging directory'
+    inputs:
+      SourceFolder: '$(System.DefaultWorkingDirectory)'
+      Contents: '**/*.ecschema.xml'
+      TargetFolder: '$(Build.StagingDirectory)\xml\'
 
-     schemasToSkip = ["ECDbFileInfo", "ECDbSystem", "ECv3ConversionAttributes", "PresentationRules", "SchemaLocalizationCustomAttributes"]
-     # folders that contain a schema but aren't a released folder as reference directories.
-     refDir = Set()
-     # all released schemas found by looking in 'Released' directories and pulling the highest schema version
-     releasedSchemas = {}
-     # files found in 'media' directories that do not end with .cmap
-     schemaMediaFiles = Set()
-     for root, dirs, files in os.walk(defaultWorkingDir):
-       files.sort(reverse=True)
-       for fileName in files:
-         # reference schema directories
-         if "Released" not in root and fileName.endswith(".ecschema.xml"):
-           refDir.add(root)
-           print "Added directory " + root + " as a reference path."
-         # Relesed schema Files
-         if "Released" in root and fileName.endswith(".ecschema.xml"):
-           schemaName = fileName[:fileName.index(".")]
-           if schemaName not in releasedSchemas and schemaName not in schemasToSkip:
-             releasedSchemas[schemaName] = os.path.join(root, fileName)
-             print "Added released schema " + fileName + " from directory " + root
-         # media files
-         if "media" in root and "docs" not in root and not fileName.endswith(".cmap"):
-           schemaMediaFiles.add(os.path.join(root, fileName))
-           print "Added media for schema " + fileName + " from directory " + root
+  - task: PythonScript@0
+    displayName: Run Schema Json Serializer
+    inputs:
+      scriptSource: inline
+      script: |
+        import os, sys, shutil, subprocess
+        from sets import Set
 
-     # add the released versions of the ECDb schemas because the real versions are not copied over
-     refDir.add(os.path.join(defaultWorkingDir, "Standard", "ECDb", "Released"))
-     rDir = ' '.join(refDir)
+        defaultWorkingDir = os.path.realpath(sys.argv[1])
 
-     schemaSerializer = os.path.realpath(sys.argv[2])
-     print "Using the schema json serializer, '" + schemaSerializer + "'."
+        schemasToSkip = ["ECDbFileInfo", "ECDbSystem", "ECv3ConversionAttributes", "PresentationRules", "SchemaLocalizationCustomAttributes"]
+        # folders that contain a schema but aren't a released folder as reference directories.
+        refDir = Set()
+        # all released schemas found by looking in 'Released' directories and pulling the highest schema version
+        releasedSchemas = {}
+        # files found in 'media' directories that do not end with .cmap
+        schemaMediaFiles = Set()
+        for root, dirs, files in os.walk(defaultWorkingDir):
+          files.sort(reverse=True)
+          for fileName in files:
+            # reference schema directories
+            if "Released" not in root and fileName.endswith(".ecschema.xml"):
+              refDir.add(root)
+              print "Added directory " + root + " as a reference path."
+            # Relesed schema Files
+            if "Released" in root and fileName.endswith(".ecschema.xml"):
+              schemaName = fileName[:fileName.index(".")]
+              if schemaName not in releasedSchemas and schemaName not in schemasToSkip:
+                releasedSchemas[schemaName] = os.path.join(root, fileName)
+                print "Added released schema " + fileName + " from directory " + root
+            # media files
+            if "media" in root and "docs" not in root and not fileName.endswith(".cmap"):
+              schemaMediaFiles.add(os.path.join(root, fileName))
+              print "Added media for schema " + fileName + " from directory " + root
 
-     outputDir = os.path.join(os.path.realpath(sys.argv[3]), "json")
-     print "Using the output directory, '" + outputDir + "'."
+        # add the released versions of the ECDb schemas because the real versions are not copied over
+        refDir.add(os.path.join(defaultWorkingDir, "Standard", "ECDb", "Released"))
+        rDir = ' '.join(refDir)
 
-     args = [
-       schemaSerializer,
-       "-a",  # Serializes all of the schemas in the Schema Graph
-       "-u",  # Inclues the standard schemas in the conversion
-       "-r", rDir,  # The reference directories to use to find other schemas
-       "-o", outputDir,  # The output directory to place the ECJson schemas
-       "-i", # The input file to be serialized to ECJson
-     ]
+        schemaSerializer = os.path.realpath(sys.argv[2])
+        print "Using the schema json serializer, '" + schemaSerializer + "'."
 
-     mdOutputDir = os.path.join(os.path.realpath(sys.argv[3]), "markdown")
-     if not os.path.exists(mdOutputDir):
-       os.makedirs(mdOutputDir)
-     
-     for schemaName, fullXmlSchemaPath in releasedSchemas.items():
-       args.append(fullXmlSchemaPath)
+        outputDir = os.path.join(os.path.realpath(sys.argv[3]), "json")
+        print "Using the output directory, '" + outputDir + "'."
 
-       print "Serializing the schema path '" + fullXmlSchemaPath+ "'."
+        args = [
+          schemaSerializer,
+          "-a",  # Serializes all of the schemas in the Schema Graph
+          "-u",  # Inclues the standard schemas in the conversion
+          "-r", rDir,  # The reference directories to use to find other schemas
+          "-o", outputDir,  # The output directory to place the ECJson schemas
+          "-i", # The input file to be serialized to ECJson
+        ]
 
-       proc = subprocess.Popen(' '.join(args), stdin = subprocess.PIPE, stdout = subprocess.PIPE, shell=True)
+        mdOutputDir = os.path.join(os.path.realpath(sys.argv[3]), "markdown")
+        if not os.path.exists(mdOutputDir):
+          os.makedirs(mdOutputDir)
+        
+        for schemaName, fullXmlSchemaPath in releasedSchemas.items():
+          args.append(fullXmlSchemaPath)
 
-       if proc.returncode is not None and proc.returncode != 0:
-         print "The serialization left a non-zero exit code: " + str(proc.returncode)
-         exit(proc.returncode)
+          print "Serializing the schema path '" + fullXmlSchemaPath+ "'."
 
-       print "Finished serializing the schema path '" + fullXmlSchemaPath + "'."
+          proc = subprocess.Popen(' '.join(args), stdin = subprocess.PIPE, stdout = subprocess.PIPE, shell=True)
 
-       args.pop()
+          if proc.returncode is not None and proc.returncode != 0:
+            print "The serialization left a non-zero exit code: " + str(proc.returncode)
+            exit(proc.returncode)
 
-       # Copy all markdown files that also have a schema.
-       fullMdSchemaPath = os.path.join(fullXmlSchemaPath[:fullXmlSchemaPath.find("Released")], schemaName) + ".remarks.md"
-       if os.path.exists(fullMdSchemaPath):
-         print "Copying schema markdown file " + fullMdSchemaPath
-         shutil.copy(fullMdSchemaPath, mdOutputDir)
+          print "Finished serializing the schema path '" + fullXmlSchemaPath + "'."
 
-     mdMediaOutputDir = os.path.join(mdOutputDir, "media")
-     for mediaFile in schemaMediaFiles:
-       targetFilePath = os.path.join(mdMediaOutputDir, mediaFile.split('media\\')[-1])
-       if not os.path.exists(os.path.dirname(targetFilePath)):
-         os.makedirs(os.path.dirname(targetFilePath))
-       if os.path.exists(targetFilePath):
-         print "ERROR - Cannot copy " + mediaFile + " because a file with the same name already exists in the media output directory."
-         exit(-1)
-       print "Copying media file " + mediaFile
-       shutil.copy(mediaFile, targetFilePath)
+          args.pop()
 
-    arguments: '$(System.DefaultWorkingDirectory) $(ECObjectsToolsPath)\lib\native\SchemaJsonSerializer $(Build.StagingDirectory)'
+          # Copy all markdown files that also have a schema.
+          fullMdSchemaPath = os.path.join(fullXmlSchemaPath[:fullXmlSchemaPath.find("Released")], schemaName) + ".remarks.md"
+          if os.path.exists(fullMdSchemaPath):
+            print "Copying schema markdown file " + fullMdSchemaPath
+            shutil.copy(fullMdSchemaPath, mdOutputDir)
 
-- script: |
-   mkdir $(Build.StagingDirectory)\markdown\
-   
-   cmd | for %%a in ($(Build.StagingDirectory)\json\*.json) do (
-     $(Build.BinariesDirectory)/node_modules/.bin/ecjson2md -i %%a -r $(Build.StagingDirectory)\json\ -o $(Build.StagingDirectory)\markdown\
-   )
-  displayName: 'Generate Markdown'
+        mdMediaOutputDir = os.path.join(mdOutputDir, "media")
+        for mediaFile in schemaMediaFiles:
+          targetFilePath = os.path.join(mdMediaOutputDir, mediaFile.split('media\\')[-1])
+          if not os.path.exists(os.path.dirname(targetFilePath)):
+            os.makedirs(os.path.dirname(targetFilePath))
+          if os.path.exists(targetFilePath):
+            print "ERROR - Cannot copy " + mediaFile + " because a file with the same name already exists in the media output directory."
+            exit(-1)
+          print "Copying media file " + mediaFile
+          shutil.copy(mediaFile, targetFilePath)
 
-- task: PublishBuildArtifacts@1
-  displayName: 'Publish Artifact: Bis Docs'
-  inputs:
-    PathtoPublish: '$(Build.StagingDirectory)\markdown\'
-    ArtifactName: 'Bis Docs'
+      arguments: '$(System.DefaultWorkingDirectory) $(ECObjectsToolsPath)\lib\native\SchemaJsonSerializer $(Build.StagingDirectory)'
+
+  - script: |
+      mkdir $(Build.StagingDirectory)\markdown\
+      
+      cmd | for %%a in ($(Build.StagingDirectory)\json\*.json) do (
+        $(Build.BinariesDirectory)/node_modules/.bin/ecjson2md -i %%a -r $(Build.StagingDirectory)\json\ -o $(Build.StagingDirectory)\markdown\
+      )
+    displayName: 'Generate Markdown'
+
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish Artifact: Bis Docs'
+    inputs:
+      PathtoPublish: '$(Build.StagingDirectory)\markdown\'
+      ArtifactName: 'Bis Docs'
+
+- job: Validate_Docs
+  displayName: Validate Docs
+  dependsOn: Generate_Docs
+  condition: and(succeeded(), in(variables['Build.Reason'], 'PullRequest', 'Manual'))
+  workspace:
+    clean: all
+  pool:
+    name: iModelTechCI
+    demands: Agent.OS -equals Windows_NT
+
+  steps:
+    - checkout: imodeljs
+      clean: true
+    - task: NodeTool@0
+      displayName: Use Node 12.17.0
+      inputs:
+        versionSpec: 12.17.0
+        checkLatest: true
+    - script: |
+        git config --local user.email $(user_email)
+        git config --local user.name $(username)
+      displayName: Setup git config
+    - template: common/config/azure-pipelines/templates/docs-build.yaml@imodeljs
+      parameters:
+        downloadCurrentBuildArtifacts: 'true'
