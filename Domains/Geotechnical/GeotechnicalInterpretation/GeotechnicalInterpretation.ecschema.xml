@@ -622,11 +622,24 @@
    
    <!-- The entities below are placeholders for now. We need to determine exactly how they fit into the big picture -->
 
+       <ECEntityClass typeName="IRegionProvider" modifier="Abstract" displayLabel="Region Provider" description="An interface that defines an IOperand that can provide a 2D plan view region.">
+        <ECCustomAttributes>
+            <IsMixin xmlns="CoreCustomAttributes.01.00.03">
+                <AppliesToEntityClass>bis:Element</AppliesToEntityClass>
+            </IsMixin>
+        </ECCustomAttributes>
+        <BaseClass>IOperand</BaseClass>
+    </ECEntityClass>
+
+
     <ECEntityClass typeName="Region" modifier="Sealed" displayLabel="Region" description="A 2D region of interest.">
         <BaseClass>GeotechnicalInterpretationElement</BaseClass>
+        <BaseClass>IRegionProvider</BaseClass>
 
         <ECProperty propertyName="Shape" displayLabel="Shape" typeName="Bentley.Geometry.Common.IGeometry" description="A 2D polygon."/>
     </ECEntityClass>
+
+    <!-- likely want to create an ISectionProvider -->
 
 <!-- QUESTION: Do we want to support cross sections that are not line segments (now or future)-->
     <ECEntityClass typeName="Section" modifier="Sealed" displayLabel="Section" description="A 2D (vertical) cross section of interest.">
@@ -887,6 +900,18 @@
         </Source>
 
         <Target multiplicity="(0..*)" roleLabel="has terrain input and is driven by" polymorphic="true">
+            <Class class="GroundGeneration" />
+        </Target>
+    </ECRelationshipClass>
+
+    <!-- Note that IRegionProvider must notify GroundGeneration of changes -->
+    <ECRelationshipClass typeName="RegionDrivesGroundGeneration" strength="referencing" modifier="Sealed" description="Connects an GroundGeneration with its input IRegionProvider (that constrains the output area).">
+        <BaseClass>InputDrivesOperation</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="is region (area bounds) input for and drives" polymorphic="true">
+            <Class class="IRegionProvider" />
+        </Source>
+
+        <Target multiplicity="(0..*)" roleLabel="has region (area bounds) input and is driven by" polymorphic="true">
             <Class class="GroundGeneration" />
         </Target>
     </ECRelationshipClass>

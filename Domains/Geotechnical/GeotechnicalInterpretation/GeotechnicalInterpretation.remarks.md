@@ -38,6 +38,7 @@ The overall structure of the Geotechnical Information hierarchy is:
           - 0..N `FencePanel`
           - 0..N `FenceBoundary`
           - 0..N `FenceStratum`
+      - 0..N `Region`s 
       - 0..N `Ground`s (exactly 1 for V1) **Need to determine if this has a submodel or not**
         - 1..N `Boundary`s **Need to clarify if 0 is valid**
         - 1..N `Block`s **Need to clarify if 0 is valid**
@@ -206,9 +207,13 @@ The `Depth` and `Location` of the `WaterTableDepth` should always be set. The `L
 
 The `Location` property is in global coordinates.
 
+### IRegionProvider
+
+An `IOperand` that can provide a 2D plan view polygon region.
+
 ### Region
 
-XXXXXXX Need clear definition and usage XXXXX
+A user-defined `IRegionProvider`.
 
 The `Shape` property is a 2D polygon in global coordinates.
 
@@ -434,6 +439,8 @@ The following layer constraints must be met:
 The positive normal of the `Surface` mesh represents the unsaturated soil side of the `Surface` (is usually upward).
 
 ### GroundGeneration
+
+TODO: describe GroundGeneration input.
 
 `GroundGeneration` output is defined as `IGroundProvider`. In the no error case, the actual output will be `Ground`.
 
