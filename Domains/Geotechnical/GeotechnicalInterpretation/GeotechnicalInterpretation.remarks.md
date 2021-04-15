@@ -19,7 +19,7 @@ In most workflows an interpretation will be published to the `GeotechnicalPhysic
 
 ### GeotechnicalInterpretationPartition
 
-A `GeotechnicalInterpretationPartition` is always parented to a `bis:Subject` and broken down by a `GeotechnicalInterpretationModel`. A `GeotechnicalInterpretationPartition` (and its `GeotechnicalInterpretationModel` submodel) are created for a `bis:Subject` when the need/desire for one or more (geotechnical) `Interpretation`s for the `Subject` is identified.
+A `GeotechnicalInterpretationPartition` is always parented to a `bis:Subject` and broken down by a `GeotechnicalInterpretationModel`. A `GeotechnicalInterpretationPartition` (and its `GeotechnicalInterpretationModel` sub-model) are created for a `bis:Subject` when the need/desire for one or more (geotechnical) `Interpretation`s for the `Subject` is identified.
 
 The overall structure of the Geotechnical Information hierarchy is:
 
@@ -39,7 +39,7 @@ The overall structure of the Geotechnical Information hierarchy is:
           - 0..N `FenceBoundary`
           - 0..N `FenceStratum`
       - 0..N `Region`s 
-      - 0..N `Ground`s (exactly 1 for V1) **Need to determine if this has a submodel or not**
+      - 0..N `Ground`s (exactly 1 for V1), each with a `GeotechnicalInterpretationModel` sub-model containing:
         - 1..N `Boundary`s **Need to clarify if 0 is valid**
         - 1..N `Block`s **Need to clarify if 0 is valid**
           - 1..N `Stratum`s **Need to clarify if 0 is valid**
@@ -104,10 +104,11 @@ The `MaterialMappedClass` property defines which `ILithology` subclass (and rela
 `IMaterial` is a mix-in that is used in classes that can identify the material of a `MaterialDepthRange` of a `Borehole` or the material of a `Stratum`.
 Every `IMaterial` has a `RenderMaterial` child element that controls the appearance of items (such as `Stratum`s and `MaterialDepthRange`s) that use the `IMaterial`.
 
-There are only expected to be two implementations of `IMaterial`:
+There are only expected to be three implementations of `IMaterial`:
 
 - `Material`
 - `AliasMaterial`
+- `UnknownMaterial`
 
 ### Material
 
@@ -141,7 +142,7 @@ An example of the need for an Alias material is when a borehole log shows *Silty
 
 `UnknownMaterial` exists to fill the role of an `IMaterial` when the material is not known.
 For example, if `MaterialDepthRange`s are inserted in gaps of `Borehole` data, there will need to be a material associated with each new `MaterialDepthRange`.
-There is always a single `UnknownMaterial` in any `GeoInterpretationConfiguration` submodel.
+There is always a single `UnknownMaterial` in any `GeoInterpretationConfiguration` sub-model.
 
 ### IGeologicalHistoryProvider
 
@@ -375,9 +376,9 @@ Currently the only `IGroundProvider` subclass is `Ground`.
 
 ### Ground
 
-`Ground` is an `IGroundProvider` that is most commonly the result of a ground generation operation. `Ground` is the head of an Element parent/child tree that looks like this:
+`Ground` is an `IGroundProvider` that is most commonly the result of a ground generation operation. Every `Ground` is sub-modeled by a `GeotechnicalInterpretationModel` that only contains `Ground` related Elements. Element hierarchy for `Ground` looks like this:
 
-- `Ground` **Need to determine if this has a submodel or not**
+- `Ground`
   - 1..N `Boundary`s **Need to clarify if 0 is valid**
   - 1..N `Block`s **Need to clarify if 0 is valid**
     - 1..N `Stratum`s **Need to clarify if 0 is valid**
@@ -405,13 +406,13 @@ A `Boundary` that has only one `BoundaryBoundsVolumes` relationship is either:
 - Part or all of the top surface (ground level) of the `Ground`, or
 - Part or all of a sidewall of the `Ground`.
 
-The `Surface` property contains a triangular mesh. The mesh has a consistent positive normal direction (by the order of the vertices in each triangular face). The terms "positive side and "negative side" in the relationships `BoundaryBoundsVolumeOnPositiveSide` and `BoundaryBoundsVolumeOnNegativeSide` refer to this normal.
+The `Surface` property contains a triangular mesh. The mesh has a consistent positive normal direction (by the order of the vertices in each triangular face). The terms "positive side" and "negative side" in the relationships `BoundaryBoundsVolumeOnPositiveSide` and `BoundaryBoundsVolumeOnNegativeSide` refer to this normal.
 
 ### Block
 
 `Block`s contain `Stratum`s and `WaterTable`s as child `Element`s. `Block`s do not have geometry of their own. The child `WaterTable`s should be fully contained in the child `Stratum`s.
 
-**Do we need to temper the statement above for cases of surface water (lake,etc) or water in subterranean voids?**
+**Do we need to temper the statement above for cases of surface water (lake, etc.) or water in subterranean voids?**
 
 Currently there is only a single `Block` in each `Ground`, but this will change with more powerful ground generation engines.
 
