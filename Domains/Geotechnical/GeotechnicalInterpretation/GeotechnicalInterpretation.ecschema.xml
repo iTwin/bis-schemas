@@ -117,17 +117,20 @@
     </ECRelationshipClass>
 
     <ECEntityClass typeName="Material" displayLabel="Material" modifier="Sealed" description="A geotechnical material, from the lithography perspective (boring logs, etc.).">
-        <BaseClass>bis:DefinitionElement</BaseClass>   
-        <BaseClass>IMaterial</BaseClass>   
+        <BaseClass>bis:DefinitionElement</BaseClass>
+        <BaseClass>bis:IParentElement</BaseClass>
+        <BaseClass>IMaterial</BaseClass>
     </ECEntityClass>
 
     <ECEntityClass typeName="UnknownMaterial" displayLabel="Unknown Material" modifier="Sealed" description="An IMaterial that does not correspond to any known Material or AliasMaterial (singleton per GeoInterpretationConfiguration).">
-        <BaseClass>bis:DefinitionElement</BaseClass>   
-        <BaseClass>IMaterial</BaseClass>   
+        <BaseClass>bis:DefinitionElement</BaseClass>
+        <BaseClass>bis:IParentElement</BaseClass>
+        <BaseClass>IMaterial</BaseClass>
     </ECEntityClass>
 
     <ECEntityClass typeName="AliasMaterial" displayLabel="AliasMaterial" modifier="Sealed" description="An IMaterial that is an alias for a Material.">
-        <BaseClass>bis:DefinitionElement</BaseClass>   
+        <BaseClass>bis:DefinitionElement</BaseClass>
+        <BaseClass>bis:IParentElement</BaseClass>
         <BaseClass>IMaterial</BaseClass>
 
         <ECNavigationProperty propertyName="AliasFor" relationshipName="AliasMaterialRenamesMaterial" direction="Forward" description="Required reference to the Material being renamed."/>
@@ -290,6 +293,7 @@
 
     <ECEntityClass typeName="BoreholeSource" modifier="Sealed" displayLabel="Borehole Source" description="An IBoreholeProvider that is an exclusive collection of Boreholes.">
         <BaseClass>GeotechnicalInterpretationElement</BaseClass>
+        <BaseClass>bis:IParentElement</BaseClass>
         <BaseClass>IBoreholeProvider</BaseClass>
 
         <ECNavigationProperty propertyName="DerivedFrom" relationshipName="BoreholeSourceIsDerivedFromInvestigationElement" direction="Forward" description="Optional reference to GeoExp:GeotechnicalInvestigationElement that is source for this BoreholeSource."/>
@@ -324,6 +328,7 @@
     <!-- Note that Borehole is NOT an IOperand (IBoreholeProvider should be used as the IOperand instead) -->
     <ECEntityClass typeName="Borehole" modifier="Sealed" displayLabel="Borehole" description="A borehole or other investigation producing data similar to borehole logs.">
         <BaseClass>GeotechnicalInterpretationElement</BaseClass>
+        <BaseClass>bis:IParentElement</BaseClass>
 
         <ECProperty propertyName="Active"   displayLabel="Active"   typeName="bool"                              description="This Borehole should be considered in calculations."/>
         <ECProperty propertyName="Location" displayLabel="Location" typeName="Bentley.Geometry.Common.IGeometry" description="The path of the Borehole from the surface downward."/>
@@ -429,6 +434,7 @@
 
     <ECEntityClass typeName="FenceDiagram" modifier="Sealed" displayLabel="Fence Diagram" description="A vertical slice through Ground, that allows display and editing of strata boundaries.">
         <BaseClass>GeotechnicalInterpretationElement</BaseClass>
+        <BaseClass>bis:IParentElement</BaseClass>
         <BaseClass>IFenceDiagramProvider</BaseClass>
 
         <ECProperty propertyName="Width" typeName="double" displayLabel="Width" kindOfQuantity="AECU:LENGTH" description="The width (half either side) of the FenceDiagram, for use in finding related Boreholes."/>
@@ -707,12 +713,10 @@
         <BaseClass>IOperand</BaseClass>
     </ECEntityClass>
 
-    <!-- QUESTION: Ground IS CURRENTLY IParentElement....BUT WE MIGHT HAVE MUCH BETTER VISIBILITY CONTROL IF IT WAS ISubmodeled -->
-
-    <ECEntityClass typeName="Ground" modifier="Sealed" displayLabel="Ground" description="A approximation of the structure of the ground at surface level and below.">
+    <ECEntityClass typeName="Ground" modifier="Sealed" displayLabel="Ground" description="A approximation of the structure of the ground at surface level and below. Instances of Ground are immutable.">
         <BaseClass>GeotechnicalInterpretationElement</BaseClass>
         <BaseClass>IGroundProvider</BaseClass>
-        <BaseClass>bis:IParentElement</BaseClass>
+        <BaseClass>bis:ISubModeledElement</BaseClass>
     </ECEntityClass>
 
     <!-- Note that none of the direct or indirect children of Ground are IOperand. -->
@@ -750,7 +754,7 @@
     </ECEntityClass>
 
     <!-- SHOULD WE NAME THIS ONE GroundBoundary for clarity? -->
-    <ECEntityClass typeName="Boundary" modifier="Sealed" displayLabel="Boundary" description="A contiguous surface that bounds Volumes. Always a child of Subsurface.">
+    <ECEntityClass typeName="Boundary" modifier="Sealed" displayLabel="Boundary" description="A contiguous surface that bounds Volumes. Always a child of Subsurface. Instances of Boundary are immutable.">
         <BaseClass>GeotechnicalInterpretationElement</BaseClass>
 
         <!-- NEED TO ADD EXTENDED TYPE extendedTypeName="GeometryFlatBuffer" or sim (when platform supports) --> 
@@ -789,8 +793,9 @@
         </Target>
     </ECRelationshipClass>
 
-    <ECEntityClass typeName="Block" modifier="Sealed" displayLabel="Block" description="A fault block or similar region of consistent Stratums. Always child of Ground.">
+    <ECEntityClass typeName="Block" modifier="Sealed" displayLabel="Block" description="A fault block or similar region of consistent Stratums. Always child of Ground. Instances of Block are immutable.">
         <BaseClass>GeotechnicalInterpretationElement</BaseClass>
+        <BaseClass>bis:IParentElement</BaseClass>
     </ECEntityClass>
 
     <!-- Stratums are always children of Blocks -->
@@ -826,7 +831,7 @@
         </Target>
     </ECRelationshipClass>
 
-    <ECEntityClass typeName="Stratum" modifier="Sealed" displayLabel="Stratum" description="A GroundVolume representing a stratum of constant material. Always child of Block.">
+    <ECEntityClass typeName="Stratum" modifier="Sealed" displayLabel="Stratum" description="A GroundVolume representing a stratum of constant material. Always child of Block. Instances of Stratum are immutable.">
         <BaseClass>GroundVolume</BaseClass>
 
         <ECNavigationProperty propertyName="Material" relationshipName="StratumHasMaterial" direction="Forward" description="Reference to IMaterial of the Stratum (required)."/>
@@ -842,7 +847,7 @@
     </ECRelationshipClass>
  
     <!-- may change this name (and clarify the concept) later -->
-    <ECEntityClass typeName="WaterTable" modifier="Sealed" displayLabel="Water Table" description="A border between saturated and unsaturated soil. Always child of Block.">
+    <ECEntityClass typeName="WaterTable" modifier="Sealed" displayLabel="Water Table" description="A border between saturated and unsaturated soil. Always child of Block. Instances of WaterTable are immutable.">
         <BaseClass>GeotechnicalInterpretationElement</BaseClass>
 
         <!-- NEED TO ADD EXTENDED TYPE extendedTypeName="GeometryFlatBuffer" or sim --> 
@@ -962,6 +967,7 @@
 
     <ECEntityClass typeName="Operation" modifier="Abstract" displayLabel="Operation" description="Abstract superclass for an operation that takes IOperand inputs and produces an IOperand result.">
         <BaseClass>GeotechnicalInformationElement</BaseClass>
+        <BaseClass>bis:IParentElement</BaseClass>
 
         <!-- *** QUESTION: PREFERENCES FOR A DIFFERENT NAME? *** -->
         <ECProperty propertyName="NeedsRerun"   displayLabel="Needs Rerun"   typeName="bool" description="This Operation has not be run since the last input change."/>
