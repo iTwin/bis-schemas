@@ -39,6 +39,7 @@ The overall structure of the Geotechnical Information hierarchy is:
           - 0..N `FenceBoundary`
           - 0..N `FenceStratum`
       - 0..N `Region`s 
+      - 0..N `Terrain`s
       - 0..N `Ground`s (exactly 1 for V1), each with a `GeotechnicalInterpretationModel` sub-model containing:
         - 1..N `Boundary`s **Need to clarify if 0 is valid**
         - 1..N `Block`s **Need to clarify if 0 is valid**
@@ -49,7 +50,7 @@ The overall structure of the Geotechnical Information hierarchy is:
       - 0..1 `InvestigationMapping`
       - 0..N `Material`s
       - 0..N `AliasMaterial`s
-      - 1..1 `UnknownMaterial`
+      - 0..1 `UnknownMaterial`
 
 ### GeotechnicalInterpretationModel
 
@@ -140,9 +141,12 @@ An example of the need for an Alias material is when a borehole log shows *Silty
 
 ### UnknownMaterial
 
-`UnknownMaterial` exists to fill the role of an `IMaterial` when the material is not known.
+`UnknownMaterial` is a singleton element (scoped to `GeoInterpretationConfiguration` sub-model) that exists to fill the role of an `IMaterial` when the material is not known.
 For example, if `MaterialDepthRange`s are inserted in gaps of `Borehole` data, there will need to be a material associated with each new `MaterialDepthRange`.
-There is always a single `UnknownMaterial` in any `GeoInterpretationConfiguration` sub-model.
+
+No more than one instance of `UnknownMaterial` exists per `GeoInterpretationConfiguration` sub-model.
+By default `UnknownMaterial` will not be present in `GeoInterpretationConfiguration` sub-model unless explicitly inserted through domain handler API or an
+indirect, automatic insert happened due to an insertion of `MaterialDepthRange` instance with no `IMaterial` specified (e.g. to fill in the gaps of a Borehole).
 
 ### IGeologicalHistoryProvider
 
@@ -168,7 +172,7 @@ In the future, a property will likely be added to specify the specific geologica
 
 `IBoreholeProvider` exists to unify `BoreholeSource` (an exclusive collection of `Borehole`s), `BoreholeGroup` (a non-exclusive collection of `Borehole`s) and any future class that is able to produce a set of `Borehole`s (e.g. perhaps in the future there will be a `BoreholeFilter` concept) for downstream processing.
 
-The TypeScript wrapper for each `IBoreholeProvider` subclass is expected to have a XXXX() method.
+The TypeScript wrapper for each `IBoreholeProvider` subclass is expected to have a `getBoreholes()` method.
 
 ### BoreholeGroup
 
@@ -238,7 +242,7 @@ The associated `Region` must have a rectangular shape, but the rectangle may hav
 
 `ISurfaceProvider` is used to unify all of the various types that can provide surfaces that can be used for downstream consumption (primarily in `Operation`s). Every `ISurfaceProvider` is also an `IOperand`. 
 
-The TypeScript wrapper for each `ISurfaceProvider` subclass is expected to have a XXXX() method.
+The TypeScript wrapper for each `ISurfaceProvider` subclass is expected to have a `getSurface()` method.
 
 ### GenericSurface
 
@@ -252,7 +256,7 @@ The `Surface` property is always defined, and is in global coordinates.
 
 `IFenceDiagramProvider` is always a child of `GroundGeneration`.
 
-The TypeScript wrapper for each `IFenceDiagramProvider` subclass is expected to have a XXXX() method.
+The TypeScript wrapper for each `IFenceDiagramProvider` subclass is expected to have a `getFenceDiagram()` method.
 
 ### FenceDiagram
 
@@ -365,14 +369,27 @@ The symbology of the `FenceBoundary` depends upon the value of the `UserSpecifie
 
 See [GeotechnicalInterpretationPartition](./GeotechnicalInterpretation.remarks.md#GeotechnicalInterpretationPartition) for an outline of the overall Geotechnical Interpretation information hierarchy, including the `Fence*` classes.
 
+### ITerrainProvider
+
+`ITerrainProvider` is used to unify all of the various types that can provide `Terrain` that can be used for downstream consumption (primarily in `GroundGeneration`).
+Every `ITerrainProvider` is also an `ISurfaceProvider`.
+
+The TypeScript wrapper for each `ITerrainProvider` subclass is expected to have a `getTerrain()` method and methods inherited from `ISurfaceProvider`.
+
+Currently the only `ITerrainProvider` subclass is `Terrain`.
+
+### Terrain
+
+`Terrain` is one of the possible inputs for `GroundGeneration`, see `TerrainDrivesGroundGeneration` for the relationship class. Multiple `Terrain`s can exist simultaneously in given `GeotechnicalInterpretationModel`.
+
 ### IGroundProvider
 
 `IGroundProvider` is used to unify all of the various types that can provide `Ground` that can be used for downstream consumption (primarily in `Operation`s).
 Every `IGroundProvider` is also an `IOperand`. 
 
-The TypeScript wrapper for each `IGroundProvider` subclass is expected to have a XXXX() method.
+The TypeScript wrapper for each `IGroundProvider` subclass is expected to have a `getGround()` method.
 
-Currently the only `IGroundProvider` subclass is `Ground`. 
+Currently the only `IGroundProvider` subclass is `Ground`.
 
 ### Ground
 
@@ -466,7 +483,7 @@ The general pattern of `IOperand` subclassing is:
 
 - Create an `IXxxProvider` whenever `Xxx` is needed for input (e.g. `ISurfaceProvider`)
 - Use *applies-to* `Element` to give implementation flexibility.
-- The TypeScript wrappers for `IXxxProvider` will have a `getXxx()` method. (e.g. `getSurface()`) **Karolis - please comment**
+- The TypeScript wrappers for `IXxxProvider` will have a `getXxx()` method. (e.g. `getSurface()`)
 - Add `IxxxProvider` to the base classes for `UniversalOperand`
 - If there is a specific `Xxx`-related property (or properties) that multiple `IXxxProvider` subclasses will contain, it *may* be useful to create a specialized descendent mixin class, such as `IXxx`. (e.g. `ISurface`).
 - Create concrete classes that (directly or indirectly) incorporate `IXxxProvider`.
@@ -541,9 +558,9 @@ There are only 2 intended subclasses of `BoundaryBoundsVolumes`:
 
 This relationship is followed during Element-Drives-Element dependency tracing to notify the `GroundGeneration` of changes to the `IBoreholeProvider`.
 
-### TerrainSurfaceDrivesGroundGeneration
+### TerrainDrivesGroundGeneration
 
-This relationship is followed during Element-Drives-Element dependency tracing to notify the `GroundGeneration` of changes to the `ISurfaceProvider`.
+This relationship is followed during Element-Drives-Element dependency tracing to notify the `GroundGeneration` of changes to the `ITerrainProvider`.
 
 ### InputDrivesOperation
 
