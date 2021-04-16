@@ -680,25 +680,22 @@
 
     <!-- ==================== Terrain Classes ================================== -->
 
-    <!-- xxxxxxxxxxxxxxxxxx NEED TO THINK ABOUT THIS 
-    
-    <ECEntityClass typeName="ITerrain" modifier="Abstract" displayLabel="Terrain" description="An interface that marks a class as defining terrain (ground level).">
+    <ECEntityClass typeName="ITerrainProvider" modifier="Abstract" displayLabel="Terrain Provider" description="An interface that marks a class as defining terrain (ground level).">
         <ECCustomAttributes>
             <IsMixin xmlns="CoreCustomAttributes.01.00.03">
-                <AppliesToEntityClass>GeotechnicalInterpretationElement</AppliesToEntityClass>
+                <AppliesToEntityClass>bis:Element</AppliesToEntityClass>
             </IsMixin>
         </ECCustomAttributes>
-        <BaseClass>IOperand</BaseClass>
+        <BaseClass>ISurfaceProvider</BaseClass>
     </ECEntityClass>
 
-    <ECEntityClass typeName="TerrainSurface" modifier="Sealed" displayLabel="Terrain Surface" description="An ITerrain that uses a surface (IndexedPolyface) to approximate ground level.">
+    <ECEntityClass typeName="Terrain" modifier="Sealed" displayLabel="Terrain" description="2.5d surface used to approximate ground level.">
         <BaseClass>GeotechnicalInterpretationElement</BaseClass>
-        <BaseClass>ITerrain</BaseClass>
-        <BaseClass>ISurface</BaseClass>
+        <BaseClass>ITerrainProvider</BaseClass>
 
+        <!-- NEED TO ADD EXTENDED TYPE extendedTypeName="GeometryFlatBuffer" or sim (when platform supports) --> 
+        <ECProperty propertyName="Surface" displayLabel="Terrain Surface" typeName="binary" description="Contiguous, non-closed IndexedPolyface defining the geometry of the terrain surface."/>
     </ECEntityClass>
-
-    xxxxxxxxxxxxxxxxxxxx -->
 
     <!-- ========================================================================================== -->
     <!-- ========================== Ground-RELATED CLASSES ======================================== -->
@@ -886,45 +883,43 @@
     <!-- Note that GroundGeneration can also have an IFenceDiagramProvider as an OperationOwnsDrivingInput child -->
 
     <!-- Note that IBoreholeProvider must notify GroundGeneration of changes -->
-    <ECRelationshipClass typeName="BoreholeProviderDrivesGroundGeneration" strength="referencing" modifier="Sealed" description="Connects a GroundGeneration with its input IBoreholeProvider.">
+    <ECRelationshipClass typeName="BoreholeProviderDrivesGroundGeneration" strength="referencing" modifier="Sealed" description="Connects GroundGeneration with its input IBoreholeProvider.">
         <BaseClass>InputDrivesOperation</BaseClass>
         <Source multiplicity="(0..*)" roleLabel="is borehole input for and drives" polymorphic="true">
             <Class class="IBoreholeProvider" />
         </Source>
-        <Target multiplicity="(0..*)" roleLabel="has borehole input and is driven by" polymorphic="true">
+        <Target multiplicity="(0..*)" roleLabel="has borehole input and is driven by" polymorphic="false">
             <Class class="GroundGeneration" />
         </Target>
     </ECRelationshipClass>
 
-    <!-- Note that ISurfaceProvider must notify GroundGeneration of changes -->
-    <ECRelationshipClass typeName="TerrainSurfaceDrivesGroundGeneration" strength="referencing" modifier="Sealed" description="Connects an GroundGeneration with its input (terrain) ISurfaceProvider.">
+    <!-- Note that ITerrainProvider must notify GroundGeneration of changes -->
+    <ECRelationshipClass typeName="TerrainDrivesGroundGeneration" strength="referencing" modifier="Sealed" description="Connects GroundGeneration with its input ITerrainProvider.">
         <BaseClass>InputDrivesOperation</BaseClass>
         <!-- NEED TO DETERMINE IF MORE THAN 1 TERRAIN SURFACE CAN BE USED FOR INPUT TO A SINGLE GENERATION-->
         <Source multiplicity="(0..*)" roleLabel="is terrain input for and drives" polymorphic="true">
-            <Class class="ISurfaceProvider" />
+            <Class class="ITerrainProvider" />
         </Source>
-
-        <Target multiplicity="(0..*)" roleLabel="has terrain input and is driven by" polymorphic="true">
+        <Target multiplicity="(0..*)" roleLabel="has terrain input and is driven by" polymorphic="false">
             <Class class="GroundGeneration" />
         </Target>
     </ECRelationshipClass>
 
     <!-- Note that IRegionProvider must notify GroundGeneration of changes -->
-    <ECRelationshipClass typeName="RegionDrivesGroundGeneration" strength="referencing" modifier="Sealed" description="Connects an GroundGeneration with its input IRegionProvider (that constrains the output area).">
+    <ECRelationshipClass typeName="RegionDrivesGroundGeneration" strength="referencing" modifier="Sealed" description="Connects GroundGeneration with its input IRegionProvider (that constrains the output area).">
         <BaseClass>InputDrivesOperation</BaseClass>
         <Source multiplicity="(0..*)" roleLabel="is region (area bounds) input for and drives" polymorphic="true">
             <Class class="IRegionProvider" />
         </Source>
-
-        <Target multiplicity="(0..*)" roleLabel="has region (area bounds) input and is driven by" polymorphic="true">
+        <Target multiplicity="(0..*)" roleLabel="has region (area bounds) input and is driven by" polymorphic="false">
             <Class class="GroundGeneration" />
         </Target>
     </ECRelationshipClass>
 
-    <ECRelationshipClass typeName="GroundGenerationHasGroundOutput" strength="referencing" modifier="Sealed" description="Connects a GroundGeneration with its output Ground.">
+    <ECRelationshipClass typeName="GroundGenerationHasGroundOutput" strength="referencing" modifier="Sealed" description="Connects GroundGeneration with its output Ground.">
         <BaseClass>OperationHasOutput</BaseClass>
         <!-- Every Ground must have come from a GroundGeneration operation-->
-        <Source multiplicity="(1..1)" roleLabel="has output" polymorphic="true">
+        <Source multiplicity="(1..1)" roleLabel="has output" polymorphic="false">
             <Class class="GroundGeneration" />
         </Source>
         <!-- before Operation is run there will not be any Subsurface-->
@@ -945,10 +940,10 @@
     <!-- GroundGenerationParameters is always a child of GroundGeneration -->
     <ECRelationshipClass typeName="GroundGenerationOwnsParameters" strength="embedding" modifier="None">
         <BaseClass>OperationOwnsParameters</BaseClass>
-        <Source multiplicity="(1..1)" polymorphic="false" roleLabel="owns and is driven by">
+        <Source multiplicity="(1..1)" roleLabel="owns and is driven by" polymorphic="false">
             <Class class="GroundGeneration"/>
         </Source>
-        <Target multiplicity="(1..1)" polymorphic="true" roleLabel="is owned by and drives">
+        <Target multiplicity="(1..1)" roleLabel="is owned by and drives" polymorphic="true">
             <Class class="GroundGenerationParameters"/>
         </Target>
     </ECRelationshipClass>
@@ -1036,6 +1031,7 @@
         <BaseClass>IOperand</BaseClass>
         <BaseClass>IGroundProvider</BaseClass>
         <BaseClass>ISurfaceProvider</BaseClass>
+        <BaseClass>ITerrainProvider</BaseClass>
         <!-- ADD ALL IOperand MIXINS (THAT CAN BE OPERATION OR FILTER OUTPUT) AS BASE CLASSES -->
     </ECEntityClass>
 
