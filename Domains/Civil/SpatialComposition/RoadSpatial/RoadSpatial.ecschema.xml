@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ECSchema schemaName="RoadSpatial" alias="rdsp" version="01.00.00" description="Schema modeling the spatial breakdown of a Road." xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
+    <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
+    <ECSchemaReference name="BisCore" version="01.00.13" alias="bis"/>
+    <ECSchemaReference name="SpatialComposition" version="01.00.01" alias="spcomp"/>
+    <ECSchemaReference name="LinearReferencing" version="02.00.03" alias="lr"/>
+
+    <ECCustomAttributes>
+        <ProductionStatus xmlns="CoreCustomAttributes.01.00.00">
+            <SupportedUse>NotForProduction</SupportedUse>
+        </ProductionStatus>
+    </ECCustomAttributes>
+
+    <ECEntityClass typeName="Road" displayLabel="Road" description="A spcomp:Facility modeling a route built on land to allow travel from one location to another, including highways, streets, cycle and foot paths, but excluding railways.">
+        <BaseClass>spcomp:Facility</BaseClass>
+        <BaseClass>lr:ILinearLocationElement</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="RoadPart" modifier="Abstract" description="A spcomp:FacilityPart serving as the base class for classes modeling parts of a Road.">
+        <BaseClass>spcomp:FacilityPart</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="RoadwayPlateau" displayLabel="Roadway Plateau" description="Strip of a Road comprising the roadway(s), shoulders, curbs and medians.">
+        <BaseClass>RoadPart</BaseClass>
+        <BaseClass>lr:ILinearLocationElement</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="CentralReserve" displayLabel="Central Reserve" description="Strip of a Road separating two of its Roadways or separating traffic lanes and sidewalk.">
+        <BaseClass>RoadPart</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="RoadSide" displayLabel="Road Side" description="A lateral strip along the Road, comprising the areas outside its RoadwayPlateau not intended for vehicles.">
+        <BaseClass>RoadPart</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="Roadway" displayLabel="Roadway" description="Strip of a Road constructed for use by vehicular traffic, including auxiliary traffic lanes, passing places, and lay-bys.">
+        <BaseClass>RoadPart</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="TrafficLane" displayLabel="Lane" description="Strip of a Roadway intended to accommodate a single line of moving vehicles, frequently defined by road markings.">
+        <BaseClass>RoadPart</BaseClass>
+        <BaseClass>lr:ILinearLocationElement</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="Shoulder" displayLabel="Shoulder" description="A lateral strip of a Road adjacent to, and usually at the same level as the Roadway, exclusive of embankment or cutting slopes.">
+        <BaseClass>RoadPart</BaseClass>
+        <BaseClass>lr:ILinearLocationElement</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="Sidewalk" displayLabel="Sidewalk" description="A spcomp:FacilityPart modeling a footpath along the side of a road.">
+        <BaseClass>RoadPart</BaseClass>
+        <BaseClass>lr:ILinearLocationElement</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="JunctionElement" modifier="Abstract" description="A spcomp:FacilityPart providing a base class for concepts modeling an at-grade junction where two or more roads meet or cross.">
+        <BaseClass>RoadPart</BaseClass>
+        <BaseClass>lr:ILinearLocationElement</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="Intersection" displayLabel="Intersection" modifier="None" description="General kind of JunctionElement modeling an at-grade junction where two or more roads meet or cross.">
+        <BaseClass>JunctionElement</BaseClass>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="RoadIncludesJunctions" modifier="None" strength="referencing" displayLabel="Road includes Junctions" description="Relates Roads with Intersections connected to them, but not directly aggregated by them.">
+        <BaseClass>spcomp:SpatialOrganizerReferencesSpatialElements</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="includes" polymorphic="true">
+            <Class class="Road"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is included by" polymorphic="true">
+            <Class class="JunctionElement"/>
+        </Target>
+    </ECRelationshipClass>
+</ECSchema>
