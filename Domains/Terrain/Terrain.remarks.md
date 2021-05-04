@@ -56,7 +56,7 @@ Every `Terrain` owns multiple `TerrainSourceFeature`s, which capture details of 
 
 `Terrain`s must be contained in `PhysicalModel`s. The same repercussions of the choice of the containing `Model` for `TerrainReference` apply to `Terrain`.
 
-Instances of `Terrain`, by default, shall use the Domain-ranked `Terrain` category.
+Instances of `Terrain`, by default, shall use the Domain-ranked `trrn:Terrain` category.
 
 
 ### TerrainBoundary
@@ -65,7 +65,7 @@ One `TerrainBoundary` is expected for every `ITerrain` instance.
 
 An `ITerrain`, if already calculated, has a *Boundary* captured by a single child element of type `TerrainBoundary`, which stores the boundary's geometrical details in its `GeometryStream` as a closed line-string (i.e. no arcs) encoded into a single *LineString3d*. The first and last point of the *LineString3d* shall be the same.
 
-Instances of `TerrainBoundary`, by default, shall use the Domain-ranked `TerrainBoundary` category.
+Instances of `TerrainBoundary`, by default, shall use the Domain-ranked `trrn:Boundary` category.
 
 
 ### TerrainSourceFeatureElement
@@ -79,7 +79,7 @@ Up to one `TerrainDrapeBoundary` is expected for every `Terrain` instance, if a 
 
 A `TerrainDrapeBoundary` stores its geometrical details in its `GeometryStream` as a closed line-string (i.e. no arcs) encoded as a *LineString3d*. Z-coordinates shall be the same (planar). The first and last point of the *LineString3d* shall be the same.
 
-Instances of `TerrainDrapeBoundary`, by default, shall use the Domain-ranked `TerrainDrapeBoundary` category.
+Instances of `TerrainDrapeBoundary`, by default, shall use the Domain-ranked `trrn:DrapeBoundary` category.
 
 
 ### TerrainBreakline
@@ -88,7 +88,7 @@ Instances of `TerrainDrapeBoundary`, by default, shall use the Domain-ranked `Te
 
 A `TerrainBreakline` stores its geometrical details in its `GeometryStream` as line-strings (i.e. no arcs) which may be open or closed. These line-strings shall be encoded as a *LineString3d*. If a single instance of `TerrainBreakline` is capturing multiple breaklines, each breakline shall be encoded into a separate *LineString3d* in the `GeometryStream`.
 
-Instances of `TerrainBreakline`, by default, shall use the Domain-ranked `TerrainBreakline` category.
+Instances of `TerrainBreakline`, by default, shall use the Domain-ranked `trrn:Breakline` category.
 
 
 ### TerrainSourceContour
@@ -97,7 +97,7 @@ One `TerrainSourceContour` typically captures one contour, but multiple of them 
 
 A `TerrainSourceContour` stores its geometrical details in its `GeometryStream` as an open or closed line-string (i.e. no arcs), encoded into a *LineString3d*. If it is closed then the first and last point of the *LineString3d* shall be the same. If a single instance of `TerrainSourceContour` is capturing multiple contours, each contour shall be encoded into a separate *LineString3d*s in the `GeometryStream`.
 
-Instances of `TerrainSourceContour`, by default, shall use the Domain-ranked `TerrainSourceContour` category.
+Instances of `TerrainSourceContour`, by default, shall use the Domain-ranked `trrn:SourceContour` category.
 
 
 ### TerrainSpotElevation
@@ -106,7 +106,7 @@ One `TerrainSpotElevation` typically captures one point, but multiple of them co
 
 A `TerrainSpotElevation` stores its geometrical details in its `GeometryStream` as a *PointString3d*. The elevation captured by a `TerrainSpotElevation` can be read from each point's Z-coordinate in the *PointString3d*. If a single instance of `TerrainSpotElevation` is capturing only one Spot elevation, its `GeometryStream` shall contain a *PointString3d* with one single point in it.
 
-Instances of `TerrainSpotElevation`, by default, shall use the Domain-ranked `TerrainSpotElevation` category.
+Instances of `TerrainSpotElevation`, by default, shall use the Domain-ranked `trrn:SpotElevation` category.
 
 
 ### TerrainHole
@@ -115,7 +115,7 @@ Instances of `TerrainSpotElevation`, by default, shall use the Domain-ranked `Te
 
 A `TerrainHole` stores its geometrical details in its `GeometryStream` as closed line-strings (i.e. no arcs) encoded into a single *LineString3d*. The first and last point of the *LineString3d* shall be the same. If a single instance of `TerrainHole` is capturing multiple hole features, each hole feature shall be encoded into a separate *LineString3d* in the `GeometryStream`.
 
-Instances of `TerrainHole`, by default, shall use the Domain-ranked `TerrainHole` category.
+Instances of `TerrainHole`, by default, shall use the Domain-ranked `trrn:Hole` category.
 
 
 ### TerrainVoid
@@ -126,7 +126,7 @@ One `TerrainVoid` typically captures one void feature, but multiple of them coul
 
 A `TerrainVoid` stores its geometrical details in its `GeometryStream` as closed line-strings (i.e. no arcs) encoded into a *LineString3d*. The first and last point of the *LineString3d* shall be the same. If a single instance of `TerrainVoid` is capturing multiple void features, each void feature shall be encoded into a separate *LineString3d* in the `GeometryStream`.
 
-Instances of `TerrainVoid`, by default, shall use the Domain-ranked `TerrainVoid` category.
+Instances of `TerrainVoid`, by default, shall use the Domain-ranked `trrn:Void` category.
 
 
 ### TerrainDrapeVoid
@@ -135,7 +135,7 @@ The same restrictions described for `TerrainVoid`s are applicable to `TerrainDra
 
 A `TerrainDrapeVoid` stores its geometrical details in its `GeometryStream` as closed line-strings (i.e. no arcs) encoded into a *LineString3d*. Z-coordinates shall be the same (planar). The first and last point of the *LineString3d* shall be the same. If a single instance of `TerrainVoid` is capturing multiple void features, each void feature shall be encoded into a separate *LineString3d* in the `GeometryStream`.
 
-Instances of `TerrainVoid`, by default, shall use the Domain-ranked `TerrainVoid` category.
+Instances of `TerrainVoid`, by default, shall use the Domain-ranked `trrn:Void` category.
 
 
 ### TerrainIsland
@@ -144,7 +144,4 @@ One `TerrainIsland` typically captures one island feature, but multiple of them 
 
 A `TerrainIsland` stores its geometrical details in its `GeometryStream` as closed line-strings (i.e. no arcs) encoded into a *LineString3d*. The first and last point of the *LineString3d* shall be the same. If a single instance of `TerrainIsland` is capturing multiple island features, each island feature shall be encoded into a separate *LineString3d* in the `GeometryStream`.
 
-Instances of `TerrainIsland`, by default, shall use the Domain-ranked `TerrainIsland` category.
-
-
-## Relationship Classes
+Instances of `TerrainIsland`, by default, shall use the Domain-ranked `trrn:Island` category.
