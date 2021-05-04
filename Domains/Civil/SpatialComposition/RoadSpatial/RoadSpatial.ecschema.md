@@ -1,0 +1,80 @@
+---
+noEditThisPage: true
+remarksTarget: RoadSpatial.ecschema.md
+---
+
+# RoadSpatial
+
+This schema contains the main classes to capture the Spatial Structure of Road projects.
+
+NOTE: Currently under development. This schema should not be used for production workflows. Data created using this schema is not supported and may not be upgradable.
+
+## Entity Classes
+
+### Road
+
+As a subclass of `spcomp:Facility`, a `Road` instance provides the basic element in the Spatial Structure hierarchy for the components of a road project (i.e. any undertaking such as design, construction or maintenance).
+
+`Road`s must be contained in `SpatialLocationModel`s or `PhysicalModel`s and can be linearly located, typically along an *Alignment*.
+
+### RoadwayPlateau
+
+A `Road` instance typically aggregates only one instance of `RoadwayPlateau`.
+
+`RoadwayPlateau`s must be contained in `SpatialLocationModel`s or `PhysicalModel`s and can be linearly located, typically along an *Alignment*.
+
+### CentralReserve
+
+In the typical case, a `CentralReserve` instance models the area that separates the roadways of a road with dual roadways, (US:Median, UK:Central reservation). A `RoadwayPlateau` instance typically aggregates zero or more instances of `CentralReserve`.
+
+`CentralReserve`s must be contained in `SpatialLocationModel`s or `PhysicalModel`s.
+
+### RoadSide
+
+A `RoadSide` instance generally models the area adjoining the outer edges of shoulders.
+
+A `Road` instance typically aggregates two instances of `RoadSide`. `JunctionElement`s can also aggregate `RoadSide`s.
+
+`RoadwaySide`s must be contained in `SpatialLocationModel`s or `PhysicalModel`s.
+
+### Roadway
+
+`Roadway`s may comprise several kinds of traffic lanes and lay-bys, as well as traffic islands, and in the case of a dual roadway road, they are separated by central reserve (UK: Carriageway).
+
+A `RoadwayPlateau` instance typically aggregates one or more instances of `Roadway`.
+
+`Roadway`s must be contained in `SpatialLocationModel`s or `PhysicalModel`s. An instance of `Roadway` may hold the `bis:PhysicalElement`s (e.g. `Course`s) directly underneath it, as part of the road's *pavement* structure.
+
+### TrafficLane
+
+A `Roadway` instance typically aggregates one or more instances of `TrafficLane`.
+
+`TrafficLanes`s must be contained in `SpatialLocationModel`s or `PhysicalModel`s and can be linearly located, typically along an *Alignment*. An instance of `TrafficLane` may hold the `bis:PhysicalElement`s (e.g. *Course*s) directly underneath it, as part of the road's *pavement* structure.
+
+### Shoulder
+
+Shoulders are not intended for vehicular traffic but may be used in case of emergency. They provide lateral support to a roadway.
+
+Instances of `Shoulder` are typically aggregated by an instance of `RoadwayPlateau`. Inner shoulders in between roadways of a dual roadway road are generally aggregated by an instance of `CentralReserve`.
+
+`Shoudler`s must be contained in `SpatialLocationModel`s or `PhysicalModel`s and can be linearly located, typically along an *Alignment*. An instance of `Shoulder` may hold the `bis:PhysicalElement`s (e.g. *Course*s) directly underneath it, as part of the road's *pavement* structure.
+
+### Sidewalk
+
+A sidewalk may accommodate moderate changes in grade (elevation) and is normally separated from the vehicular section by a curb. There may be a central reserve between the sidewalk and traffic lanes.
+
+A `RoadwayPlateau` instance typically aggregates zero or more instances of `Sidewalk`.
+
+`Sidewalk`s must be contained in `SpatialLocationModel`s or `PhysicalModel`s and can be linearly located, typically along an *Alignment*. An instance of `Sidewalk` typically holds the `bis:PhysicalElement`s (e.g. *Course*s) comprising its *pavement* structure.
+
+### JunctionElement
+
+Only one instance of `Road` can aggregate an instance of `JunctionElement`. Other `Road`s meeting or crossing the same `JunctionElement` shall use the `RoadIncludesJunctions` relationship to indicate association with it.
+
+`JunctionElement`s can be linearly located, typically along an *Alignment*.
+
+### Intersection
+
+A `Road` instance typically aggregates zero or more instances of `Intersection`. 
+
+`Intersection`s must be contained in `SpatialLocationModel`s or `PhysicalModel`s. An instance of `Intersection` typically holds the `bis:PhysicalElement`s (e.g. *Course*s) comprising its *pavement* structure.
