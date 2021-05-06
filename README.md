@@ -8,7 +8,7 @@ The repository is split up into two main parts; the tooling, used to process and
 
 All tooling will be under the "tools" directory at the root of the repository.
 
-The BIS Domain Schemas all live under the "Domains" directory, organized by domain group. Each domain group has it own directory, allowing [permissions](#managing-permissions-to-bis-schema) control by the domain group owner. If necessary for finer-grained permissions management, domain group owners can create further subdirectories. Otherwise, all domain schemas should be in the top-level domain group directory. There will be a "Release" subdirectory to hold domain schemas that have been publicly released.
+The BIS Domain Schemas all live under the "Domains" directory, organized by domain group. Each domain group has it own directory, allowing permissions control by the domain group owner. If necessary for finer-grained permissions management, domain group owners can create further subdirectories. Otherwise, all domain schemas should be in the top-level domain group directory. There will be a "Released" subdirectory to hold domain schemas that have been publicly released.
 
 Example:
 
@@ -157,7 +157,7 @@ The iModel Schema Validation tool imports each individual schema in the bis-sche
 - **Sha1 Hash Validation:** Sha1 Hash is generated for each exported schema and compared against the set of hashes of released schemas present in [SchemaInventory](https://github.com/iTwin/bis-schemas/blob/master/SchemaInventory.json).
 - **Approval Validation:** Approval status of each schema is checked from [SchemaInventory](https://github.com/iTwin/bis-schemas/blob/master/SchemaInventory.json).  
 
-> The npm script 'iModelSchemaValidation' uses the npm package [@bentley/imodel-schema-validater](https://www.npmjs.com/package/@bentley/imodel-schema-validator) to perform the validation.
+> The npm script 'iModelSchemaValidation' uses the npm package `@bentley/imodel-schema-validator` to perform the validation.
 
 To run the 'iModelSchemaValidation' script, follow these steps:
 
@@ -210,10 +210,10 @@ In case snapshots differ, use following command to generate new snapshot json:
  
 
 
- 
-- **environment:** The environment where imodel is present. This tool supports three environments: DEV, QA and PROD.
 
-- **iModelName:** Name of the imodel present in the project mentioned in projectid.
+
+
+
 
 
 
