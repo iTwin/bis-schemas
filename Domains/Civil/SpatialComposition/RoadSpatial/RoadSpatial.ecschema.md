@@ -35,7 +35,13 @@ A `RoadSide` instance generally models the area adjoining the outer edges of sho
 
 A `Road` instance typically aggregates two instances of `RoadSide`. `JunctionElement`s can also aggregate `RoadSide`s.
 
-`RoadwaySide`s must be contained in `SpatialLocationModel`s or `PhysicalModel`s.
+`RoadSide`s must be contained in `SpatialLocationModel`s or `PhysicalModel`s.
+
+### RoadSidePart
+
+Examples of `RoadSidePart` may be side slopes, roadside ditches, back slopes, bunds etc.
+
+`RoadSidePart`s must be contained in `SpatialLocationModel`s or `PhysicalModel`s and can be linearly located, typically along an *Alignment*.
 
 ### Roadway
 
@@ -71,7 +77,7 @@ A `RoadwayPlateau` instance typically aggregates zero or more instances of `Side
 
 Only one instance of `Road` can aggregate an instance of `JunctionElement`. Other `Road`s meeting or crossing the same `JunctionElement` shall use the `RoadIncludesJunctions` relationship to indicate association with it.
 
-`JunctionElement`s can be linearly located, typically along an *Alignment*.
+`JunctionElement`s can be indirectly linearly-located along more than one *Linear-Element* (e.g. *Alignment*). That can be achieved with the help of additional elements carrying the associated linear referencing data for each *Linear-Element*. These additional elements are expected to implement the `lr:ILinearLocationElement` mix-in from the LinearReferencing BIS schema, and use instances of the `lr:ILinearLocationLocatesElement` relationship to associate them with a `JunctionElement`. Note that the LinearReferencing BIS schema offers two generic concrete classes implementing the `lr:ILinearLocationElement` mix-in that can be used in this case, depending on the nature of the data: `lr:LinearLocation` and `lr:LinearLocationRecord`. The former is a `bis:SpatialLocationElement` whereas the latter is a `bis:InformationRecordElement`.
 
 ### Intersection
 
