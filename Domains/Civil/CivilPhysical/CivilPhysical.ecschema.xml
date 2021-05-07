@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ECSchema schemaName="CivilPhysical" alias="cvphys" version="01.00.00" description="Main schema for the physical modeling of elements used in Civil infrastructure." xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
+    <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
+    <ECSchemaReference name="BisCore" version="01.00.13" alias="bis"/>
+    <ECSchemaReference name="LinearReferencing" version="02.00.03" alias="lr"/>
+
+    <ECCustomAttributes>
+        <ProductionStatus xmlns="CoreCustomAttributes.01.00.00">
+            <SupportedUse>NotForProduction</SupportedUse>
+        </ProductionStatus>
+    </ECCustomAttributes>
+
+    <ECEntityClass typeName="Course" displayLabel="Course" description="Layer, usually of a single material, whose length greatly exceeds its thickness and often also its width, laid on site on top of another horizontal or nearly horizontal element.">
+        <BaseClass>lr:LinearPhysicalElement</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="CourseType" displayLabel="Course Type" description="Defines a shared set of properties whose values vary per-type of Course rather than per-instance.">
+        <BaseClass>bis:PhysicalType</BaseClass>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="CourseIsOfType" strength="referencing" modifier="None" description="A type-instance relation; one that indicates that the specific cp:Course is an instance of the defined cp:CourseType.">
+        <BaseClass>bis:PhysicalElementIsOfType</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="is of" polymorphic="true">
+            <Class class="Course" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is type of" polymorphic="true">
+            <Class class="CourseType"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="Curb" displayLabel="Curb" description="A bis:PhysicalElement intended to separate surfacings of different surfaces and to provide physical delineation or containment.">
+        <BaseClass>lr:LinearPhysicalElement</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="CurbType" displayLabel="Curb Type" description="Defines a shared set of properties whose values vary per-type of Curb rather than per-instance.">
+        <BaseClass>bis:PhysicalType</BaseClass>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="CurbIsOfType" strength="referencing" modifier="None" description="A type-instance relation; one that indicates that the specific cp:Curb is an instance of the defined cp:CurbType.">
+        <BaseClass>bis:PhysicalElementIsOfType</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="is of" polymorphic="true">
+            <Class class="Curb" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is type of" polymorphic="true">
+            <Class class="CurbType"/>
+        </Target>
+    </ECRelationshipClass>
+</ECSchema>
