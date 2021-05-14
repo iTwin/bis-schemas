@@ -208,6 +208,8 @@ Indicates that an element can be assigned to a Story.
 
 A support member in StructuralAnalysis represents a [StructuralAnalysisElement](#structuralanalysiselement) that is an analytical support. Currently, StructuralAnalysis schema includes [PointSupports](#pointsupport), [CurveSupports](#curvesupport) and [SurfaceSupports](#surfacesupport). Support elements have no direct physical meaning, they are interpreted by some applications to represent some type of support. Support connects to (supports) to elements that share same connectivity ([SharedTopologyElements](#sharedtopologyelements)). Each Support should refer to [SupportBehavior](#supportbehavior) which define how support behaves at specific connectivity.
 
+Each Support defines a simplified version of a more complex structure. e.g. Substructure elements - piles, mat foundations would be considered in a Superstructure application as Supports. Both Substructure and Superstructure elements would be stored in same Structural Analysis model. [SupportRepresentsMembers](#supportrepresentsmembers) relationship allows defining which Members are represented by a Support.
+
 ### PointSupport
 
 Represents an analytical support providing fixity at a point. For example: a support provided under column. The support has its own coordinate system and has fixity properties for each degree of freedom.
