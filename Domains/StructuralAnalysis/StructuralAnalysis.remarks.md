@@ -282,6 +282,16 @@ Not all properties of CurveMember are defined in CurveMember class. There are tw
 - Mandatory CurveMember properties, that can be repeated in multiple CurveMembers are grouped by a [CurveMemberType](#curvemembertype), these could include material, thickness, etc
 - Optional properties, that define some more unique behavior for that CurveMember that might not exist at all. These behaviors are assigned by [MemberBehaviorAspect](#memberbehavioraspect) instances. A single CurveMember might have multiple different type behavior aspects assigned but only one of each kind.
 
+#### Offsets and Rigid Zones
+
+Curve Member physical location might not always match analytical location defined by referenced topology.
+CurveMember `Offset`, `StartRigidZoneLength` and `EndRigidZoneLength` properties allows defining a physical location offset from analytical location as long as physical location remains parallel to analytical.
+
+- Offset - Represent 2d offset at each CurveMember point.
+Offset is stored as 2d Vector where X coordinate defines offset along CurveMember's bi-normal and Y coordinate - along Orientation.
+- Rigid Zones - Define area where CurveMember is infinitely rigid.
+Rigid Zone is defined as fractional distance from either Start or End point of CurveMember location curve.
+
 ### SurfaceMember
 
 Represents [Member](#member) that has one dimension (thickness) much smaller than its other dimensions and is surface-like in nature. Some examples are slabs, wall and spread footings.
@@ -366,6 +376,7 @@ When multiple loads overlap (regardless of the Load Type) the result is always a
 Loads in StructuralAnalysis schema are always hosted - they always have related [Member](#member), [Support](#support) or [Vertex](#vertex) which is assigned through [RelativeLocationAspect](#relativelocationaspect). Load values are assigned through [LoadValueAspect](#loadvalueaspect).
 
 StructuralAnalysis provide multiple [LoadTypes](#loadtype), all these types could be grouped into a [LoadContainer](#loadcontainer) which can be either [LoadGroup](#loadgroup) or [LoadCase](#loadcase). LoadCases can reference LoadGroups.
+Based on Load condition: amount of force produced by the same Load might varry. This variantion is calculated using Load Factors that are defined in a Load Container.
 
 Loads are subclassed by the area they affect:
 
