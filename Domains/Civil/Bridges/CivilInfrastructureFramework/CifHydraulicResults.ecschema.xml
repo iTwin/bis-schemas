@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ECSchema schemaName="CifHydraulicResults" alias="cifhydrs" version="01.00.01" description="iModel Connector schema containing aspect classes with result properties from the Subsurface Utilities Design and Analysis module as part of Civil Designer applications." xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
-    <ECSchemaReference name="BisCore" version="01.00.12" alias="bis"/>
-    <ECSchemaReference name="CifCommon" version="01.00.01" alias="cifcmn"/>
+<ECSchema schemaName="CifHydraulicResults" alias="cifhydrs" version="01.00.02" description="iModel Connector schema containing aspect classes with result properties from the Subsurface Utilities Design and Analysis module as part of Civil Designer applications." xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
+    <ECSchemaReference name="BisCore" version="01.00.13" alias="bis"/>
+    <ECSchemaReference name="CifCommon" version="01.00.02" alias="cifcmn"/>
     <ECSchemaReference name="CifUnits" version="01.00.01" alias="cifu"/>
     <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
     <ECCustomAttributes>
@@ -239,6 +239,11 @@
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
         <ECProperty propertyName="CatchBasinGutterResults_Depth" typeName="double" displayLabel="Depth (Gutter)" category="Results_Inlet_Capture_Drainage_Results_Inlet_Capture_Drainage" priority="0" kindOfQuantity="cifu:LENGTH_SHORT"/>
         <ECProperty propertyName="CatchBasinGutterResults_Spread" typeName="double" displayLabel="Spread / Top Width" category="Results_Inlet_Capture_Drainage_Results_Inlet_Capture_Drainage" priority="0" kindOfQuantity="cifu:LENGTH"/>
+    </ECEntityClass>
+    <ECEntityClass typeName="CatchBasinGutterStatsAspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="CatchBasinGutterStats_MaximumGutterDepth" typeName="string" displayLabel="Gutter Depth (Maximum)" category="Category_Drainage_Category_Drainage" priority="0"/>
+        <ECProperty propertyName="CatchBasinGutterStats_MaximumGutterSpread" typeName="string" displayLabel="Gutter Spread (Maximum)" category="Category_Drainage_Category_Drainage" priority="0"/>
     </ECEntityClass>
     <ECEntityClass typeName="CatchbasinNodeResultsAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
@@ -510,6 +515,15 @@
         </Source>
         <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
             <Class class="CatchBasinGutterResultsAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="ElementOwnsCatchBasinGutterStatsAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="CatchBasinGutterStatsAspect"/>
         </Target>
     </ECRelationshipClass>
     <ECRelationshipClass typeName="ElementOwnsCatchbasinNodeResultsAspect" modifier="None" strength="embedding">
@@ -2138,6 +2152,12 @@
         <ECProperty propertyName="StandardCatchbasinStatistics_TimeToMaximumInletFlow" typeName="double" displayLabel="Time To Maximum Inlet Flow" category="Results_Drainage_Results_Drainage" priority="0" kindOfQuantity="cifu:TIME_EXTENDED"/>
         <ECProperty propertyName="StandardCatchbasinStatistics_MaximumCapturedFlow" typeName="double" displayLabel="Flow (Captured Maximum)" category="Results_Drainage_Results_Drainage" priority="0" kindOfQuantity="cifu:FLOW"/>
         <ECProperty propertyName="StandardCatchbasinStatistics_TimeToMaximumCapturedFlow" typeName="double" displayLabel="Time To Maximum Captured Flow" category="Results_Drainage_Results_Drainage" priority="0" kindOfQuantity="cifu:TIME_EXTENDED"/>
+        <ECProperty propertyName="StandardCatchbasinStatistics_MaximumGutterDepth" typeName="double" displayLabel="Gutter Depth (Maximum)" category="Results_Drainage_Results_Drainage" priority="0" kindOfQuantity="cifu:LENGTH_SHORT"/>
+        <ECProperty propertyName="StandardCatchbasinStatistics_MaximumGutterSpread" typeName="double" displayLabel="Gutter Spread / Top Width (Maximum)" category="Results_Drainage_Results_Drainage" priority="0" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="StandardCatchbasinStatistics_TimeToMaxGutterDepth" typeName="double" displayLabel="Time to Maximum Gutter Depth" category="Results_Drainage_Results_Drainage" priority="0" kindOfQuantity="cifu:TIME_EXTENDED"/>
+        <ECProperty propertyName="StandardCatchbasinStatistics_TimeToMaxGutterSpread" typeName="double" displayLabel="Time to Maximum Gutter Spread / Top Width" category="Results_Drainage_Results_Drainage" priority="0" kindOfQuantity="cifu:TIME_EXTENDED"/>
+        <ECProperty propertyName="StandardCatchbasinStatistics_MinimumCaptureEfficiency" typeName="double" displayLabel="Capture Efficiency (Calculated Minimum)" category="Results_Drainage_Results_Drainage" priority="0" kindOfQuantity="cifu:PERCENT"/>
+        <ECProperty propertyName="StandardCatchbasinStatistics_TimeToMinimumCaptureEfficiency" typeName="double" displayLabel="Time to Minimum Capture Efficiency" category="Results_Drainage_Results_Drainage" priority="0" kindOfQuantity="cifu:TIME_EXTENDED"/>
     </ECEntityClass>
     <ECRelationshipClass typeName="ElementOwnsStandardCatchbasinStatisticsAspect" modifier="None" strength="embedding">
         <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
@@ -2479,99 +2499,99 @@
         </Target>
     </ECRelationshipClass>
     <PropertyCategory typeName="Boundary_Condition_Drainage_Boundary_Condition_Drainage" description="Boundary Condition [Drainage]" displayLabel="Boundary Condition [Drainage]" priority="4294889026"/>
+    <PropertyCategory typeName="Boundary_Condition_Hydraulic_Analysis_Boundary_Condition_Hydraulic_Analysis" description="Boundary Condition [Hydraulic Analysis]" displayLabel="Boundary Condition [Hydraulic Analysis]" priority="4294889026"/>
     <PropertyCategory typeName="Category_Drainage_Category_Drainage" description="Category [Drainage]" displayLabel="Category [Drainage]" priority="4294889436"/>
+    <PropertyCategory typeName="Category_Hydraulic_Analysis_Category_Hydraulic_Analysis" description="Category [Hydraulic Analysis]" displayLabel="Category [Hydraulic Analysis]" priority="4294889436"/>
     <PropertyCategory typeName="Drainage_Drainage" description="# [Drainage]" displayLabel="# [Drainage]" priority="4294928186"/>
     <PropertyCategory typeName="Generic_Drainage_Generic_Drainage" description="Generic [Drainage]" displayLabel="Generic [Drainage]" priority="4294885096"/>
+    <PropertyCategory typeName="Generic_Hydraulic_Analysis_Generic_Hydraulic_Analysis" description="Generic [Hydraulic Analysis]" displayLabel="Generic [Hydraulic Analysis]" priority="4294885096"/>
     <PropertyCategory typeName="Geometry_Drainage_Geometry_Drainage" description="&lt;Geometry&gt; [Drainage]" displayLabel="&lt;Geometry&gt; [Drainage]" priority="4294899186"/>
+    <PropertyCategory typeName="Geometry_Hydraulic_Analysis_Geometry_Hydraulic_Analysis" description="&lt;Geometry&gt; [Hydraulic Analysis]" displayLabel="&lt;Geometry&gt; [Hydraulic Analysis]" priority="4294899186"/>
+    <PropertyCategory typeName="Hydraulic_Analysis_Hydraulic_Analysis" description="# [Hydraulic Analysis]" displayLabel="# [Hydraulic Analysis]" priority="4294928186"/>
     <PropertyCategory typeName="Physical_Drainage_Physical_Drainage" description="Physical [Drainage]" displayLabel="Physical [Drainage]" priority="4294875686"/>
     <PropertyCategory typeName="Physical_Headwall_Drainage_Physical_Headwall_Drainage" description="Physical (Headwall) [Drainage]" displayLabel="Physical (Headwall) [Drainage]" priority="4294875686"/>
+    <PropertyCategory typeName="Physical_Headwall_Hydraulic_Analysis_Physical_Headwall_Hydraulic_Analysis" description="Physical (Headwall) [Hydraulic Analysis]" displayLabel="Physical (Headwall) [Hydraulic Analysis]" priority="4294875686"/>
+    <PropertyCategory typeName="Physical_Hydraulic_Analysis_Physical_Hydraulic_Analysis" description="Physical [Hydraulic Analysis]" displayLabel="Physical [Hydraulic Analysis]" priority="4294875686"/>
     <PropertyCategory typeName="Results_AASHTO_Drainage_Results_AASHTO_Drainage" description="Results (AASHTO) [Drainage]" displayLabel="Results (AASHTO) [Drainage]" priority="4294874046"/>
     <PropertyCategory typeName="Results_AASHTO_Hydraulic_Analysis_Results_AASHTO_Hydraulic_Analysis" description="Results (AASHTO) [Hydraulic Analysis]" displayLabel="Results (AASHTO) [Hydraulic Analysis]" priority="4294874046"/>
     <PropertyCategory typeName="Results_Carryover_Flow_Drainage_Results_Carryover_Flow_Drainage" description="Results (Carryover Flow) [Drainage]" displayLabel="Results (Carryover Flow) [Drainage]" priority="4294874046"/>
+    <PropertyCategory typeName="Results_Carryover_Flow_Hydraulic_Analysis_Results_Carryover_Flow_Hydraulic_Analysis" description="Results (Carryover Flow) [Hydraulic Analysis]" displayLabel="Results (Carryover Flow) [Hydraulic Analysis]" priority="4294874046"/>
     <PropertyCategory typeName="Results_Catchment_Drainage_Results_Catchment_Drainage" description="Results (Catchment) [Drainage]" displayLabel="Results (Catchment) [Drainage]" priority="4294874046"/>
+    <PropertyCategory typeName="Results_Catchment_Hydraulic_Analysis_Results_Catchment_Hydraulic_Analysis" description="Results (Catchment) [Hydraulic Analysis]" displayLabel="Results (Catchment) [Hydraulic Analysis]" priority="4294874046"/>
     <PropertyCategory typeName="Results_Connecting_Links_Drainage_Results_Connecting_Links_Drainage" description="Results (Connecting Links) [Drainage]" displayLabel="Results (Connecting Links) [Drainage]" priority="4294874046"/>
+    <PropertyCategory typeName="Results_Connecting_Links_Hydraulic_Analysis_Results_Connecting_Links_Hydraulic_Analysis" description="Results (Connecting Links) [Hydraulic Analysis]" displayLabel="Results (Connecting Links) [Hydraulic Analysis]" priority="4294874046"/>
     <PropertyCategory typeName="Results_Drainage_Results_Drainage" description="Results [Drainage]" displayLabel="Results [Drainage]" priority="4294874046"/>
     <PropertyCategory typeName="Results_Energy_Cost_Peak_Drainage_Results_Energy_Cost_Peak_Drainage" description="Results (Energy Cost Peak) [Drainage]" displayLabel="Results (Energy Cost Peak) [Drainage]" priority="4294874046"/>
     <PropertyCategory typeName="Results_Energy_Cost_Summary_Drainage_Results_Energy_Cost_Summary_Drainage" description="Results (Energy Cost Summary) [Drainage]" displayLabel="Results (Energy Cost Summary) [Drainage]" priority="4294874046"/>
     <PropertyCategory typeName="Results_Energy_Costs_Drainage_Results_Energy_Costs_Drainage" description="Results (Energy Costs) [Drainage]" displayLabel="Results (Energy Costs) [Drainage]" priority="4294874046"/>
-    <PropertyCategory typeName="Results_Engine_Parsing_Drainage_Results_Engine_Parsing_Drainage" description="Results (Engine Parsing) [Drainage]" displayLabel="Results (Engine Parsing) [Drainage]" priority="4294874046"/>
-    <PropertyCategory typeName="Results_Extended_Catchment_Drainage_Results_Extended_Catchment_Drainage" description="Results (Extended Catchment) [Drainage]" displayLabel="Results (Extended Catchment) [Drainage]" priority="4294874046"/>
-    <PropertyCategory typeName="Results_Extended_Node_Drainage_Results_Extended_Node_Drainage" description="Results (Extended Node) [Drainage]" displayLabel="Results (Extended Node) [Drainage]" priority="4294874046"/>
-    <PropertyCategory typeName="Results_Flow_Classification_Drainage_Results_Flow_Classification_Drainage" description="Results (Flow Classification) [Drainage]" displayLabel="Results (Flow Classification) [Drainage]" priority="4294874046"/>
-    <PropertyCategory typeName="Results_Flow_Drainage_Results_Flow_Drainage" description="Results (Flow) [Drainage]" displayLabel="Results (Flow) [Drainage]" priority="4294874046"/>
-    <PropertyCategory typeName="Results_H2S_Drainage_Results_H2S_Drainage" description="Results (H2S) [Drainage]" displayLabel="Results (H2S) [Drainage]" priority="4294874046"/>
-    <PropertyCategory typeName="Results_HEC_22__Second_Edition_Drainage_Results_HEC_22__Second_Edition_Drainage" description="Results (HEC-22, Second Edition) [Drainage]" displayLabel="Results (HEC-22, Second Edition) [Drainage]" priority="4294874046"/>
-    <PropertyCategory typeName="Results_HEC_22__Third_Edition_Drainage_Results_HEC_22__Third_Edition_Drainage" description="Results (HEC-22, Third Edition) [Drainage]" displayLabel="Results (HEC-22, Third Edition) [Drainage]" priority="4294874046"/>
-    <PropertyCategory typeName="Results_HEC_22_Drainage_Results_HEC_22_Drainage" description="Results (HEC-22) [Drainage]" displayLabel="Results (HEC-22) [Drainage]" priority="4294874046"/>
-    <PropertyCategory typeName="Results_HEC_22_Hydraulic_Analysis_Results_HEC_22_Hydraulic_Analysis" description="Results (HEC-22) [Hydraulic Analysis]" displayLabel="Results (HEC-22) [Hydraulic Analysis]" priority="4294874046"/>
-    <PropertyCategory typeName="Results_Hydraulic_Drainage_Results_Hydraulic_Drainage" description="Results (Hydraulic) [Drainage]" displayLabel="Results (Hydraulic) [Drainage]" priority="4294874046"/>
-    <PropertyCategory typeName="Results_Hydraulic_Summary_Drainage_Results_Hydraulic_Summary_Drainage" description="Results (Hydraulic Summary) [Drainage]" displayLabel="Results (Hydraulic Summary) [Drainage]" priority="4294874046"/>
-    <PropertyCategory typeName="Results_Infiltration_Drainage_Results_Infiltration_Drainage" description="Results (Infiltration) [Drainage]" displayLabel="Results (Infiltration) [Drainage]" priority="4294874046"/>
-    <PropertyCategory typeName="Results_Inlet_Bypassed_Flows_Drainage_Results_Inlet_Bypassed_Flows_Drainage" description="Results (Inlet Bypassed Flows) [Drainage]" displayLabel="Results (Inlet Bypassed Flows) [Drainage]" priority="4294874046"/>
-    <PropertyCategory typeName="Results_Inlet_Bypassed_Flows_Hydraulic_Analysis_Results_Inlet_Bypassed_Flows_Hydraulic_Analysis" description="Results (Inlet Bypassed Flows) [Hydraulic Analysis]" displayLabel="Results (Inlet Bypassed Flows) [Hydraulic Analysis]" priority="4294874046"/>
-    <PropertyCategory typeName="Results_Inlet_Capture_Drainage_Results_Inlet_Capture_Drainage" description="Results (Inlet Capture) [Drainage]" displayLabel="Results (Inlet Capture) [Drainage]" priority="4294874046"/>
-    <PropertyCategory typeName="Results_Inlet_Surface_Flows_Drainage_Results_Inlet_Surface_Flows_Drainage" description="Results (Inlet Surface Flows) [Drainage]" displayLabel="Results (Inlet Surface Flows) [Drainage]" priority="4294874046"/>
-    <PropertyCategory typeName="Results_Intercepted_Flow_Drainage_Results_Intercepted_Flow_Drainage" description="Results (Intercepted Flow) [Drainage]" displayLabel="Results (Intercepted Flow) [Drainage]" priority="4294874046"/>
-    <PropertyCategory typeName="Results_Interpolated_Drainage_Results_Interpolated_Drainage" description="Results (Interpolated) [Drainage]" displayLabel="Results (Interpolated) [Drainage]" priority="4294874046"/>
-    <PropertyCategory typeName="Results_Local_Flows_Drainage_Results_Local_Flows_Drainage" description="Results (Local Flows) [Drainage]" displayLabel="Results (Local Flows) [Drainage]" priority="4294874046"/>
-    <PropertyCategory typeName="Results_Lost_Flow_Drainage_Results_Lost_Flow_Drainage" description="Results (Lost Flow) [Drainage]" displayLabel="Results (Lost Flow) [Drainage]" priority="4294874046"/>
-    <PropertyCategory typeName="Results_Maximum_Values_Drainage_Results_Maximum_Values_Drainage" description="Results (Maximum Values) [Drainage]" displayLabel="Results (Maximum Values) [Drainage]" priority="4294874046"/>
-    <PropertyCategory typeName="Results_Misc_Drainage_Results_Misc_Drainage" description="Results (Misc) [Drainage]" displayLabel="Results (Misc) [Drainage]" priority="4294874046"/>
-    <PropertyCategory typeName="Results_Misc_Hydraulic_Analysis_Results_Misc_Hydraulic_Analysis" description="Results (Misc) [Hydraulic Analysis]" displayLabel="Results (Misc) [Hydraulic Analysis]" priority="4294874046"/>
-    <PropertyCategory typeName="Results_Operating_Status_Drainage_Results_Operating_Status_Drainage" description="Results (Operating Status) [Drainage]" displayLabel="Results (Operating Status) [Drainage]" priority="4294874046"/>
-    <PropertyCategory typeName="Results_Profile_Drainage_Results_Profile_Drainage" description="Results (Profile) [Drainage]" displayLabel="Results (Profile) [Drainage]" priority="4294874046"/>
-    <PropertyCategory typeName="Results_Profile_Summary_Drainage_Results_Profile_Summary_Drainage" description="Results (Profile Summary) [Drainage]" displayLabel="Results (Profile Summary) [Drainage]" priority="4294874046"/>
-    <PropertyCategory typeName="Results_Pump_Definition_Summary_Drainage_Results_Pump_Definition_Summary_Drainage" description="Results (Pump Definition Summary) [Drainage]" displayLabel="Results (Pump Definition Summary) [Drainage]" priority="4294874046"/>
-    <PropertyCategory typeName="Results_Sanitary_Loading_Drainage_Results_Sanitary_Loading_Drainage" description="Results (Sanitary Loading) [Drainage]" displayLabel="Results (Sanitary Loading) [Drainage]" priority="4294874046"/>
-    <PropertyCategory typeName="Results_Statistics_Drainage_Results_Statistics_Drainage" description="Results (Statistics) [Drainage]" displayLabel="Results (Statistics) [Drainage]" priority="4294874046"/>
-    <PropertyCategory typeName="Results_System_Flow_Drainage_Results_System_Flow_Drainage" description="Results (System Flow) [Drainage]" displayLabel="Results (System Flow) [Drainage]" priority="4294874046"/>
-    <PropertyCategory typeName="Results_Tractive_Stress_Drainage_Results_Tractive_Stress_Drainage" description="Results (Tractive Stress) [Drainage]" displayLabel="Results (Tractive Stress) [Drainage]" priority="4294874046"/>
-    <PropertyCategory typeName="Results_Upstream_Structure_Drainage_Results_Upstream_Structure_Drainage" description="Results (Upstream Structure) [Drainage]" displayLabel="Results (Upstream Structure) [Drainage]" priority="4294874046"/>
-    <PropertyCategory typeName="Results_Upstream_Structure_Hydraulic_Analysis_Results_Upstream_Structure_Hydraulic_Analysis" description="Results (Upstream Structure) [Hydraulic Analysis]" displayLabel="Results (Upstream Structure) [Hydraulic Analysis]" priority="4294874046"/>
-    <PropertyCategory typeName="Runoff_Drainage_Runoff_Drainage" description="Runoff [Drainage]" displayLabel="Runoff [Drainage]" priority="4294872496"/>
-    <PropertyCategory typeName="SCADA_Drainage_SCADA_Drainage" description="SCADA [Drainage]" displayLabel="SCADA [Drainage]" priority="4294876946"/>
-    <PropertyCategory typeName="SWMM_Results_Drainage_SWMM_Results_Drainage" description="SWMM Results [Drainage]" displayLabel="SWMM Results [Drainage]" priority="4294874826"/>
-    <PropertyCategory typeName="Boundary_Condition_Hydraulic_Analysis_Boundary_Condition_Hydraulic_Analysis" description="Boundary Condition [Hydraulic Analysis]" displayLabel="Boundary Condition [Hydraulic Analysis]" priority="4294889026"/>
-    <PropertyCategory typeName="Category_Hydraulic_Analysis_Category_Hydraulic_Analysis" description="Category [Hydraulic Analysis]" displayLabel="Category [Hydraulic Analysis]" priority="4294889436"/>
-    <PropertyCategory typeName="Generic_Hydraulic_Analysis_Generic_Hydraulic_Analysis" description="Generic [Hydraulic Analysis]" displayLabel="Generic [Hydraulic Analysis]" priority="4294885096"/>
-    <PropertyCategory typeName="Geometry_Hydraulic_Analysis_Geometry_Hydraulic_Analysis" description="&lt;Geometry&gt; [Hydraulic Analysis]" displayLabel="&lt;Geometry&gt; [Hydraulic Analysis]" priority="4294899186"/>
-    <PropertyCategory typeName="Hydraulic_Analysis_Hydraulic_Analysis" description="# [Hydraulic Analysis]" displayLabel="# [Hydraulic Analysis]" priority="4294928186"/>
-    <PropertyCategory typeName="Physical_Headwall_Hydraulic_Analysis_Physical_Headwall_Hydraulic_Analysis" description="Physical (Headwall) [Hydraulic Analysis]" displayLabel="Physical (Headwall) [Hydraulic Analysis]" priority="4294875686"/>
-    <PropertyCategory typeName="Physical_Hydraulic_Analysis_Physical_Hydraulic_Analysis" description="Physical [Hydraulic Analysis]" displayLabel="Physical [Hydraulic Analysis]" priority="4294875686"/>
-    <PropertyCategory typeName="Results_Carryover_Flow_Hydraulic_Analysis_Results_Carryover_Flow_Hydraulic_Analysis" description="Results (Carryover Flow) [Hydraulic Analysis]" displayLabel="Results (Carryover Flow) [Hydraulic Analysis]" priority="4294874046"/>
-    <PropertyCategory typeName="Results_Catchment_Hydraulic_Analysis_Results_Catchment_Hydraulic_Analysis" description="Results (Catchment) [Hydraulic Analysis]" displayLabel="Results (Catchment) [Hydraulic Analysis]" priority="4294874046"/>
-    <PropertyCategory typeName="Results_Connecting_Links_Hydraulic_Analysis_Results_Connecting_Links_Hydraulic_Analysis" description="Results (Connecting Links) [Hydraulic Analysis]" displayLabel="Results (Connecting Links) [Hydraulic Analysis]" priority="4294874046"/>
     <PropertyCategory typeName="Results_Energy_Costs_Hydraulic_Analysis_Results_Energy_Costs_Hydraulic_Analysis" description="Results (Energy Costs) [Hydraulic Analysis]" displayLabel="Results (Energy Costs) [Hydraulic Analysis]" priority="4294874046"/>
     <PropertyCategory typeName="Results_Energy_Costs_Peak_Hydraulic_Analysis_Results_Energy_Costs_Peak_Hydraulic_Analysis" description="Results (Energy Costs Peak) [Hydraulic Analysis]" displayLabel="Results (Energy Costs Peak) [Hydraulic Analysis]" priority="4294874046"/>
     <PropertyCategory typeName="Results_Energy_Costs_Summary_Hydraulic_Analysis_Results_Energy_Costs_Summary_Hydraulic_Analysis" description="Results (Energy Costs Summary) [Hydraulic Analysis]" displayLabel="Results (Energy Costs Summary) [Hydraulic Analysis]" priority="4294874046"/>
+    <PropertyCategory typeName="Results_Engine_Parsing_Drainage_Results_Engine_Parsing_Drainage" description="Results (Engine Parsing) [Drainage]" displayLabel="Results (Engine Parsing) [Drainage]" priority="4294874046"/>
     <PropertyCategory typeName="Results_Engine_Parsing_Hydraulic_Analysis_Results_Engine_Parsing_Hydraulic_Analysis" description="Results (Engine Parsing) [Hydraulic Analysis]" displayLabel="Results (Engine Parsing) [Hydraulic Analysis]" priority="4294874046"/>
+    <PropertyCategory typeName="Results_Extended_Catchment_Drainage_Results_Extended_Catchment_Drainage" description="Results (Extended Catchment) [Drainage]" displayLabel="Results (Extended Catchment) [Drainage]" priority="4294874046"/>
     <PropertyCategory typeName="Results_Extended_Catchment_Hydraulic_Analysis_Results_Extended_Catchment_Hydraulic_Analysis" description="Results (Extended Catchment) [Hydraulic Analysis]" displayLabel="Results (Extended Catchment) [Hydraulic Analysis]" priority="4294874046"/>
+    <PropertyCategory typeName="Results_Extended_Node_Drainage_Results_Extended_Node_Drainage" description="Results (Extended Node) [Drainage]" displayLabel="Results (Extended Node) [Drainage]" priority="4294874046"/>
     <PropertyCategory typeName="Results_Extended_Node_Hydraulic_Analysis_Results_Extended_Node_Hydraulic_Analysis" description="Results (Extended Node) [Hydraulic Analysis]" displayLabel="Results (Extended Node) [Hydraulic Analysis]" priority="4294874046"/>
+    <PropertyCategory typeName="Results_Flow_Classification_Drainage_Results_Flow_Classification_Drainage" description="Results (Flow Classification) [Drainage]" displayLabel="Results (Flow Classification) [Drainage]" priority="4294874046"/>
     <PropertyCategory typeName="Results_Flow_Classification_Hydraulic_Analysis_Results_Flow_Classification_Hydraulic_Analysis" description="Results (Flow Classification) [Hydraulic Analysis]" displayLabel="Results (Flow Classification) [Hydraulic Analysis]" priority="4294874046"/>
+    <PropertyCategory typeName="Results_Flow_Drainage_Results_Flow_Drainage" description="Results (Flow) [Drainage]" displayLabel="Results (Flow) [Drainage]" priority="4294874046"/>
     <PropertyCategory typeName="Results_Flow_Hydraulic_Analysis_Results_Flow_Hydraulic_Analysis" description="Results (Flow) [Hydraulic Analysis]" displayLabel="Results (Flow) [Hydraulic Analysis]" priority="4294874046"/>
+    <PropertyCategory typeName="Results_H2S_Drainage_Results_H2S_Drainage" description="Results (H2S) [Drainage]" displayLabel="Results (H2S) [Drainage]" priority="4294874046"/>
     <PropertyCategory typeName="Results_H2S_Hydraulic_Analysis_Results_H2S_Hydraulic_Analysis" description="Results (H2S) [Hydraulic Analysis]" displayLabel="Results (H2S) [Hydraulic Analysis]" priority="4294874046"/>
+    <PropertyCategory typeName="Results_HEC_22__Second_Edition_Drainage_Results_HEC_22__Second_Edition_Drainage" description="Results (HEC-22, Second Edition) [Drainage]" displayLabel="Results (HEC-22, Second Edition) [Drainage]" priority="4294874046"/>
     <PropertyCategory typeName="Results_HEC_22__Second_Edition_Hydraulic_Analysis_Results_HEC_22__Second_Edition_Hydraulic_Analysis" description="Results (HEC-22, Second Edition) [Hydraulic Analysis]" displayLabel="Results (HEC-22, Second Edition) [Hydraulic Analysis]" priority="4294874046"/>
+    <PropertyCategory typeName="Results_HEC_22__Third_Edition_Drainage_Results_HEC_22__Third_Edition_Drainage" description="Results (HEC-22, Third Edition) [Drainage]" displayLabel="Results (HEC-22, Third Edition) [Drainage]" priority="4294874046"/>
     <PropertyCategory typeName="Results_HEC_22__Third_Edition_Hydraulic_Analysis_Results_HEC_22__Third_Edition_Hydraulic_Analysis" description="Results (HEC-22, Third Edition) [Hydraulic Analysis]" displayLabel="Results (HEC-22, Third Edition) [Hydraulic Analysis]" priority="4294874046"/>
+    <PropertyCategory typeName="Results_HEC_22_Drainage_Results_HEC_22_Drainage" description="Results (HEC-22) [Drainage]" displayLabel="Results (HEC-22) [Drainage]" priority="4294874046"/>
+    <PropertyCategory typeName="Results_HEC_22_Hydraulic_Analysis_Results_HEC_22_Hydraulic_Analysis" description="Results (HEC-22) [Hydraulic Analysis]" displayLabel="Results (HEC-22) [Hydraulic Analysis]" priority="4294874046"/>
     <PropertyCategory typeName="Results_Hydraulic_Analysis_Results_Hydraulic_Analysis" description="Results [Hydraulic Analysis]" displayLabel="Results [Hydraulic Analysis]" priority="4294874046"/>
+    <PropertyCategory typeName="Results_Hydraulic_Drainage_Results_Hydraulic_Drainage" description="Results (Hydraulic) [Drainage]" displayLabel="Results (Hydraulic) [Drainage]" priority="4294874046"/>
     <PropertyCategory typeName="Results_Hydraulic_Hydraulic_Analysis_Results_Hydraulic_Hydraulic_Analysis" description="Results (Hydraulic) [Hydraulic Analysis]" displayLabel="Results (Hydraulic) [Hydraulic Analysis]" priority="4294874046"/>
+    <PropertyCategory typeName="Results_Hydraulic_Summary_Drainage_Results_Hydraulic_Summary_Drainage" description="Results (Hydraulic Summary) [Drainage]" displayLabel="Results (Hydraulic Summary) [Drainage]" priority="4294874046"/>
     <PropertyCategory typeName="Results_Hydraulic_Summary_Hydraulic_Analysis_Results_Hydraulic_Summary_Hydraulic_Analysis" description="Results (Hydraulic Summary) [Hydraulic Analysis]" displayLabel="Results (Hydraulic Summary) [Hydraulic Analysis]" priority="4294874046"/>
+    <PropertyCategory typeName="Results_Infiltration_Drainage_Results_Infiltration_Drainage" description="Results (Infiltration) [Drainage]" displayLabel="Results (Infiltration) [Drainage]" priority="4294874046"/>
     <PropertyCategory typeName="Results_Infiltration_Hydraulic_Analysis_Results_Infiltration_Hydraulic_Analysis" description="Results (Infiltration) [Hydraulic Analysis]" displayLabel="Results (Infiltration) [Hydraulic Analysis]" priority="4294874046"/>
+    <PropertyCategory typeName="Results_Inlet_Bypassed_Flows_Drainage_Results_Inlet_Bypassed_Flows_Drainage" description="Results (Inlet Bypassed Flows) [Drainage]" displayLabel="Results (Inlet Bypassed Flows) [Drainage]" priority="4294874046"/>
+    <PropertyCategory typeName="Results_Inlet_Bypassed_Flows_Hydraulic_Analysis_Results_Inlet_Bypassed_Flows_Hydraulic_Analysis" description="Results (Inlet Bypassed Flows) [Hydraulic Analysis]" displayLabel="Results (Inlet Bypassed Flows) [Hydraulic Analysis]" priority="4294874046"/>
+    <PropertyCategory typeName="Results_Inlet_Capture_Drainage_Results_Inlet_Capture_Drainage" description="Results (Inlet Capture) [Drainage]" displayLabel="Results (Inlet Capture) [Drainage]" priority="4294874046"/>
     <PropertyCategory typeName="Results_Inlet_Capture_Hydraulic_Analysis_Results_Inlet_Capture_Hydraulic_Analysis" description="Results (Inlet Capture) [Hydraulic Analysis]" displayLabel="Results (Inlet Capture) [Hydraulic Analysis]" priority="4294874046"/>
+    <PropertyCategory typeName="Results_Inlet_Surface_Flows_Drainage_Results_Inlet_Surface_Flows_Drainage" description="Results (Inlet Surface Flows) [Drainage]" displayLabel="Results (Inlet Surface Flows) [Drainage]" priority="4294874046"/>
     <PropertyCategory typeName="Results_Inlet_Surface_Flows_Hydraulic_Analysis_Results_Inlet_Surface_Flows_Hydraulic_Analysis" description="Results (Inlet Surface Flows) [Hydraulic Analysis]" displayLabel="Results (Inlet Surface Flows) [Hydraulic Analysis]" priority="4294874046"/>
+    <PropertyCategory typeName="Results_Intercepted_Flow_Drainage_Results_Intercepted_Flow_Drainage" description="Results (Intercepted Flow) [Drainage]" displayLabel="Results (Intercepted Flow) [Drainage]" priority="4294874046"/>
     <PropertyCategory typeName="Results_Intercepted_Flow_Hydraulic_Analysis_Results_Intercepted_Flow_Hydraulic_Analysis" description="Results (Intercepted Flow) [Hydraulic Analysis]" displayLabel="Results (Intercepted Flow) [Hydraulic Analysis]" priority="4294874046"/>
+    <PropertyCategory typeName="Results_Interpolated_Drainage_Results_Interpolated_Drainage" description="Results (Interpolated) [Drainage]" displayLabel="Results (Interpolated) [Drainage]" priority="4294874046"/>
     <PropertyCategory typeName="Results_Interpolated_Hydraulic_Analysis_Results_Interpolated_Hydraulic_Analysis" description="Results (Interpolated) [Hydraulic Analysis]" displayLabel="Results (Interpolated) [Hydraulic Analysis]" priority="4294874046"/>
+    <PropertyCategory typeName="Results_Local_Flows_Drainage_Results_Local_Flows_Drainage" description="Results (Local Flows) [Drainage]" displayLabel="Results (Local Flows) [Drainage]" priority="4294874046"/>
     <PropertyCategory typeName="Results_Local_Flows_Hydraulic_Analysis_Results_Local_Flows_Hydraulic_Analysis" description="Results (Local Flows) [Hydraulic Analysis]" displayLabel="Results (Local Flows) [Hydraulic Analysis]" priority="4294874046"/>
+    <PropertyCategory typeName="Results_Lost_Flow_Drainage_Results_Lost_Flow_Drainage" description="Results (Lost Flow) [Drainage]" displayLabel="Results (Lost Flow) [Drainage]" priority="4294874046"/>
     <PropertyCategory typeName="Results_Lost_Flow_Hydraulic_Analysis_Results_Lost_Flow_Hydraulic_Analysis" description="Results (Lost Flow) [Hydraulic Analysis]" displayLabel="Results (Lost Flow) [Hydraulic Analysis]" priority="4294874046"/>
+    <PropertyCategory typeName="Results_Maximum_Values_Drainage_Results_Maximum_Values_Drainage" description="Results (Maximum Values) [Drainage]" displayLabel="Results (Maximum Values) [Drainage]" priority="4294874046"/>
     <PropertyCategory typeName="Results_Maximum_Values_Hydraulic_Analysis_Results_Maximum_Values_Hydraulic_Analysis" description="Results (Maximum Values) [Hydraulic Analysis]" displayLabel="Results (Maximum Values) [Hydraulic Analysis]" priority="4294874046"/>
+    <PropertyCategory typeName="Results_Misc_Drainage_Results_Misc_Drainage" description="Results (Misc) [Drainage]" displayLabel="Results (Misc) [Drainage]" priority="4294874046"/>
+    <PropertyCategory typeName="Results_Misc_Hydraulic_Analysis_Results_Misc_Hydraulic_Analysis" description="Results (Misc) [Hydraulic Analysis]" displayLabel="Results (Misc) [Hydraulic Analysis]" priority="4294874046"/>
+    <PropertyCategory typeName="Results_Operating_Status_Drainage_Results_Operating_Status_Drainage" description="Results (Operating Status) [Drainage]" displayLabel="Results (Operating Status) [Drainage]" priority="4294874046"/>
     <PropertyCategory typeName="Results_Operating_Status_Hydraulic_Analysis_Results_Operating_Status_Hydraulic_Analysis" description="Results (Operating Status) [Hydraulic Analysis]" displayLabel="Results (Operating Status) [Hydraulic Analysis]" priority="4294874046"/>
+    <PropertyCategory typeName="Results_Profile_Drainage_Results_Profile_Drainage" description="Results (Profile) [Drainage]" displayLabel="Results (Profile) [Drainage]" priority="4294874046"/>
     <PropertyCategory typeName="Results_Profile_Hydraulic_Analysis_Results_Profile_Hydraulic_Analysis" description="Results (Profile) [Hydraulic Analysis]" displayLabel="Results (Profile) [Hydraulic Analysis]" priority="4294874046"/>
+    <PropertyCategory typeName="Results_Profile_Summary_Drainage_Results_Profile_Summary_Drainage" description="Results (Profile Summary) [Drainage]" displayLabel="Results (Profile Summary) [Drainage]" priority="4294874046"/>
     <PropertyCategory typeName="Results_Profile_Summary_Hydraulic_Analysis_Results_Profile_Summary_Hydraulic_Analysis" description="Results (Profile Summary) [Hydraulic Analysis]" displayLabel="Results (Profile Summary) [Hydraulic Analysis]" priority="4294874046"/>
+    <PropertyCategory typeName="Results_Pump_Definition_Summary_Drainage_Results_Pump_Definition_Summary_Drainage" description="Results (Pump Definition Summary) [Drainage]" displayLabel="Results (Pump Definition Summary) [Drainage]" priority="4294874046"/>
     <PropertyCategory typeName="Results_Pump_Definition_Summary_Hydraulic_Analysis_Results_Pump_Definition_Summary_Hydraulic_Analysis" description="Results (Pump Definition Summary) [Hydraulic Analysis]" displayLabel="Results (Pump Definition Summary) [Hydraulic Analysis]" priority="4294874046"/>
+    <PropertyCategory typeName="Results_Sanitary_Loading_Drainage_Results_Sanitary_Loading_Drainage" description="Results (Sanitary Loading) [Drainage]" displayLabel="Results (Sanitary Loading) [Drainage]" priority="4294874046"/>
     <PropertyCategory typeName="Results_Sanitary_Loading_Hydraulic_Analysis_Results_Sanitary_Loading_Hydraulic_Analysis" description="Results (Sanitary Loading) [Hydraulic Analysis]" displayLabel="Results (Sanitary Loading) [Hydraulic Analysis]" priority="4294874046"/>
+    <PropertyCategory typeName="Results_Statistics_Drainage_Results_Statistics_Drainage" description="Results (Statistics) [Drainage]" displayLabel="Results (Statistics) [Drainage]" priority="4294874046"/>
     <PropertyCategory typeName="Results_Statistics_Hydraulic_Analysis_Results_Statistics_Hydraulic_Analysis" description="Results (Statistics) [Hydraulic Analysis]" displayLabel="Results (Statistics) [Hydraulic Analysis]" priority="4294874046"/>
+    <PropertyCategory typeName="Results_System_Flow_Drainage_Results_System_Flow_Drainage" description="Results (System Flow) [Drainage]" displayLabel="Results (System Flow) [Drainage]" priority="4294874046"/>
     <PropertyCategory typeName="Results_System_Flow_Hydraulic_Analysis_Results_System_Flow_Hydraulic_Analysis" description="Results (System Flow) [Hydraulic Analysis]" displayLabel="Results (System Flow) [Hydraulic Analysis]" priority="4294874046"/>
+    <PropertyCategory typeName="Results_Tractive_Stress_Drainage_Results_Tractive_Stress_Drainage" description="Results (Tractive Stress) [Drainage]" displayLabel="Results (Tractive Stress) [Drainage]" priority="4294874046"/>
     <PropertyCategory typeName="Results_Tractive_Stress_Hydraulic_Analysis_Results_Tractive_Stress_Hydraulic_Analysis" description="Results (Tractive Stress) [Hydraulic Analysis]" displayLabel="Results (Tractive Stress) [Hydraulic Analysis]" priority="4294874046"/>
+    <PropertyCategory typeName="Results_Upstream_Structure_Drainage_Results_Upstream_Structure_Drainage" description="Results (Upstream Structure) [Drainage]" displayLabel="Results (Upstream Structure) [Drainage]" priority="4294874046"/>
+    <PropertyCategory typeName="Results_Upstream_Structure_Hydraulic_Analysis_Results_Upstream_Structure_Hydraulic_Analysis" description="Results (Upstream Structure) [Hydraulic Analysis]" displayLabel="Results (Upstream Structure) [Hydraulic Analysis]" priority="4294874046"/>
+    <PropertyCategory typeName="Runoff_Drainage_Runoff_Drainage" description="Runoff [Drainage]" displayLabel="Runoff [Drainage]" priority="4294872496"/>
     <PropertyCategory typeName="Runoff_Hydraulic_Analysis_Runoff_Hydraulic_Analysis" description="Runoff [Hydraulic Analysis]" displayLabel="Runoff [Hydraulic Analysis]" priority="4294872496"/>
+    <PropertyCategory typeName="SCADA_Drainage_SCADA_Drainage" description="SCADA [Drainage]" displayLabel="SCADA [Drainage]" priority="4294876946"/>
     <PropertyCategory typeName="SCADA_Hydraulic_Analysis_SCADA_Hydraulic_Analysis" description="SCADA [Hydraulic Analysis]" displayLabel="SCADA [Hydraulic Analysis]" priority="4294876946"/>
+    <PropertyCategory typeName="SWMM_Results_Drainage_SWMM_Results_Drainage" description="SWMM Results [Drainage]" displayLabel="SWMM Results [Drainage]" priority="4294874826"/>
     <PropertyCategory typeName="SWMM_Results_Hydraulic_Analysis_SWMM_Results_Hydraulic_Analysis" description="SWMM Results [Hydraulic Analysis]" displayLabel="SWMM Results [Hydraulic Analysis]" priority="4294874826"/>
 </ECSchema>
