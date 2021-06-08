@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ECSchema schemaName="CifCommon" alias="cifcmn" version="01.00.01" description="iModel Connector schema containing aspect classes with common properties from Civil Infrastructure Framework (CIF) applications." xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
-    <ECSchemaReference name="BisCore" version="01.00.12" alias="bis"/>
+<ECSchema schemaName="CifCommon" alias="cifcmn" version="01.00.02" description="iModel Connector schema containing aspect classes with common properties from Civil Infrastructure Framework (CIF) applications." xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
+    <ECSchemaReference name="BisCore" version="01.00.13" alias="bis"/>
     <ECSchemaReference name="CifUnits" version="01.00.01" alias="cifu"/>
     <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
     <ECCustomAttributes>
@@ -148,6 +148,11 @@
         <ECProperty propertyName="LinearElement_Length" typeName="double" displayLabel="Length" category="GeometryAttributes_Geometry" priority="299970" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="LinearElement_StartPoint" typeName="point3d" displayLabel="Start Point" category="GeometryAttributes_Geometry" priority="299990"/>
         <ECProperty propertyName="LinearElement_EndPoint" typeName="point3d" displayLabel="End Point" category="GeometryAttributes_Geometry" priority="299980"/>
+        <ECProperty propertyName="LinearElement_Length3d" typeName="double" displayLabel="&lt;- LENGTH 3d -&gt;" category="GeometryAttributes_Geometry" priority="299970" kindOfQuantity="cifu:LENGTH">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03"/>
+            </ECCustomAttributes>
+        </ECProperty>
     </ECEntityClass>
     <ECEntityClass typeName="BSplineAspect">
         <BaseClass>LinearElementAspect</BaseClass>
@@ -159,6 +164,11 @@
         <ECProperty propertyName="LinearElement_Length" typeName="double" displayLabel="Length" category="GeometryAttributes_Geometry" priority="299970" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="LinearElement_StartPoint" typeName="point3d" displayLabel="Start Point" category="GeometryAttributes_Geometry" priority="299990"/>
         <ECProperty propertyName="LinearElement_EndPoint" typeName="point3d" displayLabel="End Point" category="GeometryAttributes_Geometry" priority="299980"/>
+        <ECProperty propertyName="LinearElement_Length3d" typeName="double" displayLabel="&lt;- LENGTH 3d -&gt;" category="GeometryAttributes_Geometry" priority="299970" kindOfQuantity="cifu:LENGTH">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03"/>
+            </ECCustomAttributes>
+        </ECProperty>
     </ECEntityClass>
     <ECEntityClass typeName="CircularArcAspect">
         <BaseClass>ReadOnlyLinearElementAspect</BaseClass>
@@ -994,6 +1004,20 @@
             <Class class="ProfileParabolaAspect"/>
         </Target>
     </ECRelationshipClass>
+    <ECEntityClass typeName="ProfilePointbyIntersectionRuleAspect" displayLabel="Profile Intersection Point">
+        <BaseClass>CivilPresentation</BaseClass>
+        <ECProperty propertyName="Station" typeName="double" displayLabel="Station" category="ProfilePointbyIntersectionRuleAttributes_Profile_Intersection_Point" priority="299800" kindOfQuantity="cifu:STATION"/>
+        <ECProperty propertyName="Elevation" typeName="double" displayLabel="Elevation" category="ProfilePointbyIntersectionRuleAttributes_Profile_Intersection_Point" priority="299700" kindOfQuantity="cifu:LENGTH"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsProfilePointbyIntersectionRuleAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="ProfilePointbyIntersectionRuleAspect"/>
+        </Target>
+    </ECRelationshipClass>
     <ECEntityClass typeName="RadiusTransitionAspect">
         <BaseClass>CivilPresentation</BaseClass>
         <ECProperty propertyName="ParameterName" typeName="string" displayLabel="Name" category="Radius_Transition_Setting_Attributes_Radius_Transition_Settings" priority="300000"/>
@@ -1541,6 +1565,7 @@
     <PropertyCategory typeName="PointGroupCategoryAttributes_Point_Group" description="PointGroupCategoryAttributes" displayLabel="Point Group" priority="4294966996"/>
     <PropertyCategory typeName="PointOrderedListAttributes_Point_Ordered_List" description="PointOrderedListAttributes" displayLabel="Point Ordered List" priority="0"/>
     <PropertyCategory typeName="Portal_Portal" description="Portal" displayLabel="Portal" priority="199800"/>
+    <PropertyCategory typeName="ProfilePointbyIntersectionRuleAttributes_Profile_Intersection_Point" description="ProfilePointbyIntersectionRuleAttributes" displayLabel="Profile Intersection Point" priority="0"/>
     <PropertyCategory typeName="ProjectionProperties_Geographical_Coordinate_Systems" description="ProjectionProperties" displayLabel="Geographical Coordinate Systems" priority="299980"/>
     <PropertyCategory typeName="Radius_Transition_Setting_Attributes_Radius_Transition_Settings" description="Radius Transition Setting Attributes" displayLabel="Radius Transition Settings" priority="299999"/>
     <PropertyCategory typeName="SecondaryAlignment_Secondary_Alignment" description="SecondaryAlignment" displayLabel="Secondary Alignment" priority="199800"/>

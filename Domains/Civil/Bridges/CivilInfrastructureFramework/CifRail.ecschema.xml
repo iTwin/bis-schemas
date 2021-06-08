@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ECSchema schemaName="CifRail" alias="cifrl" version="01.00.00" description="iModel Connector schema containing aspect classes with properties from OpenRail Designer." xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
-    <ECSchemaReference name="BisCore" version="01.00.12" alias="bis"/>
-    <ECSchemaReference name="CifCommon" version="01.00.01" alias="cifcmn"/>
+<ECSchema schemaName="CifRail" alias="cifrl" version="01.00.01" description="iModel Connector schema containing aspect classes with properties from OpenRail Designer." xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
+    <ECSchemaReference name="BisCore" version="01.00.13" alias="bis"/>
+    <ECSchemaReference name="CifCommon" version="01.00.02" alias="cifcmn"/>
     <ECSchemaReference name="CifUnits" version="01.00.01" alias="cifu"/>
     <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
     <ECCustomAttributes>
@@ -60,7 +60,22 @@
         <ECEnumerator name="Left_Rail" value="3" displayLabel="Left Rail"/>
         <ECEnumerator name="Right_Rail" value="4" displayLabel="Right Rail"/>
     </ECEnumeration>
+    <ECEnumeration typeName="RailKeyPointsComponentForJointAspect_ControllingRail_Enum" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="Inside_Rail" value="2" displayLabel="Inside Rail"/>
+        <ECEnumerator name="Outside_Rail" value="1" displayLabel="Outside Rail"/>
+        <ECEnumerator name="SingleRail" value="0" displayLabel="SingleRail"/>
+        <ECEnumerator name="Propagate_From_Opposite_Rail" value="3" displayLabel="Propagate From Opposite Rail"/>
+    </ECEnumeration>
+    <ECEnumeration typeName="RailKeyPointsComponentForJointAspect_Remainder_Enum" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="At_Start" value="0" displayLabel="At Start"/>
+        <ECEnumerator name="At_End" value="1" displayLabel="At End"/>
+        <ECEnumerator name="At_Both_Start_And_End" value="2" displayLabel="At Both Start And End"/>
+    </ECEnumeration>
     <ECEnumeration typeName="RailOffsetRuleAspect_RailOffsetRule_CreateMesh_BoolEnum" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="True" value="1" displayLabel="Yes"/>
+        <ECEnumerator name="False" value="0" displayLabel="No"/>
+    </ECEnumeration>
+    <ECEnumeration typeName="RailTrackComponentAspect_RailTrackComponent_CreateMesh_BoolEnum" backingTypeName="int" isStrict="true">
         <ECEnumerator name="True" value="1" displayLabel="Yes"/>
         <ECEnumerator name="False" value="0" displayLabel="No"/>
     </ECEnumeration>
@@ -263,6 +278,17 @@
         <ECProperty propertyName="CrossoverRule_Turnout2Branch2P3Station" typeName="double" displayLabel="Second Turnout Branch2 P3 Station" category="CrossoverPointsProperties_Crossover_Points" priority="299220" kindOfQuantity="cifu:STATION"/>
         <ECProperty propertyName="CrossoverRule_Turnout2Branch2TheoreticalP1Station" typeName="double" displayLabel="Second Turnout Branch2 Theoretical P1 Station" category="CrossoverPointsProperties_Crossover_Points" priority="299210" kindOfQuantity="cifu:STATION"/>
     </ECEntityClass>
+    <ECEntityClass typeName="DistanceKeeperComponentAspect" displayLabel="Distance Keeper Component">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="StartDistance" typeName="double" displayLabel="Start Distance" category="DistanceKeepersProperties_Distance_Keepers" priority="299990" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="EndDistance" typeName="double" displayLabel="End Distance" category="DistanceKeepersProperties_Distance_Keepers" priority="299980" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="IntervalDistance" typeName="double" displayLabel="Interval Distance" category="DistanceKeepersProperties_Distance_Keepers" priority="299970" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="RemainderLengthOption" typeName="double" displayLabel="Remainder Length Option" category="DistanceKeepersProperties_Distance_Keepers" priority="299960" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="MinDistanceBetweenKeeper" typeName="double" displayLabel="Minimum Distance Between Keepers" category="DistanceKeepersProperties_Distance_Keepers" priority="299950" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="MaxDistanceBetweenKeeper" typeName="double" displayLabel="Maximum Distance Between Keepers" category="DistanceKeepersProperties_Distance_Keepers" priority="299940" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="DistFromStartPoint" typeName="double" displayLabel="Distance From Start Point" category="DistanceKeepersProperties_Distance_Keepers" priority="299930" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="DistFromEndPoint" typeName="double" displayLabel="Distance From End Point" category="DistanceKeepersProperties_Distance_Keepers" priority="299920" kindOfQuantity="cifu:LENGTH"/>
+    </ECEntityClass>
     <ECRelationshipClass typeName="ElementOwnsBaseRegressionPointsRuleAspect" modifier="None" strength="embedding">
         <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
         <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
@@ -353,6 +379,15 @@
             <Class class="CrossoverRuleAspect"/>
         </Target>
     </ECRelationshipClass>
+    <ECRelationshipClass typeName="ElementOwnsDistanceKeeperComponentAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="DistanceKeeperComponentAspect"/>
+        </Target>
+    </ECRelationshipClass>
     <ECEntityClass typeName="PathwayAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
         <ECProperty propertyName="Name" typeName="string" displayLabel="Name" category="Name_General_Category" priority="299999"/>
@@ -410,6 +445,39 @@
             <Class class="ProfileFromRailsRuleAspect"/>
         </Target>
     </ECRelationshipClass>
+    <ECEntityClass typeName="RailJointAspect" displayLabel="&lt;- RailJoint -&gt;">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="Length" typeName="double" displayLabel="Length" category="Joint_Joint" priority="299930" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="Station" typeName="double" displayLabel="Station" category="Joint_Joint" priority="299920" kindOfQuantity="cifu:STATION"/>
+        <ECProperty propertyName="Offset" typeName="double" displayLabel="Offset" category="Joint_Joint" priority="299940" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="Rail" typeName="double" displayLabel="Rail" category="Joint_Joint" priority="299910" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="ConstrainedPoint" typeName="boolean" displayLabel="Constrained Position" category="Joint_Joint" priority="299900"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsRailJointAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="RailJointAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="RailKeyPointsComponentForJointAspect" displayLabel="&lt;- RailKeyPointsComponentForJoint -&gt;">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="MinRailLength" typeName="double" displayLabel="Min Rail Length" category="JointGroup_Joint_Group" priority="299990" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="MaxRailLength" typeName="double" displayLabel="Max Rail Length" category="JointGroup_Joint_Group" priority="299980" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="ControllingRail" typeName="RailKeyPointsComponentForJointAspect_ControllingRail_Enum" displayLabel="Controlling Rail" category="JointGroup_Joint_Group" priority="299970"/>
+        <ECProperty propertyName="Remainder" typeName="RailKeyPointsComponentForJointAspect_Remainder_Enum" displayLabel="Remainder Placement" category="JointGroup_Joint_Group" priority="299960"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsRailKeyPointsComponentForJointAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="RailKeyPointsComponentForJointAspect"/>
+        </Target>
+    </ECRelationshipClass>
     <ECEntityClass typeName="RailOffsetRuleAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
         <ECProperty propertyName="RailOffsetRule_StartDistance" typeName="double" displayLabel="Start Distance" category="RailProperties_Rail" priority="299990" kindOfQuantity="cifu:LENGTH"/>
@@ -427,6 +495,23 @@
         </Source>
         <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
             <Class class="RailOffsetRuleAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="RailTrackComponentAspect" displayLabel="&lt;- RailTrackComponent -&gt;">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="RailTrackComponent_StartDistance" typeName="double" displayLabel="Start Distance" category="RailProperties_Rail" priority="299990" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="RailTrackComponent_EndDistance" typeName="double" displayLabel="End Distance" category="RailProperties_Rail" priority="299980" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="RailTrackComponent_CreateMesh" typeName="RailTrackComponentAspect_RailTrackComponent_CreateMesh_BoolEnum" displayLabel="Create Rail Mesh" category="RailProperties_Rail" priority="299970"/>
+        <ECProperty propertyName="RailTrackComponent_TemplateName" typeName="string" displayLabel="Template Name" category="RailProperties_Rail" priority="0"/>
+        <ECProperty propertyName="RailTrackComponent_StrokingTolerance" typeName="double" displayLabel="Stroking Tolerance" category="RailProperties_Rail" priority="299950" kindOfQuantity="cifu:LENGTH"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsRailTrackComponentAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="RailTrackComponentAspect"/>
         </Target>
     </ECRelationshipClass>
     <ECEntityClass typeName="RailwayEdgeAspect">
@@ -500,6 +585,49 @@
         </Source>
         <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
             <Class class="RegressionDetailsEntityAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="SchemaElemOnPathwayEdgeRuleAspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="RefDistanceAlongEdge" typeName="double" displayLabel="Distance Along Referenced Edge" category="SchemaElementAttributes_General_Category" priority="299999" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="VisDistanceAlongEdge" typeName="double" displayLabel="Distance Along Edge" category="SchemaElementAttributes_General_Category" priority="299998" kindOfQuantity="cifu:LENGTH"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsSchemaElemOnPathwayEdgeRuleAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="SchemaElemOnPathwayEdgeRuleAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="SchemaPathwayEdgeRuleAspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="StartPoint" typeName="point3d" displayLabel="Start Point" category="SchemaLineAttributes_General_Category" priority="299999"/>
+        <ECProperty propertyName="EndPoint" typeName="point3d" displayLabel="End Point" category="SchemaLineAttributes_General_Category" priority="299998"/>
+        <ECProperty propertyName="RefLength" typeName="double" displayLabel="Referenced Entity Length" category="SchemaLineAttributes_General_Category" priority="299997" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="ScaleRatio" typeName="double" displayLabel="Scale Ratio" category="SchemaLineAttributes_General_Category" priority="299996" kindOfQuantity="cifu:LENGTH"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsSchemaPathwayEdgeRuleAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="SchemaPathwayEdgeRuleAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="SchemaPathwayNodeRuleAspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="CenterPoint" typeName="point3d" displayLabel="Center" category="CenterPoint_General_Category" priority="299999"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsSchemaPathwayNodeRuleAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="SchemaPathwayNodeRuleAspect"/>
         </Target>
     </ECRelationshipClass>
     <ECEntityClass typeName="SingleElementFromCurvatureRuleAspect">
@@ -579,6 +707,26 @@
         </Source>
         <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
             <Class class="SingleProfileFromCurvatureRuleAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="SleeperComponentAspect" displayLabel="&lt;- SleeperComponent -&gt;">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="StartDistance" typeName="double" displayLabel="Start Distance" category="RailProperties_Rail" priority="299990" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="EndDistance" typeName="double" displayLabel="End Distance" category="RailProperties_Rail" priority="299980" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="SleeperLength" typeName="double" displayLabel="Sleeper Length" category="RailProperties_Rail" priority="299970" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="SleeperWidth" typeName="double" displayLabel="Sleeper Width" category="RailProperties_Rail" priority="299960" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="SleeperThickness" typeName="double" displayLabel="Sleeper Thickness" category="RailProperties_Rail" priority="299955" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="SleeperSpacing" typeName="double" displayLabel="Sleeper Spacing" category="RailProperties_Rail" priority="299950" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="VerticalOffset" typeName="double" displayLabel="Vertical Offset" category="RailProperties_Rail" priority="299940" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="SleeperCount" typeName="int" displayLabel="Sleeper Count" category="RailProperties_Rail" priority="299930"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsSleeperComponentAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="SleeperComponentAspect"/>
         </Target>
     </ECRelationshipClass>
     <ECEntityClass typeName="SleepersStub">
@@ -740,12 +888,16 @@
     <PropertyCategory typeName="Cant_Cant" description="Cant" displayLabel="Cant" priority="199800"/>
     <PropertyCategory typeName="CantStationPoint_Cant_Station_Point" description="CantStationPoint" displayLabel="Cant Station Point" priority="199800"/>
     <PropertyCategory typeName="CenterlineProfile_Track_Centerline_Profile" description="CenterlineProfile" displayLabel="Track Centerline Profile" priority="4294967286"/>
+    <PropertyCategory typeName="CenterPoint_General_Category" description="CenterPoint" displayLabel="General Category" priority="200000"/>
     <PropertyCategory typeName="CoachProperties_Coach" description="CoachProperties" displayLabel="Coach" priority="4294967286"/>
     <PropertyCategory typeName="CrossingPointsProperties_Crossing_Points" description="CrossingPointsProperties" displayLabel="Crossing Points" priority="4294967276"/>
     <PropertyCategory typeName="CrossingProperties_Crossing" description="CrossingProperties" displayLabel="Crossing" priority="4294967286"/>
     <PropertyCategory typeName="CrossoverPointsProperties_Crossover_Points" description="CrossoverPointsProperties" displayLabel="Crossover Points" priority="4294967276"/>
     <PropertyCategory typeName="CrossoverProperties_Crossover" description="CrossoverProperties" displayLabel="Crossover" priority="4294967286"/>
+    <PropertyCategory typeName="DistanceKeepersProperties_Distance_Keepers" description="DistanceKeepersProperties" displayLabel="Distance Keepers" priority="4294967286"/>
     <PropertyCategory typeName="HorizontalRegression_Horizontal_Regression" description="HorizontalRegression" displayLabel="Horizontal Regression" priority="4294967286"/>
+    <PropertyCategory typeName="Joint_Joint" description="Joint" displayLabel="Joint" priority="4294967286"/>
+    <PropertyCategory typeName="JointGroup_Joint_Group" description="JointGroup" displayLabel="Joint Group" priority="4294967281"/>
     <PropertyCategory typeName="Miscellaneous_Base_Turnout_Branches_Feature" description="Miscellaneous" displayLabel="Base Turnout Branches Feature" priority="401000"/>
     <PropertyCategory typeName="Miscellaneous_Base_Turnout_Elements_Feature" description="Miscellaneous" displayLabel="Base Turnout Elements Feature" priority="401000"/>
     <PropertyCategory typeName="Miscellaneous_RailwayEdgeSegmentClass" description="Miscellaneous" displayLabel="RailwayEdgeSegmentClass" priority="401000"/>
@@ -757,6 +909,8 @@
     <PropertyCategory typeName="Position_Position_On_Edge" description="Position" displayLabel="Position On Edge" priority="300000"/>
     <PropertyCategory typeName="RailProperties_Rail" description="RailProperties" displayLabel="Rail" priority="4294967286"/>
     <PropertyCategory typeName="RegressionPoint_Regression_Point" description="RegressionPoint" displayLabel="Regression Point" priority="4294967286"/>
+    <PropertyCategory typeName="SchemaElementAttributes_General_Category" description="SchemaElementAttributes" displayLabel="General Category" priority="200000"/>
+    <PropertyCategory typeName="SchemaLineAttributes_General_Category" description="SchemaLineAttributes" displayLabel="General Category" priority="200000"/>
     <PropertyCategory typeName="SweepPathProperties_Sweep_Path" description="SweepPathProperties" displayLabel="Sweep Path" priority="4294967286"/>
     <PropertyCategory typeName="TableEntry_Bending_Axis_Table_Entry" description="TableEntry" displayLabel="Bending Axis Table Entry" priority="0"/>
     <PropertyCategory typeName="TableEntry_Track_Widening_Table_Entry" description="TableEntry" displayLabel="Track Widening Table Entry" priority="0"/>
