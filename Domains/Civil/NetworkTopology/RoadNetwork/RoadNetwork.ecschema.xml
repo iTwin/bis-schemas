@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ECSchema schemaName="RoadNetwork" alias="rdnet" version="01.00.00" description="Schema containing classes defining Networks in the Road domain." xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
+    <ECSchemaReference name="BisCore" version="01.00.13" alias="bis"/>
+    <ECSchemaReference name="LinearReferencing" version="02.00.03" alias="lr"/>
+    <ECSchemaReference name="NetworkTopology" version="01.00.00" alias="net"/>
+    <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
+    <ECSchemaReference name="RoadRailUnits" version="01.00.01" alias="rru"/>
+
+    <ECCustomAttributes>
+        <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
+            <SupportedUse>NotForProduction</SupportedUse>
+        </ProductionStatus>
+    </ECCustomAttributes>
+
+    <ECEntityClass typeName="IRoadTraversalSegment" modifier="Abstract" description="Helper mix-in enabling the uniform treatment of full RoadEdges and portions thereof by RoadTraversals.">
+        <ECCustomAttributes>
+            <IsMixin xmlns='CoreCustomAttributes.01.00.00'>
+                <AppliesToEntityClass>bis:InformationRecordElement</AppliesToEntityClass>
+            </IsMixin>
+        </ECCustomAttributes>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="RoadNetwork" displayLabel="Road Network" description="A net:NetworkElement modeling a graph in the Road domain, consisting of RoadNodes and RoadEdges.">
+        <BaseClass>net:NetworkElement</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="RoadNode" displayLabel="Road Node" description="A net:NodeElement modeling a vertex in a Road graph, defining RoadEdge end-points.">
+        <BaseClass>net:NodeElement</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="RoadEdge" displayLabel="Road Edge" description="A net:EdgeElement modeling a link in a Road graph, with two end-points.">
+        <BaseClass>net:LinearElementEdge</BaseClass>
+        <BaseClass>IRoadTraversalSegment</BaseClass>
+        <BaseClass>lr:ILinearLocationElement</BaseClass>
+        <ECProperty propertyName="StartValue" typeName="double" kindOfQuantity="rru:LENGTH" displayLabel="Start Distance Along">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.00"/>
+            </ECCustomAttributes>
+        </ECProperty>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="RoadEdgeSegment" displayLabel="Road Edge Segment" description="A bis:InformationRecordElement representing a portion of a RoadEdge that can be related to a RoadTraversal.">
+        <BaseClass>bis:InformationRecordElement</BaseClass>
+        <BaseClass>IRoadTraversalSegment</BaseClass>
+        <BaseClass>lr:ILinearLocationElement</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="RoadTraversal" displayLabel="Road Traversal" description="A Linear-Element defining a Linear Referencing System along a set of RoadEdges or portions thereof.">
+        <BaseClass>bis:InformationRecordElement</BaseClass>
+        <BaseClass>lr:ILinearElement</BaseClass>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="RoadTraversalGroupsSegments" strength="referencing" modifier="None" description="Relates the RoadEdges and any portions thereof defining a Linear Referencing System captured by a RoadTraversal.">
+        <BaseClass>bis:ElementGroupsMembers</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="groups" polymorphic="true">
+            <Class class="RoadTraversal"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is grouped by" polymorphic="true">
+            <Class class="IRoadTraversalSegment"/>
+        </Target>
+        <ECProperty propertyName="ReversedDirection" typeName="boolean" displayLabel="Reversed Direction" description="Specifies the direction of the referenced RoadEdge or portion thereof in a RoadTraversal."/>
+    </ECRelationshipClass>
+</ECSchema>
