@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ECSchema schemaName="RailNetwork" alias="rlnet" version="01.00.00" description="Schema containing classes defining Networks in the Rail domain." xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
+    <ECSchemaReference name="BisCore" version="01.00.13" alias="bis"/>
+    <ECSchemaReference name="LinearReferencing" version="02.00.03" alias="lr"/>
+    <ECSchemaReference name="NetworkTopology" version="01.00.00" alias="net"/>
+    <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
+    <ECSchemaReference name="RoadRailUnits" version="01.00.01" alias="rru"/>
+
+    <ECCustomAttributes>
+        <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
+            <SupportedUse>NotForProduction</SupportedUse>
+        </ProductionStatus>
+    </ECCustomAttributes>
+
+    <ECEntityClass typeName="ITrackTraversalSegment" modifier="Abstract" description="Helper mix-in enabling the uniform treatment of full TrackEdges and portions thereof by TrackTraversals.">
+        <ECCustomAttributes>
+            <IsMixin xmlns='CoreCustomAttributes.01.00.00'>
+                <AppliesToEntityClass>bis:InformationRecordElement</AppliesToEntityClass>
+            </IsMixin>
+        </ECCustomAttributes>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="TrackNetwork" displayLabel="Track Network" description="A net:NetworkElement modeling a graph in the Rail domain, consisting of TrackNodes and TrackEdges.">
+        <BaseClass>net:NetworkElement</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="TrackNode" displayLabel="Track Node" description="A net:NodeElement modeling a vertex in a Rail graph, defining TrackEdge end-points.">
+        <BaseClass>net:NodeElement</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="TrackEdge" displayLabel="Track Edge" description="A net:EdgeElement modeling a link in a Rail graph, with two end-points.">
+        <BaseClass>net:LinearElementEdge</BaseClass>
+        <BaseClass>ITrackTraversalSegment</BaseClass>
+        <BaseClass>lr:ILinearLocationElement</BaseClass>
+        <ECProperty propertyName="StartValue" typeName="double" kindOfQuantity="rru:LENGTH" displayLabel="Start Distance Along">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.00"/>
+            </ECCustomAttributes>
+        </ECProperty>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="TrackEdgeSegment" displayLabel="Track Edge Segment" description="A bis:InformationRecordElement representing a portion of a TrackEdge that can be related to a TrackTraversal.">
+        <BaseClass>bis:InformationRecordElement</BaseClass>
+        <BaseClass>ITrackTraversalSegment</BaseClass>
+        <BaseClass>lr:ILinearLocationElement</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="TrackTraversal" displayLabel="Track Traversal" description="A Linear-Element defining a Linear Referencing System along a set of TrackEdges or portions thereof.">
+        <BaseClass>bis:InformationRecordElement</BaseClass>
+        <BaseClass>lr:ILinearElement</BaseClass>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="TrackTraversalGroupsSegments" strength="referencing" modifier="None" description="Relates the TrackEdges and any portions thereof defining a Linear Referencing System captured by a TrackTraversal.">
+        <BaseClass>bis:ElementGroupsMembers</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="groups" polymorphic="true">
+            <Class class="TrackTraversal"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is grouped by" polymorphic="true">
+            <Class class="ITrackTraversalSegment"/>
+        </Target>
+        <ECProperty propertyName="ReversedDirection" typeName="boolean" displayLabel="Reversed Direction" description="Specifies the direction of the referenced TrackEdge or portion thereof in a TrackTraversal."/>
+    </ECRelationshipClass>
+</ECSchema>
