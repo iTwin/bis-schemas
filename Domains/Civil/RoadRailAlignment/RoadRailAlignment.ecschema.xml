@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ECSchema schemaName="RoadRailAlignment" alias="rralign" version="02.00.02" description="Base schema for the Alignment domain in light of Road and Rail applications." xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
+<ECSchema schemaName="RoadRailAlignment" alias="rralign" version="02.00.03" description="Base schema for the Alignment domain in light of Road and Rail applications." xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
     <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
     <ECSchemaReference name="ECDbMap" version="02.00.00" alias="ecdbmap"/>
-    <ECSchemaReference name="BisCore" version="01.00.12" alias="bis"/>
-    <ECSchemaReference name="LinearReferencing" version="02.00.02" alias="lr"/>
+    <ECSchemaReference name="BisCore" version="01.00.13" alias="bis"/>
+    <ECSchemaReference name="LinearReferencing" version="02.00.03" alias="lr"/>
     <ECSchemaReference name="RoadRailUnits" version="01.00.01" alias="rru"/>
     <ECSchemaReference name="Formats" version="01.00.00" alias="f"/>
-    <ECSchemaReference name="Units" version="01.00.05" alias="u"/>
+    <ECSchemaReference name="Units" version="01.00.07" alias="u"/>
 
     <ECCustomAttributes>
         <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
-            <SupportedUse>Production</SupportedUse>
+            <SupportedUse>NotForProduction</SupportedUse>
         </ProductionStatus>
     </ECCustomAttributes>
 
@@ -75,6 +75,18 @@
             <Class class="VerticalAlignment"/>
         </Target>
     </ECRelationshipClass>
+    <ECEntityClass typeName="AlignmentType" displayLabel="Alignment Type" description="Defines a shared set of properties whose values vary per-type of Alignment rather than per-instance.">
+        <BaseClass>bis:SpatialLocationType</BaseClass>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="AlignmentIsOfType" strength="referencing" modifier="None" description="A type-instance relation; one that indicates that the specific Alignment is an instance of the defined AlignmentType.">
+        <BaseClass>bis:SpatialLocationIsOfType</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="is of" polymorphic="true">
+            <Class class="Alignment" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is type of" polymorphic="true">
+            <Class class="AlignmentType"/>
+        </Target>
+    </ECRelationshipClass>
     <ECEntityClass typeName="DesignAlignments" description="Entry-point element into an AlignmentModel containing Alignments used for design purposes in given Spatial Model.">
         <BaseClass>bis:SpatialLocationElement</BaseClass>
         <BaseClass>bis:ISubModeledElement</BaseClass>
@@ -89,7 +101,7 @@
             <HiddenClass xmlns="CoreCustomAttributes.01.00.00"/>
         </ECCustomAttributes>
     </ECEntityClass>
-    <ECEntityClass typeName="HorizontalAlignment" description="Detailing of an Alignment horizontally (Top/Plan view).">
+    <ECEntityClass typeName="HorizontalAlignment" displayLabel="Horizontal Alignment" description="Detailing of an Alignment horizontally (Top/Plan view).">
         <BaseClass>bis:SpatialLocationElement</BaseClass>
         <ECCustomAttributes>
             <HiddenClass xmlns="CoreCustomAttributes.01.00.00"/>
@@ -100,12 +112,12 @@
             </ECCustomAttributes>
         </ECProperty>
     </ECEntityClass>
-    <ECEntityClass typeName="VerticalAlignment" description="Detailing of a Alignment or a portion of it, vertically along its path.">
+    <ECEntityClass typeName="VerticalAlignment" displayLabel="Vertical Alignment" description="Detailing of a Alignment or a portion of it, vertically along its path.">
         <BaseClass>bis:GeometricElement2d</BaseClass>
         <ECCustomAttributes>
             <HiddenClass xmlns="CoreCustomAttributes.01.00.00"/>
         </ECCustomAttributes>
-        <ECProperty propertyName="VerticalGeometry" typeName="Bentley.Geometry.Common.IGeometry" kindOfQuantity="rru:LENGTH" description="Geometry primitives accurately describing the vertical alignment. X-values mean distance-along the HorizontalAlignment; Y-values are always zero; Z-values provide elevation information.">
+        <ECProperty propertyName="VerticalGeometry" typeName="Bentley.Geometry.Common.IGeometry" kindOfQuantity="rru:LENGTH" description="Geometry primitives accurately describing the vertical alignment. X-values mean distance-along the HorizontalAlignment; Y-values provide elevation information; Z-values are always zero.">
             <ECCustomAttributes>
                 <HiddenProperty xmlns="CoreCustomAttributes.01.00.00"/>
             </ECCustomAttributes>
@@ -132,7 +144,7 @@
             <Class class="Alignment"/>
         </Target>
     </ECRelationshipClass>
-    <ECEntityClass typeName="AlignmentStation" modifier="Sealed" description="Well-known location along a Linear-Element, with a specific Station value assigned to it.">
+    <ECEntityClass typeName="AlignmentStation" displayLabel="Alignment Station" modifier="Sealed" description="Well-known location along a Linear-Element, with a specific Station value assigned to it.">
         <BaseClass>lr:ReferentElement</BaseClass>
         <ECCustomAttributes>
             <HiddenClass xmlns="CoreCustomAttributes.01.00.00"/>
