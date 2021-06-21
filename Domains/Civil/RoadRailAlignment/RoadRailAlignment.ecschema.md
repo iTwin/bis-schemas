@@ -21,6 +21,11 @@ The `Alignment` class inherits its `LengthValue` property from the `ILinearEleme
 An `Alignment` stores its visible geometry, typically a 3D approximation calculated as a stroked line-string, in its `GeometryStream` encoded as a *Path*.
 
 
+### AlignmentType
+
+Instances of `AlignmentType` provide an additional classification that can be applied to `Alignment`s.
+
+
 ### DesignAlignments
 
 A `DesignAlignments` instance, by default, shall use the Domain-ranked `Alignment` category.
