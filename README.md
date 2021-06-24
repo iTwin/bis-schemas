@@ -1,5 +1,7 @@
 # BIS ECSchemas
 
+Copyright © Bentley Systems, Incorporated. All rights reserved. See [LICENSE.md](./LICENSE.md) for license terms and full copyright notice.
+
 This repository is the single-source-of-truth (SSOT) for all BIS schemas.
 
 ## Directory Structure
