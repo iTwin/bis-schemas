@@ -1,11 +1,11 @@
 #!Python
 #--------------------------------------------------------------------------------------
 #
-#     $Source: tools/utils/BisConstants.py $
+#     $Copyright (c) Bentley Systems, Incorporated. All rights reserved. $
 #
-#  $Copyright: (c) 2019 Bentley Systems, Incorporated. All rights reserved. $
+#  $See LICENSE.md in the project root for license terms and full copyright notice. $
 #
-#-----------------------------------------------------------------------------------
+#--------------------------------------------------------------------------------------
 SCHEMA_EXTENSION = '.ecschema.xml'
 
 RELEASED_SCHEMA_EXTENSION_REGEX = r'\.(?P<version>\d\d\.\d\d\.\d\d)\.ecschema\.xml'
