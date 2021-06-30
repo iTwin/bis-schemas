@@ -15,23 +15,77 @@
         </ProductionStatus>
     </ECCustomAttributes>
 
-    <ECEntityClass typeName="Bridge" displayLabel="Bridge" description="TODO">
+    <ECEntityClass typeName="Bridge" displayLabel="Bridge" description="A spcomp:Facility modeling civil engineering works that affords passage to pedestrians, animals, vehicles, and services above obstacles or between two points at a height above ground level.">
         <BaseClass>spcomp:Facility</BaseClass>
         <BaseClass>lr:ILinearLocationElement</BaseClass>
     </ECEntityClass>
-    <ECEntityClass typeName="Substructure" displayLabel="SubStructure" description="TODO">
+    <ECEntityClass typeName="BridgeType" displayLabel="Bridge Type" description="Defines a shared set of properties whose values vary per-type of Bridge rather than per-instance.">
+        <BaseClass>spcomp:FacilityType</BaseClass>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="BridgeIsOfType" modifier="None" strength="referencing" displayLabel="Bridge Is Of Bridge Type" description="Relates a Bridge to its Type definition">
+        <BaseClass>spcomp:FacilityIsOfType</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="is of type" polymorphic="true">
+            <Class class="Bridge"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is type of" polymorphic="true">
+            <Class class="BridgeType"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="BridgePart" modifier="Abstract" displayLabel="Bridge Part" description="A spcomp:FacilityPart serving as the base class for classes modeling parts of a Bridge.">
         <BaseClass>spcomp:FacilityPart</BaseClass>
     </ECEntityClass>
-    <ECEntityClass typeName="Superstructure" displayLabel="SuperStructure" description="TODO">
-        <BaseClass>spcomp:FacilityPart</BaseClass>
+    <ECEntityClass typeName="Substructure" displayLabel="Substructure" description="Part of a Bridge wholly or mainly below the level of the adjoining ground or a given level.">
+        <BaseClass>BridgePart</BaseClass>
     </ECEntityClass>
-    <ECEntityClass typeName="Deck" displayLabel="Deck" description="TODO">
-        <BaseClass>spcomp:FacilityPart</BaseClass>
+    <ECEntityClass typeName="Superstructure" displayLabel="Superstructure" description="Part of a Bridge above the Substructure.">
+        <BaseClass>BridgePart</BaseClass>
     </ECEntityClass>
-    <ECEntityClass typeName="Pier" displayLabel="Pier" description="TODO">
-        <BaseClass>spcomp:FacilityPart</BaseClass>
+    <ECEntityClass typeName="Deck" displayLabel="Deck" description="Horizontal surface of a Bridge.">
+        <BaseClass>BridgePart</BaseClass>
+        <BaseClass>lr:ILinearLocationElement</BaseClass>
     </ECEntityClass>
-    <ECEntityClass typeName="Abutment" displayLabel="Abutment" description="TODO">
-        <BaseClass>spcomp:FacilityPart</BaseClass>
+    <ECEntityClass typeName="DeckType" displayLabel="Deck Type" description="Defines a shared set of properties whose values vary per-type of Deck rather than per-instance.">
+        <BaseClass>spcomp:FacilityPartType</BaseClass>
     </ECEntityClass>
+    <ECRelationshipClass typeName="DeckIsOfType" modifier="None" strength="referencing" displayLabel="Deck Is Of Deck Type" description="Relates a Deck to its Type definition">
+        <BaseClass>spcomp:FacilityPartIsOfType</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="is of type" polymorphic="true">
+            <Class class="Deck"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is type of" polymorphic="true">
+            <Class class="DeckType"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="Pier" displayLabel="Pier" description="Vertical structural member of voluminous form that transmits to its base the compressive forces applied to it.">
+        <BaseClass>BridgePart</BaseClass>
+        <BaseClass>lr:ILinearLocationElement</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="PierType" displayLabel="Pier Type" description="Defines a shared set of properties whose values vary per-type of Pier rather than per-instance.">
+        <BaseClass>spcomp:FacilityPartType</BaseClass>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="PierIsOfType" modifier="None" strength="referencing" displayLabel="Pier Is Of Pier Type" description="Relates a Pier to its Type definition">
+        <BaseClass>spcomp:FacilityPartIsOfType</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="is of type" polymorphic="true">
+            <Class class="Pier"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is type of" polymorphic="true">
+            <Class class="PierType"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="Abutment" displayLabel="Abutment" description="Construction intended to resist lateral thrust and vertical load from a Bridge.">
+        <BaseClass>BridgePart</BaseClass>
+        <BaseClass>lr:ILinearLocationElement</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="AbutmentType" displayLabel="Abutment Type" description="Defines a shared set of properties whose values vary per-type of Abutment rather than per-instance.">
+        <BaseClass>spcomp:FacilityPartType</BaseClass>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="AbutmentIsOfType" modifier="None" strength="referencing" displayLabel="Abutment Is Of Abutment Type" description="Relates a Pier to its Type definition">
+        <BaseClass>spcomp:FacilityPartIsOfType</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="is of type" polymorphic="true">
+            <Class class="Abutment"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is type of" polymorphic="true">
+            <Class class="AbutmentType"/>
+        </Target>
+    </ECRelationshipClass>
 </ECSchema>
