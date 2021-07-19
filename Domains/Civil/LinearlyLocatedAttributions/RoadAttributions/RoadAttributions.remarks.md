@@ -8,6 +8,8 @@ Contains classes specific to the Road-discipline, capturing Linearly-located att
 
 ## Entity Classes
 
+![RoadAttributions](./media/RoadAttributions-classes.png)
+
 ### SuperelevationRange
 
 `SuperelevationRange`s must be contained in either `SpatialLocationModel`s or `PhysicalModel`s. They shall be linearly located along a *Linear-Element*.
