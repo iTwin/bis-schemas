@@ -3,7 +3,7 @@
 |  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
 |  * See LICENSE.md in the project root for license terms and full copyright notice.
 ======================================================================================= -->
-<ECSchema schemaName="CifBridge" alias="cifbrg" version="01.00.03" description="iModel Connector schema containing aspect classes with properties from OpenBridge Modeler." xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
+<ECSchema schemaName="CifBridge" alias="cifbrg" version="01.00.04" description="iModel Connector schema containing aspect classes with properties from OpenBridge Modeler." xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
     <ECSchemaReference name="BisCore" version="01.00.13" alias="bis"/>
     <ECSchemaReference name="CifCommon" version="01.00.02" alias="cifcmn"/>
     <ECSchemaReference name="CifUnits" version="01.00.01" alias="cifu"/>
@@ -151,6 +151,15 @@
     <ECEnumeration typeName="CustomObjectByPathRuleAspect_CustomObjectByPathRuleVerticalOrientation_Enum" backingTypeName="int" isStrict="true">
         <ECEnumerator name="Vertical" value="0" displayLabel="Vertical"/>
         <ECEnumerator name="Normal" value="1" displayLabel="Normal"/>
+    </ECEnumeration>
+    <ECEnumeration typeName="CustomPierAnalyticalAspect_Pier_PierAnalyticalType_Enum" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="Rectangle" value="0" displayLabel="Rectangle"/>
+        <ECEnumerator name="Tapered" value="1" displayLabel="Tapered"/>
+        <ECEnumerator name="InvertedT" value="2" displayLabel="InvertedT"/>
+        <ECEnumerator name="Variable" value="3" displayLabel="Variable"/>
+        <ECEnumerator name="Hammer_Head" value="4" displayLabel="Hammer Head"/>
+        <ECEnumerator name="Wall" value="5" displayLabel="Wall"/>
+        <ECEnumerator name="Pile_Bent" value="6" displayLabel="Pile Bent"/>
     </ECEnumeration>
     <ECEnumeration typeName="CustomPierBySupportLineRuleAspect_CustomPierBySupportLineRule_DeckLengthReference_Enum" backingTypeName="int" isStrict="true">
         <ECEnumerator name="Top" value="0" displayLabel="Top"/>
@@ -387,6 +396,8 @@
     <ECEntityClass typeName="BeamSegmentBaseAspect" modifier="Abstract">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
         <ECProperty propertyName="BeamSegment_Type" typeName="BeamSegmentBaseAspect_BeamSegment_Type_Enum" displayLabel="Type" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299999"/>
+        <ECProperty propertyName="BeamSegment_BeamName" typeName="string" displayLabel="&lt;- BeamName -&gt;" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299976"/>
+        <ECProperty propertyName="BeamSegment_SpanName" typeName="string" displayLabel="&lt;- SpanName -&gt;" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299975"/>
     </ECEntityClass>
     <ECEntityClass typeName="BeamSegmentCollectionBaseAspect" modifier="Abstract">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
@@ -395,6 +406,7 @@
         <ECProperty propertyName="BeamSegmentCollection_Rotation" typeName="double" displayLabel="Rotation" category="BridgeModelerAttributes_Beam" priority="299997" kindOfQuantity="cifu:ANGLE"/>
         <ECProperty propertyName="BeamSegmentCollection_TrueLength" typeName="double" displayLabel="True Length" category="BridgeModelerAttributes_Beam" priority="299996" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="BeamSegmentCollection_ProjectedLength" typeName="double" displayLabel="Projected Length" category="BridgeModelerAttributes_Beam" priority="299995" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="BeamSegmentCollection_SpanName" typeName="string" displayLabel="&lt;- SpanName -&gt;" category="BridgeModelerAttributes_Beam" priority="299992"/>
     </ECEntityClass>
     <ECEntityClass typeName="BeamSegmentCollectionAspect">
         <BaseClass>BeamSegmentCollectionBaseAspect</BaseClass>
@@ -525,6 +537,10 @@
         <BaseClass>SteelBeamSegmentBaseAspect</BaseClass>
         <ECProperty propertyName="BeamSegment_StartValue" typeName="double" displayLabel="Start Value" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299992" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="BeamSegment_EndValue" typeName="double" displayLabel="End Value" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299991" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="BeamSegment_StartWidth" typeName="double" displayLabel="Start Width" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299992" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="BeamSegment_StartHeight" typeName="double" displayLabel="Start Height" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299991" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="BeamSegment_EndWidth" typeName="double" displayLabel="End Width" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299990" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="BeamSegment_EndHeight" typeName="double" displayLabel="End Height" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299989" kindOfQuantity="cifu:LENGTH"/>
     </ECEntityClass>
     <ECEntityClass typeName="BottomFlangeBeamSegmentAspect">
         <BaseClass>SteelFlangeBeamSegmentBaseAspect</BaseClass>
@@ -556,6 +572,7 @@
         <ECProperty propertyName="Pierfooting_AssociationType" typeName="string" displayLabel="Footing Association" category="BridgeModelerAttributes_Pier" priority="-1"/>
         <ECProperty propertyName="Pierfooting_AssociatedColumn" typeName="string" displayLabel="Assoc. Column ID" category="BridgeModelerAttributes_Pier" priority="-2"/>
         <ECProperty propertyName="Pierfooting_TopElevation" typeName="double" displayLabel="Top Elevation" category="BridgeModelerAttributes_Pier" priority="-3" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="Pierfooting_BottomElevation" typeName="double" displayLabel="Bottom Elevation" category="BridgeModelerAttributes_Pier" priority="-4" kindOfQuantity="cifu:LENGTH"/>
     </ECEntityClass>
     <ECEntityClass typeName="CircularDrilledShaftPierFootingAspect">
         <BaseClass>PierFootingCommonBaseAspect</BaseClass>
@@ -784,6 +801,7 @@
     <ECEntityClass typeName="CustomPierAnalyticalAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
         <ECProperty propertyName="Pier_AnalyticalTransvOffset" typeName="double" displayLabel="Transverse Offset" category="AnalyticalProperties_Analytical_Properties" priority="299949" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="Pier_PierAnalyticalType" typeName="CustomPierAnalyticalAspect_Pier_PierAnalyticalType_Enum" displayLabel="Pier Type" category="AnalyticalProperties_Analytical_Properties" priority="299950"/>
     </ECEntityClass>
     <ECEntityClass typeName="CustomPierAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
@@ -1879,6 +1897,19 @@
         </Source>
         <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
             <Class class="RectangularChamferPierColumnAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="RectangularCombinedCommonPierFootingAspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="Pierfooting_SlopedExtraTopLength" typeName="double" displayLabel="Top Extra Length" category="BridgeModelerAttributes_Pier" priority="-14" kindOfQuantity="cifu:LENGTH"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsRectangularCombinedCommonPierFootingAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="RectangularCombinedCommonPierFootingAspect"/>
         </Target>
     </ECRelationshipClass>
     <ECEntityClass typeName="RectangularPierFootingBaseAspect" modifier="Abstract">
