@@ -11,6 +11,8 @@ NOTE: Currently under development. This schema should not be used for production
 
 ## Entity Classes
 
+![CivilPhysical](./media/CivilPhysical-classes.png)
+
 ### CourseType
 
 Instances of `CourseType` provide an additional classification that can be applied to `Course`s. Examples include Pavement, Ballast and Protection. An instance of `CourseType` can optionally specify a single *Physical Material* via its `PhysicalMaterial` property.
