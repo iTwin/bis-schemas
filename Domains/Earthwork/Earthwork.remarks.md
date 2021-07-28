@@ -14,6 +14,8 @@ NOTE: Currently under development. This schema should not be used for production
 
 Instances of `FillType` provide an additional classification that can be applied to `Fill`s. Examples include Embankment, Slope Fill or Back Fill. An instance of `FillType` can optionally specify a single *Physical Material* via its `PhysicalMaterial` property.
 
+Equivalent to [IfcEarthworksFillTypeEnum](https://standards.buildingsmart.org/IFC/DEV/IFC4_3/RC2/HTML/link/ifcearthworksfilltypeenum.htm).
+
 ### Fill
 
 Examples of `Fill` include subgrade or a parts of a structure above it (such as “soft” courses in pavement or ballast). Usually formed by spreading and compacting construction materials such as sand and gravel.
@@ -22,9 +24,13 @@ Examples of `Fill` include subgrade or a parts of a structure above it (such as 
 
 `Fill`s must be contained in `PhysicalModel`s. Instances of `Fill`, by default, shall use the Domain-ranked `ew:Volume` category.
 
+Equivalent to [IfcEarthworksFill](https://standards.buildingsmart.org/IFC/DEV/IFC4_3/RC2/HTML/link/ifcearthworksfill.htm).
+
 ### CutType
 
 Instances of `CutType` provide an additional classification that can be applied to `Cut`s. Examples include Excavation, Trench or Dredging. An instance of `CutType` can optionally specify a single *Physical Material* to be removed via its `PhysicalMaterial` property.
+
+Equivalent to [IfcEarthworksCutTypeEnum](https://standards.buildingsmart.org/IFC/DEV/IFC4_3/RC2/HTML/link/ifcearthworkscuttypeenum.htm).
 
 ### Cut
 
@@ -33,6 +39,8 @@ The material excavated, modeled by `Cut`s, can later be used as fill or discarde
 `Cut`s shall have their *Volume* stored in their `GeometryStream` as a *Polyface*.
 
 `Cut`s must be contained in `PhysicalModel`s. Instances of `Cut`, by default, shall use the Domain-ranked `ew:Volume` category.
+
+Equivalent to [IfcEarthworksCut](https://standards.buildingsmart.org/IFC/DEV/IFC4_3/RC2/HTML/link/ifcearthworkscut.htm).
 
 ### SurfaceGradeType
 
