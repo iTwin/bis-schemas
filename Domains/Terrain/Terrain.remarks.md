@@ -11,6 +11,8 @@ See the `ITerrain` documentation for details on how terrain is defined in iModel
 
 ## Entity Classes
 
+![Terrain](./media/Terrain-classes.png)
+
 ### ITerrain
 
 `ITerrain` is a common mix-in expected to be implemented by element-classes defining a static *context* for assets and projects.
@@ -44,6 +46,8 @@ Where multiple `TerrainReference`s overlap, the `TerrainReference` with the high
 - There is an implication that the party responsible for the other `Element`s in the `Model` is also responsible for the `TerrainReference`.
 
 Every `TerrainReference` has a *Footprint* captured in an associated `RealityDataMask` element. This *Footprint* is used to clip overlapping areas of `TerrainReference`s with lower priority.
+
+![Terrain](./media/Terrain-instances.png)
 
 
 ### Terrain
