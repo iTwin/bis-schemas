@@ -5,7 +5,7 @@
 ======================================================================================= -->
 <ECSchema schemaName="Terrain" alias="trrn" version="01.00.00" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.1">
     <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
-    <ECSchemaReference name="BisCore" version="01.00.11" alias="bis" />
+    <ECSchemaReference name="BisCore" version="01.00.13" alias="bis" />
 
     <ECCustomAttributes>
         <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
@@ -13,15 +13,15 @@
         </ProductionStatus>
     </ECCustomAttributes>
 
-    <ECEntityClass typeName="ITerrain" description="Mix-in to be supported by bis:SpatialElement-subclasses modeling the base terrain of a portion of the earth." modifier="Abstract">
+    <ECEntityClass typeName="ITerrain" description="Mix-in to be supported by bis:PhysicalElement-subclasses modeling the base terrain of a portion of the earth." modifier="Abstract">
         <ECCustomAttributes>
             <IsMixin xmlns='CoreCustomAttributes.01.00.00'>
-                <AppliesToEntityClass>bis:SpatialElement</AppliesToEntityClass>
+                <AppliesToEntityClass>bis:PhysicalElement</AppliesToEntityClass>
             </IsMixin>
         </ECCustomAttributes>        
     </ECEntityClass>
 
-    <ECEntityClass typeName="TerrainReference" displayLabel="Terrain Reference" description="A reference to a bis:RepositoryLink capturing the location of the service providing the base terrain for a portion of the earth.">
+    <ECEntityClass typeName="TerrainReference" displayLabel="Terrain Reference" modifier="None" description="A reference to a bis:RepositoryLink capturing the location of the service providing the base terrain for a portion of the earth.">
         <BaseClass>bis:PhysicalElement</BaseClass>
         <BaseClass>ITerrain</BaseClass>
         <ECNavigationProperty propertyName="RepositoryLink" relationshipName="TerrainReferenceViaRepositoryLink" direction="Forward" displayLabel="Repository Link" description="Reference to the bis:RepositoryLink capturing the location of the service that provides the terrain." />
@@ -37,12 +37,12 @@
         </Target>
     </ECRelationshipClass>
 
-    <ECEntityClass typeName="Terrain" displayLabel="Terrain" description="A bis:PhysicalElement modeling the base terrain for a small portion of the earth.">
+    <ECEntityClass typeName="Terrain" displayLabel="Terrain" modifier="None" description="A bis:PhysicalElement modeling the base terrain for a small portion of the earth.">
         <BaseClass>bis:PhysicalElement</BaseClass>
         <BaseClass>ITerrain</BaseClass>
     </ECEntityClass>
 
-    <ECEntityClass typeName="TerrainBoundary" displayLabel="Terrain Boundary" description="A bis:SpatialLocationElement capturing the maximum external limits an ITerrain element is modeling.">
+    <ECEntityClass typeName="TerrainBoundary" displayLabel="Terrain Boundary" modifier="None" description="A bis:SpatialLocationElement capturing the maximum external limits an ITerrain element is modeling.">
         <BaseClass>bis:SpatialLocationElement</BaseClass>
     </ECEntityClass>
 
@@ -56,7 +56,7 @@
         </Target>
     </ECRelationshipClass>
 
-    <ECEntityClass typeName="TerrainSourceFeatureElement" description="A bis:SpatialLocationElement serving as base class for elements capturing specific details of a parent Terrain element that came from the source data that was utilized to create the Terrain element." modifier="Abstract">
+    <ECEntityClass typeName="TerrainSourceFeatureElement" modifier="Abstract" description="A bis:SpatialLocationElement serving as base class for elements capturing specific details of a parent Terrain element that came from the source data that was utilized to create the Terrain element.">
         <BaseClass>bis:SpatialLocationElement</BaseClass>
     </ECEntityClass>
 
@@ -70,35 +70,35 @@
         </Target>
     </ECRelationshipClass>
 
-    <ECEntityClass typeName="TerrainDrapeBoundary" displayLabel="Terrain Drape Boundary" description="A TerrainSourceFeature capturing a surface boundary that determines its elevations by draping on the underlying surface.">
+    <ECEntityClass typeName="TerrainDrapeBoundary" displayLabel="Terrain Drape Boundary" modifier="None" description="A TerrainSourceFeature capturing a surface boundary that determines its elevations by draping on the underlying surface.">
         <BaseClass>TerrainSourceFeatureElement</BaseClass>
     </ECEntityClass>
 
-    <ECEntityClass typeName="TerrainBreakline" displayLabel="Terrain Breakline" description="A TerrainSourceFeature capturing a linear feature in a terrain where abrupt changes of slope occur.">
+    <ECEntityClass typeName="TerrainBreakline" displayLabel="Terrain Breakline" modifier="None" description="A TerrainSourceFeature capturing a linear feature in a terrain where abrupt changes of slope occur.">
         <BaseClass>TerrainSourceFeatureElement</BaseClass>
     </ECEntityClass>
 
-    <ECEntityClass typeName="TerrainSpotElevation" displayLabel="Terrain Spot Elevation" description="A TerrainSourceFeature capturing a specific point-location(s) with no functional relationship with any other point in a terrain.">
+    <ECEntityClass typeName="TerrainSpotElevation" displayLabel="Terrain Spot Elevation" modifier="None" description="A TerrainSourceFeature capturing a specific point-location(s) with no functional relationship with any other point in a terrain.">
         <BaseClass>TerrainSourceFeatureElement</BaseClass>
     </ECEntityClass>
 
-    <ECEntityClass typeName="TerrainSourceContour" displayLabel="Terrain Source Contour" description="A TerrainSourceFeature capturing a linear element(s) at the same elevation created as source data for a terrain.">
+    <ECEntityClass typeName="TerrainSourceContour" displayLabel="Terrain Source Contour" modifier="None" description="A TerrainSourceFeature capturing a linear element(s) at the same elevation created as source data for a terrain.">
         <BaseClass>TerrainSourceFeatureElement</BaseClass>
     </ECEntityClass>
 
-    <ECEntityClass typeName="TerrainHole" displayLabel="Terrain Hole" description="A TerrainSourceFeature capturing an area defined by a closed shape that delineates a region where the current terrain is ignored and the underlying terrain is utilized.">
+    <ECEntityClass typeName="TerrainHole" displayLabel="Terrain Hole" modifier="None" description="A TerrainSourceFeature capturing an area defined by a closed shape that delineates a region where the current terrain is ignored and the underlying terrain is utilized.">
         <BaseClass>TerrainSourceFeatureElement</BaseClass>
     </ECEntityClass>
 
-    <ECEntityClass typeName="TerrainDrapeVoid" displayLabel="Terrain Drape Void" description="A TerrainSourceFeature capturing an area defined by a closed shape that delineates a region of missing or invalid data that should not be used. It determines its elevations by draping on the underlying surface.">
+    <ECEntityClass typeName="TerrainDrapeVoid" displayLabel="Terrain Drape Void" modifier="None" description="A TerrainSourceFeature capturing an area defined by a closed shape that delineates a region of missing or invalid data that should not be used. It determines its elevations by draping on the underlying surface.">
         <BaseClass>TerrainSourceFeatureElement</BaseClass>
     </ECEntityClass>
 
-    <ECEntityClass typeName="TerrainVoid" displayLabel="Terrain Void" description="A TerrainSourceFeature capturing an area defined by a closed shape that delineates a region of missing or invalid data that should not be used.">
+    <ECEntityClass typeName="TerrainVoid" displayLabel="Terrain Void" modifier="None" description="A TerrainSourceFeature capturing an area defined by a closed shape that delineates a region of missing or invalid data that should not be used.">
         <BaseClass>TerrainSourceFeatureElement</BaseClass>
     </ECEntityClass>
 
-    <ECEntityClass typeName="TerrainIsland" displayLabel="Terrain Island" description="A TerrainSourceFeature capturing an area defined by a closed shape that demarcates a region for which data exists within a void of a terrain.">
+    <ECEntityClass typeName="TerrainIsland" displayLabel="Terrain Island" modifier="None" description="A TerrainSourceFeature capturing an area defined by a closed shape that demarcates a region for which data exists within a void of a terrain.">
         <BaseClass>TerrainSourceFeatureElement</BaseClass>
     </ECEntityClass>
 </ECSchema>
