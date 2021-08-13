@@ -8,6 +8,8 @@ Contains the main classes to capture Alignment information primarily used in Roa
 
 ## Entity Classes
 
+![RoadRailAlignment](./media/RoadRailAlignment-classes.png)
+
 ### Alignment
 
 When an `Alignment` drives the design of a linear asset, it is referred to as a *Design Alignment*. `Alignment`s used for design purposes shall be contained in a `SpatialLocationModel`, submodel of a `DesignAlignments` instance, and by default, shall use the Domain-ranked `Alignment` category.
