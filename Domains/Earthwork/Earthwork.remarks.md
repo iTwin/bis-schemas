@@ -10,6 +10,8 @@ NOTE: Currently under development. This schema should not be used for production
 
 ## Entity Classes
 
+![Earthwork](./media/Earthwork-classes.png)
+
 ### FillType
 
 Instances of `FillType` provide an additional classification that can be applied to `Fill`s. Examples include Embankment, Slope Fill or Back Fill. An instance of `FillType` can optionally specify a single *Physical Material* via its `PhysicalMaterial` property.
