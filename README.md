@@ -33,12 +33,7 @@ All other changes made outside of a domain group directory will require review b
 
 1. Create a branch of the bis-schemas repo to make all of your changes.
 1. Identify the owner of the Schema and decide what domain group it goes into.
-    .
-
-
-    
-    
-    
+.
 1. [Update the Schema Inventory](#update-schema-inventory)
 1. Run [Bis Rule Validation](#bis-rule-validation) and [iModel Schema Validation](#imodel-schema-validation) on your new schema and make sure they pass.
 1. Create a PR to merge your branch into master
@@ -84,10 +79,6 @@ Permissions for an individual domain schema, or a domain group are managed throu
 
 The Team is owned by the schema owner, which gives them the ability to add/remove people from that team. A given team can be setup as a required reviewer for Schema(s) it owns. Anyone within that team can review/approve pull requests to the schemas. (Note: If you are within the team and you make a pull request you will still need at least one additional reviewer.)
 
-
-
-
-
 ## Local BIS Schema Tools
 
 There are set of tools exposed as npm tasks to assist schema authors in managing new or modified schemas.
@@ -96,10 +87,12 @@ There are set of tools exposed as npm tasks to assist schema authors in managing
 
 To successfully run the tools described in this section, follow the steps below to setup your environment.
 
+#### Prerequisites
 
-
-     
-    
+- [Git](https://git-scm.com/)
+- [Node](https://nodejs.org/en/): an installation of the latest security patch of Node 14. The Node installation also includes the **npm** package manager.
+- [TypeScript](https://www.typescriptlang.org/): this is listed as a devDependency, so if you're building it from source, you will get it with `rush install`.
+- [Visual Studio Code](https://code.visualstudio.com/): an optional dependency, but the repository structure is optimized for its use
 
 1. Via the command line, navigate to the root of the bis-schemas repository.  If you have VS Code installed, open the bis-schemas folder, and open a new Terminal (Terminal -> New Terminal in the menu, or use the shortcut (Ctrl-Shift-`).  
 
@@ -107,7 +100,7 @@ To successfully run the tools described in this section, follow the steps below 
 
 ### **Update Schema Inventory**
 
-The [SchemaInventory.json](https://github.com/iTwin/bis-schemas/blob/master/SchemaInventory.json) file at the root of the bis-schemas repository contains an up-to-date inventory of all schemas in the bis-schemas repository. The schema inventory must be updated using the npm task 'updateSchemaInventory', defined in the bis-schemas package.json, for all pull-requests that define new schemas. This includes a new version of a work-in-progress schema or a new released schema.
+The [SchemaInventory.json](https://github.com/iTwin/bis-schemas/blob/master/SchemaInventory.json) file at the root of the bis-schemas repository contains an up-to-date inventory of all schemas in the bis-schemas repository. The schema inventory must be updated using the npm task 'updateSchemaInventory', defined in the bis-schemas package.json, for all pull-requests that define new schemas. This includes a new version of a work-in-progress schema or a new released schema.  
 
  > Missing schemas will cause the `Bis Schemas - TS Validation (Github)` build to fail during pull-requests builds of the bis-schemas repository.
 
@@ -195,62 +188,6 @@ In this testing, the latest released version of Biscore and Functional schemas a
 In case snapshots differ, use following command to generate new snapshot json:
 
 ````usage: npm run iModelSchemaValidation -- --generateSnapshot````
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 ## Schema Packaging
 
