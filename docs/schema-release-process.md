@@ -4,13 +4,6 @@
 
 BIS Schemas can be consumed via automatically published npm packages which is the best option for Typescript based software.
 
-
- 
-
- 
-
-
-
 ### New Released Version Schemas
 
 - A new npm package is created when a new version of a schema is added to the "Released" directory and meets the release criteria
