@@ -91,6 +91,10 @@ The 'Physical' Perspective is for modeling physical Entities (which have mass) a
 
 > Behavior: The system handler (C++) for `PhysicalPartition` ensures that it is only ever sub-modeled by a `SpatialModel`.
 
+### PhysicalSystemPartition
+
+The 'Physical System' Modeling Perspective is a subset of the 'Information' Modeling Perspective. It holds Elements which group a collection of connected Entities (primarily Physical) that collectively implement some function..
+
 ### SpatialLocationPartition
 
 The “Spatial Location” perspective is a strict subset of the “Physical” perspective. Spatial locations are massless, but they manifest in the real physical world:
