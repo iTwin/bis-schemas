@@ -107,6 +107,7 @@ async function schemaUpgradeTest(ignoreList, output, checkAllVersions) {
     writeLogsToFile(`-> ${schemaName}.${schemaVersion} successfully imported.\n\n`, output);
     previousSchema = schemaName;
   }
+  await IModelHost.shutdown();
 }
 
 async function validateReleasedSchemas(ignoreList, singleSchemaName, output) {
@@ -489,9 +490,12 @@ async function importAndExportSchemaToIModel(schemaName, previousSchema, release
 
   const requestContext = new BackendRequestContext();
   if (schemaName !== previousSchema) {
-    if (imodel)
+    if (imodel) {
       imodel.close();
+      await IModelHost.shutdown();
+    }
     const iModelPath = prepareOutputFile();
+    await IModelHost.startup();
     imodel = SnapshotDb.createEmpty(iModelPath, { rootSubject: { name: "test-imodel" } });
   }
 
@@ -505,7 +509,6 @@ async function importAndExportSchemaToIModel(schemaName, previousSchema, release
     writeLogsToFile(`-> Error: ${err}\n`, output);
   }
 
-  await IModelHost.shutdown();
   if (err !== "")
     throw Error(err);
   return imodel;
