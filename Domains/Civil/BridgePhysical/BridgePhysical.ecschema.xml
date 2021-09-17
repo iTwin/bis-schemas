@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ==================================================================================
+|  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
+|  * See LICENSE.md in the project root for license terms and full copyright notice.
+======================================================================================= -->
+<ECSchema schemaName="BridgePhysical" alias="brphys" version="01.00.00" description="Main schema for the physical modeling of elements specifically used in Bridges." xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
+    <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
+    <ECSchemaReference name="BisCore" version="01.00.14" alias="bis"/>
+
+    <ECCustomAttributes>
+        <ProductionStatus xmlns="CoreCustomAttributes.01.00.00">
+            <SupportedUse>NotForProduction</SupportedUse>
+        </ProductionStatus>
+    </ECCustomAttributes>
+
+    <ECEntityClass typeName="Bearing" displayLabel="Bearing" description="A bis:PhysicalElement that is usually used to transmit loads from a bridge's superstructure to substructure, and usually allowing movement (displacement or rotation) in one or more degrees of freedom.">
+        <BaseClass>bis:PhysicalElement</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="BearingType" displayLabel="Bearing Type" description="Defines a shared set of properties whose values vary per-type of Bearing rather than per-instance.">
+        <BaseClass>bis:PhysicalType</BaseClass>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="BearingIsOfType" strength="referencing" modifier="None" description="A type-instance relation; one that indicates that the specific brphys:Bearing is an instance of the defined brphys:BearingType.">
+        <BaseClass>bis:PhysicalElementIsOfType</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="is of" polymorphic="true">
+            <Class class="Bearing" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is type of" polymorphic="true">
+            <Class class="BearingType"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="BearingSeat" displayLabel="Bearing-seat" description="A bis:PhysicalElement modeling the portion of a beam or structural member through which loads and forces are transmitted.">
+        <BaseClass>bis:PhysicalElement</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="BearingSeatType" displayLabel="Bearing-seat Type" description="Defines a shared set of properties whose values vary per-type of Bearing-seat rather than per-instance.">
+        <BaseClass>bis:PhysicalType</BaseClass>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="BearingSeatIsOfType" strength="referencing" modifier="None" description="A type-instance relation; one that indicates that the specific brphys:BearingSeat is an instance of the defined brphys:BearingSeatType.">
+        <BaseClass>bis:PhysicalElementIsOfType</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="is of" polymorphic="true">
+            <Class class="BearingSeat" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is type of" polymorphic="true">
+            <Class class="BearingSeatType"/>
+        </Target>
+    </ECRelationshipClass>
+</ECSchema>
