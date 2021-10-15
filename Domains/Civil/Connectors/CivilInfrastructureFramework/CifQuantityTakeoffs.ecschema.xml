@@ -3,11 +3,11 @@
 |  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
 |  * See LICENSE.md in the project root for license terms and full copyright notice.
 ======================================================================================= -->
-<ECSchema schemaName="CifQuantityTakeoffs" alias="cifqto" version="01.00.00" description="iModel Bridge schema for common Quantity Takeoff data from Civil Infrastructure Framework (CIF) applications." xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
-    <ECSchemaReference name="BisCore" version="01.00.09" alias="bis"/>
+<ECSchema schemaName="CifQuantityTakeoffs" alias="cifqto" version="01.00.01" description="iModel Bridge schema for common Quantity Takeoff data from Civil Infrastructure Framework (CIF) applications." xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
+    <ECSchemaReference name="BisCore" version="01.00.14" alias="bis"/>
     <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
     <ECSchemaReference name="QuantityTakeoffsAspects" version="01.00.01" alias="qto"/>
-    <ECSchemaReference name="RoadRailUnits" version="01.00.00" alias="rru"/>
+    <ECSchemaReference name="RoadRailUnits" version="01.00.01" alias="rru"/>
     <ECCustomAttributes>
         <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
             <SupportedUse>Production</SupportedUse>
@@ -146,6 +146,36 @@
         </Source>
         <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
             <Class class="QTO_SideAreasAspect"/>
+        </Target>
+    </ECRelationshipClass>
+<ECEntityClass typeName="QTO_DimensionsAspect" description="Subclass of QuantityTakeoffsAspects.DimensionsAspect class, hiding its properties from the User Interface." modifier="Sealed">
+        <BaseClass>qto:DimensionsAspect</BaseClass>
+        <ECCustomAttributes>
+            <HiddenClass xmlns="CoreCustomAttributes.01.00.03"/>
+        </ECCustomAttributes>
+        <ECProperty propertyName="Height" typeName="double">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03"/>
+            </ECCustomAttributes>
+        </ECProperty>
+        <ECProperty propertyName="Length" typeName="double">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03"/>
+            </ECCustomAttributes>
+        </ECProperty>
+        <ECProperty propertyName="Width" typeName="double">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03"/>
+            </ECCustomAttributes>
+        </ECProperty>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsQTO_DimensionsAspect" modifier="Sealed" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="QTO_DimensionsAspect"/>
         </Target>
     </ECRelationshipClass>
 </ECSchema>
