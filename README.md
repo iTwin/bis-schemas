@@ -33,7 +33,7 @@ All other changes made outside of a domain group directory will require review b
 
 1. Create a branch of the bis-schemas repo to make all of your changes.
 1. Identify the owner of the Schema and decide what domain group it goes into.
-.
+1. Add the schema(s) to an existing domain group or create a new directory for your new domain group.
 1. [Update the Schema Inventory](#update-schema-inventory)
 1. Run [Bis Rule Validation](#bis-rule-validation) and [iModel Schema Validation](#imodel-schema-validation) on your new schema and make sure they pass.
 1. Create a PR to merge your branch into master
