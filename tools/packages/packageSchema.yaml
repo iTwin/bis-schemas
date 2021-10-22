@@ -24,7 +24,6 @@ stages:
     workspace:
       clean: all
     variables:
-    - group: 
     - name: pkgOut
       value: '$(Agent.BuildDirectory)/Packages'
 
@@ -60,72 +59,3 @@ stages:
       - publish: $(pkgOut)
         artifact: bis-schemas-packages
         displayName: 'Publish Pipeline Artifact'
-
-- stage: Publish
-  displayName: Publish
-  dependsOn: Build
-  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'),  ne(variables['skipInternal'], true))
-  jobs:
-  - job: Publish
-
-    variables:
- 
-    steps:
-      - checkout: self
-        clean: true
-      - task: NodeTool@0
-        displayName: 'Use Node 10.15.0'
-        inputs:
-          versionSpec: 10.15.0
-      - download: current
-        artifact: bis-schemas-packages
-
-      - script: npm install
-        displayName: 'npm install'
-
-
-      - bash: |
-          
-          
-          
-
-          
-          
-   
-          
-
-
-
-
-
-- stage: Publish
-  displayName: Publish
-  dependsOn: Publish
-  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'),  ne(variables['skipExternal'], true))
-  jobs:
-  - job: Publish
-    displayName: Publish
-    variables:
- ""
-    steps:
-      - checkout: self
-        clean: true
-      - task: NodeTool@0
-        displayName: 'Use Node 10.15.0'
-        inputs:
-          versionSpec: 10.15.0
-      - download: current
-        artifact: bis-schemas-packages
-
-      - bash: |
-          
-
-          
-          
-
-
-      - script: npm install
-        displayName: 'npm install'
-
-
-
