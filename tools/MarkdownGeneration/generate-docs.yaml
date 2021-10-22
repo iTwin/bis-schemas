@@ -39,7 +39,7 @@ jobs:
     - npm
 
   variables:
-  - group: 
+  - group: azure-artifacts-npm-token
   - name: ECObjectsToolsPath
     value: '$(Build.BinariesDirectory)\ECObjectsToolsNuGet_x64'
 
@@ -48,9 +48,9 @@ jobs:
     displayName: Install ECObjects Tools
     inputs:
       command: custom
-      arguments: install ECObjectsToolsNuGet_x64 -ExcludeVersion -Source https:////_packaging/Packages/nuget/v3/index.json -OutputDirectory $(Build.BinariesDirectory)
+      arguments: install ECObjectsToolsNuGet_x64 -ExcludeVersion -Source https://pkgs.dev.azure.com/bentleycs/_packaging/Packages/nuget/v3/index.json -OutputDirectory $(Build.BinariesDirectory)
 
-  #Your build pipeline references a secret variable named ‘’. This variable is pulled from the '' variable group.  You must authorize this build to use that group: https://docs.microsoft.com/en-us/azure/devops/pipelines/library/variable-groups?view=azure-devops&tabs=yaml#use-a-variable-group
+  #Your build pipeline references a secret variable named ‘artifactsRegistryToken’. This variable is pulled from the 'arzure-artifacts-npm-token' variable group.  You must authorize this build to use that group: https://docs.microsoft.com/en-us/azure/devops/pipelines/library/variable-groups?view=azure-devops&tabs=yaml#use-a-variable-group
   - powershell: |
       $npmrcDir = "$(Build.Repository.LocalPath)"
       
@@ -60,14 +60,14 @@ jobs:
       
       $npmrcFile = $npmrcDir + "/.npmrc"
       
-      
-      
-      
-      
-      
-      
-      
-      
+      Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "@bentley:registry=https://pkgs.dev.azure.com/bentleycs/_packaging/Packages/npm/registry/"
+      Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "always-auth=true" -Append
+      Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "//pkgs.dev.azure.com/bentleycs/_packaging/Packages/npm/registry/:username=Packages" -Append
+      Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "//pkgs.dev.azure.com/bentleycs/_packaging/Packages/npm/registry/:_password=$(artifactsRegistryToken)" -Append
+      Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "//pkgs.dev.azure.com/bentleycs/_packaging/Packages/npm/registry/:email=npm requires email to be set but doesn't use the value" -Append
+      Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "//pkgs.dev.azure.com/bentleycs/_packaging/Packages/npm/:username=Packages" -Append
+      Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "//pkgs.dev.azure.com/bentleycs/_packaging/Packages/npm/:_password=$(artifactsRegistryToken)" -Append
+      Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "//pkgs.dev.azure.com/bentleycs/_packaging/Packages/npm/:email=npm requires email to be set but doesn't use the value" -Append
 
   - script: npm install @bentley/ecjson2md@latest
     displayName: Install ECJson2md
