@@ -40,16 +40,8 @@ jobs:
 
   variables:
   - group: azure-artifacts-npm-token
-  - name: ECObjectsToolsPath
-    value: '$(Build.BinariesDirectory)\ECObjectsToolsNuGet_x64'
 
   steps:
-  - task: NuGetCommand@2
-    displayName: Install ECObjects Tools
-    inputs:
-      command: custom
-      arguments: install ECObjectsToolsNuGet_x64 -ExcludeVersion -Source https://pkgs.dev.azure.com/bentleycs/_packaging/Packages/nuget/v3/index.json -OutputDirectory $(Build.BinariesDirectory)
-
   #Your build pipeline references a secret variable named ‘artifactsRegistryToken’. This variable is pulled from the 'arzure-artifacts-npm-token' variable group.  You must authorize this build to use that group: https://docs.microsoft.com/en-us/azure/devops/pipelines/library/variable-groups?view=azure-devops&tabs=yaml#use-a-variable-group
   - powershell: |
       $npmrcDir = "$(Build.Repository.LocalPath)"
@@ -119,39 +111,16 @@ jobs:
         refDir.add(os.path.join(defaultWorkingDir, "Standard", "ECDb", "Released"))
         rDir = ' '.join(refDir)
 
-        schemaSerializer = os.path.realpath(sys.argv[2])
-        print "Using the schema json serializer, '" + schemaSerializer + "'."
-
-        outputDir = os.path.join(os.path.realpath(sys.argv[3]), "json")
+        outputDir = os.path.join(os.path.realpath(sys.argv[2]), "json")
+        if not os.path.exists(outputDir):
+          os.makedirs(outputDir)
         print "Using the output directory, '" + outputDir + "'."
 
-        args = [
-          schemaSerializer,
-          "-a",  # Serializes all of the schemas in the Schema Graph
-          "-u",  # Inclues the standard schemas in the conversion
-          "-r", rDir,  # The reference directories to use to find other schemas
-          "-o", outputDir,  # The output directory to place the ECJson schemas
-          "-i", # The input file to be serialized to ECJson
-        ]
-
-        mdOutputDir = os.path.join(os.path.realpath(sys.argv[3]), "markdown")
+        mdOutputDir = os.path.join(os.path.realpath(sys.argv[2]), "markdown")
         if not os.path.exists(mdOutputDir):
           os.makedirs(mdOutputDir)
-        
+
         for schemaName, fullXmlSchemaPath in releasedSchemas.items():
-          args.append(fullXmlSchemaPath)
-
-          print "Serializing the schema path '" + fullXmlSchemaPath+ "'."
-
-          proc = subprocess.Popen(' '.join(args), stdin = subprocess.PIPE, stdout = subprocess.PIPE, shell=True)
-
-          if proc.returncode is not None and proc.returncode != 0:
-            print "The serialization left a non-zero exit code: " + str(proc.returncode)
-            exit(proc.returncode)
-
-          print "Finished serializing the schema path '" + fullXmlSchemaPath + "'."
-
-          args.pop()
 
           # Copy all markdown files that also have a schema.
           fullMdSchemaPath = os.path.join(fullXmlSchemaPath[:fullXmlSchemaPath.find("Released")], schemaName) + ".remarks.md"
@@ -170,7 +139,32 @@ jobs:
           print "Copying media file " + mediaFile
           shutil.copy(mediaFile, targetFilePath)
 
-      arguments: '$(System.DefaultWorkingDirectory) $(ECObjectsToolsPath)\lib\native\SchemaJsonSerializer $(Build.StagingDirectory)'
+      arguments: '$(System.DefaultWorkingDirectory) $(Build.StagingDirectory)'
+
+  - powershell: |
+     $npmrcDir = "$(Build.Repository.LocalPath)"
+              
+     if(!(Test-Path -Path $npmrcDir)){
+             mkdir $npmrcDir
+     }
+
+     $npmrcFile = $npmrcDir + "/.npmrc"      
+     Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "@bentley:registry=https://registry.npmjs.org/"
+    displayName: 'PowerShell Script'
+
+  - task: Npm@1
+    displayName: 'npm install'
+    inputs:
+      workingDir: '$(Build.Repository.LocalPath)'
+      verbose: false
+
+  - task: Npm@1
+    displayName: 'Generate Json Schemas'
+    inputs:
+      command: custom
+      workingDir: '$(Build.Repository.LocalPath)'
+      verbose: false
+      customCommand: 'run generateJsonSchemas -- --latestReleasedVersionsForMarkdown --OutDir $(Build.StagingDirectory)/json/'
 
   - script: |
       mkdir $(Build.StagingDirectory)\markdown\
