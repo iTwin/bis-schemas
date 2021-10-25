@@ -44,7 +44,7 @@ async function main() {
  async function getJsonSchemasOfLatestReleasedVersionsForMarkdown(outputDir) {
   let schemaInfo = { name: "", path: ""}
   const schemaList = findLatestReleasedVersion(await generateReleasedSchemasList(bisRootPath));
-  const skipList = ["ECDbFileInfo", "ECDbSystem", "ECv3ConversionAttributes", "PresentationRules", "SchemaLocalizationCustomAttributes"];
+  const skipList = ["ECDbFileInfo", "ECDbSystem", "PresentationRules", "SchemaLocalizationCustomAttributes"];
 
   for (const schemaPath of schemaList) {
     if (!fs.existsSync(schemaPath))
