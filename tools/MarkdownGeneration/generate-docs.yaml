@@ -41,15 +41,7 @@ jobs:
   variables:
   
 
-    value: '$(Build.BinariesDirectory)\'
-
   steps:
-  - task: NuGetCommand@2
-    displayName: Install ECObjects Tools
-    inputs:
-      command: custom
-
-
   
   - powershell: |
       $npmrcDir = "$(Build.Repository.LocalPath)"
@@ -119,39 +111,16 @@ jobs:
         refDir.add(os.path.join(defaultWorkingDir, "Standard", "ECDb", "Released"))
         rDir = ' '.join(refDir)
 
-        schemaSerializer = os.path.realpath(sys.argv[2])
-        print "Using the schema json serializer, '" + schemaSerializer + "'."
-
-        outputDir = os.path.join(os.path.realpath(sys.argv[3]), "json")
+        outputDir = os.path.join(os.path.realpath(sys.argv[2]), "json")
+        if not os.path.exists(outputDir):
+          os.makedirs(outputDir)
         print "Using the output directory, '" + outputDir + "'."
 
-        args = [
-
-
-
-
-
-
-        ]
-
-
+        mdOutputDir = os.path.join(os.path.realpath(sys.argv[2]), "markdown")
         if not os.path.exists(mdOutputDir):
           os.makedirs(mdOutputDir)
-        
 
 
-
-
-
-
-
-
-
-
-
-
-
-          args.pop()
 
           # Copy all markdown files that also have a schema.
           fullMdSchemaPath = os.path.join(fullXmlSchemaPath[:fullXmlSchemaPath.find("Released")], schemaName) + ".remarks.md"
@@ -170,7 +139,32 @@ jobs:
           print "Copying media file " + mediaFile
           shutil.copy(mediaFile, targetFilePath)
 
-      arguments: '$(System.DefaultWorkingDirectory)  $(Build.StagingDirectory)'
+      arguments: '$(System.DefaultWorkingDirectory) $(Build.StagingDirectory)'
+
+  - powershell: |
+     $npmrcDir = "$(Build.Repository.LocalPath)"
+              
+     if(!(Test-Path -Path $npmrcDir)){
+             mkdir $npmrcDir
+     }
+
+     $npmrcFile = $npmrcDir + "/.npmrc"      
+     
+    displayName: 'PowerShell Script'
+
+  - task: Npm@1
+    displayName: 'npm install'
+    inputs:
+      workingDir: '$(Build.Repository.LocalPath)'
+      verbose: false
+
+  - task: Npm@1
+    displayName: 'Generate Json Schemas'
+    inputs:
+      command: custom
+      workingDir: '$(Build.Repository.LocalPath)'
+      verbose: false
+      customCommand: 'run generateJsonSchemas -- --latestReleasedVersionsForMarkdown --OutDir $(Build.StagingDirectory)/json/'
 
   - script: |
       mkdir $(Build.StagingDirectory)\markdown\
