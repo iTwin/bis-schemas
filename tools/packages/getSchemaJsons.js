@@ -26,8 +26,39 @@ async function main() {
       throw Error("Could not find schema validation output path.");
     }
     await getJsonSchemasOfAllReleasedVersions(outputPath);
+  } else if(argv.latestReleasedVersionsForMarkdown && argv.OutDir) {
+    const outputPath = argv.OutDir;
+    if (!fs.existsSync(outputPath)) {
+      throw Error("Could not find schema validation output path.");
+    }
+    await getJsonSchemasOfLatestReleasedVersionsForMarkdown(outputPath);
   } else {
     throw Error ("Arguments are either incomplete or incorrect.");
+  }
+}
+
+/**
+ * Get json schemas of latest released schema versions for markdown
+ * @param outputDir Folder path where output jsons will go
+ */
+ async function getJsonSchemasOfLatestReleasedVersionsForMarkdown(outputDir) {
+  let schemaInfo = { name: "", path: ""}
+  const schemaList = findLatestReleasedVersion(await generateReleasedSchemasList(bisRootPath));
+  const skipList = ["ECDbFileInfo", "ECDbSystem", "ECv3ConversionAttributes", "PresentationRules", "SchemaLocalizationCustomAttributes"];
+
+  for (const schemaPath of schemaList) {
+    if (!fs.existsSync(schemaPath))
+      throw Error(`Schema ${schemaPath} does not exist`);
+    const schemaName = path.basename(schemaPath).split(".")[0];
+    schemaInfo.name = schemaName;
+    schemaInfo.path = schemaPath;
+
+    if (!skipList.includes(schemaName)) {
+      console.log("\nGenerating json for " + schemaName);
+      await createSchemaJson(schemaInfo, outputDir);
+    } else {
+      console.log("\nSkipping json for " + schemaName);
+    }
   }
 }
 
