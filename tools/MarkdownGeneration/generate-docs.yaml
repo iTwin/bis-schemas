@@ -20,11 +20,11 @@ pr:
 
 resources:
   repositories:
-    - repository: imodeljs
+    - repository: itwinjs-core
       type: github
       ref: 'refs/heads/build-to-yaml'
       endpoint: iModelJs
-      name: imodeljs/imodeljs
+      name: iTwin/itwinjs-core
 
 jobs:
 - job: Generate_Docs
@@ -33,34 +33,12 @@ jobs:
     clean: all
 
   pool:
-    name: 
+    name: iModelTechCI
     demands:
     - Agent.OS -equals Windows_NT
     - npm
 
-  variables:
-  
-
   steps:
-  
-  - powershell: |
-      $npmrcDir = "$(Build.Repository.LocalPath)"
-      
-      if(!(Test-Path -Path $npmrcDir)){
-          mkdir $npmrcDir
-      }
-      
-      $npmrcFile = $npmrcDir + "/.npmrc"
-      
-      
-
-
-
-
-
-
-
-
   - script: npm install @bentley/ecjson2md@latest
     displayName: Install ECJson2md
     workingDirectory: $(Build.BinariesDirectory)
@@ -120,7 +98,7 @@ jobs:
         if not os.path.exists(mdOutputDir):
           os.makedirs(mdOutputDir)
 
-
+        for schemaName, fullXmlSchemaPath in releasedSchemas.items():
 
           # Copy all markdown files that also have a schema.
           fullMdSchemaPath = os.path.join(fullXmlSchemaPath[:fullXmlSchemaPath.find("Released")], schemaName) + ".remarks.md"
@@ -140,17 +118,6 @@ jobs:
           shutil.copy(mediaFile, targetFilePath)
 
       arguments: '$(System.DefaultWorkingDirectory) $(Build.StagingDirectory)'
-
-  - powershell: |
-     $npmrcDir = "$(Build.Repository.LocalPath)"
-              
-     if(!(Test-Path -Path $npmrcDir)){
-             mkdir $npmrcDir
-     }
-
-     $npmrcFile = $npmrcDir + "/.npmrc"      
-     
-    
 
   - task: Npm@1
     displayName: 'npm install'
@@ -187,11 +154,10 @@ jobs:
   workspace:
     clean: all
   pool:
-    name: 
-    demands: Agent.OS -equals Windows_NT
+    vmImage: windows-latest
 
   steps:
-    - checkout: imodeljs
+    - checkout: itwinjs-core
       clean: true
     - task: NodeTool@0
       displayName: Use Node 12.17.0
@@ -202,6 +168,6 @@ jobs:
         git config --local user.email $(user_email)
         git config --local user.name $(username)
       displayName: Setup git config
-    - template: common/config/azure-pipelines/templates/docs-build.yaml@imodeljs
+    - template: common/config/azure-pipelines/templates/docs-build.yaml@itwinjs-core
       parameters:
         downloadCurrentBuildArtifacts: 'true'
