@@ -394,10 +394,18 @@
         <ECProperty propertyName="IsMirrored" typeName="boolean" displayLabel="Is Mirrored" description="TODO" />
     </ECRelationshipClass>
 
-    <ECRelationshipClass typeName="ProfiledSolidDefinitionElementUsesProfile" modifier="Abstract" strength="referencing" strengthDirection="forward" description="TODO">
+    <ECEntityClass typeName="IProfiledSolidDefinition" modifier="Abstract" displayLabel="IProfiled Solid Definition" description="TODO">
+        <ECCustomAttributes>
+            <IsMixin xmlns='CoreCustomAttributes.01.00.00'>
+                <AppliesToEntityClass>ProfiledSolidDefinitionElement</AppliesToEntityClass>
+            </IsMixin>
+        </ECCustomAttributes>
+    </ECEntityClass>
+    
+    <ECRelationshipClass typeName="IProfiledSolidDefinitionRefersToProfile" modifier="Abstract" strength="referencing" strengthDirection="forward" description="TODO">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <Source multiplicity="(0..*)" roleLabel="uses" polymorphic="true">
-            <Class class="ProfiledSolidDefinitionElement"/>
+            <Class class="IProfiledSolidDefinition"/>
         </Source>
         <Target multiplicity="(0..1)" roleLabel="is used by" polymorphic="true">
             <Class class="Profile"/>
@@ -408,11 +416,12 @@
 
     <ECEntityClass typeName="ProfiledSolidDefinition" modifier="None" displayLabel="Profiled Solid Definition" description="TODO">
         <BaseClass>ProfiledSolidDefinitionElement</BaseClass>
+        <BaseClass>IProfiledSolidDefinition</BaseClass>
         <ECProperty propertyName="Length" typeName="double" displayLabel="Length" description="TODO" category="ProfiledSolidDefinitionProperties" kindOfQuantity="AECU:LENGTH" />
     </ECEntityClass>
 
     <ECRelationshipClass typeName="ProfiledSolidDefinitionUsesProfile" modifier="None" strength="referencing" strengthDirection="forward" description="TODO">
-        <BaseClass>ProfiledSolidDefinitionElementUsesProfile</BaseClass>
+        <BaseClass>IProfiledSolidDefinitionRefersToProfile</BaseClass>
         <Source multiplicity="(0..*)" roleLabel="uses" polymorphic="true">
             <Class class="ProfiledSolidDefinition"/>
         </Source>
@@ -437,6 +446,7 @@
 
     <ECEntityClass typeName="ProfiledSolidDefinitionSegment" modifier="None" displayLabel="Profiled Solid Definition Segment" description="TODO">
         <BaseClass>ProfiledSolidDefinitionElement</BaseClass>
+        <BaseClass>IProfiledSolidDefinition</BaseClass>
         <ECProperty propertyName="StartDistance" typeName="double" displayLabel="Start Distance" description="TODO" category="ProfiledSolidDefinitionProperties" kindOfQuantity="AECU:LENGTH" />
         <ECProperty propertyName="EndDistance" typeName="double" displayLabel="End Distance" description="TODO" category="ProfiledSolidDefinitionProperties" kindOfQuantity="AECU:LENGTH" />
         <ECProperty propertyName="TransitionType" typeName="double" displayLabel="Transition Type" description="TODO" category="ProfiledSolidDefinitionProperties" />
@@ -453,7 +463,7 @@
     </ECRelationshipClass>
 
     <ECRelationshipClass typeName="ProfiledSolidDefinitionSegmentUsesStartProfile" modifier="None" strength="referencing" strengthDirection="forward" description="TODO">
-        <BaseClass>ProfiledSolidDefinitionElementUsesProfile</BaseClass>
+        <BaseClass>IProfiledSolidDefinitionRefersToProfile</BaseClass>
         <Source multiplicity="(0..*)" roleLabel="uses" polymorphic="true">
             <Class class="ProfiledSolidDefinitionSegment"/>
         </Source>
@@ -463,7 +473,7 @@
     </ECRelationshipClass>
 
     <ECRelationshipClass typeName="ProfiledSolidDefinitionSegmentUsesEndProfile" modifier="None" strength="referencing" strengthDirection="forward" description="TODO">
-        <BaseClass>ProfiledSolidDefinitionElementUsesProfile</BaseClass>
+        <BaseClass>IProfiledSolidDefinitionRefersToProfile</BaseClass>
         <Source multiplicity="(0..*)" roleLabel="uses" polymorphic="true">
             <Class class="ProfiledSolidDefinitionSegment"/>
         </Source>
