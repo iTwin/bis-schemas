@@ -3,9 +3,9 @@
 |  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
 |  * See LICENSE.md in the project root for license terms and full copyright notice.
 ======================================================================================= -->
-<ECSchema schemaName="Profiles" alias="prf" description="EC Schema for Profiles" version="01.00.00" displayLabel="Profiles" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
+<ECSchema schemaName="Profiles" alias="prf" description="EC Schema for Profiles" version="01.00.01" displayLabel="Profiles" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
     <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
-    <ECSchemaReference name="BisCore" version="01.00.10" alias="bis" />
+    <ECSchemaReference name="BisCore" version="01.00.14" alias="bis" />
     <ECSchemaReference name="AecUnits" version="01.00.03" alias="AECU" />
 
     <ECCustomAttributes>
@@ -15,6 +15,7 @@
     </ECCustomAttributes>
 
     <PropertyCategory typeName="ProfileProperties" priority="1" displayLabel="Profile Properties" description="Properties of a Structural Profile." />
+    <PropertyCategory typeName="ProfiledSolidDefinitionProperties" priority="1" displayLabel="Profiled Solid Definition Properties" description="Properties of a Profiled Solid Definition." />
 
     <ECStructClass typeName="CardinalPoint" displayLabel="Cardinal Point" description="2D location on the profile used to place and offset profiles when extruding them on curve members.">
         <ECProperty propertyName="Name" typeName="string" description="Name of the cardinal point, used to reference and distinguish cardinal points. Unique in the scope of a profile." category="ProfileProperties" />
@@ -366,4 +367,108 @@
         <ECProperty propertyName="Width" typeName="double" description="Extent of the capsule in the direction of the x-axis." category="ProfileProperties" kindOfQuantity="AECU:LENGTH_SHORT" />
         <ECProperty propertyName="Depth" typeName="double" description="Extent of the capsule in the direction of the y-axis." category="ProfileProperties" kindOfQuantity="AECU:LENGTH_SHORT" />
     </ECEntityClass>
+
+    <ECEntityClass typeName="ProfiledSolidDefinitionElement" modifier="Abstract" displayLabel="Profiled Solid Definition Element" description="TODO">
+        <BaseClass>bis:DefinitionElement</BaseClass>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="PhysicalTypeUsesProfiledSolidDefinition" modifier="None" strength="referencing" strengthDirection="forward" description="TODO">
+        <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="uses" polymorphic="true">
+            <Class class="bis:PhysicalType"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is used by" polymorphic="true">
+            <Class class="ProfiledSolidDefinitionElement"/>
+        </Target>
+        <ECProperty propertyName="IsMirrored" typeName="boolean" displayLabel="Is Mirrored" description="TODO" />
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="PhysicalElementUsesProfiledSolidDefinition" modifier="None" strength="referencing" strengthDirection="forward" description="TODO">
+        <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="uses" polymorphic="true">
+            <Class class="bis:PhysicalElement"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is used by" polymorphic="true">
+            <Class class="ProfiledSolidDefinitionElement"/>
+        </Target>
+        <ECProperty propertyName="IsMirrored" typeName="boolean" displayLabel="Is Mirrored" description="TODO" />
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="ProfiledSolidDefinitionElementUsesProfile" modifier="Abstract" strength="referencing" strengthDirection="forward" description="TODO">
+        <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="uses" polymorphic="true">
+            <Class class="ProfiledSolidDefinitionElement"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is used by" polymorphic="true">
+            <Class class="Profile"/>
+        </Target>
+        <ECProperty propertyName="CardinalPointName" typeName="string" displayLabel="Cardinal Point" description="TODO" category="ProfiledSolidDefinitionProperties" />
+        <ECProperty propertyName="Offset" typeName="point2d" displayLabel="Offset" description="TODO" category="ProfiledSolidDefinitionProperties" />
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="ProfiledSolidDefinition" modifier="None" displayLabel="Profiled Solid Definition" description="TODO">
+        <BaseClass>ProfiledSolidDefinitionElement</BaseClass>
+        <ECProperty propertyName="Length" typeName="double" displayLabel="Length" description="TODO" category="ProfiledSolidDefinitionProperties" kindOfQuantity="AECU:LENGTH" />
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="ProfiledSolidDefinitionUsesProfile" modifier="None" strength="referencing" strengthDirection="forward" description="TODO">
+        <BaseClass>ProfiledSolidDefinitionElementUsesProfile</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="uses" polymorphic="true">
+            <Class class="ProfiledSolidDefinition"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is used by" polymorphic="true">
+            <Class class="Profile"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="SegmentedProfiledSolidDefinition" modifier="None" displayLabel="Segmented Profiled Solid Definition" description="TODO">
+        <BaseClass>ProfiledSolidDefinitionElement</BaseClass>
+        <BaseClass>bis:IParentElement</BaseClass>
+        <ECProperty propertyName="Path" typeName="Bentley.Geometry.Common.IGeometry" description="TODO" category="ProfiledSolidDefinitionProperties" kindOfQuantity="AECU:LENGTH" />
+    </ECEntityClass>
+
+    <ECEnumeration typeName="ProfiledSolidDefinitionSegmentTransitionTypeEnum" backingTypeName="int" isStrict="true" displayLabel="Profiled Solid Definition Segment Transition Type">
+        <ECEnumerator name="Linear" value="0" displayLabel="Linear" />
+        <ECEnumerator name="ParabolicAtStart" value="1" displayLabel="Parabolic At Start" />
+        <ECEnumerator name="ParabolicAtEnd" value="2" displayLabel="Parabolic At End" />
+        <ECEnumerator name="CircularAtStart" value="3" displayLabel="Circular At Start" />
+        <ECEnumerator name="CircularAtEnd" value="4" displayLabel="Circular At End" />
+    </ECEnumeration>
+
+    <ECEntityClass typeName="ProfiledSolidDefinitionSegment" modifier="None" displayLabel="Profiled Solid Definition Segment" description="TODO">
+        <BaseClass>ProfiledSolidDefinitionElement</BaseClass>
+        <ECProperty propertyName="StartDistance" typeName="double" displayLabel="Start Distance" description="TODO" category="ProfiledSolidDefinitionProperties" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="EndDistance" typeName="double" displayLabel="End Distance" description="TODO" category="ProfiledSolidDefinitionProperties" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="TransitionType" typeName="double" displayLabel="Transition Type" description="TODO" category="ProfiledSolidDefinitionProperties" />
+    </ECEntityClass>
+
+        <ECRelationshipClass typeName="ProfiledSolidDefinitionOwnsSegments" strength="embedding" modifier="None">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="owns" polymorphic="true">
+            <Class class="SegmentedProfiledSolidDefinition"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="true">
+            <Class class="ProfiledSolidDefinitionSegment"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="ProfiledSolidDefinitionSegmentUsesStartProfile" modifier="None" strength="referencing" strengthDirection="forward" description="TODO">
+        <BaseClass>ProfiledSolidDefinitionElementUsesProfile</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="uses" polymorphic="true">
+            <Class class="ProfiledSolidDefinitionSegment"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is used by" polymorphic="true">
+            <Class class="Profile"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="ProfiledSolidDefinitionSegmentUsesEndProfile" modifier="None" strength="referencing" strengthDirection="forward" description="TODO">
+        <BaseClass>ProfiledSolidDefinitionElementUsesProfile</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="uses" polymorphic="true">
+            <Class class="ProfiledSolidDefinitionSegment"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is used by" polymorphic="true">
+            <Class class="Profile"/>
+        </Target>
+    </ECRelationshipClass>
 </ECSchema>
