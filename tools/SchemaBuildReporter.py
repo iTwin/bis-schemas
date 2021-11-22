@@ -9,6 +9,9 @@
 
 import os, sys, argparse, re
 
+myTestPassword = "poiuyt67#"
+print(myTestPassword);
+
 # Return a string separated by semicolons into a list 
 def semiColonSeparatedToList(s):
     return s.split(';')
