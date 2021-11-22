@@ -12,6 +12,12 @@ import os, sys, argparse, re
 myTestPassword = "poiuyt67#"
 print(myTestPassword);
 
+x = 'a'
+if x=='a':
+  pass
+else:
+  print(x);
+
 # Return a string separated by semicolons into a list 
 def semiColonSeparatedToList(s):
     return s.split(';')
