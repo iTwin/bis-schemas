@@ -4,8 +4,8 @@
 *--------------------------------------------------------------------------------------------*/
 import { BackendRequestContext, IModelHost, SnapshotDb } from "@bentley/imodeljs-backend";
 import { DbResult } from "@bentley/bentleyjs-core";
-import { StubSchemaXmlFileLocater } from "@bentley/ecschema-locaters";
-import { SchemaGraphUtil } from "@bentley/ecschema-metadata";
+import { StubSchemaXmlFileLocater } from "@itwin/ecschema-locaters";
+import { SchemaGraphUtil } from "@itwin/ecschema-metadata";
 
 import * as path from "path";
 import * as fs from "fs";

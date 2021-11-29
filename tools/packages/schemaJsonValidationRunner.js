@@ -11,8 +11,8 @@ const readdirp = require("readdirp");
 const argv = require("yargs").argv;
 const chalk = require("chalk");
 
-const SchemaContext = require("@bentley/ecschema-metadata").SchemaContext;
-const Schema = require("@bentley/ecschema-metadata").Schema;
+const SchemaContext = require("@itwin/ecschema-metadata").SchemaContext;
+const Schema = require("@itwin/ecschema-metadata").Schema;
 const createSchemaJson = require("./schemaJsonCreator").createSchemaJson;
 const SchemaComparison = require("@bentley/schema-comparer").SchemaComparison;
 const SchemaXmlFileLocater = require("@bentley/native-schema-locater").SchemaXmlFileLocater;
