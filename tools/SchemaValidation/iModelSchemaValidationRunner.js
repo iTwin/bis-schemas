@@ -15,15 +15,14 @@ const rimraf = require("rimraf");
 const chalk = require("chalk");
 const Logger = require("@bentley/bentleyjs-core").Logger;
 const LogLevel = require("@bentley/bentleyjs-core").LogLevel;
-const SchemaGraphUtil = require("@bentley/ecschema-metadata").SchemaGraphUtil;
+const SchemaGraphUtil = require("@itwin/ecschema-metadata").SchemaGraphUtil;
 const validateSchema = require("@bentley/imodel-schema-validator").validateSchema;
 const verifyIModelSchema = require("@bentley/imodel-schema-validator").verifyIModelSchema;
 const iModelValidationResultTypes = require("@bentley/imodel-schema-validator").iModelValidationResultTypes;
 const getResults = require("@bentley/imodel-schema-validator").getResults;
-const StubSchemaXmlFileLocater = require("@bentley/ecschema-locaters").StubSchemaXmlFileLocater;
-const SnapshotDb = require("@bentley/imodeljs-backend").SnapshotDb;
-const IModelHost = require("@bentley/imodeljs-backend").IModelHost;
-const BackendRequestContext = require("@bentley/imodeljs-backend").BackendRequestContext;
+const StubSchemaXmlFileLocater = require("@itwin/ecschema-locaters").StubSchemaXmlFileLocater;
+const SnapshotDb = require("@itwin/core-backend").SnapshotDb;
+const IModelHost = require("@itwin/core-backend").IModelHost;
 const DbResult = require("@bentley/bentleyjs-core").DbResult;
 
 const bisSchemaRepo = getBisRootPath();
@@ -191,11 +190,10 @@ async function importAndExportSchema(schemaPath, schemaSearchPaths) {
   const loadedSchema = locater.loadSchema(schemaPath);
   const orderedSchemas = SchemaGraphUtil.buildDependencyOrderedSchemaList(loadedSchema);
   const schemaPaths = orderedSchemas.map((s) => s.schemaKey.fileName);
-  const requestContext = new BackendRequestContext();
   const iModelPath = prepareOutputFile();
   const imodel = SnapshotDb.createEmpty(iModelPath, { rootSubject: { name: "test-imodel" } });
   try {
-    await imodel.importSchemas(requestContext, schemaPaths);
+    await imodel.importSchemas(schemaPaths);
   } catch (error) {
     throw new Error( `Failed to import schema ${wipSchema} because ${error.toString()}`);
   }
@@ -488,7 +486,6 @@ async function importAndExportSchemaToIModel(schemaName, previousSchema, release
   const orderedSchemas = SchemaGraphUtil.buildDependencyOrderedSchemaList(loadedSchema);
   const schemaPaths = orderedSchemas.map((s) => s.schemaKey.fileName);
 
-  const requestContext = new BackendRequestContext();
   if (schemaName !== previousSchema) {
     if (imodel) {
       imodel.close();
@@ -501,7 +498,7 @@ async function importAndExportSchemaToIModel(schemaName, previousSchema, release
 
   let err = "";
   try{
-    await imodel.importSchemas(requestContext, schemaPaths);
+    await imodel.importSchemas(schemaPaths);
     imodel.saveChanges();
     imodel.nativeDb.exportSchemas(exportDir);
   } catch (error) {
@@ -538,7 +535,6 @@ async function validateMultiSchema(output, testJson) {
   if (fs.existsSync(testJson)) {
     const testSchemas = require(testJson);
     await IModelHost.startup();
-    const requestContext = new BackendRequestContext();
     const iModelPath = prepareOutputFile();
     const imodel = SnapshotDb.createEmpty(iModelPath, { rootSubject: { name: "test-imodel" } });
     const schemaList = await generateReleasedSchemasList(bisSchemaRepo);
@@ -550,7 +546,7 @@ async function validateMultiSchema(output, testJson) {
         if (schemaPath) {
           console.log(`Importing Schema            : ${testSchema}`);
           try {
-            await imodel.importSchemas(requestContext, [schemaPath]);
+            await imodel.importSchemas([schemaPath]);
           } catch (error) {
             throw new Error( `Failed to import schema ${testSchema} because ${error.toString()}`);
           }
