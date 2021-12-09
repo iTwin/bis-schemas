@@ -4,9 +4,9 @@
 
 This page provides the recommended style guidelines for creating class diagrams for Schemas using CMAP tools. For more details about CMAP see the [main page](schema-cmap-style-guide) of these guidelines.
 
-- Example CMAP can be found [here](cmap-example\example-class.cmap).
-- Template CMAP can be found [here](cmap-example\template-class.cmap).
-- CMAP with more examples and situational markings can be found [here](cmap-example\situational-markings.cmap).
+- Example CMAP can be found [here](cmap-example/example-class.cmap).
+- Template CMAP can be found [here](cmap-example/template-class.cmap).
+- CMAP with more examples and situational markings can be found [here](cmap-example/situational-markings.cmap).
 
 ## **Colors**
 
@@ -24,7 +24,7 @@ Bellow are listed default colors by class/entity type (all colors can be picked 
   - `Relationships` - purple (#C896FF)
   - `Mixins, Structs, Enums, Other` - grey (#C8C8C8)
 
-![Colors](cmap-example\media\class\colors.png)
+![Colors](cmap-example/media/class/colors.png)
 
 ## **Shapes, outlines and Class name style**
 
@@ -36,7 +36,7 @@ Outline and class name style of nodes are determined by the class modifier:
 |`None (default)`    |bold            |solid     |1             |
 |`Sealed`            |bold + underline|solid     |2             |
 
-![Shapes](cmap-example\media\class\shapes.png)
+![Shapes](cmap-example/media/class/shapes.png)
 
 ## **Inheritance/Relationships**
 
@@ -45,11 +45,11 @@ Arrows should be **straight, solid lines** (can have break points) with line **t
 - `Inheritance` - arrow pointing from derived class to base class with **no label** (CMAP shortcut: <kbd>Shift</kbd>+<kbd>Drag</kbd>). You should always aim to put the base class above the derived class.
 - `Relationship` - arrow pointing from source to target end point, with a **required label** describing the relationship. Good practice is to include the strength and UML like multiplicity ([link](https://www.uml-diagrams.org/multiplicity.html)) of the relationship, but this may be in free form.
 
-![Inheritance/Relationships](cmap-example\media\class\relationships.png)
+![Inheritance/Relationships](cmap-example/media/class/relationships.png)
 
 Relationships can be detailed by linking the label to the relationship class definition similarly like "association class" pattern in UML. The link should have **no arrows** and have a **dotted line, thickness 1**.
 
-![Association classes](cmap-example\media\class\relationships-details.png)
+![Association classes](cmap-example/media/class/relationships-details.png)
 
 ## **Content**
 
@@ -69,7 +69,7 @@ Class contents in order:
     - `navigation` - name of the end point class e.g. "PhysicalElement"
   - `description` - (optional) description in italic, should start in new line
 
-![Content](cmap-example\media\class\content-elements.png)
+![Content](cmap-example/media/class/content-elements.png)
 
 `Source` and `Target` properties of relationship classes can be defined in the form: `'- <endPoint>: <multiplicity>, <class>, [polymorphic]'` where:
 
@@ -78,7 +78,7 @@ Class contents in order:
 - `class` - class name of the relationship end point
 - `polymorphic` - (optional) "polymorphic" suffix if relationship end point is polymorphic
 
-![Content](cmap-example\media\class\content-relationships.png)
+![Content](cmap-example/media/class/content-relationships.png)
 
 ## **Stereotypes**
 
@@ -94,13 +94,13 @@ Following stereotypes **must** be added for:
 - `Struct` - **&lt;&lt;Struct>>**
 - `Enumeration` - **&lt;&lt;Enum>>**
 
-![Stereotypes](cmap-example\media\class\stereotypes.png)
+![Stereotypes](cmap-example/media/class/stereotypes.png)
 
 ## **Example**
 
-Full CMAP containing below shown example can be found [here](cmap-example\example-class.cmap).
+Full CMAP containing below shown example can be found [here](cmap-example/example-class.cmap).
 
-![Example](cmap-example\media\class\example.png)
+![Example](cmap-example/media/class/example.png)
 
 ## **Additional guidelines**
 
@@ -109,7 +109,7 @@ Full CMAP containing below shown example can be found [here](cmap-example\exampl
 
 ## **Situational examples**
 
-Full CMAP containing below shown examples can be found [here](cmap-example\situational-markings.cmap).
+Full CMAP containing below shown examples can be found [here](cmap-example/situational-markings.cmap).
 
 - In bigger cmaps placing inheritance/relationship arrows might be
 difficult as the line might extend long distances or cut through other classes.
@@ -117,9 +117,9 @@ In such cases one could use the following marking:
 have a single definition for the class and then place arrows to new nodes
 containing only the name of the referenced class.
 
-![Situational](cmap-example\media\class\situational-gaps.png)
+![Situational](cmap-example/media/class/situational-gaps.png)
 
 - In cases where some base class has many derived classes one could represent that by
 some sort of grouping like the following.
 
-![Situational](cmap-example\media\class\situational-inheritance.png)
+![Situational](cmap-example/media/class/situational-inheritance.png)
