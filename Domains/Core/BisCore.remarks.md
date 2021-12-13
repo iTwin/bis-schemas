@@ -287,7 +287,7 @@ The system handler also restricts deletion. A `GeometryPart` can only be deleted
 
 The `PhysicalMaterial` serves as the base class for the materials in the PhysicalMaterial schema.  Generally, it is expected that domain-specific properties (e.g. strength properties for the structural domain) will be added to the subclasses such as Concrete and Steel using domain-specific ElementAspects.
 
-The Density property in this base `PhysicalMaterial` class is intended to provide basic weight computation for the purposes of quantity takeoff and carbon footprint, for example, which are cross-domain functions.
+The Density property in this base `PhysicalMaterial` class is intended to provide basic weight computation for the purposes of quantity takeoff and carbon footprint, for example, which are cross-domain functions.  This kindOfQuantity for this property is AECU:DENSITY
 
 ### RenderMaterial
 
