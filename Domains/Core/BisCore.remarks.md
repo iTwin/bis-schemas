@@ -283,6 +283,12 @@ The system handler also restricts deletion. A `GeometryPart` can only be deleted
 
 > Behavior: The system handler restricts deletion. A `Texture` can only be deleted via a more expensive `deleteDefinitionElements` method that has determined the `Texture` is no longer referenced.
 
+### PhysicalMaterial
+
+The `PhysicalMaterial` serves as the base class for the materials in the PhysicalMaterial schema.  Generally, it is expected that domain-specific properties (e.g. strength properties for the structural domain) will be added to the subclasses such as Concrete and Steel using domain-specific ElementAspects.
+
+The Density property in this base `PhysicalMaterial` class is intended to provide basic weight computation for the purposes of quantity takeoff and carbon footprint, for example, which are cross-domain functions.  This kindOfQuantity for this property is AECU:DENSITY.
+
 ### RenderMaterial
 
 Marked as "Sealed" because JsonProperties will be used to persist data. This allows a single instance to "morph" between a DgnV8 render material and a future PBR material.
