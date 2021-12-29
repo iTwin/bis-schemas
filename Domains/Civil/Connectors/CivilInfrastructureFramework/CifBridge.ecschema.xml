@@ -90,6 +90,10 @@
         <ECEnumerator name="Pier" value="0" displayLabel="Pier"/>
         <ECEnumerator name="Girder" value="1" displayLabel="Girder"/>
     </ECEnumeration>
+    <ECEnumeration typeName="BearingBySupportLineRuleBaseAspect_BearingBySupportLineRuleGroutPadThicknessDefinitionMethod_Enum" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="At_Center" value="0" displayLabel="At Center"/>
+        <ECEnumerator name="Min__Thickness" value="1" displayLabel="Min. Thickness"/>
+    </ECEnumeration>
     <ECEnumeration typeName="BridgeUnitAspect_BridgeUnit_Type_Enum" backingTypeName="int" isStrict="true">
         <ECEnumerator name="Beam_Slab_P_S_or_RC_Concrete_Girders" value="1" displayLabel="Beam Slab (P/S or RC Concrete Girders)"/>
         <ECEnumerator name="Beam_Slab_Steel_Girders" value="2" displayLabel="Beam Slab (Steel Girders)"/>
@@ -556,6 +560,8 @@
         <ECProperty propertyName="BearingBySupportLineRuleBearingType" typeName="BearingBySupportLineRuleBaseAspect_BearingBySupportLineRuleBearingType_Enum" displayLabel="Bearing Type" category="BearingRuleAttributes_Rule_Property" priority="299996"/>
         <ECProperty propertyName="BearingBySupportLineRuleBeamSeatOrientation" typeName="BearingBySupportLineRuleBaseAspect_BearingBySupportLineRuleBeamSeatOrientation_Enum" displayLabel="Seat Orientation" category="BearingRuleAttributes_Rule_Property" priority="299979"/>
         <ECProperty propertyName="BearingBySupportLineRuleGroutPadOrientation" typeName="BearingBySupportLineRuleBaseAspect_BearingBySupportLineRuleGroutPadOrientation_Enum" displayLabel="Grout Pad Orientation" category="BearingRuleAttributes_Rule_Property" priority="299970"/>
+        <ECProperty propertyName="BearingBySupportLineRuleMinTopThickness" typeName="double" displayLabel="Pad Min Thickness" category="BearingRuleAttributes_Rule_Property" priority="299975" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="BearingBySupportLineRuleGroutPadThicknessDefinitionMethod" typeName="BearingBySupportLineRuleBaseAspect_BearingBySupportLineRuleGroutPadThicknessDefinitionMethod_Enum" displayLabel="Pad Thickness Definition" category="BearingRuleAttributes_Rule_Property" priority="299977"/>
     </ECEntityClass>
     <ECEntityClass typeName="BearingBySupportLineRuleCellAspect">
         <BaseClass>BearingBySupportLineRuleBaseAspect</BaseClass>
@@ -694,6 +700,8 @@
         <ECProperty propertyName="Pile_BottomAngleXAdjustment" typeName="double" displayLabel="Longitudinal Angle" category="BridgeModelerAttributes_Pier" priority="-8" kindOfQuantity="cifu:ANGLE"/>
         <ECProperty propertyName="Pile_BottomAngleYAdjustment" typeName="double" displayLabel="Transverse Angle" category="BridgeModelerAttributes_Pier" priority="-9" kindOfQuantity="cifu:ANGLE"/>
         <ECProperty propertyName="Pile_EmbedDepth" typeName="double" displayLabel="Embed Length" category="BridgeModelerAttributes_Pier" priority="-13" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="Pile_TopX" typeName="double" displayLabel="Top X" category="BridgeModelerAttributes_Pier" priority="-20" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="Pile_TopY" typeName="double" displayLabel="Top X" category="BridgeModelerAttributes_Pier" priority="-21" kindOfQuantity="cifu:LENGTH"/>
     </ECEntityClass>
     <ECEntityClass typeName="CircularPileAspect">
         <BaseClass>PileBaseAspect</BaseClass>
@@ -820,6 +828,8 @@
         <ECProperty propertyName="Pier_BackWallDepth" typeName="double" displayLabel="Back Wall Depth" category="AnalyticalProperties_Analytical" priority="299942" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="Pier_BackWallWidth" typeName="double" displayLabel="Back Wall Width" category="AnalyticalProperties_Analytical" priority="299941" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="Pier_BackWallOffset" typeName="double" displayLabel="Back Wall Horizontal Offset" category="AnalyticalProperties_Analytical" priority="299940" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="Pier_ConcretePadMaterial" typeName="string" displayLabel="Concrete Pad Material" category="BridgeModelerAttributes_Material_Material" priority="299947"/>
+        <ECProperty propertyName="Pier_ConcretePadBuildOrder" typeName="int" displayLabel="Concrete Pad Build Order" category="BridgeModelerAttributes_BuildOrder_Build_Order" priority="299947"/>
     </ECEntityClass>
     <ECEntityClass typeName="CustomAbutmentCapAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
@@ -865,13 +875,55 @@
     </ECEntityClass>
     <ECEntityClass typeName="CustomObjectByDataPointRuleAspect">
         <BaseClass>CustomObjectRuleAspect</BaseClass>
-        <ECProperty propertyName="CustomObjectByDataPointRule_CellName" typeName="string" displayLabel="Cell" category="AccessoryProperties_Accessory" priority="300000"/>
+        <ECProperty propertyName="CustomObjectByDataPointRule_CellName" typeName="string" displayLabel="Cell" category="AccessoryProperties_Accessory" priority="300000">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03"/>
+                <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                    <Description>Unnecessary duplicate-property. Use 'CustomObjectRuleCellName' directly</Description>
+                </Deprecated>
+            </ECCustomAttributes>
+        </ECProperty>
         <ECProperty propertyName="CustomObjectByDataPointRule_ActiveAngle" typeName="double" displayLabel="Active Angle" category="AccessoryProperties_Accessory" priority="299999" kindOfQuantity="cifu:ANGLE"/>
-        <ECProperty propertyName="CustomObjectByDataPointRule_XScale" typeName="double" displayLabel="X-Scale" category="AccessoryProperties_Accessory" priority="299998" kindOfQuantity="cifu:LENGTH"/>
-        <ECProperty propertyName="CustomObjectByDataPointRule_YScale" typeName="double" displayLabel="Y-Scale" category="AccessoryProperties_Accessory" priority="299997" kindOfQuantity="cifu:LENGTH"/>
-        <ECProperty propertyName="CustomObjectByDataPointRule_ZScale" typeName="double" displayLabel="Z-Scale" category="AccessoryProperties_Accessory" priority="299996" kindOfQuantity="cifu:LENGTH"/>
-        <ECProperty propertyName="CustomObjectByDataPointRule_HorizontalOffset" typeName="double" displayLabel="Horizontal Offset" category="AccessoryProperties_Accessory" priority="299995" kindOfQuantity="cifu:LENGTH"/>
-        <ECProperty propertyName="CustomObjectByDataPointRule_VerticalOffset" typeName="double" displayLabel="Vertical Offset" category="AccessoryProperties_Accessory" priority="299994" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="CustomObjectByDataPointRule_XScale" typeName="double" displayLabel="X-Scale" category="AccessoryProperties_Accessory" priority="299998" kindOfQuantity="cifu:LENGTH">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03"/>
+                <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                    <Description>Unnecessary duplicate-property. Use 'CustomObjectRuleXScale' directly</Description>
+                </Deprecated>
+            </ECCustomAttributes>
+        </ECProperty>
+        <ECProperty propertyName="CustomObjectByDataPointRule_YScale" typeName="double" displayLabel="Y-Scale" category="AccessoryProperties_Accessory" priority="299997" kindOfQuantity="cifu:LENGTH">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03"/>
+                <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                    <Description>Unnecessary duplicate-property. Use 'CustomObjectRuleYScale' directly</Description>
+                </Deprecated>
+            </ECCustomAttributes>
+        </ECProperty>
+        <ECProperty propertyName="CustomObjectByDataPointRule_ZScale" typeName="double" displayLabel="Z-Scale" category="AccessoryProperties_Accessory" priority="299996" kindOfQuantity="cifu:LENGTH">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03"/>
+                <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                    <Description>Unnecessary duplicate-property. Use 'CustomObjectRuleZScale' directly</Description>
+                </Deprecated>
+            </ECCustomAttributes>
+        </ECProperty>
+        <ECProperty propertyName="CustomObjectByDataPointRule_HorizontalOffset" typeName="double" displayLabel="Horizontal Offset" category="AccessoryProperties_Accessory" priority="299995" kindOfQuantity="cifu:LENGTH">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03"/>
+                <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                    <Description>Unnecessary duplicate-property. Use 'CustomObjectRuleHorizontalOffset' directly</Description>
+                </Deprecated>
+            </ECCustomAttributes>
+        </ECProperty>
+        <ECProperty propertyName="CustomObjectByDataPointRule_VerticalOffset" typeName="double" displayLabel="Vertical Offset" category="AccessoryProperties_Accessory" priority="299994" kindOfQuantity="cifu:LENGTH">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03"/>
+                <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                    <Description>Unnecessary duplicate-property. Use 'CustomObjectRuleVerticalOffset' directly</Description>
+                </Deprecated>
+            </ECCustomAttributes>
+        </ECProperty>
         <ECProperty propertyName="CustomObjectByDataPointRule_Number" typeName="int" displayLabel="Number" category="AccessoryProperties_Accessory" priority="200000"/>
     </ECEntityClass>
     <ECEntityClass typeName="CustomObjectByPathRuleAspect">
@@ -926,6 +978,8 @@
         <ECProperty propertyName="Pier_ColumnBuildOrder" typeName="int" displayLabel="Column Build Order" category="BridgeModelerAttributes_BuildOrder_Build_Order" priority="299949"/>
         <ECProperty propertyName="Pier_FootingBuildOrder" typeName="int" displayLabel="Footing Build Order" category="BridgeModelerAttributes_BuildOrder_Build_Order" priority="299948"/>
         <ECProperty propertyName="Pier_PileBuildOrder" typeName="int" displayLabel="Pile Build Order" category="BridgeModelerAttributes_BuildOrder_Build_Order" priority="299946"/>
+        <ECProperty propertyName="Pier_ConcretePadMaterial" typeName="string" displayLabel="Concrete Pad Material" category="BridgeModelerAttributes_Material_Material" priority="299947"/>
+        <ECProperty propertyName="Pier_ConcretePadBuildOrder" typeName="int" displayLabel="Concrete Pad Build Order" category="BridgeModelerAttributes_BuildOrder_Build_Order" priority="299947"/>
     </ECEntityClass>
     <ECEntityClass typeName="CustomPierBySupportLineRuleAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
@@ -2052,6 +2106,38 @@
             <Class class="PileCapPierCapAspect"/>
         </Target>
     </ECRelationshipClass>
+    <ECEntityClass typeName="PileWallPierCapCorbelBaseAspect" modifier="Abstract">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="PierCap_HasCorbel" typeName="boolean" displayLabel="Corbel" category="CapProperties_Cap" priority="-24"/>
+    </ECEntityClass>
+    <ECEntityClass typeName="PileWallPierCapNoCorbelAspect">
+        <BaseClass>PileWallPierCapCorbelBaseAspect</BaseClass>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsPileWallPierCapNoCorbelAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="PileWallPierCapNoCorbelAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="PileWallPierCapWithCorbelAspect">
+        <BaseClass>PileWallPierCapCorbelBaseAspect</BaseClass>
+        <ECProperty propertyName="PierCap_CorbelWidth" typeName="double" displayLabel="Corbel Width" category="CapProperties_Cap" priority="-20" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="PierCap_CorbelDepth" typeName="double" displayLabel="Corbel Depth" category="CapProperties_Cap" priority="-21" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="PierCap_CorbelSlopeDepth" typeName="double" displayLabel="Corbel Slope Depth" category="CapProperties_Cap" priority="-22" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="PierCap_CorbelVertOffset" typeName="double" displayLabel="Corbel Vertical Offset" category="CapProperties_Cap" priority="-23" kindOfQuantity="cifu:LENGTH"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsPileWallPierCapWithCorbelAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="PileWallPierCapWithCorbelAspect"/>
+        </Target>
+    </ECRelationshipClass>
     <ECEntityClass typeName="RectangleDrilledShaftPierFootingAspect">
         <BaseClass>PierFootingBaseAspect</BaseClass>
     </ECEntityClass>
@@ -2907,6 +2993,13 @@
             <Class class="WingwallFootingAspect"/>
         </Target>
     </ECRelationshipClass>
+    <ECEntityClass typeName="PipePileAspect">
+        <BaseClass>PileBaseAspect</BaseClass>
+        <ECProperty propertyName="Pile_OutsideDiameter" typeName="double" displayLabel="Outside Diameter" category="BridgeModelerAttributes_Pier" priority="-13" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="Pile_WallThickness" typeName="double" displayLabel="Wall Thickness" category="BridgeModelerAttributes_Pier" priority="-14" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="Pile_ThicknessOutside" typeName="double" displayLabel="Top Length" category="BridgeModelerAttributes_Pier" priority="-16" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="Pile_ThicknessInside" typeName="double" displayLabel="Top Length" category="BridgeModelerAttributes_Pier" priority="-17" kindOfQuantity="cifu:LENGTH"/>
+    </ECEntityClass>
     <PropertyCategory typeName="AbutmentWingWallRuleAttributes_Abutment_Wingwall_Placement_Rule" description="AbutmentWingWallRuleAttributes" displayLabel="Abutment Wingwall Placement Rule" priority="300000"/>
     <PropertyCategory typeName="AccessoryProperties_Accessory" description="AccessoryProperties" displayLabel="Accessory" priority="399999"/>
     <PropertyCategory typeName="AnalyticalProperties_Analytical" description="AnalyticalProperties" displayLabel="Analytical" priority="600"/>
