@@ -150,7 +150,7 @@ This is enforced for all `Element` subclasses.
 
 ### ElementRefersToElements
 
-Subclasses of `ElementRefersToElements` can make use of the `MemberPriority` property to prioritize or order elements being referenced. By default, `MemberPriority` is set to *null* if not assigned. Duplicate not-null values for `MemberPriority` are allowed as long as the Sources or Targets of the relationships are different. Furthermore, duplicate Sources and Targets are accepted only if their `MemberPriority` values are not the same.
+Subclasses of `ElementRefersToElements` can make use of the `MemberPriority` property to prioritize or order elements being referenced. By default, `MemberPriority` is set to *null* if not assigned. Duplicate not-null values for `MemberPriority` are allowed as long as the Sources, Targets, or the `ECClassId` of the relationships are different. Furthermore, duplicate Sources and Targets are accepted only if either their `ECClassId` or `MemberPriority` values are not the same.
 
 ### ElementDrivesElement
 
