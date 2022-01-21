@@ -3,14 +3,14 @@
 |  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
 |  * See LICENSE.md in the project root for license terms and full copyright notice.
 ======================================================================================= -->
-<ECSchema schemaName="CifSubsurface" alias="cifssuf" version="01.00.02" description="iModel Connector schema containing aspect classes with properties from the Subsurface Utilities module as part of Civil Designer applications." xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
-    <ECSchemaReference name="BisCore" version="01.00.13" alias="bis"/>
-    <ECSchemaReference name="CifCommon" version="01.00.02" alias="cifcmn"/>
+<ECSchema schemaName="CifSubsurface" alias="cifssuf" version="01.00.03" description="iModel Connector schema containing aspect classes with properties from the Subsurface Utilities module as part of Civil Designer applications." xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
+    <ECSchemaReference name="BisCore" version="01.00.14" alias="bis"/>
+    <ECSchemaReference name="CifCommon" version="01.00.03" alias="cifcmn"/>
     <ECSchemaReference name="CifUnits" version="01.00.01" alias="cifu"/>
     <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
     <ECCustomAttributes>
         <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
-            <SupportedUse>Production</SupportedUse>
+            <SupportedUse>FieldTesting</SupportedUse>
         </ProductionStatus>
     </ECCustomAttributes>
     <ECEnumeration typeName="CLASS_SU_LinkAspect_PROP_SU_CreateTrench_BoolEnum" backingTypeName="int" isStrict="true">
@@ -76,10 +76,26 @@
         <ECProperty propertyName="PROP_SU_SetInvertToStop" typeName="boolean" displayLabel="Set Invert to Stop?" category="Utility_Utility" priority="299204"/>
         <ECProperty propertyName="PROP_SU_StopInvert" typeName="double" displayLabel="Stop Invert" category="Utility_Utility" priority="299203" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="PROP_SU_Diameter" typeName="double" displayLabel="Diameter" category="Utility_Utility" priority="299202" kindOfQuantity="cifu:LENGTH"/>
-        <ECProperty propertyName="PROP_SU_InterpolateElevations" typeName="boolean" displayLabel="Single Gradient" category="Utility_Utility" priority="299201"/>
+        <ECProperty propertyName="PROP_SU_InterpolateElevations" typeName="boolean" displayLabel="Single Gradient" category="Utility_Utility" priority="299196"/>
         <ECProperty propertyName="PROP_SU_Description" typeName="string" displayLabel="Description" category="FeatureProperties_Feature" priority="0"/>
         <ECProperty propertyName="PROP_SU_CreateTrench" typeName="CLASS_SU_LinkAspect_PROP_SU_CreateTrench_BoolEnum" displayLabel="Trench" category="FeatureProperties_Feature" priority="-10"/>
         <ECProperty propertyName="CIF_ID" typeName="int" displayLabel="Utility ID" category="Utility_Utility" priority="299200"/>
+        <ECProperty propertyName="PROP_SU_NumberOfBarrels" typeName="int" displayLabel="Number of Barrels" category="Utility_Utility" priority="299202"/>
+        <ECProperty propertyName="CalculatedSlope" typeName="double" displayLabel="Slope (Calculated)" category="Utility_Utility" priority="299200" kindOfQuantity="cifu:SLOPE"/>
+        <ECProperty propertyName="PROP_SU_ConstructionSlope" typeName="double" displayLabel="Slope (Construction)" category="Utility_Utility" priority="299199" kindOfQuantity="cifu:SLOPE"/>
+        <ECProperty propertyName="PROP_SU_ConstructionLength" typeName="double" displayLabel="Length (Construction)" category="Utility_Utility" priority="299198" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="Length" typeName="double" displayLabel="Length (Unified)" category="Utility_Utility" priority="299198" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="PROP_SU_Material" typeName="string" displayLabel="Material" category="Utility_Utility" priority="299197"/>
+        <ECProperty propertyName="PROP_SU_Owner" typeName="string" displayLabel="Owner" category="Utility_Utility" priority="299195"/>
+        <ECProperty propertyName="PROP_SU_Capacity" typeName="double" displayLabel="Capacity (Full Flow)" category="Results_Drainage_Results" priority="299200" kindOfQuantity="cifu:FLOW"/>
+        <ECProperty propertyName="PROP_SU_Flow" typeName="double" displayLabel="Flow" category="Results_Drainage_Results" priority="299199" kindOfQuantity="cifu:FLOW"/>
+        <ECProperty propertyName="PROP_SU_Depth" typeName="double" displayLabel="Depth (Normal)" category="Results_Drainage_Results" priority="299198" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="PROP_SU_Velocity" typeName="double" displayLabel="Velocity" category="Results_Drainage_Results" priority="299197" kindOfQuantity="cifu:FLOW_VELOCITY"/>
+        <ECProperty propertyName="PROP_SU_SpreadStart" typeName="double" displayLabel="Spread / Top Width (Start)" category="Results_Drainage_Results" priority="299196" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="PROP_SU_SpreadStop" typeName="double" displayLabel="Spread / Top Width (Stop)" category="Results_Drainage_Results" priority="299195" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="PROP_SU_DepthIn" typeName="double" displayLabel="Depth (In)" category="Results_Drainage_Results" priority="299194" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="PROP_SU_DepthOut" typeName="double" displayLabel="Depth (Out)" category="Results_Drainage_Results" priority="299193" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="PROP_SU_RationalFlow" typeName="double" displayLabel="Rational Flow (Gutter)" category="Results_Drainage_Results" priority="299192" kindOfQuantity="cifu:FLOW"/>
     </ECEntityClass>
     <ECEntityClass typeName="DepthWidthEntityAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
@@ -147,19 +163,36 @@
     </ECRelationshipClass>
     <ECEntityClass typeName="NodeAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
-        <ECProperty propertyName="GroundElevation" typeName="double" displayLabel="Ground Elevation" category="Utility_Utility" priority="299204" kindOfQuantity="cifu:LENGTH"/>
-        <ECProperty propertyName="InvertElevation" typeName="double" displayLabel="Invert Elevation" category="Utility_Utility" priority="299203" kindOfQuantity="cifu:LENGTH"/>
-        <ECProperty propertyName="OrientTopToSurface" typeName="boolean" displayLabel="Use Slope of Surface" category="Utility_Utility" priority="299202"/>
+        <ECProperty propertyName="GroundElevation" typeName="double" displayLabel="Ground Elevation" category="Utility_Utility" priority="299210" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="InvertElevation" typeName="double" displayLabel="Invert Elevation" category="Utility_Utility" priority="299209" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="OrientTopToSurface" typeName="boolean" displayLabel="Use Slope of Surface" category="Utility_Utility" priority="299205"/>
         <ECProperty propertyName="ActiveReference" typeName="string" displayLabel="Elevation Reference" category="Utility_Utility" priority="299200"/>
         <ECProperty propertyName="ActiveStationOffsetReference" typeName="string" displayLabel="Baseline Reference" category="Utility_Utility" priority="299199"/>
-        <ECProperty propertyName="IndependentConduitElevations" typeName="boolean" displayLabel="Independent Conduit Elevations" category="Utility_Utility" priority="299198"/>
-        <ECProperty propertyName="MatchSlopeofConduit" typeName="boolean" displayLabel="Match Slope of Conduit" category="Utility_Utility" priority="299197"/>
+        <ECProperty propertyName="IndependentConduitElevations" typeName="boolean" displayLabel="Independent Conduit Elevations" category="Utility_Utility" priority="299201"/>
+        <ECProperty propertyName="MatchSlopeofConduit" typeName="boolean" displayLabel="Match Slope of Conduit" category="Utility_Utility" priority="299202"/>
         <ECProperty propertyName="CIF_ID" typeName="int" displayLabel="Utility ID" category="Utility_Utility" priority="299199"/>
         <ECProperty propertyName="ElevationIsInvert" typeName="boolean" displayLabel="Elevation is the Invert" category="Utility_Utility" priority="299990"/>
-        <ECProperty propertyName="UseRoadCrossSlope" typeName="boolean" displayLabel="Use Road Cross Slope" category="Utility_Utility" priority="299196"/>
-        <ECProperty propertyName="RoadCrossSlopeDistance" typeName="double" displayLabel="Road Cross Slope Offset" category="Utility_Utility" priority="299195" kindOfQuantity="cifu:LENGTH"/>
-        <ECProperty propertyName="PROP_OnlyIncludeContributingSlopes" typeName="boolean" displayLabel="Only Include Contributing Slopes" category="Utility_Utility" priority="299194"/>
-        <ECProperty propertyName="PROP_PROP_CrosssectionOffset" typeName="double" displayLabel="Maximum Offset" category="Utility_Utility" priority="299193" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="UseRoadCrossSlope" typeName="boolean" displayLabel="Use Road Cross Slope" category="Utility_Utility" priority="299204"/>
+        <ECProperty propertyName="RoadCrossSlopeDistance" typeName="double" displayLabel="Road Cross Slope Offset" category="Utility_Utility" priority="299203" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="PROP_OnlyIncludeContributingSlopes" typeName="boolean" displayLabel="Only Include Contributing Slopes" category="Utility_Utility" priority="299187"/>
+        <ECProperty propertyName="PROP_PROP_CrosssectionOffset" typeName="double" displayLabel="Maximum Offset" category="Utility_Utility" priority="299186" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="SetOutElevation" typeName="double" displayLabel="Set Out Elevation" category="Utility_Utility" priority="299208" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="SetOutX" typeName="double" displayLabel="Set Out X" category="Utility_Utility" priority="299207" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="SetOutY" typeName="double" displayLabel="Set Out Y" category="Utility_Utility" priority="299206" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="BaselineStation" typeName="double" displayLabel="Baseline Station" category="Utility_Utility" priority="299198" kindOfQuantity="cifu:STATION"/>
+        <ECProperty propertyName="BaselineOffset" typeName="double" displayLabel="Baseline Offset" category="Utility_Utility" priority="299197" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="Depth" typeName="double" displayLabel="Depth (Structure)" category="Utility_Utility" priority="299194" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="Width" typeName="double" displayLabel="Width" category="Utility_Utility" priority="299193" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="Length" typeName="double" displayLabel="Length" category="Utility_Utility" priority="299192" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="Diameter" typeName="double" displayLabel="Diameter" category="Utility_Utility" priority="299191" kindOfQuantity="cifu:LENGTH_DIAMETER"/>
+        <ECProperty propertyName="GrateLength" typeName="double" displayLabel="Grate Length" category="Utility_Utility" priority="299190" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="GrateWidth" typeName="double" displayLabel="Grate Width" category="Utility_Utility" priority="299189" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="CurbOpeningLength" typeName="double" displayLabel="Curb Opening Length" category="Utility_Utility" priority="299188" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="LongitudinalSlope" typeName="double" displayLabel="Longitudinal Slope" category="Utility_Utility" priority="299183" kindOfQuantity="cifu:SLOPE"/>
+        <ECProperty propertyName="PROP_Owner" typeName="string" displayLabel="Owner" category="Utility_Utility" priority="299182"/>
+        <ECProperty propertyName="Spread" typeName="double" displayLabel="Spread / Top Width" category="Results_Drainage_Results" priority="299184" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="CapturedFlow" typeName="double" displayLabel="Flow (Captured)" category="Results_Drainage_Results" priority="299181" kindOfQuantity="cifu:FLOW"/>
+        <ECProperty propertyName="BypassedFlow" typeName="double" displayLabel="Flow (Total Bypassed)" category="Results_Drainage_Results" priority="299180" kindOfQuantity="cifu:FLOW"/>
     </ECEntityClass>
     <ECRelationshipClass typeName="ElementOwnsNodeAspect" modifier="None" strength="embedding">
         <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
@@ -215,10 +248,16 @@
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
         <ECProperty propertyName="OutflowElement" typeName="string" displayLabel="Outflow Element" category="Utility_Utility" priority="300000"/>
         <ECProperty propertyName="ActiveReference" typeName="string" displayLabel="Elevation Reference" category="Utility_Utility" priority="299990"/>
-        <ECProperty propertyName="UseScaledArea" typeName="boolean" displayLabel="Use Scaled Area" category="Area_Area" priority="299998"/>
-        <ECProperty propertyName="Area" typeName="double" displayLabel="Area (User Defined)" category="Area_Area" priority="299997" kindOfQuantity="cifu:AREA"/>
-        <ECProperty propertyName="ScaledArea" typeName="double" displayLabel="Scaled Area" category="Area_Area" priority="299999" kindOfQuantity="cifu:AREA"/>
+        <ECProperty propertyName="UseScaledArea" typeName="boolean" displayLabel="Use Scaled Area" category="Utility_Utility" priority="299989"/>
+        <ECProperty propertyName="Area" typeName="double" displayLabel="Area (User Defined)" category="Utility_Utility" priority="299987" kindOfQuantity="cifu:AREA"/>
+        <ECProperty propertyName="ScaledArea" typeName="double" displayLabel="Scaled Area" category="Utility_Utility" priority="299988" kindOfQuantity="cifu:AREA"/>
         <ECProperty propertyName="CIF_ID" typeName="int" displayLabel="Utility ID" category="Utility_Utility" priority="299204"/>
+        <ECProperty propertyName="UnifiedArea" typeName="double" displayLabel="Area (Unified)" category="Utility_Utility" priority="299986" kindOfQuantity="cifu:AREA"/>
+        <ECProperty propertyName="TimeOfConcentration" typeName="double" displayLabel="Time of Concentration (Composite)" category="Utility_Utility" priority="299984" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="RunoffCoefficient" typeName="double" displayLabel="Runoff Coefficient (Rational)" category="Utility_Utility" priority="299983" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="Intensity" typeName="double" displayLabel="Catchment Intensity" category="Results_Drainage_Results" priority="299986" kindOfQuantity="cifu:RAINFALL_INTENSITY"/>
+        <ECProperty propertyName="RationalFlow" typeName="double" displayLabel="Catchment Rational Flow" category="Results_Drainage_Results" priority="299985" kindOfQuantity="cifu:FLOW"/>
+        <ECProperty propertyName="CatchmentCA" typeName="double" displayLabel="Catchment CA" category="Results_Drainage_Results" priority="299984" kindOfQuantity="cifu:AREA"/>
     </ECEntityClass>
     <ECRelationshipClass typeName="ElementOwnsPolygonAspect" modifier="None" strength="embedding">
         <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
@@ -292,6 +331,7 @@
     <PropertyCategory typeName="NodeToPointAlongRuleProperties_Node_To_Point_Along_Link_Rule" description="NodeToPointAlongRuleProperties" displayLabel="Node To Point Along Link Rule" priority="300000"/>
     <PropertyCategory typeName="PolygonBySurfaceEntityRuleAttributes_Polygon_By_Surface_Entity_Rule" description="PolygonBySurfaceEntityRuleAttributes" displayLabel="Polygon By Surface Entity Rule" priority="0"/>
     <PropertyCategory typeName="Reach_Profile_Run" description="Reach" displayLabel="Profile Run" priority="299999"/>
+    <PropertyCategory typeName="Results_Drainage_Results" description="Results" displayLabel="Drainage Results" priority="299997"/>
     <PropertyCategory typeName="StationElevationEntries_StationElevationEntries" description="StationElevationEntries" displayLabel="&lt;- StationElevationEntries -&gt;" priority="300000"/>
     <PropertyCategory typeName="Utility_Utility" description="Utility" displayLabel="Utility" priority="299999"/>
 </ECSchema>

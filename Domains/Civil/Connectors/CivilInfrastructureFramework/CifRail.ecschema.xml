@@ -3,14 +3,14 @@
 |  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
 |  * See LICENSE.md in the project root for license terms and full copyright notice.
 ======================================================================================= -->
-<ECSchema schemaName="CifRail" alias="cifrl" version="01.00.01" description="iModel Connector schema containing aspect classes with properties from OpenRail Designer." xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
-    <ECSchemaReference name="BisCore" version="01.00.13" alias="bis"/>
-    <ECSchemaReference name="CifCommon" version="01.00.02" alias="cifcmn"/>
+<ECSchema schemaName="CifRail" alias="cifrl" version="01.00.02" description="iModel Connector schema containing aspect classes with properties from OpenRail Designer." xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
+    <ECSchemaReference name="BisCore" version="01.00.14" alias="bis"/>
+    <ECSchemaReference name="CifCommon" version="01.00.03" alias="cifcmn"/>
     <ECSchemaReference name="CifUnits" version="01.00.01" alias="cifu"/>
     <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
     <ECCustomAttributes>
         <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
-            <SupportedUse>Production</SupportedUse>
+            <SupportedUse>FieldTesting</SupportedUse>
         </ProductionStatus>
     </ECCustomAttributes>
     <ECEnumeration typeName="CantEntityAspect_CantEntity_RotateAbout_Enum" backingTypeName="int" isStrict="true">
@@ -204,7 +204,7 @@
         <ECProperty propertyName="CrossingRule_Orientation" typeName="CrossingRuleAspect_CrossingRule_Orientation_Enum" displayLabel="Orientation" category="CrossingProperties_Crossing" priority="299950"/>
         <ECProperty propertyName="CrossingRule_PlacementPoint" typeName="CrossingRuleAspect_CrossingRule_PlacementPoint_Enum" displayLabel="Placement Point" category="CrossingProperties_Crossing" priority="299940"/>
         <ECProperty propertyName="CrossingRule_ToePointStation" typeName="double" displayLabel="Toe Point" category="CrossingProperties_Crossing" priority="299970" kindOfQuantity="cifu:STATION"/>
-        <ECProperty propertyName="CrossingRule_UseSleeperStub" typeName="boolean" displayLabel="Use Sleeper Stub" category="CrossingProperties_Crossing" priority="299930"/>
+        <ECProperty propertyName="CrossingRule_UseSleeperStub" typeName="boolean" displayLabel="Use LLS Extension" category="CrossingProperties_Crossing" priority="299930"/>
         <ECProperty propertyName="CrossingRule_Branch1P0" typeName="point3d" displayLabel="Branch1 P0" category="CrossingPointsProperties_Crossing_Points" priority="299800"/>
         <ECProperty propertyName="CrossingRule_Branch1P1" typeName="point3d" displayLabel="Branch1 P1" category="CrossingPointsProperties_Crossing_Points" priority="299790"/>
         <ECProperty propertyName="CrossingRule_Branch1P2" typeName="point3d" displayLabel="Branch1 P2" category="CrossingPointsProperties_Crossing_Points" priority="299780"/>
@@ -233,6 +233,10 @@
         <ECProperty propertyName="CrossingRule_Branch2NoseStation" typeName="double" displayLabel="Branch2 Nose Station" category="CrossingPointsProperties_Crossing_Points" priority="299290" kindOfQuantity="cifu:STATION"/>
         <ECProperty propertyName="CrossingRule_Branch2CommonStation" typeName="double" displayLabel="Branch2 Common Station" category="CrossingPointsProperties_Crossing_Points" priority="299280" kindOfQuantity="cifu:STATION"/>
         <ECProperty propertyName="CrossingRule_Branch2ObtuseStation" typeName="double" displayLabel="Branch2 Obtuse Station" category="CrossingPointsProperties_Crossing_Points" priority="299270" kindOfQuantity="cifu:STATION"/>
+        <ECProperty propertyName="CrossingRule_Branch1LLS" typeName="point3d" displayLabel="Branch 1 LLS" category="CrossingPointsProperties_Crossing_Points" priority="299735"/>
+        <ECProperty propertyName="CrossingRule_Branch2LLS" typeName="point3d" displayLabel="Branch 2 LLS" category="CrossingPointsProperties_Crossing_Points" priority="299665"/>
+        <ECProperty propertyName="CrossingRule_Branch1LLSStation" typeName="double" displayLabel="Branch1 LLS Extension Station" category="CrossingPointsProperties_Crossing_Points" priority="299335" kindOfQuantity="cifu:STATION"/>
+        <ECProperty propertyName="CrossingRule_Branch2LLSStation" typeName="double" displayLabel="Branch2 LLS Extension Station" category="CrossingPointsProperties_Crossing_Points" priority="299265" kindOfQuantity="cifu:STATION"/>
     </ECEntityClass>
     <ECEntityClass typeName="CrossoverRuleAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
@@ -240,7 +244,7 @@
         <ECProperty propertyName="CrossoverRule_PlacementPoint" typeName="CrossoverRuleAspect_CrossoverRule_PlacementPoint_Enum" displayLabel="Placement Point" category="CrossoverProperties_Crossover" priority="299940"/>
         <ECProperty propertyName="CrossoverRule_SinglePlacementPoint" typeName="CrossoverRuleAspect_CrossoverRule_SinglePlacementPoint_Enum" displayLabel="Single Placement Point" category="CrossoverProperties_Crossover" priority="299930"/>
         <ECProperty propertyName="CrossoverRule_ToePointStation" typeName="double" displayLabel="Toe Point" category="CrossoverProperties_Crossover" priority="299970" kindOfQuantity="cifu:STATION"/>
-        <ECProperty propertyName="CrossoverRule_UseSleeperStub" typeName="boolean" displayLabel="Use Sleeper Stub" category="CrossoverProperties_Crossover" priority="299920"/>
+        <ECProperty propertyName="CrossoverRule_UseSleeperStub" typeName="boolean" displayLabel="Use LLS Extension" category="CrossoverProperties_Crossover" priority="299920"/>
         <ECProperty propertyName="CrossoverRule_Turnout1Branch1P0" typeName="point3d" displayLabel="First Turnout Branch1 P0" category="CrossoverPointsProperties_Crossover_Points" priority="299800"/>
         <ECProperty propertyName="CrossoverRule_Turnout1Branch1P1" typeName="point3d" displayLabel="First Turnout Branch1 P1" category="CrossoverPointsProperties_Crossover_Points" priority="299790"/>
         <ECProperty propertyName="CrossoverRule_Turnout1Branch1P2" typeName="point3d" displayLabel="First Turnout Branch1 P2" category="CrossoverPointsProperties_Crossover_Points" priority="299780"/>
@@ -735,7 +739,7 @@
     </ECRelationshipClass>
     <ECEntityClass typeName="SleepersStub">
         <BaseClass>BaseTurnoutElementsObjectSettings</BaseClass>
-        <ECProperty propertyName="BaseTurnoutElementsObjectSettings_SleepersStub_Fixed" typeName="boolean" displayLabel="Fixed" category="Miscellaneous_Sleepers_Stub" priority="0"/>
+        <ECProperty propertyName="BaseTurnoutElementsObjectSettings_SleepersStub_Fixed" typeName="boolean" displayLabel="Fixed" category="Miscellaneous_LLS_Extension" priority="0"/>
     </ECEntityClass>
     <ECRelationshipClass typeName="ElementOwnsSleepersStub" modifier="None" strength="embedding">
         <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
@@ -827,7 +831,7 @@
         <ECProperty propertyName="TurnoutRule_PlacementPoint" typeName="TurnoutRuleAspect_TurnoutRule_PlacementPoint_Enum" displayLabel="Placement Point" category="TurnoutProperties_Turnout" priority="299940"/>
         <ECProperty propertyName="TurnoutRule_SinglePlacementPoint" typeName="TurnoutRuleAspect_TurnoutRule_SinglePlacementPoint_Enum" displayLabel="Single Placement Point" category="TurnoutProperties_Turnout" priority="299930"/>
         <ECProperty propertyName="TurnoutRule_ToePointStation" typeName="double" displayLabel="Toe Point" category="TurnoutProperties_Turnout" priority="299970" kindOfQuantity="cifu:STATION"/>
-        <ECProperty propertyName="TurnoutRule_UseSleeperStub" typeName="boolean" displayLabel="Use Sleeper Stub" category="TurnoutProperties_Turnout" priority="299920"/>
+        <ECProperty propertyName="TurnoutRule_UseSleeperStub" typeName="boolean" displayLabel="Use LLS Extension" category="TurnoutProperties_Turnout" priority="299920"/>
         <ECProperty propertyName="TurnoutRule_Branch1P0" typeName="point3d" displayLabel="Branch1 P0" category="TurnoutPointsProperties_Turnout_Points" priority="299800"/>
         <ECProperty propertyName="TurnoutRule_Branch1P1" typeName="point3d" displayLabel="Branch1 P1" category="TurnoutPointsProperties_Turnout_Points" priority="299790"/>
         <ECProperty propertyName="TurnoutRule_Branch1P2" typeName="point3d" displayLabel="Branch1 P2" category="TurnoutPointsProperties_Turnout_Points" priority="299780"/>
@@ -848,6 +852,10 @@
         <ECProperty propertyName="TurnoutRule_Branch2P2Station" typeName="double" displayLabel="Branch2 P2 Station" category="TurnoutPointsProperties_Turnout_Points" priority="299330" kindOfQuantity="cifu:STATION"/>
         <ECProperty propertyName="TurnoutRule_Branch2P3Station" typeName="double" displayLabel="Branch2 P3 Station" category="TurnoutPointsProperties_Turnout_Points" priority="299320" kindOfQuantity="cifu:STATION"/>
         <ECProperty propertyName="TurnoutRule_Branch2TheoreticalP1Station" typeName="double" displayLabel="Branch2 Theoretical P1 Station" category="TurnoutPointsProperties_Turnout_Points" priority="299310" kindOfQuantity="cifu:STATION"/>
+        <ECProperty propertyName="TurnoutRule_Branch1LLS" typeName="point3d" displayLabel="Branch 1 LLS" category="TurnoutPointsProperties_Turnout_Points" priority="299755"/>
+        <ECProperty propertyName="TurnoutRule_Branch2LLS" typeName="point3d" displayLabel="Branch 2 LLS" category="TurnoutPointsProperties_Turnout_Points" priority="299705"/>
+        <ECProperty propertyName="TurnoutRule_Branch1LLSStation" typeName="double" displayLabel="Branch1 LLS Extension Station" category="TurnoutPointsProperties_Turnout_Points" priority="299359" kindOfQuantity="cifu:STATION"/>
+        <ECProperty propertyName="TurnoutRule_Branch2LLSStation" typeName="double" displayLabel="Branch2 LLS Extension Station" category="TurnoutPointsProperties_Turnout_Points" priority="299309" kindOfQuantity="cifu:STATION"/>
     </ECEntityClass>
     <ECRelationshipClass typeName="ElementOwnsTurnoutRuleAspect" modifier="None" strength="embedding">
         <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
@@ -905,6 +913,7 @@
     <PropertyCategory typeName="JointGroup_Joint_Group" description="JointGroup" displayLabel="Joint Group" priority="4294967281"/>
     <PropertyCategory typeName="Miscellaneous_Base_Turnout_Branches_Feature" description="Miscellaneous" displayLabel="Base Turnout Branches Feature" priority="401000"/>
     <PropertyCategory typeName="Miscellaneous_Base_Turnout_Elements_Feature" description="Miscellaneous" displayLabel="Base Turnout Elements Feature" priority="401000"/>
+    <PropertyCategory typeName="Miscellaneous_LLS_Extension" description="Miscellaneous" displayLabel="LLS Extension" priority="401000"/>
     <PropertyCategory typeName="Miscellaneous_RailwayEdgeSegmentClass" description="Miscellaneous" displayLabel="RailwayEdgeSegmentClass" priority="401000"/>
     <PropertyCategory typeName="Miscellaneous_Sleepers_Stub" description="Miscellaneous" displayLabel="Sleepers Stub" priority="401000"/>
     <PropertyCategory typeName="Name_General_Category" description="Name" displayLabel="General Category" priority="300000"/>
