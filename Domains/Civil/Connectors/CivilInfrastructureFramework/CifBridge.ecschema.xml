@@ -280,6 +280,10 @@
         <ECEnumerator name="Centered" value="3" displayLabel="Centered"/>
         <ECEnumerator name="Approach_Slab_and_Centered" value="4" displayLabel="Approach Slab and Centered"/>
     </ECEnumeration>
+    <ECEnumeration typeName="SleeperSlabByApproachRuleAspect_SleeperSlabByApproachRuleLocation_Enum" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="Start" value="0" displayLabel="Start"/>
+        <ECEnumerator name="End" value="1" displayLabel="End"/>
+    </ECEnumeration>
     <ECEnumeration typeName="SupportLineBtMidPointRuleAspect_SupportLineBtMidPointRule_DirectionInputMode_Enum" backingTypeName="int" isStrict="true">
         <ECEnumerator name="Skew" value="0" displayLabel="Skew"/>
         <ECEnumerator name="Direction" value="1" displayLabel="Direction"/>
@@ -308,6 +312,10 @@
         <ECProperty propertyName="Pier_AbutmentAnalyticalType" typeName="AbutmentAspect_Pier_AbutmentAnalyticalType_Enum" displayLabel="Abutment Type" category="AnalyticalProperties_Analytical" priority="299950"/>
         <ECProperty propertyName="Pier_ConcretePadMaterial" typeName="string" displayLabel="Concrete Pad Material" category="BridgeModelerAttributes_Material_Material" priority="299947"/>
         <ECProperty propertyName="Pier_ConcretePadBuildOrder" typeName="int" displayLabel="Concrete Pad Build Order" category="BridgeModelerAttributes_BuildOrder_Build_Order" priority="299947"/>
+    </ECEntityClass>
+    <ECEntityClass typeName="AbutmentWingComponentAspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="AbutmentWingComponent_Name" typeName="string" displayLabel="Name" category="BridgeModelerAttributes_General" priority="299950"/>
     </ECEntityClass>
     <ECEntityClass typeName="AbutmentWingWallAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
@@ -368,8 +376,8 @@
             </ECCustomAttributes>
         </ECProperty>
         <ECProperty propertyName="ApproachSlabByTemplateRule_HorizontalOffset" typeName="double" displayLabel="Horizontal Offset" category="ApproachSlabProperties_Approach_Slab" priority="299996" kindOfQuantity="cifu:LENGTH"/>
-        <ECProperty propertyName="ApproachSlabByTemplateRule_StartVerticalOffset" typeName="double" displayLabel="StartVerticalOffset" category="ApproachSlabProperties_Approach_Slab" priority="299995" kindOfQuantity="cifu:LENGTH"/>
-        <ECProperty propertyName="ApproachSlabByTemplateRule_EndVerticalOffset" typeName="double" displayLabel="EndVerticalOffset" category="ApproachSlabProperties_Approach_Slab" priority="299994" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="ApproachSlabByTemplateRule_StartVerticalOffset" typeName="double" displayLabel="Start Vertical Offset" category="ApproachSlabProperties_Approach_Slab" priority="299995" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="ApproachSlabByTemplateRule_EndVerticalOffset" typeName="double" displayLabel="End Vertical Offset" category="ApproachSlabProperties_Approach_Slab" priority="299994" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="ApproachSlabByTemplateRule_Template" typeName="string" displayLabel="Template" category="ApproachSlabProperties_Approach_Slab" priority="299993"/>
         <ECProperty propertyName="ApproachSlabByTemplateRule_ChordTolerance" typeName="double" displayLabel="Chord Tolerance" category="ApproachSlabProperties_Approach_Slab" priority="299992" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="ApproachSlabByTemplateRule_MaximumDistanceBetweenSections" typeName="double" displayLabel="Max Dist Between Sections" category="ApproachSlabProperties_Approach_Slab" priority="299991" kindOfQuantity="cifu:LENGTH"/>
@@ -1068,6 +1076,15 @@
         </Source>
         <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
             <Class class="AbutmentAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="ElementOwnsAbutmentWingComponentAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="AbutmentWingComponentAspect"/>
         </Target>
     </ECRelationshipClass>
     <ECRelationshipClass typeName="ElementOwnsAbutmentWingWallAspect" modifier="None" strength="embedding">
@@ -2069,6 +2086,27 @@
             <Class class="PierRockSocketAspect"/>
         </Target>
     </ECRelationshipClass>
+    <ECEntityClass typeName="PierStrutAspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="PierStrut_Name" typeName="string" displayLabel="Name" category="BridgeModelerAttributes_General" priority="299950"/>
+        <ECProperty propertyName="PierStrut_SupportName" typeName="string" displayLabel="Support Name" category="BridgeModelerAttributes_General" priority="299940"/>
+        <ECProperty propertyName="PierStrut_Height" typeName="double" displayLabel="Height" category="StrutProperties_Strut" priority="0" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="PierStrut_Depth" typeName="double" displayLabel="Depth" category="StrutProperties_Strut" priority="-1" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="PierStrut_OffsetFromCap" typeName="double" displayLabel="Offset From Cap" category="StrutProperties_Strut" priority="-2" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="PierStrut_EndOffset" typeName="double" displayLabel="Right Offset" category="StrutProperties_Strut" priority="-3" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="PierStrut_ExtensionLength" typeName="double" displayLabel="Extension Length" category="StrutProperties_Strut" priority="-4" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="PierStrut_StartCol" typeName="int" displayLabel="Start Column" category="StrutProperties_Strut" priority="-5"/>
+        <ECProperty propertyName="PierStrut_EndCol" typeName="int" displayLabel="End Column" category="StrutProperties_Strut" priority="-6"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsPierStrutAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="PierStrutAspect"/>
+        </Target>
+    </ECRelationshipClass>
     <ECEntityClass typeName="PileWallPierCapBaseAspect" modifier="Abstract">
         <BaseClass>PierCapCommonBaseAspect</BaseClass>
         <ECProperty propertyName="PierCap_BackWallDepth" typeName="double" displayLabel="Back Wall Depth" category="CapProperties_Cap" priority="-16" kindOfQuantity="cifu:LENGTH"/>
@@ -2567,7 +2605,6 @@
     </ECRelationshipClass>
     <ECEntityClass typeName="SleeperSlabByApproachRuleAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
-        <ECProperty propertyName="SleeperSlabByApproachRuleLocation" typeName="int" displayLabel="Location" category="SleeperSlabProperties_Sleeper_Slab" priority="300000"/>
         <ECProperty propertyName="SleeperSlabByApproachRuleTemplateXmlFragment" typeName="string" displayLabel="Sleeper Slab Template" category="SleeperSlabProperties_Sleeper_Slab" priority="299999"/>
         <ECProperty propertyName="SleeperSlabByApproachRule_ElevationConstraints" typeName="string" displayLabel="Elevation Constraints" category="SleeperSlabProperties_Sleeper_Slab" priority="299998"/>
         <ECProperty propertyName="SleeperSlabByApproachRuleHorizontalOffset" typeName="double" displayLabel="Horizontal Offset" category="SleeperSlabProperties_Sleeper_Slab" priority="299997" kindOfQuantity="cifu:LENGTH"/>
@@ -2577,7 +2614,8 @@
         <ECProperty propertyName="SleeperSlabByApproachRuleConformWithDeckBot" typeName="boolean" displayLabel="Conform With Approach Bottom" category="SleeperSlabProperties_Sleeper_Slab" priority="299993"/>
         <ECProperty propertyName="SleeperSlabByApproachRuleVertOffsetFromApproachSlabBot" typeName="double" displayLabel="Vertical Offset From Slab Bottom" category="SleeperSlabProperties_Sleeper_Slab" priority="299992" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="SleeperSlabByApproachRule_LengthAdjustment" typeName="SleeperSlabByApproachRuleAspect_SleeperSlabByApproachRule_LengthAdjustment_Enum" displayLabel="Sleeper Length Adjustment" category="SleeperSlabProperties_Sleeper_Slab" priority="299991"/>
-        <ECProperty propertyName="SleeperSlabByApproachRuleApplySkewToSolids" typeName="boolean" displayLabel="Apply Skew To Solids" category="SleeperSlabProperties_Sleeper_Slab" priority="299990"/>
+        <ECProperty propertyName="SleeperSlabByApproachRuleApplySkewToSolids" typeName="boolean" displayLabel="Apply Skew To Solids" category="SleeperSlabProperties_Sleeper_Slab" priority="299990"/>        
+        <ECProperty propertyName="SleeperSlabByApproachRuleLocation" typeName="SleeperSlabByApproachRuleAspect_SleeperSlabByApproachRuleLocation_Enum" displayLabel="Location" category="SleeperSlabProperties_Sleeper_Slab" priority="300000"/>
     </ECEntityClass>
     <ECRelationshipClass typeName="ElementOwnsSleeperSlabByApproachRuleAspect" modifier="None" strength="embedding">
         <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
