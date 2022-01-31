@@ -424,6 +424,37 @@ This restriction applies to all `GeometricModel3d` subclasses.
 > Behavior: The system handler (C++) for `GeometricElement3d` will only permit instances to be inserted into a `GeometricModel3d` and will require its `Category` property to reference a `SpatialCategory`.
 The system handler also requires a valid *placement* if `GeometryStream` is not `NULL`.
 
+##### GeometryOperations Property
+
+This optional property holds a serialized "feature tree" used to generate the geometry stored in the GeometryStream. The "feature tree" consists of OperationNodes which have child OperationNodes and GeometryNodes that serve as operands for the operations. The GeometryNodes are the "leaf" nodes of the "feature tree". GeometryNodes hold no geometry themselves, but point to geometry in other Elements, using either their GeometryStream property or a named property that holds 'Bentley.Geometry.Common.IGeometry`. OperationNodes can also refer to to external Elements that represent the reason they exist (their "provenance.")
+
+[GeometryDetailRecord](#GeometryDetailRecord) elements hold geometry exclusively for use in this "feature tree".
+
+OperationNode and GeometryNode are not BIS classes, but iModel.js TypeScript classes serialized to JSON for persistence in the GeometryOperations property.
+
+### GeometryDetailRecord
+
+A `GeometryDetailRecord` should always be the child of a `GeometricElement3d` whose [GeometryOperations](#GeometryOperations-Property) "feature tree" it supports. Its geometry is in the local coordinate system of the parent `GeometricElement3d`.
+
+A `GeometryDetailRecord` models a geometric detail of the Entity modeled by its parent `GeometricElement3d`.
+
+The GeometryStream of the `GeometryDetailRecord` does not actually hold the geometry of the geometric detail, but rather holds information needed to *produce* the specific geometric detail in its parent `GeometricElement3d`'s GeometryStream. There may be two other geometries that a user will wish to see in conjunction with a `GeometryDetailRecord`:
+- The faces and edges produced in the parent's GeometryStream by the `GeometryDetailRecord`'s associated operation in the feature tree.
+- A representation of the geometric change caused by the associated operation in the "feature tree", e.g. a solid representing the material subtracted to create an opening or the material added to create a protrusion.
+
+Such geometries are not persisted, but can be calculated at runtime.
+
+`GeometryDetailRecord` has two subclasses:
+
+- [GeometryNodeRecord](#GeometryNodeRecord) for representing generic geometry that does not express a discipline-specific meaning.
+- [GeometricFeatureRecord](geometricfeature.ecschema.md#GeometricFeatureRecord) which models the discipline-specific meaning of the feature.
+
+No other subclasses are envisioned.
+
+### GeometryNodeRecord
+
+See [GeometryDetailRecord](#GeometryDetailRecord)
+
 ### SpatialLocationModel
 
 > Behavior: The system handler (C++) for `SpatialLocationModel` will prevent `PhysicalElement` instances from being inserted since the primary intent is for the model to contain `SpatialLocationElement` instances.
