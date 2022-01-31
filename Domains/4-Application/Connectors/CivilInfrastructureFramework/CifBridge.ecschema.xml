@@ -3,7 +3,7 @@
 |  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
 |  * See LICENSE.md in the project root for license terms and full copyright notice.
 ======================================================================================= -->
-<ECSchema schemaName="CifBridge" alias="cifbrg" version="01.00.05" description="iModel Connector schema containing aspect classes with properties from OpenBridge Modeler." xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
+<ECSchema schemaName="CifBridge" alias="cifbrg" version="01.00.06" description="iModel Connector schema containing aspect classes with properties from OpenBridge Modeler." xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
     <ECSchemaReference name="BisCore" version="01.00.14" alias="bis"/>
     <ECSchemaReference name="CifCommon" version="01.00.03" alias="cifcmn"/>
     <ECSchemaReference name="CifUnits" version="01.00.01" alias="cifu"/>
@@ -197,7 +197,7 @@
         <ECEnumerator name="By_Deck" value="1" displayLabel="Deck"/>
         <ECEnumerator name="By_Skew" value="2" displayLabel="Skew"/>
         <ECEnumerator name="Centered" value="3" displayLabel="Centered"/>
-        <ECEnumerator name="Deck_And_Centered" value="4" displayLabel="Deck And Centered"/>
+        <ECEnumerator name="Deck_And_Centered" value="4" displayLabel="Deck And Aligned"/>
     </ECEnumeration>
     <ECEnumeration typeName="CustomPierBySupportLineRuleAspect_CustomPierBySupportLineRule_TopSlopeMode_Enum" backingTypeName="int" isStrict="true">
         <ECEnumerator name="Level" value="1" displayLabel="Level"/>
@@ -219,7 +219,7 @@
         <ECEnumerator name="By_Deck" value="1" displayLabel="Deck"/>
         <ECEnumerator name="By_Skew" value="2" displayLabel="Skew"/>
         <ECEnumerator name="Centered" value="3" displayLabel="Centered"/>
-        <ECEnumerator name="Deck_And_Centered" value="4" displayLabel="Deck And Centered"/>
+        <ECEnumerator name="Deck_And_Centered" value="4" displayLabel="Deck And Aligned"/>
     </ECEnumeration>
     <ECEnumeration typeName="PierBySupportLineRuleAspect_PierBySupportLineRule_SupportLineType_Enum" backingTypeName="int" isStrict="true">
         <ECEnumerator name="Start" value="0" displayLabel="Start"/>
@@ -2614,7 +2614,7 @@
         <ECProperty propertyName="SleeperSlabByApproachRuleConformWithDeckBot" typeName="boolean" displayLabel="Conform With Approach Bottom" category="SleeperSlabProperties_Sleeper_Slab" priority="299993"/>
         <ECProperty propertyName="SleeperSlabByApproachRuleVertOffsetFromApproachSlabBot" typeName="double" displayLabel="Vertical Offset From Slab Bottom" category="SleeperSlabProperties_Sleeper_Slab" priority="299992" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="SleeperSlabByApproachRule_LengthAdjustment" typeName="SleeperSlabByApproachRuleAspect_SleeperSlabByApproachRule_LengthAdjustment_Enum" displayLabel="Sleeper Length Adjustment" category="SleeperSlabProperties_Sleeper_Slab" priority="299991"/>
-        <ECProperty propertyName="SleeperSlabByApproachRuleApplySkewToSolids" typeName="boolean" displayLabel="Apply Skew To Solids" category="SleeperSlabProperties_Sleeper_Slab" priority="299990"/>        
+        <ECProperty propertyName="SleeperSlabByApproachRuleApplySkewToSolids" typeName="boolean" displayLabel="Apply Skew To Solids" category="SleeperSlabProperties_Sleeper_Slab" priority="299990"/>
         <ECProperty propertyName="SleeperSlabByApproachRuleLocation" typeName="SleeperSlabByApproachRuleAspect_SleeperSlabByApproachRuleLocation_Enum" displayLabel="Location" category="SleeperSlabProperties_Sleeper_Slab" priority="300000"/>
     </ECEntityClass>
     <ECRelationshipClass typeName="ElementOwnsSleeperSlabByApproachRuleAspect" modifier="None" strength="embedding">
@@ -2921,6 +2921,18 @@
         </Source>
         <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
             <Class class="VariablePierCapAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="VariablePierColumnAspect">
+        <BaseClass>PierColumnBaseAspect</BaseClass>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsVariablePierColumnAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="VariablePierColumnAspect"/>
         </Target>
     </ECRelationshipClass>
     <ECEntityClass typeName="WebBeamSegmentAspect">
