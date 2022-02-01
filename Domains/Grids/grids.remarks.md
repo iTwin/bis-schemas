@@ -5,16 +5,18 @@ remarksTarget: Grids.ecschema.md
 
 # Grids
 
-This schema contains class definitions for grids.
+BIS supports both simple Grids (which are sets of curves defined in a particular plane) and GridSystems (which contain sets of surfaces organized into axes which can be used to instruct iTwin.js to generate simple Grids). 
 
-These are used to build structural,spaceplanning and other grids. A `Grid` is a collection of GridSurfaces. Every `GridSurface` has a `GridAxis`, which is currently primarily used for grouping surfaces into subgroups. intersection of GridSurfaces may create a `GridCurve` (driven by `GridCurveBundle` element).
+A Grid is equivalent to an IfcGrid. IFC has no equivalent of a GridSystem.
+
+Classes in this schema are used to build structural,spaceplanning and other `GridSystem`s and `Grid`s. A `GridSystem` is a collection of GridSurfaces. Every `GridSurface` has a `GridAxis`, which is currently primarily used for grouping surfaces into subgroups. intersection of GridSurfaces may create a `GridCurve`.
 
 <u>Schema:</u>
 
 ```xml
-<ECSchema schemaName="Grids" alias="grids" version="01.00" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.1">
-    <ECSchemaReference name="BisCore" version="01.00.00" alias="bis" />
-    <ECSchemaReference name="AecUnits" version="01.00.00" alias="AECU" />
+<ECSchema schemaName="Grids" alias="grids" version="02.00.00" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" description="defines elements used as an aid in locating structural and design and/or other elements">
+    <ECSchemaReference name="BisCore" version="01.00.14" alias="bis" />
+    <ECSchemaReference name="AecUnits" version="01.00.01" alias="AECU" />
 ```
 
 ![Grids](./media/grids.png)
@@ -24,22 +26,22 @@ These are used to build structural,spaceplanning and other grids. A `Grid` is a 
 
 ### GridCurve
 
-An object representing a grid curve. `GridCurve` is similar to `IfcGridAxis` in that it represents a curve geometry on a (usually planar) surface. it is also similar to Grid Curves as known in `AECOsim Building Designer`. Gridcurves can be found in submodels of `GridCurvesPortion` elements.
+An object representing a grid curve. `GridCurve` is similar to `IfcGridAxis` in that it represents a curve geometry on a (usually planar) surface. it is also similar to Grid Curves as known in `OpenBuildings Designer`. `GridCurve`s can be found in submodels of `Grid` elements.
 
 <u>Naming:</u>
 
-1.  Matches with Grid Curve in `AECOsim Building Designer`
+1.  Matches with Grid Curve in `OpenBuildings Designer`
 
 <u>Geometry Use:</u>
 
 1.  Open `CurveVector` with a single curve
-2.  Local Coordinates : origin at the start of the curve, aligned to creating `GridSurface`.
+2.  Local Coordinates : origin at the start of the curve, aligned to creating `GridSurface` when available.
 
 <u>Schema:</u>
 
 ```xml
-    <ECEntityClass typeName="GridCurve" modifier="Abstract">
-      <BaseClass>bis:SpatialLocationElement</BaseClass>
+    <ECEntityClass typeName="GridCurve" modifier="Abstract" description="an element representing a GridCurve - typically intersection of 2 grid surfaces">
+        <BaseClass>bis:SpatialLocationElement</BaseClass>
     </ECEntityClass>
 ```
 
@@ -49,7 +51,7 @@ An object representing a grid line. `GridLine` can be created by 2 intersecting 
 
 <u>Naming:</u>
 
-1.  Matches with Grid Line in `AECOsim Building Designer`
+1.  Matches with Grid Line in `OpenBuildings Designer`
 
 <u>Geometry Use:</u>
 
@@ -59,11 +61,8 @@ An object representing a grid line. `GridLine` can be created by 2 intersecting 
 <u>Schema:</u>
 
 ```xml
-    <ECEntityClass typeName="GridLine" description="a gridcurve that is a result of 2 planar surfaces">
-      <BaseClass>GridCurve</BaseClass>
-      <ECCustomAttributes>
-        <ClassHasHandler xmlns="BisCore.01.00.00" />
-      </ECCustomAttributes>
+    <ECEntityClass typeName="GridLine" description="a GridCurve that is a result of 2 planar surfaces">
+        <BaseClass>GridCurve</BaseClass>
     </ECEntityClass>
 ```
 
@@ -73,7 +72,7 @@ An object representing a grid arc. `GridArc` can be created by intersecting inst
 
 <u>Naming:</u>
 
-1.  Matches with Grid Arc in `AECOsim Building Designer`
+1.  Matches with Grid Arc in `OpenBuildings Designer`
 
 <u>Geometry Use:</u>
 
@@ -83,11 +82,8 @@ An object representing a grid arc. `GridArc` can be created by intersecting inst
 <u>Schema:</u>
 
 ```xml
-    <ECEntityClass typeName="GridArc" description="a gridcurve that is a result of a planar and arc surface">
-      <BaseClass>GridCurve</BaseClass>
-      <ECCustomAttributes>
-        <ClassHasHandler xmlns="BisCore.01.00.00" />
-      </ECCustomAttributes>
+    <ECEntityClass typeName="GridArc" description="a GridCurve that is a result of a planar and arc surface">
+        <BaseClass>GridCurve</BaseClass>
     </ECEntityClass>
 ```
 
@@ -97,7 +93,7 @@ An object representing a grid spline. `GridSpline` can be created by intersectin
 
 <u>Naming:</u>
 
-1.  Matches with Grid Spline in `AECOsim Building Designer`
+1.  Matches with Grid Spline in `OpenBuildings Designer`
 
 <u>Geometry Use:</u>
 
@@ -107,11 +103,8 @@ An object representing a grid spline. `GridSpline` can be created by intersectin
 <u>Schema:</u>
 
 ```xml
-    <ECEntityClass typeName="GridSpline" description="a gridcurve that is a result of a planar and a spline surface">
-      <BaseClass>GridCurve</BaseClass>
-      <ECCustomAttributes>
-        <ClassHasHandler xmlns="BisCore.01.00.00" />
-      </ECCustomAttributes>
+    <ECEntityClass typeName="GridSpline" description="a GridCurve that is a result of a planar and a spline surface">
+        <BaseClass>GridCurve</BaseClass>
     </ECEntityClass>
 ```
 
@@ -121,7 +114,7 @@ GridCurve representing other geometry (typically 3d splines). `GeneralGridCurve`
 
 <u>Naming:</u>
 
-1.  Matches with Grid Curve in `AECOsim Building Designer`
+1.  Matches with Grid Curve in `OpenBuildings Designer`
 
 <u>Geometry Use:</u>
 
@@ -131,23 +124,20 @@ GridCurve representing other geometry (typically 3d splines). `GeneralGridCurve`
 <u>Schema:</u>
 
 ```xml
-    <ECEntityClass typeName="GeneralGridCurve" description="a gridcurve that is a result of 2 non-planar surfaces">
-      <BaseClass>GridCurve</BaseClass>
-      <ECCustomAttributes>
-        <ClassHasHandler xmlns="BisCore.01.00.00" />
-      </ECCustomAttributes>
+    <ECEntityClass typeName="GeneralGridCurve" description="a GridCurve that is a result of 2 non-planar surfaces">
+        <BaseClass>GridCurve</BaseClass>
     </ECEntityClass>
 ```
 
-### Grid
+### GridSystem
 
-A collection of `GridSurface` instances.
+A collection of `GridSurface` instances, which can be used to instruct iTwin.js to generate simple Grids
 
-Grids known in other products like IAI IfcGrid or Grid in `AECOsim Building Designer` contain curves, rather than surfaces. However, those curves are later referenced over different elevations, which makes those elements conceptually surfaces intersecting those elevations. in BIS - `Grid` is a collection of surfaces rather than curves. curves are a result of surfaces intersecting, known as `GridCurve`. While this approach ensures compatibility with legacy grids it also is more flexible. i.e. by manipulating the .EndElevation properties of individual instances of `IPlanGridSurface` in a `PlanGrid` intersecting `ElevationGrid`, individual `GridCurve` instances could be made not to appear on higher elevations. curves could be made to appear on certain elevations by using the `GridCurveBundle` element (i.e. appear on story-1 and story-3, but skip story-2). number of axes is also unlimited in `SketchGrid`, `ElevationGrid` and `FreeGrid`.
+Grids known in other products like BuildingSMART IfcGrid or Grid/GridSystem in `OpenBuildings Designer`, do not contain surfaces, instead they contain curves. However, those curves are later referenced over different elevations, which makes those elements conceptually surfaces intersecting those elevations. in BIS - `GridSystem` is a collection of surfaces rather than curves. curves are a result of surfaces intersecting, known as `GridCurve`. While this approach ensures compatibility with legacy grids it also is more flexible. i.e. by manipulating the .EndElevation properties of individual instances of `IPlanGridSurface` in a `PlanGrid` intersecting `ElevationGrid`, individual `GridCurve` instances could be made not to appear on higher elevations. number of axes is also unlimited in `SketchGrid`, `ElevationGrid` and `FreeGrid`.
 
 <u>Naming:</u>
 
-1.  Equivalent with IAI IfcGrid
+1.  Equivalent with GridSystem in `OpenBuildings Designer`
 
 <u>Geometry Use:</u>
 
@@ -157,18 +147,19 @@ Grids known in other products like IAI IfcGrid or Grid in `AECOsim Building Desi
 <u>Schema:</u>
 
 ```xml
-<ECEntityClass typeName="Grid" modifier="Abstract" description="A grid is a collection of gridsurfaces.">
-  <BaseClass>bis:SpatialLocationPortion</BaseClass>
-</ECEntityClass>
+    <ECEntityClass typeName="GridSystem" modifier="Abstract" description="A GridSystem is a collection of gridsurface elements.">
+        <BaseClass>bis:SpatialLocationElement</BaseClass>
+        <BaseClass>bis:ISubModeledElement</BaseClass>
+    </ECEntityClass>
 ```
 
-### ElevationGrid
+### ElevationGridSystem
 
-A collection of ElevationGridSurfaces. has one or more `GeneralGridAxis`. typically used to slice a building. every surface is positioned across the Z axis of ElevationGrid Placement.
+A collection of ElevationGridSurfaces. has one or more `GeneralGridAxis`. typically used to slice a building. every surface is positioned across the Z axis of ElevationGridSystem Placement.
 
 <u>Naming:</u>
 
-1.  ElevationGrid because GridSurfaces are positioned based on their .Elevation and grid .Placement properties
+1.  ElevationGridSystem because GridSurfaces are positioned based on their .Elevation and grid .Placement properties
 
 <u>Geometry Use:</u>
 
@@ -183,23 +174,20 @@ A collection of ElevationGridSurfaces. has one or more `GeneralGridAxis`. typica
 <u>Schema:</u>
 
 ```xml
-<ECEntityClass typeName="ElevationGrid" description="An ElevationGrid contains planar surfaces that are parallel to the local XY plane">
-  <BaseClass>Grid</BaseClass>
-  <ECCustomAttributes>
-    <ClassHasHandler xmlns="BisCore.01.00.00" />
-  </ECCustomAttributes>
-  <ECProperty propertyName="DefaultElevationIncrement" displayLabel="DefaultElevationIncrement" typeName="double" kindOfQuantity="AECU:LENGTH"/>
-  <ECProperty propertyName="DefaultSurface2d" displayLabel="DefaultSurface2d" typeName="Bentley.Geometry.Common.IGeometry"/>
-</ECEntityClass>
+    <ECEntityClass typeName="ElevationGridSystem" description="An ElevationGridSystem contains planar surfaces that are parallel to the local XY plane">
+        <BaseClass>GridSystem</BaseClass>
+        <ECProperty propertyName="DefaultElevationIncrement" displayLabel="DefaultElevationIncrement" typeName="double" kindOfQuantity="AECU:LENGTH" description="Default elevation increment for newly added GridSurfaces" />
+        <ECProperty propertyName="DefaultSurface2d" displayLabel="DefaultSurface2d" typeName="Bentley.Geometry.Common.IGeometry" description="Default surface geometry for newly added GridSurfaces"/>
+    </ECEntityClass>
 ```
 
-### FreeGrid
+### FreeGridSystem
 
 A collection of unconstrained surfaces (`FreeGridSurface`).
 
 <u>Naming:</u>
 
-1.  FreeGrid because it is not constrained and can contain surfaces of any geometry and orientation
+1.  FreeGridSystem because it is not constrained and can contain surfaces of any geometry and orientation
 
 <u>Geometry Use:</u>
 
@@ -209,23 +197,20 @@ A collection of unconstrained surfaces (`FreeGridSurface`).
 <u>Schema:</u>
 
 ```xml
-<ECEntityClass typeName="FreeGrid" description="An FreeGrid contains surfaces that do not need to follow any rules">
-  <BaseClass>Grid</BaseClass>
-  <ECCustomAttributes>
-    <ClassHasHandler xmlns="BisCore.01.00.00" />
-  </ECCustomAttributes>
-</ECEntityClass>
+    <ECEntityClass typeName="FreeGridSystem" description="An FreeGrid contains surfaces that do not need to follow any rules">
+        <BaseClass>GridSystem</BaseClass>
+    </ECEntityClass>
 ```
 
-### PlanGrid
+### PlanGridSystem
 
 A collection of `IPlanGridSurface` elements that are single curve extrusions, sharing the extrusion direction. extrusion direction is equal to grid Z orientation.
 
 <u>Naming:</u>
 
-1. PlanGrid because all surfaces could be viewed as curves from a plan view
+1. PlanGridSystem because all surfaces could be viewed as curves from a plan view
 
-<u>Geometry Use:</u>
+<u>Geometry Use:</u>  
 
 1. No geometry
 1. Local Coordinates : defines the origin and direction for surfaces
@@ -238,21 +223,21 @@ A collection of `IPlanGridSurface` elements that are single curve extrusions, sh
 <u>Schema:</u>
 
 ```xml
-<ECEntityClass typeName="PlanGrid" modifier="Abstract" description="a grid whose surfaces are curves parallel to the local x-y plane extruded along the local z-axis">
-  <BaseClass>Grid</BaseClass>
-  <ECProperty propertyName="DefaultStartElevation" displayLabel="DefaultStartElevation" typeName="double" kindOfQuantity="AECU:LENGTH"/>
-  <ECProperty propertyName="DefaultEndElevation" displayLabel="DefaultEndElevation" typeName="double" kindOfQuantity="AECU:LENGTH"/>
-</ECEntityClass>
+    <ECEntityClass typeName="PlanGridSystem" modifier="Abstract" description="a GridSystem whose surfaces are curves parallel to the local x-y plane extruded along the local z-axis">
+        <BaseClass>GridSystem</BaseClass>
+        <ECProperty propertyName="DefaultStartElevation" displayLabel="DefaultStartElevation" typeName="double" kindOfQuantity="AECU:LENGTH" description="Default start elevation the surfaces in this GridSystem start from" />
+        <ECProperty propertyName="DefaultEndElevation" displayLabel="DefaultEndElevation" typeName="double" kindOfQuantity="AECU:LENGTH" description="Default end elevation the surfaces in this GridSystem end at" />
+    </ECEntityClass>
 ```
 
-### SketchGrid
+### SketchGridSystem
 
 A collection of surfaces that are **unconstrained** single curve extrusions, sharing the extrusion direction. extrusion direction is driven by grid Z orientation.
 
 <u>Naming:</u>
 
-1.  SketchGrid because all surfaces could be "sketched" from the plan view.
-2.  Matches with Sketch Grid in `AECOsim Building Designer`
+1.  SketchGridSystem because all surfaces could be "sketched" from the plan view.
+2.  Matches with Sketch Grid in `OpenBuildings Designer`
 
 <u>Geometry Use:</u>
 
@@ -262,21 +247,18 @@ A collection of surfaces that are **unconstrained** single curve extrusions, sha
 <u>Schema:</u>
 
 ```xml
-<ECEntityClass typeName="SketchGrid" description="A SketchGrid contains surfaces whose positions are not constrained (other than being swept to the grid normal)">
-  <BaseClass>PlanGrid</BaseClass>
-  <ECCustomAttributes>
-    <ClassHasHandler xmlns="BisCore.01.00.00" />
-  </ECCustomAttributes>
-</ECEntityClass>
+    <ECEntityClass typeName="SketchGridSystem" description="A SketchGridSystem contains surfaces whose positions are not constrained (other than being swept to the grid normal)">
+        <BaseClass>PlanGridSystem</BaseClass>
+    </ECEntityClass>
 ```
 
-### OrthogonalGrid
+### OrthogonalGridSystem
 
-A collection of `PlanCartesianGridSurface`. has 2 axes - 1 `OrthogonalAxisX` and 1 `OrthogonalAxisY`. All surfaces in the X direction belong to `OrthogonalAxisX`, all those in the Y direction belong to `OrthogonalAxisY`.
+A collection of `PlanCartesianGridSurface`s. has 2 axes - 1 `OrthogonalAxisX` and 1 `OrthogonalAxisY`. All surfaces in the X direction belong to `OrthogonalAxisX`, all those in the Y direction belong to `OrthogonalAxisY`.
 
 <u>Naming:</u>
 
-1.  Matches with Orthogonal Grid in `AECOsim Building Designer`
+1.  Matches with Orthogonal Grid in `OpenBuildings Designer`
 
 <u>Geometry Use:</u>
 
@@ -295,27 +277,24 @@ A collection of `PlanCartesianGridSurface`. has 2 axes - 1 `OrthogonalAxisX` and
 <u>Schema:</u>
 
 ```xml
-<ECEntityClass typeName="OrthogonalGrid" description="And OrthogonalGrid has all of its' surfaces orthogonal in either X or Y direction">
-  <BaseClass>PlanGrid</BaseClass>
-  <ECCustomAttributes>
-    <ClassHasHandler xmlns="BisCore.01.00.00" />
-  </ECCustomAttributes>
-  <ECProperty propertyName="DefaultCoordinateIncrementX" displayLabel="DefaultCoordinateIncrementX" typeName="double" kindOfQuantity="AECU:LENGTH"/>
-  <ECProperty propertyName="DefaultCoordinateIncrementY" displayLabel="DefaultCoordinateIncrementY" typeName="double" kindOfQuantity="AECU:LENGTH"/>
-  <ECProperty propertyName="DefaultStartExtentX" displayLabel="DefaultStartExtentX" typeName="double" kindOfQuantity="AECU:LENGTH"/>
-  <ECProperty propertyName="DefaultEndExtentX" displayLabel="DefaultEndExtentX" typeName="double" kindOfQuantity="AECU:LENGTH"/>
-  <ECProperty propertyName="DefaultStartExtentY" displayLabel="DefaultStartExtentY" typeName="double" kindOfQuantity="AECU:LENGTH"/>
-  <ECProperty propertyName="DefaultEndExtentY" displayLabel="DefaultEndExtentY" typeName="double" kindOfQuantity="AECU:LENGTH"/>
-</ECEntityClass>
+    <ECEntityClass typeName="OrthogonalGridSystem" description="And OrthogonalGridSystem has all of its' surfaces orthogonal in either X or Y direction">
+        <BaseClass>PlanGridSystem</BaseClass>
+        <ECProperty propertyName="DefaultCoordinateIncrementX" displayLabel="DefaultCoordinateIncrementX" typeName="double" kindOfQuantity="AECU:LENGTH" description="default increment in the X direction for newly added GridSurfaces" />
+        <ECProperty propertyName="DefaultCoordinateIncrementY" displayLabel="DefaultCoordinateIncrementY" typeName="double" kindOfQuantity="AECU:LENGTH" description="default increment in the Y direction for newly added GridSurfaces" />
+        <ECProperty propertyName="DefaultStartExtentX" displayLabel="DefaultStartExtentX" typeName="double" kindOfQuantity="AECU:LENGTH" description="default surface start extension in the X direction for newly added GridSurfaces" />
+        <ECProperty propertyName="DefaultEndExtentX" displayLabel="DefaultEndExtentX" typeName="double" kindOfQuantity="AECU:LENGTH" description="default surface end extension in the X direction for newly added GridSurfaces" />
+        <ECProperty propertyName="DefaultStartExtentY" displayLabel="DefaultStartExtentY" typeName="double" kindOfQuantity="AECU:LENGTH" description="default surface start extension in the Y direction for newly added GridSurfaces" />
+        <ECProperty propertyName="DefaultEndExtentY" displayLabel="DefaultEndExtentY" typeName="double" kindOfQuantity="AECU:LENGTH" description="default surface end extension in the Y direction for newly added GridSurfaces" />
+    </ECEntityClass>
 ```
 
-### RadialGrid
+### RadialGridSystem
 
 A collection of `PlanRadialGridSurface` and `PlanCircumferentialGridSurface` elements. Has 2 axes - 1 `CircularAxis` and 1 `RadialAxis`. All `PlanCircumferentialGridSurface` are in the `CircularAxis`, all `PlanRadialGridSurface` in the `RadialAxis`.
 `
 <u>Naming:</u>
 
-1.  matches with Radial Grid in `AECOsim Building Designer`
+1.  matches with Radial Grid in `OpenBuildings Designer`
 
 <u>Geometry Use:</u>
 
@@ -334,55 +313,48 @@ A collection of `PlanRadialGridSurface` and `PlanCircumferentialGridSurface` ele
 <u>Schema:</u>
 
 ```xml
-<ECEntityClass typeName="RadialGrid" description="A RadialGrid consists either of arcsurfaces in radial axis or planarsurfaces in circular axis">
-  <BaseClass>PlanGrid</BaseClass>
-  <ECCustomAttributes>
-    <ClassHasHandler xmlns="BisCore.01.00.00" />
-  </ECCustomAttributes>
-  <ECProperty propertyName="DefaultAngleIncrement" displayLabel="DefaultAngleIncrement" typeName="double" kindOfQuantity="AECU:ANGLE"/>
-  <ECProperty propertyName="DefaultRadiusIncrement" displayLabel="DefaultRadiusIncrement" typeName="double" kindOfQuantity="AECU:ANGLE"/>
-  <ECProperty propertyName="DefaultStartAngle" displayLabel="DefaultStartAngle" typeName="double" kindOfQuantity="AECU:ANGLE"/>
-  <ECProperty propertyName="DefaultEndAngle" displayLabel="DefaultEndAngle" typeName="double" kindOfQuantity="AECU:ANGLE"/>
-  <ECProperty propertyName="DefaultStartRadius" displayLabel="DefaultStartRadius" typeName="double" kindOfQuantity="AECU:LENGTH"/>
-  <ECProperty propertyName="DefaultEndRadius" displayLabel="DefaultEndRadius" typeName="double" kindOfQuantity="AECU:LENGTH"/>
-</ECEntityClass>
+    <ECEntityClass typeName="RadialGridSystem" description="A RadialGridSystem consists either of arcsurfaces in radial axis or planarsurfaces in circular axis">
+        <BaseClass>PlanGridSystem</BaseClass>
+        <ECProperty propertyName="DefaultAngleIncrement" displayLabel="DefaultAngleIncrement" typeName="double" kindOfQuantity="AECU:ANGLE" description="Default angle increment for newly added PlanRadialGridSurfaces in this GridSystem"/>
+        <ECProperty propertyName="DefaultRadiusIncrement" displayLabel="DefaultRadiusIncrement" typeName="double" kindOfQuantity="AECU:ANGLE" description="Default radius increment for newly added PlanCircumferentialGridSurface in this GridSystem" />
+        <ECProperty propertyName="DefaultStartAngle" displayLabel="DefaultStartAngle" typeName="double" kindOfQuantity="AECU:ANGLE" description="Default start angle for newly added PlanCircumferentialGridSurface in this GridSystem" />
+        <ECProperty propertyName="DefaultEndAngle" displayLabel="DefaultEndAngle" typeName="double" kindOfQuantity="AECU:ANGLE" description="Default end angle for newly added PlanCircumferentialGridSurface in this GridSystem"/>
+        <ECProperty propertyName="DefaultStartRadius" displayLabel="DefaultStartRadius" typeName="double" kindOfQuantity="AECU:LENGTH" description="Default start radius for newly added PlanRadialGridSurfaces in this GridSystem"/>
+        <ECProperty propertyName="DefaultEndRadius" displayLabel="DefaultEndRadius" typeName="double" kindOfQuantity="AECU:LENGTH" description="Default end radius for newly added PlanRadialGridSurfaces in this GridSystem"/>
+    </ECEntityClass>
 ```
 
 ### GridAxis
 
-A subcollection of GridSurfaces in a Grid. Typically used to group parallel surfaces together.
+A subcollection of `GridSurface`s in a `GridSystem`. Typically used to group parallel surfaces together.
 
 <u>Naming:</u>
 
-1.  Matches with Grid Axis in `AECOsim Building Designer`
+1.  Matches with Grid Axis in `OpenBuildings Designer`
 
 <u>Schema:</u>
 
 ```xml
-<ECEntityClass typeName="GridAxis" modifier="Abstract">
-  <BaseClass>bis:DefinitionElement</BaseClass>
-  <ECProperty propertyName="Name" displayLabel="Name" typeName="string"/>
-  <ECNavigationProperty propertyName="Grid" relationshipName="GridHasAxes" direction="Backward" description="Grid this axis belong to" />
-</ECEntityClass>
+    <ECEntityClass typeName="GridAxis" modifier="Abstract" description="an element which groups (typically parallel) GridSurface elements">
+        <BaseClass>bis:GroupInformationElement</BaseClass>
+        <ECProperty propertyName="Name" displayLabel="Name" typeName="string"/>
+    </ECEntityClass>
 ```
 
 ### GeneralGridAxis
 
-A subcollection of `GridSurface` instances in a Grid. Used solely for grouping elements.
+A subcollection of `GridSurface` instances in a Grid. Used for grouping any kind of grid surfaces together.
 
 <u>Naming:</u>
 
-1.  Matches with Grid Axis in `AECOsim Building Designer`
+1.  Matches with Grid Axis in `OpenBuildings Designer`
 
 <u>Schema:</u>
 
 ```xml
-<ECEntityClass typeName="GeneralGridAxis" description="an element which groups GridSurfaces together in other grids">
-  <BaseClass>GridAxis</BaseClass>
-  <ECCustomAttributes>
-    <ClassHasHandler xmlns="BisCore.01.00.00" />
-  </ECCustomAttributes>
-</ECEntityClass>
+    <ECEntityClass typeName="GeneralGridAxis" description="an element which groups GridSurface elements together in other grids">
+        <BaseClass>GridAxis</BaseClass>
+    </ECEntityClass>
 ```
 
 ### OrthogonalAxisX
@@ -396,12 +368,9 @@ A subcollection of `PlanCartesianGridSurface` in an `OrthogonalGrid` X direction
 <u>Schema:</u>
 
 ```xml
-<ECEntityClass typeName="OrthogonalAxisX" description="an element which groups all PlanCartesianGridSurface in the X direction">
-  <BaseClass>GridAxis</BaseClass>
-  <ECCustomAttributes>
-    <ClassHasHandler xmlns="BisCore.01.00.00" />
-  </ECCustomAttributes>
-</ECEntityClass>
+    <ECEntityClass typeName="OrthogonalAxisX" description="an element which groups all PlanCartesianGridSurface elements in the X direction">
+        <BaseClass>GridAxis</BaseClass>
+    </ECEntityClass>
 ```
 
 ### OrthogonalAxisY
@@ -415,12 +384,9 @@ A subcollection of `PlanCartesianGridSurface` in an `OrthogonalGrid` Y direction
 <u>Schema:</u>
 
 ```xml
-<ECEntityClass typeName="OrthogonalAxisY" description="an element which groups all PlanCartesianGridSurface in the Y direction">
-  <BaseClass>GridAxis</BaseClass>
-  <ECCustomAttributes>
-    <ClassHasHandler xmlns="BisCore.01.00.00" />
-  </ECCustomAttributes>
-</ECEntityClass>
+    <ECEntityClass typeName="OrthogonalAxisY" description="an element which groups all PlanCartesianGridSurface elements in the Y direction">
+        <BaseClass>GridAxis</BaseClass>
+    </ECEntityClass>
 ```
 
 ### CircularAxis
@@ -429,17 +395,14 @@ A subcollection of `PlanCircumferentialGridSurface` in a `RadialGrid`.
 
 <u>Naming:</u>
 
-1.  Matches with Circular Axis in `AECOsim Building Designer`
+1.  Matches with Circular Axis in `OpenBuildings Designer`
 
 <u>Schema:</u>
 
 ```xml
-<ECEntityClass typeName="CircularAxis" description="an element which groups all PlanCircumferentialGridSurface in a RadialGrid together">
-  <BaseClass>GridAxis</BaseClass>
-  <ECCustomAttributes>
-    <ClassHasHandler xmlns="BisCore.01.00.00" />
-  </ECCustomAttributes>
-</ECEntityClass>
+    <ECEntityClass typeName="CircularAxis" description="an element which groups all PlanCircumferentialGridSurface elements in a RadialGrid together">
+        <BaseClass>GridAxis</BaseClass>
+    </ECEntityClass>
 ```
 
 ### RadialAxis
@@ -448,26 +411,23 @@ a subcollection of `PlanRadialGridSurface` in a `RadialGrid`
 
 <u>Naming:</u>
 
-1.  Named so because it is an Y axis in OrthogonalGrid.
+1.  Matches with Radial Axis in `OpenBuildings Designer`
 
 <u>Schema:</u>
 
 ```xml
-<ECEntityClass typeName="RadialAxis" description="an element which groups all PlanRadialGridSurface in a RadialGrid together">
-  <BaseClass>GridAxis</BaseClass>
-  <ECCustomAttributes>
-    <ClassHasHandler xmlns="BisCore.01.00.00" />
-  </ECCustomAttributes>
-</ECEntityClass>
+    <ECEntityClass typeName="RadialAxis" description="an element which groups all PlanRadialGridSurface elements in a RadialGrid together">
+        <BaseClass>GridAxis</BaseClass>
+    </ECEntityClass>
 ```
 
-### GridCurvesPortion
+### Grid
 
-A space represents a volume bounded physically or only logically. Spaces provide for certain functions to be performed within a building.
+a Grid holds GridCurve elements
 
 <u>Naming:</u>
 
-1.  A `Portion` that contains `GridCurves` in the submodel
+1.  Matches with IfcGrid in IFC
 
 <u>Geometry Use:</u>
 
@@ -477,17 +437,15 @@ A space represents a volume bounded physically or only logically. Spaces provide
 <u>Schema:</u>
 
 ```xml
-<ECEntityClass typeName="GridCurvesPortion" description="a portion which holds GridCurves">
-  <BaseClass>bis:SpatialLocationPortion</BaseClass>
-  <ECCustomAttributes>
-    <ClassHasHandler xmlns="BisCore.01.00.00" />
-  </ECCustomAttributes>
-</ECEntityClass>
+    <ECEntityClass typeName="Grid" description="a Grid holds GridCurve elements">
+        <BaseClass>bis:SpatialLocationElement</BaseClass>
+        <BaseClass>bis:ISubModeledElement</BaseClass>
+    </ECEntityClass>
 ```
 
 ### GridSurface
 
-An 3dimensional surface contained in a `Grid`.
+An 3 - dimensional surface contained in a `GridSystem`. A GridSurface is modeled by combining the information of grid construction line and the elevation extents. `GridSystem`s contain such information in products like `OpenBuildings Designer`.
 
 <u>Naming:</u>
 
@@ -500,10 +458,10 @@ An 3dimensional surface contained in a `Grid`.
 <u>Schema:</u>
 
 ```xml
-<ECEntityClass typeName="GridSurface" modifier="Abstract" description="A grid surface element.">
-  <BaseClass>bis:SpatialLocationElement</BaseClass>
-  <ECNavigationProperty propertyName="Axis" relationshipName="GridAxisContainsGridSurfaces" direction="Backward" description="Axis this gridSurface belong to" />
-</ECEntityClass>
+    <ECEntityClass typeName="GridSurface" modifier="Abstract" description="A GridSurface element.">
+        <BaseClass>bis:SpatialLocationElement</BaseClass>
+        <ECNavigationProperty propertyName="Axis" relationshipName="GridAxisContainsGridSurfaces" direction="Backward" description="Axis this gridSurface belong to" />
+    </ECEntityClass>
 ```
 
 ### IPlanGridSurface
@@ -512,7 +470,7 @@ A mix-in for `GridSurface` classes contained in a `PlanGrid`
 
 <u>Naming:</u>
 
-1.  named by combining `PlanGrid` and `GridSurface`
+1.  named by combining `PlanGridSystem` and `GridSurface`
 
 <u>Properties:</u>
 
@@ -522,16 +480,16 @@ A mix-in for `GridSurface` classes contained in a `PlanGrid`
 <u>Schema:</u>
 
 ```xml
-<ECEntityClass typeName="IPlanGridSurface" modifier="Abstract" displayLabel="PlanGrid Surface" description="An interface that indicates that this Surface is suitable to be placed in a PlanGrid" >
-  <ECCustomAttributes>
-    <IsMixin xmlns="CoreCustomAttributes.01.00.00">
-      <!-- Only subclasses of grids:GridSurface can implement the IPlanGridSurface interface -->
-      <AppliesToEntityClass>GridSurface</AppliesToEntityClass>
-    </IsMixin>
-  </ECCustomAttributes>
-  <ECProperty propertyName="StartElevation" displayLabel="StartElevation" typeName="double" kindOfQuantity="AECU:LENGTH"/>
-  <ECProperty propertyName="EndElevation" displayLabel="EndElevation" typeName="double" kindOfQuantity="AECU:LENGTH"/>
-</ECEntityClass>
+    <ECEntityClass typeName="IPlanGridSurface" modifier="Abstract" displayLabel="PlanGrid Surface" description="An interface that indicates that this Surface is suitable to be placed in a PlanGrid">
+        <ECCustomAttributes>
+            <IsMixin xmlns="CoreCustomAttributes.01.00.00">
+                <!-- Only subclasses of grids:GridSurface can implement the IPlanGridSurface interface -->
+                <AppliesToEntityClass>GridSurface</AppliesToEntityClass>
+            </IsMixin>
+        </ECCustomAttributes>
+        <ECProperty propertyName="StartElevation" displayLabel="StartElevation" typeName="double" kindOfQuantity="AECU:LENGTH" description="Elevation this surface is swept from, relative to the modeled PlanGridSystem placement" />
+        <ECProperty propertyName="EndElevation" displayLabel="EndElevation" typeName="double" kindOfQuantity="AECU:LENGTH" description="Elevation this surface is swept to, relative to the modeled PlanGridSystem placement" />
+    </ECEntityClass>
 ```
 
 ### GridPlanarSurface
@@ -545,18 +503,18 @@ A class for planar `GridSurface` elements.
 <u>Schema:</u>
 
 ```xml
-<ECEntityClass typeName="GridPlanarSurface" modifier="Abstract" description="A planar grid surface element.">
-  <BaseClass>GridSurface</BaseClass>
-</ECEntityClass>
+    <ECEntityClass typeName="GridPlanarSurface" modifier="Abstract" description="A planar GridSurface element.">
+        <BaseClass>GridSurface</BaseClass>
+    </ECEntityClass>
 ```
 
 ### ElevationGridSurface
 
-A planar `GridSurface` used in `ElevationGrid`. this is the only type of `GridSurface` allowed in an ElevationGrid.
+A planar `GridSurface` used in `ElevationGridSystem`. this is the only type of `GridSurface` allowed in an `ElevationGridSystem`.
 
 <u>Naming:</u>
 
-1.  Named by combining `ElevationGrid` and `GridSurface`
+1.  Named by combining `ElevationGridSystem` and `GridSurface`
 
 <u>Geometry Use:</u>
 
@@ -565,20 +523,17 @@ A planar `GridSurface` used in `ElevationGrid`. this is the only type of `GridSu
 
 <u>Properties:</u>
 
-1.  Elevation - elevation this surface is located at, relative to `Grid` coordinate system.
+1.  Elevation - elevation this surface is located at, relative to `GridSystem` coordinate system.
 1.  Surface2d - a property for the 2d surface geometry.
 
 <u>Schema:</u>
 
 ```xml
-<ECEntityClass typeName="ElevationGridSurface" description="A PlanarGridSurface that is parallel with its Grid’s x-y plane (always contained in an ElevationGrid).">
-  <BaseClass>GridPlanarSurface</BaseClass>
-  <ECCustomAttributes>
-    <ClassHasHandler xmlns="BisCore.01.00.00" />
-  </ECCustomAttributes>
-  <ECProperty propertyName="Elevation" displayLabel="Elevation" typeName="double" kindOfQuantity="AECU:LENGTH"/>
-  <ECProperty propertyName="Surface2d" displayLabel="Surface2d" typeName="Bentley.Geometry.Common.IGeometry"/>
-</ECEntityClass>
+    <ECEntityClass typeName="ElevationGridSurface" description="A PlanarGridSurface that is parallel with its Grid’s x-y plane (always contained in an ElevationGridSystem).">
+        <BaseClass>GridPlanarSurface</BaseClass>
+        <ECProperty propertyName="Elevation" displayLabel="Elevation" typeName="double" kindOfQuantity="AECU:LENGTH" description="Elevation this surface is at, relevant to the GridSystem coordinate system"/>
+        <ECProperty propertyName="Surface2d" displayLabel="Surface2d" typeName="Bentley.Geometry.Common.IGeometry" description="geometry of the elevation surface. Must be planar and coincident with global XY plane" />
+    </ECEntityClass>
 ```
 
 ### PlanGridPlanarSurface
@@ -587,7 +542,7 @@ A class for `GridPlanarSurface` elements used in `PlanGrid`.
 
 <u>Naming:</u>
 
-1.  Named by combining `PlanGrid` and `GridPlanarSurface`
+1.  Named by combining `PlanGridSystem` and `GridPlanarSurface`
 
 <u>Geometry Use:</u>
 
@@ -597,15 +552,15 @@ A class for `GridPlanarSurface` elements used in `PlanGrid`.
 <u>Schema:</u>
 
 ```xml
-<ECEntityClass typeName="PlanGridPlanarSurface" modifier="Abstract" description="A planar plangrid surface element.">
-  <BaseClass>GridPlanarSurface</BaseClass>
-  <BaseClass>IPlanGridSurface</BaseClass>
-</ECEntityClass>
+    <ECEntityClass typeName="PlanGridPlanarSurface" modifier="Abstract" description="A planar PlanGridSurface element.">
+        <BaseClass>GridPlanarSurface</BaseClass>
+        <BaseClass>IPlanGridSurface</BaseClass>
+    </ECEntityClass>
 ```
 
 ### PlanCartesianGridSurface
 
-A class for `GridSurface` contained in `OrthogonalGrid`
+A class for `GridSurface` contained in `OrthogonalGridSystem`
 
 <u>Naming:</u>
 
@@ -614,7 +569,7 @@ A class for `GridSurface` contained in `OrthogonalGrid`
 <u>Geometry Use:</u>
 
 1.  "inherit from parent" a `SolidPrimitive` DgnExtrusion containing single line for base, swept from StartElevation to EndElevation
-2.  Local Coordinates : `Grid` coordinates + Coordinate in X or Y direction depending on the type of axis
+2.  Local Coordinates : `GridSystem` coordinates + Coordinate in X or Y direction depending on the type of axis
 
 <u>Properties:</u>
 
@@ -625,20 +580,17 @@ A class for `GridSurface` contained in `OrthogonalGrid`
 <u>Schema:</u>
 
 ```xml
-<ECEntityClass typeName="PlanCartesianGridSurface" description="A planar plan grid surface that is perpendicular to the grid’s x-axis or y-axis.">
-  <BaseClass>PlanGridPlanarSurface</BaseClass>
-  <ECCustomAttributes>
-    <ClassHasHandler xmlns="BisCore.01.00.00" />
-  </ECCustomAttributes>
-  <ECProperty propertyName="Coordinate" displayLabel="Coordinate" typeName="double" kindOfQuantity="AECU:LENGTH" description="Origin of the surface"/>
-  <ECProperty propertyName="StartExtent" displayLabel="StartExtent" typeName="double" kindOfQuantity="AECU:LENGTH"/>
-  <ECProperty propertyName="EndExtent" displayLabel="EndExtent" typeName="double" kindOfQuantity="AECU:LENGTH"/>
-</ECEntityClass>
+    <ECEntityClass typeName="PlanCartesianGridSurface" description="A planar PlanGridSurface that is perpendicular to the grid’s x-axis or y-axis.">
+        <BaseClass>PlanGridPlanarSurface</BaseClass>
+        <ECProperty propertyName="Coordinate" displayLabel="Coordinate" typeName="double" kindOfQuantity="AECU:LENGTH" description="Origin of the surface along the axis"/>
+        <ECProperty propertyName="StartExtent" displayLabel="StartExtent" typeName="double" kindOfQuantity="AECU:LENGTH" description="start extent of the surface construction line" />
+        <ECProperty propertyName="EndExtent" displayLabel="EndExtent" typeName="double" kindOfQuantity="AECU:LENGTH" description="start extent of the surface construction line" />
+    </ECEntityClass>
 ```
 
 ### PlanRadialGridSurface
 
-A class for `GridSurface` instances of angular increments contained in `RadialGrid`
+A class for `GridSurface` instances of angular increments contained in `RadialGridSystem`
 
 <u>Naming:</u>
 
@@ -647,31 +599,28 @@ A class for `GridSurface` instances of angular increments contained in `RadialGr
 <u>Geometry Use:</u>
 
 1.  "inherit from parent" a `SolidPrimitive` DgnExtrusion containing single line for base, swept from StartElevation to EndElevation
-2.  Local Coordinates : `Grid` coordinates rotated by the Angle property from Y direction, clockwise
+2.  Local Coordinates : `GridSystem` coordinates rotated by the Angle property from Y direction, clockwise
 
 <u>Properties:</u>
 
-1.  Angle - angle in the clockwise direction from the Y axis of the `RadialGrid` defining the direction of surface base line.
+1.  Angle - angle in the clockwise direction from the Y axis of the `RadialGridSystem` defining the direction of surface base line.
 2.  StartRadius - start radius of the surface
 3.  EndRadius - end radius of the surface
 
 <u>Schema:</u>
 
 ```xml
-<ECEntityClass typeName="PlanRadialGridSurface" description="A PlanGridPlanarSurface whose infinite plane contains the PlanGrid’s origin.">
-  <BaseClass>PlanGridPlanarSurface</BaseClass>
-  <ECCustomAttributes>
-    <ClassHasHandler xmlns="BisCore.01.00.00" />
-  </ECCustomAttributes>
-  <ECProperty propertyName="Angle" displayLabel="Angle" typeName="double" kindOfQuantity="AECU:LENGTH" description="Origin of the surface"/>
-  <ECProperty propertyName="StartRadius" displayLabel="StartRadius" typeName="double" kindOfQuantity="AECU:LENGTH"/>
-  <ECProperty propertyName="EndRadius" displayLabel="EndRadius" typeName="double" kindOfQuantity="AECU:LENGTH"/>
-</ECEntityClass>
+    <ECEntityClass typeName="PlanRadialGridSurface" description="A PlanGridPlanarSurface whose infinite plane contains the PlanGridSystem’s origin.">
+        <BaseClass>PlanGridPlanarSurface</BaseClass>
+        <ECProperty propertyName="Angle" displayLabel="Angle" typeName="double" kindOfQuantity="AECU:LENGTH" description="Angle at which the surface construction line is placed, relative to modeled GridSystem placement"/>
+        <ECProperty propertyName="StartRadius" displayLabel="StartRadius" typeName="double" kindOfQuantity="AECU:LENGTH" description="Start radius from which the surface construction line is drawn, relative to modeled GridSystem placement" />
+        <ECProperty propertyName="EndRadius" displayLabel="EndRadius" typeName="double" kindOfQuantity="AECU:LENGTH" description="End radius to which the surface construction line is drawn, relative to modeled GridSystem placement" />
+    </ECEntityClass>
 ```
 
 ### SketchLineGridSurface
 
-A class for `GridSurface` instances of sketched line surfaces in `SketchGrid`
+A class for `GridSurface` instances of sketched line surfaces in `SketchGridSystem`
 
 <u>Naming:</u>
 
@@ -680,7 +629,7 @@ A class for `GridSurface` instances of sketched line surfaces in `SketchGrid`
 <u>Geometry Use:</u>
 
 1.  "inherit from parent" a `SolidPrimitive` DgnExtrusion containing single line for base, swept from StartElevation to EndElevation
-2.  Local Coordinates : `Grid` coordinates
+2.  Local Coordinates : `GridSystem` coordinates
 
 <u>Properties:</u>
 
@@ -689,13 +638,10 @@ A class for `GridSurface` instances of sketched line surfaces in `SketchGrid`
 <u>Schema:</u>
 
 ```xml
-<ECEntityClass typeName="SketchLineGridSurface" description="An extruded line gridsurface element.">
-  <BaseClass>PlanGridPlanarSurface</BaseClass>
-  <ECCustomAttributes>
-    <ClassHasHandler xmlns="BisCore.01.00.00" />
-  </ECCustomAttributes>
-  <ECProperty propertyName="Line2d" displayLabel="Line2d" typeName="Bentley.Geometry.Common.IGeometry"/>
-</ECEntityClass>
+    <ECEntityClass typeName="SketchLineGridSurface" description="An extruded line gridsurface element.">
+        <BaseClass>PlanGridPlanarSurface</BaseClass>
+        <ECProperty propertyName="Line2d" displayLabel="Line2d" typeName="Bentley.Geometry.Common.IGeometry" description="Surface construction line geometry relative to the modeled GridSystem placement"/>
+    </ECEntityClass>
 ```
 
 ### GridArcSurface
@@ -709,18 +655,18 @@ A `GridSurface` that is parallel to extruded arc.
 <u>Schema:</u>
 
 ```xml
-<ECEntityClass typeName="GridArcSurface" modifier="Abstract" description="A grid surface that is parallel to extruded arc.">
-  <BaseClass>GridSurface</BaseClass>
-</ECEntityClass>
+    <ECEntityClass typeName="GridArcSurface" modifier="Abstract" description="A GridSurface that is parallel to extruded arc.">
+        <BaseClass>GridSurface</BaseClass>
+    </ECEntityClass>
 ```
 
 ### PlanGridArcSurface
 
-A class for `GridArcSurface` elements used in `PlanGrid`.
+A class for `GridArcSurface` elements used in `PlanGridSystem`.
 
 <u>Naming:</u>
 
-1.  named by combining `PlanGrid` and `GridArcSurface`
+1.  named by combining `PlanGridSystem` and `GridArcSurface`
 
 <u>Geometry Use:</u>
 
@@ -730,15 +676,15 @@ A class for `GridArcSurface` elements used in `PlanGrid`.
 <u>Schema:</u>
 
 ```xml
-<ECEntityClass typeName="PlanGridArcSurface" modifier="Abstract" description="An arc plangrid surface element.">
-  <BaseClass>GridArcSurface</BaseClass>
-  <BaseClass>IPlanGridSurface</BaseClass>
-</ECEntityClass>
+    <ECEntityClass typeName="PlanGridArcSurface" modifier="Abstract" description="An arc PlanGridSurface element.">
+        <BaseClass>GridArcSurface</BaseClass>
+        <BaseClass>IPlanGridSurface</BaseClass>
+    </ECEntityClass>
 ```
 
 ### PlanCircumferentialGridSurface
 
-A class for `GridSurface` instances of circular radius increments contained in `RadialGrid`
+A class for `GridSurface` instances of circular radius increments contained in `RadialGridSystem`
 
 <u>Naming:</u>
 
@@ -747,40 +693,37 @@ A class for `GridSurface` instances of circular radius increments contained in `
 <u>Geometry Use:</u>
 
 1.  "inherit from parent" a `SolidPrimitive` DgnExtrusion containing single arc for base, swept from StartElevation to EndElevation
-2.  Local Coordinates : `Grid` coordinates
+2.  Local Coordinates : `GridSystem` coordinates
 
 <u>Properties:</u>
 
-1.  Radius - radius from the `Grid` origin at which the arc surface is swept.
+1.  Radius - radius from the `GridSystem` origin at which the arc surface is swept.
 2.  StartAngle - start angle of the arc surface
 3.  EndAngle - end angle of the arc surface
 
 <u>Schema:</u>
 
 ```xml
-<ECEntityClass typeName="PlanCircumferentialGridSurface" description="An PlanGridArcSurface that is centered on the Grid’s origin.">
-  <BaseClass>PlanGridArcSurface</BaseClass>
-  <ECCustomAttributes>
-    <ClassHasHandler xmlns="BisCore.01.00.00" />
-  </ECCustomAttributes>
-  <ECProperty propertyName="Radius" displayLabel="Radius" typeName="double" kindOfQuantity="AECU:LENGTH" description="Origin of the surface"/>
-  <ECProperty propertyName="StartAngle" displayLabel="StartAngle" typeName="double" kindOfQuantity="AECU:ANGLE"/>
-  <ECProperty propertyName="EndAngle" displayLabel="EndAngle" typeName="double" kindOfQuantity="AECU:ANGLE"/>
-</ECEntityClass>
+    <ECEntityClass typeName="PlanCircumferentialGridSurface" description="An PlanGridArcSurface that is centered on the GridSystem’s origin.">
+        <BaseClass>PlanGridArcSurface</BaseClass>
+        <ECProperty propertyName="Radius" displayLabel="Radius" typeName="double" kindOfQuantity="AECU:LENGTH" description="Radius of the surface construction arc curve geometry"/>
+        <ECProperty propertyName="StartAngle" displayLabel="StartAngle" typeName="double" kindOfQuantity="AECU:ANGLE" description="Start Angle of the surface construction arc curve geometry, relative to the modeled GridSystem" />
+        <ECProperty propertyName="EndAngle" displayLabel="EndAngle" typeName="double" kindOfQuantity="AECU:ANGLE" description="End Angle of the surface construction arc curve geometry, relative to the modeled GridSystem" />
+    </ECEntityClass>
 ```
 
 ### SketchArcGridSurface
 
-A class for `GridSurface` instances of sketched arc surfaces in `SketchGrid`
+A class for `GridSurface` instances of sketched arc surfaces in `SketchGridSystem`
 
 <u>Naming:</u>
 
-1.  named so because it is an extruded arc surface in a `SketchGrid`
+1.  named so because it is an extruded arc surface in a `SketchGridSystem`
 
 <u>Geometry Use:</u>
 
 1.  "inherit from parent" a `SolidPrimitive` DgnExtrusion containing single arc for base, swept from StartElevation to EndElevation
-2.  Local Coordinates : `Grid` coordinates
+2.  Local Coordinates : `GridSystem` coordinates
 
 <u>Properties:</u>
 
@@ -789,13 +732,10 @@ A class for `GridSurface` instances of sketched arc surfaces in `SketchGrid`
 <u>Schema:</u>
 
 ```xml
-<ECEntityClass typeName="SketchArcGridSurface" description="An extruded arc gridsurface element.">
-  <BaseClass>PlanGridArcSurface</BaseClass>
-  <ECCustomAttributes>
-    <ClassHasHandler xmlns="BisCore.01.00.00" />
-  </ECCustomAttributes>
-  <ECProperty propertyName="Arc2d" displayLabel="Arc2d" typeName="Bentley.Geometry.Common.IGeometry"/>
-</ECEntityClass>
+    <ECEntityClass typeName="SketchArcGridSurface" description="An extruded arc gridsurface element.">
+        <BaseClass>PlanGridArcSurface</BaseClass>
+        <ECProperty propertyName="Arc2d" displayLabel="Arc2d" typeName="Bentley.Geometry.Common.IGeometry" description="Surface construction arc curve geometry relative to the modeled GridSystem placement"/>
+    </ECEntityClass>
 ```
 
 ### GridSplineSurface
@@ -809,9 +749,9 @@ A `GridSurface` that is parallel to an extruded spline.
 <u>Schema:</u>
 
 ```xml
-<ECEntityClass typeName="GridSplineSurface" modifier="Abstract" description="A grid surface that is an extruded spline.">
-  <BaseClass>GridSurface</BaseClass>
-</ECEntityClass>
+    <ECEntityClass typeName="GridSplineSurface" modifier="Abstract" description="A GridSurface that is parallel to an extruded spline.">
+        <BaseClass>GridSurface</BaseClass>
+    </ECEntityClass>
 ```
 
 ### PlanGridSplineSurface
@@ -830,19 +770,19 @@ A class for `GridSplineSurface` elements used in `PlanGrid`.
 <u>Schema:</u>
 
 ```xml
-<ECEntityClass typeName="PlanGridSplineSurface" modifier="Abstract" description="An arc plangrid surface element.">
-  <BaseClass>GridSplineSurface</BaseClass>
-  <BaseClass>IPlanGridSurface</BaseClass>
-</ECEntityClass>
+    <ECEntityClass typeName="PlanGridSplineSurface" modifier="Abstract" description="A spline PlanGridSurface element.">
+        <BaseClass>GridSplineSurface</BaseClass>
+        <BaseClass>IPlanGridSurface</BaseClass>
+    </ECEntityClass>
 ```
 
 ### SketchSplineGridSurface
 
-A class for `GridSurface` instances of sketched spline surfaces in `SketchGrid`
+A class for `GridSurface` instances of sketched spline surfaces in `SketchGridSystem`
 
 <u>Naming:</u>
 
-1.  Named so because it is an extruded spline surface in a `SketchGrid`
+1.  Named so because it is an extruded spline surface in a `SketchGridSystem`
 
 <u>Geometry Use:</u>
 
@@ -856,135 +796,16 @@ A class for `GridSurface` instances of sketched spline surfaces in `SketchGrid`
 <u>Schema:</u>
 
 ```xml
-<ECEntityClass typeName="SketchSplineGridSurface" description="An extruded spline gridsurface element.">
-  <BaseClass>PlanGridSplineSurface</BaseClass>
-  <ECCustomAttributes>
-    <ClassHasHandler xmlns="BisCore.01.00.00" />
-  </ECCustomAttributes>
-  <ECProperty propertyName="Spline2d" displayLabel="Spline2d" typeName="Bentley.Geometry.Common.IGeometry"/>
-</ECEntityClass>
+    <ECEntityClass typeName="SketchSplineGridSurface" description="An extruded spline GridSurface element.">
+        <BaseClass>PlanGridSplineSurface</BaseClass>
+        <ECProperty propertyName="Spline2d" displayLabel="Spline2d" typeName="Bentley.Geometry.Common.IGeometry" description="Surface construction spline curve geometry relative to the modeled GridSystem placement"/>
+    </ECEntityClass>
 ```
 
-### GridCurveBundle
-
-A bundle class for `GridCurve` creation. Drives the creation of GridCurve
-
-<u>Naming:</u>
-
-1.  A bundle for driving `GridCurve`
-
-<u>Schema:</u>
-
-```xml
-<ECEntityClass typeName="GridCurveBundle" displayLabel="GridCurve bundle">
-  <BaseClass>bis:DriverBundleElement</BaseClass>
-  <ECCustomAttributes>
-    <ClassHasHandler xmlns="BisCore.01.00.00" />
-  </ECCustomAttributes>
-</ECEntityClass>
-```
-
-## Relationships
-
-### GridDrivesGridSurface
-
-A driving relationship which tells that a grid is driving a gridsurface.
-
-<u>Naming:</u>
-
-1.  Named as per standards - noting that `Grid` drives `GridSurface`.
-
-<u>Schema:</u>
-
-```xml
-<ECRelationshipClass typeName="GridDrivesGridSurface" modifier="None" strength="referencing" description="a driving relationship which tells that a grid is driving a gridsurface.">
-  <BaseClass>bis:ElementDrivesElement</BaseClass>
-  <ECCustomAttributes>
-    <ClassHasHandler xmlns="BisCore.01.00.00"/>
-  </ECCustomAttributes>
-  <Source multiplicity="(1..1)" roleLabel="drives" polymorphic="true">
-    <Class class="Grid"/>
-  </Source>
-  <Target multiplicity="(0..*)" roleLabel="is driven by" polymorphic="true">
-    <Class class="GridSurface"/>
-  </Target>
-</ECRelationshipClass>
-```
-
-### GridSurfaceDrivesGridCurveBundle
-
-A driving relationship which tells that gridsurface influences the creation of GridCurve
-
-<u>Naming:</u>
-
-1.  Noting that `GridSurface` drives `GridCurveBundle`.
-
-<u>Schema:</u>
-
-```xml
-<ECRelationshipClass typeName="GridSurfaceDrivesGridCurveBundle" modifier="None" strength="referencing" description="a driving relationship which tells that gridsurface influences the creation of GridCurve">
-  <BaseClass>bis:ElementDrivesElement</BaseClass>
-  <ECCustomAttributes>
-    <ClassHasHandler xmlns="BisCore.01.00.00"/>
-  </ECCustomAttributes>
-  <Source multiplicity="(0..*)" roleLabel="influences" polymorphic="true">
-    <Class class="GridSurface"/>
-  </Source>
-  <Target multiplicity="(0..*)" roleLabel="is influenced by" polymorphic="true">
-    <Class class="GridCurveBundle"/>
-  </Target>
-</ECRelationshipClass>
-```
-
-### GridCurveBundleCreatesGridCurve
-
-A driving relationship which tells that gridcurve was created by the mapped GridCurveBundle
-
-<u>Naming:</u>
-
-1.  Noting that `GridCurveBundle` creates `GridCurve`.
-
-<u>Schema:</u>
-
-```xml
-<ECRelationshipClass typeName="GridCurveBundleCreatesGridCurve" modifier="None" strength="referencing" description="a driving relationship which tells that gridcurve was created by the mapped GridCurveBundle">
-  <BaseClass>bis:ElementDrivesElement</BaseClass>
-  <ECCustomAttributes>
-    <ClassHasHandler xmlns="BisCore.01.00.00"/>
-  </ECCustomAttributes>
-  <Source multiplicity="(1..1)" roleLabel="creates" polymorphic="true">
-    <Class class="GridCurveBundle"/>
-  </Source>
-  <Target multiplicity="(0..1)" roleLabel="is created by" polymorphic="true">
-    <Class class="GridCurve"/>
-  </Target>
-</ECRelationshipClass>
-```
-
-### GridHasAxes
-
-A relationship to map grid to its axes
-
-<u>Naming:</u>
-
-1.  Named as per standards - noting that `Grid` references `GridAxis`
-
-<u>Schema:</u>
-
-```xml
-<ECRelationshipClass typeName="GridHasAxes" strength="embedding" modifier="None" description="maps grid to its axes">
-  <Source multiplicity="(1..1)" roleLabel="Has Axis" polymorphic="true">
-    <Class class="Grid"/>
-  </Source>
-  <Target multiplicity="(0..*)" roleLabel="is axis of" polymorphic="true">
-    <Class class="GridAxis"/>
-  </Target>
-</ECRelationshipClass>
-```
 
 ### GridAxisContainsGridSurfaces
 
-A relationship to map grid to its axes
+A relationship to map `GridAxis` to its `GridSurface`s
 
 <u>Naming:</u>
 
@@ -993,12 +814,12 @@ A relationship to map grid to its axes
 <u>Schema:</u>
 
 ```xml
-<ECRelationshipClass typeName="GridAxisContainsGridSurfaces" modifier="None" strength="embedding" description="maps axis to grouped surfaces">
-  <Source multiplicity="(1..1)" roleLabel="contains" polymorphic="true">
-    <Class class="GridAxis"/>
-  </Source>
-  <Target multiplicity="(0..*)" roleLabel="is contained in" polymorphic="true">
-    <Class class="GridSurface"/>
-  </Target>
-</ECRelationshipClass>
+    <ECRelationshipClass typeName="GridAxisContainsGridSurfaces" modifier="None" strength="embedding" description="maps axis to grouped surfaces">
+        <Source multiplicity="(1..1)" roleLabel="contains" polymorphic="true">
+            <Class class="GridAxis"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is contained in" polymorphic="true">
+            <Class class="GridSurface"/>
+        </Target>
+    </ECRelationshipClass>
 ```
