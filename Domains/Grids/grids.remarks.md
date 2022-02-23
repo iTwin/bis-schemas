@@ -7,7 +7,7 @@ remarksTarget: Grids.ecschema.md
 
 Contains classes that support both simple Grids (which are sets of curves defined in a particular plane) and GridSystems (which contain sets of surfaces organized into axes which can be used to instruct iTwin.js to generate simple Grids). 
 
-A `Grid` is equivalent to an ![IfcGrid](https://standards.buildingsmart.org/IFC/DEV/IFC4_3/RC4-voting/HTML/link/ifcgrid.htm). IFC has no equivalent of a GridSystem.
+A `Grid` is equivalent to an [IfcGrid](https://standards.buildingsmart.org/IFC/DEV/IFC4_3/RC4-voting/HTML/link/ifcgrid.htm). IFC has no equivalent of a GridSystem.
 
 Classes in this schema are used to build Structural, Space-planning and other `GridSystem`s and `Grid`s. A `GridSystem` is a collection of GridSurfaces. Every `GridSurface` is associated to a `GridAxis`, which is currently primarily used for grouping surfaces into subgroups. The intersection of GridSurfaces may create a `GridCurve`.
 
@@ -18,7 +18,7 @@ Classes in this schema are used to build Structural, Space-planning and other `G
 
 ### GridCurve
 
-`GridCurve` is similar to ![IfcGridAxis](https://standards.buildingsmart.org/IFC/DEV/IFC4_3/RC4-voting/HTML/link/ifcgridaxis.htm) in that it represents a curve geometry on a (usually planar) surface. It is also similar to Grid Curves as known in `OpenBuildings Designer`. `GridCurve`s can be found in submodels of `Grid` elements.
+`GridCurve` is similar to [IfcGridAxis](https://standards.buildingsmart.org/IFC/DEV/IFC4_3/RC4-voting/HTML/link/ifcgridaxis.htm) in that it represents a curve geometry on a (usually planar) surface. It is also similar to Grid Curves as known in `OpenBuildings Designer`. `GridCurve`s can be found in submodels of `Grid` elements.
 
 <u>Geometry Use:</u>
 
@@ -159,7 +159,7 @@ a subcollection of `PlanRadialGridSurface` in a `RadialGrid`
 
 The `GridCurve`s associated to a `Grid` are contained within its submodel.
 
-A `Grid` is equivalent to an ![IfcGrid](https://standards.buildingsmart.org/IFC/DEV/IFC4_3/RC4-voting/HTML/link/ifcgrid.htm).
+A `Grid` is equivalent to an [IfcGrid](https://standards.buildingsmart.org/IFC/DEV/IFC4_3/RC4-voting/HTML/link/ifcgrid.htm).
 
 <u>Geometry Use:</u>
 
