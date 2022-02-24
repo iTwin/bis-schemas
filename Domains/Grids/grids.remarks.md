@@ -133,7 +133,7 @@ A collection of `PlanRadialGridSurface` and `PlanCircumferentialGridSurface` ele
 
 ### GridAxis
 
-A subcollection of `GridSurface`s in a `GridSystem`. Typically used to group parallel surfaces together.
+A subcollection of `GridSurface`s in a `GridSystem`. Typically organized for some common purpose.
 
 ### GeneralGridAxis
 
