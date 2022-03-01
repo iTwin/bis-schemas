@@ -5,11 +5,17 @@ remarksTarget: Grids.ecschema.md
 
 # Grids
 
+## Overview
+
 Contains classes that support both simple Grids (which are sets of curves defined in a particular plane) and GridSystems (which contain sets of surfaces organized into axes which can be used to instruct iTwin.js to generate simple Grids). 
 
 A `Grid` is equivalent to an [IfcGrid](https://standards.buildingsmart.org/IFC/DEV/IFC4_3/RC4-voting/HTML/link/ifcgrid.htm). IFC has no equivalent of a GridSystem.
 
-Classes in this schema are used to build Structural, Space-planning and other `GridSystem`s and `Grid`s. A `GridSystem` is a collection of GridSurfaces. Every `GridSurface` is associated to a `GridAxis`, which is currently primarily used for grouping surfaces into subgroups. The intersection of GridSurfaces may create a `GridCurve`.
+Classes in this schema are used to build Structural, Space-planning and other `GridSystem`s and `Grid`s. A `GridSystem` is a collection of GridSurfaces. Every `GridSurface` is associated to a `GridAxis`, which is currently primarily used for grouping surfaces into subgroups. The intersection of GridSurfaces may create a `GridCurve`. The constructed `GridCurve` should then inherit the userlabel of a `GridLabelRecord` (if present) of one of the originating `GridSurface`s. Some viewing application would show the information of `GridLabelRecord` as a dynamic annotation, similar to [Grid Labels](https://docs.bentley.com/LiveContent/web/OpenBuildings%20Designer%20Help-v5/en/GUID-5965684D-5CA4-BF92-3406-A43B5542ED30.html) in `OpenBuildings Designer`. 
+
+The most common grid surfaces intersection example could be `GridSurface`s in Orthogonal/Radial/Sketch `GridSystem` intersecting a `GridSurface` in an `ElevationGridSystem`. such intersection would create a `Grid` of `GridCurve`s as we know them in BuildingSMART IFC. 
+
+a GridSystem should be stored in the submodel of the related element. For Example structural grid for a building should be stored in the submodel of the said `BuildingSpatial:Building`. In other cases, when GridSystem is not modeled and instead `Grid`s are created directly, the `Grid` elements should then be in the submodel of said related elements. 
 
 ![Grids](./media/grids.png)
 ![Grids](./media/gridsystem_instance.png)
