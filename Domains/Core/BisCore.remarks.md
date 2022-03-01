@@ -25,7 +25,7 @@ Other schemas should use domain handlers (written in TypeScript) and the `Schema
 
 ### ISubModeledElement
 
-Sub-modeling is also sometimes described as "breaking down", i.e. a sub-modeled Element can be "broken down into" a finer-grained (sub) Model.  
+Sub-modeling is also sometimes described as "breaking down", i.e. a sub-modeled Element can be "broken down into" a finer-grained (sub) Model.
 See also [IParentElement](#iparentelement).
 
 > Behavior: The system handler (C++) for `Element` only permits a sub-model to be inserted if the class of the *modeled element* implements the `ISubModeledElement` interface.
@@ -438,6 +438,24 @@ A `GeometryDetailRecord` should always be the child of a `GeometricElement3d` wh
 
 A `GeometryDetailRecord` models a geometric detail of the Entity modeled by its parent `GeometricElement3d`.
 
+The `GeometryMap` property of the `GeometryDetailRecord` holds an array of identifiable geometry streams serialized in flat buffer format, see [ElementGeometryDataEntry](https://www.itwinjs.org/reference/core-common/geometry/elementgeometrydataentry/):
+
+```text
+table GeometryMap {
+  entries: [GeometryMapEntry];
+}
+
+table GeometryMapEntry {
+  id: int;
+  entries: [ElementGeometryDataEntry];
+}
+
+table ElementGeometryDataEntry {
+  opcode: int;
+  data: [ubyte];
+}
+```
+
 The GeometryStream of the `GeometryDetailRecord` does not actually hold the geometry of the geometric detail, but rather holds information needed to *produce* the specific geometric detail in its parent `GeometricElement3d`'s GeometryStream. There may be two other geometries that a user will wish to see in conjunction with a `GeometryDetailRecord`:
 - The faces and edges produced in the parent's GeometryStream by the `GeometryDetailRecord`'s associated operation in the feature tree.
 - A representation of the geometric change caused by the associated operation in the "feature tree", e.g. a solid representing the material subtracted to create an opening or the material added to create a protrusion.
@@ -477,7 +495,7 @@ Other `InformationContentElement` instances can also be inserted into a `Definit
 
 ### RepositoryModel
 
-> Behavior: The singleton `RepositoryModel` behaves like a standard `InformationModel` and should have been a direct subclass of `InformationModel`. Unfortunately, it subclasses from `DefinitionModel` for legacy reasons that are no longer relevant. 
+> Behavior: The singleton `RepositoryModel` behaves like a standard `InformationModel` and should have been a direct subclass of `InformationModel`. Unfortunately, it subclasses from `DefinitionModel` for legacy reasons that are no longer relevant.
 However, the system handler (C++) for `RepositoryModel` makes it act like a direct subclass of `InformationModel`.
 Consistent with a standard `InformationModel`, all `InformationContentElement` instances except `DefinitionElement` subclasses may be inserted.
 For backwards compatibility reasons, the superclass of `RepositoryModel` cannot be corrected until a major schema version upgrade.
