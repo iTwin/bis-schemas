@@ -7,17 +7,15 @@ remarksTarget: CivilPhysical.ecschema.md
 
 This schema contains classes that are commonly used in various types of Civil projects, including Road, Rail and Site-related.
 
-NOTE: Currently under development. This schema should not be used for production workflows. Data created using this schema is not supported and may not be upgradable.
+![CivilPhysical](./media/CivilPhysical-classes.png)
 
 ## Entity Classes
-
-![CivilPhysical](./media/CivilPhysical-classes.png)
 
 ### CourseType
 
 Instances of `CourseType` provide an additional classification that can be applied to `Course`s. Examples include Pavement, Ballast and Protection. An instance of `CourseType` can optionally specify a single *Physical Material* via its `PhysicalMaterial` property.
 
-Equivalent to [IfcCourseType](https://standards.buildingsmart.org/IFC/DEV/IFC4_3/RC2/HTML/link/ifccoursetype.htm).
+Equivalent to [IfcCourseType](http://ifc43-docs.standards.buildingsmart.org/IFC/RELEASE/IFC4x3/HTML/lexical/IfcCourseType.htm).
 
 ### Course
 
@@ -29,13 +27,13 @@ A `Course` is distinctive from an earthworks element in that a course is a grade
 
 The kind of structure making use of a `Course` can be also understood via its `Category`. e.g. A `Course` instance that is part of a Pavement structure shall use the Domain-ranked `cvphys:Pavement` category.
 
-Equivalent to [IfcCourse](https://standards.buildingsmart.org/IFC/DEV/IFC4_3/RC2/HTML/link/ifccourse.htm).
+Equivalent to [IfcCourse](http://ifc43-docs.standards.buildingsmart.org/IFC/RELEASE/IFC4x3/HTML/lexical/IfcCourse.htm).
 
 ### CurbType
 
 Instances of `CurbType` provide an additional classification that can be applied to `Curb`s. An instance of `CurbType` can optionally specify a single *Physical Material* via its `PhysicalMaterial` property.
 
-Equivalent to [IfcKerbType](https://standards.buildingsmart.org/IFC/DEV/IFC4_3/RC2/HTML/link/ifckerbtype.htm).
+Equivalent to [IfcKerbType](http://ifc43-docs.standards.buildingsmart.org/IFC/RELEASE/IFC4x3/HTML/lexical/IfcKerbType.htm).
 
 ### Curb
 
@@ -45,4 +43,4 @@ A `Curb` is typically a border of stone, concrete or other rigid material formed
 
 `Curb`s must be contained in `PhysicalModel`s and can be linearly located, typically along an *Alignment*. Instances of `Curb`, by default, shall use the Domain-ranked `cvphys:Curb` category.
 
-Equivalent to [IfcKerb](https://standards.buildingsmart.org/IFC/DEV/IFC4_3/RC2/HTML/link/ifckerb.htm).
+Equivalent to [IfcKerb](http://ifc43-docs.standards.buildingsmart.org/IFC/RELEASE/IFC4x3/HTML/lexical/IfcKerb.htm).
