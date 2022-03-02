@@ -19,7 +19,6 @@ The most common grid surfaces intersection example could be `GridSurface`s in Or
 
 A `GridSystem` should be stored in the model it's relevant in. For example, the structural grid for a building should be stored in the same model as the said `BuildingSpatial:Building`. The specific `Building` could be associated via `SpatialComposition:SpatialOrganizerHoldsSpatialElements` relationship. 
 
-
 The instance diagram below shows an example of such modeling standard:
 
 ![Grids-modelling](./media/grids_instance.png)
@@ -31,6 +30,8 @@ The `GridSurface`s and `GridAxis` are not getting associated to created `Grid`s 
 ### GridCurve
 
 `GridCurve` is similar to [IfcGridAxis](http://ifc43-docs.standards.buildingsmart.org/IFC/RELEASE/IFC4x3/HTML/lexical/IfcGridAxis.htm) in that it represents a curve geometry on a (usually planar) surface. It is also similar to Grid Curves as known in `OpenBuildings Designer`. `GridCurve`s can be found in submodels of `Grid` elements.
+
+![GridCurve](./media/GridCurves.png)
 
 <u>Geometry Use:</u>
 
@@ -79,6 +80,8 @@ The collection of `GridSurface` instances in a `GridSystem` can be used to instr
 
 Grids known in other products like BuildingSMART IfcGrid or Grid/GridSystem in `OpenBuildings Designer` do not contain surfaces, instead they contain curves. However, those curves are later referenced over different elevations, which makes those elements conceptually surfaces intersecting those elevations. In BIS a `GridSystem` is a collection of surfaces rather than curves. Curves are the result of surfaces intersecting, known as `GridCurve`. While this approach ensures compatibility with legacy grids it is also more flexible. For instance, by manipulating the *EndElevation* property of individual instances of `IPlanGridSurface` in a `PlanGrid` intersecting `ElevationGrid`, individual `GridCurve` instances could be made not to appear on higher elevations. Number of axes is also unlimited in `SketchGrid`, `ElevationGrid` and `FreeGrid`.
 
+![GridSystem](./media/GridSystems.png)
+
 <u>Geometry Use:</u>
 
 1.  No geometry
@@ -110,6 +113,8 @@ A collection of unconstrained surfaces (`FreeGridSurface`).
 ### PlanGridSystem
 
 A collection of `IPlanGridSurface` elements that are single curve extrusions, sharing the extrusion direction. Extrusion direction is equal to grid Z orientation.
+
+![IPlanGridSurface](./media/IPlanGridSurface.png)
 
 <u>Geometry Use:</u>  
 
@@ -147,6 +152,8 @@ A collection of `PlanRadialGridSurface` and `PlanCircumferentialGridSurface` ele
 
 A subcollection of `GridSurface`s in a `GridSystem`. Typically organized for some common purpose.
 
+![GridAxis](./media/GridAxis.png)
+
 ### GeneralGridAxis
 
 A subcollection of `GridSurface` instances in a Grid. Used for grouping any kind of grid surfaces together.
@@ -181,6 +188,8 @@ A `Grid` is equivalent to an [IfcGrid](http://ifc43-docs.standards.buildingsmart
 ### GridSurface
 
 A 3-dimensional surface contained in a `GridSystem`. A GridSurface is modeled by combining the information of grid construction line and the elevation extents. `GridSystem`s contain such information in products like `OpenBuildings Designer`.
+
+![GridSurface](./media/GridSurfaces.png)
 
 ### GridPlanarSurface
 
