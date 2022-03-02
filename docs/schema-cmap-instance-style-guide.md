@@ -22,8 +22,6 @@ All **Models** are colored white (#FFFFFF) since their type can be inferred from
 
 ![Model colors](cmap-example/media/instance/colors-models.png)
 
-On very busy instance diagrams, it may be useful to increase the thickness of the model's boundary in order to make it easier to identify.
-
 ## **Shapes and outlines**
 Models are represented by a **nested node** (see [CMAP tips](schema-cmap-style-guide#cmap-tips))
 
