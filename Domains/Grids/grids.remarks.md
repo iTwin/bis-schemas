@@ -7,18 +7,28 @@ remarksTarget: Grids.ecschema.md
 
 ## Overview
 
-Contains classes that support both simple Grids (which are sets of curves defined in a particular plane) and GridSystems (which contain sets of surfaces organized into axes which can be used to instruct iTwin.js to generate simple Grids). 
+Contains classes modelling grids and grid systems.
+
+This class diagram provides an overview for the key concepts for modelling grid systems and grids:
+
+![Grids](./media/grids.png)
+
+The grids schema support both simple grids (which are sets of curves defined in a particular plane) and grid systems (which contain sets of surfaces organized into axes which can be used to instruct iTwin.js to generate simple `Grid`s). 
 
 A `Grid` is equivalent to an [IfcGrid](https://standards.buildingsmart.org/IFC/DEV/IFC4_3/RC4-voting/HTML/link/ifcgrid.htm). IFC has no equivalent of a GridSystem.
 
-Classes in this schema are used to build Structural, Space-planning and other `GridSystem`s and `Grid`s. A `GridSystem` is a collection of GridSurfaces. Every `GridSurface` is associated to a `GridAxis`, which is used for grouping surfaces into subgroups. The intersection of `GridSurface`s may be used to create a `GridCurve`. The constructed `GridCurve` should then inherit the userlabel of a `GridLabelRecord` (if present) of one of the originating `GridSurface`s. Some viewing application would show the information of `GridLabelRecord` as a dynamic annotation, similar to [Grid Labels](https://docs.bentley.com/LiveContent/web/OpenBuildings%20Designer%20Help-v5/en/GUID-5965684D-5CA4-BF92-3406-A43B5542ED30.html) in `OpenBuildings Designer`. 
+Classes in this schema are used to build Structural, Space-planning and other `GridSystem`s and `Grid`s. A `GridSystem` is a collection of GridSurfaces. Every `GridSurface` is associated to a `GridAxis`, which is used for grouping surfaces into subgroups. The intersection of `GridSurface`s may be used to create a `GridCurve`. The constructed `GridCurve` should then inherit the codeValue of a `GridLabelRecord` (if present) of one of the originating `GridSurface`s. Some viewing applications would show the information of `GridLabelRecord` as a dynamic annotation, similar to [Grid Labels](https://docs.bentley.com/LiveContent/web/OpenBuildings%20Designer%20Help-v5/en/GUID-5965684D-5CA4-BF92-3406-A43B5542ED30.html) in `OpenBuildings Designer`. 
 
-The most common grid surfaces intersection example could be `GridSurface`s in Orthogonal/Radial/Sketch `GridSystem` intersecting a `GridSurface` in an `ElevationGridSystem`. such intersection could be used to create a `Grid` of `GridCurve`s as we know them in BuildingSMART IFC. The schema however supports creation of more complex grids, for example a complex, non-planar roof intersecting a SketchGrid could create `Grid` with `GridCurve`s required for easily modeling the structural framing of said roof. The `GridSystem`s however, are not mandatory in an iModel, `Grid`s could be modeled directly.
+The most common grid surfaces intersection example could be `GridSurface`s in Orthogonal/Radial/Sketch `GridSystem` intersecting a `GridSurface` in an `ElevationGridSystem`. such intersection could be used to create a `Grid` of `GridCurve`s as we know them in BuildingSMART IFC. The schema however supports creation of more complex grids, for example a complex, non-planar roof intersecting a SketchGrid could create `Grid` with `GridCurve`s required for easily modeling the structural framing of said roof. The `GridSurfaces`s however, are not mandatory in an iModel, `Grid`s could be modeled directly.
 
-a GridSystem should be stored in the submodel of the related element. For Example structural grid for a building should be stored in the submodel of the said `BuildingSpatial:Building`. In other cases, when GridSystem is not modeled and instead `Grid`s are created directly, the `Grid` elements should then be in the submodel of said related elements. 
+a `GridSystem` should be stored in the model it's relevant in. For example, structural grid for a building should be stored in the same model as the said `BuildingSpatial:Building`. The specific `Building` could be associated via `SpatialComposition:SpatialOrganizerHoldsSpatialElements` relationship. 
 
-![Grids](./media/grids.png)
-![Grids](./media/gridsystem_instance.png)
+
+The instance diagram below shows an example of such modeling standard:
+
+![Grids-modelling](./media/grids_instance.png)
+
+The `GridSurface`s and `GridAxis` are not getting associated to created `Grid`s and `GridCurve`s in this version of the schema, however if the data is published today, some future application could populate the relationships that will be added in subsequent versions.
 
 ## Classes
 
