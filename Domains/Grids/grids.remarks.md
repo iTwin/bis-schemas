@@ -9,7 +9,7 @@ Contains classes modelling grids and grid systems.
 
 This class diagram provides an overview for the key concepts for modelling grid systems and grids:
 
-![Grids](./media/grids.png)
+![Grids](./media/Grids.png)
 
 The grids schema support both simple grids (which are sets of curves defined in a particular plane) and grid systems (which contain sets of surfaces organized into axes which can be used to instruct iTwin.js to generate simple `Grid`s). 
 
