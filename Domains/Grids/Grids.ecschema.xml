@@ -44,7 +44,7 @@
         <BaseClass>GridAxis</BaseClass>
     </ECEntityClass>
 
-    <ECEntityClass typeName="GridCurve" modifier="Abstract" description="A bis:SpatialLocationElement serving as the base class for concrete implementations of grid curves - typically the intersection of 2 grid surfaces.">
+    <ECEntityClass typeName="GridCurve" modifier="Abstract" description="A bis:SpatialLocationElement indicating a position along one axis of a grid by representing the intersection of a `GridSurface` of that `GridAxis` with the 'plane' of the `Grid`.">
         <BaseClass>bis:SpatialLocationElement</BaseClass>
     </ECEntityClass>
 
@@ -79,15 +79,15 @@
         </Target>
     </ECRelationshipClass>
 
-    <ECEntityClass typeName="GeneralGridCurve" description="A GridCurve that is the result of 2 non-planar surfaces.">
+    <ECEntityClass typeName="GeneralGridCurve" description="A GridCurve representing the intersection of 2 non-planar surfaces.">
         <BaseClass>GridCurve</BaseClass>
     </ECEntityClass>
 
-    <ECEntityClass typeName="GridLine" description="A GridCurve that is the result of 2 planar surfaces.">
+    <ECEntityClass typeName="GridLine" description="A GridCurve representing the intersection of 2 planar surfaces.">
         <BaseClass>GridCurve</BaseClass>
     </ECEntityClass>
 
-    <ECEntityClass typeName="GridSpline" description="A GridCurve that is the result of a planar and a spline surface.">
+    <ECEntityClass typeName="GridSpline" description="A GridCurve representing the intersection of a planar and a spline surface.">
         <BaseClass>GridCurve</BaseClass>
     </ECEntityClass>
 
@@ -121,19 +121,19 @@
         <BaseClass>GridSurface</BaseClass>
     </ECEntityClass>
 
-    <ECEntityClass typeName="GridSystem" modifier="Abstract" description="A bis:SpatialLocationElement that is a collection of GridSurface elements.">
+    <ECEntityClass typeName="GridSystem" modifier="Abstract" description="A bis:SpatialLocationElement that is a collection of Grid elements and (optionally) GridSurface and related elements from which the Grids can be derived.">
         <BaseClass>bis:SpatialLocationElement</BaseClass>
         <BaseClass>bis:ISubModeledElement</BaseClass>
     </ECEntityClass>
 
 
-    <ECEntityClass typeName="PlanGridSystem" modifier="Abstract" description="A GridSystem whose surfaces are curves parallel to the local x-y plane extruded along the local z-axis.">
+    <ECEntityClass typeName="PlanGridSystem" modifier="Abstract" description="A GridSystem of Grids with 'planes' that are parallel to the local x-y plane.">
         <BaseClass>GridSystem</BaseClass>
         <ECProperty propertyName="DefaultStartElevation" displayLabel="DefaultStartElevation" typeName="double" kindOfQuantity="AECU:LENGTH" description="Default elevation the surfaces in this GridSystem start from." />
         <ECProperty propertyName="DefaultEndElevation" displayLabel="DefaultEndElevation" typeName="double" kindOfQuantity="AECU:LENGTH" description="Default elevation the surfaces in this GridSystem end at." />
     </ECEntityClass>
 
-    <ECEntityClass typeName="OrthogonalGridSystem" description="A PlanGridSystem that has all of its surfaces orthogonal in either the X or Y direction.">
+    <ECEntityClass typeName="OrthogonalGridSystem" description="A PlanGridSystem of Grids with orthogonal axes.">
         <BaseClass>PlanGridSystem</BaseClass>
         <ECProperty propertyName="DefaultCoordinateIncrementX" displayLabel="DefaultCoordinateIncrementX" typeName="double" kindOfQuantity="AECU:LENGTH" description="Default increment in the X direction for newly added GridSurfaces." />
         <ECProperty propertyName="DefaultCoordinateIncrementY" displayLabel="DefaultCoordinateIncrementY" typeName="double" kindOfQuantity="AECU:LENGTH" description="Default increment in the Y direction for newly added GridSurfaces." />
@@ -143,7 +143,7 @@
         <ECProperty propertyName="DefaultEndExtentY" displayLabel="DefaultEndExtentY" typeName="double" kindOfQuantity="AECU:LENGTH" description="Default surface end extension in the Y direction for newly added GridSurfaces." />
     </ECEntityClass>
 
-    <ECEntityClass typeName="RadialGridSystem" description="A PlanGridSystem that consists either of arc-surfaces in radial axis or planar-surfaces in circular axis.">
+    <ECEntityClass typeName="RadialGridSystem" description="A PlanGridSystem of Grids with a radial axis and an angular axis.">
         <BaseClass>PlanGridSystem</BaseClass>
         <ECProperty propertyName="DefaultAngleIncrement" displayLabel="DefaultAngleIncrement" typeName="double" kindOfQuantity="AECU:ANGLE" description="Default angle increment for newly added PlanRadialGridSurfaces in this GridSystem."/>
         <ECProperty propertyName="DefaultRadiusIncrement" displayLabel="DefaultRadiusIncrement" typeName="double" kindOfQuantity="AECU:ANGLE" description="Default radius increment for newly added PlanCircumferentialGridSurface in this GridSystem." />
@@ -153,11 +153,11 @@
         <ECProperty propertyName="DefaultEndRadius" displayLabel="DefaultEndRadius" typeName="double" kindOfQuantity="AECU:LENGTH" description="Default end radius for newly added PlanRadialGridSurfaces in this GridSystem."/>
     </ECEntityClass>
 
-    <ECEntityClass typeName="SketchGridSystem" description="A PlanGridSystem that contains surfaces whose positions are not constrained (other than being swept to the grid normal).">
+    <ECEntityClass typeName="SketchGridSystem" description="A PlanGridSystem in which the curves of the grids are aligned to one or more axes at arbitrary angles).">
         <BaseClass>PlanGridSystem</BaseClass>
     </ECEntityClass>
 
-    <ECEntityClass typeName="ElevationGridSystem" description="A GridSystem that contains planar surfaces parallel to the local XY plane.">
+    <ECEntityClass typeName="ElevationGridSystem" description="A GridSystem that contains planar GridSurfaces parallel to the local XY plane. The surfaces are typically used as the 'planes' of Grids in a related `PlanGridSystem`. May or may not contain Grids.">
         <BaseClass>GridSystem</BaseClass>
         <ECProperty propertyName="DefaultElevationIncrement" displayLabel="DefaultElevationIncrement" typeName="double" kindOfQuantity="AECU:LENGTH" description="Default elevation increment for newly added GridSurfaces." />
         <ECProperty propertyName="DefaultSurface2d" displayLabel="DefaultSurface2d" typeName="Bentley.Geometry.Common.IGeometry" description="Default surface geometry for newly added GridSurfaces.">
