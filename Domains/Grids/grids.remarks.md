@@ -48,46 +48,46 @@ A `GridSystem` should be stored in the model it's relevant in. For example, the 
 There are several specializations of `GridCurve`:
 ![GridCurve](./media/GridCurves.png)
 
-<u>Geometry Use:</u>
+<u>GeometryStream details:</u>
 
-1.  Open [Path](https://www.itwinjs.org/reference/geometry-core/curve/path/) with a single [ICurvePrimitive](https://www.itwinjs.org/reference/core-geometry/curve/curveprimitive/).
-2.  Local Coordinates : origin at the start of the curve, aligned to create a `GridSurface` when available.
+1. Content: Open [Path](https://www.itwinjs.org/reference/geometry-core/curve/path/) with a single [ICurvePrimitive](https://www.itwinjs.org/reference/core-geometry/curve/curveprimitive/) in local coordinates.
+2. Placement: Origin at the start of the curve, Roll/Pitch/Yaw aligned to create a `GridSurface` when available.
 
 ### GridLine
 
 Instances of `GridLine` can be created by 2 intersecting instances of `GridPlanarSurface`.
 
-<u>Geometry Use:</u>
+<u>GeometryStream details:</u>
 
-1.  Open [Path](https://www.itwinjs.org/reference/geometry-core/curve/path/) with a single [LineSegment3d](https://www.itwinjs.org/reference/geometry-core/curve/linesegment3d/).
-2.  Inherits from baseclass. Local Coordinates : origin at the start of the curve, aligned to creating `GridSurface`.
+1. Content: Open [Path](https://www.itwinjs.org/reference/geometry-core/curve/path/) with a single [LineSegment3d](https://www.itwinjs.org/reference/geometry-core/curve/linesegment3d/) in local coordinates.
+2. Placement: Origin at the start of the curve, aligned to create a `GridSurface`.
 
 ### GridArc
 
 Instances of `GridArc` can be created by intersecting instances of `GridPlanarSurface` and `GridArcSurface` together.
 
-<u>Geometry Use:</u>
+<u>GeometryStream details:</u>
 
-1.  Open [Path](https://www.itwinjs.org/reference/geometry-core/curve/path/) with a single [Arc3d](https://www.itwinjs.org/reference/geometry-core/curve/arc3d/).
-2.  Inherits from baseclass. Local Coordinates : origin at the start of the curve, aligned to creating `GridSurface`.
+1. Content: Open [Path](https://www.itwinjs.org/reference/geometry-core/curve/path/) with a single [Arc3d](https://www.itwinjs.org/reference/geometry-core/curve/arc3d/) in local coordinates.
+2. Placement: Origin at the start of the curve, Roll/Pitch/Yaw aligned to create a `GridSurface`.
 
 ### GridSpline
 
 Instances of `GridSpline` can be created by intersecting instances of `GridPlanarSurface` and `GridSplineSurface` together.
 
-<u>Geometry Use:</u>
+<u>GeometryStream details:</u>
 
-1.  Open [Path](https://www.itwinjs.org/reference/geometry-core/curve/path/) with a single spline
-2.  Inherits from baseclass. Local Coordinates : origin at the start of the curve, aligned to creating `GridSurface`.
+1. Content: Open [Path](https://www.itwinjs.org/reference/geometry-core/curve/path/) with a single spline, in local coordinates.
+2. Placement: Origin at the start of the curve, Roll/Pitch/Yaw aligned to create a `GridSurface`.
 
 ### GeneralGridCurve
 
 GridCurve representing other geometry (typically 3d splines). Instances of `GeneralGridCurve` can be created by intersecting other pairs of `GridSurface` instances.
 
-<u>Geometry Use:</u>
+<u>GeometryStream details:</u>
 
-1.  Open [Path](https://www.itwinjs.org/reference/geometry-core/curve/path/) with a single curve.
-2.  Inherits from baseclass. Local Coordinates : origin at the start of the curve, aligned to creating `GridSurface`.
+1. Content: Open [Path](https://www.itwinjs.org/reference/geometry-core/curve/path/) with a single curve in local coordinates.
+2. Placement: Origin at the start of the curve, Roll/Pitch/Yaw aligned to create a `GridSurface`.
 
 ### GridSystem
 
@@ -97,19 +97,19 @@ A future version of the Grids schema will support software that can automaticall
 
 ![GridSystem](./media/GridSystems.png)
 
-<u>Geometry Use:</u>
+<u>GeometryStream details:</u>
 
-1.  No geometry
-2.  Local Coordinates : defines the origin for surfaces
-Jonas, Does this "Local Coordinates" note imply something about setting the Origin, Yaw, Pitch, Roll, etc?
+1. Content: No geometry.
+2. Placement: Origin specified defines the origin for surfaces.
+
 ### ElevationGridSystem
 
 A collection of ElevationGridSurfaces has one or more `GeneralGridAxis`, typically used to slice a building. Every surface is positioned across the Z axis of `ElevationGridSystem` Placement.
 
-<u>Geometry Use:</u>
+<u>GeometryStream details:</u>
 
-1. No geometry
-2. Local Coordinates : defines the origin and direction for surfaces.
+1. Content: No geometry.
+2. Placement: Origin, Roll/Yaw/Pitch specified define the origin and direction for surfaces.
 
 <u>Properties:</u>
 
@@ -120,10 +120,10 @@ A collection of ElevationGridSurfaces has one or more `GeneralGridAxis`, typical
 
 A collection of unconstrained surfaces (`FreeGridSurface`).
 
-<u>Geometry Use:</u>
+<u>GeometryStream details:</u>
 
-1.  No geometry
-2.  Local Coordinates : defines the origin and direction for surfaces.
+1. Content: No geometry.
+2. Placement: Origin, Roll/Yaw/Pitch specified define the origin and direction for surfaces.
 
 ### PlanGridSystem
 
@@ -131,37 +131,37 @@ A collection of `IPlanGridSurface` elements that are single curve extrusions, sh
 
 ![IPlanGridSurface](./media/IPlanGridSurface.png)
 
-<u>Geometry Use:</u>  
+<u>GeometryStream details:</u>
 
-1. No geometry.
-2. Local Coordinates : defines the origin and direction for surfaces.
+1. Content: No geometry.
+2. Placement: Origin, Roll/Yaw/Pitch specified define the origin and direction for surfaces.
 
 ### SketchGridSystem
 
 A collection of surfaces that are **unconstrained** single curve extrusions, sharing the extrusion direction. Extrusion direction is driven by the grid's Z orientation.
 
-<u>Geometry Use:</u>
+<u>GeometryStream details:</u>
 
-1.  No geometry.
-2.  Local Coordinates : defines the origin and direction for surfaces.
+1. Content: No geometry.
+2. Placement: Origin, Roll/Yaw/Pitch specified define the origin and direction for surfaces.
 
 ### OrthogonalGridSystem
 
 A collection of `PlanCartesianGridSurface`s. It has 2 axes: one `OrthogonalAxisX` and one `OrthogonalAxisY`. All surfaces in the X direction belong to `OrthogonalAxisX`. All those in the Y direction belong to `OrthogonalAxisY`.
 
-<u>Geometry Use:</u>
+<u>GeometryStream details:</u>
 
-1.  No geometry.
-1.  Local Coordinates : defines the origin and direction for surfaces.
+1. Content: No geometry.
+2. Placement: Origin, Roll/Yaw/Pitch specified define the origin and direction for surfaces.
 
 ### RadialGridSystem
 
 A collection of `PlanRadialGridSurface` and `PlanCircumferentialGridSurface` elements. It has 2 axes: one `CircularAxis` and one `RadialAxis`. All `PlanCircumferentialGridSurface` are in the `CircularAxis`, all `PlanRadialGridSurface` in the `RadialAxis`.
 
-<u>Geometry Use:</u>
+<u>GeometryStream details:</u>
 
-1.  no geometry.
-2.  Local Coordinates : defines the origin and direction for surfaces.
+1. Content: No geometry.
+2. Placement: Origin, Roll/Yaw/Pitch specified define the origin and direction for surfaces.
 
 ### GridAxis
 
@@ -195,10 +195,10 @@ The `GridCurve`s associated to a `Grid` are contained within its submodel.
 
 A `Grid` is equivalent to an [IfcGrid](http://ifc43-docs.standards.buildingsmart.org/IFC/RELEASE/IFC4x3/HTML/lexical/IfcGrid.htm).
 
-<u>Geometry Use:</u>
+<u>GeometryStream details:</u>
 
-1.  No geometry
-2.  Local Coordinates : none.
+1. Content: No geometry.
+2. Placement: None.
 
 ### GridSurface
 
@@ -214,46 +214,45 @@ A class for planar `GridSurface` elements.
 
 A planar `GridSurface` used in `ElevationGridSystem`. this is the only type of `GridSurface` allowed in an `ElevationGridSystem`.
 
-<u>Geometry Use:</u>
+<u>GeometryStream details:</u>
 
-1.  A [Path](https://www.itwinjs.org/reference/geometry-core/curve/path/).
-2.  Local Coordinates : grid coordinates + Elevation property in Z axis
+1. Content: A [Path](https://www.itwinjs.org/reference/geometry-core/curve/path/).
+2. Placement: grid coordinates + Elevation property in Z axis
 
 ### PlanGridPlanarSurface
 
 A class for `GridPlanarSurface` elements used in `PlanGrid`.
 
-<u>Geometry Use:</u>
+<u>GeometryStream details:</u>
 
-1.  A `SolidPrimitive` DgnExtrusion containing single line for base, swept from StartElevation to EndElevation
-2.  Local Coordinates : defined by subclasses
+- Content: A `SolidPrimitive` DgnExtrusion containing single line for base, swept from StartElevation to EndElevation. 
 
 ### PlanCartesianGridSurface
 
 A class for `GridSurface` contained in `OrthogonalGridSystem`
 
-<u>Geometry Use:</u>
+<u>GeometryStream details:</u>
 
-1.  "inherit from parent" a `SolidPrimitive` DgnExtrusion containing single line for base, swept from StartElevation to EndElevation
-2.  Local Coordinates : `GridSystem` coordinates + Coordinate in X or Y direction depending on the type of axis
+1. Content: "inherit from parent" a `SolidPrimitive` DgnExtrusion containing single line for base, swept from StartElevation to EndElevation
+2. Local Coordinates : `GridSystem` coordinates + Coordinate in X or Y direction depending on the type of axis.
 
 ### PlanRadialGridSurface
 
 A class for `GridSurface` instances of angular increments contained in `RadialGridSystem`
 
-<u>Geometry Use:</u>
+<u>GeometryStream details:</u>
 
-1.  "inherit from parent" a `SolidPrimitive` DgnExtrusion containing single line for base, swept from StartElevation to EndElevation
-2.  Local Coordinates : `GridSystem` coordinates rotated by the Angle property from Y direction, clockwise
+1. Content: "inherit from parent" a `SolidPrimitive` DgnExtrusion containing single line for base, swept from StartElevation to EndElevation
+2. Local Coordinates : `GridSystem` coordinates rotated by the Angle property from Y direction, clockwise.
 
 ### SketchLineGridSurface
 
 A class for `GridSurface` instances of sketched line surfaces in `SketchGridSystem`
 
-<u>Geometry Use:</u>
+<u>GeometryStream details:</u>
 
-1.  "inherit from parent" a `SolidPrimitive` DgnExtrusion containing single line for base, swept from StartElevation to EndElevation
-2.  Local Coordinates : `GridSystem` coordinates
+1. Content: "inherit from parent" a `SolidPrimitive` DgnExtrusion containing single line for base, swept from StartElevation to EndElevation.
+2. Local Coordinates : `GridSystem` coordinates.
 
 <u>Properties:</u>
 
@@ -267,28 +266,28 @@ A `GridSurface` that is parallel to extruded arc.
 
 A class for `GridArcSurface` elements used in `PlanGridSystem`.
 
-<u>Geometry Use:</u>
+<u>GeometryStream details:</u>
 
-1.  A `SolidPrimitive` DgnExtrusion containing single arc for base, swept from StartElevation to EndElevation
-2.  Local Coordinates : defined by subclasses
+1. Content: A `SolidPrimitive` DgnExtrusion containing single arc for base, swept from StartElevation to EndElevation.
+2. Local Coordinates : defined by subclasses.
 
 ### PlanCircumferentialGridSurface
 
 A class for `GridSurface` instances of circular radius increments contained in `RadialGridSystem`
 
-<u>Geometry Use:</u>
+<u>GeometryStream details:</u>
 
-1.  "inherit from parent" a `SolidPrimitive` DgnExtrusion containing single arc for base, swept from StartElevation to EndElevation
-2.  Local Coordinates : `GridSystem` coordinates
+1. Content: "inherit from parent" a `SolidPrimitive` DgnExtrusion containing single arc for base, swept from StartElevation to EndElevation
+2. Local Coordinates : `GridSystem` coordinates.
 
 ### SketchArcGridSurface
 
 A class for `GridSurface` instances of sketched arc surfaces in `SketchGridSystem`
 
-<u>Geometry Use:</u>
+<u>GeometryStream details:</u>
 
-1.  "inherit from parent" a `SolidPrimitive` DgnExtrusion containing single arc for base, swept from StartElevation to EndElevation
-2.  Local Coordinates : `GridSystem` coordinates
+1. Content: "inherit from parent" a `SolidPrimitive` DgnExtrusion containing single arc for base, swept from StartElevation to EndElevation.
+2. Local Coordinates : `GridSystem` coordinates.
 
 <u>Properties:</u>
 
@@ -302,23 +301,23 @@ A `GridSurface` that is parallel to an extruded spline.
 
 A class for `GridSplineSurface` elements used in `PlanGrid`.
 
-<u>Geometry Use:</u>
+<u>GeometryStream details:</u>
 
-1.  A `SolidPrimitive` DgnExtrusion containing single spline for base, swept from StartElevation to EndElevation
-2.  Local Coordinates : defined by subclasses
+1. Content: A `SolidPrimitive` DgnExtrusion containing single spline for base, swept from StartElevation to EndElevation.
+2. Local Coordinates : defined by subclasses.
 
 ### SketchSplineGridSurface
 
 A class for `GridSurface` instances of sketched spline surfaces in `SketchGridSystem`
 
-<u>Geometry Use:</u>
+<u>GeometryStream details:</u>
 
-1.  "inherit from parent" a `SolidPrimitive` DgnExtrusion containing single spline for base, swept from StartElevation to EndElevation
-2.  Local Coordinates : `Grid` coordinates
+1. Content: "inherit from parent" a `SolidPrimitive` DgnExtrusion containing single spline for base, swept from StartElevation to EndElevation.
+2. Local Coordinates : `Grid` coordinates.
 
 <u>Properties:</u>
 
-1.  Spline2d - spline geometry used to extrude the surface - a [Path](https://www.itwinjs.org/reference/geometry-core/curve/path/) containing a single [BSplineCurve3d](https://www.itwinjs.org/reference/geometry-core/bspline/bsplinecurve3d/)spline.
+1. Spline2d - spline geometry used to extrude the surface - a [Path](https://www.itwinjs.org/reference/geometry-core/curve/path/) containing a single [BSplineCurve3d](https://www.itwinjs.org/reference/geometry-core/bspline/bsplinecurve3d/)spline.
 
 ### GridLabelRecord
 
