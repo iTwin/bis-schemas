@@ -50,7 +50,7 @@ There are several specializations of `GridCurve`:
 
 <u>Geometry Use:</u>
 
-1.  Open [Path](https://www.itwinjs.org/reference/geometry-core/curve/path/) with a single curve.
+1.  Open [Path](https://www.itwinjs.org/reference/geometry-core/curve/path/) with a single [ICurvePrimitive](https://www.itwinjs.org/reference/core-geometry/curve/curveprimitive/).
 2.  Local Coordinates : origin at the start of the curve, aligned to create a `GridSurface` when available.
 
 ### GridLine
