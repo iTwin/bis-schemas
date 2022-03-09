@@ -9,18 +9,18 @@ This page provides the recommended style guidelines for creating **instance** di
 ## **Colors**
 This style guide provides a default set of colors to use, but they **can be overridden in different contexts** if needed - in such cases the legend must be updated.
 
-For **Models** colors are determined by the type of the model:
+For **Elements**, colors are determined by the type of the element:
 - `Information` - light cyan (#EDF4F6)
 - `Physical` - light blue (#96C8FF)
 - `Functional` - light green (#C8FFC8)
 - `Spatial Location` - light yellow (#FFFF96)
 - `Drawing` - purple (#C896FF)
 
-![Model colors](cmap-example/media/instance/colors-models.png)
-
-All **Elements** are colored white (#FFFFFF) since element type can be inferred from their Model type.
-
 ![Element colors](cmap-example/media/instance/colors-elements.png)
+
+All **Models** are colored white (#FFFFFF) since their type can be inferred from their modeled-element.
+
+![Model colors](cmap-example/media/instance/colors-models.png)
 
 ## **Shapes and outlines**
 Models are represented by a **nested node** (see [CMAP tips](schema-cmap-style-guide#cmap-tips))

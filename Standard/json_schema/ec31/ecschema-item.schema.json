@@ -1,0 +1,420 @@
+{
+  "$schema": "http://json-schema.org/draft-06/schema#",
+  "$id": "https://dev.bentley.com/json_schemas/ec/31/draft-01/schemaitem",
+  "title": "SchemaItem",
+  "description": "An EC3.1 Json representation of any SchemaItem",
+  "type": "object",
+  "required": [
+    "schemaItemType",
+    "name",
+    "schema"
+  ],
+  "definitions": {
+    "ecversion": {
+      "type": "string",
+      "pattern": "^([0-9]{1,2}).([0-9]{1,2}).([0-9]{1,2})$"
+    },
+    "ecname": {
+      "type": "string",
+      "pattern": "^([a-zA-Z_.]+[a-zA-Z0-9_.]*)$"
+    },
+    "fullECName": {
+      "type": "string",
+      "pattern": "^([a-zA-Z_.]+[a-zA-Z0-9_.]*)\\.([a-zA-Z_.]+[a-zA-Z0-9_.]*)$"
+    },
+    "schemaItemType": {
+      "type": "string",
+      "description": "All supported SchemaItem types within an ECSchema",
+      "enum": [
+        "EntityClass",
+        "Mixin",
+        "StructClass",
+        "RelationshipClass",
+        "CustomAttributeClass",
+        "Enumeration",
+        "KindOfQuantity",
+        "PropertyCategory"
+      ]
+    },
+    "classModifier": {
+      "type": "string",
+      "enum": [
+        "none",
+        "abstract",
+        "sealed"
+      ],
+      "default": "None"
+    },
+    "customAttributeContainerType": {
+      "type": "string"
+    },
+    "schemaItemProperties": {
+      "type": "object",
+      "required": [
+        "name",
+        "schemaItemType"
+      ],
+      "properties": {
+        "$schema": { "type": "string"},
+        "name": { "$ref": "#/definitions/ecname" },
+        "schemaItemType": { "$ref": "#/definitions/schemaItemType" },
+        "schema": { "$ref": "#/definitions/ecname" },
+        "schemaVersion": { "$ref": "#/definitions/ecversion" },
+        "description": { "type": "string" },
+        "displayLabel": { "type": "string" } 
+      }
+    },
+    "Class": {
+      "type": "object",
+      "allOf":[
+        { "$ref": "#/definitions/schemaItemProperties" },
+        {
+          "type": "object",
+          "properties": {
+            "modifier": { "$ref": "#/definitions/classModifier" },
+            "baseClass": { "$ref": "#/definitions/fullECName" },
+            "customAttributes": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": [
+                {
+                  "type": "object",
+                  "required": [
+                    "className"
+                  ],
+                  "properties": {
+                    "className": { "$ref": "#/definitions/fullECName" }
+                  }
+                }
+              ]
+            },
+            "propertiesContents": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": [
+                {
+                  "type": "object",
+                  "oneOf": [
+                    { "$ref": "#/definitions/PrimitiveProperty" },
+                    { "$ref": "#/definitions/StructProperty" },
+                    { "$ref": "#/definitions/PrimitiveArrayProperty" },
+                    { "$ref": "#/definitions/StructArrayProperty" },
+                    { "$ref": "#/definitions/NavigationProperty" }
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "EntityClass": {
+      "type": "object",
+      "allOf": [
+        { "$ref": "#/definitions/Class"},
+        {
+          "type": "object",
+          "properties": {
+            "mixin": { "$ref": "#/definitions/fullECName" }
+          }
+        }
+      ]
+    },
+    "Mixin": {
+      "type": "object",
+      "allOf": [
+        { "$ref": "#/definitions/Class"},
+        {
+          "type": "object",
+          "properties": {
+            "appliesTo": { "$ref": "#/definitions/fullECName" }
+          }
+        }
+      ]
+    },
+    "relationshipStrength": {
+      "type": "string",
+      "enum": [
+        "embedding",
+        "referencing",
+        "holding"
+      ]
+    },
+    "strengthDirection": {
+      "type": "string",
+      "enum": [
+        "forward",
+        "backward"
+      ]
+    },
+    "RelationshipClass": {
+      "type": "object",
+      "required": [
+        "modifier"
+      ],
+      "allOf": [
+        { "$ref": "#/definitions/Class"},
+        {
+          "type": "object",
+          "required":[
+            "source",
+            "target"
+          ],
+          "properties": {
+            "strength": { "$ref": "#/definitions/relationshipStrength" },
+            "strengthDirection": { "$ref": "#/definitions/strengthDirection" },
+            "source": { "$ref": "#/definitions/RelationshipConstraint" },
+            "target": { "$ref": "#/definitions/RelationshipConstraint" }
+          }
+        }
+      ]
+    },
+    "RelationshipConstraint": {
+      "type": "object",
+      "required": [
+        "multiplicity",
+        "roleLabel",
+        "polymorphic",
+        "constraintClasses"
+      ],
+      "properties": {
+        "multiplicity": {
+          "type": "string",
+          "pattern": "\\(\\d..(\\d|\\*)\\)"
+        },
+        "roleLabel": { "type": "string" },
+        "polymorphic": { "type":"boolean" },
+        "abstractConstraint": { "$ref": "#/definitions/fullECName" },
+        "constraintClasses": {
+          "type": "array",
+          "uniqueItems": true,
+          "items":[
+            { "$ref": "#/definitions/fullECName" }
+          ]
+        }
+      }
+    },
+    "StructClass": { "$ref": "#/definitions/Class"},
+    "CustomAttributeClass": {
+      "type": "object",
+      "required": [
+        "appliedTo"
+      ],
+      "allOf": [
+        { "$ref": "#/definitions/Class"},
+        {
+          "type": "object",
+          "properties": {
+            "appliedTo": { "$ref": "#/definitions/customAttributeContainerType" }
+          }
+        }
+      ]
+    },
+    "KindOfQuantity": {
+      "type": "object",
+      "required": [
+        "persistenceUnit",
+        "relativeError",
+        "defaultPresentationUnit",
+        "alternativePresentationUnits"
+      ],
+      "allOf": [
+        { "$ref": "#/definitions/schemaItemProperties" },
+        {
+          "type": "object",
+          "properties": {
+            "persistenceUnit": { "type": "object" },
+            "relativeError": { "type":"number" },
+            "defaultPresentationUnit": { "type": "string" },
+            "alternativePresentationUnits": { "type": "string" }
+          }
+        }
+      ]
+    },
+    "Enumeration": {
+      "type": "object",
+      "required": [
+        "type",
+        "isStrict",
+        "enumerators"
+      ],
+      "allOf": [
+        { "$ref": "#/definitions/schemaItemProperties" },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "int",
+                "string"
+              ]
+            },
+            "isStrict": { "type": "boolean" },
+            "enumerators": {
+              "type": "array",
+              "uniqueItems": true,
+              "minItems": 1,
+              "items": { "$ref": "#/definitions/Enumerator" }
+            }
+          }
+        }
+      ]
+    },
+    "Enumerator": {
+      "type": "object",
+      "required": [
+        "displayLabel",
+        "value"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "displayLabel": { "type": "string" },
+        "value": { "type": ["string", "number"] }
+      }
+    },
+    "PropertyCategory": {
+      "type": "object",
+      "required": [
+        "priority"
+      ],
+      "allOf": [
+        { "$ref": "#/definitions/schemaItemProperties" },
+        {
+          "type": "object",
+          "properties": {
+            "priority": {
+              "type": "number"
+            }
+          }
+        }
+      ]
+    },
+    "primitiveTypes": {
+      "type": "string",
+      "enum": [
+        "binary",
+        "bool",
+        "boolean",
+        "dateTime",
+        "double",
+        "int",
+        "long",
+        "point2d",
+        "point3d",
+        "string",
+        "Bentley.Geometry.Common.IGeometry"
+      ]
+    },
+    "propertyTypes": {
+      "type": "string",
+      "enum": [
+        "PrimitiveProperty",
+        "StructProperty",
+        "PrimitiveArrayProperty",
+        "StructArrayProperty",
+        "NavigationProperty"
+      ]
+    },
+    "Property": {
+      "type": "object",
+      "required": [
+        "name",
+        "propertyType"
+      ],
+      "properties": {
+        "name": { "$ref": "#/definitions/ecname" },
+        "propertyType": { "$ref": "#/definitions/propertyTypes" },
+        "description": { "type": "string" },
+        "displayLabel": { "type": "string" },
+        "isReadOnly": { "type":"boolean" },
+        "category": { "ref": "#/definitions/fullECName" }
+      }
+    },
+    "PrimitiveProperty": {
+      "type": "object",
+      "allOf": [
+        { "$ref": "#/definitions/Property" },
+        {
+          "required": [
+            "typeName"
+          ],
+          "properties": {
+            "typeName": {
+              "oneOf":[
+                { "$ref": "#/definitions/primitiveTypes" },
+                { "$ref": "#/definitions/fullECName" }
+              ]
+            },
+            "extendedTypeName": { "type": "string" },
+            "minimumLength": { "type": "number" },
+            "maximumLength": { "type": "number" },
+            "minimumValue": { "type": "number" },
+            "maximumValue": { "type": "number" },
+            "kindOfQuantity": { "$ref": "#/definitions/fullECName" }
+          }
+        }
+      ]
+    },
+    "arrayAttributes": {
+      "type": "object",
+      "properties": {
+        "minOccurs": { "type": "number" },
+        "maxOccurs": { "type": "number" }
+      }
+    },
+    "PrimitiveArrayProperty": {
+      "type": "object",
+      "allOf": [
+        { "$ref": "#/definitions/PrimitiveProperty"},
+        { "$ref": "#/definitions/arrayAttributes"}
+      ]
+    },
+    "StructProperty": {
+      "type": "object",
+      "allOf": [
+        { "$ref": "#/definitions/Property" },
+        {
+          "properties": {
+            "typeName": { "$ref": "#/definitions/fullECName" }
+          }
+        }
+      ]
+    },
+    "StructArrayProperty": {
+      "type": "object",
+      "allOf": [
+        { "$ref": "#/definitions/StructProperty" },
+        { "$ref": "#/definitions/arrayAttributes" }
+      ]
+    },
+    "NavigationProperty": {
+      "type": "object",
+      "allOf": [
+        { "$ref": "#/definitions/Property" },
+        {
+          "properties": {
+            "relationshipName": { "$ref": "#/definitions/fullECName" },
+            "direction": {
+              "type": "string",
+              "enum": [
+                "backward",
+                "forward"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  },
+  "anyOf":[
+    {"$ref": "#/definitions/EntityClass"},
+    {"$ref": "#/definitions/Mixin"},
+    {"$ref": "#/definitions/StructClass"},
+    {"$ref": "#/definitions/RelationshipClass"},
+    {"$ref": "#/definitions/CustomAttributeClass"},
+    {"$ref": "#/definitions/KindOfQuantity"},
+    {"$ref": "#/definitions/PropertyCategory"},
+    {"$ref": "#/definitions/Enumeration"}
+  ]
+}
