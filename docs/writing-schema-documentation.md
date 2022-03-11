@@ -4,7 +4,7 @@ The goal of writing schema documentation is to clarify the goal of the schema, h
 
 Schemas contain descriptions on each of its items but that is meant to be a short one-line description, whereas a lot of the different classes and types within BIS require longer and more detailed explanations.  To support documenting more detailed information, an additional markdown file, a `remarks` file, can be used.
 
-The remarks file lives outside the ECSchema xml allowing for more detail, and images, to be defined in a markdown format.  When creating the documentation site the end result of schema documententation is in the form of a `*.ecschema.md` and `*.remarks.md` file, the combination of the two contains the description in the schema and all of contents of the remarks files.  (Combining the two into a single page is done by the tool __BeMetalsmith__)
+The remarks file lives outside the ECSchema xml allowing for more detail, and images, to be defined in a markdown format.  When creating the documentation site the end result of schema documentation is in the form of a `*.ecschema.md` and `*.remarks.md` file, the combination of the two contains the description in the schema and all of contents of the remarks files.  (Combining the two into a single page is done by the tool __BeMetalsmith__)
 
 More details on how this is happens in the [Writing Schema Docs Section](#writing-schema-remarks).
 
