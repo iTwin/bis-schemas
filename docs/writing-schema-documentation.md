@@ -13,7 +13,7 @@ More details on how this is happens in the [Writing Schema Docs Section](#writin
 - [Starting a new Remarks File](#starting-a-new-remarks-file)
 - [Writing Schema Remarks](#writing-schema-remarks)
   - [Schema Documentation Style Guide](./schema-documentation-style-guide.md)
-- [Viewing the Schema Docs in a local iModel.js build](#viewing-the-schema-docs-in-a-local-iModel.js-build)
+- [Viewing the Schema Docs in a local iTwin.js build](#viewing-the-schema-docs-in-a-local-iTwin.js-build)
 - [Publishing Schema Documentation](#publishing-schema-documentation)
 
 ## Starting a new Remarks File
@@ -35,7 +35,7 @@ remarksTarget: {SchemaName}.ecschema.md
 
 ## Writing Schema Remarks
 
-The schema remarks are used to enhance the descriptions and information that is available in the ECSchema.  This is done by using a separate file, a `*.remarks.md`.  The `remarks` file has a specific format to allow the tool that creates the iModel.js documentation to merge the ECSchema information with the contents of the remarks.
+The schema remarks are used to enhance the descriptions and information that is available in the ECSchema.  This is done by using a separate file, a `*.remarks.md`.  The `remarks` file has a specific format to allow the tool that creates the iTwin.js documentation to merge the ECSchema information with the contents of the remarks.
 
 The basic format for the `remarks.md` is,
 
@@ -62,8 +62,8 @@ For more information visit the [Schema documentation style guide](./schema-docum
 
 ## Publishing Schema Documentation
 
-Markdown files are generated and published as an artifact for every released schema by default (see [Docs Generation Build](../tools/MarkdownGeneration/generate-docs.yaml)).  This artifact is published automatically as part of the iModel.js doc build.  To make the schema visible in the iModel.js docs you must add it to the domains index page (docs/bis/domains/index.md) in the iModel.js repo
+Markdown files are generated and published as an artifact for every released schema by default (see [Docs Generation Build](../tools/MarkdownGeneration/generate-docs.yaml)).  This artifact is published automatically as part of the iTwin.js doc build.  To make the schema visible in the iTwin.js docs you must add it to the domains index page (docs/bis/domains/index.md) in the itwinjs-core repo.
 
-> WARNING:  When the documentation is added to the iModel.js docs it will be published publicly for anyone to see, so you will need to consider if that's what you want for your domain.
+> WARNING:  When the documentation is added to the itwinjs-core docs it will be published publicly for anyone to see, so you will need to consider if that's what you want for your domain.
 
-> NOTE: Currently there is no other published location for Schema documentation, only on the iModel.js site.
+> NOTE: Currently there is no other published location for Schema documentation, only on the iTwin.js site.
