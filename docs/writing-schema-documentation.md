@@ -60,6 +60,10 @@ An example of a remarks file for a the [Fields.ecschema.xml](./remarks-example/F
 
 For more information visit the [Schema documentation style guide](./schema-documentation-style-guide.md).
 
+## Viewing the Schema Docs in a local iTwin.js build
+
+Check the wiki page in `BIS` section to get more information.
+
 ## Publishing Schema Documentation
 
 Markdown files are generated and published as an artifact for every released schema by default (see [Docs Generation Build](../tools/MarkdownGeneration/generate-docs.yaml)).  This artifact is published automatically as part of the iTwin.js doc build.  To make the schema visible in the iTwin.js docs you must add it to the domains index page (docs/bis/domains/index.md) in the itwinjs-core repo.
