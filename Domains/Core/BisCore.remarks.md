@@ -13,7 +13,7 @@ The core classes are decorated by ECCustomAttributes that effectively define the
 
 The classes of BisCore are used as base classes for all classes in other BIS Domain schemas.
 
-See [Base Infrastructure Schemas](https://imodeljs.github.io/iModelJs-docs-output//bis/)
+See [Base Infrastructure Schemas](https://www.itwinjs.org/bis/)
 
 ## Entity Classes
 
@@ -190,7 +190,7 @@ Categories should be standardized by domain groups where possible. They generall
 
 See [Categories Introduction](../intro/categories/).
 
-Also see the [ClassificationSystems](https://imodeljs.github.io/iModelJs-docs-output/bis/domains/classificationsystems.ecschema/) domain schema for another way of categorizing and classifying elements.
+Also see the [ClassificationSystems](https://www.itwinjs.org/bis/domains/classificationsystems.ecschema/) domain schema for another way of categorizing and classifying elements.
 
 > Behavior: The system handler (C++) for `Category` requires a valid `CodeValue` (name) for every instance.
 It will insert a *default* `SubCategory` for every `Category` that is inserted.

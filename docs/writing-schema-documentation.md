@@ -4,7 +4,7 @@ The goal of writing schema documentation is to clarify the goal of the schema, h
 
 Schemas contain descriptions on each of its items but that is meant to be a short one-line description, whereas a lot of the different classes and types within BIS require longer and more detailed explanations.  To support documenting more detailed information, an additional markdown file, a `remarks` file, can be used.
 
-The remarks file lives outside the ECSchema xml allowing for more detail, and images, to be defined in a markdown format.  When creating the documentation site the end result of schema documententation is in the form of a `*.ecschema.md` and `*.remarks.md` file, the combination of the two contains the description in the schema and all of contents of the remarks files.  (Combining the two into a single page is done by the tool __BeMetalsmith__)
+The remarks file lives outside the ECSchema xml allowing for more detail, and images, to be defined in a markdown format.  When creating the documentation site the end result of schema documentation is in the form of a `*.ecschema.md` and `*.remarks.md` file, the combination of the two contains the description in the schema and all of contents of the remarks files.  (Combining the two into a single page is done by the tool __BeMetalsmith__)
 
 More details on how this is happens in the [Writing Schema Docs Section](#writing-schema-remarks).
 
@@ -13,7 +13,7 @@ More details on how this is happens in the [Writing Schema Docs Section](#writin
 - [Starting a new Remarks File](#starting-a-new-remarks-file)
 - [Writing Schema Remarks](#writing-schema-remarks)
   - [Schema Documentation Style Guide](./schema-documentation-style-guide.md)
-- [Viewing the Schema Docs in a local iModel.js build](#viewing-the-schema-docs-in-a-local-iModel.js-build)
+- [Viewing the Schema Docs in a local iTwin.js build](#viewing-the-schema-docs-in-a-local-iTwinjs-build)
 - [Publishing Schema Documentation](#publishing-schema-documentation)
 
 ## Starting a new Remarks File
@@ -35,7 +35,7 @@ remarksTarget: {SchemaName}.ecschema.md
 
 ## Writing Schema Remarks
 
-The schema remarks are used to enhance the descriptions and information that is available in the ECSchema.  This is done by using a separate file, a `*.remarks.md`.  The `remarks` file has a specific format to allow the tool that creates the iModel.js documentation to merge the ECSchema information with the contents of the remarks.
+The schema remarks are used to enhance the descriptions and information that is available in the ECSchema.  This is done by using a separate file, a `*.remarks.md`.  The `remarks` file has a specific format to allow the tool that creates the iTwin.js documentation to merge the ECSchema information with the contents of the remarks.
 
 The basic format for the `remarks.md` is,
 
@@ -60,10 +60,14 @@ An example of a remarks file for a the [Fields.ecschema.xml](./remarks-example/F
 
 For more information visit the [Schema documentation style guide](./schema-documentation-style-guide.md).
 
+## Viewing the Schema Docs in a local iTwin.js build
+
+Check the wiki page in `BIS` section to get more information.
+
 ## Publishing Schema Documentation
 
-Markdown files are generated and published as an artifact for every released schema by default (see [Docs Generation Build](../tools/MarkdownGeneration/generate-docs.yaml)).  This artifact is published automatically as part of the iModel.js doc build.  To make the schema visible in the iModel.js docs you must add it to the domains index page (docs/bis/domains/index.md) in the iModel.js repo
+Markdown files are generated and published as an artifact for every released schema by default (see [Docs Generation Build](../tools/MarkdownGeneration/generate-docs.yaml)).  This artifact is published automatically as part of the iTwin.js doc build.  To make the schema visible in the iTwin.js docs you must add it to the domains index page (docs/bis/domains/index.md) in the itwinjs-core repo.
 
-> WARNING:  When the documentation is added to the iModel.js docs it will be published publicly for anyone to see, so you will need to consider if that's what you want for your domain.
+> WARNING:  When the documentation is added to the itwinjs-core docs it will be published publicly for anyone to see, so you will need to consider if that's what you want for your domain.
 
-> NOTE: Currently there is no other published location for Schema documentation, only on the iModel.js site.
+> NOTE: Currently there is no other published location for Schema documentation, only on the iTwin.js site.
