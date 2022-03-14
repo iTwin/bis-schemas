@@ -13,7 +13,7 @@ More details on how this is happens in the [Writing Schema Docs Section](#writin
 - [Starting a new Remarks File](#starting-a-new-remarks-file)
 - [Writing Schema Remarks](#writing-schema-remarks)
   - [Schema Documentation Style Guide](./schema-documentation-style-guide.md)
-- [Viewing the Schema Docs in a local iTwin.js build](#viewing-the-schema-docs-in-a-local-iTwin.js-build)
+- [Viewing the Schema Docs in a local iTwin.js build](#viewing-the-schema-docs-in-a-local-iTwinjs-build)
 - [Publishing Schema Documentation](#publishing-schema-documentation)
 
 ## Starting a new Remarks File
