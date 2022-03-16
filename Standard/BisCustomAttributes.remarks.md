@@ -5,49 +5,55 @@ remarksTarget: BisCustomAttributes.ecschema.md
 
 # BisCustomAttributes
 
-## SchemaGradeValue
+## SchemaGrade
 
-The `SchemaGradeValue` enumeration is use in the `SchemaInfo` `CustomAttribute` to declare the schema author's intended compatibility level with BIS concepts and patterns for the schema.
+The `SchemaGrade` enumeration is use in the `SchemaInfo` `CustomAttribute` to declare the schema author's intended compatibility level with BIS concepts and patterns for the schema.
 
 ### A
 
-True BIS schemas carefully designed for editing and interoperability.
+Grade A schemas at layers lower than *Application* aim to standardize the concepts and patterns in their scope throughout the BIS ecosystem. Such *data alignment* goal enables the development of software that understands such concepts in order to offer valuable functionality or services for them. 
+
+Grade A schemas at the *Application* layer are designed with authoring in mind.
 
 ### B
 
-Either: Legacy “consensus” schemas intelligently converted to BIS, or new BIS schemas, with one-way conversion to BIS in mind, but not intended for editing (native format).
+Examples of Grade B include schemas such as `Bentley OpenPlant`'s implementation of ISO 15926, considered the standard in the Plant discipline, but developed outside of BIS. In that case, an intelligent conversion process into BIS for `OpenPlant` schemas exist, but the resulting BIS schemas typically do not support authoring correctly.
 
 ### C
 
-Legacy schema with software-discoverable semantics, intelligently converted to follow applicable BIS rules and patterns.
+An example of Grade C include auto-generated schemas classifying their data in terms of one or more Grade A schemas at the *Common*, *Discipline-Physical* or *Discipline-Other* layers. In such cases, software-driven understanding of classes in the schema is possible without human intervention.
+
+Another example of Grade C include *Application* schemas not designed with authoring or alignment in mind. Static iModel Connector schemas designed to capture concepts in the source format that are not or cannot be aligned are also considered Grade C.
 
 ### D
 
-Legacy schema with minimim or no software-discoverable semantics, converted to follow basic BIS rules and patterns.
+An example of Grade D include auto-generated schemas introducing direct, generic concrete subclasses of Element-classes in *BisCore* (e.g. `bis:PhysicalElement`). Since no other discipline-specific schemas are involved, software-driven understanding of those classes is not possible without human intervention.
 
-## SchemaLayerValue
+## SchemaLayer
 
-The `SchemaLayerValue` enumeration is use in the `SchemaInfo` `CustomAttribute` to declare the schema author's intended layer for the schema. A schema at a particular layer can reference schemas at the same layer or lower.
+A schema at a particular layer can reference schemas at the same layer or lower.
 
 ### Core
 
-Schemas defining the 'fabric of the universe' and some key organizational strategies.
+The Core layer includes schemas such as *BisCore*, *Analytic* and *Functional*.
 
 ### Common
 
-Schemas defining abstract concepts and patterns used by multiple disciplines.
+Examples of BIS schemas at the Common layer include *ClassificationSystems*, *NetworkTopology* and *SpatialComposition*.
 
 ### DisciplinePhysical
 
-Schemas defining physical/spatial and closely associated concepts, in light of a specific discipline.
+Examples of BIS schemas at the Discipline-Physical layer include *Earthwork*, *RoadSpatial* and *Rebar*.
 
 ### DisciplineOther
 
-Schemas defining concepts from modeling perspectives other than physical, in light of a specific discipline.
+Examples of BIS schemas at the Discipline-Other layer include *StructuralAnalytical* and *StructuralDesign*.
 
 ### Application
 
-Schemas defining concepts that no other schema would need or want to reference. Product and iModel Connector schemas as well as dynamically-generated or user-customized schemas belong to this layer.
+Examples of BIS schemas at the Application layer include static iModel Connector schemas such as ConceptStation's *CSSegments* and Bentley Civil's *CifRoads*. It also includes all dynamically-generated iModel Connector schemas.
+
+Other technology-specific schemas not meant to be referenced by other schemas belong to this layer. Examples include *PresentationRules*, *PointCloud* and *ScalableMesh*.
 
 ## SchemaInfo
 
