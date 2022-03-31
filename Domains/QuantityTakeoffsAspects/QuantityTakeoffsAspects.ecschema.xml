@@ -23,9 +23,9 @@
 
     <ECEntityClass typeName="DimensionsAspect" displayLabel="Dimensions Aspect" description="An aspect that defines basic object measurements: height, length width." >
         <BaseClass>QuantityTakeoffAspect</BaseClass>
-        <ECProperty propertyName="Height" typeName="double" displayLabel="Height" kindOfQuantity="AECU:LENGTH" description="Object's height/depth in meters."/>
-        <ECProperty propertyName="Length" typeName="double" displayLabel="Length" kindOfQuantity="AECU:LENGTH" description="Object's length in meters."/>
-        <ECProperty propertyName="Width" typeName="double" displayLabel="Width" kindOfQuantity="AECU:LENGTH" description="Object's width/thickness in meters."/>
+        <ECProperty propertyName="Height" typeName="double" kindOfQuantity="AECU:LENGTH" description="Object's height/depth in meters."/>
+        <ECProperty propertyName="Length" typeName="double" kindOfQuantity="AECU:LENGTH" description="Object's length in meters."/>
+        <ECProperty propertyName="Width" typeName="double" kindOfQuantity="AECU:LENGTH" description="Object's width/thickness in meters."/>
     </ECEntityClass>
 
     <ECRelationshipClass typeName="ElementOwnsDimensionsAspect" strength="embedding" modifier="None" description="A relationship tieing the specialized quantity takeoff aspect with an element">
@@ -42,7 +42,7 @@
         <BaseClass>QuantityTakeoffAspect</BaseClass>
         <ECCustomAttributes>
             <Deprecated xmlns="CoreCustomAttributes.01.00.03">
-                <Description>Use ArchitecturalPhysical:DoorType instead.</Description>
+                <Description>Use ArchitecturalPhysical:Door and ArchitecturalPhysical:DoorType instead.</Description>
             </Deprecated>
         </ECCustomAttributes>
         <ECProperty propertyName="Type" typeName="DoorType" description="Type of a door."/>
@@ -52,7 +52,7 @@
         <BaseClass>ElementOwnsQuantityTakeoffAspect</BaseClass>
         <ECCustomAttributes>
             <Deprecated xmlns="CoreCustomAttributes.01.00.03">
-                <Description>Use ArchitecturalPhysical:DoorType instead.</Description>
+                <Description>Use ArchitecturalPhysical:Door and ArchitecturalPhysical:DoorType instead.</Description>
             </Deprecated>
         </ECCustomAttributes>
         <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
@@ -78,7 +78,6 @@
         <ECEnumerator value="10" displayLabel="Narrow View w/ Louver"/>
     </ECEnumeration>
 
-    <!-- TODO: Does BIS have a better home for this Energy-performance data? -->
     <ECEntityClass typeName="EnergyPerformanceAspect" description="An aspect that defines the overall energy efficiency rating of a building." >
         <BaseClass>QuantityTakeoffAspect</BaseClass>
         <ECProperty propertyName="Rating" typeName="double" description="Energy performance rating defined as a number from 0 to 100."/>
@@ -96,22 +95,11 @@
 
     <ECEntityClass typeName="FoundationAspect" description="An aspect that describes the type of structural foundation." >
         <BaseClass>QuantityTakeoffAspect</BaseClass>
-        <ECCustomAttributes>
-            <Deprecated xmlns="CoreCustomAttributes.01.00.03">
-                <Description>Use classes from the StructuralPhysical schema instead.</Description>
-            </Deprecated>
-        </ECCustomAttributes>
-        <!-- TODO: Nabil to make sure all PhysicalElement classes in StructuralPhysical have a corresponding PhysicalType subclass. -->
         <ECProperty propertyName="Type" typeName="FoundationType" description="Type of a structural foundation."/>
     </ECEntityClass>
 
     <ECRelationshipClass typeName="ElementOwnsFoundationAspect" strength="embedding" modifier="None" description="A relationship tieing the specialized quantity takeoff aspect with an element">
         <BaseClass>ElementOwnsQuantityTakeoffAspect</BaseClass>
-        <ECCustomAttributes>
-            <Deprecated xmlns="CoreCustomAttributes.01.00.03">
-                <Description>Use classes from the StructuralPhysical schema instead.</Description>
-            </Deprecated>
-        </ECCustomAttributes>
         <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
             <Class class="bis:Element"/>
         </Source>
@@ -120,7 +108,6 @@
         </Target>
     </ECRelationshipClass>
 
-    <!-- Deprecated -->
     <ECEnumeration typeName="FoundationType" backingTypeName="int" isStrict="true">
         <ECEnumerator value="0" displayLabel="Mat Foundation"/>
         <ECEnumerator value="1" displayLabel="Pile"/>
@@ -158,7 +145,7 @@
 
     <ECEntityClass typeName="PerimeterAspect" displayLabel="Perimeter Aspect" description="An aspect that defines the length of the outline of a shape - perimeter." >
         <BaseClass>QuantityTakeoffAspect</BaseClass>
-        <ECProperty propertyName="Perimeter" typeName="double" displayLabel="Perimeter" kindOfQuantity="AECU:LENGTH" description="Perimeter of the shape in meters."/>
+        <ECProperty propertyName="Perimeter" typeName="double" kindOfQuantity="AECU:LENGTH" description="Perimeter of the shape in meters."/>
     </ECEntityClass>
     
     <ECRelationshipClass typeName="ElementOwnsPerimeterAspect" strength="embedding" modifier="None" description="A relationship tieing the specialized quantity takeoff aspect with an element">
@@ -173,22 +160,11 @@
 
     <ECEntityClass typeName="PileAspect" description="An aspect that defines the depth of a vertical structural element of a deep foundation - pile." >
         <BaseClass>QuantityTakeoffAspect</BaseClass>
-        <ECCustomAttributes>
-            <Deprecated xmlns="CoreCustomAttributes.01.00.03">
-                <Description>Use StructuralPhysical:Pile instead.</Description>
-            </Deprecated>
-        </ECCustomAttributes>
-        <!-- TODO: Nabil/Jason to investigate whether this property can be aligned in StructuralPhysical -->
         <ECProperty propertyName="EmbedmentDepth" displayLabel="Embedment Depth" typeName="double" kindOfQuantity="AECU:LENGTH" description="Describes how deep a pile is embedded in meters."/>
     </ECEntityClass>
     
     <ECRelationshipClass typeName="ElementOwnsPileAspect" strength="embedding" modifier="None" description="A relationship tieing the specialized quantity takeoff aspect with an element">
         <BaseClass>ElementOwnsQuantityTakeoffAspect</BaseClass>
-        <ECCustomAttributes>
-            <Deprecated xmlns="CoreCustomAttributes.01.00.03">
-                <Description>Use StructuralPhysical:Pile instead.</Description>
-            </Deprecated>
-        </ECCustomAttributes>
         <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
             <Class class="bis:Element"/>
         </Source>
@@ -199,11 +175,6 @@
 
     <ECEntityClass typeName="PipeAspect" description="An aspect that defines the basic measurements of a pipe." >
         <BaseClass>QuantityTakeoffAspect</BaseClass>
-        <ECCustomAttributes>
-            <Deprecated xmlns="CoreCustomAttributes.01.00.03">
-                <Description>Use Generic:PhysicalObject instead with a descriptive Generic:PhysicalType.</Description>
-            </Deprecated>
-        </ECCustomAttributes>
         <ECProperty propertyName="Diameter" typeName="double" kindOfQuantity="AECU:LENGTH_SHORT" description="Diameter of a pipe in meters."/>
         <ECProperty propertyName="Length" typeName="double" kindOfQuantity="AECU:LENGTH" description="Length of a pipe in meters."/>
         <ECProperty propertyName="Schedule" typeName="string" description="Schedule of a pipe. The schedule number on a pipe relates to the thickness of the wall on the pipe."/>
@@ -212,11 +183,6 @@
     
     <ECRelationshipClass typeName="ElementOwnsPipeAspect" strength="embedding" modifier="None" description="A relationship tieing the specialized quantity takeoff aspect with an element">
         <BaseClass>ElementOwnsQuantityTakeoffAspect</BaseClass>
-        <ECCustomAttributes>
-            <Deprecated xmlns="CoreCustomAttributes.01.00.03">
-                <Description>Use Generic:PhysicalObject instead with a descriptive Generic:PhysicalType.</Description>
-            </Deprecated>
-        </ECCustomAttributes>
         <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
             <Class class="bis:Element"/>
         </Source>
@@ -249,23 +215,12 @@
 
     <ECEntityClass typeName="SlabAspect" description="An aspect that describes the properties of a large, flat piece of concrete or stone - slab." >
         <BaseClass>QuantityTakeoffAspect</BaseClass>
-        <ECCustomAttributes>
-            <Deprecated xmlns="CoreCustomAttributes.01.00.03">
-                <Description>Use StructuralPhysical:Slab instead.</Description>
-            </Deprecated>
-        </ECCustomAttributes>
         <ECProperty propertyName="SlabDirection" displayLabel="Slab Direction" typeName="SlabDirectionType" description="Describes in which direction is a slab supported."/>
-        <!-- TODO: Nabil to make sure all PhysicalElement classes in StructuralPhysical have a corresponding PhysicalType subclass. e.g. SlabType -->
         <ECProperty propertyName="Type" typeName="SlabType" description="Type of a slab."/>
     </ECEntityClass>
     
     <ECRelationshipClass typeName="ElementOwnsSlabAspect" strength="embedding" modifier="None" description="A relationship tieing the specialized quantity takeoff aspect with an element">
         <BaseClass>ElementOwnsQuantityTakeoffAspect</BaseClass>
-        <ECCustomAttributes>
-            <Deprecated xmlns="CoreCustomAttributes.01.00.03">
-                <Description>Use StructuralPhysical:Slab instead.</Description>
-            </Deprecated>
-        </ECCustomAttributes>
         <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
             <Class class="bis:Element"/>
         </Source>
@@ -274,14 +229,12 @@
         </Target>
     </ECRelationshipClass>
 
-    <!-- Deprecated -->
     <ECEnumeration typeName="SlabDirectionType" backingTypeName="int" isStrict="true">
         <ECEnumerator value="0" displayLabel="Unknown"/>
         <ECEnumerator value="1" displayLabel="One Way"/>
         <ECEnumerator value="2" displayLabel="Two Way"/>
     </ECEnumeration>
 
-    <!-- Deprecated -->
     <ECEnumeration typeName="SlabType" backingTypeName="int" isStrict="true">
         <ECEnumerator value="0" displayLabel="Floor"/>
         <ECEnumerator value="1" displayLabel="Roof"/>
@@ -293,7 +246,7 @@
 
     <ECEntityClass typeName="SlopeAspect" displayLabel="Slope" description="An aspect that defines the angle of a slope." >
         <BaseClass>QuantityTakeoffAspect</BaseClass>
-        <ECProperty propertyName="Slope" typeName="double" displayLabel="Slope" kindOfQuantity="AECU:ANGLE" description="Angle of a slope in radians."/>
+        <ECProperty propertyName="Slope" typeName="double" kindOfQuantity="AECU:ANGLE" description="Angle of a slope in radians."/>
     </ECEntityClass>
 
     <ECRelationshipClass typeName="ElementOwnsSlopeAspect" strength="embedding" modifier="None" description="A relationship tieing the specialized quantity takeoff aspect with an element">
@@ -308,23 +261,12 @@
 
     <ECEntityClass typeName="StairsAspect" description="An aspect that describes properties of stairs." >
         <BaseClass>QuantityTakeoffAspect</BaseClass>
-        <ECCustomAttributes>
-            <Deprecated xmlns="CoreCustomAttributes.01.00.03">
-                <Description>Use ArchitecturalPhysical:Stair instead.</Description>
-            </Deprecated>
-        </ECCustomAttributes>
-        <!-- TODO: Ask ArchitecturalPhysical's owner about these properties -->
         <ECProperty propertyName="NumberOfRisers" displayLabel="Number of Risers" typeName="int" description="Number of steps/risers in the stairs."/>
         <ECProperty propertyName="RiserHeight" displayLabel="Riser Height" typeName="double" kindOfQuantity="AECU:LENGTH_SHORT" description="Height of a riser, distance between steps."/>
     </ECEntityClass>
 
     <ECRelationshipClass typeName="ElementOwnsStairsAspect" strength="embedding" modifier="None" description="A relationship tieing the specialized quantity takeoff aspect with an element">
         <BaseClass>ElementOwnsQuantityTakeoffAspect</BaseClass>
-        <ECCustomAttributes>
-            <Deprecated xmlns="CoreCustomAttributes.01.00.03">
-                <Description>Use ArchitecturalPhysical:Stair instead.</Description>
-            </Deprecated>
-        </ECCustomAttributes>
         <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
             <Class class="bis:Element"/>
         </Source>
@@ -333,7 +275,6 @@
         </Target>
     </ECRelationshipClass>
 
-    <!-- Deprecated -->
     <ECEnumeration typeName="StructuralFramingType" backingTypeName="int" isStrict="true">
         <ECEnumerator value="0" displayLabel="Beam"/>
         <ECEnumerator value="1" displayLabel="Column"/>
@@ -347,24 +288,13 @@
 
     <ECEntityClass typeName="StructuralLinearMemberAspect" description="An aspect that describes a straight structural member." >
         <BaseClass>QuantityTakeoffAspect</BaseClass>
-        <ECCustomAttributes>
-            <Deprecated xmlns="CoreCustomAttributes.01.00.03">
-                <Description>Use StructuralPhysical classes instead.</Description>
-            </Deprecated>
-        </ECCustomAttributes>
         <ECProperty propertyName="CrossSectionalArea" displayLabel="Cross-Sectional Area" typeName="double" kindOfQuantity="AECU:AREA" description="Cross-Sectional area of a structural member."/>
         <ECProperty propertyName="SectionName" displayLabel="Section Name" typeName="string" description="Name of a structural member."/>
-        <!-- TODO: Nabil to make sure all PhysicalElement classes in StructuralPhysical have a corresponding PhysicalType subclass. e.g. SlabType -->
         <ECProperty propertyName="Type" typeName="StructuralFramingType" description="Type of a structural member."/>
     </ECEntityClass>
     
     <ECRelationshipClass typeName="ElementOwnsStructuralLinearMemberAspect" strength="embedding" modifier="None" description="A relationship tieing the specialized quantity takeoff aspect with an element">
         <BaseClass>ElementOwnsQuantityTakeoffAspect</BaseClass>
-        <ECCustomAttributes>
-            <Deprecated xmlns="CoreCustomAttributes.01.00.03">
-                <Description>Use StructuralPhysical classes instead.</Description>
-            </Deprecated>
-        </ECCustomAttributes>
         <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
             <Class class="bis:Element"/>
         </Source>
@@ -422,21 +352,11 @@
 
     <ECEntityClass typeName="WallAspect" description="An aspect that describes the wall type." >
         <BaseClass>QuantityTakeoffAspect</BaseClass>
-        <ECCustomAttributes>
-            <Deprecated xmlns="CoreCustomAttributes.01.00.03">
-                <Description>Use either StructuralPhysical:Wall or ArchitecturalPhysical:Wall instead.</Description>
-            </Deprecated>
-        </ECCustomAttributes>
         <ECProperty propertyName="Type" typeName="WallType" description="Type of a wall."/>
     </ECEntityClass>
     
     <ECRelationshipClass typeName="ElementOwnsWallAspect" strength="embedding" modifier="None" description="A relationship tieing the specialized quantity takeoff aspect with an element">
         <BaseClass>ElementOwnsQuantityTakeoffAspect</BaseClass>
-        <ECCustomAttributes>
-            <Deprecated xmlns="CoreCustomAttributes.01.00.03">
-                <Description>Use either StructuralPhysical:Wall or ArchitecturalPhysical:Wall instead.</Description>
-            </Deprecated>
-        </ECCustomAttributes>
         <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
             <Class class="bis:Element"/>
         </Source>
@@ -445,7 +365,6 @@
         </Target>
     </ECRelationshipClass>
 
-    <!-- Deprecated -->
     <ECEnumeration typeName="WallType" backingTypeName="int" isStrict="true">
         <ECEnumerator value="0" displayLabel="Movable"/>
         <ECEnumerator value="1" displayLabel="Parapet"/>
