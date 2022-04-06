@@ -619,6 +619,35 @@
         </ECCustomAttributes>
         <ECNavigationProperty propertyName="PhysicalMaterial" relationshipName="PhysicalTypeIsOfPhysicalMaterial" direction="forward" description="Indicates the bis:PhysicalMaterial of which bis:PhysicalElements of the given bis:PhysicalType are made."/>
     </ECEntityClass>
+    <ECRelationshipClass typeName="PhysicalTypeComposesSubTypesBase" strength="referencing" modifier="Abstract" description="A bis:ElementGroupsMembers class that serves as the base class of relationships that relate a composite bis:PhysicalType to its more granular bis:PhysicalType instances.">
+        <BaseClass>ElementGroupsMembers</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="composes" polymorphic="true">
+            <Class class="PhysicalType" />
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is composed by" polymorphic="true">
+            <Class class="PhysicalType"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="PhysicalTypeComposesSubTypes" strength="referencing" modifier="None" description="A generic PhysicalTypeComposesSubTypesBase implementation that relates a composite bis:PhysicalType to its more granular bis:PhysicalType instances.">
+        <BaseClass>PhysicalTypeComposesSubTypesBase</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="composes" polymorphic="true">
+            <Class class="PhysicalType" />
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is composed by" polymorphic="true">
+            <Class class="PhysicalType"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="LayeredPhysicalTypeComposesSubTypes" strength="referencing" modifier="None" description="A PhysicalTypeComposesSubTypesBase implementation that relates a composite bis:PhysicalType constructed of a number of layers to bis:PhysicalType instances, each one representing a single and identifiable part of it.">
+        <BaseClass>PhysicalTypeComposesSubTypesBase</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="composes" polymorphic="true">
+            <Class class="PhysicalType" />
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is composed by" polymorphic="true">
+            <Class class="PhysicalType"/>
+        </Target>
+        <ECProperty name="Thickness" typeName="double" displayLabel="Thickness" description="Constant thickness of the layer of the referenced PhysicalType."/>
+        <ECProperty name="Offset" typeName="double" displayLabel="Offset" description="Optional offset of the layer modeled by this instance, with respect to the previous layer according to OrderIndex." />
+    </ECRelationshipClass>
     <ECRelationshipClass typeName="PhysicalTypeIsOfPhysicalMaterial" strength="referencing" modifier="Sealed" description="A relationship indicating the bis:PhysicalMaterial of which bis:PhysicalElements of the given bis:PhysicalType are made. Can be overridden with bis:PhysicalElementIsOfPhysicalMaterial.">
         <!-- @see PhysicalType.PhysicalMaterial ECNavigationProperty -->
         <Source multiplicity="(0..*)" roleLabel="is of" polymorphic="true">
