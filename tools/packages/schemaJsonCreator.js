@@ -10,7 +10,7 @@ const path = require("path");
 const readdirp = require("readdirp");
 
 const SchemaDeserializer = require("@bentley/native-schema-locater").SchemaDeserializer;
-const SchemaContext = require("@bentley/ecschema-metadata").SchemaContext;
+const SchemaContext = require("@itwin/ecschema-metadata").SchemaContext;
 
 const releasedSchemaPaths = getReleasedSchemaFolders(path.join(__dirname, "../../"))
 const allSchemaPaths = getAllSchemaFolders(path.join(__dirname, "../../"));
