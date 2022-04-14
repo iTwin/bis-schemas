@@ -58,7 +58,9 @@ stages:
         displayName: 'Publish Pipeline Artifact'
 
 - stage: Generate
-  dependsOn: []
+  # dependsOn: 
+  # - Build
+  # condition: succeeded('Build')
   jobs:
   - job: generate_jsons
     displayName: Generate JSONS
@@ -70,8 +72,6 @@ stages:
     variables:
     - name: jsonOut
       value: '$(Agent.BuildDirectory)/JSONS'
-    - name: zipOut
-      value: '$(Agent.BuildDirectory)/schemaJSONS.zip'
     
     steps:
       - task: NodeTool@0
@@ -102,13 +102,6 @@ stages:
       
       - script: node ./tools/packages/getSchemaJsons.js --latestReleasedVersions --OutDir $(jsonOut)
         displayName: Generate Jsons 
-      - task: ArchiveFiles@2
-        displayName: Compress json files into zip
-        inputs:
-          rootFolderOrFile: '$(jsonOut)'
-          includeRootFolder: false
-          archiveType: 'zip'
-          archiveFile: '$(zipOut)'
-      - publish: $(zipOut)
+      - publish: $(jsonOut)
         artifact: bis-schemas-jsons
         displayName: 'Publish Pipeline Artifact'
