@@ -56,3 +56,57 @@ stages:
       - publish: $(pkgOut)
         artifact: bis-schemas-packages
         displayName: 'Publish Pipeline Artifact'
+
+  - job: generate_jsons
+    displayName: Generate JSONS
+    pool:
+      vmImage: windows-latest
+
+    workspace:
+      clean: all
+    variables:
+    - name: jsonOut
+      value: '$(Agent.BuildDirectory)/JSONS'
+    - name: zipOut
+      value: '$(Agent.BuildDirectory)/schemaJSONS.zip'
+    
+    steps:
+      - task: NodeTool@0
+        displayName: 'Use Node 14.16.0'
+        inputs:
+          versionSpec: 14.16.0
+      - checkout: self
+        clean: true
+      
+      - powershell: |
+          $npmrcDir = "$(Build.Repository.LocalPath)"
+          
+          if(!(Test-Path -Path $npmrcDir)){
+              mkdir $npmrcDir
+          }
+          
+          $npmrcFile = $npmrcDir + "/.npmrc"
+          
+          Out-File -FilePath $npmrcFile -Encoding ascii -InputObject "@bentley:registry=https://registry.npmjs.org/"
+
+          if(!(Test-Path -Path $jsonOut)){
+              mkdir $jsonOut
+          }
+
+        displayName: 'Seed npmrc'
+        
+      - script: npm install
+        displayName: 'npm install'
+      
+      - script: node ./tools/packages/getSchemaJsons.js --latestReleasedVersions --OutDir $(jsonOut)
+        displayName: Generate Jsons 
+      - task: ArchiveFiles@2
+        displayName: Compress json files into zip
+        inputs:
+          rootFolderOrFile: '$(jsonOut)'
+          includeRootFolder: false
+          archiveType: 'zip'
+          archiveFile: '$(zipOut)'
+      - publish: $(zipOut)
+        artifact: bis-schemas-jsons
+        displayName: 'Publish Pipeline Artifact'
