@@ -13,8 +13,8 @@ const argv = require("yargs").argv;
 const fs = require("fs");
 const rimraf = require("rimraf");
 const chalk = require("chalk");
-const Logger = require("@bentley/bentleyjs-core").Logger;
-const LogLevel = require("@bentley/bentleyjs-core").LogLevel;
+const Logger = require("@itwin/core-bentley").Logger;
+const LogLevel = require("@itwin/core-bentley").LogLevel;
 const SchemaGraphUtil = require("@itwin/ecschema-metadata").SchemaGraphUtil;
 const validateSchema = require("@bentley/imodel-schema-validator").validateSchema;
 const verifyIModelSchema = require("@bentley/imodel-schema-validator").verifyIModelSchema;
@@ -23,7 +23,7 @@ const getResults = require("@bentley/imodel-schema-validator").getResults;
 const StubSchemaXmlFileLocater = require("@itwin/ecschema-locaters").StubSchemaXmlFileLocater;
 const SnapshotDb = require("@itwin/core-backend").SnapshotDb;
 const IModelHost = require("@itwin/core-backend").IModelHost;
-const DbResult = require("@bentley/bentleyjs-core").DbResult;
+const DbResult = require("@itwin/core-bentley").DbResult;
 
 const bisSchemaRepo = getBisRootPath();
 const tempDir = process.env.TMP;
@@ -195,7 +195,7 @@ async function importAndExportSchema(schemaPath, schemaSearchPaths) {
   try {
     await imodel.importSchemas(schemaPaths);
   } catch (error) {
-    throw new Error( `Failed to import schema ${wipSchema} because ${error.toString()}`);
+    throw new Error( `Failed to import schema ${loadedSchema.fullName} because of ${error.toString()}`);
   }
   imodel.saveChanges();
   imodel.nativeDb.exportSchemas(exportDir);
