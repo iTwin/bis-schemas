@@ -185,8 +185,8 @@ In addition, such Profiles have a bounding box which is centered at the center o
   - must be less than ninety degrees
   - `WebSlopeHeight` must be less or equal to half `FlangeInnerEdgeLength`
 
-![TShape (all properties)](media/ProfilePictures/TShape2.png)
 ![TShape (only mandatory properties)](media/ProfilePictures/TShape1.png)
+![TShape (all properties)](media/ProfilePictures/TShape2.png)
 
 ### **LShapeProfile**
 **Derivative properties:**
@@ -217,8 +217,8 @@ In addition, such Profiles have a bounding box which is centered at the center o
   - `HorizontalLegSlopeHeight` must be less or equal to half `VerticalLegInnerEdgeLength`
   - `VerticalLegSlopeHeight` must be less or equal to half `HorizontalLegInnerEdgeLength`
 
-![LShape (all properties)](media/ProfilePictures/LShape2.png)
 ![LShape (only mandatory properties)](media/ProfilePictures/LShape1.png)
+![LShape (all properties)](media/ProfilePictures/LShape2.png)
 
 ### **TTShapeProfile**
 **Derivative properties:**
@@ -314,8 +314,8 @@ In addition, such Profiles have a bounding box which is centered at the center o
   - must be less than ninety degrees
   - `FlangeSlopeHeight` must be less or equal to half `WebEdgeLength`
 
-![ZShape (only mandatory properties)](media/ProfilePictures/ZShape1.png)
-![ZShape (all properties)](media/ProfilePictures/ZShape2.png)
+![ZShape (only mandatory properties)](media/ProfilePictures/ZShape2.png)
+![ZShape (all properties)](media/ProfilePictures/ZShape1.png)
 
 ### **DerivedProfile**
 [SinglePerimeterProfile](#singleperimeterprofile) that is based on another [SinglePerimeterProfile](#singleperimeterprofile) with applied standard transformations (scale, rotation, translation, mirror). This [Profile](#profile) is defined for compatibility reasons with [IFC](#https://standards.buildingsmart.org/IFC/RELEASE/IFC4/FINAL/HTML/) and its **usage is not recommended**.
@@ -412,7 +412,11 @@ Instantiable [CompositeProfile](#compositeprofile) that is used to define an arb
 
 This Profile is constructed by inserting [ArbitraryCompositeProfileAspects](#arbitrarycompositeprofileaspects) that reference and transform [SinglePerimeterProfiles](#singleperimeterprofile). [ArbitraryCompositeProfile](#arbitrarycompositeprofile) can reference the same [SinglePerimeterProfile](#singleperimeterprofile) multiple times, but apply different transformations.
 
-[TODO Examples]()
+**Examples:**
+- An [ArbitraryCompositeProfile](#arbitrarycompositeprofile) that is made up of 2 [Profiles](#profile):
+  - [IShapeProfile](#ishapeprofile) - referenced once with no transformation.
+  - [RectangleProfile](#rectangleprofile) - referenced twice with different `Offset`.
+  - ![ArbitraryComposite (cross)](media/ProfilePictures/ArbitraryComposite1.png)
 
 ### **ArbitraryCompositeProfileAspect**
 
@@ -444,24 +448,33 @@ Note that deletion of the referenced [CShapeProfile](#cshapeprofile) is prohibit
 
 ### **ArbitraryShapeProfile**
 
-A [SinglePerimeterProfile](#singleperimeterprofile) whose geometry is defined by an arbitrary single perimeter.
+A [SinglePerimeterProfile](#singleperimeterprofile) whose geometry is defined by an arbitrary single perimeter. Geometry of [ArbitraryShapeProfile](#arbitraryshapeprofile) can have voids i.e. it
+can be formed using a [ParityRegion](https://www.itwinjs.org/reference/core-geometry/curve/parityregion/) (see example of a Profile with a void).
 
 **Constraints:**
-- `Shape`
+- `Shape` (instance of [CurveCollection](https://www.itwinjs.org/reference/core-geometry/curve/curvecollection/) or [CurvePrimitive](https://www.itwinjs.org/reference/core-geometry/curve/curveprimitive/)
   - must be closed
   - must be of a single perimeter
   - must not self intersect
   - must be planar and lie on the XY plane
 
+**Examples:**
+- [ArbitraryShapeProfile](#arbitraryshapeprofile) whose `Shape` is a closed [LineString](https://www.itwinjs.org/reference/core-geometry/curve/linestring3d/).
+  - ![ArbitraryShape (cross)](media/ProfilePictures/ArbitraryShape1.png)
+
+- [ArbitraryShapeProfile](#arbitraryshapeprofile) whose `Shape` is a [ParityRegion](https://www.itwinjs.org/reference/core-geometry/curve/parityregion/) of a rectangle
+([LineString](https://www.itwinjs.org/reference/core-geometry/curve/linestring3d/)) and the `Shape` of an [IShapeProfile](#ishapeprofile).
+  - ![ArbitraryShape (IShapeProfile encasing)](media/ProfilePictures/ArbitraryShape2.png)
+
 ### **ArbitraryCenterLineProfile**
 
-Extended [ArbitraryShapeProfile](#arbitraryshapeprofile) with an additional constraint that the defined single perimeter (area) must have a non self intersecting centerline.Geometry of such [Profile](#proflile) is created by applying a constant thickness to the centerline.
+Extended [ArbitraryShapeProfile](#arbitraryshapeprofile) with an additional constraint that the defined single perimeter (area) must have a non self intersecting centerline. Geometry of such [Profile](#proflile) is created by applying a constant thickness to the centerline.
 
 [ArbitraryCenterLineProfiles](#arbitrarycenterlineprofile) are often used to model cold-formed sections.
 
-TODO Detailed meaning and usage of properties "ArcAngle" and "ChamferAngle", this text should reference pictures/examples to better denote the effects of these properties.
-
-[TODO Examples]()
+**Examples:**
+- [ArbitraryCenterLineProfile](#arbitrarycenterlineprofile) that defines a "hat" shape profile.
+  - ![ArbitraryCenterline (hat)](media/ProfilePictures/ArbitraryCenterline1.png)
 
 **Constraints:**
 - `WallThickness` must be greater than zero
