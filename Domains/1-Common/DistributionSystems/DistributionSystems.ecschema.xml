@@ -63,7 +63,7 @@
         </ECCustomAttributes>
     </ECEntityClass>
 
-    <ECEnumeration typeName="DirectionType" backingTypeName="int" isStrict="true">
+    <ECEnumeration typeName="PortDirection" backingTypeName="int" isStrict="true">
         <ECEnumerator value="0" displayLabel="Undefined" name="Undefined"/>
         <ECEnumerator value="1" displayLabel="Input" name="Input"/>
         <ECEnumerator value="2" displayLabel="Output" name="Output"/>
@@ -74,7 +74,7 @@
     <ECEntityClass typeName="DistributionPort" modifier="Abstract" displayLabel="Distribution Port" description="An inlet or outlet of a distribution element through which a particular substance may flow.">
         <BaseClass>bis:SpatialLocationElement</BaseClass>
         <ECProperty propertyName="Description" typeName="string" displayLabel="Description" description="A human-readable description of the Distribution Port"/>
-        <ECProperty propertyName="Direction" typeName="DirectionType" displayLabel="Direction" description="Direction of the port: e.g. Input, Output, Free Directional, Bi-Directional."/>
+        <ECProperty propertyName="Direction" typeName="PortDirection" displayLabel="Direction" description="Direction of the port: e.g. Input, Output, InputOrOutput, InputAndOutput."/>
         <ECProperty propertyName="LocalOrigin" typeName="point3d" description="The local placement origin of this DistributionPort in relation to its parent.">
             <ECCustomAttributes>
                 <HiddenProperty xmlns="CoreCustomAttributes.01.00.03"/>
@@ -99,7 +99,7 @@
     
     <ECRelationshipClass typeName="DistributionElementOwnsDistributionPorts" strength="embedding" modifier="None" description="A relationship that relates child distribution ports to parent distribution element.">
         <BaseClass>bis:ElementOwnsChildElements</BaseClass>
-        <Source multiplicity="(0..1)" roleLabel="owns" polymorphic="true">
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
             <Class class="IDistributionElement"/>
         </Source>
         <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="true">
