@@ -12,7 +12,7 @@ stages:
       clean: all
     variables:
     - name: jsonOut
-      value: '$(Build.Repository.LocalPath)/JSONS'
+      value: '$(Agent.BuildDirectory)/JSONS'
     
     steps:
       - task: NodeTool@0
@@ -26,7 +26,8 @@ stages:
         displayName: 'npm install'
 
       - powershell: |
-          mkdir $jsonOut
+          mkdir "%jsonOut%"
+          echo JSON Generation Output Directory= %jsonOut%
         displayName: 'Create JSON output directory'
 
       - script: node ./tools/packages/getSchemaJsons.js --latestReleasedVersions --OutDir $(jsonOut)
