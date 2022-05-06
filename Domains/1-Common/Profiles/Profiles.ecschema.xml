@@ -3,9 +3,9 @@
 |  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
 |  * See LICENSE.md in the project root for license terms and full copyright notice.
 ======================================================================================= -->
-<ECSchema schemaName="Profiles" alias="prf" description="EC Schema for Profiles" version="01.00.00" displayLabel="Profiles" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
+<ECSchema schemaName="Profiles" alias="prf" description="EC Schema for Profiles" version="01.00.01" displayLabel="Profiles" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
     <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
-    <ECSchemaReference name="BisCore" version="01.00.10" alias="bis" />
+    <ECSchemaReference name="BisCore" version="01.00.14" alias="bis" />
     <ECSchemaReference name="AecUnits" version="01.00.03" alias="AECU" />
 
     <ECCustomAttributes>
@@ -15,6 +15,7 @@
     </ECCustomAttributes>
 
     <PropertyCategory typeName="ProfileProperties" priority="1" displayLabel="Profile Properties" description="Properties of a Structural Profile." />
+    <PropertyCategory typeName="ProfiledSolidInformationRecordProperties" priority="1" displayLabel="Profiled Solid Information Record Properties" description="Properties of a Profiled Solid Information Record." />
 
     <ECStructClass typeName="CardinalPoint" displayLabel="Cardinal Point" description="2D location on the profile used to place and offset profiles when extruding them on curve members.">
         <ECProperty propertyName="Name" typeName="string" description="Name of the cardinal point, used to reference and distinguish cardinal points. Unique in the scope of a profile." category="ProfileProperties" />
@@ -366,4 +367,134 @@
         <ECProperty propertyName="Width" typeName="double" description="Extent of the capsule in the direction of the x-axis." category="ProfileProperties" kindOfQuantity="AECU:LENGTH_SHORT" />
         <ECProperty propertyName="Depth" typeName="double" description="Extent of the capsule in the direction of the y-axis." category="ProfileProperties" kindOfQuantity="AECU:LENGTH_SHORT" />
     </ECEntityClass>
+
+    <ECEntityClass typeName="ProfiledSolidInformationRecordElement" modifier="Abstract" displayLabel="Profiled Solid Information Record Element" description="A bis:InformationRecordElement serving as the base class for implementations capturing data about solids defined from Profiles.">
+        <BaseClass>bis:InformationRecordElement</BaseClass>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="PhysicalTypeOwnsProfiledSolidInformationRecord" modifier="None" strength="embedding" strengthDirection="forward" description="Relates a bis:PhysicalType to a child ProfiledSolidInformationRecordElement carrying details about a profiled solid.">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:PhysicalType"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="true">
+            <Class class="ProfiledSolidInformationRecordElement"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="PhysicalElementOwnsProfiledSolidInformationRecord" modifier="None" strength="embedding" strengthDirection="forward" description="Relates a bis:PhysicalElement to a child ProfiledSolidInformationRecordElement carrying details about a profiled solid.">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:PhysicalElement"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="true">
+            <Class class="ProfiledSolidInformationRecordElement"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="IProfiledSolidInformationRecord" modifier="Abstract" displayLabel="IProfiled Solid Information Record" description="An interface that can be mixed-into bis:InformationRecordElement classes to relate how a solid is defined based on profiles.">
+        <ECCustomAttributes>
+            <IsMixin xmlns='CoreCustomAttributes.01.00.00'>
+                <AppliesToEntityClass>bis:InformationRecordElement</AppliesToEntityClass>
+            </IsMixin>
+        </ECCustomAttributes>
+    </ECEntityClass>
+    
+    <ECRelationshipClass typeName="IProfiledSolidInformationRecordRefersToProfile" modifier="Abstract" strength="referencing" strengthDirection="forward" description="A bis:ElementRefersToElements relationship serving as the base class for implementations relating profiles with classes mixing-in the IProfiledSolidInformationRecord interface.">
+        <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="true">
+            <Class class="IProfiledSolidInformationRecord"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is referenced by" polymorphic="true">
+            <Class class="Profile"/>
+        </Target>
+        <ECProperty propertyName="CardinalPointName" typeName="string" displayLabel="Cardinal Point" description="Cardinal Point Name from the referenced Profile that connects with the path of the extrusion or sweep." category="ProfiledSolidInformationRecordProperties" />
+        <ECProperty propertyName="Offset" typeName="point2d" displayLabel="Offset" description="Optional offset from the specific Cardinal Point in the Profile and the path of the extrusion or sweep." category="ProfiledSolidInformationRecordProperties" />
+        <ECProperty propertyName="MirrorAboutYAxis" typeName="boolean" displayLabel="Mirror about Y-axis" description="Indicates whether the Profile should be mirrored about the Y-axis." category="ProfiledSolidInformationRecordProperties" />
+        <ECProperty propertyName="RotationAboutYAxis" typeName="double" displayLabel="Rotation about Y-axis" description="Indicates the rotation angle for the referenced Profile about the Y-axis." category="ProfiledSolidInformationRecordProperties" />
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="ProfiledSolidInformationRecord" modifier="None" displayLabel="Profiled Solid Information Record" description="A concrete ProfiledSolidInformationRecordElement that models solids originating from a simple straight extrusion of a Profile along a given distance.">
+        <BaseClass>ProfiledSolidInformationRecordElement</BaseClass>
+        <BaseClass>IProfiledSolidInformationRecord</BaseClass>
+        <ECProperty propertyName="Length" typeName="double" displayLabel="Length" description="Length of the straight extrusion of the referenced Profile." category="ProfiledSolidInformationRecordProperties" kindOfQuantity="AECU:LENGTH" />
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="ProfiledSolidInformationRecordUsesProfile" modifier="None" strength="referencing" strengthDirection="forward" description="A concrete implementation of IProfiledSolidInformationRecordRefersToProfile that relates a ProfiledSolidInformationRecord to the Profile used for extrusion.">
+        <BaseClass>IProfiledSolidInformationRecordRefersToProfile</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="uses" polymorphic="true">
+            <Class class="ProfiledSolidInformationRecord"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is used by" polymorphic="true">
+            <Class class="Profile"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="SegmentedProfiledSolidInformationRecord" modifier="None" displayLabel="Segmented Profiled Solid Information Record" description="A concrete ProfiledSolidInformationRecordElement that models solids originating from various Profiles swept along a path.">
+        <BaseClass>ProfiledSolidInformationRecordElement</BaseClass>
+        <BaseClass>bis:IParentElement</BaseClass>
+        <ECProperty propertyName="Path" typeName="Bentley.Geometry.Common.IGeometry" description="Path of the sweep applied to the referenced profiles." category="ProfiledSolidInformationRecordProperties" kindOfQuantity="AECU:LENGTH" />
+    </ECEntityClass>
+
+    <ECEnumeration typeName="ProfiledSolidSegmentTransitionTypeEnum" backingTypeName="int" isStrict="true" displayLabel="Profiled Solid Definition Segment Transition Type">
+        <ECEnumerator name="Linear" value="0" displayLabel="Linear" />
+        <ECEnumerator name="ParabolicAtStart" value="1" displayLabel="Parabolic At Start" />
+        <ECEnumerator name="ParabolicAtEnd" value="2" displayLabel="Parabolic At End" />
+        <ECEnumerator name="CircularAtStart" value="3" displayLabel="Circular At Start" />
+        <ECEnumerator name="CircularAtEnd" value="4" displayLabel="Circular At End" />
+    </ECEnumeration>
+
+    <ECEntityClass typeName="ProfiledSolidSegment" modifier="None" displayLabel="Profiled Solid Segment" description="A bis:InformationRecordElement that describes a segment of a solid originating from the sweep of a start and an end Profile.">
+        <BaseClass>bis:InformationRecordElement</BaseClass>
+        <BaseClass>IProfiledSolidInformationRecord</BaseClass>
+        <ECProperty propertyName="StartDistance" typeName="double" displayLabel="Start Distance" description="Start distance along the Path where the referenced Starting Profile is swept at." category="ProfiledSolidInformationRecordProperties" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="EndDistance" typeName="double" displayLabel="End Distance" description="End distance along the Path where the referenced Ending Profile is swept at" category="ProfiledSolidInformationRecordProperties" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="TransitionType" typeName="ProfiledSolidSegmentTransitionTypeEnum" displayLabel="Transition Type" description="Transition type between the Starting and Ending Profiles, which are assumed to be compatible." category="ProfiledSolidInformationRecordProperties" />
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="ProfiledSolidInformationRecordOwnsSegments" strength="embedding" modifier="None" description="Relates a SegmentedProfiledSolidInformationRecord to its child ProfiledSolidSegment instances.">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="owns" polymorphic="true">
+            <Class class="SegmentedProfiledSolidInformationRecord"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="true">
+            <Class class="ProfiledSolidSegment"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="ProfiledSolidSegmentUsesStartProfile" modifier="None" strength="referencing" strengthDirection="forward" description="A concrete implementation of IProfiledSolidInformationRecordRefersToProfile that relates a ProfiledSolidSegment to the Profile used at its start location.">
+        <BaseClass>IProfiledSolidInformationRecordRefersToProfile</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="uses" polymorphic="true">
+            <Class class="ProfiledSolidSegment"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is used by" polymorphic="true">
+            <Class class="Profile"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="ProfiledSolidSegmentUsesEndProfile" modifier="None" strength="referencing" strengthDirection="forward" description="A concrete implementation of IProfiledSolidInformationRecordRefersToProfile that relates a ProfiledSolidSegment to the Profile used at its end location.">
+        <BaseClass>IProfiledSolidInformationRecordRefersToProfile</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="uses" polymorphic="true">
+            <Class class="ProfiledSolidSegment"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is used by" polymorphic="true">
+            <Class class="Profile"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="ProfiledSolidPlacementAspect" modifier="None" strength="referencing" strengthDirection="forward" description="A bis:ElementUniqueAspect that can be optionally used to specify different Placement settings related to Profiled solids from the ones assumed by default, for an individual bis:PhysicalElement.">
+        <BaseClass>bis:ElementUniqueAspect</BaseClass>
+        <ECProperty propertyName="CardinalPointName" typeName="string" displayLabel="Cardinal Point" description="Cardinal Point Name from the referenced Profile that connects with the path of the extrusion or sweep." category="ProfiledSolidInformationRecordProperties" />
+        <ECProperty propertyName="Offset" typeName="point2d" displayLabel="Offset" description="Optional offset from the specific Cardinal Point in the Profile and the path of the extrusion or sweep." category="ProfiledSolidInformationRecordProperties" />
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="PhysicalElementOwnsProfiledSolidPlacementAspect" strength="embedding" modifier="None">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:PhysicalElement"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="ProfiledSolidPlacementAspect"/>
+        </Target>
+    </ECRelationshipClass>
 </ECSchema>
