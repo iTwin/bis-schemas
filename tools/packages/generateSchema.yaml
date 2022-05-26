@@ -1,0 +1,38 @@
+trigger:
+  - master
+stages:
+- stage: Generate
+  jobs:
+  - job: Generate_jsons_and_build
+    displayName: 'Generate JSONS and Build'
+    pool:
+      vmImage: windows-latest
+
+    workspace:
+      clean: all
+    variables:
+    - name: jsonOut
+      value: '$(Agent.BuildDirectory)\JSONS'
+    
+    steps:
+      - task: NodeTool@0
+        displayName: 'Use Node 14.16.0'
+        inputs:
+          versionSpec: 14.16.0
+      - checkout: self
+        clean: true
+        
+      - script: npm install
+        displayName: 'npm install'
+
+      - task: CmdLine@2
+        displayName: 'Create JSON output directory'
+        inputs:
+          script: |
+            mkdir $(jsonOut)
+
+      - script: node ./tools/packages/getSchemaJsons.js --latestReleasedVersions --OutDir $(jsonOut)
+        displayName: Generate Jsons 
+      - publish: $(jsonOut)
+        artifact: bis-schemas-jsons
+        displayName: 'Publish Pipeline Artifact'

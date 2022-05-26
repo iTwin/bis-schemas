@@ -109,3 +109,38 @@ See [DistributionSystems](#distributionsystems).
 | `IfcDistributionControlElement` | (for sensing predefinedtypes) | `IDistributionSensorElement` | (none) |
 
 `IDistributionSensorElement` maps to `IfcDistributionControlElement` and <b><u>not</u></b> `IfcSensor`.
+
+
+## DistributionPort
+
+A distribution port is a flow connection point of a distribution element through which a particular substance may flow.
+Distribution ports define the physical connection and substance, electricity or data flow points of a distribution flow element. Subclasses of DistributionPort should specialize distributionport in a given domain by adding relevant properties like FlowVolume for plumbing, or RatedVoltage for electrical.
+Ports are similar to openings in that they do not have any visible geometry, such geometry is captured by the parent distribution element. Ports do have placement to indicate position and orientation of the connection.
+Distribution ports are owned by the `DistributionElement` as they are essentially part of the whole definition of the element, similar to openings in a wall. `DistributionElementOwnsDistributionPorts` relationship is used for `DistributionElement` owning `DistributionPorts`.
+
+### Mapping to and from IFC
+
+| From BIS    | Condition | To IFC    | Condition |
+| ----------- | --------- | --------- | --------- |
+| `DistributionPort` | (none) | `IfcDistributionPort` | (none) |
+
+| From IFC  | Condition | To BIS    | Condition |
+| --------- | --------- | --------- | --------- |
+| `IfcDistributionPort` | (none) | `DistributionPort` | (none) |
+
+
+## PortConnection
+
+A `PortConnection` defines a physical connection between 2 DistributionPorts. In the case where a connection is realized by some other physical element, the realizing element could be found using `PortConnectionIsRealizedByPhysicalElements` relationship.
+
+a PortConnection is always between 2 distribution ports, however this constraint may be removed if a suitable use case is found.
+
+### Mapping to and from IFC
+
+| From BIS    | Condition | To IFC    | Condition |
+| ----------- | --------- | --------- | --------- |
+| `PortConnection` | (none) | `IfcRelConnectsPorts` | (none) |
+
+| From IFC  | Condition | To BIS    | Condition |
+| --------- | --------- | --------- | --------- |
+| `IfcRelConnectsPorts` | (none) | `PortConnection` | (none) |
