@@ -1025,6 +1025,72 @@
         </Target>
     </ECRelationshipClass>
 
+    <ECEntityClass typeName="SheetIndexEntry" modifier="Abstract" description="A bis:InformationReferenceElement used as the base-class for elements that participate in a Sheet-Index hierarchy.">
+        <!-- @note The Element.Parent property + the ElementOwnsChildElements relationship is used to navigate to the owning Sheet Index or Folder -->
+        <BaseClass>InformationReferenceElement</BaseClass>
+        <ECProperty propertyName="EntryPriority" typeName="int" displayLabel="Priority" description="Can be used to prioritize or order members within a SheetIndex or SheetIndexFolder."/>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="SheetIndexFolder" modifier="None" description="A SheetIndexEntry used to organize other SheetIndexEntry instances in a hierarchy.">
+        <BaseClass>SheetIndexEntry</BaseClass>
+        <BaseClass>bis:IParentElement</BaseClass>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="SheetIndexFolderOwnsEntries" strength="embedding" modifier="None">
+        <BaseClass>ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="owns" polymorphic="true">
+            <Class class="SheetIndexFolder"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="true">
+            <Class class="SheetIndexEntry"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="SheetReference" modifier="None" description="A SheetIndexEntry used to include a Sheet instance into a Sheet-Index hierarchy.">
+        <BaseClass>SheetIndexEntry</BaseClass>
+        <ECNavigationProperty propertyName="Sheet" relationshipName="SheetReferenceRefersToSheet" direction="forward" readOnly="true" displayLabel="Sheet" description="The bis:Sheet that this bis:SheetReference is ponting to."/>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="SheetReferenceRefersToSheet" strength="referencing" modifier="Sealed">
+        <!-- @see SheetReference.Sheet ECNavigationProperty -->
+        <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="true">
+            <Class class="SheetReference" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is referenced by" polymorphic="true">
+            <Class class="Sheet"/>
+        </Target>
+    </ECRelationshipClass>
+    
+    <ECEntityClass typeName="SheetIndex" modifier="None" description="A bis:InformationReferenceElement used to organize bis:Sheet instances into a hierarchy with the assistance of bis:SheetIndexFolder and other bis:SheetIndex instances.">
+        <BaseClass>bis:InformationReferenceElement</BaseClass>
+        <BaseClass>bis:IParentElement</BaseClass>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="SheetIndexOwnsEntries" strength="embedding" modifier="None">
+        <BaseClass>ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="owns" polymorphic="true">
+            <Class class="SheetIndex"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="true">
+            <Class class="SheetIndexEntry"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="SheetIndexReference" modifier="None" description="A SheetIndexEntry used to include a SheetIndex hierarchy into another one.">
+        <BaseClass>SheetIndexEntry</BaseClass>
+        <ECNavigationProperty propertyName="SheetIndex" relationshipName="SheetIndexReferenceRefersToSheetIndex" direction="forward" readOnly="true" displayLabel="SheetIndex" description="The bis:SheetIndex that this bis:SheetIndexReference is ponting to."/>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="SheetIndexReferenceRefersToSheetIndex" strength="referencing" modifier="Sealed">
+        <!-- @see SheetIndexReference.SheetIndex ECNavigationProperty -->
+        <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="true">
+            <Class class="SheetIndexReference" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is referenced by" polymorphic="true">
+            <Class class="SheetIndex"/>
+        </Target>
+    </ECRelationshipClass>
+
     <ECEntityClass typeName="InformationCarrierElement" modifier="Abstract" displayLabel="Information Carrier" description="DEPRECATED: An Information Carrier carries information, but is not the information itself. For example, the arrangement of ink on paper or the sequence of electronic bits are information carriers.">
         <BaseClass>Element</BaseClass>
         <ECCustomAttributes>
