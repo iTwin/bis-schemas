@@ -63,7 +63,7 @@ Class contents in order:
   - `name` - name of the property
   - `separator` - ":" if it's a regular property or " ->" if it's a navigation property
   - `type` - type of the property, this might be:
-    - `primitive` - ec primitive types ([full list](https://imodeljs.github.io/iModelJs-docs-output/bis/ec/primitive-types/)) e.g. string, double, point3d, IGeometry, etc.
+    - `primitive` - ec primitive types ([full list](https://www.itwinjs.org/bis/ec/primitive-types/)) e.g. string, double, point3d, IGeometry, etc.
     - `array` - double[], SomeStruct[], etc.
     - `enum` - name of the enum e.g. "SomeEnum"
     - `navigation` - name of the end point class e.g. "PhysicalElement"

@@ -1,0 +1,144 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!-- ==================================================================================
+|  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
+|  * See LICENSE.md in the project root for license terms and full copyright notice.
+======================================================================================= -->
+<ECSchema schemaName="DistributionSystems" alias="dsys" version="01.00.01" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.1" description="A schema for defining distribution systems.">
+    <ECSchemaReference name="BisCore" version="01.00.14" alias="bis" />
+    <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
+
+    <ECCustomAttributes>
+        <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
+            <SupportedUse>NotForProduction</SupportedUse>
+        </ProductionStatus>
+    </ECCustomAttributes>
+
+    <ECEntityClass typeName="DistributionSystem" modifier="none" displayLabel="Distribution System" description="A network designed to receive, store, maintain, distribute, or control the flow of a distribution media.">
+        <BaseClass>bis:PhysicalSystem</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="IDistributionElement" modifier="Abstract" displayLabel="Distribution Element" description="An interface that can be mixed-into a bis:PhysicalElement to indicate that it can be a member of a DistributionSystem.">
+        <BaseClass>bis:IParentElement</BaseClass>
+        <ECCustomAttributes>
+            <IsMixin xmlns="CoreCustomAttributes.01.00.03">
+                <AppliesToEntityClass>bis:PhysicalElement</AppliesToEntityClass>
+            </IsMixin>
+        </ECCustomAttributes>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="DistributionSystemGroupsDistributionElements" strength="referencing" modifier="None" displayLabel="Distribution System Groups Distribution Elements" description="A relationship used to identify the dsys:IDistributionElements that are members of a DistributionSystem.">
+        <BaseClass>bis:PhysicalSystemGroupsMembers</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="groups" polymorphic="true">
+            <Class class="DistributionSystem"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is grouped by" polymorphic="true">
+            <Class class="IDistributionElement"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="IDistributionControlElement" modifier="Abstract" displayLabel="Distribution Control Element" description="An interface that can be mixed-into a bis:PhysicalElement to indicate that it is an IDistributionElement that controls other elements of a distribution system.">
+        <BaseClass>IDistributionElement</BaseClass>
+        <ECCustomAttributes>
+            <IsMixin xmlns="CoreCustomAttributes.01.00.03">
+                <AppliesToEntityClass>bis:PhysicalElement</AppliesToEntityClass>
+            </IsMixin>
+        </ECCustomAttributes>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="IDistributionSensorElement" modifier="Abstract" displayLabel="Distribution Sensor Element" description="An interface that can be mixed-into a bis:PhysicalElement to indicate that it is an IDistributionElement that observes conditions that affect a distribution system.">
+        <BaseClass>IDistributionElement</BaseClass>
+        <ECCustomAttributes>
+            <IsMixin xmlns="CoreCustomAttributes.01.00.03">
+                <AppliesToEntityClass>bis:PhysicalElement</AppliesToEntityClass>
+            </IsMixin>
+        </ECCustomAttributes>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="IDistributionFlowElement" modifier="Abstract" displayLabel="Distribution Flow Element" description="An interface that can be mixed-into a bis:PhysicalElement to indicate that it is an IDistributionElement that facilitates the distribution of energy or matter, such as air, water or power.">
+        <BaseClass>IDistributionElement</BaseClass>
+        <ECCustomAttributes>
+            <IsMixin xmlns="CoreCustomAttributes.01.00.03">
+                <AppliesToEntityClass>bis:PhysicalElement</AppliesToEntityClass>
+            </IsMixin>
+        </ECCustomAttributes>
+    </ECEntityClass>
+
+    <ECEnumeration typeName="PortDirection" backingTypeName="int" isStrict="true">
+        <ECEnumerator value="0" displayLabel="Undefined" name="Undefined"/>
+        <ECEnumerator value="1" displayLabel="Input" name="Input"/>
+        <ECEnumerator value="2" displayLabel="Output" name="Output"/>
+        <ECEnumerator value="3" displayLabel="Input Or Output" name="InputOrOutput"/>
+        <ECEnumerator value="4" displayLabel="Input And Output" name="InputAndOutput"/>
+    </ECEnumeration>
+
+    <ECEntityClass typeName="DistributionPort" modifier="Abstract" displayLabel="Distribution Port" description="An inlet or outlet of a distribution element through which a particular substance may flow.">
+        <BaseClass>bis:SpatialLocationElement</BaseClass>
+        <ECProperty propertyName="Description" typeName="string" displayLabel="Description" description="A human-readable description of the Distribution Port"/>
+        <ECProperty propertyName="Direction" typeName="PortDirection" displayLabel="Direction" description="Direction of the port: e.g. Input, Output, InputOrOutput, InputAndOutput."/>
+        <ECProperty propertyName="LocalOrigin" typeName="point3d" description="The local placement origin of this DistributionPort in relation to its parent.">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03"/>
+            </ECCustomAttributes>
+        </ECProperty>
+        <ECProperty propertyName="LocalYaw" typeName="double" description="The local Yaw angle (in degrees) of the orientation of this DistributionPort in relation to its parent.">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03"/>
+            </ECCustomAttributes>
+        </ECProperty>
+        <ECProperty propertyName="LocalPitch" typeName="double" description="The local Pitch angle (in degrees) of the orientation of this DistributionPort in relation to its parent.">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03"/>
+            </ECCustomAttributes>
+        </ECProperty>
+        <ECProperty propertyName="LocalRoll" typeName="double" description="The local Roll angle (in degrees) of the orientation of this DistributionPort in relation to its parent.">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03"/>
+            </ECCustomAttributes>
+        </ECProperty>
+    </ECEntityClass>
+    
+    <ECRelationshipClass typeName="DistributionElementOwnsDistributionPorts" strength="embedding" modifier="None" description="A relationship that relates child distribution ports to parent distribution element.">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="IDistributionElement"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="true">
+            <Class class="DistributionPort"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="PortConnection" modifier="None" displayLabel="Port Connection" description="An element that indicates a connection between 2 distribution ports.">
+        <BaseClass>bis:InformationRecordElement</BaseClass>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="PortConnectionConnectsPorts" strength="referencing" modifier="Abstract" description="Indicates that the DistributionPort is connected to some other Distribution ports via PortConnection.">
+        <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="connects" polymorphic="true">
+            <Class class="PortConnection"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is connected by" polymorphic="true">
+            <Class class="DistributionPort"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="PortConnectionConnectsTwoPorts" strength="referencing" modifier="Abstract" description="Indicates that the DistributionPort is connected to one other Distribution port via PortConnection.">
+        <BaseClass>PortConnectionConnectsPorts</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="connects" polymorphic="true">
+            <Class class="PortConnection"/>
+        </Source>
+        <Target multiplicity="(0..2)" roleLabel="is connected by" polymorphic="true">
+            <Class class="DistributionPort"/>
+        </Target>
+    </ECRelationshipClass>
+    
+    <ECRelationshipClass typeName="PortConnectionIsRealizedByPhysicalElements" strength="referencing" modifier="None" description="Indicates that the Port Connection is realized by some Physical Element(s).">
+        <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="is realized by" polymorphic="true">
+            <Class class="PortConnection"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="realizes" polymorphic="true">
+            <Class class="bis:PhysicalElement"/>
+        </Target>
+    </ECRelationshipClass>
+
+</ECSchema>

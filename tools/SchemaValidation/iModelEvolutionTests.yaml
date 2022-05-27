@@ -1,0 +1,47 @@
+trigger:
+  - master
+
+pr:
+  drafts: false
+  branches:
+    include:
+      - master
+
+jobs:
+- job: iModelEvolutionTests
+  timeoutInMinutes: 90
+  workspace:
+    clean: all
+
+  pool:
+    vmImage: windows-latest
+  variables:
+  - group: "User Credentials - Schema Validation"
+
+  steps:
+  - task: PythonScript@0
+    displayName: 'Get Branch Name'
+    inputs:
+      scriptSource: inline
+      script: |
+        import sys;
+        if ( "System.PullRequest.SourceBranch" not in sys.argv[1] ):
+          branchName = sys.argv[1];
+        else:
+          branchName = sys.argv[2];
+        print ('##vso[task.setvariable variable=sourceBranch]' + branchName);
+      arguments: '$(System.PullRequest.SourceBranch) $(Build.SourceBranchName)'
+
+  - script: 'echo %sourceBranch%'
+    displayName: 'Display Source Branch'
+
+  - task: benjhuser.tfs-extensions-build-tasks.trigger-build-task.TriggerBuild@4
+    displayName: 'Execute iModelEvolution Test'
+    inputs:
+      buildDefinition: '4418'
+      useSameBranch: false
+      branchToUse: 'master'
+      waitForQueuedBuildsToFinish: true
+      buildParameters: 'sourceBranch: $(sourceBranch)'
+      authenticationMethod: 'Personal Access Token'
+      password: '$(triggerBuildToken)'
