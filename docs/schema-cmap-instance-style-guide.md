@@ -1,7 +1,7 @@
 # **Schema CMAP instance diagram style guide**
 
 ## **Introduction**
-This page provides the recommended style guidelines for creating **instance** diagrams for Schemas using CMAP tools. For more details about CMAP see the [main page](schema-cmap-style-guide) of these guidelines.
+This page provides the recommended style guidelines for creating **instance** diagrams for Schemas using CMAP tools. For more details about CMAP see the [main page](schema-cmap-style-guide.md) of these guidelines.
 
 - Example CMAP can be found [here](cmap-example/example-instance.cmap).
 - Template CMAP can be found [here](cmap-example/template-instance.cmap).
@@ -23,7 +23,7 @@ All **Models** are colored white (#FFFFFF) since their type can be inferred from
 ![Model colors](cmap-example/media/instance/colors-models.png)
 
 ## **Shapes and outlines**
-Models are represented by a **nested node** (see [CMAP tips](schema-cmap-style-guide#cmap-tips))
+Models are represented by a **nested node** (see [CMAP tips](schema-cmap-style-guide.md#cmap-tips))
 
 Both Models and Elements should have a **rounded rectangle** shape, **solid line, thickness 1** outline and **margin 4 (default)**.
 

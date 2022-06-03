@@ -13,16 +13,10 @@ This page provides the recommended style guidelines for creating CMAPs that repr
 
 ## Guidelines
 
-- **Class diagram**
-  - [Guidelines](schema-cmap-class-style-guide)
-  - [Example](cmap-example/example-class.cmap)
-  - [Template](cmap-example/template-class.cmap)
-- **Instance diagram**
-  - [Guidelines](schema-cmap-instance-style-guide)
-  - [Example](cmap-example/example-instance.cmap)
-  - [Template](cmap-example/template-instance.cmap)
+- [Class Diagram Guidelines](schema-cmap-class-style-guide.md)
+- [Instance Diagram Guidelines](schema-cmap-instance-style-guide.md)
 
-## **CMAP Tips**
+## CMAP Tips
 
 ### Fix arrowhead Style
 
