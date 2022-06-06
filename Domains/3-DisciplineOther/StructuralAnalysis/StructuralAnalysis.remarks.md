@@ -441,7 +441,7 @@ Groups [Loads](#loads) which can be later added to multiple [LoadCases](#loadcas
 OrientedEdgeAspect allows to assign [Edge](#edge) for a [Path](#path).
 
 A Path might refer to multiple Edges, one of OrientedEdgeAspect purposes is to define the order of Edges in a Path by providing a unique (for that Path) index.
-Each Edge has a direction from its start Vertex to end Vertex. OrientedEdgeAspect can change the direction how the Edge is treated in Path's context. Edges in a Path are required to connect head to tail.
+Each Edge has a direction from its start Vertex to end Vertex. OrientedEdgeAspect can change the direction how the Edge is treated in Path's context. Edges in a Path are required to connect head to tail. Head OrientedEdgeAspect must have index property set to 0. Each subsequent OrientedEdgeAspect in a Path must have index incremented by 1.
 
 ### OrientedFaceAspect
 
