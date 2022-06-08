@@ -2,7 +2,7 @@
 
 ## **Introduction**
 
-This page provides the recommended style guidelines for creating class diagrams for Schemas using CMAP tools. For more details about CMAP see the [main page](schema-cmap-style-guide) of these guidelines.
+This page provides the recommended style guidelines for creating class diagrams for Schemas using CMAP tools. For more details about CMAP see the [main page](schema-cmap-style-guide.md) of these guidelines.
 
 - Example CMAP can be found [here](cmap-example/example-class.cmap).
 - Template CMAP can be found [here](cmap-example/template-class.cmap).
