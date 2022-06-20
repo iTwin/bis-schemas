@@ -219,4 +219,4 @@ function getOutputPath() {
   return outputPath;
 }
 
-module.exports = { getAllSchemas, findLatestReleasedSchema, processResults };
+module.exports = { getAllSchemas, findLatestReleasedSchema, processResults, compareSchemas };
