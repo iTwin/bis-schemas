@@ -87,7 +87,7 @@ function processResults(releasedSchema, schema, results) {
 
   reportWarning("Schema differences were found. Please see logs for details");
 
-  if (0 <= versionCompare(schema.version, releasedSchema.version)) {
+  if (versionCompare(schema.version, releasedSchema.version) <=0 ) {
     reportError(`Schema version ${schema.version} must be greater than the latest release version ${releasedSchema.version}`);
     return true;
   }
@@ -119,8 +119,12 @@ function getRefpaths(schemas) {
   return referencePaths;
 }
 
-async function getAllSchemas() {
-  const bisRoot = getBisRootPath();
+async function getAllSchemas(schemaDir = undefined) {
+  let bisRoot;
+  if (schemaDir === undefined)
+     bisRoot = getBisRootPath();
+  else
+     bisRoot = schemaDir;
   const allSchemas = await readdirp.promise(bisRoot, {fileFilter: "*.ecschema.xml", directoryFilter: ["!docs", "!node_modules", "!tools", "!.vscode", "!cmaps", "!Deprecated", "!test"]});
 
   const schemas = new Set();
@@ -164,6 +168,11 @@ function findLatestReleasedSchema(schema, schemas) {
 function versionCompare(version1, version2) {
   const [read1, write1, minor1] = version1.split(".");
   const [read2, write2, minor2] = version2.split(".");
+
+  // If schema version not specified
+  if ([read1, write1, minor1].includes(undefined)) {
+    return;
+  }
 
   const dRead = +read1 - +read2;
   const dWrite = +write1 - +write2;
@@ -210,4 +219,4 @@ function getOutputPath() {
   return outputPath;
 }
 
-compareSchemas();
+module.exports = { getAllSchemas, findLatestReleasedSchema, processResults };
