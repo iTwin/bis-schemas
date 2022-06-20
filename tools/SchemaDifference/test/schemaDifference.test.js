@@ -68,7 +68,7 @@ describe('Schema Difference Tests', function() {
     chai.expect(hasErrors).to.equal(false);
   });
 
-  it("WIP schema version is equivalent to the latest released version", async function() {
+  it("WIP schema version is equivalent to the latest released version in file names", async function() {
     let hasErrors = false;
     const releasedSchemaE = schemaDifferenceHandler.findLatestReleasedSchema([...schemas][4], schemas);
     const options = new CompareOptions(releasedSchemaE.fullPath, [...schemas][4].fullPath, [], [], outDir);
@@ -78,5 +78,22 @@ describe('Schema Difference Tests', function() {
       hasErrors = true;
 
     chai.expect(hasErrors).to.equal(true);
+  });
+
+  it("WIP schema version is equivalent and version is not specified in file name", async function() {
+    let hasErrors = false;
+    const releasedSchemaE = schemaDifferenceHandler.findLatestReleasedSchema([...schemas][5], schemas);
+    const options = new CompareOptions(releasedSchemaE.fullPath, [...schemas][5].fullPath, [], [], outDir);
+    const results = await SchemaComparison.compare(options);
+
+    if (schemaDifferenceHandler.processResults(releasedSchemaE, [...schemas][5], results))
+      hasErrors = true;
+
+    chai.expect(hasErrors).to.equal(false);
+  });
+
+  it("Pick all wip schemas of same name", async function() {
+    chai.expect([...schemas][4].path).to.equal('SchemaE.01.00.00.ecschema.xml');
+    chai.expect([...schemas][5].path).to.equal('SchemaE.ecschema.xml');
   });
 });

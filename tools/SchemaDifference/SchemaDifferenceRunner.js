@@ -87,7 +87,7 @@ function processResults(releasedSchema, schema, results) {
 
   reportWarning("Schema differences were found. Please see logs for details");
 
-  if (versionCompare(schema.version, releasedSchema.version) <=0 ) {
+  if (versionCompare(schema.version, releasedSchema.version) <= 0 ) {
     reportError(`Schema version ${schema.version} must be greater than the latest release version ${releasedSchema.version}`);
     return true;
   }
