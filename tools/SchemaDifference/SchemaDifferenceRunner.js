@@ -171,7 +171,7 @@ function versionCompare(version1, version2) {
 
   // If schema version not specified
   if ([read1, write1, minor1].includes(undefined)) {
-    return;
+    return 1;
   }
 
   const dRead = +read1 - +read2;
