@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ECSchema schemaName="IoTDevice" alias="iot" version="01.00.00" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.1"
+description="The IoT schema defines common base classes to be used for IoT sensor devices.">
+    <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
+    <ECSchemaReference name="BisCore" version="01.00.12" alias="bis"/>
+    <ECSchemaReference name="Functional" version="01.00.03" alias="func"/>
+    <ECSchemaReference name="Generic" version="01.00.04" alias="generic"/>
+
+    <ECEntityClass typeName="DeviceInterface" modifier="Sealed" displayLabel="DeviceInterface"
+    description="An iot:DeviceInterface models a functional IoT sensor device Entity which will not
+     be sub-modeled at a finer granularity and does not have 'child' parts.">
+        <BaseClass>func:FunctionalComponentElement</BaseClass>
+        <ECProperty propertyName="ioTId" typeName="string" />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="DeviceType" modifier="None" displayLabel="DeviceType"
+    description="An iot:DeviceType defines a set of type definitions that may be associated with an element.">
+        <BaseClass>func:functionalType</BaseClass>
+        <ECProperty propertyName="manufacturer" typeName="string" />
+        <ECProperty propertyName="modelNumber" typeName="string" />
+        <ECProperty propertyName="deviceKind" typeName="string" />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="DevicePoint" modifier="Abstract" displayLabel="DevicePoint">
+        <BaseClass>func:FunctionalComponentElement</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="TelemetryPoint" modifier="Sealed" displayLabel="TelemetryPoint">
+        <BaseClass>DevicePoint</BaseClass>
+        <ECProperty propertyName="ioTId" typeName="string" />
+        <ECProperty propertyName="phenomenon" typeName="string" />
+    </ECEntityClass>
+
+     <ECEntityClass typeName="ActuationPoint" modifier="Sealed" displayLabel="ActuationPoint">
+        <BaseClass>DevicePoint</BaseClass>
+        <ECProperty propertyName="ioTId" typeName="string" />
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="DevicePointObservesSpatialElement" strength="referencing" modifier="None">
+        <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="observes" polymorphic="true">
+            <Class class="TelemetryPoint"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is observed by" polymorphic="true">
+            <Class class="bis:SpatialElement"/>
+        </Target>
+    </ECRelationshipClass>
+</ECSchema>
