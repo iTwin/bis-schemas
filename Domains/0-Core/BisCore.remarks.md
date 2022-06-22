@@ -5,7 +5,7 @@ remarksTarget: BisCore.ecschema.md
 
 # BisCore
 
-BisCore contains the core classes that define the [fundamental building-blocks of BIS](../intro/fabric-of-the-universe/) (e.g. Models, Elements, and ElementAspects) and which specialize them to establish domain-neutral base-classes for modeling the real world from multiple Modeling Perspectives.
+BisCore contains the core classes that define the [fundamental building-blocks of BIS](../guide/intro/fabric-of-the-universe/) (e.g. Models, Elements, and ElementAspects) and which specialize them to establish domain-neutral base-classes for modeling the real world from multiple Modeling Perspectives.
 
 BisCore also contains some less-fundamental classes related to infrastructure engineering visualization and documentation in general, such as drawings, views, etc.
 
@@ -44,7 +44,7 @@ An InformationPartitionElement partitions the information in a BIS Repository in
 
 A bis:Subject mentions a real-world Object. BIS *sees* the Object as one-or-more Entities, where each Entity considers the Object from a particular Modeling Perspective. A specialization of a bis:InformationPartitionElement establishes a Perspective for modeling the Object to which the Subject refers. The top-Model sub-models the Partition. The actual modeling of the Entity with one-or-more Elements of the appropriate Modeling Perspective begins in the top-Model.
 
-See [Top of the World](../intro/top-of-the-world/)
+See [Top of the World](../guide/data-organization/top-of-the-world/)
 
 > Behavior: The system handler (C++) for `InformationPartitionElement` will only permit instances to be inserted into the `RepositoryModel`.
 The system handler will also require every `InformationPartitionElement` to have its `Parent` property reference a `Subject`.
@@ -111,7 +111,7 @@ In retrospect, the complexity added by introducing a distinct "Spatial Location"
 
 ### Model
 
-See [Model Fundamentals](../intro/model-fundamentals/).
+See [Model Fundamentals](../guide/fundamentals/model-fundamentals/).
 
 > Behavior: System handlers (written in C++) and domain handlers (written in TypeScript) provide behavior to specific `Model` subclasses.
 The system handler for `Model` requires its `ModeledElement` property to reference an `Element` that implements `ISubModeledElement`.
@@ -141,7 +141,7 @@ A more consistent name for this relationship would have been 'SheetModelSubModel
 
 ### Element
 
-See [Element Fundamentals](../intro/element-fundamentals/).
+See [Element Fundamentals](../guide/fundamentals/element-fundamentals/).
 
 > Behavior: System handlers (written in C++) and domain handlers (written in TypeScript) provide behavior to specific `Element` subclasses.
 The system handler for `Element` requires a valid `Model` reference and a valid or *empty* `Code`.
@@ -188,7 +188,7 @@ The system handler also prevents the "root" `Subject` from ever being deleted.
 
 Categories should be standardized by domain groups where possible. They generally correlate with groups of BIS Element classes, or a single base class.
 
-See [Categories Introduction](../intro/categories/).
+See [Categories Introduction](../guide/fundamentals/categories/).
 
 Also see the [ClassificationSystems](https://www.itwinjs.org/bis/domains/classificationsystems.ecschema/) domain schema for another way of categorizing and classifying elements.
 
