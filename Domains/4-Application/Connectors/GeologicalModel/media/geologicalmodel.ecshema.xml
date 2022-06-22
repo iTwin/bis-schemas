@@ -1,78 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ECSchema schemaName="GeologicalModel" alias="GeoModel" version="01.00.00" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" displayLabel="Geological Model" description="The GeologicalModel schema defines classes that represent data for interpreting the earth's subterranean structure">
+<ECSchema schemaName="GeologicalModel" alias="geomodel" version="01.00.00" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" displayLabel="Geological Model" description="The GeologicalModel schema defines classes that represent data for interpreting the earth's subterranean structure">
     <ECSchemaReference name="BisCore" version="01.00.14" alias="bis" />
     <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
     <ECSchemaReference name="Analytical" version="01.00.00" alias="anlyt" />
 
-    <ECEntityClass typeName="GeologicalModel">
-        <BaseClass>anlyt:AnalyticalModel</BaseClass>
-        <ECProperty propertyName="Thumbnail" typeName="binary"/>
-    </ECEntityClass>
-
-    <ECEntityClass typeName="GeologicElement3d">
-        <BaseClass>anlyt:AnalyticalElement</BaseClass>
-    </ECEntityClass>
-
-    <!-- TODO: rename, "Partition" in this sense is more a perspective/thematic difference -->
-    <ECEntityClass typeName="FaultBlock" description="A Fault Partition is a set of volumes and surfaces that may be partitioned by one or more Fault Surfaces">
+    <ECEntityClass typeName="GeologicAnalyticalPartition" modifier="Sealed" description="A specialized Analytical Partition advertising a Geologic model (interpretation) based on Fault Blocks partitioned by one or more Fault Surfaces.">
         <BaseClass>anlyt:AnalyticalPartition</BaseClass>
     </ECEntityClass>
 
-    <ECEntityClass typeName="GeologicalCategoryVolume" description="A Volume of a particular Category. Categories commonly represent Lithology">
+    <ECEntityClass typeName="GeologicalModel" modifier="Sealed" description="An AnalyticalModel specialization expected to contain GeologicElement3d instances at different granularities.">
+        <BaseClass>anlyt:AnalyticalModel</BaseClass>
+        <!-- TODO: Where is this Thumbnail expected to show? -->
+        <ECProperty propertyName="Thumbnail" typeName="binary"/>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="GeologicElement3d" modifier="Abstract" description="An AnalyticalElement serving as common base class for all element-classes modeling Geological concepts.">
+        <BaseClass>anlyt:AnalyticalElement</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="FaultBlock" modifier="None" description="A GeologicElement3d modeling a set of volumes and surfaces that may be partitioned by one or more Fault Surfaces">
+        <BaseClass>GeologicElement3d</BaseClass>
+        <BaseClass>bis:ISubModeledElement</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="GeologicalCategoryVolume" modifier="None" description="A GeologicElement3d modeling a Volume of a particular Category. Categories commonly represent Lithology.">
         <BaseClass>GeologicElement3d</BaseClass>
     </ECEntityClass>
 
-    <ECEntityClass typeName="ContactSurface" description="A surface between two or more Category Volumes.">
+    <ECEntityClass typeName="ContactSurface" modifier="None" description="A GeologicElement3d modeling a surface between two or more Category Volumes.">
         <BaseClass>GeologicElement3d</BaseClass>
     </ECEntityClass>
 
-    <ECEntityClass typeName="FaultSurface" description="A surface that describes a Fault that partitions a Geological Model">
+    <ECEntityClass typeName="FaultSurface" modifier="None" description="A GeologicElement3d modeling a surface that describes a Fault that partitions a Geological Model.">
         <BaseClass>GeologicElement3d</BaseClass>
     </ECEntityClass>
 
-    <ECRelationshipClass typeName="GeologicalModelFaultBlocks" displayLabel="Geological Model Fault Blocks" description="Geological Model has one or more Fault Blocks">
-        <Source multiplicity="(1..*)" roleLabel="has">
-            <Class class="GelogicalModel"/>
-        </Source>
-        <Target multiplicity="(1..1)" roleLabel="is part of">
-            <Class class="FaultBlock"/>
-        </Target>
-    </ECRelationshipClass>
-
-    <ECRelationshipClass typeName="GeologicalModelFaultSurfaces" displayLabel="Geological Model Fault Surfaces" description="Geological Model may have one or more Fault Surfaces">
-        <Source multiplicity="(1..*)" roleLabel="can have">
-            <Class class="GeologicalModel"/>
-        </Source>
-        <Target multiplicity="(0..1)" roleLabel="is part of">
-            <Class class="FaultSurface">
-        </Target>
-    </ECRelationshipClass>
-
-    <!-- These Volumes represent a particular Category within the entire Geological Model  -->
-    <ECRelationshipClass typeName="GeologicalModelCategoryVolumes" displayLabel="Geological Model Volumes" description="Geological Model has one or more Category Volumes">
-        <Source multiplicity="(1..*)" roleLabel="has">
-            <Class class="GeologicalModel"/>
-        </Source>
-        <Target multiplicity="(1..1)" roleLabel="is part of">
-            <Class class="GeologicalCategoryVolume"/>
-        </Source>
-    </ECRelationshipClass>
-
-    <ECRelationshipClass typeName="FaultBlockVolumes" displayLabel="Fault Partition Volumes" description="Fault Partition has one or more Volumes">
-        <Source multiplicity="(1..*)" roleLabel="has">
-            <Class class="FaultBlock"/>
-        </Source>
-        <Target multiplicity="(1..1)" roleLabel="is part of">
-            <Class class="GeologicalCategoryVolume"/>
-        </Source>
-    </ECRelationshipClass>
-
-    <ECRelationshipClass typeName="FaultBlockContactSurfaces" displayLabel="Fault Partition Contact Surfaces" description="Fault Partition has one or more Contact Surfaces">
-        <Source multiplicity="(1..*)" roleLabel="has">
-            <Class class="FaultBlock"/>
-        </Source>
-        <Target multiplicity="(1..1)" roleLabel="is part of">
+    <ECRelationshipClass typeName="ContactSurfaceIsAdjecentToVolume" modifier="None" strength="referencing" description="A relationship between a ContactSurface and an adjacent GeologicalCategoryVolume.">
+        <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="is adjecent to" polymorphic="true">
             <Class class="ContactSurface"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is adjacent to" polymorphic="true">
+            <Class class="GeologicalCategoryVolume"/>
         </Source>
     </ECRelationshipClass>
 
