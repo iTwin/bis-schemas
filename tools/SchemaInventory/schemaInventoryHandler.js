@@ -129,7 +129,7 @@ async function createRepositoryInventory(bisRootDir) {
 }
 
 async function updateNewReleasedSchemaEntry(schema, schemaDirectories, bisRootDir) {
-  const sha1 = computeSchemaChecksum(schema, bisRootDir, schemaDirectories);
+  const sha1 = await computeSchemaChecksum(schema, bisRootDir, schemaDirectories);
   const date = new Date();
   
   schema.comment = "";
