@@ -95,6 +95,12 @@ The 'Physical' Perspective is for modeling physical Entities (which have mass) a
 
 The 'Physical System' Modeling Perspective is a subset of the 'Information' Modeling Perspective. It holds Elements which group a collection of connected Entities (primarily Physical) that collectively implement some function..
 
+### PhysicalSystemAggregatesSubSystems
+
+Forms a strict hierarchy (A PhysicalSystem can only be aggregated by a single 'aggregator').
+
+See [PhysicalSystem](#physicalsystem) for more information.
+
 ### SpatialLocationPartition
 
 The “Spatial Location” perspective is a strict subset of the “Physical” perspective. Spatial locations are massless, but they manifest in the real physical world:
@@ -387,6 +393,10 @@ A `DefinitionGroup` may not be both the source and the target of the same relati
 A non-exclusive set of `SpatialElements` grouped using the `PhysicalSystemGroupsMembers` relationship. A `SpatialElement` can be a member of multiple `PhysicalSystems`.
 
 The primary contents of the `PhysicalSystem` are `PhysicalElements`, but `SpatialLocationElements` can be included, as well.
+
+The hierarchy of `PhysicalSystem`s is built using the [PhysicalSystemAggregatesSubSystems](#physicalsystemaggregatessubsystems) relationship, similar to [IfcRelAggregates](https://standards.buildingsmart.org/IFC/DEV/IFC4_2/FINAL/HTML/schema/ifckernel/lexical/ifcrelaggregates.htm). The "source" Element of the relationship is an "Aggregator" that aggregates parts that are essentially a different representation of the aggregator, but at a finer granularity.
+
+A Physical System can define as many levels of hierarchy as needed.
 
 ### SynchronizationConfigLink
 
