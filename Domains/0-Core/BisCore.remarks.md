@@ -237,6 +237,14 @@ See [SheetTemplate.Border ECNavigationProperty](#SheetTemplate) ECNavigationProp
 
 See [SheetBorder.BorderTemplate ECNavigationProperty](#SheetBorder) ECNavigationProperty
 
+### SheetIndexReferenceRefersToSheetIndex
+
+See [SheetIndexReference.SheetIndex ECNavigationProperty](#SheetIndexReference) ECNavigationProperty
+
+### SheetReferenceRefersToSheet
+
+See [SheetReference.Sheet ECNavigationProperty](#SheetReference) ECNavigationProperty
+
 ### ViewIsAttached
 
 See [ViewAttachment.View ECNavigationProperty](#ViewAttachment) ECNavigationProperty
