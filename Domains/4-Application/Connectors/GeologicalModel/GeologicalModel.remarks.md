@@ -15,12 +15,12 @@ The `GeologicalModel` schema defines classes that represent data for interpretin
 
 ### FaultBlock
 
-Instances of `FaultBlock` typically do not have geometry on their own. An instance of `FaultBlock` is submodeled by a `GeologicalModel` containing instances of `GeologicalCategoryVolume` and adjacent `ContactSurface`s.
+Instances of `FaultBlock` do not have geometry on their own, and are separated by `FaultSurface`s. An instance of `FaultBlock` is submodeled by a `GeologicalModel`, containing instances of `GeologicalCategoryVolume` and adjacent `ContactSurface`s.
 
 ### GeologicalCategoryVolume
 
-Instances of `GeologicalCategoryVolume` are expected to be contained in a submodel of a `FaultBlock` instance that it is part of. An instance of `GeologicalCategoryVolume` can use multiple `ContactSurfaceIsAdjecentToVolume` relationship instances to associate it with its adjacent `ContactSurface`s.
+Instances of `GeologicalCategoryVolume` are expected to be contained in a submodel of a `FaultBlock` instance that it is part of. They represent a particular Geological Category, such as lithology. An instance of `GeologicalCategoryVolume` can use multiple `ContactSurfaceIsAdjecentToVolume` relationship instances to associate it with its adjacent `ContactSurface`s.
 
 ### ContactSurface
 
-Instances of `ContactSurface` are expected to be contained in a submodel of a `FaultBlock` instance that it is part of. An instance of `ContactSurface` can use multiple `ContactSurfaceIsAdjecentToVolume` relationship instances to associate it with its adjacent `GeologicalCategoryVolume`s.
+Instances of `ContactSurface` are expected to be contained in a submodel of a `FaultBlock` instance that it is part of. They represent the contact between `GeologicalCategoryVolume`s. An instance of `ContactSurface` can use multiple `ContactSurfaceIsAdjecentToVolume` relationship instances to associate it with its adjacent `GeologicalCategoryVolume`s.
