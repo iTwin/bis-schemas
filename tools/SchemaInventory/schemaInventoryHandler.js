@@ -77,7 +77,7 @@ async function updateSchemaInventory() {
       // Handle WIP schemas
       let inventoryMerged = false;
       for (const inventorySchema of inventorySchemas) {
-        if (inventorySchema.released)
+        if (inventorySchema.released || ( !inventorySchema.released && !matchSchemaFileNames(inventorySchema.path, schema.path)))
           continue;
         // Existing WIP found, so replace with new
         Object.assign (inventorySchema, schema);
@@ -94,6 +94,14 @@ async function updateSchemaInventory() {
     cleanupInventoryEntries(existingInventory);
     fs.writeFileSync(existingInventoryPath, JSON.stringify(existingInventory, null, 2));
   }
+}
+
+function matchSchemaFileNames(path1, path2) {
+  const file1 = path.parse(path1).base;
+  const file2 = path.parse(path2).base;
+  if (file1 !== file2)
+    return false;
+  return true;
 }
 
 async function createRepositoryInventory(bisRootDir) {
