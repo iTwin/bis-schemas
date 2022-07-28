@@ -54,9 +54,9 @@ describe.only('Schema Inventory Tests', function() {
 
     function mockRepoInventory(schemaInfo, schemaVersion = undefined) {
       for (const entry of schemaInfo) {
-        schemaVersion = schemaVersion === undefined ? entry.version : schemaVersion;
+        const version = schemaVersion === undefined ? entry.version : schemaVersion;
         const schemaPath = path.join(assetsDir, entry.path);
-        fsReadFileSyncStub.withArgs(schemaPath).returns(`"<ECSchema version="${schemaVersion}"`);
+        fsReadFileSyncStub.withArgs(schemaPath).returns(`"<ECSchema version="${version}"`);
       }
       fsReadFileSyncStub.callThrough();
       readdirpPromiseStub.onFirstCall().resolves(schemaInfo);
@@ -242,6 +242,98 @@ describe.only('Schema Inventory Tests', function() {
       expect(inventory["TestSchema"][0].author).to.equal("");
       expect(inventory["TestSchema"][0].approved).to.equal("No");
       expect(inventory["TestSchema"][0].dynamic).to.equal("No");
+    });
+
+    it("Multiple WIP schemas, new WIP schema with different file name than the existing WIP schema, inventory updated", async function() {
+      const existingInventory = {
+        SchemaD: [
+          {
+            name: "SchemaD",
+            path: "Test\\Path\\SchemaD.ecschema.xml", 
+            released: false,
+            version: "01.00.02",
+            comment: "Working Copy",
+            sha1: "", 
+            author: "", 
+            date: "Unknown", 
+            dynamic: "No", 
+            approved: "No"
+          }
+        ]
+      };
+      const repositorySchemas = [
+        {
+          basename: "SchemaD.01.01.00.ecschema.xml",
+          path: "Test\\Path\\SchemaD.01.01.00.ecschema.xml",
+          version: "01.01.00",
+        },
+        {
+          basename: "SchemaD.ecschema.xml",
+          path: "Test\\Path\\SchemaD.ecschema.xml",
+          version: "01.00.02",
+        }
+      ];
+      mockSchemaInventory(existingInventory);
+      mockRepoInventory(repositorySchemas);
+
+      await inventoryHandler.updateSchemaInventory(); 
+      const inventory = JSON.parse(fs.readFileSync(inventoryFile));
+
+      expect(Object.keys(inventory.SchemaD).length).to.equal(2);
+      expect(inventory["SchemaD"][1].name).to.equal("SchemaD");
+      expect(inventory["SchemaD"][1].path).to.equal("Test\\Path\\SchemaD.01.01.00.ecschema.xml");
+      expect(inventory["SchemaD"][1].released).to.be.false;
+      expect(inventory["SchemaD"][1].version).to.equal("01.01.00");
+      expect(inventory["SchemaD"][1].comment).to.equal("Working Copy");
+      expect(inventory["SchemaD"][1].sha1).to.equal("");
+      expect(inventory["SchemaD"][1].author).to.equal("");
+      expect(inventory["SchemaD"][1].approved).to.equal("No");
+      expect(inventory["SchemaD"][1].dynamic).to.equal("No");
+      expect(inventory["SchemaD"][1].date).to.equal("Unknown");
+    });
+
+    it("Multiple WIP schemas, when a new WIP schema found and existing WIP schema version upgraded, inventory updated", async function() {
+      const existingInventory = {
+        SchemaF: [
+          {
+            name: "SchemaF",
+            path: "Test\\Path\\SchemaF.ecschema.xml", 
+            released: false,
+            version: "01.00.02",
+            comment: "Working Copy",
+            sha1: "", 
+            author: "", 
+            date: "Unknown", 
+            dynamic: "No", 
+            approved: "No"
+          }
+        ]
+      };
+      const repositorySchemas = [
+        {
+          basename: "SchemaF.01.01.00.ecschema.xml",
+          path: "Test\\Path\\SchemaF.01.01.00.ecschema.xml",
+          version: "01.01.00",
+        },
+        {
+          basename: "SchemaF.ecschema.xml",
+          path: "Test\\Path\\SchemaF.ecschema.xml",
+          version: "01.00.06",
+        }
+      ];
+      mockSchemaInventory(existingInventory);
+      mockRepoInventory(repositorySchemas);
+
+      await inventoryHandler.updateSchemaInventory(); 
+      const inventory = JSON.parse(fs.readFileSync(inventoryFile));
+
+      expect(inventory["SchemaF"][0].name).to.equal("SchemaF");
+      expect(inventory["SchemaF"][0].path).to.equal("Test\\Path\\SchemaF.ecschema.xml");
+      expect(inventory["SchemaF"][0].version).to.equal("01.00.06");
+
+      expect(inventory["SchemaF"][1].name).to.equal("SchemaF");
+      expect(inventory["SchemaF"][1].path).to.equal("Test\\Path\\SchemaF.01.01.00.ecschema.xml");
+      expect(inventory["SchemaF"][1].version).to.equal("01.01.00");
     });
 
     it("BisRootPath not defined, default path (../..) does not exist, throws", async function() {
