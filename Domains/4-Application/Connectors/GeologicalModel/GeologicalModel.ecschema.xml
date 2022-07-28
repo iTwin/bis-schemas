@@ -18,7 +18,7 @@
 
     <ECEntityClass typeName="FaultBlock" modifier="None" description="A GeologicElement3d modeling a set of volumes and surfaces that may be partitioned by one or more Fault Surfaces">
         <BaseClass>GeologicElement3d</BaseClass>
-        <BaseClass>bis:ISubModeledElement</BaseClass>
+        <BaseClass>bis:IParentElement</BaseClass>
     </ECEntityClass>
 
     <ECEntityClass typeName="GeologicalCategoryVolume" modifier="None" description="A GeologicElement3d modeling a Volume of a particular Category. Categories commonly represent Lithology.">
@@ -28,6 +28,26 @@
     <ECEntityClass typeName="ContactSurface" modifier="None" description="A GeologicElement3d modeling a surface between two or more Category Volumes.">
         <BaseClass>GeologicElement3d</BaseClass>
     </ECEntityClass>
+
+    <ECRelationshipClass typeName="FaultBlockOwnsGeologicalCategoryVolume" modifier="None" strength="referencing" description="Relates a FaultBlock to child GeologicCategoryVolumes.">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="owns" polymorphic="true">
+            <Class class="FaultBlock"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="true">
+            <Class class="GeologicalCategoryVolume"/>
+        </Source>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="FaultBlockOwnsContactSurface" modifier="None" strength="referencing" description="Relates a FaultBlock to child ContactSurfaces.">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="owns" polymorphic="true">
+            <Class class="FaultBlock"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="true">
+            <Class class="ContactSurface"/>
+        </Source>
+    </ECRelationshipClass>
 
     <ECEntityClass typeName="FaultSurface" modifier="None" description="A GeologicElement3d modeling a surface that describes a Fault that partitions a Geological Model.">
         <BaseClass>GeologicElement3d</BaseClass>
