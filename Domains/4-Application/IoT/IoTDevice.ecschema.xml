@@ -1,45 +1,84 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
-<ECSchema schemaName="IoTDevice" alias="iot" version="00.00.00" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.1"
-description="The IoT schema defines common base classes to be used for IoT sensor devices.">
+<ECSchema schemaName="IoTDeviceFunctional" alias="iotdfunc" version="01.00.00" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" description="The IoTDevice schema defines common base functional classes to be used for IoT sensor devices.">
     <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
-    <ECSchemaReference name="BisCore" version="01.00.12" alias="bis"/>
+    <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
+    <ECSchemaReference name="BisCore" version="01.00.14" alias="bis"/>
     <ECSchemaReference name="Functional" version="01.00.03" alias="func"/>
-    <ECSchemaReference name="Generic" version="01.00.04" alias="generic"/>
 
-    <ECEntityClass typeName="DeviceInterface" modifier="Sealed" displayLabel="DeviceInterface"
-    description="An iot:DeviceInterface models a functional IoT sensor device Entity which will not
-     be sub-modeled at a finer granularity and does not have 'child' parts.">
+    <ECCustomAttributes>
+        <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
+            <SupportedUse>NotForProduction</SupportedUse>
+        </ProductionStatus>
+        <SchemaLayerInfo xmlns="BisCustomAttributes.01.00.00">
+            <Value>DisciplineOther</Value>
+        </SchemaLayerInfo>
+    </ECCustomAttributes>
+
+    <ECEntityClass typeName="DeviceInterface" modifier="Sealed" displayLabel="Device Interface" description="A func:FunctionalComponentElement that models a functional IoT sensor device Entity which will not be modeled at a finer granularity and does not have 'child' parts.">
         <BaseClass>func:FunctionalComponentElement</BaseClass>
-        <ECProperty propertyName="ioTId" typeName="string" />
+        <ECProperty propertyName="CodeValue" displayLabel="IoT Id" description="Asset or container tag in the Time Series Service."/>
     </ECEntityClass>
 
-    <ECEntityClass typeName="DeviceType" modifier="None" displayLabel="DeviceType"
-    description="An iot:DeviceType defines a set of type definitions that may be associated with an element.">
-        <BaseClass>func:functionalType</BaseClass>
-        <ECProperty propertyName="manufacturer" typeName="string" />
-        <ECProperty propertyName="modelNumber" typeName="string" />
-        <ECProperty propertyName="deviceKind" typeName="string" />
+    <ECEntityClass typeName="DeviceInterfaceType" modifier="None" displayLabel="Device Type" description="A bis:PhysicalType that defines a shared set of properties whose values vary per-type of a bis:PhysicalElement modeling an IoT sensor device rather than per-instance.">
+        <BaseClass>func:FunctionalType</BaseClass>
+        <BaseClass>bis:IParentElement</BaseClass>
+        <ECProperty propertyName="CodeValue" displayLabel="Model Number" typeName="string" />
     </ECEntityClass>
 
-    <ECEntityClass typeName="DevicePoint" modifier="Abstract" displayLabel="DevicePoint">
+    <ECRelationshipClass typeName="DeviceInterfaceIsOfType" strength="referencing" modifier="None" description="A type-instance relation; one that indicates that the specific DeviceInterface is an instance of the defined DeviceInterfaceType.">
+        <BaseClass>func:FunctionalElementIsOfType</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="is of" polymorphic="true">
+            <Class class="DeviceInterface" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is type of" polymorphic="true">
+            <Class class="DeviceInterfaceType"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="DevicePoint" modifier="Abstract" displayLabel="Device Point">
         <BaseClass>func:FunctionalComponentElement</BaseClass>
+        <ECProperty propertyName="CodeValue" displayLabel="IoT Id" description="Point tag in Time Series Service."/>
     </ECEntityClass>
 
-    <ECEntityClass typeName="TelemetryPoint" modifier="Sealed" displayLabel="TelemetryPoint">
+    <ECEntityClass typeName="DevicePointType" modifier="None" displayLabel="Device Point Type" description="A bis:PhysicalType that defines a shared set of properties whose values vary per-type of iotd:ISensor rather than per-instance.">
+        <BaseClass>bis:PhysicalType</BaseClass>
+        <ECProperty propertyName="CodeValue" displayLabel="IoT Id" typeName="string" />
+        <ECProperty propertyName="Phenomenon" typeName="string" />
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="DevicePointIsOfType" strength="referencing" modifier="None" description="A type-instance relation; one that indicates that the specific DevicePoint is an instance of the defined DevicePointType.">
+        <BaseClass>func:FunctionalElementIsOfType</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="is of" polymorphic="true">
+            <Class class="DevicePoint" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is type of" polymorphic="true">
+            <Class class="DevicePointType"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="DeviceInterfaceTypeOwnsDevicePointTypes" strength="embedding" modifier="None" description="Relates a iotd:DeviceType to child iotd:DevicePointType which represent parts of the Entity modeled by the parent iotd:DeviceType.">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="owns" polymorphic="true">
+            <Class class="DeviceInterfaceType"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="true">
+            <Class class="DevicePointType"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="MeasurementPoint" modifier="Sealed" displayLabel="Measurement Point">
         <BaseClass>DevicePoint</BaseClass>
-        <ECProperty propertyName="ioTId" typeName="string" />
-        <ECProperty propertyName="phenomenon" typeName="string" />
     </ECEntityClass>
 
-     <ECEntityClass typeName="ActuationPoint" modifier="Sealed" displayLabel="ActuationPoint">
+
+    <ECEntityClass typeName="Parameter" modifier="Sealed" displayLabel="Parameter">
         <BaseClass>DevicePoint</BaseClass>
-        <ECProperty propertyName="ioTId" typeName="string" />
     </ECEntityClass>
 
-    <ECRelationshipClass typeName="DevicePointObservesSpatialElement" strength="referencing" modifier="None">
+    <ECRelationshipClass typeName="MeasurementPointObservesSpatialElement" strength="referencing" modifier="None">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <Source multiplicity="(0..*)" roleLabel="observes" polymorphic="true">
-            <Class class="TelemetryPoint"/>
+            <Class class="MeasurementPoint"/>
         </Source>
         <Target multiplicity="(0..1)" roleLabel="is observed by" polymorphic="true">
             <Class class="bis:SpatialElement"/>
