@@ -3,186 +3,62 @@
 |  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
 |  * See LICENSE.md in the project root for license terms and full copyright notice.
 ======================================================================================= -->
-<ECSchema schemaName="StructuralPhysical" description="The classes and relationships required for the physical representation of a building structure.  As opposed to the representation used for structural analysis which is idealized to facilitate calculations, the physical structure more closely maps to the real-world structure and its elements for the purposes of design, fabrication and erection." alias="sp" version="01.01.00" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
-    <ECSchemaReference name="BisCore" version="01.00.00" alias="bis" />
-    <ECSchemaReference name="StructuralPhysicalInterop" version="01.00.00" alias="spi" />
-    <ECSchemaReference name="Rebar" version="01.00.00" alias="SPR" />
-    <ECSchemaReference name="Profiles" version="01.00.00" alias="prf" />
+<ECSchema schemaName="StructuralPhysical" alias="sp" version="01.00.02" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
+    <ECSchemaReference name="BisCore" version="01.00.14" alias="bis" />
     <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
+    <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
 
-    <ECEntityClass typeName="StructuralPhysicalModel" displayLabel="Structural Physical Model" description="DEPRECATED: DO NOT USE.">
+    <ECCustomAttributes>
+        <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
+            <SupportedUse>Production</SupportedUse>
+        </ProductionStatus>
+        <SchemaLayerInfo xmlns="BisCustomAttributes.01.00.00">
+            <Value>DisciplinePhysical</Value>
+        </SchemaLayerInfo>
+    </ECCustomAttributes>
+
+    <ECEntityClass typeName="StructuralPhysicalModel" displayLabel="Structural Physical Model">
         <BaseClass>bis:PhysicalModel</BaseClass>
         <ECCustomAttributes>
             <Deprecated xmlns="CoreCustomAttributes.01.00.03">
                 <Description>PhysicalModel should be used in place of this class.</Description>
             </Deprecated>
-         </ECCustomAttributes>
-    </ECEntityClass>
-
-    <ECEntityClass typeName="IGenericComponent" description="An interface that indicates that this element is a structural component of a generic material." displayLabel="Generic Component Mixin" modifier ="Abstract">
-        <ECCustomAttributes>
-            <IsMixin xmlns="CoreCustomAttributes.01.00.03">
-                <AppliesToEntityClass>bis:PhysicalElement</AppliesToEntityClass>
-            </IsMixin>
         </ECCustomAttributes>
     </ECEntityClass>
-
-    <ECEntityClass typeName="IMetalComponent" description="An interface that indicates that this element is a metal structural component" displayLabel="Metal Component Mixin" modifier ="Abstract">
-        <ECCustomAttributes>
-            <IsMixin xmlns="CoreCustomAttributes.01.00.03">
-                <AppliesToEntityClass>bis:PhysicalElement</AppliesToEntityClass>
-            </IsMixin>
-        </ECCustomAttributes>
-    </ECEntityClass>
-
-    <ECEntityClass typeName="IConcreteComponent" modifier ="Abstract" displayLabel="Concrete Component Mixin" description="An interface that indicates that this Element is a concrete structural component">
-        <BaseClass>spr:IReinforceable</BaseClass>
-        <ECCustomAttributes>
-            <IsMixin xmlns="CoreCustomAttributes.01.00.03">
-                <AppliesToEntityClass>bis:PhysicalElement</AppliesToEntityClass>
-            </IsMixin>
-        </ECCustomAttributes>
-    </ECEntityClass>
-
-    <ECEntityClass typeName="StructuralComponentType" description="A physical type for a structural component." displayLabel="Structural Component Type" modifier ="Abstract">
-            <BaseClass>bis:PhysicalType</BaseClass>
-    </ECEntityClass>
-
-    <ECEntityClass typeName="SolidComponentType" description="A physical type for a solid structural component." displayLabel="Solid Component Type" modifier ="Abstract">
-            <BaseClass>StructuralComponentType</BaseClass>
-    </ECEntityClass>
-
-    <ECEntityClass typeName="ProfiledComponentType" description="A physical type for a profiled component." displayLabel="Profiled Component Type">
-        <BaseClass>SolidComponentType</BaseClass>
-    </ECEntityClass>
-
-    <ECEntityClass typeName="TaperedProfiledComponentType" description="A physical type for a tapered profiled component." displayLabel="Tapered Profiled Component Type">
-        <BaseClass>ProfiledComponentType</BaseClass>
-    </ECEntityClass>
-
-    <ECEntityClass typeName="PlateComponentType" description="A physical type for a plate component." displayLabel="Plate Component Type">
-        <BaseClass>SolidComponentType</BaseClass>
-    </ECEntityClass>
-
-    <ECEntityClass typeName="GenericComponentType" description="A physical type for a generic component." displayLabel="Generic Component Type">
-        <BaseClass>StructuralComponentType</BaseClass>
-    </ECEntityClass>
-
-    <ECEntityClass typeName="StructuralElement" displayLabel="Structural Element" modifier="Abstract" description="An abstract entity from which all structural physical components and assemblies are derived.">
+    <ECEntityClass typeName="StructuralElement" displayLabel="Structural Element" modifier="Abstract">
         <BaseClass>bis:PhysicalElement</BaseClass>
-        <BaseClass>spi:IStructuralElement</BaseClass>
     </ECEntityClass>
-    <ECEntityClass typeName="StructuralComponent" displayLabel="Structural Component" modifier="Abstract" description="A component is the smallest distinct structural entity.  It can't be broken down further.">
+    <ECEntityClass typeName="StructuralMember" displayLabel="Structural Member">
         <BaseClass>StructuralElement</BaseClass>
-        <BaseClass>spi:IStructuralComponent</BaseClass>
-        <!--<ECProperty propertyName="IsMain" description="Designates a structural component as the main component in a member.  All structural members must have one component that is considered the main component." typeName="boolean" />-->
     </ECEntityClass>
-    <ECEntityClass typeName="StructuralAssembly" displayLabel="Structural Assembly" description="A single structural entity that is built from smaller parts known as components or other structural assemblies">
-        <BaseClass>StructuralElement</BaseClass>
-        <BaseClass>spi:IStructuralAssembly</BaseClass>
-    </ECEntityClass>
-    <ECEntityClass typeName="SolidComponent" description="A solid structural component." displayLabel="Solid Component" modifier="Abstract">
-        <BaseClass>StructuralComponent</BaseClass>
-    </ECEntityClass>
-        <ECEntityClass typeName="ArbitraryComponent" description="A structural component that has complex geometry that can't be described parametrically like an extrusion or plate." displayLabel="Arbitrary Component">
-        <BaseClass>StructuralComponent</BaseClass>
-    </ECEntityClass>
-    <ECEntityClass typeName="PlateComponent" displayLabel="Plate" description="Sheet of metal typically steel that is more than approximately 1 cm. (1/4 inch.) thick">
-        <BaseClass>SolidComponent</BaseClass>
-        <ECProperty propertyName="Boundary" description="The planar polygon or shape defining the boundary for the plate." displayLabel="Path" typeName="Bentley.Geometry.Common.IGeometry"/>
-        <ECProperty propertyName="Thickness" description="The thickness of the plate component." displayLabel="Thickness" typeName="double"/>
-        <ECProperty propertyName="Justification" description="Describes how the plate boundary is located relative to the thickness of the plate component." displayLabel="Justification" typeName="string"/>
-    </ECEntityClass>
-    <ECEntityClass typeName="ProfiledComponent" displayLabel="Profiled Component" description="A common structural extrusion designated by a cross-section (profile) and an extrusion path or length e.g. a prismatic steel column">
-        <BaseClass>SolidComponent</BaseClass>
-         <ECProperty propertyName="Path" description="The curve or line along which the profile is extruded or swept." displayLabel="Path" typeName="Bentley.Geometry.Common.IGeometry"/>
-         <ECProperty propertyName="CardinalPoint" description="The identifier of a predefined point in the section definition to designate the location of the profile that intersects the path curve." displayLabel="Cardinal Point" typeName="string"/>
-         <ECProperty propertyName="Offset" description="A 2D translation to be combined with the cardinal point to locate the profiles intersection with the path curve in-between or offset from the predefined points." displayLabel="Offset" typeName="point2d"/>
-         <ECProperty propertyName="OrientationVector" description="A vector which orients the strong axis of a profile about the path of the profiled component" displayLabel="Orientation Vector" typeName="point3d"/>
-         <ECProperty propertyName="IsMirrored" description="Designates that the profile used in this component is reflected from its default position." typeName="boolean" />        
-    </ECEntityClass>
-
-    <ECEntityClass typeName="TaperedProfiledComponent" displayLabel="Tapered Profiled Component" description="A tapered structural member designated by a starting and ending cross-section (profile) and an extrusion path or length">
-        <BaseClass>ProfiledComponent</BaseClass>
-    </ECEntityClass>
-
-    <ECEntityClass typeName="StructuralAccessory" displayLabel="Structural Accessory" description="A structural assembly that does not function as a member in the structure, however, must be accounted for.  e.g. Loose clips which mush be shipped to the site by the fabricator are examples of structural accessories">
-        <BaseClass>StructuralAssembly</BaseClass>
-    </ECEntityClass>
-    <ECEntityClass typeName="StructuralMember" displayLabel="Structural Member" description="A major identifiable StructuralElement of the load bearing structure.">
-        <BaseClass>StructuralAssembly</BaseClass>
-    </ECEntityClass>
-    <ECEntityClass typeName="SubAssembly" displayLabel="SubAssembly" description="An assembly of members or components that acts as member in a larger assembly.">
-        <BaseClass>StructuralMember</BaseClass>
-    </ECEntityClass>    
-    <ECEntityClass typeName="Slab" displayLabel="Slab" description="A plate-like superstructure StructuralMember that is primarily horizontal, and that transmits to its support locations (usually walls and columns) the applied loads, primarily through bending.">
+    <ECEntityClass typeName="Slab" displayLabel="Slab">
         <BaseClass>StructuralMember</BaseClass>
     </ECEntityClass>
-    <ECEntityClass typeName="Wall" displayLabel="Wall" description="A plate-like superstructure StructuralMember that is primarily vertical, and that transmits forces to its base, primarily through compression.">
+    <ECEntityClass typeName="Wall" displayLabel="Wall">
         <BaseClass>StructuralMember</BaseClass>
     </ECEntityClass>
-    <ECEntityClass typeName="Beam" displayLabel="Beam" description="A slender superstructure StructuralMember that is primarily horizontal, and that transmits to its ends the applied loads, primarily through bending.">
+    <ECEntityClass typeName="Beam" displayLabel="Beam">
         <BaseClass>StructuralMember</BaseClass>
     </ECEntityClass>
-    <ECEntityClass typeName="Column" displayLabel="Column" description="A slender superstructure StructuralMember that is primarily vertical, and that transmits to its base the forces, primarily through compression.">
+    <ECEntityClass typeName="Column" displayLabel="Column">
         <BaseClass>StructuralMember</BaseClass>
     </ECEntityClass>
-    <ECEntityClass typeName="Brace" displayLabel="Brace" description="A slender superstructure StructuralMember that may have any orientation, and prevents racking behavior, primarily through axial forces.">
+    <ECEntityClass typeName="Brace" displayLabel="Brace">
         <BaseClass>StructuralMember</BaseClass>
     </ECEntityClass>
-    <ECEntityClass typeName="FoundationMember" displayLabel="Foundation Member" description="A StructuralMember that forms part of the substructure that transfers the loads from the superstructure to the ground.">
+    <ECEntityClass typeName="FoundationMember" displayLabel="Foundation Member">
         <BaseClass>StructuralMember</BaseClass>
     </ECEntityClass>
-    <ECEntityClass typeName="StripFooting" displayLabel="Strip Footing" description="A linear FoundationMember that transfers the load from a linear superstructure element (usually a Wall) or a linear series of closely spaced superstructure elements on to the ground.">
+    <ECEntityClass typeName="StripFooting" displayLabel="Strip Footing">
         <BaseClass>FoundationMember</BaseClass>
     </ECEntityClass>
-    <ECEntityClass typeName="SpreadFooting" displayLabel="Spread Footing" description="A FoundationMember that transfers the load from a small number of superstructure elements (often one) to the ground, spreading the load in two directions.">
+    <ECEntityClass typeName="SpreadFooting" displayLabel="Spread Footing">
         <BaseClass>FoundationMember</BaseClass>
     </ECEntityClass>
-    <ECEntityClass typeName="PileCap" displayLabel="Pile Cap" description="A FoundationMember that transfers the load from the superstructure to a or pile or group of piles.">
+    <ECEntityClass typeName="PileCap" displayLabel="Pile Cap">
         <BaseClass>FoundationMember</BaseClass>
     </ECEntityClass>
-    <ECEntityClass typeName="Pile" displayLabel="Pile" description="A slender FoundationMember, substantially underground, intended to transmit forces into loadbearing strata below the surface of the ground.">
+    <ECEntityClass typeName="Pile" displayLabel="Pile">
         <BaseClass>FoundationMember</BaseClass>
     </ECEntityClass>
-    <ECRelationshipClass typeName="StructuralAssemblyOwnsStructuralAssembly" description="For supporting sub-assemblies" displayLabel="Structural Member Owns Structural Members" modifier="None" strength="embedding">
-        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
-        <Source multiplicity="(0..1)" roleLabel="owns" polymorphic="true">
-            <Class class="spi:IStructuralAssembly"/>
-        </Source>
-        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="true">
-            <Class class="spi:IStructuralAssembly"/>
-        </Target>
-    </ECRelationshipClass>
-
-    <ECRelationshipClass typeName="ProfiledComponentTypeUsesProfile" description="Relates a profiled component type to a profile." displayLabel="Profiled Component Type Uses Profile" modifier="None" strength="referencing">
-        <BaseClass>bis:ElementRefersToElements</BaseClass>
-        <Source multiplicity="(0..1)" roleLabel="uses" polymorphic="true">
-            <Class class="ProfiledComponentType"/>
-        </Source>
-        <Target multiplicity="(1..1)" roleLabel="is used by" polymorphic="true">
-            <Class class="prf:Profile"/>
-        </Target>
-    </ECRelationshipClass>
-
-    <ECRelationshipClass typeName="TaperedProfiledComponentTypeUsesEndProfile" description="Relates a tapered profiled component type to its end profile." displayLabel="Tapered Profiled Component Type Uses End Profile" modifier="None" strength="referencing">
-        <BaseClass>bis:ElementRefersToElements</BaseClass>
-        <Source multiplicity="(0..1)" roleLabel="uses end" polymorphic="true">
-            <Class class="TaperedProfiledComponentType"/>
-        </Source>
-        <Target multiplicity="(1..1)" roleLabel="is used as end profile by" polymorphic="true">
-            <Class class="prf:Profile"/>
-        </Target>
-    </ECRelationshipClass>
-
-    <ECRelationshipClass typeName="StructuralComponentIsOfType" strength="referencing" modifier="None" description="A type-instance relation; one that indicates that the specific sp:StructuralComponent is an instance of the defined sp:StructuralComponentType.">
-        <BaseClass>bis:PhysicalElementIsOfType</BaseClass>
-        <Source multiplicity="(0..*)" roleLabel="is of type" polymorphic="true">
-            <Class class="StructuralComponent" />
-        </Source>
-        <Target multiplicity="(0..1)" roleLabel="is type of" polymorphic="true">
-            <Class class="StructuralComponentType"/>
-        </Target>
-    </ECRelationshipClass>
-
 </ECSchema>

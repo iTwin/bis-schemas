@@ -3,11 +3,12 @@
 * See LICENSE.md in the project root for license terms and full copyright notice.
 *--------------------------------------------------------------------------------------------*/
 const path = require("path");
-const ECSchemaOpsNativeLibrary = require("@bentley/ecschema-ops").ECSchemaOpsNativeLibrary;
-const ECSchemaOpsNative = ECSchemaOpsNativeLibrary.load();
-const schemaOps = new ECSchemaOpsNative.ECSchemaOps();
+const IModelHost = require("@itwin/core-backend").IModelHost;
 
-module.exports = function (schema, bisRootDir, schemaDirectories) {
+module.exports = async function (schema, bisRootDir, schemaDirectories) {
   const fullSchemaPath = path.join(bisRootDir, schema.path);
-  return schemaOps.computeChecksum(fullSchemaPath, schemaDirectories);
+  await IModelHost.startup();
+  const sha1 = IModelHost.computeSchemaChecksum({ schemaXmlPath: fullSchemaPath, referencePaths: schemaDirectories });
+  await IModelHost.shutdown();
+  return sha1;
 };
