@@ -139,6 +139,10 @@ A more consistent name for this relationship would have been 'DrawingModelSubMod
 
 A more consistent name for this relationship would have been 'SheetModelSubModelsSheet', but the existing name cannot be changed in this generation of BIS. At times, we use "breaks down" as a synonym for "sub-models", but we are standardizing on "sub-models", reserving "breakdown" for use with various engineering breakdown structures.
 
+### SubjectRefersToSubject
+
+A `bis:Subject` can be referenced by zero or more `bis:Subject` instances as opposed to the `bis:SubjectOwnsSubjects` relationship that leads to a strict hierarchy.
+
 ### Element
 
 See [Element Fundamentals](../guide/fundamentals/element-fundamentals/).
