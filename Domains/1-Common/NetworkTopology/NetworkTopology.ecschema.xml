@@ -24,17 +24,18 @@
                 <AppliesToEntityClass>bis:Element</AppliesToEntityClass>
             </IsMixin>
         </ECCustomAttributes>
+        <ECNavigationProperty propertyName="AggregatingNetwork" displayLabel="Aggregator" relationshipName="NetworkAggregatesSubNetworks" direction="Backward" description="The aggregator of this sub-network within the Network hierarchy."/>
     </ECEntityClass>
-    <ECEntityClass typeName="NetworkElement" modifier="Abstract" description="Base class for implementations of INetwork as InformationRecord">
-      <BaseClass>bis:InformationRecordElement</BaseClass>
+    <ECEntityClass typeName="NetworkElement" modifier="Abstract" description="Base class for implementations of INetwork as bis:GroupInformationElement">
+      <BaseClass>bis:GroupInformationElement</BaseClass>
       <BaseClass>INetwork</BaseClass>
     </ECEntityClass>
-    <ECRelationshipClass typeName="NetworkGroupsNetworks" strength="referencing" modifier="None" description="Relationship used to group other INetworks at the same level of granularity.">
-        <BaseClass>bis:ElementGroupsMembers</BaseClass>
-        <Source multiplicity="(0..1)" polymorphic="true" roleLabel="groups">
+    <ECRelationshipClass typeName="NetworkAggregatesSubNetworks" strength="referencing" modifier="None" description="Relationship used to aggregate other INetworks at the same level of granularity.">
+        <!-- @see INetwork.AggregatingNetwork -->
+        <Source multiplicity="(0..1)" polymorphic="true" roleLabel="aggregates">
             <Class class="INetwork"/>
         </Source>
-        <Target multiplicity="(0..*)" polymorphic="true" roleLabel="is grouped by">
+        <Target multiplicity="(0..*)" polymorphic="true" roleLabel="is aggregated by">
             <Class class="INetwork"/>
         </Target>
     </ECRelationshipClass>
