@@ -15,7 +15,7 @@ The `GeologicalModel` schema defines classes that represent data for interpretin
 
 ### FaultBlock
 
-Instances of `FaultBlock` do not have geometry on their own, and are separated by `FaultSurface`s. An instance of `FaultBlock` owns instances of `GeologicalCategoryVolume` and adjacent `ContactSurface`s modeling its parts.
+Instances of `FaultBlock` do not have geometry on their own, and are separated by `FaultSurface`s. An instance of `FaultBlock` owns instances of `GeologicalCategoryVolume` and adjacent `ContactSurface`s modeling its parts. A `FaultBlock` is owned by a `GeologicalModel`
 
 ### GeologicalCategoryVolume
 

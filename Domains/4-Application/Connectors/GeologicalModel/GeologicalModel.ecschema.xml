@@ -10,6 +10,7 @@
 
     <ECEntityClass typeName="GeologicalModel" modifier="Sealed" description="An AnalyticalModel specialization expected to contain GeologicElement3d instances at different granularities.">
         <BaseClass>anlyt:AnalyticalModel</BaseClass>
+        <BaseClass>bis:IParentElement</BaseClass>
     </ECEntityClass>
 
     <ECEntityClass typeName="GeologicElement3d" modifier="Abstract" description="An AnalyticalElement serving as common base class for all element-classes modeling Geological concepts.">
@@ -28,6 +29,16 @@
     <ECEntityClass typeName="ContactSurface" modifier="None" description="A GeologicElement3d modeling a surface between two or more Category Volumes.">
         <BaseClass>GeologicElement3d</BaseClass>
     </ECEntityClass>
+
+    <ECRelationshipClass typeName="GeologicalModelOwnsFaultBlocks" modifier="None" strength="referencing" description="Relates a Geological Model to child FaultBlocks.">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="owns" polymorphic="true">
+            <Class class="GeologicalModel"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="true">
+            <Class class="FaultBlock">
+        </Target>
+    </ECRelationshipClass>
 
     <ECRelationshipClass typeName="FaultBlockOwnsGeologicalCategoryVolume" modifier="None" strength="referencing" description="Relates a FaultBlock to child GeologicCategoryVolumes.">
         <BaseClass>bis:ElementOwnsChildElements</BaseClass>
