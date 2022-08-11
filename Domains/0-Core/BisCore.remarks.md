@@ -148,6 +148,10 @@ The system handler for `Element` requires a valid `Model` reference and a valid 
 If the `Parent` property is not `NULL`, the system handler also requires that the child Element be in the same Model as the parent Element.
 This is enforced for all `Element` subclasses.
 
+### ElementRefersToElements
+
+Subclasses of `ElementRefersToElements` can make use of the `MemberPriority` property to prioritize or order elements being referenced. By default, `MemberPriority` is set to *null* if not assigned. Duplicate not-null values for `MemberPriority` are allowed as long as the Sources, Targets, or the `ECClassId` of the relationships are different. Furthermore, duplicate Sources and Targets are accepted only if either their `ECClassId` or `MemberPriority` values are not the same.
+
 ### ElementDrivesElement
 
 In iModels, a change-propagation system calls handlers that allow the driven Element to be affected by the driving Element.
