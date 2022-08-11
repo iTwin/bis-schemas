@@ -29,12 +29,18 @@ The `Phenomenon` property is expected to capture the equivalent concept in [EC t
 "<schema_name | schema_alias>:<phenomenon_name>" 
 ```
 
-For example, "u:TEMPERATURE" referring to the "TEMPERATURE" phenomenon defined in the Units schema.
+For example, "u:TEMPERATURE" referring to the "TEMPERATURE" phenomenon defined in the [Units schema](https://www.itwinjs.org/bis/domains/units.ecschema/).
 
 ### DevicePoint
 
-Sub-classes of `DevicePoint` are expected to capture the involved function and unit of data-point values (if any) by referring to an instance of `DevicePointType` carrying such information.
+Sub-classes of `DevicePoint` are expected to capture the involved function and unit of data-point values (if any) by referring to an instance of `DevicePointType` that carries such information.
 
 ### MeasurementPoint
 
-Additional classification of `MeasurementPoint` instances can be achieved by using the patterns available in the **ClassificationSystems** schema, more specifically its `ElementHasClassifications` relationship. 
+Additional classification of `MeasurementPoint` instances can be achieved by using the patterns available in the **ClassificationSystems** schema, more specifically its `ElementHasClassifications` relationship.
+
+This class is sealed by design. Unit of data-point values (if any) can be specified by referring to an instance of `DevicePointType` that carries such information via its **Phenomenon** property.
+
+### Parameter
+
+The example depicted by the instance-diagram above includes a Set-Point on a Thermostat, indicating such `DeviceInterface` has a parameter-base functionality. In this example, it allows the setting of the desired temperature that the Thermostat is meant to maintain.
