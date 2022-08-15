@@ -142,10 +142,25 @@ jobs:
       PathtoPublish: '$(Build.StagingDirectory)\markdown\'
       ArtifactName: 'Bis Docs'
 
+  - task: PowerShell@2
+    condition: and(succeeded(), not(canceled()), startsWith(variables['Build.SourceBranchName'], 'refs/tags/imodeljs/'))
+    name: RetainTagBuildsOnSuccess
+    displayName: Retain Tag Builds on Success
+    inputs:
+      failOnStderr: true
+      targetType: 'inline'
+      script: |
+        $contentType = "application/json";
+        $headers = @{ Authorization = 'Bearer $(System.AccessToken)' };
+        $rawRequest = @{ daysValid = 365 * 1; definitionId = $(System.DefinitionId); ownerId = 'User:$(Build.RequestedForId)'; protectPipeline = $false; runId = $(Build.BuildId) };
+        $request = ConvertTo-Json @($rawRequest);
+        $uri = "$(System.CollectionUri)$(System.TeamProject)/_apis/build/retention/leases?api-version=6.0-preview.1";
+        Invoke-RestMethod -uri $uri -method POST -Headers $headers -ContentType $contentType -Body $request;
+
 - job: Validate_Docs
   dependsOn: Generate_Docs
   displayName: Validate Docs
-  condition: and(succeeded(), in(variables['Build.Reason'], 'IndividualCI', 'PullRequest'))
+  condition: and(succeeded(), in(variables['Build.Reason'], 'IndividualCI', 'PullRequest', 'Manual'))
   workspace:
     clean: all
   pool:

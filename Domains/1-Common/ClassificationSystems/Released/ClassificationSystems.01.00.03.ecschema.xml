@@ -1,0 +1,101 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!-- ==================================================================================
+|  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
+|  * See LICENSE.md in the project root for license terms and full copyright notice.
+======================================================================================= -->
+<ECSchema schemaName="ClassificationSystems" alias="clsf" version="01.00.03" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" description="A schema for classifying elements">
+    <ECSchemaReference name="BisCore" version="01.00.14" alias="bis" />
+    <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA" />
+    <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA" />
+
+    <ECCustomAttributes>
+        <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
+            <SupportedUse>Production</SupportedUse>
+        </ProductionStatus>
+        <SchemaLayerInfo xmlns="BisCustomAttributes.01.00.00">
+            <Value>Common</Value>
+        </SchemaLayerInfo>
+    </ECCustomAttributes>
+
+    <ECEntityClass typeName="ClassificationSystem" displayLabel="Classification System" description="An element used to represent a classification system">
+        <BaseClass>bis:DefinitionElement</BaseClass>
+        <BaseClass>bis:IParentElement</BaseClass>
+        <ECProperty propertyName="Source" displayLabel="Source" typeName="string" description="Source (or publisher) for this classification" />
+        <ECProperty propertyName="Edition" displayLabel="Edition" typeName="string" description="The edition or version of the classification system from which the classification notation is derived." />
+        <ECProperty propertyName="Location" displayLabel="Location" typeName="string" description="Resource identifier or locator, provided as URI, URN or URL, of the classification." />
+        <ECProperty propertyName="Description" typeName="string" displayLabel="Description" description="Description for this ClassificationSystem"/>
+    </ECEntityClass>
+  
+    <ECEntityClass typeName="ClassificationTable" displayLabel="Classification Table" description="An element used to represent a table in a classification system">
+        <BaseClass>bis:DefinitionElement</BaseClass>
+        <BaseClass>bis:ISubModeledElement</BaseClass>
+        <ECProperty propertyName="Description" typeName="string" displayLabel="Description" description="Description for this ClassificationTable"/>
+    </ECEntityClass>
+  
+    <ECEntityClass typeName="Classification" displayLabel="Classification" description="An element that represents a single entry in a classification system">
+        <BaseClass>bis:DefinitionElement</BaseClass>
+        <BaseClass>bis:IParentElement</BaseClass>
+        <ECProperty propertyName="Description" typeName="string" displayLabel="Description" description="Description for this Classification"/>
+    </ECEntityClass>
+    
+    <ECEntityClass typeName="ClassificationGroup" displayLabel="Classification group" description="ClassificationGroup groups classifications">
+        <BaseClass>bis:GroupInformationElement</BaseClass>
+        <ECProperty propertyName="Description" typeName="string" displayLabel="Description" description="Description for this ClassificationGroup"/>
+    </ECEntityClass>
+        
+    <ECRelationshipClass typeName="ElementHasClassifications" modifier="None" strength="referencing" description="Assigns Classifications to Elements">
+        <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="has classification" polymorphic="true">
+            <Class class="bis:Element"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="classifies" polymorphic="true">
+            <Class class="Classification"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="ClassificationGroupGroupsClassifications" modifier="None" strength="referencing" description="Maps Classification to its group">
+        <BaseClass>bis:ElementGroupsMembers</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="groups" polymorphic="true">
+            <Class class="ClassificationGroup"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is grouped in" polymorphic="true">
+            <Class class="Classification"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="ClassificationOwnsSubClassifications" modifier="None" strength="embedding" description="A relationship used to indicate that one classification specializes another classification">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="owns" polymorphic="true">
+            <Class class="Classification"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="true">
+            <Class class="Classification"/>
+         </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="ClassificationSystemOwnsClassificationTable" modifier="None" strength="embedding" description="Maps classification systems to their tables">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="owns" polymorphic="true">
+            <Class class="ClassificationSystem"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="true">
+            <Class class="ClassificationTable"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="ClassificationSystemOwnsClassifications" modifier="None" strength="embedding" description="DEPRECATED: Identifies classifications directly owned by a classification system">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <ECCustomAttributes>
+            <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                <Description>Decided that even simple ClassificationSystems should use the ClassificationTable layer to maintain one consistent way of querying for related Classifications.</Description>
+            </Deprecated>
+        </ECCustomAttributes>
+        <Source multiplicity="(0..1)" roleLabel="owns" polymorphic="true">
+            <Class class="ClassificationSystem"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="true">
+            <Class class="Classification"/>
+        </Target>
+    </ECRelationshipClass>
+
+</ECSchema>
