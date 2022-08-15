@@ -15,11 +15,19 @@ The `GeologicalModel` schema defines classes that represent data for interpretin
 
 ### FaultBlock
 
-Instances of `FaultBlock` do not have geometry on their own, and are separated by `FaultSurface`s. An instance of `FaultBlock` owns instances of `GeologicalCategoryVolume` and adjacent `ContactSurface`s modeling its parts. A `FaultBlock` is owned by a `GeologicalModel`
+Instances of `FaultBlock` do not have geometry on their own, and are separated by `FaultSurface`s. An instance of `FaultBlock` owns instances of `GeologicalCategoryVolume` and adjacent `ContactSurface`s modeling its parts. Instances of `FaultBlock` are expected to always be contained in a `GeologicalModel`.
+
+### GeologicAnalyticalPartition
+
+A `GeologicAnalyticalPartition` is always submodeled by a `GeologicalModel`.
 
 ### GeologicalCategoryVolume
 
 Instances of `GeologicalCategoryVolume` are expected to be children of a `FaultBlock` instance that they are part of. They represent a particular Geological Category, such as lithology. An instance of `GeologicalCategoryVolume` can use multiple `ContactSurfaceIsAdjecentToVolume` relationship instances to associate it with its adjacent `ContactSurface`s.
+
+### GeologicalModel
+
+A `GeologicalModel` contain all `GeologicalElement3d` instances resulting from the interpretation of a specific Geological model. A `GeologicalModel` always sub-models an instance of `GeologicAnalyticalPartition`.
 
 ### ContactSurface
 
