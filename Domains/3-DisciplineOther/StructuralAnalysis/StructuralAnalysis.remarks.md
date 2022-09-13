@@ -183,11 +183,9 @@ AnalysisElements use [TopologyElements](#topologyelement) to define their locati
 
 Derives from [AnalysisElement](#analysiselement) and provides base class for structural elements.
 
-### Structure
+### StructuralAnalysisPartition
 
-A class that represents an entire structure and is sub-modeled by [StructuralAnalysisModel](#stucturalanalysismodel), derives from [StructuralAnalysisElement](#structuralanalysiselement).
-Always has a single property to represent the definition container that is referred by the structure.
-The sub-model of the definition container should be used as a default model for storing related DefinitionElements.
+A partition that defines a Structural Analysis perspective for a Subject. Each partition must be sub-modeled by a [StructuralAnalysisModel]. This model is expected to contain all Structural Analysis Elements that define the Subject. Each Structural Analysis Partition must point to a DefinitionContainer that is by default expected to contain most Definitions Elements related to the Analysis Partition.
 
 ### StructurePart
 
