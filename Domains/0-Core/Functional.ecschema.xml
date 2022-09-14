@@ -3,11 +3,11 @@
 |  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
 |  * See LICENSE.md in the project root for license terms and full copyright notice.
 ======================================================================================= -->
-<ECSchema schemaName="Functional" alias="func" version="01.00.04" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.1" description="The Functional schema defines common base classes to be used by discipline-specific functional domains.">
+<ECSchema schemaName="Functional" alias="func" version="01.00.04" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" description="The Functional schema defines common base classes to be used by discipline-specific functional domains.">
 
-    <ECSchemaReference name="CoreCustomAttributes" version="01.00.01" alias="CoreCA"/>
+    <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
     <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
-    <ECSchemaReference name="BisCore" version="01.00.02" alias="bis"/>
+    <ECSchemaReference name="BisCore" version="01.00.15" alias="bis"/>
     <ECSchemaReference name="ECDbMap" version="02.00.00" alias="ecdbmap"/>
 
     <ECCustomAttributes>
@@ -22,28 +22,28 @@
     <ECEntityClass typeName="FunctionalPartition" displayLabel="Functional Partition" description="A func:FunctionalPartition element establishes a 'Functional' Modeling Perspective for its parent bis:Subject. It is intended to be specialized, and should be considered 'abstract'.">
         <BaseClass>bis:InformationPartitionElement</BaseClass>
         <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00" />
+            <ClassHasHandler xmlns="BisCore.01.00.00" />
         </ECCustomAttributes>
     </ECEntityClass>
 
     <ECEntityClass typeName="FunctionalModel" displayLabel="Functional Model" description="A container for persisting func:FunctionalElement instances.">
         <BaseClass>bis:RoleModel</BaseClass>
         <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00"/>
+            <ClassHasHandler xmlns="BisCore.01.00.00"/>
         </ECCustomAttributes>
     </ECEntityClass>
 
     <ECEntityClass typeName="FunctionalElement" modifier="Abstract" displayLabel="Functional Element" description="A func:FunctionalElement models required functionality that will ultimately be fulfilled by a physical Entity.">
         <BaseClass>bis:RoleElement</BaseClass>
         <ECCustomAttributes>
-            <ShareColumns xmlns="ECDbMap.02.00">
+            <ShareColumns xmlns="ECDbMap.02.00.00">
                 <MaxSharedColumnsBeforeOverflow>32</MaxSharedColumnsBeforeOverflow>
                 <ApplyToSubclassesOnly>True</ApplyToSubclassesOnly>
             </ShareColumns>
         </ECCustomAttributes>
         <ECNavigationProperty propertyName="TypeDefinition" relationshipName="FunctionalElementIsOfType" direction="Forward" displayLabel="Type Definition">
             <ECCustomAttributes>
-                <ForeignKeyConstraint xmlns="ECDbMap.02.00"/>
+                <ForeignKeyConstraint xmlns="ECDbMap.02.00.00"/>
             </ECCustomAttributes>
             <!-- NOTE: Has same propertyName as other element subclasses in case the concept of "TypeDefinition" needs to move down to bis:Element. -->
         </ECNavigationProperty>
@@ -53,15 +53,15 @@
         <BaseClass>FunctionalElement</BaseClass>
         <BaseClass>bis:IParentElement</BaseClass>
         <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00"/>
+            <ClassHasHandler xmlns="BisCore.01.00.00"/>
         </ECCustomAttributes>
     </ECEntityClass>
 
     <ECEntityClass typeName="FunctionalComposite" displayLabel="Functional Composite" description="DEPRECATED: Inherit from FunctionalBreakdownElement instead.">
         <BaseClass>FunctionalBreakdownElement</BaseClass>
         <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00"/>
-            <Deprecated xmlns="CoreCustomAttributes.1.0">
+            <ClassHasHandler xmlns="BisCore.01.00.00"/>
+            <Deprecated xmlns="CoreCustomAttributes.01.00.03">
                 <Description>The best practice is now to inherit from a FunctionalBreakdownElement instead.</Description>
             </Deprecated>
         </ECCustomAttributes>
@@ -70,14 +70,14 @@
     <ECEntityClass typeName="FunctionalComponentElement" modifier="Abstract" displayLabel="Functional Component" description="A func:FunctionalComponentElement models an 'atomic' functional Entity which will not be sub-modeled at a finer granularity and does not have 'child' parts.">
         <BaseClass>FunctionalElement</BaseClass>
         <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00"/>
+            <ClassHasHandler xmlns="BisCore.01.00.00"/>
         </ECCustomAttributes>
     </ECEntityClass>
 
     <ECEntityClass typeName="FunctionalPortion" displayLabel="Functional Portion" description="DEPRECATED: A Functional Portion is a Functional Component that will be broken down in more detail in a separate (sub) Functional Model.">
         <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00"/>
-            <Deprecated xmlns="CoreCustomAttributes.1.0">
+            <ClassHasHandler xmlns="BisCore.01.00.00"/>
+            <Deprecated xmlns="CoreCustomAttributes.01.00.03">
                 <Description>The best practice is now to inherit from a FunctionalComponentElement subclass and mix in ISubModeledElement when a breakdown concept is needed.</Description>
             </Deprecated>
         </ECCustomAttributes>
@@ -88,15 +88,15 @@
     <ECEntityClass typeName="FunctionalType" modifier="Abstract" displayLabel="Functional Type" description="Defines a shared set of properties (the 'type') that can be associated with a func:FunctionalElement.">
         <BaseClass>bis:TypeDefinitionElement</BaseClass>
         <ECCustomAttributes>
-            <ClassHasHandler xmlns="BisCore.01.00"/>
+            <ClassHasHandler xmlns="BisCore.01.00.00"/>
         </ECCustomAttributes>
     </ECEntityClass>
     
     <ECRelationshipClass typeName="FunctionalElementIsOfType" strength="referencing" modifier="None" description="A type-instance relation; one that indicates that the specific func:FunctionalElement is an instance of the defined func:FunctionalType.">
-        <Source multiplicity="(0..*)" roleLabel="is of" polymorphic="true">
+        <Source multiplicity="(0..*)" roleLabel="is of type" polymorphic="true">
             <Class class="FunctionalElement" />
         </Source>
-        <Target multiplicity="(0..1)" roleLabel="defines" polymorphic="true">
+        <Target multiplicity="(0..1)" roleLabel="is type of" polymorphic="true">
             <Class class="FunctionalType"/>
         </Target>
     </ECRelationshipClass>

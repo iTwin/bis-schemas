@@ -13,7 +13,7 @@ The core classes are decorated by ECCustomAttributes that effectively define the
 
 The classes of BisCore are used as base classes for all classes in other BIS Domain schemas.
 
-See [Base Infrastructure Schemas](https://www.itwinjs.org/bis/)
+See [Base Infrastructure Schemas](../)
 
 ## Entity Classes
 
@@ -190,7 +190,7 @@ Categories should be standardized by domain groups where possible. They generall
 
 See [Categories Introduction](../guide/fundamentals/categories/).
 
-Also see the [ClassificationSystems](https://www.itwinjs.org/bis/domains/classificationsystems.ecschema/) domain schema for another way of categorizing and classifying elements.
+Also see the [ClassificationSystems](./classificationsystems.ecschema/) domain schema for another way of categorizing and classifying elements.
 
 > Behavior: The system handler (C++) for `Category` requires a valid `CodeValue` (name) for every instance.
 It will insert a *default* `SubCategory` for every `Category` that is inserted.
@@ -408,6 +408,8 @@ This restriction applies to all `GeometricModel2d` subclasses.
 > Behavior: The system handler (C++) for `GeometricElement2d` will only permit instances to be inserted into a `GeometricModel2d` and will require its `Category` property to reference a `DrawingCategory`.
 The system handler also requires a valid *placement* if `GeometryStream` is not `NULL`.
 
+See [GeometryStream](../../learning/common/geometrystream/) for a more in-depth explanation about that property.
+
 ### DrawingModel
 
 > Behavior: The system handler (C++) for `DrawingModel` ensures that the *modeled element* for a `DrawingModel` is a `Drawing` or a `TemplateRecipe2d`.
@@ -423,6 +425,8 @@ This restriction applies to all `GeometricModel3d` subclasses.
 
 > Behavior: The system handler (C++) for `GeometricElement3d` will only permit instances to be inserted into a `GeometricModel3d` and will require its `Category` property to reference a `SpatialCategory`.
 The system handler also requires a valid *placement* if `GeometryStream` is not `NULL`.
+
+See [GeometryStream](../../learning/common/geometrystream/) for a more in-depth explanation about that property.
 
 ### SpatialLocationModel
 
