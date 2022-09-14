@@ -280,6 +280,7 @@
         </ECCustomAttributes>
     </ECEntityClass>
     <ECEntityClass typeName="RepositoryModel" modifier="Sealed" displayLabel="Repository Model" description="The singleton Model at the root of a BIS repository. Contains a hierarchy of bis:Subject elements that declare what the repository is modeling and child bis:InformationPartitionElement instances that establish Modeling Perspectives. Serves as a high-level table-of-contents for the BIS repository.">
+        <!-- Note: Should have directly subclassed from bis:InformationModel. Has the behavior of a standard InformationModel, not a DefinitionModel. -->
         <BaseClass>DefinitionModel</BaseClass>
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.01.00.00"/>
@@ -455,7 +456,7 @@
                 <HiddenProperty xmlns="CoreCustomAttributes.01.00.00"/>
             </ECCustomAttributes>
         </ECProperty>
-        <ECNavigationProperty propertyName="CodeSpec" displayLabel="Code Specification" relationshipName="CodeSpecSpecifiesCode" direction="backward" description="The CodeSpec property identifies the bis:CodeSpec used to generate and validate the code for this bis:Element. The combination of CodeSpec, CodeScope, and CodeValue properties must be unique for each bis:Element instance.">
+        <ECNavigationProperty propertyName="CodeSpec" displayLabel="Code Specification" relationshipName="CodeSpecSpecifiesCode" direction="backward" description="The CodeSpec property identifies the bis:CodeSpec used to generate and validate the code value for this bis:Element. The combination of CodeSpec, CodeScope, and CodeValue properties must be unique for each bis:Element instance.">
             <ECCustomAttributes>
                 <HiddenProperty xmlns="CoreCustomAttributes.01.00.00"/>
                 <CustomHandledProperty>
@@ -479,7 +480,7 @@
                 </ForeignKeyConstraint>
             </ECCustomAttributes>
         </ECNavigationProperty>
-        <ECProperty propertyName="CodeValue" typeName="string" displayLabel="Code" description="The CodeValue property stores the formal name (business key) for a bis:Element. The combination of CodeSpec, CodeScope, and CodeValue properties must be unique for each bis:Element instance.">
+        <ECProperty propertyName="CodeValue" typeName="string" displayLabel="Code" description="The CodeValue property stores a human-readable real-world identifier of the Entity represented by the bis:Element. The combination of CodeSpec, CodeScope, and CodeValue properties must be unique for each bis:Element instance.">
             <ECCustomAttributes>
                 <PropertyMap xmlns="ECDbMap.02.00.00">
                     <IsNullable>True</IsNullable>
@@ -625,7 +626,7 @@
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.01.00.00"/>
         </ECCustomAttributes>
-        <ECNavigationProperty propertyName="PhysicalMaterial" relationshipName="PhysicalTypeIsOfPhysicalMaterial" direction="forward" description="Indicates the bis:PhysicalMaterial of which bis:PhysicalElements of the given bis:PhysicalType are made."/>
+        <ECNavigationProperty propertyName="PhysicalMaterial" displayLabel="Physical Material" relationshipName="PhysicalTypeIsOfPhysicalMaterial" direction="forward" description="Indicates the bis:PhysicalMaterial of which bis:PhysicalElements of the given bis:PhysicalType are made."/>
     </ECEntityClass>
     <ECRelationshipClass typeName="PhysicalTypeIsOfPhysicalMaterial" strength="referencing" modifier="Sealed" description="A relationship indicating the bis:PhysicalMaterial of which bis:PhysicalElements of the given bis:PhysicalType are made. Can be overridden with bis:PhysicalElementIsOfPhysicalMaterial.">
         <!-- @see PhysicalType.PhysicalMaterial ECNavigationProperty -->
@@ -1167,7 +1168,7 @@
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.01.00.00"/>
         </ECCustomAttributes>
-        <ECNavigationProperty propertyName="PhysicalMaterial" displayLabel="Physical Material" relationshipName="PhysicalElementIsOfPhysicalMaterial" direction="forward" description="Indicates the bis:PhysicalMaterial of which the bis:PhysicalElement is made."/>
+        <ECNavigationProperty propertyName="PhysicalMaterial" relationshipName="PhysicalElementIsOfPhysicalMaterial" direction="forward" displayLabel="Physical Material" description="Indicates the bis:PhysicalMaterial of which the bis:PhysicalElement is made."/>
     </ECEntityClass>
     <ECRelationshipClass typeName="PhysicalElementIsOfPhysicalMaterial" strength="referencing" modifier="Sealed" description="A relationship indicating the bis:PhysicalMaterial of which the bis:PhysicalElement is made.">
         <!-- @see PhysicalElement.PhysicalMaterial ECNavigationProperty -->
@@ -1547,7 +1548,7 @@
 
     <ECEntityClass typeName="ExternalSourceAttachment" displayLabel ="External Source Attachment" description="Attachment of an ExternalSource">
         <BaseClass>InformationReferenceElement</BaseClass>
-        <!-- @note The Element.Parent property + the ExternalSourceOwnsAttachments relationship is used to navigate to the owning ExternalSource -->
+        <!-- Note: The Element.Parent property + the ExternalSourceOwnsAttachments relationship is used to navigate to the owning ExternalSource -->
         <ECNavigationProperty propertyName="Attaches" relationshipName="ExternalSourceAttachmentAttachesSource" direction="forward" displayLabel="Attaches" description="The ExternalSource that is attached by this ExternalSourceAttachment"/>
         <ECProperty propertyName="Role" typeName="ExternalSourceAttachmentRole" description="If Role=SpecifyContext, the attached ExternalSource provides context. If Role=SpecifyPart, the attached ExternalSource models a part of the whole."></ECProperty>
         <ECProperty propertyName="Translation" typeName="Point3d" description="The translation or offset in global coordinates of the attached ExternalSource relative to the ExternalSource that attaches it."/>
@@ -2172,16 +2173,16 @@
         </Target>
     </ECRelationshipClass>
 
-    <ECEntityClass typeName="ModelSelector" displayLabel="Model Selector">
+    <ECEntityClass typeName="ModelSelector" displayLabel="Model Selector" description="Specifies the list of 3d models displayed by a SpatialViewDefinition. Multiple SpatialViewDefinitions may point to the same ModelSelector.">
         <BaseClass>DefinitionElement</BaseClass>
         <ECCustomAttributes><ClassHasHandler xmlns="BisCore.01.00.00"/></ECCustomAttributes>
-        <!-- Note: The Models in the selector are actually captured by the 1:N ModelSelectorRefersToModels ECRelationship -->
+        <!-- Note: The Models in the selector are actually captured by the ModelSelectorRefersToModels ECRelationship -->
     </ECEntityClass>
 
-    <ECEntityClass typeName="CategorySelector" displayLabel="Category Selector">
+    <ECEntityClass typeName="CategorySelector" displayLabel="Category Selector" description="Specifies the list of categories displayed by a ViewDefinition. Multiple ViewDefinitions may point to the same CategorySelector.">
         <BaseClass>DefinitionElement</BaseClass>
         <ECCustomAttributes><ClassHasHandler xmlns="BisCore.01.00.00"/></ECCustomAttributes>
-        <!-- Note: The Categories in the selector are actually captured by the 1:N ECRelationship CategorySelectorRefersToCategories -->
+        <!-- Note: The Categories in the selector are actually captured by the CategorySelectorRefersToCategories ECRelationship -->
     </ECEntityClass>
 
     <ECEntityClass typeName="DisplayStyle" modifier="Abstract" displayLabel="Display Style" description="A bis:DisplayStyle defines the 'styling' parameters for rendering the contents of a view. It determines how graphics are rendered, not which elements are rendered. A bis:DisplayStyle can be shared by many Views.">
