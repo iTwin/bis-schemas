@@ -13,7 +13,7 @@ The core classes are decorated by ECCustomAttributes that effectively define the
 
 The classes of BisCore are used as base classes for all classes in other BIS Domain schemas.
 
-See [Base Infrastructure Schemas](https://www.itwinjs.org/bis/)
+See [Base Infrastructure Schemas](../)
 
 ## Entity Classes
 
@@ -94,6 +94,12 @@ The 'Physical' Perspective is for modeling physical Entities (which have mass) a
 ### PhysicalSystemPartition
 
 The 'Physical System' Modeling Perspective is a subset of the 'Information' Modeling Perspective. It holds Elements which group a collection of connected Entities (primarily Physical) that collectively implement some function..
+
+### PhysicalSystemAggregatesSubSystems
+
+Forms a strict hierarchy (A PhysicalSystem can only be aggregated by a single 'aggregator').
+
+See [PhysicalSystem](#physicalsystem) for more information.
 
 ### SpatialLocationPartition
 
@@ -194,7 +200,7 @@ Categories should be standardized by domain groups where possible. They generall
 
 See [Categories Introduction](../guide/fundamentals/categories/).
 
-Also see the [ClassificationSystems](https://www.itwinjs.org/bis/domains/classificationsystems.ecschema/) domain schema for another way of categorizing and classifying elements.
+Also see the [ClassificationSystems](./classificationsystems.ecschema/) domain schema for another way of categorizing and classifying elements.
 
 > Behavior: The system handler (C++) for `Category` requires a valid `CodeValue` (name) for every instance.
 It will insert a *default* `SubCategory` for every `Category` that is inserted.
@@ -392,6 +398,10 @@ A non-exclusive set of `SpatialElements` grouped using the `PhysicalSystemGroups
 
 The primary contents of the `PhysicalSystem` are `PhysicalElements`, but `SpatialLocationElements` can be included, as well.
 
+The hierarchy of `PhysicalSystem`s is built using the [PhysicalSystemAggregatesSubSystems](#physicalsystemaggregatessubsystems) relationship, similar to [IfcRelAggregates](https://standards.buildingsmart.org/IFC/DEV/IFC4_2/FINAL/HTML/schema/ifckernel/lexical/ifcrelaggregates.htm). The "source" Element of the relationship is an "Aggregator" that aggregates parts that are essentially a different representation of the aggregator, but at a finer granularity.
+
+A Physical System can define as many levels of hierarchy as needed.
+
 ### SynchronizationConfigLink
 
 A Link to the Configuration for a Synchronization Job.  By convention, a unique Id for the SynchronizationConfigLink such as a job Id should be set in the CodeValue property and a name should be set in in the UserLabel property.
@@ -412,6 +422,8 @@ This restriction applies to all `GeometricModel2d` subclasses.
 > Behavior: The system handler (C++) for `GeometricElement2d` will only permit instances to be inserted into a `GeometricModel2d` and will require its `Category` property to reference a `DrawingCategory`.
 The system handler also requires a valid *placement* if `GeometryStream` is not `NULL`.
 
+See [GeometryStream](../../learning/common/geometrystream/) for a more in-depth explanation about that property.
+
 ### DrawingModel
 
 > Behavior: The system handler (C++) for `DrawingModel` ensures that the *modeled element* for a `DrawingModel` is a `Drawing` or a `TemplateRecipe2d`.
@@ -427,6 +439,8 @@ This restriction applies to all `GeometricModel3d` subclasses.
 
 > Behavior: The system handler (C++) for `GeometricElement3d` will only permit instances to be inserted into a `GeometricModel3d` and will require its `Category` property to reference a `SpatialCategory`.
 The system handler also requires a valid *placement* if `GeometryStream` is not `NULL`.
+
+See [GeometryStream](../../learning/common/geometrystream/) for a more in-depth explanation about that property.
 
 ### SpatialLocationModel
 
