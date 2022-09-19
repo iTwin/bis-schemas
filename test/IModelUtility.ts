@@ -2,8 +2,8 @@
 * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
 * See LICENSE.md in the project root for license terms and full copyright notice.
 *--------------------------------------------------------------------------------------------*/
-import { BackendRequestContext, IModelHost, SnapshotDb } from "@bentley/imodeljs-backend";
-import { DbResult } from "@bentley/bentleyjs-core";
+import { IModelHost, SnapshotDb } from "@itwin/core-backend";
+import { SchemaWriteStatus } from "@bentley/imodeljs-native";
 import { StubSchemaXmlFileLocater } from "@itwin/ecschema-locaters";
 import { SchemaGraphUtil } from "@itwin/ecschema-metadata";
 
@@ -26,10 +26,9 @@ export class IModelUtility {
         fs.mkdirSync(outputDir);
     const inventory: SchemaInventory = new SchemaInventory;
     await IModelHost.startup();
-    const requestContext = new BackendRequestContext();
     const imodel = SnapshotDb.createEmpty(path.join(outputDir, "test-imodel.bim"), { rootSubject: { name: "test-imodel" } });
     for (const schema of schemaList) {
-      console.log(`Importing Schema            : ${path.basename(schema)}`);
+      console.log(`  -> Importing Schema            : ${path.basename(schema)}`);
       let schemaPaths;
       if (searchSchemaPaths && searchSchemaPaths.length) {
         const locater = new StubSchemaXmlFileLocater();
@@ -41,20 +40,20 @@ export class IModelUtility {
         schemaPaths = [inventory.getSchemaPath(schema)];
       }
       try {
-        await imodel.importSchemas(requestContext, schemaPaths);
-        console.log(`Import successful for Schema: ${path.basename(schema)}\n`);                
+        await imodel.importSchemas(schemaPaths);
+        console.log(`     Import successful for Schema: ${path.basename(schema)}\n`);                
       } catch (error) {
-        console.log( `Failed to import schema ${schema} because ${error.toString()}`);
+        console.log( `     Failed to import schema ${schema} because ${error.toString()}`);
         passed = false;
       }
       imodel.saveChanges();
     }
 
-    const result: DbResult = imodel.nativeDb.exportSchemas(outputDir);
-    if (result === DbResult.BE_SQLITE_OK)
-      console.log(`Exported all schemas to: ${outputDir}`);
+    const result: SchemaWriteStatus = imodel.nativeDb.exportSchemas(outputDir);
+    if (result === SchemaWriteStatus.Success)
+      console.log(`  Exported all schemas to: ${outputDir}`);
     else
-      console.log(`Schema export failed with status: ${result}`);
+      console.log(`  Schema export failed with status: ${result}`);
     imodel.close();
     IModelHost.shutdown();
     return passed;

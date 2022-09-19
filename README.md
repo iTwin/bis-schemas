@@ -179,6 +179,14 @@ In this testing, we take latest major versions e.g 3.x.x of a schema and try to 
 
 **NOTE:** Schemas listed in the [ignore schema](https://github.com/iTwin/bis-schemas/blob/master/ignoreSchemaList.json) list are skipped when validating all schemas. To run validation against these schemas use a command like `npm run iModelSchemaValidation -- --wip Asset`
 
+#### Multi Schema Tests
+
+These tests provide guidelines on how multiple schemas can be imported into an iModel and in case of any failures, how to detect them.
+
+````usage: npm run test````
+
+Sample tests can be seen [here](./test/SchemaImport.test.ts).
+
 #### Snapshot Comparison
 
 In this testing, the latest released version of Biscore and Functional schemas are imported to an iModel and then information of tables, indexes of this iModel is extracted and compared with the [previously stored information](https://github.com/iTwin/bis-schemas/blob/master/snapshotInformation.json) for any possible changes.

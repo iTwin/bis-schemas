@@ -2,7 +2,7 @@
 * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
 * See LICENSE.md in the project root for license terms and full copyright notice.
 *--------------------------------------------------------------------------------------------*/
-import { Logger, LogLevel } from "@bentley/bentleyjs-core";
+import { Logger, LogLevel } from "@itwin/core-bentley";
 import { SchemaInventory } from "./InventoryHelper";
 import { IModelUtility } from "./IModelUtility";
 import { assert } from "chai";
@@ -30,6 +30,7 @@ function getTestDataRoot() {
 describe("multi schema import tests", async () => {
   const repoPath = getBisRootPath();
   const testSchemasPath = path.join(repoPath, "lib", "test", "assets", "test-schemas");
+
   it("should import all Building Domain schemas in repo successfully", async () => {
       const inventory: SchemaInventory = new SchemaInventory;
       const released = inventory.getReleasedSchemas();
@@ -48,6 +49,7 @@ describe("multi schema import tests", async () => {
       const result: boolean = await IModelUtility.importSchemas(path.join(__dirname, "BuildingSchemas"), schemaList, allSchemas);
       assert.isTrue(result, "One or more schemas import failed. Please check logs");
   });
+
   it("should fail import of test schema consuming DistributionSystem shcema", async () => {
     Logger.initializeToConsole();
     Logger.setLevelDefault(LogLevel.Error);
