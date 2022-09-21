@@ -116,13 +116,14 @@ See [SpaceType](#spacetype).
 ## ZonalSystem
 
 Equivalent to [IfcZone](http://ifc43-docs.standards.buildingsmart.org/IFC/RELEASE/IFC4x3/HTML/lexical/IfcZone.htm). A `ZonalSystem` (as a `bis:PhysicalSystem`), does not have its own geometry, groups its members via the `bis:PhysicalSystemGroupsMembers` relationship and can "service" `bis:SpatialElement`s via `bis:PhysicalSystemServicesSpatialElements` relationship.
+Examples include a tenancy zone, security zone, etc.
 
 ## Zone
 
 Equivalent to [IfcSpatialZone](http://ifc43-docs.standards.buildingsmart.org/IFC/RELEASE/IFC4x3/HTML/lexical/IfcSpatialZone.htm). 
 
 A `Zone` (as a `bis:SpatialLocationElement`) has its own geometry for expressing a spatial region and (as an [ISpatialOrganizer](#ispatialorganizer)) can organize other `bis:SpatialElements` for any purpose.
-Examples include a lighting zone, construction zone, loading area, circulation zone, tenancy zone, security zone, etc.
+Examples include a lighting zone, construction zone, loading area, circulation zone, etc.
 
 As a [ISpatialOrganizer](#ispatialorganizer), a `Zone` represents a category for organizing spatial elements. The [ZoneType](#zonetype) defines the "criteria" or "dimension" for organizing.
 In general, a `Zone` will only use the [`SpatialOrganizerReferencesSpatialElements`](#spatialorganizerreferencesspatialelements) relationship, but the "holds" relationship is also available for special cases.
