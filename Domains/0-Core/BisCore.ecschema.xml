@@ -766,6 +766,15 @@
             <Class class="Subject"/>
         </Target>
     </ECRelationshipClass>
+    <ECRelationshipClass typeName="SubjectRefersToSubject" strength="referencing" modifier="None" description="A relationship allowing a bis:Subject to express association with another bis:Subject that is not one of its children.">
+        <BaseClass>ElementRefersToElements</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="false">
+            <Class class="Subject"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is referenced by" polymorphic="false">
+            <Class class="Subject"/>
+        </Target>
+    </ECRelationshipClass>
     <ECEntityClass typeName="InformationPartitionElement" modifier="Abstract" displayLabel="Information Partition" description="An instance of a specialization of bis:InformationPartitionElement establishes a particular Modeling Perspective for its parent bis:Subject. Instances are always sub-modeled by a specialization of bis:Model of the appropriate Modeling Perspective.">
         <BaseClass>InformationContentElement</BaseClass>
         <BaseClass>ISubModeledElement</BaseClass>
@@ -1708,7 +1717,18 @@
 
     <ECEntityClass typeName="PhysicalSystem" modifier="Abstract" displayLabel="Physical System" description="A collection of connected `SpatialElements` (primarily `PhysicalElements`) that collectively implement some function.">
         <BaseClass>GroupInformationElement</BaseClass>
+        <ECNavigationProperty propertyName="AggregatingSystem" displayLabel="Aggregator" relationshipName="PhysicalSystemAggregatesSubSystems" direction="Backward" description="The aggregator of this sub-system within the System hierarchy."/>
     </ECEntityClass>
+
+    <ECRelationshipClass typeName="PhysicalSystemAggregatesSubSystems" modifier="None" strength="referencing" displayLabel="Physical System Aggregates Sub-Systems" description="Forms the Physical System hierarchy.">
+        <!-- @see PhysicalSystem.AggregatingSystem -->
+        <Source multiplicity="(0..1)" roleLabel="aggregates" polymorphic="true">
+            <Class class="PhysicalSystem"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is aggregated by" polymorphic="true">
+            <Class class="PhysicalSystem"/>
+        </Target>
+    </ECRelationshipClass>
 
     <ECRelationshipClass typeName="PhysicalSystemGroupsMembers" strength="referencing" modifier="None" displayLabel="Physical System Groups Spatial Elements" description="A relationship used to identify the bis:PhysicalElements that are members of a PhysicalSystem.">
         <BaseClass>ElementGroupsMembers</BaseClass>
