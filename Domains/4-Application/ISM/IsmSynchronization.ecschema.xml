@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ECSchema schemaName="IsmSynchronization" alias="ismsync" description="Schema for synchronizing Ism and iModel entities" version="01.00.02" displayLabel="Ism Synchronization" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.1">
+    <ECSchemaReference name="BisCore" version="01.00.00" alias="bis" />
+    <ECSchemaReference name="StructuralAnalysis" version="01.00.00" alias="sa" />
+
+    <ECEntityClass typeName="IsmAspect" modifier="Sealed" displayLabel="Ism Aspect" description="This Aspect stores Ism class instance Id for synchronization with iModel class instances." >
+        <BaseClass>bis:ElementUniqueAspect</BaseClass>
+        <ECProperty propertyName="IsmId" typeName="string" displayLabel="IsmId" description="Id of an Ism class instance" />
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="ElementOwnsIsmAspect" strength="embedding" modifier="Sealed">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:Element"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="IsmAspect" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="ReactionAspect" modifier="Sealed" displayLabel="Reaction Aspect" description="This aspect shows if element is a reaction element." >
+        <BaseClass>bis:ElementUniqueAspect</BaseClass>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="LoadOwnsReactionAspect" strength="embedding" modifier="Sealed">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="sa:Load"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="ReactionAspect"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="IsmCurveMemberAspect" modifier="Sealed" displayLabel="Ism Calculated Curve Member Properties Aspect" description="This aspect stores calculated properties of Ism Curve Member." >
+        <BaseClass>bis:ElementUniqueAspect</BaseClass>
+        <ECProperty propertyName="Length" typeName="double" displayLabel="Length" description="Length of Ism Curve Member." />
+        <ECProperty propertyName="Volume" typeName="double" displayLabel="Volume" description="Volume of Ism Curve Member." />
+        <ECProperty propertyName="Weight" typeName="double" displayLabel="Weight" description="Weight of Ism Curve Member." />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="IsmSurfaceMemberAspect" modifier="Sealed" displayLabel="Ism Calculated Surface Member Properties Aspect" description="This Aspect stores calculated properties of Ism Surface Member." >
+        <BaseClass>bis:ElementUniqueAspect</BaseClass>
+        <ECProperty propertyName="Area" typeName="double" displayLabel="Area" description="Area of Surface Member." />
+        <ECProperty propertyName="Volume" typeName="double" displayLabel="Volume" description="Volume of Surface Member." />
+        <ECProperty propertyName="Weight" typeName="double" displayLabel="Weight" description="Weight of Surface Member." />
+    </ECEntityClass>
+</ECSchema>
