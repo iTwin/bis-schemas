@@ -3,12 +3,12 @@
 |  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
 |  * See LICENSE.md in the project root for license terms and full copyright notice.
 ======================================================================================= -->
-<ECSchema schemaName="CifSubsurfaceConflictAnalysis" alias="cifsscfan" version="01.00.04" description="iModel Connector schema containing aspect classes with properties from the Subsurface Utilities Engineering module as part of Civil Designer applications." xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
+<ECSchema schemaName="CifSubsurfaceConflictAnalysis" alias="cifsscfan" version="01.00.05" description="iModel Connector schema containing aspect classes with properties from the Subsurface Utilities Engineering module as part of Civil Designer applications." xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
     <ECSchemaReference name="BisCore" version="01.00.14" alias="bis"/>
+    <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
     <ECSchemaReference name="CifCommon" version="01.00.03" alias="cifcmn"/>
     <ECSchemaReference name="CifUnits" version="01.00.01" alias="cifu"/>
     <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
-    <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
     <ECCustomAttributes>
         <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
             <SupportedUse>Production</SupportedUse>
@@ -41,6 +41,7 @@
         <ECEnumerator name="Removed" value="3" displayLabel="Removed"/>
         <ECEnumerator name="Temporary" value="4" displayLabel="Temporary"/>
         <ECEnumerator name="Under_Construction" value="5" displayLabel="Under Construction"/>
+        <ECEnumerator name="Abandon_In_Place" value="6" displayLabel="Abandon In Place"/>
     </ECEnumeration>
     <ECEnumeration typeName="BaseLink_Physical_SegmentShapeTypeAspect_SegmentShapeType_Enum" backingTypeName="int" isStrict="true">
         <ECEnumerator name="Circle" value="2" displayLabel="Circle"/>
@@ -81,6 +82,7 @@
         <ECEnumerator name="Removed" value="3" displayLabel="Removed"/>
         <ECEnumerator name="Temporary" value="4" displayLabel="Temporary"/>
         <ECEnumerator name="Under_Construction" value="5" displayLabel="Under Construction"/>
+        <ECEnumerator name="Abandon_In_Place" value="6" displayLabel="Abandon In Place"/>
     </ECEnumeration>
     <ECEnumeration typeName="CommunicationNode_NetworkDataAspect_CommNodeType_Enum" backingTypeName="int" isStrict="true">
         <ECEnumerator name="Access_Point" value="0" displayLabel="Access Point"/>
@@ -128,6 +130,7 @@
     <ECEnumeration typeName="ConflictNode_ConflictAspect_ConflictType_Enum" backingTypeName="int" isStrict="true">
         <ECEnumerator name="Hard" value="0" displayLabel="Hard"/>
         <ECEnumerator name="Soft" value="1" displayLabel="Soft"/>
+        <ECEnumerator name="Trench" value="2" displayLabel="Trench"/>
     </ECEnumeration>
     <ECEnumeration typeName="ConflictNode_ConflictAspect_CurrentStatus_Enum" backingTypeName="int" isStrict="true">
         <ECEnumerator name="Created" value="0" displayLabel="Created"/>
@@ -552,6 +555,14 @@
         <ECProperty propertyName="InvestigationLevel" typeName="BaseNode_HmiDataSetGeometryAspect_InvestigationLevel_Enum" displayLabel="Investigation Level" category="Utility_Quality_Utilities_Utility_Quality_Utilities" priority="0"/>
         <ECProperty propertyName="Authority" typeName="BaseNode_HmiDataSetGeometryAspect_Authority_Enum" displayLabel="Authority" category="Utility_Quality_Utilities_Utility_Quality_Utilities" priority="0"/>
         <ECProperty propertyName="HmiDataSetGeometry_NodeRotation" typeName="double" displayLabel="Node Rotation" category="Physical_Utilities_Physical_Utilities" priority="0" kindOfQuantity="cifu:ANGLE"/>
+        <ECProperty propertyName="LocationPointX" typeName="double" displayLabel="Location Point X" category="Physical_Utilities_Physical_Utilities" priority="0" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="LocationPointY" typeName="double" displayLabel="Location Point Y" category="Physical_Utilities_Physical_Utilities" priority="0" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="LocationPointFeature" typeName="string" displayLabel="Location Point Feature" category="References_Utilities_References_Utilities" priority="0"/>
+        <ECProperty propertyName="LocationPointStation" typeName="double" displayLabel="Location Point Station" category="References_Utilities_References_Utilities" priority="0" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="LocationPointOffset" typeName="double" displayLabel="Location Point Offset" category="References_Utilities_References_Utilities" priority="0" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="VerticalOffset" typeName="double" displayLabel="Vertical Offset" category="References_Utilities_References_Utilities" priority="0" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="AbsoluteRotation" typeName="double" displayLabel="Absolute Rotation" category="Physical_Utilities_Physical_Utilities" priority="0" kindOfQuantity="cifu:ANGLE"/>
+        <ECProperty propertyName="RotationFeature" typeName="string" displayLabel="Rotation Feature" category="References_Utilities_References_Utilities" priority="0"/>
     </ECEntityClass>
     <ECEntityClass typeName="BaseNode_NetworkDataAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
@@ -608,6 +619,10 @@
         <ECProperty propertyName="OtherResolutionDescription" typeName="string" displayLabel="Other Resolution Description" category="Utility_Data_Utilities_Utility_Data_Utilities" priority="0"/>
         <ECProperty propertyName="ConflictType" typeName="ConflictNode_ConflictAspect_ConflictType_Enum" displayLabel="Conflict Type" category="Utility_Data_Utilities_Utility_Data_Utilities" priority="0"/>
         <ECProperty propertyName="RequiresTestHole" typeName="boolean" displayLabel="Requires Test Hole?" category="Utility_Data_Utilities_Utility_Data_Utilities" priority="0"/>
+        <ECProperty propertyName="NodeMicroStationID" typeName="string" displayLabel="MicroStation 3D ID" category="General_Utilities_General_Utilities" priority="0"/>
+        <ECProperty propertyName="NodeMicroStation2dID" typeName="string" displayLabel="MicroStation 2D ID" category="General_Utilities_General_Utilities" priority="0"/>
+        <ECProperty propertyName="ConflicteeName" typeName="string" displayLabel="Conflictee (Feature A)" category="Utility_Data_Utilities_Utility_Data_Utilities" priority="0"/>
+        <ECProperty propertyName="ConflicterName" typeName="string" displayLabel="Conflicter (Feature B)" category="Utility_Data_Utilities_Utility_Data_Utilities" priority="0"/>
     </ECEntityClass>
     <ECEntityClass typeName="ConflictNode_HmiDataSetGeometryAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
