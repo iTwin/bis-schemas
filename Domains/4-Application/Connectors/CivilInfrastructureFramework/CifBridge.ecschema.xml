@@ -714,7 +714,6 @@
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
         <ECProperty propertyName="Pierfooting_FootingType" typeName="PierFootingBaseAspect_Pierfooting_FootingType_Enum" displayLabel="Footing Type" category="FootingProperties_Footing" priority="0"/>
         <ECProperty propertyName="Pierfooting_Material" typeName="string" displayLabel="Footing Material" category="BridgeModelerAttributes_Material_Material" priority="299930"/>
-        <ECProperty propertyName="PierFooting_ConcretePadMaterial" typeName="string" displayLabel="Concrete Pad Material" category="BridgeModelerAttributes_Material_Material" priority="299920"/>
     </ECEntityClass>
     <ECEntityClass typeName="PierFootingCommonBaseAspect" modifier="Abstract">
         <BaseClass>PierFootingBaseAspect</BaseClass>
@@ -2155,6 +2154,21 @@
             <Class class="PierFootingSlopedExtraTopLengthAspect"/>
         </Target>
     </ECRelationshipClass>
+    <ECEntityClass typeName="PierFootingWithConcretePadAspect" modifier="Abstract">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="PierFooting_ConcretePadTransverseOffset" typeName="double" displayLabel="Concrete Pad Transverse Offset" category="FootingProperties_Footing" priority="-17" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="PierFooting_ConcretePadThickness" typeName="double" displayLabel="Concrete Pad Thickness" category="FootingProperties_Footing" priority="-19" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="PierFooting_ConcretePadLongitudinalOffset" typeName="double" displayLabel="Concrete Pad Longitudinal Offset" category="FootingProperties_Footing" priority="-18" kindOfQuantity="cifu:LENGTH"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsPierFootingWithConcretePadAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="PierFootingWithConcretePadAspect"/>
+        </Target>
+    </ECRelationshipClass>
     <ECEntityClass typeName="PierRockSocketAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
         <ECProperty propertyName="PierRockSocket_Name" typeName="string" displayLabel="Name" category="BridgeModelerAttributes_General" priority="299950"/>
@@ -2316,6 +2330,12 @@
         <ECProperty propertyName="Pierfooting_SlopeHeight" typeName="double" displayLabel="Slope Depth" category="FootingProperties_Footing" priority="-10" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="Pierfooting_SlopedTopWidth" typeName="double" displayLabel="Top Width" category="FootingProperties_Footing" priority="-11" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="Pierfooting_SlopedTopLength" typeName="double" displayLabel="Top Length" category="FootingProperties_Footing" priority="-12" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="PierFooting_HasConcretePad" typeName="boolean" displayLabel="Concrete Pad" category="FootingProperties_Footing" priority="-20"/>
+        <ECProperty propertyName="PierFooting_ConcretePadMaterial" typeName="string" displayLabel="Concrete Pad Material" category="BridgeModelerAttributes_Material_Material" priority="299920">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03"/>
+            </ECCustomAttributes>
+        </ECProperty>
     </ECEntityClass>
     <ECEntityClass typeName="RectangularPierFootingCommonBaseAspect" modifier="Abstract">
         <BaseClass>RectangularPierFootingBaseAspect</BaseClass>
@@ -2756,13 +2776,13 @@
         </Target>
     </ECRelationshipClass>
     <ECEntityClass typeName="StrutAspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
         <ECCustomAttributes>
             <Deprecated xmlns="CoreCustomAttributes.01.00.03">
                 <Description>StrutAspect is no longer in use. Use PierStrutAspect instead.</Description>
             </Deprecated>
             <HiddenClass xmlns="CoreCustomAttributes.01.00.03"/>
         </ECCustomAttributes>
-        <BaseClass>cifcmn:CivilPresentation</BaseClass>
         <ECProperty propertyName="Strut_Name" typeName="string" displayLabel="Name" category="BridgeModelerAttributes_General" priority="299950"/>
         <ECProperty propertyName="Strut_SupportName" typeName="string" displayLabel="Support Name" category="BridgeModelerAttributes_General" priority="299940"/>
         <ECProperty propertyName="PierStrut_Height" typeName="double" displayLabel="Height" category="StrutProperties_Strut" priority="0" kindOfQuantity="cifu:LENGTH"/>
