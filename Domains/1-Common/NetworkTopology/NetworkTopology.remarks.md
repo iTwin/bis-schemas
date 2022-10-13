@@ -11,6 +11,18 @@ A given Network Topology implementation can be defined in a separate Information
 
 Base classes in terms of bis:InformationRecordElement implementing Network Topology mix-ins are provided. They can be used as examples of how to properly mix-ins the Network Topology interfaces in BIS schemas targetting different modeling perspectives.
 
+The following class-diagram depicts the core mix-ins that address hierarchy of networks.
+
+![Network hierarchies](./media/Network-hierarchy-classes.png)
+
+The following class-diagram shows the core mix-ins that target connectivity among topology elements.
+
+![Connectivity](./media/Connectivity-classes.png)
+
+The following class-diagram summarizes the default base classes implementing the provided mix-ins in this schema.
+
+![Base classes](./media/Default-base-classes.png)
+
 ## Entity Classes
 
 ### ITopologyElement

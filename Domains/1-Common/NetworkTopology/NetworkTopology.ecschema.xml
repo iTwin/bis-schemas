@@ -6,8 +6,8 @@
 <ECSchema schemaName="NetworkTopology" alias="net" version="01.00.00" description="Base schema for Network Topology." xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
     <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
     <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
-    <ECSchemaReference name="BisCore" version="01.00.10" alias="bis"/>
-    <ECSchemaReference name="LinearReferencing" version="02.00.02" alias="lr"/>
+    <ECSchemaReference name="BisCore" version="01.00.14" alias="bis"/>
+    <ECSchemaReference name="LinearReferencing" version="02.00.03" alias="lr"/>
 
     <ECCustomAttributes>
         <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
@@ -24,17 +24,18 @@
                 <AppliesToEntityClass>bis:Element</AppliesToEntityClass>
             </IsMixin>
         </ECCustomAttributes>
+        <ECNavigationProperty propertyName="AggregatingNetwork" displayLabel="Aggregator" relationshipName="NetworkAggregatesSubNetworks" direction="Backward" description="The aggregator of this sub-network within the Network hierarchy."/>
     </ECEntityClass>
-    <ECEntityClass typeName="NetworkElement" modifier="Abstract" description="Base class for implementations of INetwork as InformationRecord">
-      <BaseClass>bis:InformationRecordElement</BaseClass>
+    <ECEntityClass typeName="NetworkElement" modifier="Abstract" description="Base class for implementations of INetwork as bis:GroupInformationElement">
+      <BaseClass>bis:GroupInformationElement</BaseClass>
       <BaseClass>INetwork</BaseClass>
     </ECEntityClass>
-    <ECRelationshipClass typeName="NetworkGroupsNetworks" strength="referencing" modifier="None" description="Relationship used to group other INetworks at the same level of granularity.">
-        <BaseClass>bis:ElementGroupsMembers</BaseClass>
-        <Source multiplicity="(0..1)" polymorphic="true" roleLabel="groups">
+    <ECRelationshipClass typeName="NetworkAggregatesSubNetworks" strength="referencing" modifier="None" description="Relationship used to aggregate other INetworks at the same level of granularity.">
+        <!-- @see INetwork.AggregatingNetwork -->
+        <Source multiplicity="(0..1)" polymorphic="true" roleLabel="aggregates">
             <Class class="INetwork"/>
         </Source>
-        <Target multiplicity="(0..*)" polymorphic="true" roleLabel="is grouped by">
+        <Target multiplicity="(0..*)" polymorphic="true" roleLabel="is aggregated by">
             <Class class="INetwork"/>
         </Target>
     </ECRelationshipClass>
@@ -135,7 +136,7 @@
             <Class class="INode"/>
         </Target>
     </ECRelationshipClass>
-    <ECRelationshipClass typeName="EdgeInnerConnectsAlongILinearElementEdge" strength="referencing" modifier="None" description="Relationship indicating the edge, mixing-in lr:ILinearElement, an IEdgeInnerConnection is connected along. The target end-point element of this relationship is expected to be an IEdge.">
+    <ECRelationshipClass typeName="EdgeInnerConnectsAlongLinearElementEdge" strength="referencing" modifier="None" description="Relationship indicating the edge, mixing-in lr:ILinearElement, an IEdgeInnerConnection is connected along. The target end-point element of this relationship is expected to be an IEdge.">
         <BaseClass>lr:ILinearlyLocatedAlongILinearElement</BaseClass>
         <Source multiplicity="(0..*)" polymorphic="true" roleLabel="connects along">
             <Class class="IEdgeInnerConnection"/>
