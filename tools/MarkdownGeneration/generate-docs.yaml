@@ -136,6 +136,13 @@ jobs:
       )
     displayName: 'Generate Markdown'
 
+  - task: CopyFiles@2
+    displayName: 'Copy Logo to Media Directory'
+    inputs:
+      SourceFolder: '$(Build.BinariesDirectory)/node_modules/@bentley/ecjson2md/lib/media/'
+      Contents: imodel-schema-editor-icon.png
+      TargetFolder: '$(Build.StagingDirectory)/markdown/media'
+
   - task: PublishBuildArtifacts@1
     displayName: 'Publish Artifact: Bis Docs'
     inputs:
@@ -160,7 +167,7 @@ jobs:
 - job: Validate_Docs
   dependsOn: Generate_Docs
   displayName: Validate Docs
-  condition: and(succeeded(), in(variables['Build.Reason'], 'IndividualCI', 'PullRequest'))
+  condition: and(succeeded(), in(variables['Build.Reason'], 'IndividualCI', 'PullRequest', 'Manual'))
   workspace:
     clean: all
   pool:
