@@ -31,4 +31,4 @@ A `GeologicalModel` contain all `GeologicalElement3d` instances resulting from t
 
 ### ContactSurface
 
-Instances of `ContactSurface` are expected to be children of a `FaultBlock` instance that they are part of. They represent the contact between `GeologicalCategoryVolume`s. An instance of `ContactSurface` can use multiple `ContactSurfaceIsAdjecentToVolume` relationship instances to associate it with its adjacent `GeologicalCategoryVolume`s.
+Instances of `ContactSurface` are expected to be children of a `FaultBlock` instance that they are part of. They represent the contact between `GeologicalCategoryVolume`s.
