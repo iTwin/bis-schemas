@@ -7,8 +7,6 @@ remarksTarget: DocumentMetadata.ecschema.md
 
 This schema contains classes serving as the common layer for implementations capturing metadata about persistent sets of information from Common Data Environments (CDE). This schema is meant to be the place to standardize metadata according to [ISO 19650:2018 - Organization and digitization of information about buildings and civil engineering works, including building information modelling (BIM) - Information management using building information modelling](https://www.iso.org/standard/68078.html).
 
-NOTE: Currently under development. This schema should not be used for production workflows. Data created using this schema is not supported and may not be upgradable.
-
 ![DocumentMetadata](./media/DocumentMetadata-classes.png)
 
 ## Entity Classes
