@@ -5,10 +5,10 @@
 ======================================================================================= -->
 <ECSchema schemaName="CifHydraulicAnalysis" alias="cifhydan" version="01.00.04" description="iModel Connector schema containing aspect classes with input properties from the Subsurface Utilities Design and Analysis module as part of Civil Designer applications." xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
     <ECSchemaReference name="BisCore" version="01.00.14" alias="bis"/>
-    <ECSchemaReference name="CifCommon" version="01.00.03" alias="cifcmn"/>
-    <ECSchemaReference name="CifUnits" version="01.00.01" alias="cifu"/>
-    <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
     <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
+    <ECSchemaReference name="CifCommon" version="01.00.03" alias="cifcmn"/>
+    <ECSchemaReference name="CifUnits" version="01.00.02" alias="cifu"/>
+    <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
     <ECCustomAttributes>
         <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
             <SupportedUse>Production</SupportedUse>
@@ -20,6 +20,22 @@
     <ECEnumeration typeName="BasePump_InitialSettingsAspect_PumpStatus_Enum" backingTypeName="int" isStrict="true">
         <ECEnumerator name="On" value="0" displayLabel="On"/>
         <ECEnumerator name="Off" value="1" displayLabel="Off"/>
+    </ECEnumeration>
+    <ECEnumeration typeName="BoundaryLine2D_SurfaceAspect_BoundaryFlowType_Enum" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="Constant" value="1" displayLabel="Constant"/>
+        <ECEnumerator name="Hydrograph" value="2" displayLabel="Hydrograph"/>
+    </ECEnumeration>
+    <ECEnumeration typeName="BoundaryLine2D_SurfaceAspect_SurfaceBoundaryElevationType_Enum" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="Constant" value="1" displayLabel="Constant"/>
+        <ECEnumerator name="Time_Elevation_Curve" value="2" displayLabel="Time-Elevation Curve"/>
+    </ECEnumeration>
+    <ECEnumeration typeName="BoundaryLine2D_SurfaceAspect_SurfaceBoundaryType_Enum" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="Flow" value="0" displayLabel="Flow"/>
+        <ECEnumerator name="Elevation" value="1" displayLabel="Elevation"/>
+    </ECEnumeration>
+    <ECEnumeration typeName="BoundaryPoint2D_SurfaceAspect_BoundaryFlowType_Enum" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="Constant" value="1" displayLabel="Constant"/>
+        <ECEnumerator name="Hydrograph" value="2" displayLabel="Hydrograph"/>
     </ECEnumeration>
     <ECEnumeration typeName="CatchBasin_Physical_GutterShapeAspect_GutterShape_Enum" backingTypeName="int" isStrict="true">
         <ECEnumerator name="Conventional" value="0" displayLabel="Conventional"/>
@@ -75,6 +91,8 @@
         <ECEnumerator name="Initial_Loss_and_Constant_Loss_Rate" value="8" displayLabel="Initial Loss and Constant Loss Rate"/>
         <ECEnumerator name="Initial_Loss_and_Constant_Fraction" value="9" displayLabel="Initial Loss and Constant Fraction"/>
         <ECEnumerator name="Runoff_Coefficient" value="10" displayLabel="Runoff Coefficient"/>
+        <ECEnumerator name="Green_and_Ampt_Modified" value="11" displayLabel="Green and Ampt (Modified)"/>
+        <ECEnumerator name="Horton_Modified" value="12" displayLabel="Horton (Modified)"/>
     </ECEnumeration>
     <ECEnumeration typeName="Catchment_Hydrologic_RunoffMethod_EpaSwmmAspect_SubareaRouting_Enum" backingTypeName="int" isStrict="true">
         <ECEnumerator name="Pervious_To_Impervious" value="0" displayLabel="Pervious To Impervious"/>
@@ -114,6 +132,7 @@
     <ECEnumeration typeName="Catchment_HydrologicAspect_AreaDefinitionType_Enum" backingTypeName="int" isStrict="true">
         <ECEnumerator name="Single_Area" value="0" displayLabel="Single Area"/>
         <ECEnumerator name="Multiple_Subareas" value="1" displayLabel="Multiple Subareas"/>
+        <ECEnumerator name="Land_Cover_Areas" value="2" displayLabel="Land Cover Areas"/>
     </ECEnumeration>
     <ECEnumeration typeName="Catchment_HydrologicAspect_Hydrologic_GwEquationUnitSystem_Enum" backingTypeName="int" isStrict="true">
         <ECEnumerator name="US_Customary" value="2" displayLabel="US Customary"/>
@@ -133,12 +152,12 @@
     </ECEnumeration>
     <ECEnumeration typeName="Conduit_InfiltrationAndInflow_TypeAspect_InfiltrationLoadType_Enum" backingTypeName="int" isStrict="true">
         <ECEnumerator name="None" value="0" displayLabel="None"/>
-        <ECEnumerator name="Pipe_Length" value="1" displayLabel="Pipe Length"/>
+        <ECEnumerator name="Pipe_Length" value="1" displayLabel="Link Length"/>
         <ECEnumerator name="Pipe_Rise_Length" value="2" displayLabel="Pipe Rise-Length"/>
-        <ECEnumerator name="Pipe_Surface_Area" value="3" displayLabel="Pipe Surface Area"/>
+        <ECEnumerator name="Pipe_Surface_Area" value="3" displayLabel="Surface Area"/>
         <ECEnumerator name="Count_Based" value="4" displayLabel="Count Based"/>
         <ECEnumerator name="Hydrograph" value="5" displayLabel="Hydrograph"/>
-        <ECEnumerator name="Pattern_Load" value="6" displayLabel="Pattern Load"/>
+        <ECEnumerator name="Pattern_Load" value="6" displayLabel="Infiltration Pattern Load"/>
     </ECEnumeration>
     <ECEnumeration typeName="Conduit_OutputAspect_OutputOptionsType_Enum" backingTypeName="int" isStrict="true">
         <ECEnumerator name="Summary_Results" value="0" displayLabel="Summary Results"/>
@@ -261,6 +280,23 @@
         <ECEnumerator name="No_Storage" value="2" displayLabel="No Storage"/>
         <ECEnumerator name="Ponded_Area" value="3" displayLabel="Ponded Area"/>
     </ECEnumeration>
+    <ECEnumeration typeName="GravitySurfaceStructure_PhysicalAspect_GridRimElevationMatching_Enum" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="Adjust_Grid_To_Rim" value="0" displayLabel="Adjust Grid To Rim"/>
+        <ECEnumerator name="Adjust_Rim_To_Grid" value="1" displayLabel="Adjust Rim To Grid"/>
+    </ECEnumeration>
+    <ECEnumeration typeName="Grid2D_BoundaryConditionAspect_GridBoundaryType_Enum" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="Closed" value="0" displayLabel="Closed"/>
+        <ECEnumerator name="Constant" value="1" displayLabel="Constant"/>
+    </ECEnumeration>
+    <ECEnumeration typeName="Grid2D_InitialSettingsAspect_GridInitialValuesType_Enum" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="Depth" value="1" displayLabel="Depth"/>
+        <ECEnumerator name="Elevation" value="2" displayLabel="Elevation"/>
+        <ECEnumerator name="None" value="0" displayLabel="&lt;None&gt;"/>
+    </ECEnumeration>
+    <ECEnumeration typeName="Grid2D_SurfaceAspect_GridSurfaceInfiltrationMode_Enum" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="None" value="0" displayLabel="&lt;None&gt;"/>
+        <ECEnumerator name="SCS_CN" value="1" displayLabel="SCS CN"/>
+    </ECEnumeration>
     <ECEnumeration typeName="GutterLink_PhysicalAspect_GutterLinkGutterType_Enum" backingTypeName="int" isStrict="true">
         <ECEnumerator name="User_Defined" value="0" displayLabel="User Defined"/>
         <ECEnumerator name="Catalog_Gutter" value="1" displayLabel="Catalog Gutter"/>
@@ -378,6 +414,87 @@
         <ECEnumerator name="Fixed_Head" value="1" displayLabel="Fixed Head"/>
         <ECEnumerator name="Fixed_Flow" value="2" displayLabel="Fixed Flow"/>
     </ECEnumeration>
+    <ECEnumeration typeName="SurfaceLine_SurfaceAspect_RoadElevationAdjustmentType_Enum" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="None" value="0" displayLabel="&lt;None&gt;"/>
+        <ECEnumerator name="SetTo" value="1" displayLabel="SetTo"/>
+        <ECEnumerator name="Add" value="2" displayLabel="Add"/>
+        <ECEnumerator name="Subtract" value="3" displayLabel="Subtract"/>
+    </ECEnumeration>
+    <ECEnumeration typeName="SurfaceLine_SurfaceAspect_SurfacePolylineCNAdjustmentType_Enum" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="None" value="0" displayLabel="&lt;None&gt;"/>
+        <ECEnumerator name="User_Defined" value="1" displayLabel="User Defined"/>
+        <ECEnumerator name="Catalog" value="2" displayLabel="Catalog"/>
+    </ECEnumeration>
+    <ECEnumeration typeName="SurfaceLine_SurfaceAspect_SurfacePolylineImpAdjustmentType_Enum" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="None" value="0" displayLabel="&lt;None&gt;"/>
+        <ECEnumerator name="User_Defined" value="1" displayLabel="User Defined"/>
+        <ECEnumerator name="Catalog" value="2" displayLabel="Catalog"/>
+    </ECEnumeration>
+    <ECEnumeration typeName="SurfaceLine_SurfaceAspect_SurfacePolylineManningsAdjustmentType_Enum" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="None" value="0" displayLabel="&lt;None&gt;"/>
+        <ECEnumerator name="User_Defined" value="1" displayLabel="User Defined"/>
+        <ECEnumerator name="Catalog" value="2" displayLabel="Catalog"/>
+    </ECEnumeration>
+    <ECEnumeration typeName="SurfaceLine_SurfaceAspect_SurfacePolylineType_Enum" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="Breakline" value="0" displayLabel="Breakline"/>
+        <ECEnumerator name="Road_Centerline" value="1" displayLabel="Road Centerline"/>
+    </ECEnumeration>
+    <ECEnumeration typeName="SurfacePoint_SurfaceAspect_SurfacePointElevationAdjustmentType_Enum" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="None" value="0" displayLabel="&lt;None&gt;"/>
+        <ECEnumerator name="Add" value="2" displayLabel="Add"/>
+        <ECEnumerator name="Subtract" value="3" displayLabel="Subtract"/>
+        <ECEnumerator name="Set" value="1" displayLabel="Set"/>
+    </ECEnumeration>
+    <ECEnumeration typeName="SurfacePoint_SurfaceAspect_SurfacePointType_Enum" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="Reporting_Point" value="0" displayLabel="Reporting Point"/>
+        <ECEnumerator name="Spot_Elevation" value="1" displayLabel="Spot Elevation"/>
+        <ECEnumerator name="Void" value="2" displayLabel="Void"/>
+    </ECEnumeration>
+    <ECEnumeration typeName="SurfacePolygon_SurfaceAspect_SurfacePolygonCAdjustmentType_Enum" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="None" value="0" displayLabel="&lt;None&gt;"/>
+        <ECEnumerator name="User_Defined" value="1" displayLabel="User Defined"/>
+        <ECEnumerator name="Catalog" value="2" displayLabel="Catalog"/>
+    </ECEnumeration>
+    <ECEnumeration typeName="SurfacePolygon_SurfaceAspect_SurfacePolygonCNAdjustmentType_Enum" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="None" value="0" displayLabel="&lt;None&gt;"/>
+        <ECEnumerator name="User_Defined" value="1" displayLabel="User Defined"/>
+        <ECEnumerator name="Catalog" value="2" displayLabel="Catalog"/>
+    </ECEnumeration>
+    <ECEnumeration typeName="SurfacePolygon_SurfaceAspect_SurfacePolygonElevationAdjustmentType_Enum" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="None" value="0" displayLabel="&lt;None&gt;"/>
+        <ECEnumerator name="Set_To" value="1" displayLabel="Set To"/>
+        <ECEnumerator name="Add" value="2" displayLabel="Add"/>
+        <ECEnumerator name="Subtract" value="3" displayLabel="Subtract"/>
+    </ECEnumeration>
+    <ECEnumeration typeName="SurfacePolygon_SurfaceAspect_SurfacePolygonImpAdjustmentType_Enum" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="None" value="0" displayLabel="&lt;None&gt;"/>
+        <ECEnumerator name="User_Defined" value="1" displayLabel="User Defined"/>
+        <ECEnumerator name="Catalog" value="2" displayLabel="Catalog"/>
+    </ECEnumeration>
+    <ECEnumeration typeName="SurfacePolygon_SurfaceAspect_SurfacePolygonManningsAdjustmentType_Enum" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="None" value="0" displayLabel="&lt;None&gt;"/>
+        <ECEnumerator name="User_Defined" value="1" displayLabel="User Defined"/>
+        <ECEnumerator name="Catalog" value="2" displayLabel="Catalog"/>
+    </ECEnumeration>
+    <ECEnumeration typeName="SurfacePolygon_SurfaceAspect_SurfacePolygonPriorityType_Enum" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="ZeroTen_Lowest_Auto" value="0" displayLabel="0: Lowest/Auto"/>
+        <ECEnumerator name="One" value="1" displayLabel="1"/>
+        <ECEnumerator name="Two" value="2" displayLabel="2"/>
+        <ECEnumerator name="Three" value="3" displayLabel="3"/>
+        <ECEnumerator name="Four" value="4" displayLabel="4"/>
+        <ECEnumerator name="Five" value="5" displayLabel="5"/>
+        <ECEnumerator name="Six" value="6" displayLabel="6"/>
+        <ECEnumerator name="Seven" value="7" displayLabel="7"/>
+        <ECEnumerator name="Eight" value="8" displayLabel="8"/>
+        <ECEnumerator name="NineTen_Highest" value="9" displayLabel="9: Highest"/>
+    </ECEnumeration>
+    <ECEnumeration typeName="SurfacePolygon_SurfaceAspect_SurfacePolygonType_Enum" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="Void" value="3" displayLabel="Void"/>
+        <ECEnumerator name="Building" value="2" displayLabel="Building"/>
+        <ECEnumerator name="Land_Use" value="0" displayLabel="Land Use"/>
+        <ECEnumerator name="Adjustment_Area" value="1" displayLabel="Adjustment Area"/>
+        <ECEnumerator name="Road" value="4" displayLabel="Road"/>
+    </ECEnumeration>
     <ECEnumeration typeName="TapNode_PhysicalAspect_TapConnectsAt_Enum" backingTypeName="int" isStrict="true">
         <ECEnumerator name="Invert_To_Center" value="0" displayLabel="Invert To Center"/>
         <ECEnumerator name="Invert_To_Soffit" value="1" displayLabel="Invert To Soffit"/>
@@ -458,16 +575,6 @@
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
         <ECProperty propertyName="HMIActiveTopologyIsActive" typeName="boolean" displayLabel="Is Active?" category="Active_Topology_Drainage_Active_Topology_Drainage" priority="0"/>
     </ECEntityClass>
-    <ECEntityClass typeName="BaseNode_PhysicalAspect">
-        <BaseClass>cifcmn:CivilPresentation</BaseClass>
-        <ECProperty propertyName="Physical_GroundElevation" typeName="double" displayLabel="Elevation (Ground)" category="Physical_Drainage_Physical_Drainage" priority="0" kindOfQuantity="cifu:ELEVATION"/>
-        <ECProperty propertyName="NodeRotation" typeName="double" displayLabel="Rotation" category="Physical_Hydraulic_Analysis_Physical_Hydraulic_Analysis" priority="0" kindOfQuantity="cifu:ANGLE"/>
-        <ECProperty propertyName="SetOutPointX" typeName="double" displayLabel="Set Out X" category="Geometry_Drainage_Geometry_Drainage" priority="0" kindOfQuantity="cifu:LENGTH"/>
-        <ECProperty propertyName="SetOutPointY" typeName="double" displayLabel="Set Out Y" category="Geometry_Drainage_Geometry_Drainage" priority="0" kindOfQuantity="cifu:LENGTH"/>
-        <ECProperty propertyName="SetOutPointElevation" typeName="double" displayLabel="Set Out Elevation" category="Geometry_Drainage_Geometry_Drainage" priority="0" kindOfQuantity="cifu:ELEVATION"/>
-        <ECProperty propertyName="LargestSize" typeName="double" displayLabel="Largest Connected Conduit" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0" kindOfQuantity="cifu:LENGTH_DIAMETER"/>
-        <ECProperty propertyName="SmallestSize" typeName="double" displayLabel="Smallest Connected Conduit" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0" kindOfQuantity="cifu:LENGTH_DIAMETER"/>
-    </ECEntityClass>
     <ECEntityClass typeName="BaseNode_Physical_Conduit1Aspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
         <ECProperty propertyName="Conduit1Label" typeName="string" displayLabel="Conduit 1 Label" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0"/>
@@ -513,6 +620,15 @@
         <ECProperty propertyName="Conduit5Invert" typeName="double" displayLabel="Conduit 5 Invert" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0" kindOfQuantity="cifu:ELEVATION"/>
         <ECProperty propertyName="Conduit5Angle" typeName="double" displayLabel="Conduit 5 Angle" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0" kindOfQuantity="cifu:ANGLE"/>
     </ECEntityClass>
+    <ECEntityClass typeName="BaseNode_Physical_DiversionAspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="DiversionLabel" typeName="string" displayLabel="Diversion Label" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0"/>
+        <ECProperty propertyName="DiversionSectionType" typeName="string" displayLabel="Diversion Section Type" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0"/>
+        <ECProperty propertyName="DiversionMaterial" typeName="string" displayLabel="Diversion Material" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0"/>
+        <ECProperty propertyName="DiversionSize" typeName="double" displayLabel="Diversion Size" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0" kindOfQuantity="cifu:LENGTH_DIAMETER"/>
+        <ECProperty propertyName="DiversionInvert" typeName="double" displayLabel="Diversion Invert" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0" kindOfQuantity="cifu:ELEVATION"/>
+        <ECProperty propertyName="DiversionAngle" typeName="double" displayLabel="Diversion Angle" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0" kindOfQuantity="cifu:ANGLE"/>
+    </ECEntityClass>
     <ECEntityClass typeName="BaseNode_Physical_OutgoingAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
         <ECProperty propertyName="OutgoingLabel" typeName="string" displayLabel="Outgoing Label" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0"/>
@@ -522,14 +638,15 @@
         <ECProperty propertyName="OutgoingInvert" typeName="double" displayLabel="Outgoing Invert" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0" kindOfQuantity="cifu:ELEVATION"/>
         <ECProperty propertyName="OutgoingAngle" typeName="double" displayLabel="Outgoing Angle" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0" kindOfQuantity="cifu:ANGLE"/>
     </ECEntityClass>
-    <ECEntityClass typeName="BaseNode_Physical_DiversionAspect">
+    <ECEntityClass typeName="BaseNode_PhysicalAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
-        <ECProperty propertyName="DiversionLabel" typeName="string" displayLabel="Diversion Label" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0"/>
-        <ECProperty propertyName="DiversionSectionType" typeName="string" displayLabel="Diversion Section Type" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0"/>
-        <ECProperty propertyName="DiversionMaterial" typeName="string" displayLabel="Diversion Material" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0"/>
-        <ECProperty propertyName="DiversionSize" typeName="double" displayLabel="Diversion Size" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0" kindOfQuantity="cifu:LENGTH_DIAMETER"/>
-        <ECProperty propertyName="DiversionInvert" typeName="double" displayLabel="Diversion Invert" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0" kindOfQuantity="cifu:ELEVATION"/>
-        <ECProperty propertyName="DiversionAngle" typeName="double" displayLabel="Diversion Angle" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0" kindOfQuantity="cifu:ANGLE"/>
+        <ECProperty propertyName="Physical_GroundElevation" typeName="double" displayLabel="Elevation (Ground)" category="Physical_Drainage_Physical_Drainage" priority="0" kindOfQuantity="cifu:ELEVATION"/>
+        <ECProperty propertyName="NodeRotation" typeName="double" displayLabel="Rotation" category="Physical_Hydraulic_Analysis_Physical_Hydraulic_Analysis" priority="0" kindOfQuantity="cifu:ANGLE"/>
+        <ECProperty propertyName="SetOutPointX" typeName="double" displayLabel="Set Out X" category="Geometry_Drainage_Geometry_Drainage" priority="0" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="SetOutPointY" typeName="double" displayLabel="Set Out Y" category="Geometry_Drainage_Geometry_Drainage" priority="0" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="SetOutPointElevation" typeName="double" displayLabel="Set Out Elevation" category="Geometry_Drainage_Geometry_Drainage" priority="0" kindOfQuantity="cifu:ELEVATION"/>
+        <ECProperty propertyName="LargestSize" typeName="double" displayLabel="Largest Connected Conduit" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0" kindOfQuantity="cifu:LENGTH_DIAMETER"/>
+        <ECProperty propertyName="SmallestSize" typeName="double" displayLabel="Smallest Connected Conduit" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0" kindOfQuantity="cifu:LENGTH_DIAMETER"/>
     </ECEntityClass>
     <ECEntityClass typeName="BasePolygon_HMIActiveTopologyAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
@@ -553,6 +670,40 @@
     </ECEntityClass>
     <ECEntityClass typeName="BasePumpAspect">
         <BaseClass>BaseDirectedNodeAspect</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="BaseSimplePolyline_HMIActiveTopologyAspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="HMIActiveTopologyIsActive" typeName="boolean" displayLabel="Is Active?" category="Active_Topology_Drainage_Active_Topology_Drainage" priority="0"/>
+    </ECEntityClass>
+    <ECEntityClass typeName="BaseSimplePolyline_HmiDataSetGeometryAspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="HMIGeometryScaledLength" typeName="double" displayLabel="Length (Scaled)" category="Geometry_Drainage_Geometry_Drainage" priority="0" kindOfQuantity="cifu:LENGTH"/>
+    </ECEntityClass>
+    <ECEntityClass typeName="BaseSimplePolylineAspect">
+        <BaseClass>GlobalBase_Washington_Aspect</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="BoundaryLine2D_SurfaceAspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="SurfaceBoundaryType" typeName="BoundaryLine2D_SurfaceAspect_SurfaceBoundaryType_Enum" displayLabel="Boundary Type" category="TwoD_Solver_Drainage_2D_Solver_Drainage" priority="0"/>
+        <ECProperty propertyName="SurfaceBoundaryElevationType" typeName="BoundaryLine2D_SurfaceAspect_SurfaceBoundaryElevationType_Enum" displayLabel="Boundary Elevation Type" category="TwoD_Solver_Drainage_2D_Solver_Drainage" priority="0"/>
+        <ECProperty propertyName="ConstantElevation" typeName="double" displayLabel="Water Surface Elevation (Boundary)" category="TwoD_Solver_Drainage_2D_Solver_Drainage" priority="0" kindOfQuantity="cifu:ELEVATION"/>
+        <ECProperty propertyName="BoundaryFlowType" typeName="BoundaryLine2D_SurfaceAspect_BoundaryFlowType_Enum" displayLabel="Boundary Flow Type" category="TwoD_Solver_Drainage_2D_Solver_Drainage" priority="0"/>
+        <ECProperty propertyName="Surface_BoundaryFlow" typeName="double" displayLabel="Flow" category="TwoD_Solver_Drainage_2D_Solver_Drainage" priority="0" kindOfQuantity="cifu:FLOW"/>
+    </ECEntityClass>
+    <ECEntityClass typeName="BoundaryLine2DAspect">
+        <BaseClass>BaseSimplePolylineAspect</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="BoundaryPoint2D_HMIActiveTopologyAspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="HMIActiveTopologyIsActive" typeName="boolean" displayLabel="Is Active?" category="Active_Topology_Drainage_Active_Topology_Drainage" priority="0"/>
+    </ECEntityClass>
+    <ECEntityClass typeName="BoundaryPoint2D_SurfaceAspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="BoundaryFlowType" typeName="BoundaryPoint2D_SurfaceAspect_BoundaryFlowType_Enum" displayLabel="Boundary Flow Type" category="TwoD_Solver_Drainage_2D_Solver_Drainage" priority="0"/>
+        <ECProperty propertyName="Surface_BoundaryFlow" typeName="double" displayLabel="Flow" category="TwoD_Solver_Drainage_2D_Solver_Drainage" priority="0" kindOfQuantity="cifu:FLOW"/>
+    </ECEntityClass>
+    <ECEntityClass typeName="BoundaryPoint2DAspect">
+        <BaseClass>GlobalBase_Washington_Aspect</BaseClass>
     </ECEntityClass>
     <ECEntityClass typeName="CatchBasin_Design_LocalConstraintsAspect" modifier="Abstract">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
@@ -748,6 +899,25 @@
         <BaseClass>Catchment_Hydrologic_ApplyGroundWater_True_GwWaterTableElevationAspect</BaseClass>
         <ECProperty propertyName="Hydrologic_GwWaterTableElevation" typeName="double" displayLabel="Water Table Elevation" category="SWMM_Extended_Data_Drainage_SWMM_Extended_Data_Drainage" priority="0" kindOfQuantity="cifu:DEPTH_LARGE"/>
     </ECEntityClass>
+    <ECEntityClass typeName="Catchment_HydrologicAspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="Hydrologic_TimeOfConcentration" typeName="double" displayLabel="Time of Concentration" category="Runoff_Drainage_Runoff_Drainage" priority="0" kindOfQuantity="cifu:TIME_EXTENDED"/>
+        <ECProperty propertyName="TcComputeType" typeName="Catchment_HydrologicAspect_TcComputeType_Enum" displayLabel="Tc Input Type" category="Runoff_Drainage_Runoff_Drainage" priority="0"/>
+        <ECProperty propertyName="Hydrologic_GwEquationUnitSystem" typeName="Catchment_HydrologicAspect_Hydrologic_GwEquationUnitSystem_Enum" displayLabel="Groundwater Equation Unit System" category="SWMM_Extended_Data_Drainage_SWMM_Extended_Data_Drainage" priority="0"/>
+        <ECProperty propertyName="Hydrologic_ApplyGwDeepwaterEqn" typeName="boolean" displayLabel="Apply Custom Deep Flow Equation?" category="SWMM_Extended_Data_Drainage_SWMM_Extended_Data_Drainage" priority="0"/>
+        <ECProperty propertyName="CustomGwDeepwaterEqn" typeName="string" displayLabel="Custom Deep Flow Equation" category="SWMM_Extended_Data_Drainage_SWMM_Extended_Data_Drainage" priority="0"/>
+        <ECProperty propertyName="Hydrologic_ApplyGwLateralEqn" typeName="boolean" displayLabel="Apply Custom Lateral Flow Equation?" category="SWMM_Extended_Data_Drainage_SWMM_Extended_Data_Drainage" priority="0"/>
+        <ECProperty propertyName="CustomGwLateralEqn" typeName="string" displayLabel="Custom Groundwater Lateral Equation" category="SWMM_Extended_Data_Drainage_SWMM_Extended_Data_Drainage" priority="0"/>
+        <ECProperty propertyName="Hydrologic_UseScaledArea" typeName="boolean" displayLabel="Use Scaled Area?" category="Geometry_Drainage_Geometry_Drainage" priority="0"/>
+        <ECProperty propertyName="Hydrologic_Area" typeName="double" displayLabel="Area (User Defined)" category="Geometry_Drainage_Geometry_Drainage" priority="0" kindOfQuantity="cifu:AREA"/>
+        <ECProperty propertyName="AreaDefinitionType" typeName="Catchment_HydrologicAspect_AreaDefinitionType_Enum" displayLabel="Area Defined By" category="Runoff_Drainage_Runoff_Drainage" priority="0"/>
+    </ECEntityClass>
+    <ECEntityClass typeName="Catchment_Hydrologic_LandCoverAreasAspect">
+        <BaseClass>Catchment_HydrologicAspect</BaseClass>
+        <ECProperty propertyName="LandCoverAreasType_ScsCNDefault" typeName="double" displayLabel="SCS CN (Default)" category="Runoff_Drainage_Runoff_Drainage" priority="0" kindOfQuantity="cifu:CURVE_NUMBER"/>
+        <ECProperty propertyName="LandCoverAreasType_RunoffCoefficientDefault" typeName="double" displayLabel="Runoff Coefficient (Default)" category="Runoff_Drainage_Runoff_Drainage" priority="0" kindOfQuantity="cifu:COEFFICIENT"/>
+        <ECProperty propertyName="LandCoverAreasType_RationalCDefault" typeName="double" displayLabel="Rational C (Default)" category="Runoff_Drainage_Runoff_Drainage" priority="0" kindOfQuantity="cifu:COEFFICIENT"/>
+    </ECEntityClass>
     <ECEntityClass typeName="Catchment_Hydrologic_LossMethodTypeAspect" modifier="Abstract">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
         <ECProperty propertyName="LossMethodType" typeName="Catchment_Hydrologic_LossMethodTypeAspect_LossMethodType_Enum" displayLabel="Loss Method" category="Runoff_Drainage_Runoff_Drainage" priority="0"/>
@@ -792,8 +962,16 @@
     </ECEntityClass>
     <ECEntityClass typeName="Catchment_Hydrologic_LossMethodType_ScsCnAspect">
         <BaseClass>Catchment_Hydrologic_LossMethodTypeAspect</BaseClass>
-        <ECProperty propertyName="ScsCnType_CN" typeName="double" displayLabel="SCS CN" category="Runoff_Drainage_Runoff_Drainage" priority="0" kindOfQuantity="cifu:COEFFICIENT"/>
+        <ECProperty propertyName="ScsCnType_CN" typeName="double" displayLabel="SCS CN [Deprecated]" category="Runoff_Drainage_Runoff_Drainage" priority="0" kindOfQuantity="cifu:COEFFICIENT">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03"/>
+                <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                    <Description>Use 'ScsCnType_CNValue' instead</Description>
+                </Deprecated>
+            </ECCustomAttributes>
+        </ECProperty>
         <ECProperty propertyName="LossMethodType_DryingTime" typeName="double" displayLabel="Drying Time" category="Runoff_Drainage_Runoff_Drainage" priority="0" kindOfQuantity="cifu:TIME_MEDIUM"/>
+        <ECProperty propertyName="ScsCnType_CNValue" typeName="double" displayLabel="SCS CN" category="Runoff_Drainage_Runoff_Drainage" priority="0" kindOfQuantity="cifu:CURVE_NUMBER"/>
     </ECEntityClass>
     <ECEntityClass typeName="Catchment_Hydrologic_RunoffMethodTypeAspect" modifier="Abstract">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
@@ -879,19 +1057,6 @@
     </ECEntityClass>
     <ECEntityClass typeName="Catchment_Hydrologic_RunoffMethod_UserDefinedHydrographAspect">
         <BaseClass>Catchment_Hydrologic_RunoffMethodTypeAspect</BaseClass>
-    </ECEntityClass>
-    <ECEntityClass typeName="Catchment_HydrologicAspect">
-        <BaseClass>cifcmn:CivilPresentation</BaseClass>
-        <ECProperty propertyName="Hydrologic_TimeOfConcentration" typeName="double" displayLabel="Time of Concentration" category="Runoff_Drainage_Runoff_Drainage" priority="0" kindOfQuantity="cifu:TIME_EXTENDED"/>
-        <ECProperty propertyName="TcComputeType" typeName="Catchment_HydrologicAspect_TcComputeType_Enum" displayLabel="Tc Input Type" category="Runoff_Drainage_Runoff_Drainage" priority="0"/>
-        <ECProperty propertyName="Hydrologic_GwEquationUnitSystem" typeName="Catchment_HydrologicAspect_Hydrologic_GwEquationUnitSystem_Enum" displayLabel="Groundwater Equation Unit System" category="SWMM_Extended_Data_Drainage_SWMM_Extended_Data_Drainage" priority="0"/>
-        <ECProperty propertyName="Hydrologic_ApplyGwDeepwaterEqn" typeName="boolean" displayLabel="Apply Custom Deep Flow Equation?" category="SWMM_Extended_Data_Drainage_SWMM_Extended_Data_Drainage" priority="0"/>
-        <ECProperty propertyName="CustomGwDeepwaterEqn" typeName="string" displayLabel="Custom Deep Flow Equation" category="SWMM_Extended_Data_Drainage_SWMM_Extended_Data_Drainage" priority="0"/>
-        <ECProperty propertyName="Hydrologic_ApplyGwLateralEqn" typeName="boolean" displayLabel="Apply Custom Lateral Flow Equation?" category="SWMM_Extended_Data_Drainage_SWMM_Extended_Data_Drainage" priority="0"/>
-        <ECProperty propertyName="CustomGwLateralEqn" typeName="string" displayLabel="Custom Groundwater Lateral Equation" category="SWMM_Extended_Data_Drainage_SWMM_Extended_Data_Drainage" priority="0"/>
-        <ECProperty propertyName="Hydrologic_UseScaledArea" typeName="boolean" displayLabel="Use Scaled Area?" category="Geometry_Drainage_Geometry_Drainage" priority="0"/>
-        <ECProperty propertyName="Hydrologic_Area" typeName="double" displayLabel="Area (User Defined)" category="Geometry_Drainage_Geometry_Drainage" priority="0" kindOfQuantity="cifu:AREA"/>
-        <ECProperty propertyName="AreaDefinitionType" typeName="Catchment_HydrologicAspect_AreaDefinitionType_Enum" displayLabel="Area Defined By" category="Runoff_Drainage_Runoff_Drainage" priority="0"/>
     </ECEntityClass>
     <ECEntityClass typeName="Catchment_RainfallRunoffAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
@@ -1141,6 +1306,7 @@
         <ECProperty propertyName="Physical_NumberOfBarrels" typeName="int" displayLabel="Number of Barrels" category="Physical_Drainage_Physical_Drainage" priority="0"/>
         <ECProperty propertyName="Physical_ConduitShapeLabel" typeName="string" displayLabel="Conduit Description" category="Physical_Drainage_Physical_Drainage" priority="0"/>
         <ECProperty propertyName="Physical_UseLocalConduitShapeLabel" typeName="boolean" displayLabel="Use Local Conduit Description?" category="Physical_Drainage_Physical_Drainage" priority="0"/>
+        <ECProperty propertyName="MultiBarrelGapDistance" typeName="double" displayLabel="Multiple Barrel Gap" category="Physical_Drainage_Physical_Drainage" priority="0" kindOfQuantity="cifu:LENGTH"/>
     </ECEntityClass>
     <ECEntityClass typeName="Conduit_ShapeAspect" modifier="Abstract">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
@@ -1554,6 +1720,78 @@
             <Class class="BasePumpAspect"/>
         </Target>
     </ECRelationshipClass>
+    <ECRelationshipClass typeName="ElementOwnsBaseSimplePolyline_HMIActiveTopologyAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="BaseSimplePolyline_HMIActiveTopologyAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="ElementOwnsBaseSimplePolyline_HmiDataSetGeometryAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="BaseSimplePolyline_HmiDataSetGeometryAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="ElementOwnsBaseSimplePolylineAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="BaseSimplePolylineAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="ElementOwnsBoundaryLine2D_SurfaceAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="BoundaryLine2D_SurfaceAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="ElementOwnsBoundaryLine2DAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="BoundaryLine2DAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="ElementOwnsBoundaryPoint2D_HMIActiveTopologyAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="BoundaryPoint2D_HMIActiveTopologyAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="ElementOwnsBoundaryPoint2D_SurfaceAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="BoundaryPoint2D_SurfaceAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="ElementOwnsBoundaryPoint2DAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="BoundaryPoint2DAspect"/>
+        </Target>
+    </ECRelationshipClass>
     <ECRelationshipClass typeName="ElementOwnsCatchBasin_Design_LocalConstraints_FalseAspect" modifier="None" strength="embedding">
         <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
         <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
@@ -1840,6 +2078,15 @@
         </Source>
         <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
             <Class class="Catchment_Hydrologic_ApplyGroundWater_True_GwWaterTableElevationUserDefinedAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="ElementOwnsCatchment_Hydrologic_LandCoverAreasAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="Catchment_Hydrologic_LandCoverAreasAspect"/>
         </Target>
     </ECRelationshipClass>
     <ECRelationshipClass typeName="ElementOwnsCatchment_Hydrologic_LossMethodType_fLossAspect" modifier="None" strength="embedding">
@@ -2972,6 +3219,19 @@
             <Class class="GravitySurfaceStructure_DesignAspect"/>
         </Target>
     </ECRelationshipClass>
+    <ECEntityClass typeName="GravitySurfaceStructure_OutputAspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="HasTwoDTimeSeriesResults" typeName="boolean" displayLabel="Has 2D Detailed Results?" category="Output_2D_Drainage_Output_2D_Drainage" priority="0"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsGravitySurfaceStructure_OutputAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="GravitySurfaceStructure_OutputAspect"/>
+        </Target>
+    </ECRelationshipClass>
     <ECEntityClass typeName="GravitySurfaceStructure_Physical_GravityStructureTypeAspect" modifier="Abstract">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
         <ECProperty propertyName="GravityStructureType" typeName="GravitySurfaceStructure_Physical_GravityStructureTypeAspect_GravityStructureType_Enum" displayLabel="Structure Type" category="Physical_Drainage_Physical_Drainage" priority="0"/>
@@ -3072,6 +3332,7 @@
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
         <ECProperty propertyName="Physical_SetRimToGroundElevation" typeName="boolean" displayLabel="Set Rim to Ground Elevation?" category="Physical_Drainage_Physical_Drainage" priority="0"/>
         <ECProperty propertyName="Physical_RimElevation" typeName="double" displayLabel="Elevation (Rim)" category="Physical_Drainage_Physical_Drainage" priority="0" kindOfQuantity="cifu:ELEVATION"/>
+        <ECProperty propertyName="GridRimElevationMatching" typeName="GravitySurfaceStructure_PhysicalAspect_GridRimElevationMatching_Enum" displayLabel="2D Surface Elevation Matching" category="Physical_Drainage_Physical_Drainage" priority="0"/>
     </ECEntityClass>
     <ECRelationshipClass typeName="ElementOwnsGravitySurfaceStructure_PhysicalAspect" modifier="None" strength="embedding">
         <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
@@ -3116,6 +3377,65 @@
         </Source>
         <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
             <Class class="GravitySurfaceStructureAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="Grid2D_BoundaryConditionAspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="GridBoundaryType" typeName="Grid2D_BoundaryConditionAspect_GridBoundaryType_Enum" displayLabel="Grid Boundary Type" category="Boundary_Condition_Drainage_Boundary_Condition_Drainage" priority="0"/>
+        <ECProperty propertyName="BoundaryElevation" typeName="double" displayLabel="Water Surface Elevation (Boundary)" category="Boundary_Condition_Drainage_Boundary_Condition_Drainage" priority="0" kindOfQuantity="cifu:ELEVATION"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsGrid2D_BoundaryConditionAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="Grid2D_BoundaryConditionAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="Grid2D_InitialSettingsAspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="GridInitialValuesType" typeName="Grid2D_InitialSettingsAspect_GridInitialValuesType_Enum" displayLabel="Initial Depth Mode" category="Initial_Settings_Drainage_Initial_Settings_Drainage" priority="0"/>
+        <ECProperty propertyName="Grid_InitialDepth" typeName="double" displayLabel="Depth (Initial)" category="Initial_Settings_Drainage_Initial_Settings_Drainage" priority="0" kindOfQuantity="cifu:DEPTH_LARGE"/>
+        <ECProperty propertyName="Grid_InitialElevation" typeName="double" displayLabel="Elevation (Initial)" category="Initial_Settings_Drainage_Initial_Settings_Drainage" priority="0" kindOfQuantity="cifu:ELEVATION"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsGrid2D_InitialSettingsAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="Grid2D_InitialSettingsAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="Grid2D_SurfaceAspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="Surface_GridCellSize" typeName="double" displayLabel="Grid Cell Size" category="TwoD_Solver_Drainage_2D_Solver_Drainage" priority="0" kindOfQuantity="cifu:LENGTH_WIDTH"/>
+        <ECProperty propertyName="Surface_GridAngle" typeName="double" displayLabel="Angle" category="TwoD_Solver_Drainage_2D_Solver_Drainage" priority="0" kindOfQuantity="cifu:ANGLE"/>
+        <ECProperty propertyName="Surface_DefaultManningsN" typeName="double" displayLabel="Manning's n (Default)" category="Defaults_2D_Drainage_Defaults_2D_Drainage" priority="0" kindOfQuantity="cifu:ROUGHNESS_MANNINGS"/>
+        <ECProperty propertyName="GridSurfaceInfiltrationMode" typeName="Grid2D_SurfaceAspect_GridSurfaceInfiltrationMode_Enum" displayLabel="Infiltration Mode" category="Defaults_2D_Drainage_Defaults_2D_Drainage" priority="0"/>
+        <ECProperty propertyName="Surface_DefaultCN" typeName="double" displayLabel="SCS CN (Default)" category="Defaults_2D_Drainage_Defaults_2D_Drainage" priority="0" kindOfQuantity="cifu:CURVE_NUMBER"/>
+        <ECProperty propertyName="Surface_DefaultImpermeabilityFraction" typeName="double" displayLabel="Impermeability Fraction (Default)" category="Defaults_2D_Drainage_Defaults_2D_Drainage" priority="0" kindOfQuantity="cifu:FRACTION"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsGrid2D_SurfaceAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="Grid2D_SurfaceAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="Grid2DAspect">
+        <BaseClass>BasePolygonAspect</BaseClass>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsGrid2DAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="Grid2DAspect"/>
         </Target>
     </ECRelationshipClass>
     <ECEntityClass typeName="GutterLink_PhysicalAspect">
@@ -4073,6 +4393,128 @@
             <Class class="StandardPumpAspect"/>
         </Target>
     </ECRelationshipClass>
+    <ECEntityClass typeName="SurfaceLine_SurfaceAspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="SurfacePolylineType" typeName="SurfaceLine_SurfaceAspect_SurfacePolylineType_Enum" displayLabel="Type" category="Type_Operations_Drainage_Type_Operations_Drainage" priority="0"/>
+        <ECProperty propertyName="SurfacePolylineRoadWidth" typeName="double" displayLabel="Road Width" category="Type_Operations_Drainage_Type_Operations_Drainage" priority="0" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="RoadElevationAdjustmentType" typeName="SurfaceLine_SurfaceAspect_RoadElevationAdjustmentType_Enum" displayLabel="Elevation Adjustment Operation" category="Type_Operations_Drainage_Type_Operations_Drainage" priority="0"/>
+        <ECProperty propertyName="RoadElevationAdjustment" typeName="double" displayLabel="Elevation Adjustment" category="Type_Operations_Drainage_Type_Operations_Drainage" priority="0" kindOfQuantity="cifu:ELEVATION"/>
+        <ECProperty propertyName="SurfacePolylineCNAdjustmentType" typeName="SurfaceLine_SurfaceAspect_SurfacePolylineCNAdjustmentType_Enum" displayLabel="SCS CN Adjustment Type" category="Land_Cover_Drainage_Land_Cover_Drainage" priority="0"/>
+        <ECProperty propertyName="SurfacePolylineSCSCN" typeName="double" displayLabel="SCS CN (User Defined)" category="Land_Cover_Drainage_Land_Cover_Drainage" priority="0" kindOfQuantity="cifu:CURVE_NUMBER"/>
+        <ECProperty propertyName="SurfacePolylineImpAdjustmentType" typeName="SurfaceLine_SurfaceAspect_SurfacePolylineImpAdjustmentType_Enum" displayLabel="Impermeability Fraction Adjustment Type" category="Land_Cover_Drainage_Land_Cover_Drainage" priority="0"/>
+        <ECProperty propertyName="SurfacePolylineImpermeabilityFraction" typeName="double" displayLabel="Impermeability Fraction (User Defined)" category="Land_Cover_Drainage_Land_Cover_Drainage" priority="0" kindOfQuantity="cifu:FRACTION"/>
+        <ECProperty propertyName="SurfacePolylineManningsAdjustmentType" typeName="SurfaceLine_SurfaceAspect_SurfacePolylineManningsAdjustmentType_Enum" displayLabel="Manning's n Adjustment Type" category="Land_Cover_Drainage_Land_Cover_Drainage" priority="0"/>
+        <ECProperty propertyName="SurfacePolylineManningsN" typeName="double" displayLabel="Manning's n (User Defined)" category="Land_Cover_Drainage_Land_Cover_Drainage" priority="0" kindOfQuantity="cifu:ROUGHNESS_MANNINGS"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsSurfaceLine_SurfaceAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="SurfaceLine_SurfaceAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="SurfaceLineAspect">
+        <BaseClass>BaseSimplePolylineAspect</BaseClass>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsSurfaceLineAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="SurfaceLineAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="SurfacePoint_HMIActiveTopologyAspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="HMIActiveTopologyIsActive" typeName="boolean" displayLabel="Is Active?" category="Active_Topology_Drainage_Active_Topology_Drainage" priority="0"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsSurfacePoint_HMIActiveTopologyAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="SurfacePoint_HMIActiveTopologyAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="SurfacePoint_SurfaceAspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="SurfacePointType" typeName="SurfacePoint_SurfaceAspect_SurfacePointType_Enum" displayLabel="Type" category="Type_Operations_Drainage_Type_Operations_Drainage" priority="0"/>
+        <ECProperty propertyName="SurfacePointElevationAdjustmentType" typeName="SurfacePoint_SurfaceAspect_SurfacePointElevationAdjustmentType_Enum" displayLabel="Elevation Adjustment Operation" category="Type_Operations_Drainage_Type_Operations_Drainage" priority="0"/>
+        <ECProperty propertyName="SurfacePointElevationRelativeAdjustment" typeName="double" displayLabel="Elevation Adjustment" category="Type_Operations_Drainage_Type_Operations_Drainage" priority="0" kindOfQuantity="cifu:ELEVATION"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsSurfacePoint_SurfaceAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="SurfacePoint_SurfaceAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="SurfacePointAspect">
+        <BaseClass>GlobalBase_Washington_Aspect</BaseClass>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsSurfacePointAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="SurfacePointAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="SurfacePolygon_SurfaceAspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="SurfacePolygonType" typeName="SurfacePolygon_SurfaceAspect_SurfacePolygonType_Enum" displayLabel="Type" category="Type_Operations_Drainage_Type_Operations_Drainage" priority="0"/>
+        <ECProperty propertyName="SurfacePolygonElevationAdjustmentType" typeName="SurfacePolygon_SurfaceAspect_SurfacePolygonElevationAdjustmentType_Enum" displayLabel="Elevation Adjustment Operation" category="Type_Operations_Drainage_Type_Operations_Drainage" priority="0"/>
+        <ECProperty propertyName="SurfacePolygonElevationAdjustment" typeName="double" displayLabel="Elevation Adjustment" category="Type_Operations_Drainage_Type_Operations_Drainage" priority="0" kindOfQuantity="cifu:ELEVATION"/>
+        <ECProperty propertyName="SurfacePolygonCNAdjustmentType" typeName="SurfacePolygon_SurfaceAspect_SurfacePolygonCNAdjustmentType_Enum" displayLabel="SCS CN Adjustment Type" category="Land_Cover_Drainage_Land_Cover_Drainage" priority="0"/>
+        <ECProperty propertyName="SurfacePolygonCN" typeName="double" displayLabel="SCS CN (User Defined)" category="Land_Cover_Drainage_Land_Cover_Drainage" priority="0" kindOfQuantity="cifu:CURVE_NUMBER"/>
+        <ECProperty propertyName="SurfacePolygonImpAdjustmentType" typeName="SurfacePolygon_SurfaceAspect_SurfacePolygonImpAdjustmentType_Enum" displayLabel="Impermeability Fraction Adjustment Type" category="Land_Cover_Drainage_Land_Cover_Drainage" priority="0"/>
+        <ECProperty propertyName="SurfacePolygonImpermeabilityFraction" typeName="double" displayLabel="Impermeability Fraction (User Defined)" category="Land_Cover_Drainage_Land_Cover_Drainage" priority="0" kindOfQuantity="cifu:FRACTION"/>
+        <ECProperty propertyName="SurfacePolygonManningsAdjustmentType" typeName="SurfacePolygon_SurfaceAspect_SurfacePolygonManningsAdjustmentType_Enum" displayLabel="Manning's n Adjustment Type" category="Land_Cover_Drainage_Land_Cover_Drainage" priority="0"/>
+        <ECProperty propertyName="SurfacePolygonMannings" typeName="double" displayLabel="Manning's n (User Defined)" category="Land_Cover_Drainage_Land_Cover_Drainage" priority="0" kindOfQuantity="cifu:ROUGHNESS_MANNINGS"/>
+        <ECProperty propertyName="SurfacePolygonPriorityType" typeName="SurfacePolygon_SurfaceAspect_SurfacePolygonPriorityType_Enum" displayLabel="Priority" category="Type_Operations_Drainage_Type_Operations_Drainage" priority="0"/>
+        <ECProperty propertyName="SurfacePolygonCAdjustmentType" typeName="SurfacePolygon_SurfaceAspect_SurfacePolygonCAdjustmentType_Enum" displayLabel="Rational C Adjustment Type" category="Land_Cover_Drainage_Land_Cover_Drainage" priority="0"/>
+        <ECProperty propertyName="SurfacePolygonC" typeName="double" displayLabel="Rational C (User Defined)" category="Land_Cover_Drainage_Land_Cover_Drainage" priority="0" kindOfQuantity="cifu:COEFFICIENT"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsSurfacePolygon_SurfaceAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="SurfacePolygon_SurfaceAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="SurfacePolygonAspect">
+        <BaseClass>BasePolygonAspect</BaseClass>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsSurfacePolygonAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="SurfacePolygonAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="SurfaceProfilePolylineAspect">
+        <BaseClass>BaseSimplePolylineAspect</BaseClass>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsSurfaceProfilePolylineAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="SurfaceProfilePolylineAspect"/>
+        </Target>
+    </ECRelationshipClass>
     <ECEntityClass typeName="TapNode_HMIActiveTopologyAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
         <ECProperty propertyName="HMIActiveTopologyIsActive" typeName="boolean" displayLabel="Is Active?" category="Active_Topology_Drainage_Active_Topology_Drainage" priority="0"/>
@@ -4358,6 +4800,7 @@
     <PropertyCategory typeName="Boundary_Condition_Drainage_Boundary_Condition_Drainage" description="Boundary Condition [Drainage]" displayLabel="Boundary Condition [Drainage]" priority="4294889026"/>
     <PropertyCategory typeName="Boundary_Condition_Hydraulic_Analysis_Boundary_Condition_Hydraulic_Analysis" description="Boundary Condition [Hydraulic Analysis]" displayLabel="Boundary Condition [Hydraulic Analysis]" priority="4294889026"/>
     <PropertyCategory typeName="Connecting_Links_Drainage_Connecting_Links_Drainage" description="Connecting Links [Drainage]" displayLabel="Connecting Links [Drainage]" priority="4294888096"/>
+    <PropertyCategory typeName="Defaults_2D_Drainage_Defaults_2D_Drainage" description="Defaults (2D) [Drainage]" displayLabel="Defaults (2D) [Drainage]" priority="4294888176"/>
     <PropertyCategory typeName="Design_Drainage_Design_Drainage" description="Design [Drainage]" displayLabel="Design [Drainage]" priority="4294888046"/>
     <PropertyCategory typeName="Design_Hydraulic_Analysis_Design_Hydraulic_Analysis" description="Design [Hydraulic Analysis]" displayLabel="Design [Hydraulic Analysis]" priority="4294888046"/>
     <PropertyCategory typeName="Diversion_Drainage_Diversion_Drainage" description="Diversion [Drainage]" displayLabel="Diversion [Drainage]" priority="4294887616"/>
@@ -4384,10 +4827,12 @@
     <PropertyCategory typeName="Inlet_Location_Hydraulic_Analysis_Inlet_Location_Hydraulic_Analysis" description="Inlet Location [Hydraulic Analysis]" displayLabel="Inlet Location [Hydraulic Analysis]" priority="4294882216"/>
     <PropertyCategory typeName="Inlet_Opening_Drainage_Inlet_Opening_Drainage" description="Inlet Opening [Drainage]" displayLabel="Inlet Opening [Drainage]" priority="4294882216"/>
     <PropertyCategory typeName="Inlet_Opening_Hydraulic_Analysis_Inlet_Opening_Hydraulic_Analysis" description="Inlet Opening [Hydraulic Analysis]" displayLabel="Inlet Opening [Hydraulic Analysis]" priority="4294882216"/>
+    <PropertyCategory typeName="Land_Cover_Drainage_Land_Cover_Drainage" description="Land Cover [Drainage]" displayLabel="Land Cover [Drainage]" priority="4294880496"/>
     <PropertyCategory typeName="Operating_Range_Drainage_Operating_Range_Drainage" description="Operating Range [Drainage]" displayLabel="Operating Range [Drainage]" priority="4294876086"/>
     <PropertyCategory typeName="Operating_Range_Hydraulic_Analysis_Operating_Range_Hydraulic_Analysis" description="Operating Range [Hydraulic Analysis]" displayLabel="Operating Range [Hydraulic Analysis]" priority="4294876086"/>
     <PropertyCategory typeName="Operational_Drainage_Operational_Drainage" description="Operational [Drainage]" displayLabel="Operational [Drainage]" priority="4294876086"/>
     <PropertyCategory typeName="Operational_Hydraulic_Analysis_Operational_Hydraulic_Analysis" description="Operational [Hydraulic Analysis]" displayLabel="Operational [Hydraulic Analysis]" priority="4294876086"/>
+    <PropertyCategory typeName="Output_2D_Drainage_Output_2D_Drainage" description="Output (2D) [Drainage]" displayLabel="Output (2D) [Drainage]" priority="4294875436"/>
     <PropertyCategory typeName="Output_Drainage_Output_Drainage" description="Output [Drainage]" displayLabel="Output [Drainage]" priority="4294875436"/>
     <PropertyCategory typeName="Output_Hydraulic_Analysis_Output_Hydraulic_Analysis" description="Output [Hydraulic Analysis]" displayLabel="Output [Hydraulic Analysis]" priority="4294875436"/>
     <PropertyCategory typeName="Physical_Control_Structure_Drainage_Physical_Control_Structure_Drainage" description="Physical (Control Structure) [Drainage]" displayLabel="Physical (Control Structure) [Drainage]" priority="4294875686"/>
@@ -4426,6 +4871,8 @@
     <PropertyCategory typeName="SWMM_Extended_Data_Water_Quality_Hydraulic_Analysis_SWMM_Extended_Data_Water_Quality_Hydraulic_Analysis" description="SWMM Extended Data (Water Quality) [Hydraulic Analysis]" displayLabel="SWMM Extended Data (Water Quality) [Hydraulic Analysis]" priority="4294874826"/>
     <PropertyCategory typeName="Tractive_Stress_Drainage_Tractive_Stress_Drainage" description="Tractive Stress [Drainage]" displayLabel="Tractive Stress [Drainage]" priority="4294870926"/>
     <PropertyCategory typeName="Tractive_Stress_Hydraulic_Analysis_Tractive_Stress_Hydraulic_Analysis" description="Tractive Stress [Hydraulic Analysis]" displayLabel="Tractive Stress [Hydraulic Analysis]" priority="4294870926"/>
+    <PropertyCategory typeName="TwoD_Solver_Drainage_2D_Solver_Drainage" description="2D Solver [Drainage]" displayLabel="2D Solver [Drainage]" priority="4294910176"/>
+    <PropertyCategory typeName="Type_Operations_Drainage_Type_Operations_Drainage" description="Type/Operations [Drainage]" displayLabel="Type/Operations [Drainage]" priority="4294870076"/>
     <PropertyCategory typeName="Water_Quality_Drainage_Water_Quality_Drainage" description="Water Quality [Drainage]" displayLabel="Water Quality [Drainage]" priority="4294869436"/>
     <PropertyCategory typeName="Water_Quality_Hydraulic_Analysis_Water_Quality_Hydraulic_Analysis" description="Water Quality [Hydraulic Analysis]" displayLabel="Water Quality [Hydraulic Analysis]" priority="4294869436"/>
 </ECSchema>
