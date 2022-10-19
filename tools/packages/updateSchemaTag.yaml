@@ -12,24 +12,23 @@ stages:
       clean: all
     
     steps:
+      - checkout: none
+        clean: true
+
       - task: NodeTool@0
         displayName: 'Use Node 14.16.0'
         inputs:
           versionSpec: 14.16.0
-      - checkout: none
-        clean: true
 
       - bash: |
-          registry=https://devops0187.pkgs.visualstudio.com/_packaging/test/npm/registry/                 
-          always-auth=true
-          ; begin auth token
-          //devops0187.pkgs.visualstudio.com/_packaging/test/npm/registry/:username=Devops0187
-          //devops0187.pkgs.visualstudio.com/_packaging/test/npm/registry/:_password=$(token)
-          //devops0187.pkgs.visualstudio.com/_packaging/test/npm/registry/:email=npm requires email to be set but doesn't use the value
-          //devops0187.pkgs.visualstudio.com/_packaging/test/npm/:username=Devops0187
-          //devops0187.pkgs.visualstudio.com/_packaging/test/npm/:_password=$(token)
-          //devops0187.pkgs.visualstudio.com/_packaging/test/npm/:email=npm requires email to be set but doesn't use the value
-          ; end auth token
+          npm config set registry=https://devops0187.pkgs.visualstudio.com/_packaging/test/npm/registry/                 
+          npm config set always-auth=true
+          npm config set //devops0187.pkgs.visualstudio.com/_packaging/test/npm/registry/:username=Devops0187
+          npm config set //devops0187.pkgs.visualstudio.com/_packaging/test/npm/registry/:_password=$(token)
+          npm config set //devops0187.pkgs.visualstudio.com/_packaging/test/npm/registry/:email="not used"
+          npm config set //devops0187.pkgs.visualstudio.com/_packaging/test/npm/:username=Devops0187
+          npm config set //devops0187.pkgs.visualstudio.com/_packaging/test/npm/:_password=$(token)
+          npm config set //devops0187.pkgs.visualstudio.com/_packaging/test/npm/:email="not used"
         displayName: 'Seed npmrc'
 
       - script: |
