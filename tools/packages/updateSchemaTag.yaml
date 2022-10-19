@@ -1,0 +1,24 @@
+trigger:
+  - master
+stages:
+- stage: FixTags
+  jobs:
+  - job: fixTags_build
+    displayName: 'Fix Tags Internal'
+    pool:
+      vmImage: windows-latest
+
+    workspace:
+      clean: all
+    
+    steps:
+      - task: NodeTool@0
+        displayName: 'Use Node 14.16.0'
+        inputs:
+          versionSpec: 14.16.0
+      - checkout: none
+        clean: true
+
+      - script: |
+         npm view $(packageName) dist-tags --json
+        displayName: 'npm test and cover'
