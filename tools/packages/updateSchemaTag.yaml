@@ -21,6 +21,9 @@ stages:
           versionSpec: 14.16.0
 
       - bash: |
+          echo "registry: $registry"
+          echo "prefix: $prefix"
+          echo "username: $username"
           npm config set registry=$(registry)               
           npm config set always-auth=true
           npm config set $(prefix):username=$(username)
@@ -30,6 +33,10 @@ stages:
           npm config set $(prefix):_password=$(token)
           npm config set $(prefix):email="not used"
         displayName: 'Seed npmrc'
+        env:
+          prefix: $(prefix)
+          username: $(username)
+          registry: $(registry)
 
       - script: |
          npm view $(packageName) dist-tags --json
