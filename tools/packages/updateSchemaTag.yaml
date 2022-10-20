@@ -1,0 +1,48 @@
+trigger:
+  - master
+stages:
+- stage: FixTags
+  jobs:
+  - job: fixTags_build
+    displayName: 'Fix Tags Internal'
+    pool:
+      vmImage: windows-latest
+
+    workspace:
+      clean: all
+    
+    steps:
+      - checkout: none
+        clean: true
+
+      - task: NodeTool@0
+        displayName: 'Use Node 14.16.0'
+        inputs:
+          versionSpec: 14.16.0
+
+      - bash: |
+          npm config set $(PREFIX)registry=https:$(registry)               
+          npm config set always-auth=true
+          npm config set $(registry):username=$(USER)
+          npm config set $(registry):_password=$(token)
+          npm config set $(registry):email="not used"
+          npm config set $(registry):username=$(USER)
+          npm config set $(registry):_password=$(token)
+          npm config set $(registry):email="not used"
+        displayName: 'Seed npmrc'
+        env:
+          USER: $(USER)
+          PREFIX: $(PREFIX)
+          REGISTRY: $(REGISTRY)
+
+      - script: |
+         npm view $(packageName) dist-tags --json
+        displayName: 'Old Dist Tags'
+
+      - script: |
+         npm dist-tag add $(packageName)@$(version) $(tag)
+        displayName: 'Update Tags'
+
+      - script: |
+         npm view $(packageName) dist-tags --json
+        displayName: 'New Dist Tags'
