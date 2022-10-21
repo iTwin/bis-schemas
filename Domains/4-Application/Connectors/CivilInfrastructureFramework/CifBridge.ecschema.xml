@@ -7,7 +7,7 @@
     <ECSchemaReference name="BisCore" version="01.00.14" alias="bis"/>
     <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
     <ECSchemaReference name="CifCommon" version="01.00.03" alias="cifcmn"/>
-    <ECSchemaReference name="CifUnits" version="01.00.01" alias="cifu"/>
+    <ECSchemaReference name="CifUnits" version="01.00.02" alias="cifu"/>
     <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
     <ECCustomAttributes>
         <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
@@ -537,11 +537,51 @@
         <BaseClass>BeamSegmentBaseAspect</BaseClass>
         <ECProperty propertyName="BeamSegment_Length" typeName="double" displayLabel="Length" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299994" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="BeamSegment_Material" typeName="string" displayLabel="Material" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299987"/>
-        <ECProperty propertyName="BeamSegment_Material_UnitPrice" typeName="double" displayLabel="Material Unit Price" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299986" kindOfQuantity="cifu:LENGTH"/>
-        <ECProperty propertyName="BeamSegment_Material_UnitWeight" typeName="double" displayLabel="Unit Wt" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299985" kindOfQuantity="cifu:LENGTH"/>
-        <ECProperty propertyName="BeamSegment_Material_CTE" typeName="double" displayLabel="CTE" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299984" kindOfQuantity="cifu:LENGTH"/>
-        <ECProperty propertyName="BeamSegment_Material_E" typeName="double" displayLabel="E" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299983" kindOfQuantity="cifu:LENGTH"/>
-        <ECProperty propertyName="BeamSegment_Material_Poisson" typeName="double" displayLabel="Poisson" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299982" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="BeamSegment_Material_UnitPrice" typeName="double" displayLabel="Material Unit Price [Deprecated]" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299986" kindOfQuantity="cifu:LENGTH">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03"/>
+                <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                    <Description>Use 'BeamSegment_Material_UnitPrice_Unitless' instead</Description>
+                </Deprecated>
+            </ECCustomAttributes>
+        </ECProperty>
+        <ECProperty propertyName="BeamSegment_Material_UnitWeight" typeName="double" displayLabel="Unit Wt [Deprecated]" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299985" kindOfQuantity="cifu:LENGTH">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03"/>
+                <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                    <Description>Use 'BeamSegment_Material_UnitWeight_Unitized' instead</Description>
+                </Deprecated>
+            </ECCustomAttributes>
+        </ECProperty>
+        <ECProperty propertyName="BeamSegment_Material_CTE" typeName="double" displayLabel="CTE [Deprecated]" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299984" kindOfQuantity="cifu:LENGTH">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03"/>
+                <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                    <Description>Use 'BeamSegment_Material_CTE_Unitized' instead</Description>
+                </Deprecated>
+            </ECCustomAttributes>
+        </ECProperty>
+        <ECProperty propertyName="BeamSegment_Material_E" typeName="double" displayLabel="E [Deprecated]" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299983" kindOfQuantity="cifu:LENGTH">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03"/>
+                <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                    <Description>Use 'BeamSegment_Material_E_Unitized' instead</Description>
+                </Deprecated>
+            </ECCustomAttributes>
+        </ECProperty>
+        <ECProperty propertyName="BeamSegment_Material_Poisson" typeName="double" displayLabel="Poisson [Deprecated]" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299982" kindOfQuantity="cifu:LENGTH">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03"/>
+                <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                    <Description>Use 'BeamSegment_Material_Poisson_Coefficient' instead</Description>
+                </Deprecated>
+            </ECCustomAttributes>
+        </ECProperty>
+        <ECProperty propertyName="BeamSegment_Material_UnitWeight_Unitized" typeName="double" displayLabel="Unit Wt" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299985" kindOfQuantity="cifu:DENSITY"/>
+        <ECProperty propertyName="BeamSegment_Material_UnitPrice_Unitless" typeName="double" displayLabel="Material Unit Price" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299986" kindOfQuantity="cifu:UNITLESS_PRICE"/>
+        <ECProperty propertyName="BeamSegment_Material_Poisson_Coefficient" typeName="double" displayLabel="Poisson" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299982" kindOfQuantity="cifu:COEFFICIENT"/>
+        <ECProperty propertyName="BeamSegment_Material_E_Unitized" typeName="double" displayLabel="E" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299983" kindOfQuantity="cifu:PRESSURE_LARGE"/>
+        <ECProperty propertyName="BeamSegment_Material_CTE_Unitized" typeName="double" displayLabel="CTE" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299984" kindOfQuantity="cifu:THERMAL_COEFFICIENT"/>
     </ECEntityClass>
     <ECEntityClass typeName="BeamSegmentWidthAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
@@ -645,9 +685,33 @@
     </ECEntityClass>
     <ECEntityClass typeName="SteelSPCBeamSegmentBaseAspect" modifier="Abstract">
         <BaseClass>SteelBeamSegmentBaseAspect</BaseClass>
-        <ECProperty propertyName="BeamSegment_Material_Steel_FU" typeName="double" displayLabel="Fu" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299981" kindOfQuantity="cifu:LENGTH"/>
-        <ECProperty propertyName="BeamSegment_Material_Steel_Fy" typeName="double" displayLabel="Fy" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299980" kindOfQuantity="cifu:LENGTH"/>
-        <ECProperty propertyName="BeamSegment_Material_Steel_G" typeName="double" displayLabel="G" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299979" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="BeamSegment_Material_Steel_FU" typeName="double" displayLabel="Fu [Deprecated]" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299981" kindOfQuantity="cifu:LENGTH">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03"/>
+                <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                    <Description>Use 'BeamSegment_Material_Steel_FU_Unitized' instead</Description>
+                </Deprecated>
+            </ECCustomAttributes>
+        </ECProperty>
+        <ECProperty propertyName="BeamSegment_Material_Steel_Fy" typeName="double" displayLabel="Fy [Deprecated]" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299980" kindOfQuantity="cifu:LENGTH">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03"/>
+                <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                    <Description>Use 'BeamSegment_Material_Steel_Fy_Unitized' instead</Description>
+                </Deprecated>
+            </ECCustomAttributes>
+        </ECProperty>
+        <ECProperty propertyName="BeamSegment_Material_Steel_G" typeName="double" displayLabel="G [Deprecated]" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299979" kindOfQuantity="cifu:LENGTH">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03"/>
+                <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                    <Description>Use 'BeamSegment_Material_Steel_G_Unitized' instead</Description>
+                </Deprecated>
+            </ECCustomAttributes>
+        </ECProperty>
+        <ECProperty propertyName="BeamSegment_Material_Steel_FU_Unitized" typeName="double" displayLabel="Fu" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299981" kindOfQuantity="cifu:PRESSURE_LARGE"/>
+        <ECProperty propertyName="BeamSegment_Material_Steel_Fy_Unitized" typeName="double" displayLabel="Fy" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299980" kindOfQuantity="cifu:PRESSURE_LARGE"/>
+        <ECProperty propertyName="BeamSegment_Material_Steel_G_Unitized" typeName="double" displayLabel="G" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299979" kindOfQuantity="cifu:PRESSURE_LARGE"/>
     </ECEntityClass>
     <ECEntityClass typeName="BottomCoverPlateBeamSegmentAspect">
         <BaseClass>SteelSPCBeamSegmentBaseAspect</BaseClass>
@@ -745,9 +809,33 @@
     <ECEntityClass typeName="ConcreteBeamSegmentBaseAspect" modifier="Abstract">
         <BaseClass>BeamSegmentCommonBaseAspect</BaseClass>
         <ECProperty propertyName="BeamSegment_Template" typeName="string" displayLabel="Template" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299997"/>
-        <ECProperty propertyName="BeamSegment_Material_Concrete_FC" typeName="double" displayLabel="f’c" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299978" kindOfQuantity="cifu:LENGTH"/>
-        <ECProperty propertyName="BeamSegment_Material_Concrete_FCi" typeName="double" displayLabel="f’ci" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299977" kindOfQuantity="cifu:LENGTH"/>
-        <ECProperty propertyName="BeamSegment_Material_Concrete_MR" typeName="double" displayLabel="MR" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299976" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="BeamSegment_Material_Concrete_FC" typeName="double" displayLabel="f’c [Deprecated]" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299978" kindOfQuantity="cifu:LENGTH">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03"/>
+                <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                    <Description>Use 'BeamSegment_Material_Concrete_FC_Unitized' instead</Description>
+                </Deprecated>
+            </ECCustomAttributes>
+        </ECProperty>
+        <ECProperty propertyName="BeamSegment_Material_Concrete_FCi" typeName="double" displayLabel="f’ci [Deprecated]" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299977" kindOfQuantity="cifu:LENGTH">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03"/>
+                <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                    <Description>Use 'BeamSegment_Material_Concrete_FCi_Unitized' instead</Description>
+                </Deprecated>
+            </ECCustomAttributes>
+        </ECProperty>
+        <ECProperty propertyName="BeamSegment_Material_Concrete_MR" typeName="double" displayLabel="MR [Deprecated]" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299976" kindOfQuantity="cifu:LENGTH">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03"/>
+                <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                    <Description>Use 'BeamSegment_Material_Concrete_MR_Unitized' instead</Description>
+                </Deprecated>
+            </ECCustomAttributes>
+        </ECProperty>
+        <ECProperty propertyName="BeamSegment_Material_Concrete_FC_Unitized" typeName="double" displayLabel="f’c" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299978" kindOfQuantity="cifu:PRESSURE_LARGE"/>
+        <ECProperty propertyName="BeamSegment_Material_Concrete_FCi_Unitized" typeName="double" displayLabel="f’ci" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299977" kindOfQuantity="cifu:PRESSURE_LARGE"/>
+        <ECProperty propertyName="BeamSegment_Material_Concrete_MR_Unitized" typeName="double" displayLabel="MR" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299976" kindOfQuantity="cifu:PRESSURE_LARGE"/>
     </ECEntityClass>
     <ECEntityClass typeName="ConcreteDiaphragmAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
