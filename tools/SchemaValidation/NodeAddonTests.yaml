@@ -20,38 +20,38 @@ resources:
     name: iTwin/imodel-native-internal
 
 stages:
-- stage: Find_Branch
-  displayName: Find PR Branch
-  condition: and(succeeded(), in(variables['Build.Reason'], 'IndividualCI', 'Schedule', 'Manual'))
+# - stage: Find_Branch
+#   displayName: Find PR Branch
+#   condition: and(succeeded(), in(variables['Build.Reason'], 'IndividualCI', 'Schedule', 'Manual'))
 
-  jobs:
-  - job: Check_PR_Branch
-    workspace:
-      clean: all
+#   jobs:
+#   - job: Check_PR_Branch
+#     workspace:
+#       clean: all
 
-    pool:
-      vmImage: windows-latest
+#     pool:
+#       vmImage: windows-latest
 
-    steps:
-    - task: PythonScript@0
-      name: Get_Branch_Name
-      displayName: 'Get Branch Name'
-      inputs:
-        scriptSource: inline
-        script: |
-          import sys;
-          if ( "System.PullRequest.SourceBranch" not in sys.argv[1] ):
-            branchName = sys.argv[1];
-          else:
-            branchName = sys.argv[2];
-          print ('##vso[task.setvariable variable=sourceBranch]' + branchName);
-        arguments: '$(System.PullRequest.SourceBranch) $(Build.SourceBranchName)'
+#     steps:
+#     - task: PythonScript@0
+#       name: Get_Branch_Name
+#       displayName: 'Get Branch Name'
+#       inputs:
+#         scriptSource: inline
+#         script: |
+#           import sys;
+#           if ( "System.PullRequest.SourceBranch" not in sys.argv[1] ):
+#             branchName = sys.argv[1];
+#           else:
+#             branchName = sys.argv[2];
+#           print ('##vso[task.setvariable variable=sourceBranch]' + branchName);
+#         arguments: '$(System.PullRequest.SourceBranch) $(Build.SourceBranchName)'
 
-    - script: 'echo %sourceBranch%'
-      displayName: 'Display Source Branch'
+#     - script: 'echo %sourceBranch%'
+#       displayName: 'Display Source Branch'
 
 - stage: NodeAddonTests
-  dependsOn: Find_Branch
+  # dependsOn: Find_Branch
   displayName: NodeAddon Tests
   condition: and(succeeded(), in(variables['Build.Reason'], 'IndividualCI', 'Schedule', 'Manual'))
 
