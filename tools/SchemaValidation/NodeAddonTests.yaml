@@ -2,7 +2,7 @@ trigger:
   - master
 
 pr:
-  drafts: true
+  drafts: false
   branches:
     include:
       - master
@@ -20,38 +20,7 @@ resources:
     name: iTwin/imodel-native-internal
 
 stages:
-# - stage: Find_Branch
-#   displayName: Find PR Branch
-#   condition: and(succeeded(), in(variables['Build.Reason'], 'IndividualCI', 'Schedule', 'Manual'))
-
-#   jobs:
-#   - job: Check_PR_Branch
-#     workspace:
-#       clean: all
-
-#     pool:
-#       vmImage: windows-latest
-
-#     steps:
-#     - task: PythonScript@0
-#       name: Get_Branch_Name
-#       displayName: 'Get Branch Name'
-#       inputs:
-#         scriptSource: inline
-#         script: |
-#           import sys;
-#           if ( "System.PullRequest.SourceBranch" not in sys.argv[1] ):
-#             branchName = sys.argv[1];
-#           else:
-#             branchName = sys.argv[2];
-#           print ('##vso[task.setvariable variable=sourceBranch]' + branchName);
-#         arguments: '$(System.PullRequest.SourceBranch) $(Build.SourceBranchName)'
-
-#     - script: 'echo %sourceBranch%'
-#       displayName: 'Display Source Branch'
-
 - stage: NodeAddonTests
-  # dependsOn: Find_Branch
   displayName: NodeAddon Tests
   condition: and(succeeded(), in(variables['Build.Reason'], 'IndividualCI', 'Schedule', 'Manual'))
 
@@ -71,11 +40,28 @@ stages:
       PY_EXE: py -3
       BB_SRC_ROOT: $(Agent.BuildDirectory)/bbsrc
       bb: $(BB_SRC_ROOT)/BentleyBuild/BentleyBuild.py
-      branch: $[ stageDependencies.Find_Branch.Check_PR_Branch.outputs['Get_Branch_Name.sourceBranch'] ]
+      strategy: 'iModelCore;SkipPull_imodel-native-internal+iModelJsNodeAddon;SkipPull_imodel-native-internal'
 
     steps:
     - checkout: imodel-native
     - checkout: imodel-native-internal
+
+    - task: PythonScript@0
+      name: Get_Branch_Name
+      displayName: 'Get Branch Name'
+      inputs:
+        scriptSource: inline
+        script: |
+          import sys;
+          if ( "System.PullRequest.SourceBranch" not in sys.argv[1] ):
+            branchName = sys.argv[1];
+          else:
+            branchName = sys.argv[2];
+          print ('##vso[task.setvariable variable=sourceBranch]' + branchName);
+        arguments: '$(System.PullRequest.SourceBranch) $(Build.SourceBranchName)'
+
+    - script: 'echo %sourceBranch%'
+      displayName: 'Display Source Branch'
 
     - script: |
        Dir
@@ -86,21 +72,33 @@ stages:
        Dir
       displayName: 'Dir'
 
+    - script: |
+       cd /d $(Agent.BuildDirectory)/bbsrc
+       Dir
+      displayName: 'Dir'
+
     - template: build/templates/prebuild.yml@imodel-native-internal
       parameters:
         otherRepo: imodel-native
 
-    - script: $(PY_EXE) $(BB_SRC_ROOT)/imodel-native-internal/build/call_bb.py pull -v $(BB_V) -a $(BB_ARCH) -s "iModelJsNodeAddon;SkipPull_imodel-native-internal"
+    - script: $(PY_EXE) $(BB_SRC_ROOT)/imodel-native-internal/build/call_bb.py pull -v $(BB_V) -a $(BB_ARCH) -s $(strategy)
       displayName: Pull
       env:
         AZURE_DEVOPS_EXT_PAT: $(System.AccessToken)
 
     - script: |
-        if not "%branch%" == "" (
-          cd /d $(Agent.BuildDirectory)/bbsrc/BisSchemas
-          git checkout %branch%
+        if not "%sourceBranch%" == "" (
+          cd /d $(BB_SRC_ROOT)/BisSchemas
+          git checkout %sourceBranch%
         )
       displayName: 'Set Source Branch'
 
-    - script: 'echo %branch%'
-      displayName: 'Display Source Branch'
+    - script: |
+        if not "%sourceBranch%" == "" (
+          cd /d $(BB_SRC_ROOT)/BisSchemas
+          git branch
+        )
+      displayName: 'Display PR Branch'
+
+    - script: $(PY_EXE) $(bb) -v $(BB_V) -a $(BB_ARCH) -s $(strategy) build
+      displayName: Build
