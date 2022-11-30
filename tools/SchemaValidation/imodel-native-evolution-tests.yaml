@@ -80,99 +80,89 @@ stages:
       strategy: 'iModelCore;SkipPull_imodel-native-internal+iModelJsNodeAddon;SkipPull_imodel-native-internal'
 
     steps:
-    - checkout: none
+    - checkout: imodel-native
+    - checkout: imodel-native-internal
 
-    - task: PythonScript@0
-      name: Get_Branch_Name
-      displayName: 'Get Branch Name'
-      inputs:
-        scriptSource: inline
-        script: |
-          import sys;
-          print (sys.argv[1]);
-        arguments: '$(Branch_Name)'
-#     - checkout: imodel-native
-#     - checkout: imodel-native-internal
+    - template: build/templates/prebuild.yml@imodel-native-internal
+      parameters:
+        otherRepo: imodel-native
 
-#     - template: build/templates/prebuild.yml@imodel-native-internal
-#       parameters:
-#         otherRepo: imodel-native
+    - script: $(PY_EXE) $(BB_SRC_ROOT)/imodel-native-internal/build/call_bb.py pull -v $(BB_V) -a $(BB_ARCH) -s $(strategy)
+      displayName: Pull
+      env:
+        AZURE_DEVOPS_EXT_PAT: $(System.AccessToken)
 
-#     - script: $(PY_EXE) $(BB_SRC_ROOT)/imodel-native-internal/build/call_bb.py pull -v $(BB_V) -a $(BB_ARCH) -s $(strategy)
-#       displayName: Pull
-#       env:
-#         AZURE_DEVOPS_EXT_PAT: $(System.AccessToken)
+    - script: |
+        if not "%BRANCH_NAME%" == "" (
+          cd /d $(BB_SRC_ROOT)/BisSchemas
+          git checkout %BRANCH_NAME%
+        )
+      displayName: 'Set Source Branch'
 
-#     - script: |
-#         if not "%sourceBranch%" == "" (
-#           cd /d $(BB_SRC_ROOT)/BisSchemas
-#           git checkout %sourceBranch%
-#         )
-#       displayName: 'Set Source Branch'
+    - script: |
+        if not "%BRANCH_NAME%" == "" (
+          cd /d $(BB_SRC_ROOT)/BisSchemas
+          git branch
+        )
+      displayName: 'Display Source Branch'
 
-#     - script: |
-#         if not "%sourceBranch%" == "" (
-#           cd /d $(BB_SRC_ROOT)/BisSchemas
-#           git branch
-#         )
-#       displayName: 'Display Source Branch'
+    - script: $(PY_EXE) $(bb) -v $(BB_V) -a $(BB_ARCH) -s $(strategy) build
+      displayName: Build
 
-#     - script: $(PY_EXE) $(bb) -v $(BB_V) -a $(BB_ARCH) -s $(strategy) build
-#       displayName: Build
+- stage: iModeEvolution
+  displayName: iModeEvolution Tests
+  dependsOn: Source_Branch
+  condition: and(succeeded(), in(variables['Build.Reason'], 'IndividualCI', 'Schedule', 'Manual', 'PullRequest'))
 
-# - stage: iModeEvolution
-#   displayName: iModeEvolution Tests
-#   dependsOn: Source_Branch
-#   condition: and(succeeded(), in(variables['Build.Reason'], 'IndividualCI', 'Schedule', 'Manual', 'PullRequest'))
+  jobs:
+  - job: RuniModeEvolutionTests
+    timeoutInMinutes: 90
 
-#   jobs:
-#   - job: RuniModeEvolutionTests
-#     timeoutInMinutes: 90
+    workspace:
+      clean: all
 
-#     workspace:
-#       clean: all
+    pool:
+      name: iModelTechCI
+      demands: Agent.OS -equals Windows_NT
 
-#     pool:
-#       name: iModelTechCI
-#       demands: Agent.OS -equals Windows_NT
+    variables:
+      BB_V: 4
+      BB_ARCH: x64
+      PY_EXE: py -3
+      BB_SRC_ROOT: $(Agent.BuildDirectory)/bbsrc
+      bb: $(BB_SRC_ROOT)/BentleyBuild/BentleyBuild.py
+      strategy: 'iModelEvolutionTests;SkipPull_imodel-native-internal'
+      BRANCH_NAME: $[ stageDependencies.Source_Branch.Find_Branch.outputs['Get_Branch_Name.sourceBranch'] ]
 
-#     variables:
-#       BB_V: 4
-#       BB_ARCH: x64
-#       PY_EXE: py -3
-#       BB_SRC_ROOT: $(Agent.BuildDirectory)/bbsrc
-#       bb: $(BB_SRC_ROOT)/BentleyBuild/BentleyBuild.py
-#       strategy: 'iModelEvolutionTests;SkipPull_imodel-native-internal'
+    steps:
+    - checkout: imodel-native
+    - checkout: imodel-native-internal
 
-#     steps:
-#     - checkout: imodel-native
-#     - checkout: imodel-native-internal
+    - template: build/templates/prebuild.yml@imodel-native-internal
+      parameters:
+        otherRepo: imodel-native
 
-#     - template: build/templates/prebuild.yml@imodel-native-internal
-#       parameters:
-#         otherRepo: imodel-native
+    - script: $(PY_EXE) $(BB_SRC_ROOT)/imodel-native-internal/build/call_bb.py pull -v $(BB_V) -a $(BB_ARCH) -s $(strategy)
+      displayName: Pull
+      env:
+        AZURE_DEVOPS_EXT_PAT: $(System.AccessToken)
 
-#     - script: $(PY_EXE) $(BB_SRC_ROOT)/imodel-native-internal/build/call_bb.py pull -v $(BB_V) -a $(BB_ARCH) -s $(strategy)
-#       displayName: Pull
-#       env:
-#         AZURE_DEVOPS_EXT_PAT: $(System.AccessToken)
+    - script: |
+        if not "%BRANCH_NAME%" == "" (
+          cd /d $(BB_SRC_ROOT)/BisSchemas
+          git checkout %BRANCH_NAME%
+        )
+      displayName: 'Set Source Branch'
 
-#     - script: |
-#         if not "%sourceBranch%" == "" (
-#           cd /d $(BB_SRC_ROOT)/BisSchemas
-#           git checkout %sourceBranch%
-#         )
-#       displayName: 'Set Source Branch'
+    - script: |
+        if not "%BRANCH_NAME%" == "" (
+          cd /d $(BB_SRC_ROOT)/BisSchemas
+          git branch
+        )
+      displayName: 'Display Source Branch'
 
-#     - script: |
-#         if not "%sourceBranch%" == "" (
-#           cd /d $(BB_SRC_ROOT)/BisSchemas
-#           git branch
-#         )
-#       displayName: 'Display Source Branch'
-
-#     - script: $(PY_EXE) $(bb) -v $(BB_V) -a $(BB_ARCH) -s $(strategy) build
-#       displayName: Build
-#       env:
-#         NuGetFeed_Address: $(NUGETFEED_ADDRESS)
-#         AZURE_DEVOPS_EXT_PAT: $(System.AccessToken)
+    - script: $(PY_EXE) $(bb) -v $(BB_V) -a $(BB_ARCH) -s $(strategy) build
+      displayName: Build
+      env:
+        NuGetFeed_Address: $(NUGETFEED_ADDRESS)
+        AZURE_DEVOPS_EXT_PAT: $(System.AccessToken)
