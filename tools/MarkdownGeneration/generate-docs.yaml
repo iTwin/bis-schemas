@@ -24,7 +24,7 @@ resources:
       type: github
       endpoint: iModelJs
       name: iTwin/itwinjs-core
-      ref: refs/heads/support-external-docs-builds
+
 stages:
   - stage: Generate_Docs
     jobs:
@@ -174,33 +174,3 @@ stages:
       parameters:
         checkout: itwinjs-core
         downloadCurrentBuildArtifacts: 'true'
-
-# - job: Validate_Docs
-#   dependsOn: Generate_Docs
-#   displayName: Validate Docs
-#   condition: and(succeeded(), in(variables['Build.Reason'], 'IndividualCI', 'PullRequest', 'Manual'))
-#   workspace:
-#     clean: all
-#   pool:
-#     name: iModelTechCI
-#     demands:
-#     - Agent.OS -equals Windows_NT
-#     - npm
-
-#   steps:
-#     - checkout: itwinjs-core
-#       clean: true
-#     - task: NodeTool@0
-#       displayName: Use Node 14.16.0
-#       inputs:
-#         versionSpec: 14.16.0
-#         checkLatest: true
-#     - script: |
-#         git config --local user.email $(user_email)
-#         git config --local user.name $(username)
-#       displayName: Setup git config
-
-#     - template: common/config/azure-pipelines/templates/docs-build.yaml@itwinjs-core
-#       parameters:
-#         downloadCurrentBuildArtifacts: 'true'
-#         workingDir: $(Build.SourcesDirectory)
