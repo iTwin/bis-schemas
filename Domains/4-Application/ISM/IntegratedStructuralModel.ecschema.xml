@@ -2,10 +2,10 @@
 <ECSchema schemaName="IntegratedStructuralModel" alias="ism" version="01.00.03" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" displayLabel="Integrated Structural Model" description="Integrated Structural Model Schema.">
     <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
     <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
-    <ECSchemaReference name="BisCore" version="01.00.10" alias="bis" />
+    <ECSchemaReference name="BisCore" version="01.00.14" alias="bis" />
     <ECSchemaReference name="Analytical" version="01.00.00" alias="anlyt" />
     <ECSchemaReference name="AecUnits" version="01.00.03" alias="AECU" />
-    <ECSchemaReference name="StructuralAnalysis" version="01.00.00" alias="sa" />
+    <ECSchemaReference name="StructuralAnalysis" version="01.00.03" alias="sa" />
 
     <ECCustomAttributes>
         <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
@@ -16,19 +16,19 @@
         </SchemaLayerInfo>
     </ECCustomAttributes>
 
-    <ECRelationshipClass typeName="IsmObject_Object" modifier="None" strength="referencing" strengthDirection="forward" description="">
+    <ECRelationshipClass typeName="IsmObject_Object" modifier="None" strength="referencing" strengthDirection="forward">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
-        <Source multiplicity="(0..*)" roleLabel="has IsmObject" polymorphic="True">
+        <Source multiplicity="(0..*)" roleLabel="has IsmObject" polymorphic="true">
             <Class class="bis:Element" />
         </Source>
-        <Target multiplicity="(0..*)" roleLabel="is used by IsmObject" polymorphic="True">
+        <Target multiplicity="(0..*)" roleLabel="is used by IsmObject" polymorphic="true">
             <Class class="bis:Element" />
         </Target>
     </ECRelationshipClass>
 
     <ECEntityClass typeName="IIsmPropertyHolder" modifier="Abstract">
         <ECCustomAttributes>
-            <IsMixin xmlns="CoreCustomAttributes.01.00.00">
+            <IsMixin xmlns="CoreCustomAttributes.01.00.03">
                 <AppliesToEntityClass>bis:Element</AppliesToEntityClass>
             </IsMixin>
         </ECCustomAttributes>
@@ -37,7 +37,7 @@
     <ECEntityClass typeName="IIsmObject" displayLabel="IIsm Object" modifier="Abstract">
         <BaseClass>IIsmPropertyHolder</BaseClass>
         <ECCustomAttributes>
-            <IsMixin xmlns="CoreCustomAttributes.01.00.00">
+            <IsMixin xmlns="CoreCustomAttributes.01.00.03">
                 <AppliesToEntityClass>bis:Element</AppliesToEntityClass>
             </IsMixin>
         </ECCustomAttributes>
@@ -80,29 +80,29 @@
         <BaseClass>bis:DefinitionElement</BaseClass>
         <BaseClass>IIsmObject</BaseClass>
         <ECProperty propertyName="Area" typeName="double" displayLabel="Area" kindOfQuantity="AECU:AREA_SMALL" />
-        <ECProperty propertyName="Coating" typeName="RebarMaterialCoatingType" displayName="Coating" />
+        <ECProperty propertyName="Coating" typeName="RebarMaterialCoatingType" displayLabel="Coating" />
         <ECProperty propertyName="DetailingCode" typeName="RebarMaterialDetailingCodeType" displayLabel="Detailing Code" />
         <ECProperty propertyName="Diameter" typeName="double" displayLabel="Diameter" kindOfQuantity="AECU:LENGTH_SHORT" />
         <ECProperty propertyName="Surface" typeName="RebarMaterialSurfaceType" displayLabel="Surface" />
         <ECProperty propertyName="YieldStress" typeName="double" displayLabel="Yield Stress" kindOfQuantity="AECU:PRESSURE" />
     </ECEntityClass>
 
-    <ECRelationshipClass typeName="IsmRebar_Material" modifier="None" strength="referencing" strengthDirection="forward" description="">
+    <ECRelationshipClass typeName="IsmRebar_Material" modifier="None" strength="referencing" strengthDirection="forward">
         <BaseClass>IsmObject_Object</BaseClass>
-        <Source multiplicity="(0..*)" roleLabel="has material" polymorphic="True">
+        <Source multiplicity="(0..*)" roleLabel="has material" polymorphic="true">
             <Class class="IsmRebar" />
         </Source>
-        <Target multiplicity="(0..1)" roleLabel="is used by bars" polymorphic="True">
+        <Target multiplicity="(0..1)" roleLabel="is used by bars" polymorphic="true">
             <Class class="IsmRebarMaterial" />
         </Target>
     </ECRelationshipClass>
 
-    <ECRelationshipClass typeName="IsmRebar_Members" modifier="None" strength="referencing" strengthDirection="forward" description="">
+    <ECRelationshipClass typeName="IsmRebar_Members" modifier="None" strength="referencing" strengthDirection="forward">
         <BaseClass>IsmObject_Object</BaseClass>
-        <Source multiplicity="(0..*)" roleLabel="has material" polymorphic="True">
+        <Source multiplicity="(0..*)" roleLabel="has material" polymorphic="true">
             <Class class="IsmRebar" />
         </Source>
-        <Target multiplicity="(0..*)" roleLabel="is used by bars" polymorphic="True">
+        <Target multiplicity="(0..*)" roleLabel="is used by bars" polymorphic="true">
             <Class class="sa:Member" />
         </Target>
     </ECRelationshipClass>
@@ -110,7 +110,7 @@
     <ECEntityClass typeName="IIsmSubObject" displayLabel="IIsm Sub Object" modifier="Abstract">
         <BaseClass>IIsmObject</BaseClass>
         <ECCustomAttributes>
-            <IsMixin xmlns="CoreCustomAttributes.01.00.00">
+            <IsMixin xmlns="CoreCustomAttributes.01.00.03">
                 <AppliesToEntityClass>bis:Element</AppliesToEntityClass>
             </IsMixin>
         </ECCustomAttributes>
@@ -153,12 +153,12 @@
         <BaseClass>IIsmObject</BaseClass>
     </ECEntityClass>
 
-    <ECRelationshipClass typeName="IsmRebar_Cage" modifier="None" strength="referencing" strengthDirection="forward" description="">
+    <ECRelationshipClass typeName="IsmRebar_Cage" modifier="None" strength="referencing" strengthDirection="forward">
         <BaseClass>IsmObject_Object</BaseClass>
-        <Source multiplicity="(0..*)" roleLabel="Is part of cage" polymorphic="True">
+        <Source multiplicity="(0..*)" roleLabel="Is part of cage" polymorphic="true">
             <Class class="IsmRebar" />
         </Source>
-        <Target multiplicity="(0..1)" roleLabel="contains bars" polymorphic="False">
+        <Target multiplicity="(0..1)" roleLabel="contains bars" polymorphic="false">
             <Class class="IsmRebarCage" />
         </Target>
     </ECRelationshipClass>
@@ -262,56 +262,79 @@
         <ECEnumerator value="30" name="Bar" displayLabel="Bar" />
     </ECEnumeration>
 
-    <ECEnumeration typeName="TendonDuctShapeType" backingTypeName="int" isStrict="true">
+    <ECEnumeration typeName="TendonDuctProfile" backingTypeName="int" isStrict="true">
         <ECEnumerator value="0" name="Unspecified" displayLabel="Unspecified" />
         <ECEnumerator value="10" name="Flat" displayLabel="Flat" />
         <ECEnumerator value="20" name="Round" displayLabel="Round" />
         <ECEnumerator value="30" name="Oval" displayLabel="Oval" />
     </ECEnumeration>
 
-    <ECEntityClass typeName="IsmTendonSet" modifier="None" displayLabel="Tendon Set">
+    <ECEnumeration typeName="DuctMaterial" backingTypeName="int" isStrict="true">
+        <ECEnumerator value="0" name="Unspecified" displayLabel="Unspecified" />
+        <ECEnumerator value="10" name="Plastic" displayLabel="Plastic" />
+        <ECEnumerator value="20" name="Steel" displayLabel="Steel" />
+    </ECEnumeration>
+
+    <ECEnumeration typeName="PostTensioningSystem" backingTypeName="int" isStrict="true">
+        <ECEnumerator value="0" name="Unspecified" displayLabel="Unspecified" />
+        <ECEnumerator value="10" name="Bonded" displayLabel="Bonded" />
+        <ECEnumerator value="20" name="Unbonded" displayLabel="Unbonded" />
+    </ECEnumeration>
+
+    <ECEnumeration typeName="AnchorType" backingTypeName="int" isStrict="true">
+        <ECEnumerator value="0" name="Unspecified" displayLabel="Unspecified" />
+        <ECEnumerator value="10" name="Monostrand" displayLabel="Monostrand" />
+        <ECEnumerator value="20" name="FlatMultiPlane" displayLabel="Flat Multi Plane" />
+        <ECEnumerator value="30" name="FlatSinglePlane" displayLabel="Flat Single Plane" />
+        <ECEnumerator value="40" name="CircularMultiPlane" displayLabel="Circular Multi Plane" />
+        <ECEnumerator value="50" name="CircularSinglePlane" displayLabel="Circular Single Plane" />
+        <ECEnumerator value="60" name="SquareMultiPlane" displayLabel="Square Multi Plane" />
+        <ECEnumerator value="70" name="SquareSinglePlane" displayLabel="Square Single Plane" />
+    </ECEnumeration>
+
+    <ECEntityClass typeName="IsmTendonSet" modifier="Sealed" displayLabel="Tendon Set">
         <BaseClass>bis:InformationRecordElement</BaseClass>
         <BaseClass>IIsmObject</BaseClass>
     </ECEntityClass>
 
-    <ECRelationshipClass typeName="IsmTendonSet_Members" modifier="None" strength="referencing" strengthDirection="forward" description="">
+    <ECRelationshipClass typeName="IsmTendonSet_Members" modifier="Sealed" strength="referencing" strengthDirection="forward">
         <BaseClass>IsmObject_Object</BaseClass>
-        <Source multiplicity="(0..*)" roleLabel="is located in members" polymorphic="False">
+        <Source multiplicity="(0..*)" roleLabel="is located in members" polymorphic="false">
             <Class class="IsmTendonSet" />
         </Source>
-        <Target multiplicity="(0..*)" roleLabel="has tendon sets" polymorphic="True">
+        <Target multiplicity="(0..*)" roleLabel="has tendon sets" polymorphic="true">
             <Class class="sa:Member" />
         </Target>
     </ECRelationshipClass>
 
-    <ECEntityClass typeName="IsmTendonNode" modifier="None" displayLabel="Tendon Node">
+    <ECEntityClass typeName="IsmTendonNode" modifier="Sealed" displayLabel="Tendon Node">
         <BaseClass>anlyt:AnalyticalElement</BaseClass>
         <BaseClass>IIsmSubObject</BaseClass>
         <ECProperty propertyName="Location" typeName="point3d" displayLabel="Location" />
     </ECEntityClass>
 
-    <ECRelationshipClass typeName="IsmTendonSet_Nodes" modifier="None" strength="referencing" strengthDirection="forward" description="">
+    <ECRelationshipClass typeName="IsmTendonSet_Nodes" modifier="Sealed" strength="referencing" strengthDirection="forward">
         <BaseClass>IsmObject_Object</BaseClass>
-        <Source multiplicity="(0..1)" roleLabel="owns nodes" polymorphic="False">
+        <Source multiplicity="(0..1)" roleLabel="owns nodes" polymorphic="false">
             <Class class="IsmTendonSet" />
         </Source>
-        <Target multiplicity="(0..*)" roleLabel="is owned by set" polymorphic="False">
+        <Target multiplicity="(0..*)" roleLabel="is owned by set" polymorphic="false">
             <Class class="IsmTendonNode" />
         </Target>
     </ECRelationshipClass>
 
-    <ECEntityClass typeName="IsmTendon" modifier="None" displayLabel="Tendon">
+    <ECEntityClass typeName="IsmTendon" modifier="Sealed" displayLabel="Tendon">
         <BaseClass>anlyt:AnalyticalElement</BaseClass>
         <BaseClass>IIsmSubObject</BaseClass>
         <ECProperty propertyName="StrandCount" typeName="double" displayLabel="Strand Count" />
     </ECEntityClass>
 
-    <ECRelationshipClass typeName="IsmTendonSet_Tendon" modifier="None" strength="referencing" strengthDirection="forward" description="">
+    <ECRelationshipClass typeName="IsmTendonSet_Tendon" modifier="Sealed" strength="referencing" strengthDirection="forward">
         <BaseClass>IsmObject_Object</BaseClass>
-        <Source multiplicity="(0..1)" roleLabel="owns tendons" polymorphic="False">
+        <Source multiplicity="(0..1)" roleLabel="owns tendons" polymorphic="false">
             <Class class="IsmTendonSet" />
         </Source>
-        <Target multiplicity="(0..*)" roleLabel="is part of a set" polymorphic="False">
+        <Target multiplicity="(0..*)" roleLabel="is part of a set" polymorphic="false">
             <Class class="IsmTendon" />
         </Target>
     </ECRelationshipClass>
@@ -322,33 +345,46 @@
         <ECProperty propertyName="AngularFriction" typeName="double" displayLabel="Angular Friction" />
         <ECProperty propertyName="WobbleFriction" typeName="double" displayLabel="Wobble Friction" />
         <ECProperty propertyName="StrandType" typeName="TendonStrandType" displayLabel="Strand Type" />
-        <ECProperty propertyName="StrandArea" typeName="double" displayLabel="Strand Area" kindOfQuantity="AECU:AREA_SMALL" />
-        <ECProperty propertyName="StrandElasticModulus" typeName="double" displayLabel="Strand Elastic Modulus" kindOfQuantity="AECU:PRESSURE" />
-        <ECProperty propertyName="StrandUltimateTensileStrength" typeName="double" displayLabel="Strand Ultimate Tensile Strength" kindOfQuantity="AECU:PRESSURE" />
-        <ECProperty propertyName="StrandYieldStrength" typeName="double" displayLabel="Strand Yield Strength" kindOfQuantity="AECU:PRESSURE" />
-        <ECProperty propertyName="StrandFinalEffectiveStress" typeName="double" displayLabel="Strand Final Effective Stress" kindOfQuantity="AECU:PRESSURE" />
-        <ECProperty propertyName="LongTermLosses" typeName="double" displayLabel="Long Term Losses" kindOfQuantity="AECU:PRESSURE" />
-        <ECProperty propertyName="MinCurvatureRadius" typeName="double" displayLabel="Minimum Curvature Radius" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="StrandArea" typeName="double" displayLabel="Strand Area" />
+        <ECProperty propertyName="StrandElasticModulus" typeName="double" displayLabel="Strand Elastic Modulus" />
+        <ECProperty propertyName="StrandUltimateTensileStrength" typeName="double" displayLabel="Strand Ultimate Tensile Strength" />
+        <ECProperty propertyName="StrandYieldStrength" typeName="double" displayLabel="Strand Yield Strength" />
+        <ECProperty propertyName="StrandFinalEffectiveStress" typeName="double" displayLabel="Strand Final Effective Stress" />
+        <ECProperty propertyName="LongTermLosses" typeName="double" displayLabel="Long Term Losses" />
+        <ECProperty propertyName="MinCurvatureRadius" typeName="double" displayLabel="Minimum Curvature Radius" />
+        <ECProperty propertyName="PostTensioningSystem" typeName="PostTensioningSystem" displayLabel="Post Tensioning System" />
     </ECEntityClass>
 
-    <ECEntityClass typeName="IsmTendonDuctedSystem" modifier="None" displayLabel="Tendon Ducted System">
+    <ECEntityClass typeName="IsmTendonDuctedSystem" modifier="Abstract" displayLabel="Tendon Ducted System">
         <BaseClass>IsmTendonSystem</BaseClass>
-        <ECProperty propertyName="DuctShape" typeName="TendonDuctShapeType" displayLabel="Duct Shape" />
-        <ECProperty propertyName="DuctWidth" typeName="double" displayLabel="Duct Width" kindOfQuantity="AECU:LENGTH_SHORT" />
-        <ECProperty propertyName="DuctHeight" typeName="double" displayLabel="Duct Height" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="DuctProfile" typeName="TendonDuctProfile" displayLabel="Duct Profile" />
+        <ECProperty propertyName="DuctWidth" typeName="double" displayLabel="Duct Width" />
+        <ECProperty propertyName="DuctHeight" typeName="double" displayLabel="Duct Height" />
         <ECProperty propertyName="StrandsPerDuct" typeName="double" displayLabel="Strands per Duct" />
+        <ECProperty propertyName="DuctWallThickness" typeName="double" displayLabel="Duct Wall Thickness" />
+        <ECProperty propertyName="DuctMaterial" typeName="DuctMaterial" displayLabel="Duct Material" />
     </ECEntityClass>
 
-    <ECEntityClass typeName="IsmTendonTightlySheathedSystem" modifier="None" displayLabel="Tendon Tightly Sheathed System">
+    <ECEntityClass typeName="IsmTendonCorrugatedDuctedSystem" modifier="Sealed" displayLabel="Tendon Corrugated Ducted System">
+        <BaseClass>IsmTendonDuctedSystem</BaseClass>
+        <ECProperty propertyName="CorrugationDimension" typeName="double" displayLabel="Corrugation Dimension" />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="IsmTendonSmoothDuctedSystem" modifier="Sealed" displayLabel="Tendon Smooth Ducted System">
+        <BaseClass>IsmTendonDuctedSystem</BaseClass>
+    </ECEntityClass>
+
+	<ECEntityClass typeName="IsmTendonTightlySheathedSystem" modifier="Sealed" displayLabel="Tendon Tightly Sheathed System">
         <BaseClass>IsmTendonSystem</BaseClass>
+        <ECProperty propertyName="Diameter" typeName="double" displayLabel="Diameter" />
     </ECEntityClass>
 
-    <ECRelationshipClass typeName="IsmTendon_System" modifier="None" strength="referencing" strengthDirection="forward" description="">
+    <ECRelationshipClass typeName="IsmTendon_System" modifier="Sealed" strength="referencing" strengthDirection="forward">
         <BaseClass>IsmObject_Object</BaseClass>
-        <Source multiplicity="(0..*)" roleLabel="uses system" polymorphic="False">
+        <Source multiplicity="(0..*)" roleLabel="uses system" polymorphic="false">
             <Class class="IsmTendon" />
         </Source>
-        <Target multiplicity="(0..1)" roleLabel="is system for" polymorphic="True">
+        <Target multiplicity="(0..1)" roleLabel="is system for" polymorphic="true">
             <Class class="IsmTendonSystem" />
         </Target>
     </ECRelationshipClass>
@@ -356,41 +392,45 @@
     <ECEntityClass typeName="IsmTendonPart" modifier="Abstract" displayLabel="Tendon Part">
         <BaseClass>anlyt:AnalyticalElement</BaseClass>
         <BaseClass>IIsmSubObject</BaseClass>
+        <ECProperty propertyName="Orientation" typeName="point3d" displayLabel="Orientation" />
     </ECEntityClass>
 
-    <ECRelationshipClass typeName="IsmTendon_TendonPart" modifier="None" strength="referencing" strengthDirection="forward" description="">
+    <ECRelationshipClass typeName="IsmTendon_TendonPart" modifier="Sealed" strength="referencing" strengthDirection="forward">
         <BaseClass>IsmObject_Object</BaseClass>
-        <Source multiplicity="(0..1)" roleLabel="owns parts" polymorphic="False">
+        <Source multiplicity="(0..1)" roleLabel="owns parts" polymorphic="false">
             <Class class="IsmTendon" />
         </Source>
-        <Target multiplicity="(0..*)" roleLabel="is part of tendon" polymorphic="True">
+        <Target multiplicity="(0..*)" roleLabel="is part of tendon" polymorphic="true">
             <Class class="IsmTendonPart" />
         </Target>
     </ECRelationshipClass>
 
-    <ECEntityClass typeName="IsmTendonSegment" modifier="None" displayLabel="Tendon Segment">
+    <ECEntityClass typeName="IsmTendonSegment" modifier="Sealed" displayLabel="Tendon Segment">
         <BaseClass>IsmTendonPart</BaseClass>
         <ECProperty propertyName="Harped" typeName="boolean" displayLabel="Harped" />
         <ECProperty propertyName="InflectionRatio" typeName="double" displayLabel="Inflection Ratio" />
-        <ECProperty propertyName="Location" typeName="Bentley.Geometry.Common.IGeometry" />
+        <ECProperty propertyName="Location" typeName="Bentley.Geometry.Common.IGeometry" displayLabel="Location" />
+        <ECProperty propertyName="DuctLocation" typeName="Bentley.Geometry.Common.IGeometry" displayLabel="Duct Location" />
+        <ECProperty propertyName="StartStress" typeName="double" displayLabel="Start Stress" />
+        <ECProperty propertyName="EndStress" typeName="double" displayLabel="End Stress" />
     </ECEntityClass>
 
-    <ECRelationshipClass typeName="IsmTendonSegment_StartNode" modifier="None" strength="referencing" strengthDirection="forward" description="">
+    <ECRelationshipClass typeName="IsmTendonSegment_StartNode" modifier="Sealed" strength="referencing" strengthDirection="forward">
         <BaseClass>IsmObject_Object</BaseClass>
-        <Source multiplicity="(0..*)" roleLabel="has start node" polymorphic="False">
+        <Source multiplicity="(0..*)" roleLabel="has start node" polymorphic="false">
             <Class class="IsmTendonSegment" />
         </Source>
-        <Target multiplicity="(0..1)" roleLabel="is start node for segment" polymorphic="False">
+        <Target multiplicity="(0..1)" roleLabel="is start node for segment" polymorphic="false">
             <Class class="IsmTendonNode" />
         </Target>
     </ECRelationshipClass>
 
-    <ECRelationshipClass typeName="IsmTendonSegment_EndNode" modifier="None" strength="referencing" strengthDirection="forward" description="">
+    <ECRelationshipClass typeName="IsmTendonSegment_EndNode" modifier="Sealed" strength="referencing" strengthDirection="forward">
         <BaseClass>IsmObject_Object</BaseClass>
-        <Source multiplicity="(0..*)" roleLabel="has end node" polymorphic="False">
+        <Source multiplicity="(0..*)" roleLabel="has end node" polymorphic="false">
             <Class class="IsmTendonSegment" />
         </Source>
-        <Target multiplicity="(0..1)" roleLabel="is end node for segment" polymorphic="False">
+        <Target multiplicity="(0..1)" roleLabel="is end node for segment" polymorphic="false">
             <Class class="IsmTendonNode" />
         </Target>
     </ECRelationshipClass>
@@ -398,27 +438,28 @@
     <ECEntityClass typeName="IsmTendonAnchor" modifier="Abstract" displayLabel="Tendon Anchor">
         <BaseClass>IsmTendonPart</BaseClass>
         <ECProperty propertyName="AnchorFriction" typeName="double" displayLabel="Anchor Friction" />
-        <ECProperty propertyName="Orientation" typeName="point3d" displayLabel="Orientation" />
+        <ECProperty propertyName="AnchorType" typeName="AnchorType" displayLabel="Anchor Type" />
+        <ECProperty propertyName="Direction" typeName="point3d" displayLabel="Direction" />
     </ECEntityClass>
 
-    <ECRelationshipClass typeName="IsmTendonAnchor_Node" modifier="None" strength="referencing" strengthDirection="forward" description="">
+    <ECRelationshipClass typeName="IsmTendonAnchor_Node" modifier="Sealed" strength="referencing" strengthDirection="forward">
         <BaseClass>IsmObject_Object</BaseClass>
-        <Source multiplicity="(0..1)" roleLabel="is located on a node" polymorphic="True">
+        <Source multiplicity="(0..1)" roleLabel="is located on a node" polymorphic="true">
             <Class class="IsmTendonAnchor" />
         </Source>
-        <Target multiplicity="(0..1)" roleLabel="is location node for anchor" polymorphic="False">
+        <Target multiplicity="(0..1)" roleLabel="is location node for anchor" polymorphic="false">
             <Class class="IsmTendonNode" />
         </Target>
     </ECRelationshipClass>
 
-    <ECEntityClass typeName="IsmTendonTensioningEndAnchor" modifier="None" displayLabel="Tendon Tensioning-End Anchor">
+    <ECEntityClass typeName="IsmTendonTensioningEndAnchor" modifier="Sealed" displayLabel="Tendon Tensioning-End Anchor">
         <BaseClass>IsmTendonAnchor</BaseClass>
-        <ECProperty propertyName="JackStress" typeName="double" displayLabel="Jack Stress" kindOfQuantity="AECU:PRESSURE" />
-        <ECProperty propertyName="SeatingDistance" typeName="double" displayLabel="Seating Distance" kindOfQuantity="AECU:LENGTH_SHORT" />
-        <ECProperty propertyName="Elongation" typeName="double" displayLabel="Elongation" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="JackStress" typeName="double" displayLabel="Jack Stress" />
+        <ECProperty propertyName="SeatingDistance" typeName="double" displayLabel="Seating Distance" />
+        <ECProperty propertyName="Elongation" typeName="double" displayLabel="Elongation" />
     </ECEntityClass>
 
-    <ECEntityClass typeName="IsmTendonFixedEndAnchor" modifier="None" displayLabel="Tendon Fixed-End Anchor">
+    <ECEntityClass typeName="IsmTendonFixedEndAnchor" modifier="Sealed" displayLabel="Tendon Fixed-End Anchor">
         <BaseClass>IsmTendonAnchor</BaseClass>
     </ECEntityClass>
 
@@ -481,152 +522,152 @@
         <ECEnumerator value="1300" name="Other" displayLabel="Other" />
     </ECEnumeration>
 
-    <ECRelationshipClass typeName="IsmAnalysisResults_AnalysisDesign" modifier="None" strength="referencing" strengthDirection="forward" descriptoin="">
+    <ECRelationshipClass typeName="IsmAnalysisResults_AnalysisDesign" modifier="None" strength="referencing" strengthDirection="forward">
         <BaseClass>IsmObject_Object</BaseClass>
-        <Source multiplicity="(0..1)" roleLabel="belongs to analysis results" polymorphic="False">
+        <Source multiplicity="(0..1)" roleLabel="belongs to analysis results" polymorphic="false">
             <Class class="IsmAnalysisResults" />
         </Source>
-        <Target multiplicity="(0..1)" roleLabel="owns results" polymorphic="False">
+        <Target multiplicity="(0..1)" roleLabel="owns results" polymorphic="false">
             <Class class="IsmAnalysisDesign" />
         </Target>
     </ECRelationshipClass>
 
-    <ECRelationshipClass typeName="IsmDesignResults_AnalysisDesign" modifier="None" strength="referencing" strengthDirection="forward" description="">
+    <ECRelationshipClass typeName="IsmDesignResults_AnalysisDesign" modifier="None" strength="referencing" strengthDirection="forward">
         <BaseClass>IsmObject_Object</BaseClass>
-        <Source multiplicity="(0..1)" roleLabel="is owned by analysis design" polymorphic="False">
+        <Source multiplicity="(0..1)" roleLabel="is owned by analysis design" polymorphic="false">
             <Class class="IsmDesignResults" />
         </Source>
-        <Target multiplicity="(0..1)" roleLabel="owns" polymorphic="False">
+        <Target multiplicity="(0..1)" roleLabel="owns" polymorphic="false">
             <Class class="IsmAnalysisDesign" />
         </Target>
     </ECRelationshipClass>
 
-    <ECRelationshipClass typeName="IsmMemberDesignCriteria_AnalysisDesign" modifier="None" strength="referencing" strengthDirection="forward" description="">
+    <ECRelationshipClass typeName="IsmMemberDesignCriteria_AnalysisDesign" modifier="None" strength="referencing" strengthDirection="forward">
         <BaseClass>IsmObject_Object</BaseClass>
-        <Source multiplicity="(0..1)" roleLabel="is owned by analysis design" polymorphic="True">
+        <Source multiplicity="(0..1)" roleLabel="is owned by analysis design" polymorphic="true">
             <Class class="IsmMemberDesignCriteria" />
         </Source>
-        <Target multiplicity="(0..*)" roleLabel="owns criteria" polymorphic="True">
+        <Target multiplicity="(0..*)" roleLabel="owns criteria" polymorphic="true">
             <Class class="IsmAnalysisDesign" />
         </Target>
     </ECRelationshipClass>
 
-    <ECRelationshipClass typeName="IsmAnalysisResults_MaxDisplacementLoadCase" modifier="None" strength="referencing" strengthDirection="forward" description="">
+    <ECRelationshipClass typeName="IsmAnalysisResults_MaxDisplacementLoadCase" modifier="None" strength="referencing" strengthDirection="forward">
         <BaseClass>IsmObject_Object</BaseClass>
-        <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="False">
+        <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="false">
             <Class class="IsmAnalysisResults" />
         </Source>
-        <Target multiplicity="(0..1)" roleLabel="is referred by" polymorphic="True">
+        <Target multiplicity="(0..1)" roleLabel="is referred by" polymorphic="true">
             <Class class="sa:LoadCase" />
         </Target>
     </ECRelationshipClass>
 
-    <ECRelationshipClass typeName="IsmMemberAnalysisResults_AnalysisResults" modifier="None" strength="referencing" strengthDirection="forward" description="">
+    <ECRelationshipClass typeName="IsmMemberAnalysisResults_AnalysisResults" modifier="None" strength="referencing" strengthDirection="forward">
         <BaseClass>IsmObject_Object</BaseClass>
-        <Source multiplicity="(0..*)" roleLabel="is owned by analysis results" polymorphic="True">
+        <Source multiplicity="(0..*)" roleLabel="is owned by analysis results" polymorphic="true">
             <Class class="IsmMemberAnalysisResults" />
         </Source>
-        <Target multiplicity="(0..1)" roleLabel="has member results" polymorphic="False">
+        <Target multiplicity="(0..1)" roleLabel="has member results" polymorphic="false">
             <Class class="IsmAnalysisResults" />
         </Target>
     </ECRelationshipClass>
 
-    <ECRelationshipClass typeName="IsmMemberAnalysisResults_Member" modifier="None" strength="referencing" strengthDirection="forward" description="">
+    <ECRelationshipClass typeName="IsmMemberAnalysisResults_Member" modifier="None" strength="referencing" strengthDirection="forward">
         <BaseClass>IsmObject_Object</BaseClass>
-        <Source multiplicity="(0..1)" roleLabel="refers to a member" polymorphic="True">
+        <Source multiplicity="(0..1)" roleLabel="refers to a member" polymorphic="true">
             <Class class="IsmMemberAnalysisResults" />
         </Source>
-        <Target multiplicity="(0..1)" roleLabel="is referred by results" polymorphic="True">
+        <Target multiplicity="(0..1)" roleLabel="is referred by results" polymorphic="true">
             <Class class="sa:Member" />
         </Target>
     </ECRelationshipClass>
 
-    <ECRelationshipClass typeName="IsmCurveMemberAnalysisResults_MaxDisplacementLoadCase" modifier="None" strength="referencing" strengthDirection="forward" description="">
+    <ECRelationshipClass typeName="IsmCurveMemberAnalysisResults_MaxDisplacementLoadCase" modifier="None" strength="referencing" strengthDirection="forward">
         <BaseClass>IsmObject_Object</BaseClass>
-        <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="True">
+        <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="true">
             <Class class="IsmCurveMemberAnalysisResults" />
         </Source>
-        <Target multiplicity="(0..1)" roleLabel="is referred by" polymorphic="True">
+        <Target multiplicity="(0..1)" roleLabel="is referred by" polymorphic="true">
             <Class class="sa:LoadCase" />
         </Target>
     </ECRelationshipClass>
 
-    <ECRelationshipClass typeName="IsmDesignResults_CriticalMemberResults" modifier="None" strength="referencing" strengthDirection="forward" description="">
+    <ECRelationshipClass typeName="IsmDesignResults_CriticalMemberResults" modifier="None" strength="referencing" strengthDirection="forward">
         <BaseClass>IsmObject_Object</BaseClass>
-        <Source multiplicity="(0..1)" roleLabel="refers to" polymorphic="False">
+        <Source multiplicity="(0..1)" roleLabel="refers to" polymorphic="false">
             <Class class="IsmDesignResults" />
         </Source>
-        <Target multiplicity="(0..1)" roleLabel="is referred by" polymorphic="True">
+        <Target multiplicity="(0..1)" roleLabel="is referred by" polymorphic="true">
             <Class class="IsmMemberDesignResults" />
         </Target>
     </ECRelationshipClass>
 
-    <ECRelationshipClass typeName="IsmMemberDesignResults_DesignResults" modifier="None" strength="referencing" strengthDirection="forward" description="">
+    <ECRelationshipClass typeName="IsmMemberDesignResults_DesignResults" modifier="None" strength="referencing" strengthDirection="forward">
         <BaseClass>IsmObject_Object</BaseClass>
-        <Source multiplicity="(0..1)" roleLabel="is referred by" polymorphic="True">
+        <Source multiplicity="(0..1)" roleLabel="is referred by" polymorphic="true">
             <Class class="IsmMemberDesignResults" />
         </Source>
-        <Target multiplicity="(0..*)" roleLabel="refers to" polymorphic="False">
+        <Target multiplicity="(0..*)" roleLabel="refers to" polymorphic="false">
             <Class class="IsmDesignResults" />
         </Target>
     </ECRelationshipClass>
 
-    <ECRelationshipClass typeName="IsmMemberDesignResults_ConsideredLoadCases" modifier="None" strength="referencing" strengthDirection="forward" description="">
+    <ECRelationshipClass typeName="IsmMemberDesignResults_ConsideredLoadCases" modifier="None" strength="referencing" strengthDirection="forward">
         <BaseClass>IsmObject_Object</BaseClass>
-        <Source multiplicity="(0..*)" roleLabel="is referred by" polymorphic="True">
+        <Source multiplicity="(0..*)" roleLabel="is referred by" polymorphic="true">
             <Class class="IsmMemberDesignResults" />
         </Source>
-        <Target multiplicity="(0..*)" roleLabel="refers to" polymorphic="False">
+        <Target multiplicity="(0..*)" roleLabel="refers to" polymorphic="false">
             <Class class="sa:LoadCase" />
         </Target>
     </ECRelationshipClass>
 
-    <ECRelationshipClass typeName="IsmMemberDesignResults_Member" modifier="None" strength="referencing" strengthDirection="forward" description="">
+    <ECRelationshipClass typeName="IsmMemberDesignResults_Member" modifier="None" strength="referencing" strengthDirection="forward">
         <BaseClass>IsmObject_Object</BaseClass>
-        <Source multiplicity="(0..1)" roleLabel="refers to a member" polymorphic="True">
+        <Source multiplicity="(0..1)" roleLabel="refers to a member" polymorphic="true">
             <Class class="IsmMemberDesignResults" />
         </Source>
-        <Target multiplicity="(0..1)" roleLabel="is referred by results" polymorphic="True">
+        <Target multiplicity="(0..1)" roleLabel="is referred by results" polymorphic="true">
             <Class class="sa:Member" />
         </Target>
     </ECRelationshipClass>
 
-    <ECRelationshipClass typeName="IsmMemberCheck_MemberDesignResults" modifier="None" strength="referencing" strengthDirection="forward" description="">
+    <ECRelationshipClass typeName="IsmMemberCheck_MemberDesignResults" modifier="None" strength="referencing" strengthDirection="forward">
         <BaseClass>IsmObject_Object</BaseClass>
-        <Source multiplicity="(0..1)" roleLabel="is owned by results" polymorphic="False">
+        <Source multiplicity="(0..1)" roleLabel="is owned by results" polymorphic="false">
             <Class class="IsmMemberCheck" />
         </Source>
-        <Target multiplicity="(0..*)" roleLabel="owns checks" polymorphic="True">
+        <Target multiplicity="(0..*)" roleLabel="owns checks" polymorphic="true">
             <Class class="IsmMemberDesignResults" />
         </Target>
     </ECRelationshipClass>
 
-    <ECRelationshipClass typeName="IsmDesignParameter_MemberDesignCriteria" modifier="None" strength="referencing" strengthDirection="forward" description="">
+    <ECRelationshipClass typeName="IsmDesignParameter_MemberDesignCriteria" modifier="None" strength="referencing" strengthDirection="forward">
         <BaseClass>IsmObject_Object</BaseClass>
-        <Source multiplicity="(0..1)" roleLabel="is owned by" polymorphic="False">
+        <Source multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
             <Class class="IsmDesignParameter" />
         </Source>
-        <Target multiplicity="(0..*)" roleLabel="owns" polymorphic="True">
+        <Target multiplicity="(0..*)" roleLabel="owns" polymorphic="true">
             <Class class="IsmMemberDesignCriteria" />
         </Target>
     </ECRelationshipClass>
 
-    <ECRelationshipClass typeName="IsmMemberDesignResults_MemberDesignCriteria" modifier="None" strength="referencing" strengthDirection="forward" description="">
+    <ECRelationshipClass typeName="IsmMemberDesignResults_MemberDesignCriteria" modifier="None" strength="referencing" strengthDirection="forward">
         <BaseClass>IsmObject_Object</BaseClass>
-        <Source multiplicity="(0..1)" roleLabel="refers to a criteria" polymorphic="True">
+        <Source multiplicity="(0..1)" roleLabel="refers to a criteria" polymorphic="true">
             <Class class="IsmMemberDesignResults" />
         </Source>
-        <Target multiplicity="(0..1)" roleLabel="is referred by results" polymorphic="True">
+        <Target multiplicity="(0..1)" roleLabel="is referred by results" polymorphic="true">
             <Class class="IsmMemberDesignCriteria" />
         </Target>
     </ECRelationshipClass>
 
-    <ECRelationshipClass typeName="IsmMemberCheck_CriticalLoadCase" modifier="None" strength="referencing" strengthDirection="forward" description="">
+    <ECRelationshipClass typeName="IsmMemberCheck_CriticalLoadCase" modifier="None" strength="referencing" strengthDirection="forward">
         <BaseClass>IsmObject_Object</BaseClass>
-        <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="False">
+        <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="false">
             <Class class="IsmMemberCheck" />
         </Source>
-        <Target multiplicity="(0..1)" roleLabel="is referred by" polymorphic="False">
+        <Target multiplicity="(0..1)" roleLabel="is referred by" polymorphic="false">
             <Class class="sa:LoadCase" />
         </Target>
     </ECRelationshipClass>
