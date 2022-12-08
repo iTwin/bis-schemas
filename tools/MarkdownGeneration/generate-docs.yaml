@@ -25,171 +25,152 @@ resources:
       endpoint: iModelJs
       name: iTwin/itwinjs-core
 
-jobs:
-- job: Generate_Docs
-  displayName: Generate Docs
-  workspace:
-    clean: all
+stages:
+  - stage: Generate_Docs
+    jobs:
+    - job:
+      displayName: Generate Docs
+      workspace:
+        clean: all
 
-  pool:
-    vmImage: windows-latest
+      pool:
+        vmImage: windows-latest
 
-  steps:
-  - script: npm install @bentley/ecjson2md@latest
-    displayName: Install ECJson2md
-    workingDirectory: $(Build.BinariesDirectory)
+      steps:
+      - script: npm install @bentley/ecjson2md@latest
+        displayName: Install ECJson2md
+        workingDirectory: $(Build.BinariesDirectory)
 
-  - task: CopyFiles@2
-    displayName: 'Copy all schemas to staging directory'
-    inputs:
-      SourceFolder: '$(System.DefaultWorkingDirectory)'
-      Contents: '**/*.ecschema.xml'
-      TargetFolder: '$(Build.StagingDirectory)\xml\'
+      - task: CopyFiles@2
+        displayName: 'Copy all schemas to staging directory'
+        inputs:
+          SourceFolder: '$(System.DefaultWorkingDirectory)'
+          Contents: '**/*.ecschema.xml'
+          TargetFolder: '$(Build.StagingDirectory)\xml\'
 
-  - task: PythonScript@0
-    displayName: Run Schema Json Serializer
-    inputs:
-      scriptSource: inline
-      script: |
-        import os, sys, shutil, subprocess
-        #from sets import Set
+      - task: PythonScript@0
+        displayName: Run Schema Json Serializer
+        inputs:
+          scriptSource: inline
+          script: |
+            import os, sys, shutil, subprocess
+            #from sets import Set
 
-        defaultWorkingDir = os.path.realpath(sys.argv[1])
+            defaultWorkingDir = os.path.realpath(sys.argv[1])
 
-        schemasToSkip = ["ECDbFileInfo", "ECDbSystem", "ECv3ConversionAttributes", "PresentationRules", "SchemaLocalizationCustomAttributes"]
-        # folders that contain a schema but aren't a released folder as reference directories.
-        refDir = set()
-        # all released schemas found by looking in 'Released' directories and pulling the highest schema version
-        releasedSchemas = {}
-        # files found in 'media' directories that do not end with .cmap
-        schemaMediaFiles = set()
-        for root, dirs, files in os.walk(defaultWorkingDir):
-                files.sort(reverse=True)
-                for fileName in files:
-                        # reference schema directories
-                        if "Released" not in root and fileName.endswith(".ecschema.xml"):
-                                refDir.add(root)
-                                print ("Added directory " + root + " as a reference path.")
-                        # Relesed schema Files
-                        if "Released" in root and fileName.endswith(".ecschema.xml"):
-                                schemaName = fileName[:fileName.index(".")]
-                                if schemaName not in releasedSchemas and schemaName not in schemasToSkip:
-                                        releasedSchemas[schemaName] = os.path.join(root, fileName)
-                                        print ("Added released schema " + fileName + " from directory " + root)
-                        # media files
-                        if "media" in root and "docs" not in root and not fileName.endswith(".cmap"):
-                                schemaMediaFiles.add(os.path.join(root, fileName))
-                                print ("Added media for schema " + fileName + " from directory " + root)
+            schemasToSkip = ["ECDbFileInfo", "ECDbSystem", "ECv3ConversionAttributes", "PresentationRules", "SchemaLocalizationCustomAttributes"]
+            # folders that contain a schema but aren't a released folder as reference directories.
+            refDir = set()
+            # all released schemas found by looking in 'Released' directories and pulling the highest schema version
+            releasedSchemas = {}
+            # files found in 'media' directories that do not end with .cmap
+            schemaMediaFiles = set()
+            for root, dirs, files in os.walk(defaultWorkingDir):
+                    files.sort(reverse=True)
+                    for fileName in files:
+                            # reference schema directories
+                            if "Released" not in root and fileName.endswith(".ecschema.xml"):
+                                    refDir.add(root)
+                                    print ("Added directory " + root + " as a reference path.")
+                            # Relesed schema Files
+                            if "Released" in root and fileName.endswith(".ecschema.xml"):
+                                    schemaName = fileName[:fileName.index(".")]
+                                    if schemaName not in releasedSchemas and schemaName not in schemasToSkip:
+                                            releasedSchemas[schemaName] = os.path.join(root, fileName)
+                                            print ("Added released schema " + fileName + " from directory " + root)
+                            # media files
+                            if "media" in root and "docs" not in root and not fileName.endswith(".cmap"):
+                                    schemaMediaFiles.add(os.path.join(root, fileName))
+                                    print ("Added media for schema " + fileName + " from directory " + root)
 
-        # add the released versions of the ECDb schemas because the real versions are not copied over
-        refDir.add(os.path.join(defaultWorkingDir, "Standard", "ECDb", "Released"))
-        rDir = ' '.join(refDir)
+            # add the released versions of the ECDb schemas because the real versions are not copied over
+            refDir.add(os.path.join(defaultWorkingDir, "Standard", "ECDb", "Released"))
+            rDir = ' '.join(refDir)
 
-        outputDir = os.path.join(os.path.realpath(sys.argv[2]), "json")
-        if not os.path.exists(outputDir):
-                os.makedirs(outputDir)
-        print ("Using the output directory, '" + outputDir + "'.")
+            outputDir = os.path.join(os.path.realpath(sys.argv[2]), "json")
+            if not os.path.exists(outputDir):
+                    os.makedirs(outputDir)
+            print ("Using the output directory, '" + outputDir + "'.")
 
-        mdOutputDir = os.path.join(os.path.realpath(sys.argv[2]), "markdown")
-        if not os.path.exists(mdOutputDir):
-                os.makedirs(mdOutputDir)
+            mdOutputDir = os.path.join(os.path.realpath(sys.argv[2]), "markdown")
+            if not os.path.exists(mdOutputDir):
+                    os.makedirs(mdOutputDir)
 
-        for schemaName, fullXmlSchemaPath in releasedSchemas.items():
-                # Copy all markdown files that also have a schema.
-                fullMdSchemaPath = os.path.join(fullXmlSchemaPath[:fullXmlSchemaPath.find("Released")], schemaName) + ".remarks.md"
-                if os.path.exists(fullMdSchemaPath):
-                        print ("Copying schema markdown file " + fullMdSchemaPath)
-                        shutil.copy(fullMdSchemaPath, mdOutputDir)
+            for schemaName, fullXmlSchemaPath in releasedSchemas.items():
+                    # Copy all markdown files that also have a schema.
+                    fullMdSchemaPath = os.path.join(fullXmlSchemaPath[:fullXmlSchemaPath.find("Released")], schemaName) + ".remarks.md"
+                    if os.path.exists(fullMdSchemaPath):
+                            print ("Copying schema markdown file " + fullMdSchemaPath)
+                            shutil.copy(fullMdSchemaPath, mdOutputDir)
 
-        mdMediaOutputDir = os.path.join(mdOutputDir, "media")
-        for mediaFile in schemaMediaFiles:
-                targetFilePath = os.path.join(mdMediaOutputDir, mediaFile.split('media\\')[-1])
-                if not os.path.exists(os.path.dirname(targetFilePath)):
-                        os.makedirs(os.path.dirname(targetFilePath))
-                if os.path.exists(targetFilePath):
-                        print ("ERROR - Cannot copy " + mediaFile + " because a file with the same name already exists in the media output directory.")
-                        exit(-1)
-                print ("Copying media file " + mediaFile)
-                shutil.copy(mediaFile, targetFilePath)
+            mdMediaOutputDir = os.path.join(mdOutputDir, "media")
+            for mediaFile in schemaMediaFiles:
+                    targetFilePath = os.path.join(mdMediaOutputDir, mediaFile.split('media\\')[-1])
+                    if not os.path.exists(os.path.dirname(targetFilePath)):
+                            os.makedirs(os.path.dirname(targetFilePath))
+                    if os.path.exists(targetFilePath):
+                            print ("ERROR - Cannot copy " + mediaFile + " because a file with the same name already exists in the media output directory.")
+                            exit(-1)
+                    print ("Copying media file " + mediaFile)
+                    shutil.copy(mediaFile, targetFilePath)
 
-      arguments: '$(System.DefaultWorkingDirectory) $(Build.StagingDirectory)'
+          arguments: '$(System.DefaultWorkingDirectory) $(Build.StagingDirectory)'
 
-  - task: Npm@1
-    displayName: 'npm install'
-    inputs:
-      workingDir: '$(Build.Repository.LocalPath)'
-      verbose: false
+      - task: Npm@1
+        displayName: 'npm install'
+        inputs:
+          workingDir: '$(Build.Repository.LocalPath)'
+          verbose: false
 
-  - task: Npm@1
-    displayName: 'Generate Json Schemas'
-    inputs:
-      command: custom
-      workingDir: '$(Build.Repository.LocalPath)'
-      verbose: false
-      customCommand: 'run generateJsonSchemas -- --latestReleasedVersionsForMarkdown --OutDir $(Build.StagingDirectory)/json/'
+      - task: Npm@1
+        displayName: 'Generate Json Schemas'
+        inputs:
+          command: custom
+          workingDir: '$(Build.Repository.LocalPath)'
+          verbose: false
+          customCommand: 'run generateJsonSchemas -- --latestReleasedVersionsForMarkdown --OutDir $(Build.StagingDirectory)/json/'
 
-  - script: |
-      mkdir $(Build.StagingDirectory)\markdown\
-      
-      cmd | for %%a in ($(Build.StagingDirectory)\json\*.json) do (
-        $(Build.BinariesDirectory)/node_modules/.bin/ecjson2md -i %%a -r $(Build.StagingDirectory)\json\ -o $(Build.StagingDirectory)\markdown\
-      )
-    displayName: 'Generate Markdown'
+      - script: |
+          mkdir $(Build.StagingDirectory)\markdown\
+          
+          cmd | for %%a in ($(Build.StagingDirectory)\json\*.json) do (
+            $(Build.BinariesDirectory)/node_modules/.bin/ecjson2md -i %%a -r $(Build.StagingDirectory)\json\ -o $(Build.StagingDirectory)\markdown\
+          )
+        displayName: 'Generate Markdown'
 
-  - task: CopyFiles@2
-    displayName: 'Copy Logo to Media Directory'
-    inputs:
-      SourceFolder: '$(Build.BinariesDirectory)/node_modules/@bentley/ecjson2md/lib/media/'
-      Contents: imodel-schema-editor-icon.png
-      TargetFolder: '$(Build.StagingDirectory)/markdown/media'
+      - task: CopyFiles@2
+        displayName: 'Copy Logo to Media Directory'
+        inputs:
+          SourceFolder: '$(Build.BinariesDirectory)/node_modules/@bentley/ecjson2md/lib/media/'
+          Contents: imodel-schema-editor-icon.png
+          TargetFolder: '$(Build.StagingDirectory)/markdown/media'
 
-  - task: PublishBuildArtifacts@1
-    displayName: 'Publish Artifact: Bis Docs'
-    inputs:
-      PathtoPublish: '$(Build.StagingDirectory)\markdown\'
-      ArtifactName: 'Bis Docs'
+      - task: PublishBuildArtifacts@1
+        displayName: 'Publish Artifact: Bis Docs'
+        inputs:
+          PathtoPublish: '$(Build.StagingDirectory)\markdown\'
+          ArtifactName: 'Bis Docs'
 
-  - task: PowerShell@2
-    condition: and(succeeded(), not(canceled()), startsWith(variables['Build.SourceBranchName'], 'refs/tags/imodeljs/'))
-    name: RetainTagBuildsOnSuccess
-    displayName: Retain Tag Builds on Success
-    inputs:
-      failOnStderr: true
-      targetType: 'inline'
-      script: |
-        $contentType = "application/json";
-        $headers = @{ Authorization = 'Bearer $(System.AccessToken)' };
-        $rawRequest = @{ daysValid = 365 * 1; definitionId = $(System.DefinitionId); ownerId = 'User:$(Build.RequestedForId)'; protectPipeline = $false; runId = $(Build.BuildId) };
-        $request = ConvertTo-Json @($rawRequest);
-        $uri = "$(System.CollectionUri)$(System.TeamProject)/_apis/build/retention/leases?api-version=6.0-preview.1";
-        Invoke-RestMethod -uri $uri -method POST -Headers $headers -ContentType $contentType -Body $request;
+      - task: PowerShell@2
+        condition: and(succeeded(), not(canceled()), startsWith(variables['Build.SourceBranchName'], 'refs/tags/imodeljs/'))
+        name: RetainTagBuildsOnSuccess
+        displayName: Retain Tag Builds on Success
+        inputs:
+          failOnStderr: true
+          targetType: 'inline'
+          script: |
+            $contentType = "application/json";
+            $headers = @{ Authorization = 'Bearer $(System.AccessToken)' };
+            $rawRequest = @{ daysValid = 365 * 1; definitionId = $(System.DefinitionId); ownerId = 'User:$(Build.RequestedForId)'; protectPipeline = $false; runId = $(Build.BuildId) };
+            $request = ConvertTo-Json @($rawRequest);
+            $uri = "$(System.CollectionUri)$(System.TeamProject)/_apis/build/retention/leases?api-version=6.0-preview.1";
+            Invoke-RestMethod -uri $uri -method POST -Headers $headers -ContentType $contentType -Body $request;
 
-- job: Validate_Docs
-  dependsOn: Generate_Docs
-  displayName: Validate Docs
-  condition: and(succeeded(), in(variables['Build.Reason'], 'IndividualCI', 'PullRequest', 'Manual'))
-  workspace:
-    clean: all
-  pool:
-    name: iModelTechCI
-    demands:
-    - Agent.OS -equals Windows_NT
-    - npm
-
-  steps:
-    - checkout: itwinjs-core
-      clean: true
-    - task: NodeTool@0
-      displayName: Use Node 14.16.0
-      inputs:
-        versionSpec: 14.16.0
-        checkLatest: true
-    - script: |
-        git config --local user.email $(user_email)
-        git config --local user.name $(username)
-      displayName: Setup git config
-
-    - template: common/config/azure-pipelines/templates/docs-build.yaml@itwinjs-core
+  - stage: Validate_Docs
+    dependsOn: Generate_Docs
+    condition: and(succeeded(), in(variables['Build.Reason'], 'IndividualCI', 'PullRequest', 'Manual'))
+    jobs:
+    - template: common/config/azure-pipelines/jobs/docs-build.yaml@itwinjs-core
       parameters:
-        downloadCurrentBuildArtifacts: 'true'
-        workingDir: $(Build.SourcesDirectory)
+        checkout: itwinjs-core
+        downloadCurrentBuildArtifacts: true
