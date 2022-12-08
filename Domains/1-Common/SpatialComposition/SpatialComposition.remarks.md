@@ -113,14 +113,17 @@ Equivalent to [IfcSpace](https://standards.buildingsmart.org/IFC/DEV/IFC4_2/FINA
 
 See [SpaceType](#spacetype).
 
+## ZonalSystem
+
+Equivalent to [IfcZone](http://ifc43-docs.standards.buildingsmart.org/IFC/RELEASE/IFC4x3/HTML/lexical/IfcZone.htm). A `ZonalSystem` (as a `bis:PhysicalSystem`), does not have its own geometry, groups its members via the `bis:PhysicalSystemGroupsMembers` relationship and can "service" `bis:SpatialElement`s via `bis:PhysicalSystemServicesSpatialElements` relationship.
+Examples include a tenancy zone, security zone, etc.
+
 ## Zone
 
-Equivalent to [IfcSpatialZone](https://standards.buildingsmart.org/IFC/DEV/IFC4_2/FINAL/HTML/schema/ifcproductextension/lexical/ifcspatialzone.htm) but also maps to [IfcZone](https://standards.buildingsmart.org/IFC/DEV/IFC4_2/FINAL/HTML/schema/ifcproductextension/lexical/ifczone.htm). In the latter case, its GeometryStream will be null. Our understanding is that IFC originally used `IfcZone` for this concept, but then realized that zones sometimes need geometry of their own, and so introduced IfcSpatialZone. We map instances of both IFC classes to `spcomp:Zone`.
-
-An [IfcZone](https://standards.buildingsmart.org/IFC/DEV/IFC4_2/FINAL/HTML/schema/ifcproductextension/lexical/ifczone.htm) is a subclass of [IfcSystem](https://standards.buildingsmart.org/IFC/DEV/IFC4_2/FINAL/HTML/schema/ifcproductextension/lexical/ifcsystem.htm), and thus can "service" [IfcSpatialStructureElements](https://standards.buildingsmart.org/IFC/DEV/IFC4_2/FINAL/HTML/schema/ifcproductextension/lexical/ifcspatialstructureelement.htm). In BIS, this would map to the `spcomp:Zone` being "held" or "referenced" by `spcomp:SpatialStructureElement`s.
+Equivalent to [IfcSpatialZone](http://ifc43-docs.standards.buildingsmart.org/IFC/RELEASE/IFC4x3/HTML/lexical/IfcSpatialZone.htm). 
 
 A `Zone` (as a `bis:SpatialLocationElement`) has its own geometry for expressing a spatial region and (as an [ISpatialOrganizer](#ispatialorganizer)) can organize other `bis:SpatialElements` for any purpose.
-Examples include a lighting zone, construction zone, loading area, circulation zone, tenancy zone, security zone, etc.
+Examples include a lighting zone, construction zone, loading area, circulation zone, etc.
 
 As a [ISpatialOrganizer](#ispatialorganizer), a `Zone` represents a category for organizing spatial elements. The [ZoneType](#zonetype) defines the "criteria" or "dimension" for organizing.
 In general, a `Zone` will only use the [`SpatialOrganizerReferencesSpatialElements`](#spatialorganizerreferencesspatialelements) relationship, but the "holds" relationship is also available for special cases.
