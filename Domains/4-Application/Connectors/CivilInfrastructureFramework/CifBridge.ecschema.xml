@@ -3,15 +3,16 @@
 |  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
 |  * See LICENSE.md in the project root for license terms and full copyright notice.
 ======================================================================================= -->
-<ECSchema schemaName="CifBridge" alias="cifbrg" version="01.00.07" description="iModel Connector schema containing aspect classes with properties from OpenBridge Modeler." xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
+<ECSchema schemaName="CifBridge" alias="cifbrg" version="01.00.08" description="iModel Connector schema containing aspect classes with properties from OpenBridge Modeler." xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
     <ECSchemaReference name="BisCore" version="01.00.14" alias="bis"/>
-    <ECSchemaReference name="CifCommon" version="01.00.03" alias="cifcmn"/>
-    <ECSchemaReference name="CifUnits" version="01.00.01" alias="cifu"/>
-    <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
     <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
+    <ECSchemaReference name="CifCommon" version="01.00.03" alias="cifcmn"/>
+    <ECSchemaReference name="CifUnits" version="01.00.02" alias="cifu"/>
+    <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
+    <ECSchemaReference name="SchemaUpgradeCustomAttributes" version="01.00.00" alias="SchemaUpgradeCA"/>
     <ECCustomAttributes>
         <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
-            <SupportedUse>Production</SupportedUse>
+            <SupportedUse>NotForProduction</SupportedUse>
         </ProductionStatus>
         <SchemaLayerInfo xmlns="BisCustomAttributes.01.00.00">
             <Value>Application</Value>
@@ -29,6 +30,12 @@
     <ECEnumeration typeName="ApproachSlabByTemplateRuleAspect_ApproachSlabByTemplateRule_TemplateOrientation_Enum" backingTypeName="int" isStrict="true">
         <ECEnumerator name="Vertical" value="0" displayLabel="Vertical"/>
         <ECEnumerator name="Normal" value="1" displayLabel="Normal"/>
+    </ECEnumeration>
+    <ECEnumeration typeName="BarrierAspect_Barrier_PayUnit_Enum" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="Linear_Unit" value="0" displayLabel="Linear Unit"/>
+        <ECEnumerator name="Area_Unit" value="1" displayLabel="Area Unit"/>
+        <ECEnumerator name="Volume_Unit" value="2" displayLabel="Volume Unit"/>
+        <ECEnumerator name="Each" value="3" displayLabel="Each"/>
     </ECEnumeration>
     <ECEnumeration typeName="BarrierByTemplateRuleAspect_BarrierByTemplateRule_EndCutOrientation_Enum" backingTypeName="int" isStrict="true">
         <ECEnumerator name="Follow_Skew" value="0" displayLabel="Follow Skew"/>
@@ -128,6 +135,10 @@
         <ECEnumerator name="Right_Construct_Line" value="19" displayLabel="Right Construct Line"/>
         <ECEnumerator name="Left_Connector_Angle" value="20" displayLabel="Left Connector Angle"/>
         <ECEnumerator name="Right_Connector_Angle" value="21" displayLabel="Right Connector Angle"/>
+        <ECEnumerator name="Left_Connector_Down_Station" value="22" displayLabel="Left Connector Down Station"/>
+        <ECEnumerator name="Left_Connector_Up_Station" value="23" displayLabel="Left Connector Up Station"/>
+        <ECEnumerator name="Right_Connector_Down_Station" value="24" displayLabel="Right Connector Down Station"/>
+        <ECEnumerator name="Right_Connector_Up_Station" value="25" displayLabel="Right Connector Up Station"/>
     </ECEnumeration>
     <ECEnumeration typeName="CrossFrameG2Aspect_CrossFrameG2_CrossFrameType_Enum" backingTypeName="int" isStrict="true">
         <ECEnumerator name="Frame_X" value="0" displayLabel="Frame X"/>
@@ -200,7 +211,7 @@
         <ECEnumerator name="None" value="0" displayLabel="None"/>
         <ECEnumerator name="By_Deck" value="1" displayLabel="Deck"/>
         <ECEnumerator name="By_Skew" value="2" displayLabel="Skew"/>
-        <ECEnumerator name="Centered" value="3" displayLabel="Centered"/>
+        <ECEnumerator name="Centered" value="3" displayLabel="Aligned"/>
         <ECEnumerator name="Deck_And_Centered" value="4" displayLabel="Deck And Aligned"/>
     </ECEnumeration>
     <ECEnumeration typeName="CustomPierBySupportLineRuleAspect_CustomPierBySupportLineRule_TopSlopeMode_Enum" backingTypeName="int" isStrict="true">
@@ -222,7 +233,7 @@
         <ECEnumerator name="None" value="0" displayLabel="None"/>
         <ECEnumerator name="By_Deck" value="1" displayLabel="Deck"/>
         <ECEnumerator name="By_Skew" value="2" displayLabel="Skew"/>
-        <ECEnumerator name="Centered" value="3" displayLabel="Centered"/>
+        <ECEnumerator name="Centered" value="3" displayLabel="Aligned"/>
         <ECEnumerator name="Deck_And_Centered" value="4" displayLabel="Deck And Aligned"/>
     </ECEnumeration>
     <ECEnumeration typeName="PierBySupportLineRuleAspect_PierBySupportLineRule_SupportLineType_Enum" backingTypeName="int" isStrict="true">
@@ -255,6 +266,7 @@
         <ECEnumerator name="Circular_Drilled_Shaft" value="3" displayLabel="Circular Drilled Shaft"/>
         <ECEnumerator name="Rect__Combined_with_Crash_Wall" value="4" displayLabel="Rect. Combined with Crash Wall"/>
         <ECEnumerator name="None" value="-1" displayLabel="None"/>
+        <ECEnumerator name="Custom" value="5" displayLabel="Custom"/>
     </ECEnumeration>
     <ECEnumeration typeName="PileBaseAspect_Pile_Type_Enum" backingTypeName="int" isStrict="true">
         <ECEnumerator name="Rectangle" value="0" displayLabel="Rectangle"/>
@@ -281,8 +293,8 @@
         <ECEnumerator name="None" value="0" displayLabel="None"/>
         <ECEnumerator name="Approach_Slab" value="1" displayLabel="Approach Slab"/>
         <ECEnumerator name="Skew" value="2" displayLabel="Skew"/>
-        <ECEnumerator name="Centered" value="3" displayLabel="Centered"/>
-        <ECEnumerator name="Approach_Slab_and_Centered" value="4" displayLabel="Approach Slab and Centered"/>
+        <ECEnumerator name="Centered" value="3" displayLabel="Aligned"/>
+        <ECEnumerator name="Approach_Slab_and_Centered" value="4" displayLabel="Approach Slab and Aligned"/>
     </ECEnumeration>
     <ECEnumeration typeName="SleeperSlabByApproachRuleAspect_SleeperSlabByApproachRuleLocation_Enum" backingTypeName="int" isStrict="true">
         <ECEnumerator name="Start" value="0" displayLabel="Start"/>
@@ -368,6 +380,7 @@
         <ECProperty propertyName="ApproachSlab_TemplateName" typeName="string" displayLabel="Template Name" category="ApproachSlabProperties_Approach_Slab" priority="399998"/>
         <ECProperty propertyName="ApproachSlab_MainMaterial" typeName="string" displayLabel="Approach Slab Material Name" category="BridgeModelerAttributes_Material_Material" priority="399997"/>
         <ECProperty propertyName="ApproachSlab_MainBuildOrder" typeName="int" displayLabel="Approach Slab Build Order" category="BridgeModelerAttributes_BuildOrder_Build_Order" priority="399996"/>
+        <ECProperty propertyName="ApproachSlab_TopSurfaceArea" typeName="double" displayLabel="Top Surface Area" category="ApproachSlabProperties_Approach_Slab" priority="200000" kindOfQuantity="cifu:AREA"/>
     </ECEntityClass>
     <ECEntityClass typeName="ApproachSlabByTemplateRuleAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
@@ -387,6 +400,10 @@
         <ECProperty propertyName="ApproachSlabByTemplateRule_MaximumDistanceBetweenSections" typeName="double" displayLabel="Max Dist Between Sections" category="ApproachSlabProperties_Approach_Slab" priority="299991" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="ApproachSlabByTemplateRule_VarConst" typeName="string" displayLabel="Variable Constraint" category="ApproachSlabProperties_Approach_Slab" priority="299990"/>
         <ECProperty propertyName="ApproachSlabByTemplateRule_PointControl" typeName="string" displayLabel="Point Control" category="ApproachSlabProperties_Approach_Slab" priority="299989"/>
+        <ECProperty propertyName="ApproachSlabByTemplateRule_LeftStartBreakbackDistance" typeName="double" displayLabel="Left Start Breakback Distance" category="ApproachSlabBreakbackProperties_Approach_Slab_Breakbacks" priority="299988" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="ApproachSlabByTemplateRule_RightStartBreakbackDistance" typeName="double" displayLabel="Right Start Breakback Distance" category="ApproachSlabBreakbackProperties_Approach_Slab_Breakbacks" priority="299987" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="ApproachSlabByTemplateRule_LeftEndBreakbackDistance" typeName="double" displayLabel="Left End Breakback Distance" category="ApproachSlabBreakbackProperties_Approach_Slab_Breakbacks" priority="299986" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="ApproachSlabByTemplateRule_RightEndBreakbackDistance" typeName="double" displayLabel="Right End Breakback Distance" category="ApproachSlabBreakbackProperties_Approach_Slab_Breakbacks" priority="299985" kindOfQuantity="cifu:LENGTH"/>
     </ECEntityClass>
     <ECEntityClass typeName="AppurtenanceAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
@@ -418,6 +435,8 @@
         <ECProperty propertyName="Barrier_MainMaterial" typeName="string" displayLabel="Barrier Material" category="BridgeModelerAttributes_Material_Material" priority="399920"/>
         <ECProperty propertyName="Barrier_MainBuildOrder" typeName="int" displayLabel="Build Order" category="BridgeModelerAttributes_BuildOrder_Build_Order" priority="399910"/>
         <ECProperty propertyName="Barrier_Length" typeName="double" displayLabel="Length" category="BarrierProperties_Barrier" priority="-100" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="Barrier_PayUnit" typeName="BarrierAspect_Barrier_PayUnit_Enum" displayLabel="Pay Unit" category="BarrierProperties_Barrier" priority="-90"/>
+        <ECProperty propertyName="Barrier_PayUnitText" typeName="string" displayLabel="Pay Unit Text" category="BarrierProperties_Barrier" priority="-95"/>
     </ECEntityClass>
     <ECEntityClass typeName="SolidByTemplateRuleAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
@@ -494,8 +513,9 @@
     <ECEntityClass typeName="BeamSegmentBaseAspect" modifier="Abstract">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
         <ECProperty propertyName="BeamSegment_Type" typeName="BeamSegmentBaseAspect_BeamSegment_Type_Enum" displayLabel="Type" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299999"/>
-        <ECProperty propertyName="BeamSegment_BeamName" typeName="string" displayLabel="Beam Name" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299976"/>
-        <ECProperty propertyName="BeamSegment_SpanName" typeName="string" displayLabel="Span Name" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299975"/>
+        <ECProperty propertyName="BeamSegment_BeamName" typeName="string" displayLabel="Beam Name" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299975"/>
+        <ECProperty propertyName="BeamSegment_SpanName" typeName="string" displayLabel="Span Name" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299974"/>
+        <ECProperty propertyName="BeamSegment_TypeText" typeName="string" displayLabel="Type Text" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299998"/>
     </ECEntityClass>
     <ECEntityClass typeName="BeamSegmentCollectionBaseAspect" modifier="Abstract">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
@@ -516,17 +536,52 @@
     </ECEntityClass>
     <ECEntityClass typeName="BeamSegmentCommonBaseAspect" modifier="Abstract">
         <BaseClass>BeamSegmentBaseAspect</BaseClass>
-        <ECProperty propertyName="BeamSegment_Length" typeName="double" displayLabel="Length" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299995" kindOfQuantity="cifu:LENGTH"/>
-        <ECProperty propertyName="BeamSegment_Material" typeName="string" displayLabel="Material" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299988"/>
-        <ECProperty propertyName="BeamSegment_Material_UnitPrice" typeName="double" displayLabel="Material Unit Price" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299987" kindOfQuantity="cifu:LENGTH"/>
-        <ECProperty propertyName="BeamSegment_Material_UnitWeight" typeName="double" displayLabel="Unit Wt" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299986" kindOfQuantity="cifu:LENGTH"/>
-        <ECProperty propertyName="BeamSegment_Material_CTE" typeName="double" displayLabel="CTE" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299985" kindOfQuantity="cifu:LENGTH"/>
-        <ECProperty propertyName="BeamSegment_Material_E" typeName="double" displayLabel="E" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299984" kindOfQuantity="cifu:LENGTH"/>
-        <ECProperty propertyName="BeamSegment_Material_Poisson" typeName="double" displayLabel="Poisson" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299983" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="BeamSegment_Length" typeName="double" displayLabel="Length" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299994" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="BeamSegment_Material" typeName="string" displayLabel="Material" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299987"/>
+        <ECProperty propertyName="BeamSegment_Material_UnitPrice" typeName="double" displayLabel="Material Unit Price" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299986" kindOfQuantity="cifu:UNITLESS_PRICE">
+            <ECCustomAttributes>
+                <AllowUnitChange xmlns="SchemaUpgradeCustomAttributes.01.00.00">
+                    <From>u:M</From>
+                    <To>u:COEFFICIENT</To>
+                </AllowUnitChange>
+            </ECCustomAttributes>
+        </ECProperty>
+        <ECProperty propertyName="BeamSegment_Material_UnitWeight" typeName="double" displayLabel="Unit Wt" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299985" kindOfQuantity="cifu:DENSITY">
+            <ECCustomAttributes>
+                <AllowUnitChange xmlns="SchemaUpgradeCustomAttributes.01.00.00">
+                    <From>u:M</From>
+                    <To>u:KG_PER_CUB_M</To>
+                </AllowUnitChange>
+            </ECCustomAttributes>
+        </ECProperty>
+        <ECProperty propertyName="BeamSegment_Material_CTE" typeName="double" displayLabel="CTE" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299984" kindOfQuantity="cifu:THERMAL_COEFFICIENT">
+            <ECCustomAttributes>
+                <AllowUnitChange xmlns="SchemaUpgradeCustomAttributes.01.00.00">
+                    <From>u:M</From>
+                    <To>u:STRAIN_PER_KELVIN</To>
+                </AllowUnitChange>
+            </ECCustomAttributes>
+        </ECProperty>
+        <ECProperty propertyName="BeamSegment_Material_E" typeName="double" displayLabel="E" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299983" kindOfQuantity="cifu:PRESSURE_LARGE">
+            <ECCustomAttributes>
+                <AllowUnitChange xmlns="SchemaUpgradeCustomAttributes.01.00.00">
+                    <From>u:M</From>
+                    <To>u:PA</To>
+                </AllowUnitChange>
+            </ECCustomAttributes>
+        </ECProperty>
+        <ECProperty propertyName="BeamSegment_Material_Poisson" typeName="double" displayLabel="Poisson" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299982" kindOfQuantity="cifu:COEFFICIENT">
+            <ECCustomAttributes>
+                <AllowUnitChange xmlns="SchemaUpgradeCustomAttributes.01.00.00">
+                    <From>u:M</From>
+                    <To>u:COEFFICIENT</To>
+                </AllowUnitChange>
+            </ECCustomAttributes>
+        </ECProperty>
     </ECEntityClass>
     <ECEntityClass typeName="BeamSegmentWidthAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
-        <ECProperty propertyName="BeamSegment_Width" typeName="double" displayLabel="Width" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299994" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="BeamSegment_Width" typeName="double" displayLabel="Width" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299993" kindOfQuantity="cifu:LENGTH"/>
     </ECEntityClass>
     <ECEntityClass typeName="BearingBaseAspect" modifier="Abstract">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
@@ -622,13 +677,34 @@
     </ECEntityClass>
     <ECEntityClass typeName="SteelBeamSegmentBaseAspect" modifier="Abstract">
         <BaseClass>BeamSegmentCommonBaseAspect</BaseClass>
-        <ECProperty propertyName="BeamSegment_Thickness" typeName="double" displayLabel="Thickness" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299993" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="BeamSegment_Thickness" typeName="double" displayLabel="Thickness" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299992" kindOfQuantity="cifu:LENGTH"/>
     </ECEntityClass>
     <ECEntityClass typeName="SteelSPCBeamSegmentBaseAspect" modifier="Abstract">
         <BaseClass>SteelBeamSegmentBaseAspect</BaseClass>
-        <ECProperty propertyName="BeamSegment_Material_Steel_FU" typeName="double" displayLabel="Fu" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299982" kindOfQuantity="cifu:LENGTH"/>
-        <ECProperty propertyName="BeamSegment_Material_Steel_Fy" typeName="double" displayLabel="Fy" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299981" kindOfQuantity="cifu:LENGTH"/>
-        <ECProperty propertyName="BeamSegment_Material_Steel_G" typeName="double" displayLabel="G" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299980" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="BeamSegment_Material_Steel_FU" typeName="double" displayLabel="Fu" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299981" kindOfQuantity="cifu:PRESSURE_LARGE">
+            <ECCustomAttributes>
+                <AllowUnitChange xmlns="SchemaUpgradeCustomAttributes.01.00.00">
+                    <From>u:M</From>
+                    <To>u:PA</To>
+                </AllowUnitChange>
+            </ECCustomAttributes>
+        </ECProperty>
+        <ECProperty propertyName="BeamSegment_Material_Steel_Fy" typeName="double" displayLabel="Fy" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299980" kindOfQuantity="cifu:PRESSURE_LARGE">
+            <ECCustomAttributes>
+                <AllowUnitChange xmlns="SchemaUpgradeCustomAttributes.01.00.00">
+                    <From>u:M</From>
+                    <To>u:PA</To>
+                </AllowUnitChange>
+            </ECCustomAttributes>
+        </ECProperty>
+        <ECProperty propertyName="BeamSegment_Material_Steel_G" typeName="double" displayLabel="G" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299979" kindOfQuantity="cifu:PRESSURE_LARGE">
+            <ECCustomAttributes>
+                <AllowUnitChange xmlns="SchemaUpgradeCustomAttributes.01.00.00">
+                    <From>u:M</From>
+                    <To>u:PA</To>
+                </AllowUnitChange>
+            </ECCustomAttributes>
+        </ECProperty>
     </ECEntityClass>
     <ECEntityClass typeName="BottomCoverPlateBeamSegmentAspect">
         <BaseClass>SteelSPCBeamSegmentBaseAspect</BaseClass>
@@ -637,10 +713,10 @@
         <BaseClass>SteelBeamSegmentBaseAspect</BaseClass>
         <ECProperty propertyName="BeamSegment_StartValue" typeName="double" displayLabel="Start Value" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299992" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="BeamSegment_EndValue" typeName="double" displayLabel="End Value" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299991" kindOfQuantity="cifu:LENGTH"/>
-        <ECProperty propertyName="BeamSegment_StartWidth" typeName="double" displayLabel="Start Width" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299992" kindOfQuantity="cifu:LENGTH"/>
-        <ECProperty propertyName="BeamSegment_StartHeight" typeName="double" displayLabel="Start Height" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299991" kindOfQuantity="cifu:LENGTH"/>
-        <ECProperty propertyName="BeamSegment_EndWidth" typeName="double" displayLabel="End Width" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299990" kindOfQuantity="cifu:LENGTH"/>
-        <ECProperty propertyName="BeamSegment_EndHeight" typeName="double" displayLabel="End Height" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299989" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="BeamSegment_StartWidth" typeName="double" displayLabel="Start Width" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299991" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="BeamSegment_StartHeight" typeName="double" displayLabel="Start Height" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299990" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="BeamSegment_EndWidth" typeName="double" displayLabel="End Width" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299989" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="BeamSegment_EndHeight" typeName="double" displayLabel="End Height" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299988" kindOfQuantity="cifu:LENGTH"/>
     </ECEntityClass>
     <ECEntityClass typeName="BottomFlangeBeamSegmentAspect">
         <BaseClass>SteelFlangeBeamSegmentBaseAspect</BaseClass>
@@ -665,6 +741,7 @@
     <ECEntityClass typeName="PierFootingBaseAspect" modifier="Abstract">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
         <ECProperty propertyName="Pierfooting_FootingType" typeName="PierFootingBaseAspect_Pierfooting_FootingType_Enum" displayLabel="Footing Type" category="FootingProperties_Footing" priority="0"/>
+        <ECProperty propertyName="Pierfooting_Material" typeName="string" displayLabel="Footing Material" category="BridgeModelerAttributes_Material_Material" priority="299930"/>
     </ECEntityClass>
     <ECEntityClass typeName="PierFootingCommonBaseAspect" modifier="Abstract">
         <BaseClass>PierFootingBaseAspect</BaseClass>
@@ -683,6 +760,7 @@
     <ECEntityClass typeName="PierColumnBaseAspect" modifier="Abstract">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
         <ECProperty propertyName="PierColumn_Type" typeName="PierColumnBaseAspect_PierColumn_Type_Enum" displayLabel="Column Type" category="ColumnProperties_Column" priority="0"/>
+        <ECProperty propertyName="PierColumn_Material" typeName="string" displayLabel="Material" category="BridgeModelerAttributes_Material_Material" priority="299930"/>
     </ECEntityClass>
     <ECEntityClass typeName="PierColumnCommonBaseAspect" modifier="Abstract">
         <BaseClass>PierColumnBaseAspect</BaseClass>
@@ -714,6 +792,8 @@
         <ECProperty propertyName="Pile_EmbedDepth" typeName="double" displayLabel="Embed Length" category="BridgeModelerAttributes_Pier" priority="-13" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="Pile_TopX" typeName="double" displayLabel="Top X" category="BridgeModelerAttributes_Pier" priority="-20" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="Pile_TopY" typeName="double" displayLabel="Top Y" category="BridgeModelerAttributes_Pier" priority="-21" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="PierPile_Material" typeName="string" displayLabel="Material" category="BridgeModelerAttributes_Material_Material" priority="299930"/>
+        <ECProperty propertyName="PierPile_PileTypeText" typeName="string" displayLabel="Pile Shape Text" category="PileProperties_Pile" priority="-1"/>
     </ECEntityClass>
     <ECEntityClass typeName="CircularPileAspect">
         <BaseClass>PileBaseAspect</BaseClass>
@@ -721,10 +801,31 @@
     </ECEntityClass>
     <ECEntityClass typeName="ConcreteBeamSegmentBaseAspect" modifier="Abstract">
         <BaseClass>BeamSegmentCommonBaseAspect</BaseClass>
-        <ECProperty propertyName="BeamSegment_Template" typeName="string" displayLabel="Template" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299998"/>
-        <ECProperty propertyName="BeamSegment_Material_Concrete_FC" typeName="double" displayLabel="f’c" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299979" kindOfQuantity="cifu:LENGTH"/>
-        <ECProperty propertyName="BeamSegment_Material_Concrete_FCi" typeName="double" displayLabel="f’ci" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299978" kindOfQuantity="cifu:LENGTH"/>
-        <ECProperty propertyName="BeamSegment_Material_Concrete_MR" typeName="double" displayLabel="MR" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299977" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="BeamSegment_Template" typeName="string" displayLabel="Template" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299997"/>
+        <ECProperty propertyName="BeamSegment_Material_Concrete_FC" typeName="double" displayLabel="f’c" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299978" kindOfQuantity="cifu:PRESSURE_LARGE">
+            <ECCustomAttributes>
+                <AllowUnitChange xmlns="SchemaUpgradeCustomAttributes.01.00.00">
+                    <From>u:M</From>
+                    <To>u:PA</To>
+                </AllowUnitChange>
+            </ECCustomAttributes>
+        </ECProperty>
+        <ECProperty propertyName="BeamSegment_Material_Concrete_FCi" typeName="double" displayLabel="f’ci" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299977" kindOfQuantity="cifu:PRESSURE_LARGE">
+            <ECCustomAttributes>
+                <AllowUnitChange xmlns="SchemaUpgradeCustomAttributes.01.00.00">
+                    <From>u:M</From>
+                    <To>u:PA</To>
+                </AllowUnitChange>
+            </ECCustomAttributes>
+        </ECProperty>
+        <ECProperty propertyName="BeamSegment_Material_Concrete_MR" typeName="double" displayLabel="MR" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299976" kindOfQuantity="cifu:PRESSURE_LARGE">
+            <ECCustomAttributes>
+                <AllowUnitChange xmlns="SchemaUpgradeCustomAttributes.01.00.00">
+                    <From>u:M</From>
+                    <To>u:PA</To>
+                </AllowUnitChange>
+            </ECCustomAttributes>
+        </ECProperty>
     </ECEntityClass>
     <ECEntityClass typeName="ConcreteDiaphragmAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
@@ -750,6 +851,7 @@
         <ECProperty propertyName="CrossFrameComponentHolder_Volume" typeName="double" displayLabel="Volume" category="ComponentProperties_Component_Properties" priority="299977" kindOfQuantity="cifu:VOLUME"/>
         <ECProperty propertyName="CrossFrameComponentHolder_Weight" typeName="double" displayLabel="Weight" category="ComponentProperties_Component_Properties" priority="299976" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="CrossFrameComponentHolder_ComponentType" typeName="CrossFrameComponentHolderBaseAspect_CrossFrameComponentHolder_ComponentType_Enum" displayLabel="Type" category="ComponentProperties_Component_Properties" priority="299975"/>
+        <ECProperty propertyName="CrossFrameComponentHolder_ComponentTypeText" typeName="string" displayLabel="Type Text" category="ComponentProperties_Component_Properties" priority="299974"/>
     </ECEntityClass>
     <ECEntityClass typeName="CrossFrameComponentHolderAngleAspect">
         <BaseClass>CrossFrameComponentHolderBaseAspect</BaseClass>
@@ -813,9 +915,10 @@
         <ECProperty propertyName="CrossFrameHolder_TotalWeight" typeName="double" displayLabel="Total Components Weight" category="CrossFrameProperties_Cross_Frame_Properties" priority="299998" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="CrossFrameHolder_Template" typeName="string" displayLabel="Template" category="CrossFrameTemplateProperties_Cross_Frame_Template_Properties" priority="299997"/>
         <ECProperty propertyName="CrossFrameHolder_CrossFrameType" typeName="CrossFrameHolderAspect_CrossFrameHolder_CrossFrameType_Enum" displayLabel="Cross-Frame Type" category="CrossFrameTemplateProperties_Cross_Frame_Template_Properties" priority="299996"/>
-        <ECProperty propertyName="CrossFrameHolder_LayoutDefinition" typeName="string" displayLabel="Cross-Frame Placement" category="CrossFrameProperties_Cross_Frame_Properties" priority="299995"/>
-        <ECProperty propertyName="CrossFrameHolder_MainBuildOrder" typeName="int" displayLabel="Crossframe Build Order" category="BridgeModelerAttributes_BuildOrder_Build_Order" priority="299994"/>
+        <ECProperty propertyName="CrossFrameHolder_LayoutDefinition" typeName="string" displayLabel="Cross-Frame Placement" category="CrossFrameProperties_Cross_Frame_Properties" priority="299994"/>
+        <ECProperty propertyName="CrossFrameHolder_MainBuildOrder" typeName="int" displayLabel="Crossframe Build Order" category="BridgeModelerAttributes_BuildOrder_Build_Order" priority="299993"/>
         <ECProperty propertyName="CrossFrameHolder_TemplateName" typeName="string" displayLabel="Template Name" category="CrossFrameTemplateProperties_Cross_Frame_Template_Properties" priority="299997"/>
+        <ECProperty propertyName="CrossFrameHolder_CrossFrameTypeText" typeName="string" displayLabel="Cross-Frame Type Text" category="CrossFrameTemplateProperties_Cross_Frame_Template_Properties" priority="299995"/>
     </ECEntityClass>
     <ECEntityClass typeName="CustomAbutmentAnalyticalAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
@@ -868,8 +971,8 @@
     </ECEntityClass>
     <ECEntityClass typeName="CustomConcreteBeamSegmentAspect">
         <BaseClass>ConcreteBeamSegmentBaseAspect</BaseClass>
-        <ECProperty propertyName="BeamSegment_IsDualTemplate" typeName="boolean" displayLabel="Is Dual Template" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299997"/>
-        <ECProperty propertyName="BeamSegment_EndTemplate" typeName="string" displayLabel="End Template" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299996"/>
+        <ECProperty propertyName="BeamSegment_IsDualTemplate" typeName="boolean" displayLabel="Is Dual Template" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299996"/>
+        <ECProperty propertyName="BeamSegment_EndTemplate" typeName="string" displayLabel="End Template" category="BeamSegmentProperties_Beam_Segment_Properties" priority="299995"/>
     </ECEntityClass>
     <ECEntityClass typeName="CustomObjectAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
@@ -971,6 +1074,7 @@
         <ECProperty propertyName="CustomObjectByPathRuleAngleCalculation" typeName="CustomObjectByPathRuleAspect_CustomObjectByPathRuleAngleCalculation_Enum" displayLabel="Angle Calculation" category="CustomObjectRuleAttributes_Rule_Property" priority="299984"/>
         <ECProperty propertyName="CustomObjectByPathRuleFrequencyModeEnum" typeName="CustomObjectByPathRuleAspect_CustomObjectByPathRuleFrequencyModeEnum_Enum" displayLabel="Mode" category="CustomObjectRuleAttributes_Rule_Property" priority="299985"/>
         <ECProperty propertyName="CustomObjectByPathRuleVerticalOrientation" typeName="CustomObjectByPathRuleAspect_CustomObjectByPathRuleVerticalOrientation_Enum" displayLabel="Vertical Orientation" category="CustomObjectRuleAttributes_Rule_Property" priority="299983"/>
+        <ECProperty propertyName="CustomObjectByPathRule_ActiveAngle" typeName="double" displayLabel="Active Angle" category="AccessoryProperties_Accessory" priority="299999" kindOfQuantity="cifu:ANGLE"/>
     </ECEntityClass>
     <ECEntityClass typeName="CustomPierAnalyticalAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
@@ -1008,6 +1112,10 @@
         <ECProperty propertyName="CustomPierBySupportLineRule_DeckLengthReference" typeName="CustomPierBySupportLineRuleAspect_CustomPierBySupportLineRule_DeckLengthReference_Enum" displayLabel="Deck Length Side" category="CustomPierRuleAttributes_Rule_Property" priority="299988"/>
         <ECProperty propertyName="CustomPierBySupportLineRule_TopSlopeMode" typeName="CustomPierBySupportLineRuleAspect_CustomPierBySupportLineRule_TopSlopeMode_Enum" displayLabel="Top Slope" category="CustomPierRuleAttributes_Rule_Property" priority="299990"/>
         <ECProperty propertyName="CustomPierBySupportLineRuleIgnoreSupportLinewSkew" typeName="boolean" displayLabel="Ignore Support Line Skew" category="CustomPierRuleAttributes_Rule_Property" priority="299987"/>
+        <ECProperty propertyName="CustomPierBySupportLineRuleMappedPlacementAngle" typeName="string" displayLabel="Placement Angle" category="GenCompMappedAttributes_Gen_Comp_Mapped" priority="299986"/>
+        <ECProperty propertyName="CustomPierBySupportLineRuleMappedCapLength" typeName="string" displayLabel="Cap Length" category="GenCompMappedAttributes_Gen_Comp_Mapped" priority="299985"/>
+        <ECProperty propertyName="CustomPierBySupportLineRuleMappedHorizontalOffset" typeName="string" displayLabel="Horizontal Offset" category="GenCompMappedAttributes_Gen_Comp_Mapped" priority="299984"/>
+        <ECProperty propertyName="CustomPierBySupportLineRuleMappedVerticalOffset" typeName="string" displayLabel="Vertical Offset" category="GenCompMappedAttributes_Gen_Comp_Mapped" priority="299983"/>
     </ECEntityClass>
     <ECEntityClass typeName="CustomPierCapAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
@@ -1054,7 +1162,7 @@
         <BaseClass>SolidByTemplateRuleAspect</BaseClass>
         <ECProperty propertyName="DeckByTemplateRule_StartOffset" typeName="double" displayLabel="Start Station Offset" category="DeckProperties_Deck" priority="299999" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="DeckByTemplateRule_EndOffset" typeName="double" displayLabel="End Station Offset" category="DeckProperties_Deck" priority="299998" kindOfQuantity="cifu:LENGTH"/>
-        <ECProperty propertyName="DeckByTemplateRule_TemplateOrientation" typeName="DeckByTemplateRuleAspect_DeckByTemplateRule_TemplateOrientation_Enum" displayLabel="Template Orientation" category="DeckProperties_Deck" priority="299997"/>
+        <ECProperty propertyName="DeckByTemplateRule_TemplateOrientation" typeName="DeckByTemplateRuleAspect_DeckByTemplateRule_TemplateOrientation_Enum" displayLabel="Template Orientation" category="DeckProperties_Deck" priority="299993"/>
         <ECProperty propertyName="DeckByTemplateRule_HorizontalOffset" typeName="double" displayLabel="Horizontal Offset" category="DeckProperties_Deck" priority="299990" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="DeckByTemplateRule_VerticalOffset" typeName="double" displayLabel="Vertical Offset" category="DeckProperties_Deck" priority="299989" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="DeckByTemplateRule_Template" typeName="string" displayLabel="Template" category="DeckProperties_Deck" priority="299988"/>
@@ -1062,6 +1170,10 @@
         <ECProperty propertyName="DeckByTemplateRule_MaximumDistanceBetweenSections" typeName="double" displayLabel="Max Dist Between Sections" category="DeckProperties_Deck" priority="299986" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="DeckByTemplateRule_VarConst" typeName="string" displayLabel="Variable Constraint" category="DeckProperties_Deck" priority="299985"/>
         <ECProperty propertyName="DeckByTemplateRule_PointControl" typeName="string" displayLabel="Point Control" category="DeckProperties_Deck" priority="299984"/>
+        <ECProperty propertyName="DeckByTemplateRule_LeftStartBreakbackDistance" typeName="double" displayLabel="Left Start Breakback Distance" category="DeckBreakbackProperties_Deck_Breakbacks" priority="299997" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="DeckByTemplateRule_RightStartBreakbackDistance" typeName="double" displayLabel="Right Start Breakback Distance" category="DeckBreakbackProperties_Deck_Breakbacks" priority="299996" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="DeckByTemplateRule_LeftEndBreakbackDistance" typeName="double" displayLabel="Left End Breakback Distance" category="DeckBreakbackProperties_Deck_Breakbacks" priority="299995" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="DeckByTemplateRule_RightEndBreakbackDistance" typeName="double" displayLabel="Right End Breakback Distance" category="DeckBreakbackProperties_Deck_Breakbacks" priority="299994" kindOfQuantity="cifu:LENGTH"/>
     </ECEntityClass>
     <ECEntityClass typeName="DeckPropertiesAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
@@ -1849,6 +1961,7 @@
     <ECEntityClass typeName="PierCapBaseAspect" modifier="Abstract">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
         <ECProperty propertyName="PierCap_Type" typeName="PierCapBaseAspect_PierCap_Type_Enum" displayLabel="Cap Type" category="CapProperties_Cap" priority="0"/>
+        <ECProperty propertyName="PierCap_Material" typeName="string" displayLabel="Material" category="BridgeModelerAttributes_Material_Material" priority="299930"/>
     </ECEntityClass>
     <ECEntityClass typeName="PierCapCommonBaseAspect" modifier="Abstract">
         <BaseClass>PierCapBaseAspect</BaseClass>
@@ -1978,6 +2091,7 @@
         <ECProperty propertyName="PierBell_BottomDiameter" typeName="double" displayLabel="Bell Bottom Diameter" category="BellProperties_Bell" priority="-1" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="PierBell_SlopedHeight" typeName="double" displayLabel="Bell Sloped Height" category="BellProperties_Bell" priority="-2" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="PierBell_StraightHeight" typeName="double" displayLabel="Bell Straight Height" category="BellProperties_Bell" priority="-3" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="PierBell_Material" typeName="string" displayLabel="Material" category="BridgeModelerAttributes_Material_Material" priority="299930"/>
     </ECEntityClass>
     <ECRelationshipClass typeName="ElementOwnsPierBellAspect" modifier="None" strength="embedding">
         <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
@@ -2025,6 +2139,7 @@
         <ECProperty propertyName="PierCheekWall_Width" typeName="double" displayLabel="Width" category="CheekWallProperties_Cheek_Wall" priority="-3" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="PierCheekWall_WidthOffset" typeName="double" displayLabel="Width Offset" category="CheekWallProperties_Cheek_Wall" priority="-4" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="PierCheekWall_LengthOffset" typeName="double" displayLabel="Length Offset" category="CheekWallProperties_Cheek_Wall" priority="-5" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="PierCheekWall_Material" typeName="string" displayLabel="Material" category="BridgeModelerAttributes_Material_Material" priority="299930"/>
     </ECEntityClass>
     <ECRelationshipClass typeName="ElementOwnsPierCheekWallAspect" modifier="None" strength="embedding">
         <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
@@ -2057,6 +2172,7 @@
         <ECProperty propertyName="PierCrashWall_WallThicknessTop" typeName="double" displayLabel="Wall Thickness Top" category="CrashWallProperties_Crash_Wall" priority="-2" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="PierCrashWall_WallThicknessBottom" typeName="double" displayLabel="Wall Thickness Bottom" category="CrashWallProperties_Crash_Wall" priority="-3" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="PierCrashWall_WallHeight" typeName="double" displayLabel="Wall Height" category="CrashWallProperties_Crash_Wall" priority="-4" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="PierCrashWall_Material" typeName="string" displayLabel="Material" category="BridgeModelerAttributes_Material_Material" priority="299930"/>
     </ECEntityClass>
     <ECRelationshipClass typeName="ElementOwnsPierCrashWallAspect" modifier="None" strength="embedding">
         <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
@@ -2080,12 +2196,28 @@
             <Class class="PierFootingSlopedExtraTopLengthAspect"/>
         </Target>
     </ECRelationshipClass>
+    <ECEntityClass typeName="PierFootingWithConcretePadAspect" modifier="Abstract">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="PierFooting_ConcretePadTransverseOffset" typeName="double" displayLabel="Concrete Pad Transverse Offset" category="FootingProperties_Footing" priority="-17" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="PierFooting_ConcretePadThickness" typeName="double" displayLabel="Concrete Pad Thickness" category="FootingProperties_Footing" priority="-19" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="PierFooting_ConcretePadLongitudinalOffset" typeName="double" displayLabel="Concrete Pad Longitudinal Offset" category="FootingProperties_Footing" priority="-18" kindOfQuantity="cifu:LENGTH"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsPierFootingWithConcretePadAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="PierFootingWithConcretePadAspect"/>
+        </Target>
+    </ECRelationshipClass>
     <ECEntityClass typeName="PierRockSocketAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
         <ECProperty propertyName="PierRockSocket_Name" typeName="string" displayLabel="Name" category="BridgeModelerAttributes_General" priority="299950"/>
         <ECProperty propertyName="PierRockSocket_SupportName" typeName="string" displayLabel="Support Name" category="BridgeModelerAttributes_General" priority="299940"/>
         <ECProperty propertyName="PierRockSocket_Diameter" typeName="double" displayLabel="Rock Socket Diameter" category="RockSocketProperties_Rock_Socket" priority="0" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="PierRockSocket_Length" typeName="double" displayLabel="Rock Socket Length" category="RockSocketProperties_Rock_Socket" priority="-1" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="PierRockSocket_Material" typeName="string" displayLabel="Material" category="BridgeModelerAttributes_Material_Material" priority="299930"/>
     </ECEntityClass>
     <ECRelationshipClass typeName="ElementOwnsPierRockSocketAspect" modifier="None" strength="embedding">
         <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
@@ -2107,6 +2239,7 @@
         <ECProperty propertyName="PierStrut_ExtensionLength" typeName="double" displayLabel="Extension Length" category="StrutProperties_Strut" priority="-4" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="PierStrut_StartCol" typeName="int" displayLabel="Start Column" category="StrutProperties_Strut" priority="-5"/>
         <ECProperty propertyName="PierStrut_EndCol" typeName="int" displayLabel="End Column" category="StrutProperties_Strut" priority="-6"/>
+        <ECProperty propertyName="PierStrut_Material" typeName="string" displayLabel="Material" category="BridgeModelerAttributes_Material_Material" priority="299930"/>
     </ECEntityClass>
     <ECRelationshipClass typeName="ElementOwnsPierStrutAspect" modifier="None" strength="embedding">
         <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
@@ -2144,6 +2277,7 @@
     <ECEntityClass typeName="PileWallPierCapCorbelBaseAspect" modifier="Abstract">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
         <ECProperty propertyName="PierCap_HasCorbel" typeName="boolean" displayLabel="Corbel" category="CapProperties_Cap" priority="-24"/>
+        <ECProperty propertyName="PierCap_Material" typeName="string" displayLabel="Material" category="BridgeModelerAttributes_Material_Material" priority="299930"/>
     </ECEntityClass>
     <ECEntityClass typeName="PileWallPierCapNoCorbelAspect">
         <BaseClass>PileWallPierCapCorbelBaseAspect</BaseClass>
@@ -2238,6 +2372,12 @@
         <ECProperty propertyName="Pierfooting_SlopeHeight" typeName="double" displayLabel="Slope Depth" category="FootingProperties_Footing" priority="-10" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="Pierfooting_SlopedTopWidth" typeName="double" displayLabel="Top Width" category="FootingProperties_Footing" priority="-11" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="Pierfooting_SlopedTopLength" typeName="double" displayLabel="Top Length" category="FootingProperties_Footing" priority="-12" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="PierFooting_HasConcretePad" typeName="boolean" displayLabel="Concrete Pad" category="FootingProperties_Footing" priority="-20"/>
+        <ECProperty propertyName="PierFooting_ConcretePadMaterial" typeName="string" displayLabel="Concrete Pad Material" category="BridgeModelerAttributes_Material_Material" priority="299920">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03"/>
+            </ECCustomAttributes>
+        </ECProperty>
     </ECEntityClass>
     <ECEntityClass typeName="RectangularPierFootingCommonBaseAspect" modifier="Abstract">
         <BaseClass>RectangularPierFootingBaseAspect</BaseClass>
@@ -2679,6 +2819,12 @@
     </ECRelationshipClass>
     <ECEntityClass typeName="StrutAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECCustomAttributes>
+            <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                <Description>StrutAspect is no longer in use. Use PierStrutAspect instead.</Description>
+            </Deprecated>
+            <HiddenClass xmlns="CoreCustomAttributes.01.00.03"/>
+        </ECCustomAttributes>
         <ECProperty propertyName="Strut_Name" typeName="string" displayLabel="Name" category="BridgeModelerAttributes_General" priority="299950"/>
         <ECProperty propertyName="Strut_SupportName" typeName="string" displayLabel="Support Name" category="BridgeModelerAttributes_General" priority="299940"/>
         <ECProperty propertyName="PierStrut_Height" typeName="double" displayLabel="Height" category="StrutProperties_Strut" priority="0" kindOfQuantity="cifu:LENGTH"/>
@@ -2976,6 +3122,9 @@
         <ECProperty propertyName="Wingwall_BtmThickness" typeName="double" displayLabel="Bottom Thickness" category="WingwallProperties_Wingwall" priority="-7" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="Wingwall_AdditionalBtmVertOffset" typeName="double" displayLabel="Additional Bottom Vertical Offset" category="WingwallProperties_Wingwall" priority="-8" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="Wingwall_FootingOffset" typeName="double" displayLabel="Footing Offset" category="WingwallProperties_Wingwall" priority="-9" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="Wingwall_Material" typeName="string" displayLabel="Material" category="BridgeModelerAttributes_Material_Material" priority="299930"/>
+        <ECProperty propertyName="Wingwall_UseTopSlope" typeName="boolean" displayLabel="Use Top Slope" category="WingwallProperties_Wingwall" priority="-10"/>
+        <ECProperty propertyName="Wingwall_TopSlope" typeName="string" displayLabel="Top Slope" category="WingwallProperties_Wingwall" priority="-11"/>
     </ECEntityClass>
     <ECRelationshipClass typeName="ElementOwnsWingwallAspect" modifier="None" strength="embedding">
         <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
@@ -2994,20 +3143,21 @@
         <ECProperty propertyName="WingWallByAbutmentRuleTransverseOffset" typeName="double" displayLabel="Transverse Offset" category="AbutmentWingWallRuleAttributes_Abutment_Wingwall_Placement_Rule" priority="299996" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="WingWallByAbutmentRuleLongitudinalOffset" typeName="double" displayLabel="Longitudinal Offset" category="AbutmentWingWallRuleAttributes_Abutment_Wingwall_Placement_Rule" priority="299994" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="WingWallByAbutmentRuleParallelToAlignment" typeName="boolean" displayLabel="Parallel To Alignment" category="AbutmentWingWallRuleAttributes_Abutment_Wingwall_Placement_Rule" priority="299993"/>
-        <ECProperty propertyName="WingWallByAbutmentRuleSkewAngle" typeName="double" displayLabel="Skew Angle" category="AbutmentWingWallRuleAttributes_Abutment_Wingwall_Placement_Rule" priority="299992" kindOfQuantity="cifu:ANGLE"/>
-        <ECProperty propertyName="WingWallByAbutmentRuleAdjustHeightToBackwall" typeName="boolean" displayLabel="Adjust Height to Backwall" category="AbutmentWingWallRuleAttributes_Abutment_Wingwall_Placement_Rule" priority="299991"/>
-        <ECProperty propertyName="WingWallByAbutmentRuleComputeLength" typeName="boolean" displayLabel="Compute Length" category="AbutmentWingWallRuleAttributes_Abutment_Wingwall_Placement_Rule" priority="299990"/>
-        <ECProperty propertyName="WingWallByAbutmentRuleFillSlope" typeName="string" displayLabel="Fill Slope" category="AbutmentWingWallRuleAttributes_Abutment_Wingwall_Placement_Rule" priority="299989"/>
-        <ECProperty propertyName="WingWallByAbutmentRuleBermHorizontalOffset" typeName="double" displayLabel="Berm Horizontal Offset" category="AbutmentWingWallRuleAttributes_Abutment_Wingwall_Placement_Rule" priority="299988" kindOfQuantity="cifu:LENGTH"/>
-        <ECProperty propertyName="WingWallByAbutmentRuleBermVerticalOffset" typeName="double" displayLabel="Berm Vertical Offset" category="AbutmentWingWallRuleAttributes_Abutment_Wingwall_Placement_Rule" priority="299987" kindOfQuantity="cifu:LENGTH"/>
-        <ECProperty propertyName="WingWallByAbutmentRuleLengthExtension" typeName="double" displayLabel="Length Extension" category="AbutmentWingWallRuleAttributes_Abutment_Wingwall_Placement_Rule" priority="299986" kindOfQuantity="cifu:LENGTH"/>
-        <ECProperty propertyName="WingWallByAbutmentRuleTemplateXmlFragment" typeName="string" displayLabel="Wingwall Template" category="AbutmentWingWallRuleAttributes_Abutment_Wingwall_Placement_Rule" priority="299985">
+        <ECProperty propertyName="WingWallByAbutmentRuleSkewAngle" typeName="double" displayLabel="Skew Angle" category="AbutmentWingWallRuleAttributes_Abutment_Wingwall_Placement_Rule" priority="299991" kindOfQuantity="cifu:ANGLE"/>
+        <ECProperty propertyName="WingWallByAbutmentRuleAdjustHeightToBackwall" typeName="boolean" displayLabel="Adjust Height to Backwall" category="AbutmentWingWallRuleAttributes_Abutment_Wingwall_Placement_Rule" priority="299990"/>
+        <ECProperty propertyName="WingWallByAbutmentRuleComputeLength" typeName="boolean" displayLabel="Compute Length" category="AbutmentWingWallRuleAttributes_Abutment_Wingwall_Placement_Rule" priority="299989"/>
+        <ECProperty propertyName="WingWallByAbutmentRuleFillSlope" typeName="string" displayLabel="Fill Slope" category="AbutmentWingWallRuleAttributes_Abutment_Wingwall_Placement_Rule" priority="299988"/>
+        <ECProperty propertyName="WingWallByAbutmentRuleBermHorizontalOffset" typeName="double" displayLabel="Berm Horizontal Offset" category="AbutmentWingWallRuleAttributes_Abutment_Wingwall_Placement_Rule" priority="299987" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="WingWallByAbutmentRuleBermVerticalOffset" typeName="double" displayLabel="Berm Vertical Offset" category="AbutmentWingWallRuleAttributes_Abutment_Wingwall_Placement_Rule" priority="299986" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="WingWallByAbutmentRuleLengthExtension" typeName="double" displayLabel="Length Extension" category="AbutmentWingWallRuleAttributes_Abutment_Wingwall_Placement_Rule" priority="299985" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="WingWallByAbutmentRuleTemplateXmlFragment" typeName="string" displayLabel="Wingwall Template" category="AbutmentWingWallRuleAttributes_Abutment_Wingwall_Placement_Rule" priority="299984">
             <ECCustomAttributes>
                 <HiddenProperty xmlns="CoreCustomAttributes.01.00.03"/>
             </ECCustomAttributes>
         </ECProperty>
-        <ECProperty propertyName="WingWallByAbutmentRuleTemplateName" typeName="string" displayLabel="Template Name" category="AbutmentWingWallRuleAttributes_Abutment_Wingwall_Placement_Rule" priority="299984"/>
+        <ECProperty propertyName="WingWallByAbutmentRuleTemplateName" typeName="string" displayLabel="Template Name" category="AbutmentWingWallRuleAttributes_Abutment_Wingwall_Placement_Rule" priority="299983"/>
         <ECProperty propertyName="WingWallByAbutmentRuleAlignWithFrontFaceOfBackWall" typeName="boolean" displayLabel="Align With FFBW" category="AbutmentWingWallRuleAttributes_Abutment_Wingwall_Placement_Rule" priority="299995"/>
+        <ECProperty propertyName="WingWallByAbutmentRuleUseSlopeFromProfile" typeName="boolean" displayLabel="Use Slope From Profile" category="AbutmentWingWallRuleAttributes_Abutment_Wingwall_Placement_Rule" priority="299992"/>
     </ECEntityClass>
     <ECRelationshipClass typeName="ElementOwnsWingWallByAbutmentRuleAspect" modifier="None" strength="embedding">
         <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
@@ -3030,6 +3180,7 @@
         <ECProperty propertyName="WingwallFooting_SlopeHeight" typeName="double" displayLabel="Slope Depth" category="FootingProperties_Footing" priority="-5" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="WingwallFooting_SlopedTopWidth" typeName="double" displayLabel="Top Width" category="FootingProperties_Footing" priority="-6" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="WingwallFooting_SlopedTopLength" typeName="double" displayLabel="Top Length" category="FootingProperties_Footing" priority="-7" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="WingwallFooting_Material" typeName="string" displayLabel="Footing Material" category="BridgeModelerAttributes_Material_Material" priority="299930"/>
     </ECEntityClass>
     <ECRelationshipClass typeName="ElementOwnsWingwallFootingAspect" modifier="None" strength="embedding">
         <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
@@ -3053,6 +3204,7 @@
     <PropertyCategory typeName="AnalyticalProperties_Analytical_Properties" description="AnalyticalProperties" displayLabel="Analytical Properties" priority="600"/>
     <PropertyCategory typeName="ApproachRefLineRuleAttributes_Approach_Reference_Line_Rule" description="ApproachRefLineRuleAttributes" displayLabel="Approach Reference Line Rule" priority="0"/>
     <PropertyCategory typeName="ApproachRefLineRuleAttributes_ApproachRefLineRule" description="ApproachRefLineRuleAttributes" displayLabel="&lt;- ApproachRefLineRule -&gt;" priority="0"/>
+    <PropertyCategory typeName="ApproachSlabBreakbackProperties_Approach_Slab_Breakbacks" description="ApproachSlabBreakbackProperties" displayLabel="Approach Slab Breakbacks" priority="399997"/>
     <PropertyCategory typeName="ApproachSlabProperties_Approach_Slab" description="ApproachSlabProperties" displayLabel="Approach Slab" priority="399999"/>
     <PropertyCategory typeName="AuxObjectRuleAttributes_Rule_Property" description="AuxObjectRuleAttributes" displayLabel="Rule Property" priority="300000"/>
     <PropertyCategory typeName="BarrierProperties_Barrier" description="BarrierProperties" displayLabel="Barrier" priority="300000"/>
@@ -3095,6 +3247,7 @@
     <PropertyCategory typeName="CrossFrameTemplateProperties_Cross_Frame_Template_Properties" description="CrossFrameTemplateProperties" displayLabel="Cross-Frame Template Properties" priority="300000"/>
     <PropertyCategory typeName="CustomObjectRuleAttributes_Rule_Property" description="CustomObjectRuleAttributes" displayLabel="Rule Property" priority="300000"/>
     <PropertyCategory typeName="CustomPierRuleAttributes_Rule_Property" description="CustomPierRuleAttributes" displayLabel="Rule Property" priority="300000"/>
+    <PropertyCategory typeName="DeckBreakbackProperties_Deck_Breakbacks" description="DeckBreakbackProperties" displayLabel="Deck Breakbacks" priority="399998"/>
     <PropertyCategory typeName="DeckByMultiTemplateRuleAttributes_Rule_Property" description="DeckByMultiTemplateRuleAttributes" displayLabel="Rule Property" priority="300000"/>
     <PropertyCategory typeName="DeckProperties_Deck" description="DeckProperties" displayLabel="Deck" priority="300000"/>
     <PropertyCategory typeName="ExcavationRuleAttributes_Excavation_Rule" description="ExcavationRuleAttributes" displayLabel="Excavation Rule" priority="299999"/>
@@ -3102,7 +3255,9 @@
     <PropertyCategory typeName="FieldSpliceGroupProperties_Field_Splice_Group" description="FieldSpliceGroupProperties" displayLabel="Field Splice Group" priority="300000"/>
     <PropertyCategory typeName="FieldSpliceProperties_Field_Splice_Properties" description="FieldSpliceProperties" displayLabel="Field Splice Properties" priority="300000"/>
     <PropertyCategory typeName="FootingProperties_Footing" description="FootingProperties" displayLabel="Footing" priority="399999"/>
+    <PropertyCategory typeName="GenCompMappedAttributes_Gen_Comp_Mapped" description="GenCompMappedAttributes" displayLabel="Gen Comp Mapped" priority="300000"/>
     <PropertyCategory typeName="PierBySupportLineRuleAttributes_Substructure_Placement_Rule" description="PierBySupportLineRuleAttributes" displayLabel="Substructure Placement Rule" priority="299999"/>
+    <PropertyCategory typeName="PileProperties_Pile" description="PileProperties" displayLabel="Pile" priority="399999"/>
     <PropertyCategory typeName="RockSocketProperties_Rock_Socket" description="RockSocketProperties" displayLabel="Rock Socket" priority="399999"/>
     <PropertyCategory typeName="SegmentalBalancedCategory_Segmental_Cantilever" description="SegmentalBalancedCategory" displayLabel="Segmental Cantilever" priority="300000"/>
     <PropertyCategory typeName="SegmentalSpanCategory_Span_by_Span" description="SegmentalSpanCategory" displayLabel="Span by Span" priority="300000"/>
