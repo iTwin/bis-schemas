@@ -105,8 +105,38 @@ stages:
         )
       displayName: 'Display Source Branch'
 
-    - script: $(PY_EXE) $(bb) -v $(BB_V) -a $(BB_ARCH) -s $(strategy) build
+    - script: $(PY_EXE) $(bb) -v $(BB_V) -a $(BB_ARCH) -s $(strategy) --outputroot $(Build.BinariesDirectory) build
       displayName: Build
+
+    - task: ArchiveFiles@2
+      displayName: Archive imodeljs-native
+      inputs:
+        rootFolderOrFile: '$(Build.BinariesDirectory)/WinX64/imodeljsnodeaddon_pkgs/imodeljs-native'
+        includeRootFolder: true
+        archiveType: 'zip'
+        archiveFile: '$(Build.ArtifactStagingDirectory)/iModelJsNodeAddon/imodeljs-native.zip'
+
+    - task: ArchiveFiles@2
+      displayName: Archive imodeljs-win32-x64
+      inputs:
+        rootFolderOrFile: '$(Build.BinariesDirectory)/WinX64/imodeljsnodeaddon_pkgs/imodeljs-win32-x64'
+        includeRootFolder: true
+        archiveType: 'zip'
+        archiveFile: '$(Build.ArtifactStagingDirectory)/iModelJsNodeAddon/imodeljs-win32-x64.zip'
+
+    - task: PublishPipelineArtifact@1
+      displayName: Publish imodeljs-native
+      inputs:
+        path: '$(Build.ArtifactStagingDirectory)/iModelJsNodeAddon/imodeljs-native.zip' 
+        artifactName: 'imodeljs-native' 
+        artifactType: 'pipeline'
+
+    - task: PublishPipelineArtifact@1
+      displayName: Publish imodeljs-win32-x64
+      inputs:
+        path: '$(Build.ArtifactStagingDirectory)/iModelJsNodeAddon/imodeljs-win32-x64.zip' 
+        artifactName: 'imodeljs-win32-x64' 
+        artifactType: 'pipeline'
 
 - stage: iModeEvolution
   displayName: iModeEvolution Tests
