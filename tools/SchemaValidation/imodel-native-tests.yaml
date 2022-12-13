@@ -19,6 +19,11 @@ resources:
     endpoint: imodel-native
     name: iTwin/imodel-native-internal
 
+  - repository: itwinjs-core
+    type: github
+    endpoint: imodel-native
+    name: iTwin/itwinjs-core
+
 stages:
 - stage: Source_Branch
   displayName: Select Source Branch
@@ -76,7 +81,8 @@ stages:
       BB_SRC_ROOT: $(Agent.BuildDirectory)/bbsrc
       bb: $(BB_SRC_ROOT)/BentleyBuild/BentleyBuild.py
       Branch_Name: $[ stageDependencies.Source_Branch.Find_Branch.outputs['Get_Branch_Name.sourceBranch'] ]
-      strategy: 'iModelCore;SkipPull_imodel-native-internal+iModelJsNodeAddon;SkipPull_imodel-native-internal'
+      strategy: 'iModelJsNodeAddon;SkipPull_imodel-native-internal'
+      #strategy: 'iModelCore;SkipPull_imodel-native-internal+iModelJsNodeAddon;SkipPull_imodel-native-internal'
 
     steps:
     - checkout: imodel-native
@@ -138,13 +144,13 @@ stages:
         artifactName: 'imodeljs-win32-x64' 
         artifactType: 'pipeline'
 
-- stage: iModeEvolution
-  displayName: iModeEvolution Tests
-  dependsOn: Source_Branch
+- stage: iTwinjsCore
+  displayName: iTwin.js-Core Tests
+  dependsOn: iModelCore_NodeAddon
   condition: and(succeeded(), in(variables['Build.Reason'], 'IndividualCI', 'Schedule', 'Manual', 'PullRequest'))
 
   jobs:
-  - job: RuniModeEvolutionTests
+  - job: iTwinjsCoreTests
     timeoutInMinutes: 90
 
     workspace:
@@ -155,43 +161,115 @@ stages:
       demands: Agent.OS -equals Windows_NT
 
     variables:
-      BB_V: 4
-      BB_ARCH: x64
-      PY_EXE: py -3
-      BB_SRC_ROOT: $(Agent.BuildDirectory)/bbsrc
-      bb: $(BB_SRC_ROOT)/BentleyBuild/BentleyBuild.py
-      strategy: 'iModelEvolutionTests;SkipPull_imodel-native-internal'
-      BRANCH_NAME: $[ stageDependencies.Source_Branch.Find_Branch.outputs['Get_Branch_Name.sourceBranch'] ]
+      DOWNLOAD_PATH: $(System.ArtifactsDirectory)/iModelJsNodeAddon
 
     steps:
-    - checkout: imodel-native
-    - checkout: imodel-native-internal
+    - checkout: itwinjs-core
 
-    - template: build/templates/prebuild.yml@imodel-native-internal
-      parameters:
-        otherRepo: imodel-native
+  - task: DownloadBuildArtifacts@0
+    displayName: Download imodeljs-native artifact
+    inputs:
+      buildType: current
+      project: 2c48216e-e72f-48b4-a4eb-40ff1c04e8e4
+      pipeline: 8507
+      artifactName: 'imodeljs-native'
+      allowPartiallySucceededBuilds: true
+      downloadPath: $(DOWNLOAD_PATH)
 
-    - script: $(PY_EXE) $(BB_SRC_ROOT)/imodel-native-internal/build/call_bb.py pull -v $(BB_V) -a $(BB_ARCH) -s $(strategy)
-      displayName: Pull
-      env:
-        AZURE_DEVOPS_EXT_PAT: $(System.AccessToken)
+  - task: DownloadBuildArtifacts@0
+    displayName: Download imodeljs-win32-x64 artifact
+    inputs:
+      buildType: current
+      project: 2c48216e-e72f-48b4-a4eb-40ff1c04e8e4
+      pipeline: 8507
+      artifactName: 'imodeljs-win32-x64'
+      allowPartiallySucceededBuilds: true
+      downloadPath: $(DOWNLOAD_PATH)
 
-    - script: |
-        if not "%BRANCH_NAME%" == "" (
-          cd /d $(BB_SRC_ROOT)/BisSchemas
-          git checkout %BRANCH_NAME%
-        )
-      displayName: 'Set Source Branch'
+  - task: ExtractFiles@1
+    displayName: 'Extract imodeljs-native'
+    inputs:
+      archiveFilePatterns: '$(DOWNLOAD_PATH)/imodeljs-native.zip'
+      destinationFolder: $(DOWNLOAD_PATH)
+      cleanDestinationFolder: false
 
-    - script: |
-        if not "%BRANCH_NAME%" == "" (
-          cd /d $(BB_SRC_ROOT)/BisSchemas
-          git branch
-        )
-      displayName: 'Display Source Branch'
+  - task: ExtractFiles@1
+    displayName: 'Extract imodeljs-win32-x64 artifact'
+    inputs:
+      archiveFilePatterns: '$(DOWNLOAD_PATH)/imodeljs-win32-x64.zip'
+      destinationFolder: '$(DOWNLOAD_PATH)/imodeljs-native'
+      cleanDestinationFolder: false
+      overwriteExistingFiles: true
 
-    - script: $(PY_EXE) $(bb) -v $(BB_V) -a $(BB_ARCH) -s $(strategy) build
-      displayName: Build
-      env:
-        NuGetFeed_Address: $(NUGETFEED_ADDRESS)
-        AZURE_DEVOPS_EXT_PAT: $(System.AccessToken)
+  - task: PythonScript@0
+    inputs:
+      scriptSource: inline
+      script: |
+        print(r"##vso[task.setvariable variable=IMODELJS_NATIVE_OVERRIDE]$(DOWNLOAD_PATH)/imodeljs-native")
+    displayName: 'Set environment variable IMODELJS_NATIVE_OVERRIDE'
+  - task: PythonScript@0
+    inputs:
+      scriptSource: inline
+      script: |
+        import os
+        nativeOverridePath = os.getenv("IMODELJS_NATIVE_OVERRIDE", "None")
+        print("IMODELJS_NATIVE_OVERRIDE path is " + nativeOverridePath)
+    displayName: 'Print IMODELJS_NATIVE_OVERRIDE path'
+
+# - stage: iModeEvolution
+#   displayName: iModeEvolution Tests
+#   dependsOn: Source_Branch
+#   condition: and(succeeded(), in(variables['Build.Reason'], 'IndividualCI', 'Schedule', 'Manual', 'PullRequest'))
+
+#   jobs:
+#   - job: RuniModeEvolutionTests
+#     timeoutInMinutes: 90
+
+#     workspace:
+#       clean: all
+
+#     pool:
+#       name: iModelTechCI
+#       demands: Agent.OS -equals Windows_NT
+
+#     variables:
+#       BB_V: 4
+#       BB_ARCH: x64
+#       PY_EXE: py -3
+#       BB_SRC_ROOT: $(Agent.BuildDirectory)/bbsrc
+#       bb: $(BB_SRC_ROOT)/BentleyBuild/BentleyBuild.py
+#       strategy: 'iModelEvolutionTests;SkipPull_imodel-native-internal'
+#       BRANCH_NAME: $[ stageDependencies.Source_Branch.Find_Branch.outputs['Get_Branch_Name.sourceBranch'] ]
+
+#     steps:
+#     - checkout: imodel-native
+#     - checkout: imodel-native-internal
+
+#     - template: build/templates/prebuild.yml@imodel-native-internal
+#       parameters:
+#         otherRepo: imodel-native
+
+#     - script: $(PY_EXE) $(BB_SRC_ROOT)/imodel-native-internal/build/call_bb.py pull -v $(BB_V) -a $(BB_ARCH) -s $(strategy)
+#       displayName: Pull
+#       env:
+#         AZURE_DEVOPS_EXT_PAT: $(System.AccessToken)
+
+#     - script: |
+#         if not "%BRANCH_NAME%" == "" (
+#           cd /d $(BB_SRC_ROOT)/BisSchemas
+#           git checkout %BRANCH_NAME%
+#         )
+#       displayName: 'Set Source Branch'
+
+#     - script: |
+#         if not "%BRANCH_NAME%" == "" (
+#           cd /d $(BB_SRC_ROOT)/BisSchemas
+#           git branch
+#         )
+#       displayName: 'Display Source Branch'
+
+#     - script: $(PY_EXE) $(bb) -v $(BB_V) -a $(BB_ARCH) -s $(strategy) build
+#       displayName: Build
+#       env:
+#         NuGetFeed_Address: $(NUGETFEED_ADDRESS)
+#         AZURE_DEVOPS_EXT_PAT: $(System.AccessToken)
