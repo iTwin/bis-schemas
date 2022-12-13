@@ -166,6 +166,7 @@ stages:
 
     steps:
     - checkout: itwinjs-core
+      fetchDepth: 0
 
     - task: DownloadPipelineArtifact@2
       displayName: Download imodeljs-native artifact
@@ -232,12 +233,6 @@ stages:
         script: |
           print(r"##vso[task.setvariable variable=IMODELJS_NATIVE_OVERRIDE]$(DOWNLOAD_PATH)/imodeljs-native")
       displayName: 'Set environment variable IMODELJS_NATIVE_OVERRIDE'
-
-    - template: common/config/azure-pipelines/templates/core-build.yaml@itwinjs-core
-      parameters:
-        currentBranch: 'master'
-        nodeVersion: 18.12.x
-        rushBuildCacheEnabled: 0
       
     - task: PythonScript@0
       inputs:
@@ -247,6 +242,12 @@ stages:
           nativeOverridePath = os.getenv("IMODELJS_NATIVE_OVERRIDE", "None")
           print("IMODELJS_NATIVE_OVERRIDE path is " + nativeOverridePath)
       displayName: 'Print IMODELJS_NATIVE_OVERRIDE path'
+    
+    - template: common/config/azure-pipelines/templates/core-build.yaml@itwinjs-core
+      parameters:
+        currentBranch: 'master'
+        nodeVersion: 18.12.x
+        rushBuildCacheEnabled: 0
 
 # - stage: iModeEvolution
 #   displayName: iModeEvolution Tests
