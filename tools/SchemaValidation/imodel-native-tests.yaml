@@ -166,55 +166,55 @@ stages:
     steps:
     - checkout: itwinjs-core
 
-  - task: DownloadBuildArtifacts@0
-    displayName: Download imodeljs-native artifact
-    inputs:
-      buildType: current
-      project: 2c48216e-e72f-48b4-a4eb-40ff1c04e8e4
-      pipeline: 8507
-      artifactName: 'imodeljs-native'
-      allowPartiallySucceededBuilds: true
-      downloadPath: $(DOWNLOAD_PATH)
+    - task: DownloadBuildArtifacts@0
+      displayName: Download imodeljs-native artifact
+      inputs:
+        buildType: current
+        project: 2c48216e-e72f-48b4-a4eb-40ff1c04e8e4
+        pipeline: 8507
+        artifactName: 'imodeljs-native'
+        allowPartiallySucceededBuilds: true
+        downloadPath: $(DOWNLOAD_PATH)
 
-  - task: DownloadBuildArtifacts@0
-    displayName: Download imodeljs-win32-x64 artifact
-    inputs:
-      buildType: current
-      project: 2c48216e-e72f-48b4-a4eb-40ff1c04e8e4
-      pipeline: 8507
-      artifactName: 'imodeljs-win32-x64'
-      allowPartiallySucceededBuilds: true
-      downloadPath: $(DOWNLOAD_PATH)
+    - task: DownloadBuildArtifacts@0
+      displayName: Download imodeljs-win32-x64 artifact
+      inputs:
+        buildType: current
+        project: 2c48216e-e72f-48b4-a4eb-40ff1c04e8e4
+        pipeline: 8507
+        artifactName: 'imodeljs-win32-x64'
+        allowPartiallySucceededBuilds: true
+        downloadPath: $(DOWNLOAD_PATH)
 
-  - task: ExtractFiles@1
-    displayName: 'Extract imodeljs-native'
-    inputs:
-      archiveFilePatterns: '$(DOWNLOAD_PATH)/imodeljs-native.zip'
-      destinationFolder: $(DOWNLOAD_PATH)
-      cleanDestinationFolder: false
+    - task: ExtractFiles@1
+      displayName: 'Extract imodeljs-native'
+      inputs:
+        archiveFilePatterns: '$(DOWNLOAD_PATH)/imodeljs-native.zip'
+        destinationFolder: $(DOWNLOAD_PATH)
+        cleanDestinationFolder: false
 
-  - task: ExtractFiles@1
-    displayName: 'Extract imodeljs-win32-x64 artifact'
-    inputs:
-      archiveFilePatterns: '$(DOWNLOAD_PATH)/imodeljs-win32-x64.zip'
-      destinationFolder: '$(DOWNLOAD_PATH)/imodeljs-native'
-      cleanDestinationFolder: false
-      overwriteExistingFiles: true
+    - task: ExtractFiles@1
+      displayName: 'Extract imodeljs-win32-x64 artifact'
+      inputs:
+        archiveFilePatterns: '$(DOWNLOAD_PATH)/imodeljs-win32-x64.zip'
+        destinationFolder: '$(DOWNLOAD_PATH)/imodeljs-native'
+        cleanDestinationFolder: false
+        overwriteExistingFiles: true
 
-  - task: PythonScript@0
-    inputs:
-      scriptSource: inline
-      script: |
-        print(r"##vso[task.setvariable variable=IMODELJS_NATIVE_OVERRIDE]$(DOWNLOAD_PATH)/imodeljs-native")
-    displayName: 'Set environment variable IMODELJS_NATIVE_OVERRIDE'
-  - task: PythonScript@0
-    inputs:
-      scriptSource: inline
-      script: |
-        import os
-        nativeOverridePath = os.getenv("IMODELJS_NATIVE_OVERRIDE", "None")
-        print("IMODELJS_NATIVE_OVERRIDE path is " + nativeOverridePath)
-    displayName: 'Print IMODELJS_NATIVE_OVERRIDE path'
+    - task: PythonScript@0
+      inputs:
+        scriptSource: inline
+        script: |
+          print(r"##vso[task.setvariable variable=IMODELJS_NATIVE_OVERRIDE]$(DOWNLOAD_PATH)/imodeljs-native")
+      displayName: 'Set environment variable IMODELJS_NATIVE_OVERRIDE'
+    - task: PythonScript@0
+      inputs:
+        scriptSource: inline
+        script: |
+          import os
+          nativeOverridePath = os.getenv("IMODELJS_NATIVE_OVERRIDE", "None")
+          print("IMODELJS_NATIVE_OVERRIDE path is " + nativeOverridePath)
+      displayName: 'Print IMODELJS_NATIVE_OVERRIDE path'
 
 # - stage: iModeEvolution
 #   displayName: iModeEvolution Tests
