@@ -76,10 +76,8 @@ stages:
 
     variables:
       BB_V: '-v 4'
-      BB_ARCH: x64
       PY_EXE: py -3
       BB_SRC_ROOT: $(Agent.BuildDirectory)/bbsrc
-      bb: $(BB_SRC_ROOT)/BentleyBuild/BentleyBuild.py
       BDF_DIR: $(Build.ArtifactStagingDirectory)/bdf
       VERSIONS_FILE: $(BDF_DIR)/versions.json
 
@@ -137,14 +135,14 @@ stages:
       demands: Agent.OS -equals Windows_NT
 
     variables:
-      BB_V: 4
+      BB_V: '-v 4'
       BB_ARCH: x64
       PY_EXE: py -3
       BB_SRC_ROOT: $(Agent.BuildDirectory)/bbsrc
       BDF_DIR: $(Build.ArtifactStagingDirectory)/bdf
-      bb: $(BB_SRC_ROOT)/BentleyBuild/BentleyBuild.py
+      BB: $(BB_SRC_ROOT)/BentleyBuild/BentleyBuild.py
       Branch_Name: $[ stageDependencies.Source_Branch.Find_Branch.outputs['Get_Branch_Name.sourceBranch'] ]
-      strategy: 'iModelCore;SkipPull_imodel-native-internal+iModelJsNodeAddon;SkipPull_imodel-native-internal'
+      STRATEGY: 'iModelCore;SkipPull_imodel-native-internal+iModelJsNodeAddon;SkipPull_imodel-native-internal'
 
     steps:
     - checkout: imodel-native
@@ -178,7 +176,7 @@ stages:
         )
       displayName: 'Display Source Branch'
 
-    - script: $(PY_EXE) $(bb) -v $(BB_V) -a $(BB_ARCH) -s $(strategy) --outputroot $(Build.BinariesDirectory) build
+    - script: $(PY_EXE) $(BB) -v $(BB_V) -a $(BB_ARCH) -s $(STRATEGY) --outputroot $(Build.BinariesDirectory) build
       displayName: Build
 
     - task: ArchiveFiles@2
@@ -238,8 +236,8 @@ stages:
       displayName: Download imodeljs-native artifact
       inputs:
         buildType: 'current'
-        project: 2c48216e-e72f-48b4-a4eb-40ff1c04e8e4
-        definition: 8507
+        project: $(project)
+        definition: $(definition)
         downloadPath: $(DOWNLOAD_PATH)
         artifactName: 'imodeljs-native'
         allowPartiallySucceededBuilds: true
@@ -248,8 +246,8 @@ stages:
       displayName: Download imodeljs-win32-x64 artifact
       inputs:
         buildType: 'current'
-        project: 2c48216e-e72f-48b4-a4eb-40ff1c04e8e4
-        definition: 8507
+        project: $(project)
+        definition: $(definition)
         downloadPath: $(DOWNLOAD_PATH)
         artifactName: 'imodeljs-win32-x64'
         allowPartiallySucceededBuilds: true
