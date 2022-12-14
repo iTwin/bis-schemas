@@ -93,22 +93,29 @@ stages:
     - script: $(PY_EXE) $(CALL_BB_PATH) pull $(BB_V)
       displayName: Pull
       env:
+        CALL_BB_PATH: $(CALL_BB_PATH)
         AZURE_DEVOPS_EXT_PAT: $(System.AccessToken)
 
     - script: $(PY_EXE) $(CALL_BB_PATH) clean $(BB_V)
       displayName: Clean
+      env:
+        CALL_BB_PATH: $(CALL_BB_PATH)
 
     - script: $(PY_EXE) $(COMPUTE_VER_PATH) $(BB_V) -o $(VERSIONS_FILE) --reserve  
       displayName: Compute Versions
       env: 
         BSI_BDF_TOKEN: $(bdfAccessToken)
+        COMPUTE_VER_PATH: $(COMPUTE_VER_PATH)
 
     - script: $(PY_EXE) $(CALL_BB_PATH) checkunused $(BB_V) -r $(VERSIONS_FILE)
       displayName: Validate Versions
+      env:
+        CALL_BB_PATH: $(CALL_BB_PATH)
 
     - script: $(PY_EXE) $(CALL_BB_PATH) bdf $(BB_V) -b $(BDF_DIR) -r $(VERSIONS_FILE)
       displayName: Create BDFs
       env: 
+        CALL_BB_PATH: $(CALL_BB_PATH)
         BSI_BDF_TOKEN: $(bdfAccessToken)
 
     - publish: $(BDF_DIR)
