@@ -25,12 +25,6 @@ resources:
     endpoint: imodel-native
     name: iTwin/itwinjs-core
 
-  - repository: itwinjs-core-imodel02
-    type: github
-    ref: imodel02
-    endpoint: imodel-native
-    name: iTwin/itwinjs-core
-
 stages:
 - stage: Source_Branch
   displayName: Select Source Branch
@@ -65,68 +59,9 @@ stages:
     - script: 'echo %sourceBranch%'
       displayName: 'Display Source Branch'
 
-
-- stage: Create_BDF
-  displayName: Create BDF
-  dependsOn: Source_Branch
-  condition: and(succeeded(), in(variables['Build.Reason'], 'IndividualCI', 'Schedule', 'Manual', 'PullRequest'))
-
-  jobs:
-  - job: BDF
-    displayName: Create BDF
-    timeoutInMinutes: 60
-
-    pool:
-      name: iModelTechCI
-      demands: Agent.OS -equals Windows_NT
-
-    variables:
-      BB_V: '-v 4'
-      PY_EXE: py -3
-      BB_SRC_ROOT: $(Agent.BuildDirectory)/bbsrc
-      BDF_DIR: $(Build.ArtifactStagingDirectory)/bdf
-      VERSIONS_FILE: $(BDF_DIR)/versions.json
-
-    steps:
-    - checkout: imodel-native-internal
-
-    - template: build/templates/prebuild.yml@imodel-native-internal
-      parameters:
-        otherRepo: imodel-native
-
-    - script: $(PY_EXE) $(CALL_BB_PATH) pull $(BB_V)
-      displayName: Pull
-      env:
-        CALL_BB_PATH: $(CALL_BB_PATH)
-        AZURE_DEVOPS_EXT_PAT: $(System.AccessToken)
-
-    - script: $(PY_EXE) $(CALL_BB_PATH) clean $(BB_V)
-      displayName: Clean
-      env:
-        CALL_BB_PATH: $(CALL_BB_PATH)
-
-    - script: $(PY_EXE) $(COMPUTE_VER_PATH) $(BB_V) -o $(VERSIONS_FILE) --reserve  
-      displayName: Compute Versions
-      env: 
-        COMPUTE_VER_PATH: $(COMPUTE_VER_PATH)
-
-    - script: $(PY_EXE) $(CALL_BB_PATH) checkunused $(BB_V) -r $(VERSIONS_FILE)
-      displayName: Validate Versions
-      env:
-        CALL_BB_PATH: $(CALL_BB_PATH)
-
-    - script: $(PY_EXE) $(CALL_BB_PATH) bdf $(BB_V) -b $(BDF_DIR) -r $(VERSIONS_FILE)
-      displayName: Create BDFs
-      env: 
-        CALL_BB_PATH: $(CALL_BB_PATH)
-
-    - publish: $(BDF_DIR)
-      displayName: Save BDFs
-      artifact: bdf
-
 - stage: iModelCore_NodeAddon
   displayName: NodeAddon and iModelCore Tests
-  dependsOn: Create_BDF
+  dependsOn: Source_Branch
   condition: and(succeeded(), in(variables['Build.Reason'], 'IndividualCI', 'Schedule', 'Manual', 'PullRequest'))
 
   jobs:
@@ -145,8 +80,6 @@ stages:
       BB_ARCH: x64
       PY_EXE: py -3
       BB_SRC_ROOT: $(Agent.BuildDirectory)/bbsrc
-      BDF_DIR: $(Pipeline.Workspace)/bdf
-      VERSIONS_FILE: $(BDF_DIR)/versions.json
       BB: $(BB_SRC_ROOT)/BentleyBuild/BentleyBuild.py
       Branch_Name: $[ stageDependencies.Source_Branch.Find_Branch.outputs['Get_Branch_Name.sourceBranch'] ]
       STRATEGY: 'iModelCore;SkipPull_imodel-native-internal+iModelJsNodeAddon;SkipPull_imodel-native-internal'
@@ -155,15 +88,11 @@ stages:
     - checkout: imodel-native
     - checkout: imodel-native-internal
 
-    - download: current
-      displayName: Download BDFs
-      artifact: bdf
-
     - template: build/templates/prebuild.yml@imodel-native-internal
       parameters:
         otherRepo: imodel-native
 
-    - script: $(PY_EXE) $(CALL_BB_PATH) pull $(BB_V) -a $(BB_ARCH) -b $(BDF_DIR) $(STRATEGY_OVERRIDE)
+    - script: $(PY_EXE) $(CALL_BB_PATH) pull $(BB_V) -a $(BB_ARCH) $(STRATEGY_OVERRIDE)
       displayName: Pull
       env:
         CALL_BB_PATH: $(CALL_BB_PATH)
@@ -238,8 +167,6 @@ stages:
     steps:
     - checkout: itwinjs-core
       fetchDepth: 0
-    - checkout: itwinjs-core-imodel02
-      fetchDepth: 0
       
     - task: DownloadPipelineArtifact@2
       displayName: Download imodeljs-native artifact
@@ -260,30 +187,6 @@ stages:
         downloadPath: $(DOWNLOAD_PATH)
         artifactName: 'imodeljs-win32-x64'
         allowPartiallySucceededBuilds: true
-
-    # - task: DownloadPipelineArtifact@2
-    #   displayName: Download imodeljs-native artifact
-    #   inputs:
-    #     buildType: 'specific'
-    #     project: 2c48216e-e72f-48b4-a4eb-40ff1c04e8e4
-    #     definition: 8507
-    #     buildId: 1845191
-    #     downloadPath: $(DOWNLOAD_PATH)
-    #     artifactName: 'imodeljs-native'
-    #     buildVersionToDownload: specific
-    #     allowPartiallySucceededBuilds: true
-        
-    # - task: DownloadPipelineArtifact@2
-    #   displayName: Download imodeljs-win32-x64 artifact
-    #   inputs:
-    #     buildType: 'specific'
-    #     project: 2c48216e-e72f-48b4-a4eb-40ff1c04e8e4
-    #     definition: 8507
-    #     buildId: 1845191
-    #     downloadPath: $(DOWNLOAD_PATH)
-    #     artifactName: 'imodeljs-win32-x64'
-    #     buildVersionToDownload: specific
-    #     allowPartiallySucceededBuilds: true
 
     - task: ExtractFiles@1
       displayName: 'Extract imodeljs-native artifact'
@@ -318,7 +221,7 @@ stages:
     
     - template: common/config/azure-pipelines/templates/core-build.yaml@itwinjs-core
       parameters:
-        currentBranch: 'imodel02'
+        currentBranch: 'master'
         nodeVersion: 18.12.x
         rushBuildCacheEnabled: 0
         workingDir: $(System.DefaultWorkingDirectory)/itwinjs-core-imodel02
