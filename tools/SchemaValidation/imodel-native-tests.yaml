@@ -104,7 +104,6 @@ stages:
     - script: $(PY_EXE) $(COMPUTE_VER_PATH) $(BB_V) -o $(VERSIONS_FILE) --reserve  
       displayName: Compute Versions
       env: 
-        BSI_BDF_TOKEN: $(bdfAccessToken)
         COMPUTE_VER_PATH: $(COMPUTE_VER_PATH)
 
     - script: $(PY_EXE) $(CALL_BB_PATH) checkunused $(BB_V) -r $(VERSIONS_FILE)
@@ -116,7 +115,6 @@ stages:
       displayName: Create BDFs
       env: 
         CALL_BB_PATH: $(CALL_BB_PATH)
-        BSI_BDF_TOKEN: $(bdfAccessToken)
 
     - publish: $(BDF_DIR)
       displayName: Save BDFs
@@ -143,22 +141,27 @@ stages:
       BB_ARCH: x64
       PY_EXE: py -3
       BB_SRC_ROOT: $(Agent.BuildDirectory)/bbsrc
+      BDF_DIR: $(Build.ArtifactStagingDirectory)/bdf
       bb: $(BB_SRC_ROOT)/BentleyBuild/BentleyBuild.py
       Branch_Name: $[ stageDependencies.Source_Branch.Find_Branch.outputs['Get_Branch_Name.sourceBranch'] ]
-      #strategy: 'iModelJsNodeAddon;SkipPull_imodel-native-internal'
       strategy: 'iModelCore;SkipPull_imodel-native-internal+iModelJsNodeAddon;SkipPull_imodel-native-internal'
 
     steps:
     - checkout: imodel-native
     - checkout: imodel-native-internal
 
+    - download: current
+      displayName: Download BDFs
+      artifact: bdf
+
     - template: build/templates/prebuild.yml@imodel-native-internal
       parameters:
         otherRepo: imodel-native
 
-    - script: $(PY_EXE) $(BB_SRC_ROOT)/imodel-native-internal/build/call_bb.py pull -v $(BB_V) -a $(BB_ARCH) -s $(strategy)
+    - script: $(PY_EXE) $(CALL_BB_PATH) pull $(BB_V) -a $(BB_ARCH) -b $(BDF_DIR) $(STRATEGY_OVERRIDE)
       displayName: Pull
       env:
+        CALL_BB_PATH: $(CALL_BB_PATH)
         AZURE_DEVOPS_EXT_PAT: $(System.AccessToken)
 
     - script: |
