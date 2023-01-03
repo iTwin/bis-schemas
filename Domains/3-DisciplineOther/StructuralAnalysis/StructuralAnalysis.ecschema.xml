@@ -13,7 +13,7 @@
 
     <ECCustomAttributes>
         <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
-            <SupportedUse>Production</SupportedUse>
+            <SupportedUse>NotForProduction</SupportedUse>
         </ProductionStatus>
         <SchemaLayerInfo xmlns="BisCustomAttributes.01.00.00">
             <Value>DisciplineOther</Value>
@@ -75,15 +75,35 @@
 
     <ECEntityClass typeName="StructuralAnalysisPartition" modifier="Sealed" displayLabel="Structural Analysis Partition" description="StructuralAnalysisPartition element indicates that there is a specialized StructuralAnalysis perspective within the overall information hierarchy." >
         <BaseClass>anlyt:AnalyticalPartition</BaseClass>
+        <ECNavigationProperty propertyName="DefaultDefinitionContainer" relationshipName="StructuralAnalysisPartitionRefersToDefinitionContainer" direction="Forward" displayLabel="Default Definition Container" description="Default location for definition elements." />
     </ECEntityClass>
 
-    <ECEntityClass typeName="Structure" modifier="Sealed" displayLabel="Structure" description="Used to store an entire structure.">
+    <ECRelationshipClass typeName="StructuralAnalysisPartitionRefersToDefinitionContainer" strength="referencing" modifier="Sealed" >
+        <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="false">
+            <Class class="StructuralAnalysisPartition"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is referenced by" polymorphic="true">
+            <Class class="bis:DefinitionContainer"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="Structure" modifier="Sealed" displayLabel="Structure" description="DEPRECATED" >
+        <ECCustomAttributes>
+            <Deprecated xmlns="CoreCustomAttributes.1.0.3">
+                <Description>Instances of Structure are no longer created. Analysis Elements should be inserted directly to StructuralAnalysisPartition model.</Description>
+            </Deprecated>
+        </ECCustomAttributes>
         <BaseClass>StructuralAnalysisElement</BaseClass>
         <BaseClass>bis:ISubModeledElement</BaseClass>
         <ECNavigationProperty propertyName="DefaultDefinitionContainer" relationshipName="StructureRefersToDefinitionContainer" direction="Forward" displayLabel="Default Definition Container" description="Default location for definition elements. (Required)" />
     </ECEntityClass>
 
-    <ECRelationshipClass typeName="StructureRefersToDefinitionContainer" strength="referencing" modifier="Sealed" description="A relationship that indicates that a Structure refers to a Definition Constainer.">
+    <ECRelationshipClass typeName="StructureRefersToDefinitionContainer" strength="referencing" modifier="Sealed" description="DEPRECATED" >
+        <ECCustomAttributes>
+            <Deprecated xmlns="CoreCustomAttributes.1.0.3">
+                <Description>Instances of Structure are no longer created so this relationship is no longer needed.</Description>
+            </Deprecated>
+        </ECCustomAttributes>
         <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="false">
             <Class class="Structure"/>
         </Source>
