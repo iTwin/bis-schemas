@@ -151,6 +151,8 @@ A `bis:Subject` can be referenced by zero or more `bis:Subject` instances as opp
 
 ### Element
 
+Sets of `bis:Element`s (contained in `bis:Model`s) are used to sub-model other `bis:Element`s that represent larger scale real world Entities. Using this recursive modeling strategy, `bis:Element`s can represent Entities at any scale. Elements can represent physical things, abstract concepts or simply be information records.
+
 See [Element Fundamentals](../guide/fundamentals/element-fundamentals/).
 
 > Behavior: System handlers (written in C++) and domain handlers (written in TypeScript) provide behavior to specific `Element` subclasses.
@@ -404,7 +406,7 @@ A Physical System can define as many levels of hierarchy as needed.
 
 ### SynchronizationConfigLink
 
-A Link to the Configuration for a Synchronization Job.  By convention, a unique Id for the SynchronizationConfigLink such as a job Id should be set in the CodeValue property and a name should be set in in the UserLabel property.
+A Link to the Configuration for a Synchronization Job.  By convention, a unique Id for the SynchronizationConfigLink such as a job Id should be set in the `CodeValue` property and a name should be set in in the UserLabel property.
 
 ### ExternalSourceGroup
 
@@ -497,6 +499,8 @@ This behavior applies to all `RoleModel` subclasses.
 `FunctionalModel` (from the `Functional` schema) is the most widely known subclass of `RoleModel`.
 
 ### RoleElement
+
+An Entity is modeled as a `bis:RoleElement` when a set of external circumstances define an important role (one that is worth tracking) that is not intrinsic to the Entity playing the role. For example, a person can play the role of a teacher or a rock can play the role of a boundary marker.
 
 > Behavior: The system handler (C++) for `RoleElement` will only permit instances to be inserted into a `RoleModel`.
 This behavior applies to all `RoleElement` subclasses.
