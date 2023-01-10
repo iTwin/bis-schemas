@@ -270,21 +270,27 @@ stages:
         AZURE_DEVOPS_EXT_PAT: $(System.AccessToken)
 
     - script: |
-        if not "%BRANCH_NAME%" == "" (
-          cd /d $(BB_SRC_ROOT)/BisSchemas
-          git checkout %BRANCH_NAME%
-        )
-      displayName: 'Set Source Branch'
+        cd /d $(BB_SRC_ROOT)
+        dir
+      displayName: Dir /d
+      condition: always()
 
-    - script: |
-        if not "%BRANCH_NAME%" == "" (
-          cd /d $(BB_SRC_ROOT)/BisSchemas
-          git branch
-        )
-      displayName: 'Display Source Branch'
+    # - script: |
+    #     if not "%BRANCH_NAME%" == "" (
+    #       cd /d $(BB_SRC_ROOT)/BisSchemas
+    #       git checkout %BRANCH_NAME%
+    #     )
+    #   displayName: 'Set Source Branch'
 
-    - script: $(PY_EXE) $(bb) -v $(BB_V) -a $(BB_ARCH) -s $(strategy) build
-      displayName: Build
-      env:
-        NuGetFeed_Address: $(NUGETFEED_ADDRESS)
-        AZURE_DEVOPS_EXT_PAT: $(System.AccessToken)
+    # - script: |
+    #     if not "%BRANCH_NAME%" == "" (
+    #       cd /d $(BB_SRC_ROOT)/BisSchemas
+    #       git branch
+    #     )
+    #   displayName: 'Display Source Branch'
+
+    # - script: $(PY_EXE) $(bb) -v $(BB_V) -a $(BB_ARCH) -s $(strategy) build
+    #   displayName: Build
+    #   env:
+    #     NuGetFeed_Address: $(NUGETFEED_ADDRESS)
+    #     AZURE_DEVOPS_EXT_PAT: $(System.AccessToken)
