@@ -3,7 +3,7 @@
 |  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
 |  * See LICENSE.md in the project root for license terms and full copyright notice.
 ======================================================================================= -->
-<ECSchema schemaName="CifHydraulicAnalysis" alias="cifhydan" version="01.00.06" description="iModel Connector schema containing aspect classes with input properties from the Subsurface Utilities Design and Analysis module as part of Civil Designer applications." xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
+<ECSchema schemaName="CifHydraulicAnalysis" alias="cifhydan" version="01.00.04" description="iModel Connector schema containing aspect classes with input properties from the Subsurface Utilities Design and Analysis module as part of Civil Designer applications." xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
     <ECSchemaReference name="BisCore" version="01.00.14" alias="bis"/>
     <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
     <ECSchemaReference name="CifCommon" version="01.00.03" alias="cifcmn"/>
@@ -11,7 +11,7 @@
     <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
     <ECCustomAttributes>
         <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
-            <SupportedUse>NotForProduction</SupportedUse>
+            <SupportedUse>Production</SupportedUse>
         </ProductionStatus>
         <SchemaLayerInfo xmlns="BisCustomAttributes.01.00.00">
             <Value>Application</Value>
@@ -152,12 +152,12 @@
     </ECEnumeration>
     <ECEnumeration typeName="Conduit_InfiltrationAndInflow_TypeAspect_InfiltrationLoadType_Enum" backingTypeName="int" isStrict="true">
         <ECEnumerator name="None" value="0" displayLabel="None"/>
-        <ECEnumerator name="Pipe_Length" value="1" displayLabel="Pipe Length"/>
+        <ECEnumerator name="Pipe_Length" value="1" displayLabel="Link Length"/>
         <ECEnumerator name="Pipe_Rise_Length" value="2" displayLabel="Pipe Rise-Length"/>
-        <ECEnumerator name="Pipe_Surface_Area" value="3" displayLabel="Pipe Surface Area"/>
+        <ECEnumerator name="Pipe_Surface_Area" value="3" displayLabel="Surface Area"/>
         <ECEnumerator name="Count_Based" value="4" displayLabel="Count Based"/>
         <ECEnumerator name="Hydrograph" value="5" displayLabel="Hydrograph"/>
-        <ECEnumerator name="Pattern_Load" value="6" displayLabel="Pattern Load"/>
+        <ECEnumerator name="Pattern_Load" value="6" displayLabel="Infiltration Pattern Load"/>
     </ECEnumeration>
     <ECEnumeration typeName="Conduit_OutputAspect_OutputOptionsType_Enum" backingTypeName="int" isStrict="true">
         <ECEnumerator name="Summary_Results" value="0" displayLabel="Summary Results"/>
@@ -393,10 +393,10 @@
     <ECEnumeration typeName="ScadaElement_ScadaAspect_TargetAttribute_Enum" backingTypeName="int" isStrict="true">
         <ECEnumerator name="none" value="0" displayLabel="&lt;none&gt;"/>
         <ECEnumerator name="Flow" value="-44" displayLabel="Flow"/>
-        <ECEnumerator name="Hydraulic_Grade_In" value="-45" displayLabel="Hydraulic Grade (From/Suction)"/>
-        <ECEnumerator name="Hydraulic_Grade_Out" value="-46" displayLabel="Hydraulic Grade (To/Discharge)"/>
-        <ECEnumerator name="Pressure_Suction" value="-47" displayLabel="Pressure (From/Suction)"/>
-        <ECEnumerator name="Pressure_Discharge" value="-48" displayLabel="Pressure (To/Discharge)"/>
+        <ECEnumerator name="Hydraulic_Grade_In" value="-45" displayLabel="Hydraulic Grade (In)"/>
+        <ECEnumerator name="Hydraulic_Grade_Out" value="-46" displayLabel="Hydraulic Grade (Out)"/>
+        <ECEnumerator name="Pressure_Suction" value="-47" displayLabel="Pressure (Suction)"/>
+        <ECEnumerator name="Pressure_Discharge" value="-48" displayLabel="Pressure (Discharge)"/>
         <ECEnumerator name="Pressure" value="-54" displayLabel="Pressure"/>
         <ECEnumerator name="Pipe_Status" value="-56" displayLabel="Pipe Status"/>
         <ECEnumerator name="Pump_Status" value="-57" displayLabel="Pump Status"/>
@@ -411,7 +411,7 @@
     </ECEnumeration>
     <ECEnumeration typeName="StandardPump_PhysicalAspect_VSPType_Enum" backingTypeName="int" isStrict="true">
         <ECEnumerator name="Pattern_Based" value="0" displayLabel="Pattern Based"/>
-        <ECEnumerator name="Fixed_Head" value="1" displayLabel="Target Head"/>
+        <ECEnumerator name="Fixed_Head" value="1" displayLabel="Fixed Head"/>
         <ECEnumerator name="Fixed_Flow" value="2" displayLabel="Fixed Flow"/>
     </ECEnumeration>
     <ECEnumeration typeName="SurfaceLine_SurfaceAspect_RoadElevationAdjustmentType_Enum" backingTypeName="int" isStrict="true">
@@ -500,9 +500,9 @@
         <ECEnumerator name="Invert_To_Soffit" value="1" displayLabel="Invert To Soffit"/>
     </ECEnumeration>
     <ECEnumeration typeName="WetWell_Physical_TankSectionAspect_TankSection_Enum" backingTypeName="int" isStrict="true">
-        <ECEnumerator name="Constant_Area___Circular" value="0" displayLabel="Circular"/>
-        <ECEnumerator name="Constant_Area___Non_Circular" value="1" displayLabel="Non-Circular"/>
-        <ECEnumerator name="Variable_Volume" value="2" displayLabel="Variable Area"/>
+        <ECEnumerator name="Constant_Area___Circular" value="0" displayLabel="Constant Area - Circular"/>
+        <ECEnumerator name="Constant_Area___Non_Circular" value="1" displayLabel="Constant Area - Non-Circular"/>
+        <ECEnumerator name="Variable_Volume" value="2" displayLabel="Variable Volume"/>
         <ECEnumerator name="Depth_Area" value="3" displayLabel="Depth Area"/>
         <ECEnumerator name="Depth_ft_to_Area_sq__ft_function" value="4" displayLabel="Depth (ft) to Area (sq. ft) function"/>
         <ECEnumerator name="Depth_m_to_Area_sq__m_function" value="5" displayLabel="Depth (m) to Area (sq. m) function"/>
@@ -668,17 +668,8 @@
         <ECProperty propertyName="InitialSettings_RelativeSpeedFactor" typeName="double" displayLabel="Relative Speed Factor (Initial)" category="Initial_Settings_Drainage_Initial_Settings_Drainage" priority="0" kindOfQuantity="cifu:COEFFICIENT"/>
         <ECProperty propertyName="PumpStatus" typeName="BasePump_InitialSettingsAspect_PumpStatus_Enum" displayLabel="Status (Initial)" category="Initial_Settings_Drainage_Initial_Settings_Drainage" priority="0"/>
     </ECEntityClass>
-    <ECEntityClass typeName="BasePump_PhysicalAspect">
-        <BaseClass>cifcmn:CivilPresentation</BaseClass>
-        <ECProperty propertyName="NodeMicroStationID" typeName="string" displayLabel="MicroStation 3D ID" category="General_Drainage_General_Drainage" priority="0"/>
-        <ECProperty propertyName="NodeMicroStation2dID" typeName="string" displayLabel="MicroStation 2D ID" category="General_Drainage_General_Drainage" priority="0"/>
-    </ECEntityClass>
     <ECEntityClass typeName="BasePumpAspect">
         <BaseClass>BaseDirectedNodeAspect</BaseClass>
-        <ECProperty propertyName="BaselineFeature" typeName="string" displayLabel="Baseline Feature" category="References_Drainage_References_Drainage" priority="0"/>
-        <ECProperty propertyName="BaselineOffset" typeName="double" displayLabel="Baseline Offset" category="References_Drainage_References_Drainage" priority="0" kindOfQuantity="cifu:LENGTH"/>
-        <ECProperty propertyName="BaselineStation" typeName="double" displayLabel="Baseline Station" category="References_Drainage_References_Drainage" priority="0" kindOfQuantity="cifu:STATION"/>
-        <ECProperty propertyName="ElevationReference" typeName="string" displayLabel="Elevation Reference" category="References_Drainage_References_Drainage" priority="0"/>
     </ECEntityClass>
     <ECEntityClass typeName="BaseSimplePolyline_HMIActiveTopologyAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
@@ -1315,7 +1306,7 @@
         <ECProperty propertyName="Physical_NumberOfBarrels" typeName="int" displayLabel="Number of Barrels" category="Physical_Drainage_Physical_Drainage" priority="0"/>
         <ECProperty propertyName="Physical_ConduitShapeLabel" typeName="string" displayLabel="Conduit Description" category="Physical_Drainage_Physical_Drainage" priority="0"/>
         <ECProperty propertyName="Physical_UseLocalConduitShapeLabel" typeName="boolean" displayLabel="Use Local Conduit Description?" category="Physical_Drainage_Physical_Drainage" priority="0"/>
-        <ECProperty propertyName="MultiBarrelGapDistance" typeName="double" displayLabel="Multiple Barrel Gap Distance" category="Physical_Drainage_Physical_Drainage" priority="0" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="MultiBarrelGapDistance" typeName="double" displayLabel="Multiple Barrel Gap" category="Physical_Drainage_Physical_Drainage" priority="0" kindOfQuantity="cifu:LENGTH"/>
     </ECEntityClass>
     <ECEntityClass typeName="Conduit_ShapeAspect" modifier="Abstract">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
@@ -1718,15 +1709,6 @@
         </Source>
         <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
             <Class class="BasePump_InitialSettingsAspect"/>
-        </Target>
-    </ECRelationshipClass>
-    <ECRelationshipClass typeName="ElementOwnsBasePump_PhysicalAspect" modifier="None" strength="embedding">
-        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
-        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
-            <Class class="bis:GeometricElement3d"/>
-        </Source>
-        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
-            <Class class="BasePump_PhysicalAspect"/>
         </Target>
     </ECRelationshipClass>
     <ECRelationshipClass typeName="ElementOwnsBasePumpAspect" modifier="None" strength="embedding">
@@ -3051,7 +3033,7 @@
     <ECEntityClass typeName="GravityNode_DesignAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
         <ECProperty propertyName="Design_DesignStructureElevation" typeName="boolean" displayLabel="Design Structure Elevation?" category="Design_Drainage_Design_Drainage" priority="0"/>
-        <ECProperty propertyName="Design_DesiredSumpDepth" typeName="double" displayLabel="Sump Depth" category="Design_Drainage_Design_Drainage" priority="0" kindOfQuantity="cifu:DEPTH_LARGE"/>
+        <ECProperty propertyName="Design_DesiredSumpDepth" typeName="double" displayLabel="Desired Sump Depth" category="Design_Drainage_Design_Drainage" priority="0" kindOfQuantity="cifu:DEPTH_LARGE"/>
     </ECEntityClass>
     <ECRelationshipClass typeName="ElementOwnsGravityNode_DesignAspect" modifier="None" strength="embedding">
         <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
@@ -3512,7 +3494,7 @@
     <ECEntityClass typeName="Headwall_DesignAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
         <ECProperty propertyName="Design_DesignStructureElevation" typeName="boolean" displayLabel="Design Structure Elevation?" category="Design_Drainage_Design_Drainage" priority="0"/>
-        <ECProperty propertyName="Design_DesiredSumpDepth" typeName="double" displayLabel="Sump Depth" category="Design_Drainage_Design_Drainage" priority="0" kindOfQuantity="cifu:DEPTH_LARGE"/>
+        <ECProperty propertyName="Design_DesiredSumpDepth" typeName="double" displayLabel="Desired Sump Depth" category="Design_Drainage_Design_Drainage" priority="0" kindOfQuantity="cifu:DEPTH_LARGE"/>
         <ECProperty propertyName="Design_NodeMinimumCover" typeName="double" displayLabel="Conduit Cover at Node (Minimum)" category="Design_Drainage_Design_Drainage" priority="0" kindOfQuantity="cifu:ELEVATION"/>
         <ECProperty propertyName="Design_NodeMaximumCover" typeName="double" displayLabel="Conduit Cover at Node (Maximum)" category="Design_Drainage_Design_Drainage" priority="0" kindOfQuantity="cifu:ELEVATION"/>
         <ECProperty propertyName="Design_LocalPipeMatchingConstraints" typeName="boolean" displayLabel="Local Pipe Matching Constraints?" category="Design_Drainage_Design_Drainage" priority="0"/>
@@ -4342,7 +4324,7 @@
     </ECRelationshipClass>
     <ECEntityClass typeName="ScadaElement_ScadaAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
-        <ECProperty propertyName="Scada_TargetElementStorageUnit" typeName="int" displayLabel="Model Element (Storage Unit)" category="SCADA_Drainage_SCADA_Drainage" priority="0"/>
+        <ECProperty propertyName="Scada_TargetElementStorageUnit" typeName="int" displayLabel="Target Element (Storage Unit)" category="SCADA_Drainage_SCADA_Drainage" priority="0"/>
         <ECProperty propertyName="TargetAttribute" typeName="ScadaElement_ScadaAspect_TargetAttribute_Enum" displayLabel="Field" category="SCADA_Drainage_SCADA_Drainage" priority="0"/>
     </ECEntityClass>
     <ECRelationshipClass typeName="ElementOwnsScadaElement_ScadaAspect" modifier="None" strength="embedding">
