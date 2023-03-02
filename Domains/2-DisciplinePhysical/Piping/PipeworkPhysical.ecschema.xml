@@ -14,22 +14,22 @@
         </SchemaLayerInfo>
     </ECCustomAttributes>
 
-    <ECEntityClass typeName="PipingComponent" modifier="Abstract" displayLabel="Piping Component" description="TODO">
+    <ECEntityClass typeName="PipingComponent" modifier="Abstract" displayLabel="Piping Component" description="A bis:PhysicalElement that serves as the base class for concepts that model elements that facilitate the distribution of matter in a piping network.">
         <BaseClass>bis:PhysicalElement</BaseClass>
         <BaseClass>dsys:IDistributionFlowElement</BaseClass>
     </ECEntityClass>
 
-    <ECEntityClass typeName="PipingComponentType" modifier="Abstract" displayLabel="Piping Component Type" description="TODO">
+    <ECEntityClass typeName="PipingComponentType" modifier="Abstract" displayLabel="Piping Component Type" description="Base class for bis:PhysicalTypes that define a shared set of properties whose values vary per-type of PipingComponent rather than per-instance.">
         <BaseClass>bis:PhysicalType</BaseClass>
     </ECEntityClass>
 
-    <ECEntityClass typeName="PipeNominalDiameter" modifier="Sealed" displayLabel="Pipe Nominal Diameter" description="TODO">
+    <ECEntityClass typeName="PipeNominalDiameter" modifier="Sealed" displayLabel="Pipe Nominal Diameter" description="A bis:DefinitionElement that models standard sizes for pipes.">
         <BaseClass>bis:DefinitionElement</BaseClass>
-        <ECProperty propertyName="NominalDiameter" typeName="double" kindOfQuantity="AECU:LENGTH_SHORT" displayLabel="Nominal Diameter" description="TODO"/>
-        <ECProperty propertyName="OutsideDiameter" typeName="double" kindOfQuantity="AECU:LENGTH_SHORT" displayLabel="Outside Diameter" description="TODO"/>
+        <ECProperty propertyName="NominalDiameter" typeName="double" kindOfQuantity="AECU:LENGTH_SHORT" displayLabel="Nominal Diameter" description="Nominal pipe diameter"/>
+        <ECProperty propertyName="OutsideDiameter" typeName="double" kindOfQuantity="AECU:LENGTH_SHORT" displayLabel="Outside Diameter" description="Outside pipe diameter"/>
     </ECEntityClass>
 
-    <ECEntityClass typeName="PipeSchedule" modifier="Sealed" displayLabel="Pipe Schedule" description="TODO">
+    <ECEntityClass typeName="PipeSchedule" modifier="Sealed" displayLabel="Pipe Schedule" description="A bis:DefinitionElement that models standardized Pipe Schedules that describe associated Wall Thicknesses.">
         <BaseClass>bis:DefinitionElement</BaseClass>
     </ECEntityClass>
 
@@ -52,7 +52,7 @@
         </Target>
     </ECRelationshipClass>
 
-    <ECEntityClass typeName="PipingComponentPressureClass" modifier="Sealed" displayLabel="Pressure Class" description="TODO">
+    <ECEntityClass typeName="PipingComponentPressureClass" modifier="Sealed" displayLabel="Pressure Class" description="A bis:DefinitionElement that models standardized Pressure Class values that describe associated Pressure Temperature Ratings.">
         <BaseClass>bis:DefinitionElement</BaseClass>        
     </ECEntityClass>
 
@@ -141,25 +141,25 @@
         </Target>
     </ECRelationshipClass>
 
-    <ECEntityClass typeName="PipeElement" modifier="Abstract" displayLabel="Pipe Element" description="TODO">
+    <ECEntityClass typeName="PipeElement" modifier="Abstract" displayLabel="Pipe Element" description="A PipingComponent used to typically join two sections of a piping network.">
         <BaseClass>PipingComponent</BaseClass>
     </ECEntityClass>
 
-    <ECEntityClass typeName="PipeElementType" modifier="Abstract" displayLabel="Pipe Element Type" description="TODO">
+    <ECEntityClass typeName="PipeElementType" modifier="Abstract" displayLabel="Pipe Element Type" description="Defines a shared set of properties whose values vary per-type of PipeElement rather than per-instance.">
         <BaseClass>PipingComponentType</BaseClass>
         <BaseClass>ITwoPortTypesConstantDiameterPipingComponentType</BaseClass>
     </ECEntityClass>
 
-    <ECEntityClass typeName="Pipe" modifier="None" displayLabel="Pipe" description="TODO">
+    <ECEntityClass typeName="Pipe" modifier="None" displayLabel="Pipe" description="A straight PipingComponent used to typically join two sections of a piping network.">
         <BaseClass>PipeElement</BaseClass>
     </ECEntityClass>
 
-    <ECEntityClass typeName="PipeType" modifier="None" displayLabel="Pipe Type" description="TODO">
+    <ECEntityClass typeName="PipeType" modifier="None" displayLabel="Pipe Type" description="Defines a shared set of properties whose values vary per-type of Pipe rather than per-instance.">
         <BaseClass>PipeElementType</BaseClass>
         <BaseClass>IScheduleDesignatedPipingComponentType</BaseClass>
     </ECEntityClass>
 
-    <ECRelationshipClass typeName="PipeIsOfType" strength="referencing" modifier="None" description="TODO">
+    <ECRelationshipClass typeName="PipeIsOfType" strength="referencing" modifier="None" description="A type-instance relation; one that indicates that the specific Pipe is an instance of the defined PipeType">
         <BaseClass>bis:PhysicalElementIsOfType</BaseClass>
         <Source multiplicity="(0..*)" roleLabel="is of" polymorphic="true">
             <Class class="Pipe" />
@@ -169,15 +169,15 @@
         </Target>
     </ECRelationshipClass>
 
-    <ECEntityClass typeName="PipeFitting" modifier="None" displayLabel="Pipe Fitting" description="TODO">
+    <ECEntityClass typeName="PipeFitting" modifier="None" displayLabel="Pipe Fitting" description="A PipingComponent that acts as a junction or transition in a piping flow distribution system used to connect Pipes and other PipingComponents, resulting in changes in flow characteristics to the fluid such as direction or flow rate.">
         <BaseClass>PipingComponent</BaseClass>
     </ECEntityClass>
 
-    <ECEntityClass typeName="PipeFittingType" modifier="Abstract" displayLabel="Pipe Fitting Type" description="TODO">
+    <ECEntityClass typeName="PipeFittingType" modifier="Abstract" displayLabel="Pipe Fitting Type" description="Base class for PipingComponentTypes that define a shared set of properties whose values vary per-type of PipeFitting rather than per-instance.">
         <BaseClass>PipingComponentType</BaseClass>
     </ECEntityClass>
 
-    <ECRelationshipClass typeName="PipeFittingIsOfType" strength="referencing" modifier="None" description="TODO">
+    <ECRelationshipClass typeName="PipeFittingIsOfType" strength="referencing" modifier="None" description="A type-instance relation; one that indicates that the specific PipeFitting is an instance of the defined PipeFittingType.">
         <BaseClass>bis:PhysicalElementIsOfType</BaseClass>
         <Source multiplicity="(0..*)" roleLabel="is of" polymorphic="true">
             <Class class="PipeFitting" />
@@ -187,48 +187,48 @@
         </Target>
     </ECRelationshipClass>
 
-    <ECEntityClass typeName="ReducerType" modifier="None" displayLabel="Reducer Type" description="TODO">
+    <ECEntityClass typeName="ReducerType" modifier="None" displayLabel="Reducer Type" description="A PipeFittingType that classifies associated PipeFitting instances as Reducers.">
         <BaseClass>PipeFittingType</BaseClass>
         <BaseClass>ITwoPortTypesPipingComponentType</BaseClass>
     </ECEntityClass>
 
-    <ECEntityClass typeName="BendType" modifier="None" displayLabel="Bend Type" description="TODO">
+    <ECEntityClass typeName="BendType" modifier="None" displayLabel="Bend Type" description="A PipeFittingType that classifies associated PipeFitting instances as Bends.">
         <BaseClass>PipeFittingType</BaseClass>
         <BaseClass>ITwoPortTypesPipingComponentType</BaseClass>
         <ECProperty propertyName="Angle" typeName="double" kindOfQuantity="AECU:ANGLE" displayLabel="Angle" description="TODO"/>
         <ECProperty propertyName="Radius" typeName="double" kindOfQuantity="AECU:LENGTH_SHORT" displayLabel="Radius" description="TODO"/>
     </ECEntityClass>
 
-    <ECEntityClass typeName="FlangeType" modifier="None" displayLabel="Flange Type" description="TODO">
+    <ECEntityClass typeName="FlangeType" modifier="None" displayLabel="Flange Type" description="A PipeFittingType that classifies associated PipeFitting instances as Flanges.">
         <BaseClass>PipeFittingType</BaseClass>
         <BaseClass>IPressureClassDesignatedPipingComponentType</BaseClass>
         <BaseClass>ISinglePortTypePipingComponentType</BaseClass>
     </ECEntityClass>
 
-    <ECEntityClass typeName="FlexBellowType" modifier="None" displayLabel="Flex-Bellow Type" description="TODO">
+    <ECEntityClass typeName="FlexBellowType" modifier="None" displayLabel="Flex-Bellow Type" description="A PipeFittingType that classifies associated PipeFitting instances as FlexBellows.">
         <BaseClass>PipeFittingType</BaseClass>
         <BaseClass>ISinglePortTypePipingComponentType</BaseClass>
     </ECEntityClass>
 
-    <ECEntityClass typeName="BranchType" modifier="Abstract" displayLabel="Branch Type" description="TODO">
+    <ECEntityClass typeName="BranchType" modifier="Abstract" displayLabel="Branch Type" description="Base class for PipeFittingTypes that redistribute flow among their PipingPorts.">
         <BaseClass>PipeFittingType</BaseClass>
     </ECEntityClass>
 
-    <ECEntityClass typeName="TeeType" modifier="None" displayLabel="Tee Type" description="TODO">
+    <ECEntityClass typeName="TeeType" modifier="None" displayLabel="Tee Type" description="A BranchType that classifies associated PipeFitting instances as Tees.">
         <BaseClass>BranchType</BaseClass>
         <BaseClass>ITwoPortTypesPipingComponentType</BaseClass>
     </ECEntityClass>
 
-    <ECEntityClass typeName="CrossType" modifier="None" displayLabel="Cross Type" description="TODO">
+    <ECEntityClass typeName="CrossType" modifier="None" displayLabel="Cross Type" description="A BranchType that classifies associated PipeFitting instances as Crosses.">
         <BaseClass>BranchType</BaseClass>
         <BaseClass>ITwoPortTypesPipingComponentType</BaseClass>
     </ECEntityClass>
 
-    <ECEntityClass typeName="Valve" modifier="None" displayLabel="Valve" description="TODO">
+    <ECEntityClass typeName="Valve" modifier="None" displayLabel="Valve" description="A PipingComponent used to control or modulate the flow of fluid in a piping network.">
         <BaseClass>PipingComponent</BaseClass>
     </ECEntityClass>
 
-    <ECEntityClass typeName="ValveType" modifier="None" displayLabel="Valve Type" description="TODO">
+    <ECEntityClass typeName="ValveType" modifier="None" displayLabel="Valve Type" description="Defines a shared set of properties whose values vary per-type of Valve rather than per-instance.">
         <BaseClass>PipingComponentType</BaseClass>
         <BaseClass>IPressureClassDesignatedPipingComponentType</BaseClass>
         <BaseClass>ITwoPortTypesPipingComponentType</BaseClass>
@@ -245,11 +245,11 @@
         </Target>
     </ECRelationshipClass>
 
-    <ECEntityClass typeName="PipingPortElement" modifier="Abstract" displayLabel="Piping Port Element" description="TODO">
+    <ECEntityClass typeName="PipingPortElement" modifier="Abstract" displayLabel="Piping Port Element" description="A dsys:DistributionPort of a PipingComponent.">
         <BaseClass>dsys:DistributionPort</BaseClass>
     </ECEntityClass>
 
-    <ECRelationshipClass typeName="PipingComponentOwnsPorts" strength="embedding" modifier="None" description="TODO">
+    <ECRelationshipClass typeName="PipingComponentOwnsPorts" strength="embedding" modifier="None" description="Relationship between a PipingComponent and its Ports.">
         <BaseClass>dsys:DistributionElementOwnsDistributionPorts</BaseClass>
         <Source multiplicity="(0..1)" roleLabel="owns" polymorphic="true">
             <Class class="PipingComponent"/>
@@ -259,16 +259,16 @@
         </Target>
     </ECRelationshipClass>
 
-    <ECEntityClass typeName="PipingPort" modifier="None" displayLabel="Piping Port" description="TODO">
+    <ECEntityClass typeName="PipingPort" modifier="None" displayLabel="Piping Port" description="A general dsys:DistributionPort of a PipingComponent.">
         <BaseClass>PipingPortElement</BaseClass>
     </ECEntityClass>
 
-    <ECEntityClass typeName="PipingPortType" modifier="Abstract" displayLabel="Piping Port Type" description="TODO">
+    <ECEntityClass typeName="PipingPortType" modifier="Abstract" displayLabel="Piping Port Type" description="Defines a shared set of properties whose values vary per-type of PipingPort rather than per-instance.">
         <BaseClass>bis:SpatialLocationType</BaseClass>
-        <ECNavigationProperty propertyName="NominalDiameter" relationshipName="PipingPortTypeIsOfNominalDiameter" direction="Forward" displayLabel="Nominal Diameter" description="TODO"/>
+        <ECNavigationProperty propertyName="NominalDiameter" relationshipName="PipingPortTypeIsOfNominalDiameter" direction="Forward" displayLabel="Nominal Diameter" description="Nominal Diameter of a PipingPortType."/>
     </ECEntityClass>
 
-    <ECRelationshipClass typeName="PipingPortTypeIsOfNominalDiameter" strength="referencing" modifier="None" description="TODO">
+    <ECRelationshipClass typeName="PipingPortTypeIsOfNominalDiameter" strength="referencing" modifier="None" description="Relationship between a PipingPortType and its NominalDiameter.">
         <Source multiplicity="(0..*)" polymorphic="true" roleLabel="is of">
             <Class class="PipingPortType"/>
         </Source>
@@ -277,7 +277,7 @@
         </Target>
     </ECRelationshipClass>
 
-    <ECRelationshipClass typeName="PipingPortIsOfType" strength="referencing" modifier="None" description="TODO">
+    <ECRelationshipClass typeName="PipingPortIsOfType" strength="referencing" modifier="None" description="A type-instance relation; one that indicates that the specific PipingPort is an instance of the defined PipingPortType">
         <BaseClass>bis:SpatialLocationIsOfType</BaseClass>
         <Source multiplicity="(0..*)" roleLabel="is of" polymorphic="true">
             <Class class="PipingPort" />
@@ -287,35 +287,35 @@
         </Target>
     </ECRelationshipClass>
 
-    <ECEntityClass typeName="CompressionPortType" modifier="None" displayLabel="Compression Port Type" description="TODO">
+    <ECEntityClass typeName="CompressionPortType" modifier="None" displayLabel="Compression Port Type" description="A PipingPortType that classifies associated PipingPort instances as CompressionPorts.">
         <BaseClass>PipingPortType</BaseClass>
     </ECEntityClass>
 
-    <ECEntityClass typeName="FlangedPortType" modifier="None" displayLabel="Flanged Port Type" description="TODO">
+    <ECEntityClass typeName="FlangedPortType" modifier="None" displayLabel="Flanged Port Type" description="A PipingPortType that classifies associated PipingPort instances as FlangedPorts.">
         <BaseClass>PipingPortType</BaseClass>
     </ECEntityClass>
 
-    <ECEntityClass typeName="GroovedPortType" modifier="None" displayLabel="Grooved Port Type" description="TODO">
+    <ECEntityClass typeName="GroovedPortType" modifier="None" displayLabel="Grooved Port Type" description="A PipingPortType that classifies associated PipingPort instances as GroovedPorts.">
         <BaseClass>PipingPortType</BaseClass>
     </ECEntityClass>
 
-    <ECEntityClass typeName="OutsideSleevePortType" modifier="None" displayLabel="Outside-Sleeve Port Type" description="TODO">
+    <ECEntityClass typeName="OutsideSleevePortType" modifier="None" displayLabel="Outside-Sleeve Port Type" description="A PipingPortType that classifies associated PipingPort instances as OutsideSleevePorts.">
         <BaseClass>PipingPortType</BaseClass>
     </ECEntityClass>
 
-    <ECEntityClass typeName="SolderedPortType" modifier="None" displayLabel="Soldered Port Type" description="TODO">
+    <ECEntityClass typeName="SolderedPortType" modifier="None" displayLabel="Soldered Port Type" description="A PipingPortType that classifies associated PipingPort instances as SolderedPorts.">
         <BaseClass>PipingPortType</BaseClass>
     </ECEntityClass>
 
-    <ECEntityClass typeName="SwedgePortType" modifier="None" displayLabel="Swedge Port Type" description="TODO">
+    <ECEntityClass typeName="SwedgePortType" modifier="None" displayLabel="Swedge Port Type" description="A PipingPortType that classifies associated PipingPort instances as SwedgePorts.">
         <BaseClass>PipingPortType</BaseClass>
     </ECEntityClass>
 
-    <ECEntityClass typeName="ThreadedPortType" modifier="None" displayLabel="Threaded Port Type" description="TODO">
+    <ECEntityClass typeName="ThreadedPortType" modifier="None" displayLabel="Threaded Port Type" description="A PipingPortType that classifies associated PipingPort instances as ThreadedPorts.">
         <BaseClass>PipingPortType</BaseClass>
     </ECEntityClass>
 
-    <ECEntityClass typeName="WeldedPortType" modifier="None" displayLabel="Welded Port Type" description="TODO">
+    <ECEntityClass typeName="WeldedPortType" modifier="None" displayLabel="Welded Port Type" description="A PipingPortType that classifies associated PipingPort instances as WeldedPorts.">
         <BaseClass>PipingPortType</BaseClass>
     </ECEntityClass>
 </ECSchema>
