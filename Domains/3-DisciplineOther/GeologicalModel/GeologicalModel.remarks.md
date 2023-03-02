@@ -11,6 +11,9 @@ The `GeologicalModel` schema defines classes that represent data for interpretin
 - It models one view of reality and not reality itself.
 - There can be multiple interpretations of the same subterranean region.
 
+![GeologicalModel - classes](./media/geologicalmodel-classes-1.png)
+![GeologicalModel - classes](./media/geologicalmodel-classes-2.png)
+
 ## Entity Classes
 
 ### FaultBlock
