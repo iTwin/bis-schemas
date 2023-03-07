@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ECSchema schemaName="GeologicalModel" alias="geomodel" version="01.00.00" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" displayLabel="Geological Model" description="The GeologicalModel schema defines classes that represent data for interpreting the earth's subterranean structure">
+    <ECSchemaReference name="BisCore" version="01.00.04" alias="bis" />
+    <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
+    <ECSchemaReference name="Analytical" version="01.00.00" alias="anlyt" />
+
+    <ECEntityClass typeName="GeologicAnalyticalPartition" modifier="Sealed" description="A specialized Analytical Partition advertising a Geologic model (interpretation) based on Fault Blocks partitioned by one or more Fault Surfaces.">
+        <BaseClass>anlyt:AnalyticalPartition</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="GeologicalModel" modifier="Sealed" description="An AnalyticalModel specialization expected to contain GeologicElement3d instances at different granularities.">
+        <BaseClass>anlyt:AnalyticalModel</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="GeologicElement3d" modifier="Abstract" description="An AnalyticalElement serving as common base class for all element-classes modeling Geological concepts.">
+        <BaseClass>anlyt:AnalyticalElement</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="FaultBlock" modifier="None" description="A GeologicElement3d modeling a set of volumes and surfaces that may be partitioned by one or more Fault Surfaces">
+        <BaseClass>GeologicElement3d</BaseClass>
+        <BaseClass>bis:IParentElement</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="GeologicalCategoryVolume" modifier="None" description="A GeologicElement3d modeling a Volume of a particular Category. Categories commonly represent Lithology.">
+        <BaseClass>GeologicElement3d</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="ContactSurface" modifier="None" description="A GeologicElement3d modeling a surface between two or more Category Volumes.">
+        <BaseClass>GeologicElement3d</BaseClass>
+    </ECEntityClass>
+    
+    <ECEntityClass typeName="FaultSurface" modifier="None" description="A GeologicElement3d modeling a surface that describes a Fault that partitions a Geological Model.">
+        <BaseClass>GeologicElement3d</BaseClass>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="FaultBlockOwnsGeologicalCategoryVolume" modifier="None" strength="embedding" description="Relates a FaultBlock to child GeologicCategoryVolumes.">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="owns" polymorphic="true">
+            <Class class="FaultBlock"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="true">
+            <Class class="GeologicalCategoryVolume"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="FaultBlockOwnsContactSurface" modifier="None" strength="embedding" description="Relates a FaultBlock to child ContactSurfaces.">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="owns" polymorphic="true">
+            <Class class="FaultBlock"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="true">
+            <Class class="ContactSurface"/>
+        </Target>
+    </ECRelationshipClass>
+</ECSchema>
