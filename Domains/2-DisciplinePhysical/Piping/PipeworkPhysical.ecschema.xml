@@ -23,6 +23,17 @@
         <BaseClass>bis:PhysicalType</BaseClass>
     </ECEntityClass>
 
+    <ECRelationshipClass typeName="PipingComponentTypeIncludesPortTypes" strength="referencing" modifier="None" description="Relationship that associates a PipingComponentType with the PipingPortTypes included in it.">
+        <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <Source multiplicity="(0..*)" polymorphic="true" roleLabel="includes">
+            <Class class="PipingComponentType"/>
+        </Source>
+        <Target multiplicity="(0..*)" polymorphic="true" roleLabel="is included in">
+            <Class class="PipingPortType"/>
+        </Target>
+        <ECProperty propertyName="PortCount" typeName="int" kindOfQuantity="AECU:LENGTH_SHORT" displayLabel="Port Count" description="Port-instance count of the referenced PortType included in the PipingComponentType."/>
+    </ECRelationshipClass>
+
     <ECEntityClass typeName="PipeNominalDiameter" modifier="Sealed" displayLabel="Pipe Nominal Diameter" description="A bis:DefinitionElement that models standard sizes for pipes.">
         <BaseClass>bis:DefinitionElement</BaseClass>
         <ECProperty propertyName="NominalDiameter" typeName="double" kindOfQuantity="AECU:LENGTH_SHORT" displayLabel="Nominal Diameter" description="Nominal pipe diameter"/>
@@ -33,17 +44,17 @@
         <BaseClass>bis:DefinitionElement</BaseClass>
     </ECEntityClass>
 
-    <ECEntityClass typeName="IScheduleDesignatedPipingComponentType" modifier="Abstract" displayLabel="Piping Component Designated by Schedule" description="TODO">
+    <ECEntityClass typeName="IScheduleDesignatedPipingComponentType" modifier="Abstract" displayLabel="Piping Component Designated by Schedule" description="An interface that can be mixed-into a PipingComponentType to indicate that it is designated by Schedule. This interface is mutually exclusive with IPressureClassDesignatedPipingComponentType.">
         <ECCustomAttributes>
-            <IsMixin xmlns='CoreCustomAttributes.01.00.00'>
+            <IsMixin xmlns='CoreCustomAttributes.01.00.03'>
                 <AppliesToEntityClass>PipingComponentType</AppliesToEntityClass>
             </IsMixin>
         </ECCustomAttributes>
-        <ECNavigationProperty propertyName="Schedule" relationshipName="PipingComponentTypeIsOfSchedule" direction="Forward" displayLabel="Schedule" description="TODO"/>
-        <ECProperty propertyName="WallThickness" typeName="double" kindOfQuantity="AECU:LENGTH_SHORT" displayLabel="Wall Thickness" description="TODO"/>
+        <ECNavigationProperty propertyName="Schedule" relationshipName="PipingComponentTypeIsOfSchedule" direction="Forward" displayLabel="Schedule" description="Schedule of the Piping Component Type."/>
+        <ECProperty propertyName="WallThickness" typeName="double" kindOfQuantity="AECU:LENGTH_SHORT" displayLabel="Wall Thickness" description="Wall thickness of the Piping Component Type."/>
     </ECEntityClass>
 
-    <ECRelationshipClass typeName="PipingComponentTypeIsOfSchedule" strength="referencing" modifier="None" description="TODO">
+    <ECRelationshipClass typeName="PipingComponentTypeIsOfSchedule" strength="referencing" modifier="None" description="Relationship that indicates the specific Piping Component Type is designed by a particular Schedule instance.">
         <Source multiplicity="(0..*)" polymorphic="true" roleLabel="is of">
             <Class class="IScheduleDesignatedPipingComponentType"/>
         </Source>
@@ -56,17 +67,17 @@
         <BaseClass>bis:DefinitionElement</BaseClass>        
     </ECEntityClass>
 
-    <ECEntityClass typeName="IPressureClassDesignatedPipingComponentType" modifier="Abstract" displayLabel="Piping Component Designated by Pressure Class" description="TODO">
+    <ECEntityClass typeName="IPressureClassDesignatedPipingComponentType" modifier="Abstract" displayLabel="Piping Component Designated by Pressure Class" description="An interface that can be mixed-into a PipingComponentType to indicate that it is designated by Pressure Class. This interface is mutually exclusive with IScheduleDesignatedPipingComponentType.">
         <ECCustomAttributes>
-            <IsMixin xmlns='CoreCustomAttributes.01.00.00'>
+            <IsMixin xmlns='CoreCustomAttributes.01.00.03'>
                 <AppliesToEntityClass>PipingComponentType</AppliesToEntityClass>
             </IsMixin>
         </ECCustomAttributes>
-        <ECNavigationProperty propertyName="PressureClass" relationshipName="PipingComponentTypeIsOfPressureClass" direction="Forward" displayLabel="Class" description="TODO"/>
-        <ECProperty propertyName="PressureRating" typeName="double" kindOfQuantity="AECU:PRESSURE" displayLabel="Pressure Rating" description="TODO"/>
+        <ECNavigationProperty propertyName="PressureClass" relationshipName="PipingComponentTypeIsOfPressureClass" direction="Forward" displayLabel="Class" description="Pressure Class of the Piping Component Type."/>
+        <ECProperty propertyName="PressureRating" typeName="double" kindOfQuantity="AECU:PRESSURE" displayLabel="Pressure Rating" description="Pressure Rating of the Piping Component Type."/>
     </ECEntityClass>
 
-    <ECRelationshipClass typeName="PipingComponentTypeIsOfPressureClass" strength="referencing" modifier="None" description="TODO">
+    <ECRelationshipClass typeName="PipingComponentTypeIsOfPressureClass" strength="referencing" modifier="None" description="Relationship that indicates the specific Piping Component Type is designed by a particular PressureClass instance.">
         <Source multiplicity="(0..*)" polymorphic="true" roleLabel="is of">
             <Class class="IPressureClassDesignatedPipingComponentType"/>
         </Source>
@@ -75,66 +86,18 @@
         </Target>
     </ECRelationshipClass>
 
-    <ECEntityClass typeName="ISinglePortTypePipingComponentType" modifier="Abstract" displayLabel="Single Port Type Piping Component Type" description="TODO">
+    <ECEntityClass typeName="IInvariantDiameterPipingComponentType" modifier="Abstract" displayLabel="Invariant Diameter Piping Component Type" description="An interface that can be mixed-into PipingComponentTypes with an invariant Nominal Diameter.">
         <ECCustomAttributes>
-            <IsMixin xmlns='CoreCustomAttributes.01.00.00'>
+            <IsMixin xmlns='CoreCustomAttributes.01.00.03'>
                 <AppliesToEntityClass>PipingComponentType</AppliesToEntityClass>
             </IsMixin>
         </ECCustomAttributes>
-        <ECNavigationProperty propertyName="PortType" relationshipName="PipingComponentTypeUsesPortType" direction="Forward" displayLabel="Port Type" description="TODO"/>
-        <ECNavigationProperty propertyName="NominalDiameter" relationshipName="PipingComponentTypeIsOfNominalDiameter" direction="Forward" displayLabel="Nominal Diameter" description="TODO"/>
+        <ECNavigationProperty propertyName="NominalDiameter" relationshipName="PipingComponentTypeIsOfNominalDiameter" direction="Forward" displayLabel="Nominal Diameter" description="Nominal Diameter of the PipingComponent."/>
     </ECEntityClass>
 
-    <ECRelationshipClass typeName="PipingComponentTypeIsOfNominalDiameter" strength="referencing" modifier="None" description="TODO">
+    <ECRelationshipClass typeName="PipingComponentTypeIsOfNominalDiameter" strength="referencing" modifier="None" description="Relationship that indicates the specific PipingComponentType is of a particular NominalDiameter instance.">
         <Source multiplicity="(0..*)" polymorphic="true" roleLabel="is of">
-            <Class class="ISinglePortTypePipingComponentType"/>
-        </Source>
-        <Target multiplicity="(0..1)" polymorphic="true" roleLabel="applies to">
-            <Class class="PipeNominalDiameter"/>
-        </Target>
-    </ECRelationshipClass>
-
-    <ECRelationshipClass typeName="PipingComponentTypeUsesPortType" strength="referencing" modifier="None" description="TODO">
-        <Source multiplicity="(0..*)" polymorphic="true" roleLabel="is of">
-            <Class class="ISinglePortTypePipingComponentType"/>
-        </Source>
-        <Target multiplicity="(0..1)" polymorphic="true" roleLabel="applies to">
-            <Class class="PipingPortType"/>
-        </Target>
-    </ECRelationshipClass>
-
-    <ECEntityClass typeName="ITwoPortTypesConstantDiameterPipingComponentType" modifier="Abstract" displayLabel="Two Port Types Constant Diameter Piping Component Type" description="TODO">
-        <BaseClass>ISinglePortTypePipingComponentType</BaseClass>
-        <ECCustomAttributes>
-            <IsMixin xmlns='CoreCustomAttributes.01.00.00'>
-                <AppliesToEntityClass>PipingComponentType</AppliesToEntityClass>
-            </IsMixin>
-        </ECCustomAttributes>
-        <ECNavigationProperty propertyName="SecondPortType" relationshipName="PipingComponentTypeUsesSecondPortType" direction="Forward" displayLabel="Second Port Type" description="TODO"/>        
-    </ECEntityClass>
-
-    <ECEntityClass typeName="ITwoPortTypesPipingComponentType" modifier="Abstract" displayLabel="Two Port Types Piping Component Type" description="TODO">
-        <BaseClass>ITwoPortTypesConstantDiameterPipingComponentType</BaseClass>
-        <ECCustomAttributes>
-            <IsMixin xmlns='CoreCustomAttributes.01.00.00'>
-                <AppliesToEntityClass>PipingComponentType</AppliesToEntityClass>
-            </IsMixin>
-        </ECCustomAttributes>
-        <ECNavigationProperty propertyName="NominalDiameterSecondPortType" relationshipName="PipingComponentTypeSecondPortTypeIsOfNominalDiameter" direction="Forward" displayLabel="Nominal Diameter Port Type 2" description="TODO"/>
-    </ECEntityClass>
-
-    <ECRelationshipClass typeName="PipingComponentTypeUsesSecondPortType" strength="referencing" modifier="None" description="TODO">
-        <Source multiplicity="(0..*)" polymorphic="true" roleLabel="uses">
-            <Class class="ITwoPortTypesConstantDiameterPipingComponentType"/>
-        </Source>
-        <Target multiplicity="(0..1)" polymorphic="true" roleLabel="is used by">
-            <Class class="PipingPortType"/>
-        </Target>
-    </ECRelationshipClass>
-
-    <ECRelationshipClass typeName="PipingComponentTypeSecondPortTypeIsOfNominalDiameter" strength="referencing" modifier="None" description="TODO">
-        <Source multiplicity="(0..*)" polymorphic="true" roleLabel="is of">
-            <Class class="ITwoPortTypesPipingComponentType"/>
+            <Class class="IInvariantDiameterPipingComponentType"/>
         </Source>
         <Target multiplicity="(0..1)" polymorphic="true" roleLabel="applies to">
             <Class class="PipeNominalDiameter"/>
@@ -147,7 +110,7 @@
 
     <ECEntityClass typeName="PipeElementType" modifier="Abstract" displayLabel="Pipe Element Type" description="Defines a shared set of properties whose values vary per-type of PipeElement rather than per-instance.">
         <BaseClass>PipingComponentType</BaseClass>
-        <BaseClass>ITwoPortTypesConstantDiameterPipingComponentType</BaseClass>
+        <BaseClass>IInvariantDiameterPipingComponentType</BaseClass>
     </ECEntityClass>
 
     <ECEntityClass typeName="Pipe" modifier="None" displayLabel="Pipe" description="A straight PipingComponent used to typically join two sections of a piping network.">
@@ -189,25 +152,23 @@
 
     <ECEntityClass typeName="ReducerType" modifier="None" displayLabel="Reducer Type" description="A PipeFittingType that classifies associated PipeFitting instances as Reducers.">
         <BaseClass>PipeFittingType</BaseClass>
-        <BaseClass>ITwoPortTypesPipingComponentType</BaseClass>
     </ECEntityClass>
 
     <ECEntityClass typeName="BendType" modifier="None" displayLabel="Bend Type" description="A PipeFittingType that classifies associated PipeFitting instances as Bends.">
         <BaseClass>PipeFittingType</BaseClass>
-        <BaseClass>ITwoPortTypesPipingComponentType</BaseClass>
-        <ECProperty propertyName="Angle" typeName="double" kindOfQuantity="AECU:ANGLE" displayLabel="Angle" description="TODO"/>
-        <ECProperty propertyName="Radius" typeName="double" kindOfQuantity="AECU:LENGTH_SHORT" displayLabel="Radius" description="TODO"/>
+        <ECProperty propertyName="Angle" typeName="double" kindOfQuantity="AECU:ANGLE" displayLabel="Angle" description="The change of direction of flow for the Bend Type."/>
+        <ECProperty propertyName="Radius" typeName="double" kindOfQuantity="AECU:LENGTH_SHORT" displayLabel="Radius" description="The radius of bending for the Bend Type."/>
     </ECEntityClass>
 
     <ECEntityClass typeName="FlangeType" modifier="None" displayLabel="Flange Type" description="A PipeFittingType that classifies associated PipeFitting instances as Flanges.">
         <BaseClass>PipeFittingType</BaseClass>
         <BaseClass>IPressureClassDesignatedPipingComponentType</BaseClass>
-        <BaseClass>ISinglePortTypePipingComponentType</BaseClass>
+        <BaseClass>IInvariantDiameterPipingComponentType</BaseClass>
     </ECEntityClass>
 
     <ECEntityClass typeName="FlexBellowType" modifier="None" displayLabel="Flex-Bellow Type" description="A PipeFittingType that classifies associated PipeFitting instances as FlexBellows.">
         <BaseClass>PipeFittingType</BaseClass>
-        <BaseClass>ISinglePortTypePipingComponentType</BaseClass>
+        <BaseClass>IInvariantDiameterPipingComponentType</BaseClass>
     </ECEntityClass>
 
     <ECEntityClass typeName="BranchType" modifier="Abstract" displayLabel="Branch Type" description="Base class for PipeFittingTypes that redistribute flow among their PipingPorts.">
@@ -216,12 +177,10 @@
 
     <ECEntityClass typeName="TeeType" modifier="None" displayLabel="Tee Type" description="A BranchType that classifies associated PipeFitting instances as Tees.">
         <BaseClass>BranchType</BaseClass>
-        <BaseClass>ITwoPortTypesPipingComponentType</BaseClass>
     </ECEntityClass>
 
     <ECEntityClass typeName="CrossType" modifier="None" displayLabel="Cross Type" description="A BranchType that classifies associated PipeFitting instances as Crosses.">
         <BaseClass>BranchType</BaseClass>
-        <BaseClass>ITwoPortTypesPipingComponentType</BaseClass>
     </ECEntityClass>
 
     <ECEntityClass typeName="Valve" modifier="None" displayLabel="Valve" description="A PipingComponent used to control or modulate the flow of fluid in a piping network.">
@@ -231,11 +190,10 @@
     <ECEntityClass typeName="ValveType" modifier="None" displayLabel="Valve Type" description="Defines a shared set of properties whose values vary per-type of Valve rather than per-instance.">
         <BaseClass>PipingComponentType</BaseClass>
         <BaseClass>IPressureClassDesignatedPipingComponentType</BaseClass>
-        <BaseClass>ITwoPortTypesPipingComponentType</BaseClass>
-        <ECProperty propertyName="GrossWeight" typeName="double" kindOfQuantity="AECU:WEIGHT" displayLabel="Gross Weight" description="TODO"/>
+        <ECProperty propertyName="GrossWeight" typeName="double" kindOfQuantity="AECU:WEIGHT" displayLabel="Gross Weight" description="Gross Weight of the Valve Type."/>
     </ECEntityClass>
 
-    <ECRelationshipClass typeName="ValveIsOfType" strength="referencing" modifier="None" description="TODO">
+    <ECRelationshipClass typeName="ValveIsOfType" strength="referencing" modifier="None" description="A type-instance relation; one that indicates that the specific Valve is an instance of the defined ValveType.">
         <BaseClass>bis:PhysicalElementIsOfType</BaseClass>
         <Source multiplicity="(0..*)" roleLabel="is of" polymorphic="true">
             <Class class="Valve" />
@@ -251,7 +209,7 @@
 
     <ECRelationshipClass typeName="PipingComponentOwnsPorts" strength="embedding" modifier="None" description="Relationship between a PipingComponent and its Ports.">
         <BaseClass>dsys:DistributionElementOwnsDistributionPorts</BaseClass>
-        <Source multiplicity="(0..1)" roleLabel="owns" polymorphic="true">
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
             <Class class="PipingComponent"/>
         </Source>
         <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="true">

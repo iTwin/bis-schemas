@@ -5,7 +5,7 @@ remarksTarget: PipeworkPhysical.ecschema.md
 
 # PipeworkPhysical
 
-This schema contains classes that are commonly used in various types piping networks.
+This schema contains classes that are commonly used in various types of piping networks.
 
 ## Entity Classes
 
@@ -44,6 +44,10 @@ Equivalent to [IfcPipeFittingType](http://ifc43-docs.standards.buildingsmart.org
 A _GroovedPort_ is a `PipingPort` that exhibits a groove that, by using additional accessories, enable connections among `PipingComponent`s.
 
 Equivalent to an [IfcDistributionPort](http://ifc43-docs.standards.buildingsmart.org/IFC/RELEASE/IFC4x3/HTML/lexical/IfcDistributionPort.htm), with its [Pset_DistributionPortTypePipe.ConnectionType](https://ifc43-docs.standards.buildingsmart.org/IFC/RELEASE/IFC4x3/HTML/lexical/Pset_DistributionPortTypePipe.htm) property set to _PEnum_PipeEndStyleTreatment.GROOVED_.
+
+### IInvariantDiameterPipingComponentType
+
+The `IInvariantDiameterPipingComponentType` interface makes it easier to read _NominalDiameter_ values from `PipingComponentType`s by caching them on the latter. _NominalDiameter_ values, in general, are expected to be stored in `PipingPortType` instances. These can be accessed from `PipingComponentType`s via the `PipingComponentTypeIncludesPortTypes` relationship. When _NominalDiameter_ is expected to be invariant across all `PipingPortType`s associated to a `PipingComponentType`, the `IInvariantDiameterPipingComponentType` interface saves data-readers from traversing the aforementioned relationship in order to find such value. This data-duplication was deemed acceptable given the prevalence of _NominalDiameter_ values in workflows that involve certain `PipingComponentType`s such as `PipeType`s.
 
 ### Pipe
 
