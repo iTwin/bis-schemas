@@ -23,18 +23,18 @@
         <BaseClass>bis:PhysicalType</BaseClass>
     </ECEntityClass>
 
-    <ECRelationshipClass typeName="PipingComponentTypeIncludesPortTypes" strength="referencing" modifier="None" description="Relationship that associates a PipingComponentType with the PipingPortTypes included in it.">
+    <ECRelationshipClass typeName="PipingComponentTypeUsesPortTypes" strength="referencing" modifier="None" description="Relationship that associates a PipingComponentType with the PipingPortTypes it uses.">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
-        <Source multiplicity="(0..*)" polymorphic="true" roleLabel="includes">
+        <Source multiplicity="(0..*)" polymorphic="true" roleLabel="uses">
             <Class class="PipingComponentType"/>
         </Source>
-        <Target multiplicity="(0..*)" polymorphic="true" roleLabel="is included in">
+        <Target multiplicity="(0..*)" polymorphic="true" roleLabel="is used by">
             <Class class="PipingPortType"/>
         </Target>
-        <ECProperty propertyName="PortCount" typeName="int" kindOfQuantity="AECU:LENGTH_SHORT" displayLabel="Port Count" description="Port-instance count of the referenced PortType included in the PipingComponentType."/>
+        <ECProperty propertyName="PortCount" typeName="int" kindOfQuantity="AECU:LENGTH_SHORT" displayLabel="Port Count" description="Port-instance count of the referenced PortType used by the PipingComponentType."/>
     </ECRelationshipClass>
 
-    <ECEntityClass typeName="PipeNominalDiameter" modifier="Sealed" displayLabel="Pipe Nominal Diameter" description="A bis:DefinitionElement that models standard sizes for pipes.">
+    <ECEntityClass typeName="PipeDiameterDefinition" modifier="Sealed" displayLabel="Pipe Diameter Definition" description="A bis:DefinitionElement that models standard sizes for pipes.">
         <BaseClass>bis:DefinitionElement</BaseClass>
         <ECProperty propertyName="NominalDiameter" typeName="double" kindOfQuantity="AECU:LENGTH_SHORT" displayLabel="Nominal Diameter" description="Nominal pipe diameter"/>
         <ECProperty propertyName="OutsideDiameter" typeName="double" kindOfQuantity="AECU:LENGTH_SHORT" displayLabel="Outside Diameter" description="Outside pipe diameter"/>
@@ -86,31 +86,12 @@
         </Target>
     </ECRelationshipClass>
 
-    <ECEntityClass typeName="IInvariantDiameterPipingComponentType" modifier="Abstract" displayLabel="Invariant Diameter Piping Component Type" description="An interface that can be mixed-into PipingComponentTypes with an invariant Nominal Diameter.">
-        <ECCustomAttributes>
-            <IsMixin xmlns='CoreCustomAttributes.01.00.03'>
-                <AppliesToEntityClass>PipingComponentType</AppliesToEntityClass>
-            </IsMixin>
-        </ECCustomAttributes>
-        <ECNavigationProperty propertyName="NominalDiameter" relationshipName="PipingComponentTypeIsOfNominalDiameter" direction="Forward" displayLabel="Nominal Diameter" description="Nominal Diameter of the PipingComponent."/>
-    </ECEntityClass>
-
-    <ECRelationshipClass typeName="PipingComponentTypeIsOfNominalDiameter" strength="referencing" modifier="None" description="Relationship that indicates the specific PipingComponentType is of a particular NominalDiameter instance.">
-        <Source multiplicity="(0..*)" polymorphic="true" roleLabel="is of">
-            <Class class="IInvariantDiameterPipingComponentType"/>
-        </Source>
-        <Target multiplicity="(0..1)" polymorphic="true" roleLabel="applies to">
-            <Class class="PipeNominalDiameter"/>
-        </Target>
-    </ECRelationshipClass>
-
     <ECEntityClass typeName="PipeElement" modifier="Abstract" displayLabel="Pipe Element" description="A PipingComponent used to typically join two sections of a piping network.">
         <BaseClass>PipingComponent</BaseClass>
     </ECEntityClass>
 
     <ECEntityClass typeName="PipeElementType" modifier="Abstract" displayLabel="Pipe Element Type" description="Defines a shared set of properties whose values vary per-type of PipeElement rather than per-instance.">
         <BaseClass>PipingComponentType</BaseClass>
-        <BaseClass>IInvariantDiameterPipingComponentType</BaseClass>
     </ECEntityClass>
 
     <ECEntityClass typeName="Pipe" modifier="None" displayLabel="Pipe" description="A straight PipingComponent used to typically join two sections of a piping network.">
@@ -163,12 +144,10 @@
     <ECEntityClass typeName="FlangeType" modifier="None" displayLabel="Flange Type" description="A PipeFittingType that classifies associated PipeFitting instances as Flanges.">
         <BaseClass>PipeFittingType</BaseClass>
         <BaseClass>IPressureClassDesignatedPipingComponentType</BaseClass>
-        <BaseClass>IInvariantDiameterPipingComponentType</BaseClass>
     </ECEntityClass>
 
     <ECEntityClass typeName="FlexBellowType" modifier="None" displayLabel="Flex-Bellow Type" description="A PipeFittingType that classifies associated PipeFitting instances as FlexBellows.">
         <BaseClass>PipeFittingType</BaseClass>
-        <BaseClass>IInvariantDiameterPipingComponentType</BaseClass>
     </ECEntityClass>
 
     <ECEntityClass typeName="BranchType" modifier="Abstract" displayLabel="Branch Type" description="Base class for PipeFittingTypes that redistribute flow among their PipingPorts.">
@@ -223,15 +202,15 @@
 
     <ECEntityClass typeName="PipingPortType" modifier="Abstract" displayLabel="Piping Port Type" description="Defines a shared set of properties whose values vary per-type of PipingPort rather than per-instance.">
         <BaseClass>bis:SpatialLocationType</BaseClass>
-        <ECNavigationProperty propertyName="NominalDiameter" relationshipName="PipingPortTypeIsOfNominalDiameter" direction="Forward" displayLabel="Nominal Diameter" description="Nominal Diameter of a PipingPortType."/>
+        <ECNavigationProperty propertyName="DiameterDefinition" relationshipName="PipingPortTypeIsOfDiameter" direction="Forward" displayLabel="Diameter" description="Diameter Definition of a PipingPortType."/>
     </ECEntityClass>
 
-    <ECRelationshipClass typeName="PipingPortTypeIsOfNominalDiameter" strength="referencing" modifier="None" description="Relationship between a PipingPortType and its NominalDiameter.">
+    <ECRelationshipClass typeName="PipingPortTypeIsOfDiameter" strength="referencing" modifier="None" description="Relationship between a PipingPortType and its Diameter Definition.">
         <Source multiplicity="(0..*)" polymorphic="true" roleLabel="is of">
             <Class class="PipingPortType"/>
         </Source>
         <Target multiplicity="(0..1)" polymorphic="true" roleLabel="applies to">
-            <Class class="PipeNominalDiameter"/>
+            <Class class="PipeDiameterDefinition"/>
         </Target>
     </ECRelationshipClass>
 
