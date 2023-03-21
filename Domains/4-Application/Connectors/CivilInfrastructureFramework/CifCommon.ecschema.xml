@@ -3,14 +3,18 @@
 |  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
 |  * See LICENSE.md in the project root for license terms and full copyright notice.
 ======================================================================================= -->
-<ECSchema schemaName="CifCommon" alias="cifcmn" version="01.00.03" description="iModel Connector schema containing aspect classes with common properties from Civil Infrastructure Framework (CIF) applications." xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
+<ECSchema schemaName="CifCommon" alias="cifcmn" version="01.00.06" description="iModel Connector schema containing aspect classes with common properties from Civil Infrastructure Framework (CIF) applications." xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
     <ECSchemaReference name="BisCore" version="01.00.14" alias="bis"/>
+    <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
     <ECSchemaReference name="CifUnits" version="01.00.01" alias="cifu"/>
     <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
     <ECCustomAttributes>
         <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
-            <SupportedUse>Production</SupportedUse>
+            <SupportedUse>NotForProduction</SupportedUse>
         </ProductionStatus>
+        <SchemaLayerInfo xmlns="BisCustomAttributes.01.00.00">
+            <Value>Application</Value>
+        </SchemaLayerInfo>
     </ECCustomAttributes>
     <ECEnumeration typeName="ApplyTemplateCorridorAspect_Mirror_BoolEnum" backingTypeName="int" isStrict="true">
         <ECEnumerator name="True" value="1" displayLabel="True"/>
@@ -185,6 +189,7 @@
         <ECProperty propertyName="LinearElement_CircularArc_DegreeOfCurve" typeName="double" displayLabel="Degree of Curvature" category="GeometryAttributes_Geometry" priority="299870" kindOfQuantity="cifu:ANGLE"/>
         <ECProperty propertyName="LinearElement_CircularArc_DegreeOfCurveDefinition" typeName="CircularArcAspect_LinearElement_CircularArc_DegreeOfCurveDefinition_Enum" displayLabel="Degree of Curvature Definition" category="GeometryAttributes_Geometry" priority="299880"/>
         <ECProperty propertyName="LinearElement_CircularArc_CenterPoint" typeName="point3d" displayLabel="Center Point" category="GeometryAttributes_Geometry" priority="299860"/>
+        <ECProperty propertyName="LinearElement_CircularArc_Hand" typeName="string" displayLabel="Hand" category="GeometryAttributes_Geometry" priority="299880"/>
     </ECEntityClass>
     <ECEntityClass typeName="CivilCellAspect">
         <BaseClass>CivilPresentation</BaseClass>
@@ -237,6 +242,7 @@
         <ECProperty propertyName="LinearElement_Spiral_IntrinsicPoint" typeName="point3d" displayLabel="Intrinsic Point" category="GeometryAttributes_Geometry" priority="299700"/>
         <ECProperty propertyName="LinearElement_Spiral_StartArcCenterPoint" typeName="point3d" displayLabel="Start Arc Center Point" category="GeometryAttributes_Geometry" priority="299690"/>
         <ECProperty propertyName="LinearElement_Spiral_EndArcCenterPoint" typeName="point3d" displayLabel="End Arc Center Point" category="GeometryAttributes_Geometry" priority="299680"/>
+        <ECProperty propertyName="LinearElement_Spiral_Hand" typeName="string" displayLabel="Hand" category="GeometryAttributes_Geometry" priority="299760"/>
     </ECEntityClass>
     <ECEntityClass typeName="ClothoidAspect">
         <BaseClass>SpiralAspect</BaseClass>
@@ -256,6 +262,7 @@
         <ECProperty propertyName="LinearElement_Spiral_IntrinsicPoint" typeName="point3d" displayLabel="Intrinsic Point" category="GeometryAttributes_Geometry" priority="299700"/>
         <ECProperty propertyName="LinearElement_Spiral_StartArcCenterPoint" typeName="point3d" displayLabel="Start Arc Center Point" category="GeometryAttributes_Geometry" priority="299690"/>
         <ECProperty propertyName="LinearElement_Spiral_EndArcCenterPoint" typeName="point3d" displayLabel="End Arc Center Point" category="GeometryAttributes_Geometry" priority="299680"/>
+        <ECProperty propertyName="LinearElement_Spiral_Hand" typeName="string" displayLabel="Hand" category="GeometryAttributes_Geometry" priority="299760"/>
     </ECEntityClass>
     <ECEntityClass typeName="CompoundElementAspect">
         <BaseClass>ProfiledElementAspect</BaseClass>
@@ -731,13 +738,29 @@
         </ECProperty>
         <ECProperty propertyName="MeshSurfaceEntity_Depth" typeName="double" displayLabel="Depth" category="MeshSurfaceEntity_Component_Layer" priority="299990" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="MeshSurfaceEntity_Description" typeName="string" displayLabel="Description" category="MeshSurfaceEntity_Component_Layer" priority="299980"/>
-        <ECProperty propertyName="MeshSurfaceEntity_StartStation" typeName="string" displayLabel="Start Station" category="MeshSurfaceEntity_Component_Layer" priority="299950"/>
-        <ECProperty propertyName="MeshSurfaceEntity_EndStation" typeName="string" displayLabel="End Station" category="MeshSurfaceEntity_Component_Layer" priority="299940"/>
+        <ECProperty propertyName="MeshSurfaceEntity_StartStation" typeName="string" displayLabel="Start Station [Deprecated]" category="MeshSurfaceEntity_Component_Layer" priority="299950">
+            <ECCustomAttributes>
+                <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                    <Description>Replaced by the new MeshSurfaceEntity_StartStationNumeric property.</Description>
+                </Deprecated>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03"/>
+            </ECCustomAttributes>
+        </ECProperty>
+        <ECProperty propertyName="MeshSurfaceEntity_EndStation" typeName="string" displayLabel="End Station [Deprecated]" category="MeshSurfaceEntity_Component_Layer" priority="299940">
+            <ECCustomAttributes>
+                <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                    <Description>Replaced by the new MeshSurfaceEntity_EndStationNumeric property.</Description>
+                </Deprecated>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03"/>
+            </ECCustomAttributes>
+        </ECProperty>
         <ECProperty propertyName="MeshSurfaceEntity_MaterialSubtype" typeName="string" displayLabel="Material Subtype" category="MeshSurfaceEntity_Component_Layer" priority="299930"/>
         <ECProperty propertyName="MeshSurfaceEntity_SlopedArea" typeName="double" displayLabel="Top Sloped Area" category="MeshQuantities_Civil_Quantities" priority="299920" kindOfQuantity="cifu:AREA"/>
         <ECProperty propertyName="MeshSurfaceEntity_PlanarArea" typeName="double" displayLabel="Planar Area" category="MeshQuantities_Civil_Quantities" priority="299910" kindOfQuantity="cifu:AREA"/>
         <ECProperty propertyName="MeshSurfaceEntity_CivilVolume" typeName="double" displayLabel="Volume" category="MeshQuantities_Civil_Quantities" priority="299900" kindOfQuantity="cifu:VOLUME"/>
         <ECProperty propertyName="VolumeOption" typeName="MeshSurfaceEntityAspect_VolumeOption_Enum" displayLabel="Volume Option" category="MeshSurfaceEntity_Component_Layer" priority="299925"/>
+        <ECProperty propertyName="MeshSurfaceEntity_StartStationNumeric" typeName="double" displayLabel="Start Station" category="MeshSurfaceEntity_Component_Layer" priority="299950" kindOfQuantity="cifu:STATION"/>
+        <ECProperty propertyName="MeshSurfaceEntity_EndStationNumeric" typeName="double" displayLabel="End Station" category="MeshSurfaceEntity_Component_Layer" priority="299940" kindOfQuantity="cifu:STATION"/>
     </ECEntityClass>
     <ECRelationshipClass typeName="ElementOwnsMeshSurfaceEntityAspect" modifier="None" strength="embedding">
         <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
@@ -1019,6 +1042,7 @@
         <BaseClass>CivilPresentation</BaseClass>
         <ECProperty propertyName="Station" typeName="double" displayLabel="Station" category="ProfilePointbyIntersectionRuleAttributes_Profile_Intersection_Point" priority="299800" kindOfQuantity="cifu:STATION"/>
         <ECProperty propertyName="Elevation" typeName="double" displayLabel="Elevation" category="ProfilePointbyIntersectionRuleAttributes_Profile_Intersection_Point" priority="299700" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="Name" typeName="double" displayLabel="Name" category="ProfilePointbyIntersectionRuleAttributes_Profile_Intersection_Point" priority="299600" kindOfQuantity="cifu:LENGTH"/>
     </ECEntityClass>
     <ECRelationshipClass typeName="ElementOwnsProfilePointbyIntersectionRuleAspect" modifier="None" strength="embedding">
         <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
@@ -1070,6 +1094,7 @@
         <ECProperty propertyName="LinearElement_CircularArc_DegreeOfCurve" typeName="double" displayLabel="Degree of Curvature" category="GeometryAttributes_Geometry" priority="299870" kindOfQuantity="cifu:ANGLE"/>
         <ECProperty propertyName="LinearElement_CircularArc_DegreeOfCurveDefinition" typeName="ReadOnlyCircularArcAspect_LinearElement_CircularArc_DegreeOfCurveDefinition_Enum" displayLabel="Degree of Curvature Definition" category="GeometryAttributes_Geometry" priority="299880"/>
         <ECProperty propertyName="LinearElement_CircularArc_CenterPoint" typeName="point3d" displayLabel="Center Point" category="GeometryAttributes_Geometry" priority="299860"/>
+        <ECProperty propertyName="LinearElement_CircularArc_Hand" typeName="string" displayLabel="Hand" category="GeometryAttributes_Geometry" priority="299880"/>
     </ECEntityClass>
     <ECRelationshipClass typeName="ElementOwnsReadOnlyCircularArcAspect" modifier="None" strength="embedding">
         <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
@@ -1133,6 +1158,7 @@
         <ECProperty propertyName="LinearElement_Spiral_IntrinsicPoint" typeName="point3d" displayLabel="Intrinsic Point" category="GeometryAttributes_Geometry" priority="299700"/>
         <ECProperty propertyName="LinearElement_Spiral_StartArcCenterPoint" typeName="point3d" displayLabel="Start Arc Center Point" category="GeometryAttributes_Geometry" priority="299690"/>
         <ECProperty propertyName="LinearElement_Spiral_EndArcCenterPoint" typeName="point3d" displayLabel="End Arc Center Point" category="GeometryAttributes_Geometry" priority="299680"/>
+        <ECProperty propertyName="LinearElement_Spiral_Hand" typeName="string" displayLabel="Hand" category="GeometryAttributes_Geometry" priority="299760"/>
     </ECEntityClass>
     <ECEntityClass typeName="ReadOnlyClothoidAspect">
         <BaseClass>ReadOnlySpiralAspect</BaseClass>
@@ -1152,6 +1178,7 @@
         <ECProperty propertyName="LinearElement_Spiral_IntrinsicPoint" typeName="point3d" displayLabel="Intrinsic Point" category="GeometryAttributes_Geometry" priority="299700"/>
         <ECProperty propertyName="LinearElement_Spiral_StartArcCenterPoint" typeName="point3d" displayLabel="Start Arc Center Point" category="GeometryAttributes_Geometry" priority="299690"/>
         <ECProperty propertyName="LinearElement_Spiral_EndArcCenterPoint" typeName="point3d" displayLabel="End Arc Center Point" category="GeometryAttributes_Geometry" priority="299680"/>
+        <ECProperty propertyName="LinearElement_Spiral_Hand" typeName="string" displayLabel="Hand" category="GeometryAttributes_Geometry" priority="299760"/>
     </ECEntityClass>
     <ECRelationshipClass typeName="ElementOwnsReadOnlyClothoidAspect" modifier="None" strength="embedding">
         <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>

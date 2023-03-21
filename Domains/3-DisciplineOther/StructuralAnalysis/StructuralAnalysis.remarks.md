@@ -183,11 +183,9 @@ AnalysisElements use [TopologyElements](#topologyelement) to define their locati
 
 Derives from [AnalysisElement](#analysiselement) and provides base class for structural elements.
 
-### Structure
+### StructuralAnalysisPartition
 
-A class that represents an entire structure and is sub-modeled by [StructuralAnalysisModel](#stucturalanalysismodel), derives from [StructuralAnalysisElement](#structuralanalysiselement).
-Always has a single property to represent the definition container that is referred by the structure.
-The sub-model of the definition container should be used as a default model for storing related DefinitionElements.
+A partition that defines a Structural Analysis perspective for a Subject. Each partition must be sub-modeled by a [StructuralAnalysisModel]. This model is expected to contain all Structural Analysis Elements that define the Subject. Each Structural Analysis Partition must point to a DefinitionContainer that is by default expected to contain most Definitions Elements related to the Analysis Partition.
 
 ### StructurePart
 
@@ -441,7 +439,7 @@ Groups [Loads](#loads) which can be later added to multiple [LoadCases](#loadcas
 OrientedEdgeAspect allows to assign [Edge](#edge) for a [Path](#path).
 
 A Path might refer to multiple Edges, one of OrientedEdgeAspect purposes is to define the order of Edges in a Path by providing a unique (for that Path) index.
-Each Edge has a direction from its start Vertex to end Vertex. OrientedEdgeAspect can change the direction how the Edge is treated in Path's context. Edges in a Path are required to connect head to tail.
+Each Edge has a direction from its start Vertex to end Vertex. OrientedEdgeAspect can change the direction how the Edge is treated in Path's context. Edges in a Path are required to connect head to tail. Head OrientedEdgeAspect must have index property set to 0. Each subsequent OrientedEdgeAspect in a Path must have index incremented by 1.
 
 ### OrientedFaceAspect
 

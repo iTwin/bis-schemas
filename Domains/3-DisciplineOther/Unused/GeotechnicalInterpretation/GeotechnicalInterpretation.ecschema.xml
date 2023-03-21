@@ -1,0 +1,1127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ==================================================================================
+|  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
+|  * See LICENSE.md in the project root for license terms and full copyright notice.
+======================================================================================= -->
+<ECSchema schemaName="GeotechnicalInterpretation" alias="GeoInt" version="01.00.00" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" displayLabel="Geotechnical Interpretation" description="The GeotechnicalInterpretation schema defines classes that represent data for interpreting the earth's subterranean structure based on limited geotechnical exploration.">
+    <ECSchemaReference name="AecUnits" version="01.00.03" alias="AECU"/>
+    <ECSchemaReference name="Analytical" version="01.00.00" alias="anlyt" />
+    <ECSchemaReference name="BisCore" version="01.00.10" alias="bis" />
+    <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
+    <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
+    <ECSchemaReference name="GeotechnicalExploration" version="01.00.00" alias="GeoExp" />
+
+    <ECCustomAttributes>
+        <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
+            <SupportedUse>NotForProduction</SupportedUse>
+        </ProductionStatus>
+        <SchemaLayerInfo xmlns="BisCustomAttributes.01.00.00">
+            <Value>DisciplineOther</Value>
+        </SchemaLayerInfo>
+    </ECCustomAttributes>
+
+    <!-- ========================================================================================== -->
+    <!-- ==================== SCHEMA ORGANIZATION NOTES =========================================== -->
+    <!-- ========================================================================================== -->
+    <!-- Schema files can get large and are difficult to navigate. These Guidelines help define 
+         where to put ECEntityClasses and ECRelationshipClasses in this file. -->
+
+    <!-- 1. Create major blocks (using 3 bar heading style) for each major concept.
+            Examples of major concepts are: "Configuration", "Boreholes", "IOperands and Operations",
+            "Ground", and "Fence Diagrams". Most Operations will qualify as major concepts. -->
+
+    <!-- 2. All the classes that appear in a dependable parent-child Element tree should be lumped
+            into a major block. Examples are: Borehole (and children), Ground (and children) and
+            FenceDiagram (and children). -->
+
+    <!-- 3. Create minor blocks (using 1 bar heading style) for each significant class and related
+            relationships. Parent-Child relationships are usually grouped with the child class. -->
+
+    <!-- ========================================================================================== -->
+    <!-- ==================== CORE INFORMATION HIERARCHY CLASSES ================================== -->
+    <!-- ========================================================================================== -->
+
+    <ECEntityClass typeName="GeotechnicalInterpretationPartition" modifier="Sealed" displayLabel="Geotechnical Interpretation Partition" description="GeotechnicalInterpretationPartition element indicates that there is a specialized Geotechnical Interpretation perspective for the parent Subject. " >
+        <BaseClass>anlyt:AnalyticalPartition</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="GeotechnicalInterpretationModel" modifier="Sealed" displayLabel="Geotechnical Interpretation Model" description="Model containing elements related to Geotechnical Interpretations." >
+        <BaseClass>anlyt:AnalyticalModel</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="GeotechnicalInterpretationElement" modifier="Abstract" displayLabel="Geotechnical Interpretation Element" description="Abstract superclass for all spatially-located Geotechnical Interpretation classes.">
+        <BaseClass>anlyt:AnalyticalElement</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="GeotechnicalInformationElement" modifier="Abstract" displayLabel="Geotechnical Information Element" description="Abstract superclass for all non-spatially-located Geotechnical Interpretation classes.">
+        <BaseClass>bis:InformationRecordElement</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="Interpretation" modifier="Sealed" displayLabel="Interpretation" description="A geotechnical interpretation of a region of the earth's subsurface. Interpretations always have a GeotechnicalInterpretationModel submodel.">
+        <BaseClass>GeotechnicalInterpretationElement</BaseClass>
+        <BaseClass>bis:ISubModeledElement</BaseClass>
+
+        <ECNavigationProperty propertyName="Configuration" relationshipName="InterpretationHasConfiguration" direction="Forward" description="Reference to GeotechnicalInterpretationConfiguration that is used by this Interpretation."/>
+
+        <!-- Add Bounds? -->
+    </ECEntityClass>
+
+    <!-- ========================================================================================== -->
+    <!-- ==================== CONFIGURATION (DEFINITION MODEL) RELATED CLASSES ==================== -->
+    <!-- ========================================================================================== -->
+
+    <ECEntityClass typeName="GeotechnicalInterpretationConfiguration" modifier="Sealed" displayLabel="Geotechnical Interpretation Configuration" description="The configuration for one or more GeoExp:Interpretation.">
+        <BaseClass>bis:DefinitionContainer</BaseClass>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="InterpretationHasConfiguration" strength="referencing" modifier="Sealed" description="Relationship to define that a specific GeoInterp:Interpretation has a configuration of GeoInterp:GeotechnicalInterpretationConfiguration.">
+        <Source multiplicity="(0..*)" roleLabel="has configuration" polymorphic="false">
+            <Class class="Interpretation" />
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="is configuration for" polymorphic="false">
+            <Class class="GeotechnicalInterpretationConfiguration"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <!-- ========================== InvestigationMapping-related classes ========================== -->
+
+    <ECEntityClass typeName="InvestigationMapping" displayLabel="Investigation Mapping" modifier="Sealed" description="A mapping from a GeoExp:GeotechnicalInvestigationConfiguration to a GeoInterp:GeotechnicalInterpretationConfiguration.">
+        <BaseClass>bis:DefinitionElement</BaseClass>   
+        <ECProperty           propertyName="MaterialMappedClass"     typeName="string" displayLabel="Material Mapped Class"   description="Identifies the GeoExp:ILithology subclass that maps to GeoInterp:Material"/>
+
+        <ECNavigationProperty propertyName="MappedConfiguration"    relationshipName="InvestigationMappingMapsInvestigationConfiguration"   direction="Forward" description="Reference to GeoExp:GeotechnicalInvestigationConfiguration that is being mapped."/>
+   </ECEntityClass>
+
+    <ECRelationshipClass typeName="InvestigationMappingMapsInvestigationConfiguration" strength="referencing" modifier="Sealed" description="Relationship to define that a specific GeoInterp:InvestigationMapping maps a GeoExp:GeotechnicalInvestigationConfiguration.">
+        <Source multiplicity="(0..*)" roleLabel="maps" polymorphic="false">
+            <Class class="InvestigationMapping" />
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="is mapped by" polymorphic="true">
+            <Class class="GeoExp:GeotechnicalInvestigationConfiguration"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <!-- ========================== Material-related classes ====================================== -->
+
+    <ECEntityClass typeName="IMaterial" modifier="Abstract" displayLabel="IMaterial" description="A geotechnical material, uniform for the purposes of the interpretation.">
+        <!-- ********* This triggers schema validation failure ***
+        <BaseClass>bis:IParentElement</BaseClass> <!- - it will own a RenderMaterial - ->
+        ****-->
+        <ECCustomAttributes>
+            <IsMixin xmlns="CoreCustomAttributes.01.00.00">
+                <AppliesToEntityClass>bis:DefinitionElement</AppliesToEntityClass>
+            </IsMixin>
+        </ECCustomAttributes>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="MaterialOwnsRenderMaterial" strength="embedding" modifier="Sealed" description="Every IMaterial owns a ReferenceMaterial.">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(0..1)" polymorphic="false" roleLabel="owns">
+            <Class class="IMaterial"/>
+        </Source>
+        <Target multiplicity="(1..1)" polymorphic="false" roleLabel="is owned by">
+            <Class class="bis:RenderMaterial"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="Material" displayLabel="Material" modifier="Sealed" description="A geotechnical material, from the lithography perspective (boring logs, etc.).">
+        <BaseClass>bis:DefinitionElement</BaseClass>
+        <BaseClass>bis:IParentElement</BaseClass>
+        <BaseClass>IMaterial</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="UnknownMaterial" displayLabel="Unknown Material" modifier="Sealed" description="An IMaterial that does not correspond to any known Material or AliasMaterial (singleton per GeoInterpretationConfiguration).">
+        <BaseClass>bis:DefinitionElement</BaseClass>
+        <BaseClass>bis:IParentElement</BaseClass>
+        <BaseClass>IMaterial</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="AliasMaterial" displayLabel="AliasMaterial" modifier="Sealed" description="An IMaterial that is an alias for a Material.">
+        <BaseClass>bis:DefinitionElement</BaseClass>
+        <BaseClass>bis:IParentElement</BaseClass>
+        <BaseClass>IMaterial</BaseClass>
+
+        <ECNavigationProperty propertyName="AliasFor" relationshipName="AliasMaterialRenamesMaterial" direction="Forward" description="Required reference to the Material being renamed."/>
+    </ECEntityClass>
+
+    <!-- DO WE EVER ENVISION THIS WOULD NEED TO BE A DRIVING RELATIONSHIP? IF SO IT CAN'T BE A NAVIGATION PROPERTY-->
+    <!-- (would we ever flag something down stream as needing calculation based on change in Material?) -->
+    <ECRelationshipClass typeName="AliasMaterialRenamesMaterial" strength="referencing" modifier="Sealed" description="Relates an AliasMaterial to the Material it renames.">
+        <Source multiplicity="(0..*)" roleLabel="renames" polymorphic="false">
+            <Class class="AliasMaterial" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is renamed as" polymorphic="false">
+            <Class class="Material" />
+        </Target>
+    </ECRelationshipClass>
+
+    <!-- ========================== Material-mapping-related classes ============================== -->
+
+    <!-- Abstract Material Mapping Relationship (in case we need it) -->
+    <ECRelationshipClass typeName="LithologyMapsToMaterial" strength="referencing" modifier="Abstract" description="Maps GeoExp:ILithology to the GeoInterp:Material that represents that material." >
+        <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="maps to" polymorphic="true">
+            <Class class="GeoExp:ILithology"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is mapped from" polymorphic="false">
+            <Class class="Material"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <!-- LegendCode-to-Material Mapping -->
+    <ECRelationshipClass typeName="LegendCodeMapsToMaterial" strength="referencing" modifier="Sealed" description="Maps a GeoExp:LegendCode to a GeoInterp:Material." >
+        <BaseClass>LithologyMapsToMaterial</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="maps to" polymorphic="true">
+            <Class class="GeoExp:LegendCode"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is mapped to" polymorphic="false">
+            <Class class="Material"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <!-- UscsCode-to-Material Mapping -->
+    <!-- TBD -->
+
+    <!-- GeologyCode-to-Material Mapping -->
+    <ECRelationshipClass typeName="GeologyCodeMapsToMaterial" strength="referencing" modifier="Sealed" description="Maps a GeoExp:GeologyCode to a GeoInterp:Material." >
+        <BaseClass>LithologyMapsToMaterial</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="maps to" polymorphic="true">
+            <Class class="GeoExp:GeologyCode"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is mapped to" polymorphic="false">
+            <Class class="Material"/>
+        </Target>
+    </ECRelationshipClass>
+
+
+    <!-- AlternateGeologyCode-to-Material Mapping -->
+    <ECRelationshipClass typeName="AlternateGeologyCodeMapsToMaterial" strength="referencing" modifier="Sealed" description="Maps a GeoExp:AlternateGeologyCode to a GeoInterp:Material." >
+        <BaseClass>LithologyMapsToMaterial</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="maps to" polymorphic="true">
+            <Class class="GeoExp:AlternateGeologyCode"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is mapped to" polymorphic="false">
+            <Class class="Material"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <!-- ========================================================================================== -->
+    <!-- ========================== Geologic History RELATED CLASSES ============================== -->
+    <!-- ========================================================================================== -->
+
+    <ECEntityClass typeName="IGeologicalHistoryProvider" modifier="Abstract" displayLabel="Geological History Provider" description="An IOperand that can provide a GeologicalHistory.">
+        <ECCustomAttributes>
+            <IsMixin xmlns="CoreCustomAttributes.01.00.03">
+                <AppliesToEntityClass>bis:Element</AppliesToEntityClass>
+            </IsMixin>
+        </ECCustomAttributes>
+        <BaseClass>IOperand</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="GeologicalHistory" modifier="Sealed" displayLabel="Geological History" description="An Element describing the geological history of the region being interpreted.">
+        <BaseClass>GeotechnicalInformationElement</BaseClass>
+        <BaseClass>IGeologicalHistoryProvider</BaseClass>
+        <BaseClass>bis:IParentElement</BaseClass>
+    </ECEntityClass>
+
+    <!-- ========================== GeologicalHistoryStep-related classes ========================= -->
+
+    <ECEntityClass typeName="GeologicalHistoryStep" modifier="Abstract" displayLabel="Geologic History Step" description="A step in geologic history representing a consistent process that influenced the present geology.">
+        <BaseClass>GeotechnicalInformationElement</BaseClass>
+
+        <ECProperty propertyName="Index"  typeName="int" displayLabel="Index" description="The zero-based index of the step, with zero being the earliest step."/>
+    </ECEntityClass>
+
+    <!-- Note that GeologicalHistoryStep must notify GeologicHistory of changes -->
+    <!-- Note that GeologicHistoryOwnsStep is not subclassed for all the subclasses of GeologicalHistoryStep -->
+    <ECRelationshipClass typeName="GeologicalHistoryOwnsSteps" strength="embedding" modifier="Sealed">
+        <BaseClass>ElementOwnsDrivingChildElements</BaseClass>
+        <Source multiplicity="(1..1)" polymorphic="false" roleLabel="owns">
+            <Class class="GeologicalHistory"/>
+        </Source>
+        <Target multiplicity="(0..*)" polymorphic="true" roleLabel="is owned by">
+            <Class class="GeologicalHistoryStep"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <!-- ========================== AdditiveGeologicalHistoryStep-related classes ============================= -->
+
+    <ECEntityClass typeName="AdditiveGeologicalHistoryStep" modifier="Sealed" displayLabel="Additive Geologic History Step" description="A GeologicalHistoryStep that adds Material to the geology.">
+        <BaseClass>GeologicalHistoryStep</BaseClass>
+
+        <!-- in the future we may add a process field here (e.g. "deposit", "intrusion", etc.)-->
+    </ECEntityClass>
+
+    <!-- Note that AdditiveGeologicalHistoryStep must be notified if this relationship changes -->
+    <ECRelationshipClass typeName="AdditiveGeologicalHistoryStepAddsMaterial" strength="referencing" modifier="Sealed" description="Relationship to define that a AdditiveGeologicalHistoryStep adds a specific Material.">
+        <BaseClass>bis:ElementDrivesElement</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="is added by and drives" polymorphic="true">
+            <Class class="IMaterial" />
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="adds material and is driven by" polymorphic="false"> 
+            <Class class="AdditiveGeologicalHistoryStep"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <!-- ========== (in the future there might be SubtractiveGeologicalHistoryStep here) ========== -->
+
+    <!-- ========================================================================================== -->
+    <!-- ========================== IBoreholeProvider-RELATED CLASSES ============================= -->
+    <!-- ========================================================================================== -->
+
+    <ECEntityClass typeName="IBoreholeProvider" modifier="Abstract" displayLabel="Borehole Provider" description="An IOperand that can provide a set of Boreholes.">
+        <ECCustomAttributes>
+            <IsMixin xmlns="CoreCustomAttributes.01.00.03">
+                <AppliesToEntityClass>bis:Element</AppliesToEntityClass>
+            </IsMixin>
+        </ECCustomAttributes>
+        <BaseClass>IOperand</BaseClass>
+    </ECEntityClass>
+
+    <!-- ========================== BoreholeGroup-related classes ============================= -->
+
+    <ECEntityClass typeName="BoreholeGroup" modifier="Sealed" displayLabel="Borehole Group" description="An IBoreholeProvider that is a non-exclusive collection of Boreholes.">
+        <BaseClass>GeotechnicalInterpretationElement</BaseClass>
+        <BaseClass>IBoreholeProvider</BaseClass>
+    </ECEntityClass>
+
+    <!-- QUESTION: ARE WE HAPPY WITH _NOT_ INCLUDING "DRIVES" IN THESE RELATIONSHIP NAMES? -->
+    <!-- Note that Boreholes must notify BoreholeGroup of changes -->
+    <ECRelationshipClass typeName="BoreholeInBoreholeGroup" strength="referencing" modifier="Sealed" description="Includes a Borehole into a BoreholeGroup" >
+        <BaseClass>bis:ElementDrivesElement</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="is included in and drives" polymorphic="false">
+            <Class class="Borehole"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="includes and is driven by" polymorphic="false">
+            <Class class="BoreholeGroup"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <!-- ========================== BoreholeSource-related classes ============================= -->
+
+    <ECEntityClass typeName="BoreholeSource" modifier="Sealed" displayLabel="Borehole Source" description="An IBoreholeProvider that is an exclusive collection of Boreholes.">
+        <BaseClass>GeotechnicalInterpretationElement</BaseClass>
+        <BaseClass>bis:IParentElement</BaseClass>
+        <BaseClass>IBoreholeProvider</BaseClass>
+
+        <ECNavigationProperty propertyName="DerivedFrom" relationshipName="BoreholeSourceIsDerivedFromInvestigationElement" direction="Forward" description="Optional reference to GeoExp:GeotechnicalInvestigationElement that is source for this BoreholeSource."/>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="BoreholeSourceIsDerivedFromInvestigationElement" strength="referencing" modifier="Sealed" description="Relates a BoreholeSource to the GeoExp:GeotechnicalInvestigationElement it was derived from.">
+        <Source multiplicity="(0..*)" roleLabel="is derived from" polymorphic="false">
+            <Class class="BoreholeSource" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is source for" polymorphic="true">
+            <Class class="GeoExp:GeotechnicalInvestigationElement" />
+        </Target>
+    </ECRelationshipClass>
+
+    <!-- Allan: Move this relationship under Borehole in future (organization only) PR -->
+
+    <!-- Note that Boreholes must notify BoreholeSource of changes -->
+    <ECRelationshipClass typeName="BoreholeSourceOwnsBoreholes" strength="embedding" modifier="Sealed">
+        <BaseClass>ElementOwnsDrivingChildElements</BaseClass>
+        <Source multiplicity="(1..1)" polymorphic="false" roleLabel="owns">
+            <Class class="BoreholeSource"/>
+        </Source>
+        <Target multiplicity="(0..*)" polymorphic="false" roleLabel="is owned by">
+            <Class class="Borehole"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <!-- ========================================================================================== -->
+    <!-- ========================== Borehole-RELATED CLASSES ====================================== -->
+    <!-- ========================================================================================== -->
+
+    <!-- Note that Borehole is NOT an IOperand (IBoreholeProvider should be used as the IOperand instead) -->
+    <ECEntityClass typeName="Borehole" modifier="Sealed" displayLabel="Borehole" description="A borehole or other investigation producing data similar to borehole logs.">
+        <BaseClass>GeotechnicalInterpretationElement</BaseClass>
+        <BaseClass>bis:IParentElement</BaseClass>
+
+        <ECProperty propertyName="Active"   displayLabel="Active"   typeName="bool"                              description="This Borehole should be considered in calculations."/>
+        <ECProperty propertyName="Location" displayLabel="Location" typeName="Bentley.Geometry.Common.IGeometry" description="The path of the Borehole from the surface downward."/>
+
+        <ECNavigationProperty propertyName="DerivedFrom" relationshipName="BoreholeIsDerivedFromExploratoryLocation" direction="Forward" description="Optional reference to GeoExp:ExploratoryLocation that is source for this Borehole."/>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="BoreholeIsDerivedFromExploratoryLocation" strength="referencing" modifier="Sealed" description="Relates a Borehole to the GeoExp:ExploratoryLocation it was derived from.">
+        <Source multiplicity="(0..*)" roleLabel="is derived from" polymorphic="false">
+            <Class class="Borehole" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is source information for" polymorphic="true">
+            <Class class="GeoExp:ExploratoryLocation" />
+        </Target>
+    </ECRelationshipClass>
+
+    <!-- ========================== MaterialDepthRange-related classes ============================ -->
+
+    <!-- GENERAL QUESTION FOR MANY CLASSES: SOMETIMES WE NAME GEOMETRIC PROPERTIES "LOCATION" AND
+        SOMETIMES WE USE SOMETHING LIKE "SURFACE". WHICH APPROACH IS BETTER? OR DOES IT DEPEND UPON THE CASE? -->
+        
+    <ECEntityClass typeName="MaterialDepthRange" modifier="Sealed" displayLabel="Material Depth Range" description="A contiguous portion of a Borehole with a constant Material. Always parented by Borehole.">
+        <BaseClass>GeotechnicalInterpretationElement</BaseClass>
+
+        <ECProperty propertyName="Location"  typeName="Bentley.Geometry.Common.IGeometry" displayLabel="Location"     kindOfQuantity="AECU:LENGTH" description="The location this MaterialDepthRange (portion of the parent Borehole path)."/>
+        <ECProperty propertyName="DepthTop"  typeName="double"                            displayLabel="Top Depth"    kindOfQuantity="AECU:LENGTH" description="Distance from ground surface to top of depth range." />
+        <ECProperty propertyName="DepthBase" typeName="double"                            displayLabel="Bottom Depth" kindOfQuantity="AECU:LENGTH" description="Distance from ground surface to bottom of depth range."/>
+    </ECEntityClass>
+
+    <!-- QUESTION: Suggestions for better term than "Defines"?-->
+    <!-- Note that MaterialDepthRange must be notified if this relationship changes -->
+    <ECRelationshipClass typeName="MaterialDefinesMaterialDepthRange" strength="referencing" modifier="Sealed" description="Relationship to define that a MaterialDepthRange has a material of Material.">
+        <BaseClass>bis:ElementDrivesElement</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="is material for and drives" polymorphic="true">
+            <Class class="IMaterial" />
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="has material and is driven by" polymorphic="false"> <!-- left polymorphic for expected future change to IMaterial or similar -->
+            <Class class="MaterialDepthRange"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <!-- Note that MaterialDepthRange must notify Borehole of changes -->
+    <ECRelationshipClass typeName="BoreholeOwnsMaterialDepthRanges" strength="embedding" modifier="Sealed">
+        <BaseClass>ElementOwnsDrivingChildElements</BaseClass>
+        <Source multiplicity="(1..1)" polymorphic="false" roleLabel="owns">
+            <Class class="Borehole"/>
+        </Source>
+        <Target multiplicity="(0..*)" polymorphic="false" roleLabel="is owned by">
+            <Class class="MaterialDepthRange"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <!-- ========================== WaterTableDepth-related classes =============================== -->
+
+    <ECEntityClass typeName="WaterTableDepth" modifier="Sealed" displayLabel="Water Table Depth" description="A location down a Borehole defining the border of saturated and unsaturated soil.">
+        <BaseClass>GeotechnicalInterpretationElement</BaseClass>
+
+        <ECProperty propertyName="Location" typeName="point3d" displayLabel="Location"   kindOfQuantity="AECU:LENGTH" description="The location this WaterTableDepth (along the parent Borehole path)."/>
+        <ECProperty propertyName="Depth"    typeName="double"  displayLabel="Top Depth"  kindOfQuantity="AECU:LENGTH" description="Distance from ground surface to water table." />
+    </ECEntityClass>
+
+    <!-- Note that WaterTableDepth must notify Borehole of changes -->
+    <ECRelationshipClass typeName="BoreholeOwnsWaterTableDepths" strength="embedding" modifier="Sealed">
+        <BaseClass>ElementOwnsDrivingChildElements</BaseClass>
+        <Source multiplicity="(1..1)" polymorphic="false" roleLabel="owns">
+            <Class class="Borehole"/>
+        </Source>
+        <Target multiplicity="(0..*)" polymorphic="false" roleLabel="is owned by">
+            <Class class="WaterTableDepth"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <!-- ========================================================================================== -->
+    <!-- ========================== Fence Diagrams, Etc. ========================================== -->
+    <!-- ========================================================================================== -->
+
+<!-- QUESTION - We use quite a few "driving" relationships here to keep all the pieces consistent.
+                Is that the best approach? Should we assume some other mechanism instead? -->
+
+    <!-- ========================== IFenceDiagramProvider-related classes ========================= -->
+
+    <!-- This is keeping with our rule that all input IOperands should be "providers" for future flexibility -->
+    <ECEntityClass typeName="IFenceDiagramProvider" modifier="Abstract" displayLabel="FenceDiagram Provider" description="An IOperand that can provide a FenceDiagram.">
+        <ECCustomAttributes>
+            <IsMixin xmlns="CoreCustomAttributes.01.00.03">
+                <AppliesToEntityClass>bis:Element</AppliesToEntityClass>
+            </IsMixin>
+        </ECCustomAttributes>
+        <BaseClass>IOperand</BaseClass>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="GroundGenerationOwnsFenceDiagram" strength="embedding" modifier="None" description="Connects an GroundGeneration with its child input IFenceDiagramProviders.">
+        <BaseClass>OperationOwnsDrivingInput</BaseClass>
+        <Source multiplicity="(1..1)" polymorphic="true" roleLabel="owns and has input">
+            <Class class="GroundGeneration"/>
+        </Source>
+        <Target multiplicity="(0..*)" polymorphic="true" roleLabel="is owned by and is input for">
+            <Class class="IFenceDiagramProvider"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <!-- ========================== FenceDiagram-related classes ================================== -->
+
+    <ECEntityClass typeName="FenceDiagram" modifier="Sealed" displayLabel="Fence Diagram" description="A vertical slice through Ground, that allows display and editing of strata boundaries.">
+        <BaseClass>GeotechnicalInterpretationElement</BaseClass>
+        <BaseClass>bis:IParentElement</BaseClass>
+        <BaseClass>IFenceDiagramProvider</BaseClass>
+
+        <ECProperty propertyName="Width" typeName="double" displayLabel="Width" kindOfQuantity="AECU:LENGTH" description="The width (half either side) of the FenceDiagram, for use in finding related Boreholes."/>
+    </ECEntityClass>
+
+    <!-- Note that due to GroundGenerationOwnsFenceDiagram and IFenceDiagramProvider, FenceDiagram is always a child of GroundGeneration -->
+
+    <!-- Note that when a Borehole LOCATES A FencePost (and so there is already a relationship), this relationship should be provided also -->
+
+    <ECRelationshipClass typeName="BoreholeGuidesFenceDiagram" strength="referencing" modifier="Sealed" description="Relationship to define the FenceDiagram is guided by the Borehole.">
+        <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="guides" polymorphic="false">
+            <Class class="Borehole" />
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is guided by" polymorphic="false">
+            <Class class="FenceDiagram"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <!-- ========================== FencePanel-related classes =================================== -->
+
+    <ECEntityClass typeName="FencePanel" modifier="Sealed" displayLabel="Fence Panel" description="A portion of a FenceDiagram, extending between FencePosts. Always child of FenceDiagram.">
+        <BaseClass>GeotechnicalInterpretationElement</BaseClass>
+
+        <ECProperty propertyName="Index"  typeName="int"    displayLabel="Index"                               description="The zero-based index of the FencePanel relative to other FencePanels in the FenceDiagram."/>
+        <ECProperty propertyName="Length" typeName="double" displayLabel="Length" kindOfQuantity="AECU:LENGTH" description="A cached value of the distance from the start FencePost to the end FencePost."/>
+    </ECEntityClass>
+
+
+    <!-- Note that FencePanel must notify FenceDiagram of changes (the only relevant change is the change in FencePost location) -->
+    <ECRelationshipClass typeName="FenceDiagramOwnsFencePanel" strength="embedding" modifier="Sealed">
+        <BaseClass>ElementOwnsDrivingChildElements</BaseClass>
+        <Source multiplicity="(1..1)" polymorphic="false" roleLabel="owns">
+            <Class class="FenceDiagram"/>
+        </Source>
+        <Target multiplicity="(0..*)" polymorphic="false" roleLabel="is owned by">
+            <Class class="FencePanel"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <!-- Note that FencePost must notify FencePanel of changes (the only relevant change is a change of location)-->
+    <!-- This is conceptually an abstract class, but we can't create an abstract class that has a non-abstract base class. -->
+    <ECRelationshipClass typeName="FencePanelIsBoundedByFencePost" strength="referencing" modifier="None" description="Relationship to define the FencePanel is bounded by the FencePost.">
+        <BaseClass>bis:ElementDrivesElement</BaseClass>
+        <!-- A FencePost must bound at least 1 FencePanel, but we can't use the 1..* constraint as each subclass is 0..*-->
+        <Source multiplicity="(0..*)" roleLabel="is bounded by" polymorphic="false">
+            <Class class="FencePanel" />
+        </Source>
+        <!-- A FencePanel must have 2 FencePosts, but we can't use the 2..2 constraint as each subclass is 1..1-->
+        <Target multiplicity="(1..2)" roleLabel="bounds" polymorphic="false">
+            <Class class="FencePost"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="FencePanelHasStartFencePost" strength="referencing" modifier="Sealed" description="Relationship to define the FenceVolume is bounded by the left side of the FenceBoundary.">
+        <BaseClass>FencePanelIsBoundedByFencePost</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="has start FencePost" polymorphic="false">
+            <Class class="FencePanel" />
+        </Source>
+        <!-- A FencePanel must have exactly 1 "start" FencePost -->
+        <Target multiplicity="(1..1)" roleLabel="defines start of" polymorphic="true">
+            <Class class="FencePost"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="FencePanelHasEndFencePost" strength="referencing" modifier="Sealed" description="Relationship to define the FenceVolume is bounded by the right side of the Boundary.">
+        <BaseClass>FencePanelIsBoundedByFencePost</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="has end FencePost" polymorphic="false">
+            <Class class="FencePanel" />
+        </Source>
+        <!-- A FencePanel must have exactly 1 "end" FencePost -->
+        <Target multiplicity="(1..1)" roleLabel="defines end of" polymorphic="true">
+            <Class class="FencePost"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <!-- ========================== FencePost-related classes ===================================== -->
+
+    <!-- QUESTION - WE NEED TO UNDERSTAND IF/WHEN A FencePost CAN MOVE. THIS MOVEMENT NEEDS TO BE PASSED ON DOWNSTREAM TO UPDATE THE FencePanels, ETC..-->
+
+    <ECEntityClass typeName="FencePost" modifier="Sealed" displayLabel="Fence Post" description="The start/end location of one or more FencePanels. Conceptually an infinite vertical line.">
+        <BaseClass>GeotechnicalInterpretationElement</BaseClass>
+
+        <ECProperty propertyName="Location" typeName="point2d" displayLabel="Location" kindOfQuantity="AECU:LENGTH" description="The 2D location of this FencePost (in global coordinates)."/>
+    </ECEntityClass>
+
+    <!-- Note that Borehole must notify FencePost of location changes (at ground level) -->
+    <ECRelationshipClass typeName="BoreholeLocatesFencePost" strength="referencing" modifier="Sealed" description="Relationship to define the FencePost is located at a Borehole.">
+        <BaseClass>bis:ElementDrivesElement</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="locates" polymorphic="false">
+            <Class class="Borehole" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="bounds" polymorphic="false">
+            <Class class="FencePost"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <!-- Every Borehole that is Drives a FencePost should guide (BoreholeGuidesFenceDiagram) all FenceDiagrams which contain the FencePost -->
+
+    <!-- ========================== FenceVolume-related classes =================================== -->
+
+    <ECEntityClass typeName="FenceVolume" modifier="Abstract" displayLabel="FenceVolume" description="A contiguous 2D region that is part of a FenceDiagram and is bounded by FenceBoundaries.">
+        <BaseClass>GeotechnicalInterpretationElement</BaseClass>
+
+        <ECProperty propertyName="Shape" displayLabel="Shape" typeName="Bentley.Geometry.Common.IGeometry" description="The shape (a 2D polygon) in FenceDiagram coordinates."/>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="FenceBoundaryBoundsVolumes" strength="referencing" modifier="Abstract" description="Relationship to define the FenceVolume is bounded by the FenceBoundary.">
+        <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <!-- A FenceVolume must be bounded by as least one FenceBoundary, but we can't use the 1..* constraint as each subclass is 0..*-->
+        <Source multiplicity="(0..*)" roleLabel="bounds" polymorphic="false">
+            <Class class="FenceBoundary" />
+        </Source>
+        <!-- A FenceBoundary must bound as least one FenceVolume, but we can't use the 1..2 constraint as each subclass is 0..1-->
+        <Target multiplicity="(0..2)" roleLabel="is bounded by" polymorphic="true">
+            <Class class="FenceVolume"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="FenceBoundaryBoundsVolumeOnLeftSide" strength="referencing" modifier="Sealed" description="Relationship to define the FenceVolume is bounded by the left side of the FenceBoundary.">
+        <BaseClass>FenceBoundaryBoundsVolumes</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="bounds on left side" polymorphic="false">
+            <Class class="FenceBoundary" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is bounded by left side of" polymorphic="true">
+            <Class class="FenceVolume"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="FenceBoundaryBoundsVolumeOnRightSide" strength="referencing" modifier="Sealed" description="Relationship to define the FenceVolume is bounded by the right side of the Boundary.">
+        <BaseClass>FenceBoundaryBoundsVolumes</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="bounds on right side" polymorphic="false">
+            <Class class="FenceBoundary" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is bounded by right side of" polymorphic="true">
+            <Class class="FenceVolume"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <!-- ========================== FenceStratum-related classes ================================== -->
+
+    <ECEntityClass typeName="FenceStratum" modifier="Sealed" displayLabel="Fence Stratum" description="A stratum within a FenceDiagram.">
+        <BaseClass>FenceVolume</BaseClass>
+
+        <!-- note inherited Shape property from FenceVolume -->
+        <ECNavigationProperty propertyName="Material" relationshipName="FenceStratumHasMaterial" direction="Forward" description="Reference to IMaterial of the FenceStratum (required)."/>
+    </ECEntityClass>
+   
+     <ECRelationshipClass typeName="FenceStratumHasMaterial" strength="referencing" modifier="Sealed" description="Relationship to define that a FenceStratum has a material of Material.">
+        <Source multiplicity="(0..*)" roleLabel="has material" polymorphic="false">
+            <Class class="FenceStratum" />
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="is material for" polymorphic="true">
+            <Class class="IMaterial"/> 
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="FenceDiagramOwnsFenceStratum" strength="embedding" modifier="Sealed">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(1..1)" polymorphic="false" roleLabel="owns">
+            <Class class="FenceDiagram"/>
+        </Source>
+        <Target multiplicity="(0..*)" polymorphic="false" roleLabel="is owned by">
+            <Class class="FenceStratum"/>
+        </Target>
+    </ECRelationshipClass>
+ 
+    <!-- ========================== FenceBoundary-related classes ================================= -->
+
+    <ECEntityClass typeName="FenceBoundary" modifier="Sealed" displayLabel="Fence Boundary" description="The boundary of 1 or 2 FenceStratums.">
+        <BaseClass>GeotechnicalInterpretationElement</BaseClass>
+
+        <ECProperty propertyName="Location"      displayLabel="Location"       typeName="Bentley.Geometry.Common.IGeometry" description="A 2D polyline in FenceDiagram coordinates."/>
+        <ECProperty propertyName="UserSpecified" displayLabel="User Specified" typeName="bool"                              description="Was this FenceBoundary specified by the user (and is not just a reflection of the generated Ground)."/>
+    </ECEntityClass>
+
+    <!-- Note that FenceBoundary must notify FenceDiagram of changes -->
+    <ECRelationshipClass typeName="FenceDiagramOwnsFenceBoundary" strength="embedding" modifier="Sealed">
+        <BaseClass>ElementOwnsDrivingChildElements</BaseClass>
+        <Source multiplicity="(1..1)" polymorphic="false" roleLabel="owns">
+            <Class class="FenceDiagram"/>
+        </Source>
+        <Target multiplicity="(0..*)" polymorphic="false" roleLabel="is owned by">
+            <Class class="FenceBoundary"/>
+        </Target>
+    </ECRelationshipClass>
+ 
+    <!-- ========================================================================================== -->
+    <!-- ========================== Region, Section, Etc. ========================================= -->
+    <!-- ========================================================================================== -->
+   
+   <!-- The entities below are placeholders for now. We need to determine exactly how they fit into the big picture -->
+
+       <ECEntityClass typeName="IRegionProvider" modifier="Abstract" displayLabel="Region Provider" description="An interface that defines an IOperand that can provide a 2D plan view region.">
+        <ECCustomAttributes>
+            <IsMixin xmlns="CoreCustomAttributes.01.00.03">
+                <AppliesToEntityClass>bis:Element</AppliesToEntityClass>
+            </IsMixin>
+        </ECCustomAttributes>
+        <BaseClass>IOperand</BaseClass>
+    </ECEntityClass>
+
+
+    <ECEntityClass typeName="Region" modifier="Sealed" displayLabel="Region" description="A 2D region of interest.">
+        <BaseClass>GeotechnicalInterpretationElement</BaseClass>
+        <BaseClass>IRegionProvider</BaseClass>
+
+        <ECProperty propertyName="Shape" displayLabel="Shape" typeName="Bentley.Geometry.Common.IGeometry" description="A 2D polygon."/>
+    </ECEntityClass>
+
+    <!-- likely want to create an ISectionProvider -->
+
+<!-- QUESTION: Do we want to support cross sections that are not line segments (now or future)-->
+    <ECEntityClass typeName="Section" modifier="Sealed" displayLabel="Section" description="A 2D (vertical) cross section of interest.">
+        <BaseClass>GeotechnicalInterpretationElement</BaseClass>
+
+        <ECProperty propertyName="Line" displayLabel="Line" typeName="Bentley.Geometry.Common.IGeometry" description="A 2D line segment."/>
+    </ECEntityClass>
+
+    <!-- ========================================================================================== -->
+    <!-- ========================== Geometry-RELATED IOperands ==================================== -->
+    <!-- ========================================================================================== -->
+   
+    <ECEntityClass typeName="ISurfaceProvider" modifier="Abstract" displayLabel="Surface Provider" description="An interface that defines an IOperand that can provide a surface.">
+        <ECCustomAttributes>
+            <IsMixin xmlns="CoreCustomAttributes.01.00.03">
+                <AppliesToEntityClass>bis:Element</AppliesToEntityClass>
+            </IsMixin>
+        </ECCustomAttributes>
+        <BaseClass>IOperand</BaseClass>
+    </ECEntityClass>
+
+    <!-- NEED MORE DISCUSSION (LATER!) ON GENERIC GEOMETRY (e.g. Terrain vs Surface)-->
+    <ECEntityClass typeName="GenericSurface" modifier="None" displayLabel="Generic Surface" description="A surface of unknown meaning.">
+        <BaseClass>GeotechnicalInterpretationElement</BaseClass>
+        <BaseClass>ISurfaceProvider</BaseClass>
+
+        <!-- NEED TO ADD EXTENDED TYPE extendedTypeName="GeometryFlatBuffer" or sim (when platform is ready) -->        
+        <ECProperty propertyName="Surface" displayLabel="Surface" typeName="binary" description="Contiguous IndexedPolyface defining the geometry of the surface. May be closed."/>
+    </ECEntityClass>
+
+    <!-- Future IVolumeProvider and GenericVolume here -->
+
+    <!-- ==================== Terrain Classes ================================== -->
+
+    <ECEntityClass typeName="ITerrainProvider" modifier="Abstract" displayLabel="Terrain Provider" description="An interface that marks a class as defining terrain (ground level).">
+        <ECCustomAttributes>
+            <IsMixin xmlns="CoreCustomAttributes.01.00.03">
+                <AppliesToEntityClass>bis:Element</AppliesToEntityClass>
+            </IsMixin>
+        </ECCustomAttributes>
+        <BaseClass>ISurfaceProvider</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="Terrain" modifier="Sealed" displayLabel="Terrain" description="2.5d surface used to approximate ground level.">
+        <BaseClass>GeotechnicalInterpretationElement</BaseClass>
+        <BaseClass>ITerrainProvider</BaseClass>
+
+        <!-- NEED TO ADD EXTENDED TYPE extendedTypeName="GeometryFlatBuffer" or sim (when platform supports) --> 
+        <ECProperty propertyName="Surface" displayLabel="Terrain Surface" typeName="binary" description="Contiguous, non-closed IndexedPolyface defining the geometry of the terrain surface."/>
+    </ECEntityClass>
+
+    <!-- ========================================================================================== -->
+    <!-- ========================== Ground-RELATED CLASSES ======================================== -->
+    <!-- ========================================================================================== -->
+
+    <ECEntityClass typeName="IGroundProvider" modifier="Abstract" displayLabel="Ground Provider" description="An IOperand that can provide a Ground.">
+        <ECCustomAttributes>
+            <IsMixin xmlns="CoreCustomAttributes.01.00.03">
+                <AppliesToEntityClass>bis:Element</AppliesToEntityClass>
+            </IsMixin>
+        </ECCustomAttributes>
+        <BaseClass>IOperand</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="Ground" modifier="Sealed" displayLabel="Ground" description="A approximation of the structure of the ground at surface level and below. Instances of Ground are immutable.">
+        <BaseClass>GeotechnicalInterpretationElement</BaseClass>
+        <BaseClass>IGroundProvider</BaseClass>
+        <BaseClass>bis:ISubModeledElement</BaseClass>
+    </ECEntityClass>
+
+    <!-- Note that none of the direct or indirect children of Ground are IOperand. -->
+    <!-- This (correctly) prevents them from being used _directly_ as input to an Operation. -->
+
+    <!-- TODO: rearrange/organize this section better -->
+
+    <!-- Blocks are always children of Ground -->
+    <ECRelationshipClass typeName="GroundOwnsBlocks" strength="embedding" modifier="Sealed">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(1..1)" polymorphic="false" roleLabel="owns">
+            <Class class="Ground"/>
+        </Source>
+        <Target multiplicity="(0..*)" polymorphic="false" roleLabel="is owned by">
+            <Class class="Block"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <!-- Boundaries are always children of Ground -->
+    <ECRelationshipClass typeName="GroundOwnsBoundaries" strength="embedding" modifier="Sealed">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(1..1)" polymorphic="false" roleLabel="owns">
+            <Class class="Ground"/>
+        </Source>
+        <Target multiplicity="(0..*)" polymorphic="false" roleLabel="is owned by">
+            <Class class="Boundary"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="GroundVolume" modifier="Abstract" displayLabel="Ground Volume" description="A contiguous 3D volume that is part of a Ground and is bounded by Boundaries.">
+        <BaseClass>GeotechnicalInterpretationElement</BaseClass>
+
+        <!-- NEED TO ADD EXTENDED TYPE extendedTypeName="GeometryFlatBuffer" or sim (when platform supports) --> 
+        <ECProperty propertyName="Volume" displayLabel="Volume" typeName="binary" description="A closed IndexedPolyface that defines a cache of the geometry of the 3D volume."/>
+    </ECEntityClass>
+
+    <!-- SHOULD WE NAME THIS ONE GroundBoundary for clarity? -->
+    <ECEntityClass typeName="Boundary" modifier="Sealed" displayLabel="Boundary" description="A contiguous surface that bounds Volumes. Always a child of Subsurface. Instances of Boundary are immutable.">
+        <BaseClass>GeotechnicalInterpretationElement</BaseClass>
+
+        <!-- NEED TO ADD EXTENDED TYPE extendedTypeName="GeometryFlatBuffer" or sim (when platform supports) --> 
+        <ECProperty propertyName="Surface" displayLabel="Surface" typeName="binary" description="Contiguous IndexedPolyface defining the geometry of the surface. May be closed."/>
+    </ECEntityClass>
+   
+    <ECRelationshipClass typeName="BoundaryBoundsVolumes" strength="referencing" modifier="Abstract" description="Relationship to define the Volume is bounded by the Boundary.">
+        <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <!-- A GroundVolume must be bounded by as least one Boundary, but we can't use the 1..* constraint as each subclass is 0..*-->
+        <Source multiplicity="(0..*)" roleLabel="bounds" polymorphic="false">
+            <Class class="Boundary" />
+        </Source>
+        <!-- A Boundary must bound as least one GroundVolume, but we can't use the 1..2 constraint as each subclass is 0..1-->
+        <Target multiplicity="(0..2)" roleLabel="is bounded by" polymorphic="true">
+            <Class class="GroundVolume"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="BoundaryBoundsVolumeOnPositiveSide" strength="referencing" modifier="Sealed" description="Relationship to define the GroundVolume is bounded by the positive side of the Boundary.">
+        <BaseClass>BoundaryBoundsVolumes</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="bounds on positive side" polymorphic="false">
+            <Class class="Boundary" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is bounded by positive side of" polymorphic="true">
+            <Class class="GroundVolume"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="BoundaryBoundsVolumeOnNegativeSide" strength="referencing" modifier="Sealed" description="Relationship to define the GroundVolume is bounded by the negative side of the Boundary.">
+        <BaseClass>BoundaryBoundsVolumes</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="bounds on negative side" polymorphic="false">
+            <Class class="Boundary" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is bounded by negative side of" polymorphic="true">
+            <Class class="GroundVolume"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="Block" modifier="Sealed" displayLabel="Block" description="A fault block or similar region of consistent Stratums. Always child of Ground. Instances of Block are immutable.">
+        <BaseClass>GeotechnicalInterpretationElement</BaseClass>
+        <BaseClass>bis:IParentElement</BaseClass>
+    </ECEntityClass>
+
+    <!-- Stratums are always children of Blocks -->
+    <ECRelationshipClass typeName="BlockOwnsStratums" strength="embedding" modifier="Sealed">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(1..1)" polymorphic="false" roleLabel="owns">
+            <Class class="Block"/>
+        </Source>
+        <Target multiplicity="(0..*)" polymorphic="false" roleLabel="is owned by">
+            <Class class="Stratum"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <!-- WaterTables are always children of Blocks -->
+    <ECRelationshipClass typeName="BlockOwnsWaterTables" strength="embedding" modifier="Sealed">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(1..1)" polymorphic="false" roleLabel="owns">
+            <Class class="Block"/>
+        </Source>
+        <Target multiplicity="(0..*)" polymorphic="false" roleLabel="is owned by">
+            <Class class="WaterTable"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <!-- LayerOrder are always children of Blocks -->
+    <ECRelationshipClass typeName="BlockOwnsLayerOrder" strength="embedding" modifier="Sealed">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(1..1)" polymorphic="false" roleLabel="owns">
+            <Class class="Block"/>
+        </Source>
+        <Target multiplicity="(0..1)" polymorphic="false" roleLabel="is owned by">
+            <Class class="LayerOrder"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="Stratum" modifier="Sealed" displayLabel="Stratum" description="A GroundVolume representing a stratum of constant material. Always child of Block. Instances of Stratum are immutable.">
+        <BaseClass>GroundVolume</BaseClass>
+
+        <ECNavigationProperty propertyName="Material" relationshipName="StratumHasMaterial" direction="Forward" description="Reference to IMaterial of the Stratum (required)."/>
+    </ECEntityClass>
+   
+     <ECRelationshipClass typeName="StratumHasMaterial" strength="referencing" modifier="Sealed" description="Relationship to define that a Stratum has a material of Material.">
+        <Source multiplicity="(0..*)" roleLabel="has material" polymorphic="false">
+            <Class class="Stratum" />
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="is material for" polymorphic="true">
+            <Class class="IMaterial"/> 
+        </Target>
+    </ECRelationshipClass>
+ 
+    <!-- may change this name (and clarify the concept) later -->
+    <ECEntityClass typeName="WaterTable" modifier="Sealed" displayLabel="Water Table" description="A border between saturated and unsaturated soil. Always child of Block. Instances of WaterTable are immutable.">
+        <BaseClass>GeotechnicalInterpretationElement</BaseClass>
+
+        <!-- NEED TO ADD EXTENDED TYPE extendedTypeName="GeometryFlatBuffer" or sim --> 
+        <ECProperty propertyName="Surface" displayLabel="Surface" typeName="binary" description="Contiguous surface defining the geometry of the WaterTable. May be closed."/>
+    </ECEntityClass>
+
+     <ECEntityClass typeName="LayerOrder" modifier="Sealed" displayLabel="Layer Order" description="An Element representing the order of IMaterials in the Block's Stratums. Always child of Block.">
+        <BaseClass>GeotechnicalInformationElement</BaseClass>
+    </ECEntityClass>
+  
+     <ECRelationshipClass typeName="LayerOrderOrdersMaterials" strength="referencing" modifier="Sealed" description="Relationship to define the order of IMaterials in a Block's Stratums.">
+        <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="orders material" polymorphic="false">
+            <Class class="LayerOrder" />
+        </Source>
+        <!-- QUESTION: Can we have a LayerOrder with no layers? (corresponds to no Stratums in a Block?) -->
+        <Target multiplicity="(0..1)" roleLabel="is ordered by" polymorphic="true">
+            <Class class="IMaterial"/> 
+        </Target>
+        <!-- QUESTION: Do we want 1-based indexing or 0-based indexing? -->
+        <ECProperty propertyName="LayerIndex" typeName="int" displayLabel="Layer Index" description="1-based top-to-bottom index of the layer of the IMaterial"/>
+    </ECRelationshipClass>
+
+    <!-- ========================================================================================== -->
+    <!-- ========================== GroundGeneration-RELATED CLASSES ============================== -->
+    <!-- ========================================================================================== -->
+
+    <!-- This is mostly a placeholder for now. We may want to structure this differently. -->
+    <!-- NEED TO DETERMINE IF WE WILL HAVE A FAMILY OF GroundGenerations, OR HANDLE THAT THROUGH PARAMETERS, OR ?-->
+    <!-- ALSO NEED TO DETERMINE IF THERE WILL BE A SINGLETON GroundGeneration, OR THERE CAN (POST-V1) BE MULTIPLE-->
+    <ECEntityClass typeName="GroundGeneration" modifier="Sealed" displayLabel="Ground Generation" description="An Operation that generates a Ground from boreholes, terrain surfaces, etc..">
+        <BaseClass>Operation</BaseClass>
+
+    </ECEntityClass>
+
+    <!-- Note that GroundGeneration can also have an IFenceDiagramProvider as an OperationOwnsDrivingInput child -->
+
+    <!-- Note that IBoreholeProvider must notify GroundGeneration of changes -->
+    <ECRelationshipClass typeName="BoreholeProviderDrivesGroundGeneration" strength="referencing" modifier="Sealed" description="Connects GroundGeneration with its input IBoreholeProvider.">
+        <BaseClass>InputDrivesOperation</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="is borehole input for and drives" polymorphic="true">
+            <Class class="IBoreholeProvider" />
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="has borehole input and is driven by" polymorphic="false">
+            <Class class="GroundGeneration" />
+        </Target>
+    </ECRelationshipClass>
+
+    <!-- Note that ITerrainProvider must notify GroundGeneration of changes -->
+    <ECRelationshipClass typeName="TerrainDrivesGroundGeneration" strength="referencing" modifier="Sealed" description="Connects GroundGeneration with its input ITerrainProvider.">
+        <BaseClass>InputDrivesOperation</BaseClass>
+        <!-- NEED TO DETERMINE IF MORE THAN 1 TERRAIN SURFACE CAN BE USED FOR INPUT TO A SINGLE GENERATION-->
+        <Source multiplicity="(0..*)" roleLabel="is terrain input for and drives" polymorphic="true">
+            <Class class="ITerrainProvider" />
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="has terrain input and is driven by" polymorphic="false">
+            <Class class="GroundGeneration" />
+        </Target>
+    </ECRelationshipClass>
+
+    <!-- Note that IRegionProvider must notify GroundGeneration of changes -->
+    <ECRelationshipClass typeName="RegionDrivesGroundGeneration" strength="referencing" modifier="Sealed" description="Connects GroundGeneration with its input IRegionProvider (that constrains the output area).">
+        <BaseClass>InputDrivesOperation</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="is region (area bounds) input for and drives" polymorphic="true">
+            <Class class="IRegionProvider" />
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="has region (area bounds) input and is driven by" polymorphic="false">
+            <Class class="GroundGeneration" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="GroundGenerationHasGroundOutput" strength="referencing" modifier="Sealed" description="Connects GroundGeneration with its output Ground.">
+        <BaseClass>OperationHasOutput</BaseClass>
+        <!-- Every Ground must have come from a GroundGeneration operation-->
+        <Source multiplicity="(1..1)" roleLabel="has output" polymorphic="false">
+            <Class class="GroundGeneration" />
+        </Source>
+        <!-- before Operation is run there will not be any Subsurface-->
+        <Target multiplicity="(0..1)" roleLabel="is output for" polymorphic="true">
+            <Class class="IGroundProvider" />
+        </Target>
+    </ECRelationshipClass>
+
+    <!-- GroundGenerationParameters-related classes -->
+
+    <!-- TODO: Eventually we need a way to designate the "active GroundGenerationParameters -->
+    <!-- TODO: Do we need to have an identifier for the Engine, or will the subclass be enough of an identifier? -->
+    <!-- TODO: It is likely for both of these questions that we can procrastinate until we need to support more than 1 engine. -->
+    <ECEntityClass typeName="GroundGenerationParameters" modifier="Abstract" displayLabel="Ground Generation Parameters" description="Parameters that are available to influence the GroundGeneration Operation.">
+        <BaseClass>OperationParameters</BaseClass>
+    </ECEntityClass>
+
+    <!-- GroundGenerationParameters is always a child of GroundGeneration -->
+    <ECRelationshipClass typeName="GroundGenerationOwnsParameters" strength="embedding" modifier="None">
+        <BaseClass>OperationOwnsParameters</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns and is driven by" polymorphic="false">
+            <Class class="GroundGeneration"/>
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="is owned by and drives" polymorphic="true">
+            <Class class="GroundGenerationParameters"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <!-- ========================================================================================== -->
+    <!-- ========================== CORE Operation/IOperand SYSTEM ================================ -->
+    <!-- ========================================================================================== -->
+
+    <ECEntityClass typeName="IOperand" modifier="Abstract" displayLabel="IOperand" description="Element which can be used as input to an Operation and/or may be output from an Operation.">
+        <ECCustomAttributes>
+            <IsMixin xmlns="CoreCustomAttributes.01.00.00">
+                <AppliesToEntityClass>bis:Element</AppliesToEntityClass>
+            </IsMixin>
+        </ECCustomAttributes>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="Operation" modifier="Abstract" displayLabel="Operation" description="Abstract superclass for an operation that takes IOperand inputs and produces an IOperand result.">
+        <BaseClass>GeotechnicalInformationElement</BaseClass>
+        <BaseClass>bis:IParentElement</BaseClass>
+
+        <!-- *** QUESTION: PREFERENCES FOR A DIFFERENT NAME? *** -->
+        <ECProperty propertyName="NeedsRerun"   displayLabel="Needs Rerun"   typeName="bool" description="This Operation has not be run since the last input change."/>
+    </ECEntityClass>
+
+    <!-- QUESTION: ARE WE HAPPY WITH THE "DRIVES" TERMINOLOGY? -->
+
+    <!-- We can't change the order of EDE, so it has to be InputXxxOperation -->
+    <!-- Note that (input) IOperand must notify Operation of changes -->
+    <ECRelationshipClass typeName="InputDrivesOperation" strength="referencing" modifier="None" description="Connects an Operation with its (non-child) input IOperands.">
+        <BaseClass>bis:ElementDrivesElement</BaseClass>
+        <!-- While an Operation always requires input, some subclasses of this relationship may have optional input, so we need to have 0..* cardinality below-->
+        <Source multiplicity="(0..*)" roleLabel="is input for" polymorphic="true">
+            <Class class="IOperand" />
+        </Source>
+        <!-- IOperand may be input for 0, 1 or many Operations-->
+        <Target multiplicity="(0..*)" roleLabel="has input" polymorphic="true">
+            <Class class="Operation" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="OperationOwnsDrivingInput" strength="embedding" modifier="None" description="Connects an Operation with its child input IOperands.">
+        <BaseClass>ElementOwnsDrivingChildElements</BaseClass>
+        <Source multiplicity="(1..1)" polymorphic="true" roleLabel="owns and has input">
+            <Class class="Operation"/>
+        </Source>
+        <Target multiplicity="(0..*)" polymorphic="true" roleLabel="is owned by and is input for">
+            <Class class="IOperand"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <!-- TBD: Should result IOperands be children of the Operation? That would enforce cascading delete behavior (appropriately). -->
+    <!-- TBD: If so, this needs to be a subclass of ElementOwnsChildElements. -->
+    <ECRelationshipClass typeName="OperationHasOutput" strength="referencing" modifier="Abstract" description="Connects an Operation with its output IOperands.">
+        <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <!-- IOperand can be result of 0 Operations (if it is "pure input") or 1 Operation if it is a result-->
+        <Source multiplicity="(0..1)" roleLabel="has output" polymorphic="true"> 
+            <Class class="Operation" />
+        </Source>
+        <!-- Operation has 1 IOperand result, but won't have any if it hasn't been run -->
+        <Target multiplicity="(0..1)" roleLabel="is output of" polymorphic="true"> 
+            <Class class="IOperand" />
+        </Target>
+    </ECRelationshipClass>
+
+    <!-- OperationParameters-related classes -->
+
+    <ECEntityClass typeName="OperationParameters" modifier="Abstract" displayLabel="OperationParameters" description="Parameters that are related to an Operation and are conceptually part of the Operation.">
+        <BaseClass>GeotechnicalInformationElement</BaseClass>
+        <BaseClass>IOperand</BaseClass>
+    </ECEntityClass>
+
+    <!-- All OperationParameters are (driving input) children of their Operation-->
+    <ECRelationshipClass typeName="OperationOwnsParameters" strength="embedding" modifier="None">
+        <BaseClass>OperationOwnsDrivingInput</BaseClass>
+        <Source multiplicity="(1..1)" polymorphic="true" roleLabel="owns and is driven by">
+            <Class class="Operation"/>
+        </Source>
+        <Target multiplicity="(0..*)" polymorphic="true" roleLabel="is owned by and drives">
+            <Class class="OperationParameters"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="UniversalOperand" description="An IOperand that can be used as input for all Operations." modifier="Abstract">
+        <BaseClass>GeotechnicalInformationElement</BaseClass>
+        <BaseClass>IOperand</BaseClass>
+        <BaseClass>IGroundProvider</BaseClass>
+        <BaseClass>ISurfaceProvider</BaseClass>
+        <BaseClass>ITerrainProvider</BaseClass>
+        <!-- ADD ALL IOperand MIXINS (THAT CAN BE OPERATION OR FILTER OUTPUT) AS BASE CLASSES -->
+    </ECEntityClass>
+
+    <ECEntityClass typeName="EmptyOperand" description="A UniversalOperand representing no-results-produced-by-an-Operation." modifier="Sealed">
+        <BaseClass>UniversalOperand</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="InvalidOperand" description="A UniversalOperand representing error-instead-of-results-produced-by-an-Operation." modifier="Sealed">
+        <BaseClass>UniversalOperand</BaseClass>
+
+        <!-- QUESTION: how do we want to record error information? Is localization an issue? -->
+        <ECProperty propertyName="Error"     typeName="string" displayLabel="Error"   description="Information about the error."/>
+    </ECEntityClass>
+
+    <!-- ========================================================================================== -->
+    <!-- ========================== TEMPORARY ===================================================== -->
+    <!-- ========================================================================================== -->
+
+    <!-- THIS IS TEMPORARY RELATIONSHIP TO FLAG PARENT-CHILD RELATIONSHIPS THAT NEED TO BE UPDATED TO TIE INTO EDE DEPENDENCY TREE -->
+    <!-- See work item: 510194 -->
+    <ECRelationshipClass typeName="ElementOwnsDrivingChildElements" strength="embedding" modifier="None">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(1..1)" polymorphic="true" roleLabel="owns and is driven by">
+            <Class class="bis:Element"/>
+        </Source>
+        <Target multiplicity="(0..*)" polymorphic="true" roleLabel="is owned by and drives">
+            <Class class="bis:Element"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <!-- ========================================================================================== -->
+    <!-- ========================== FOR TEMPORARY PERFORMANCE TESTING ONLY ======================== -->
+    <!-- ========================================================================================== -->
+
+    <ECEntityClass typeName="TestSurface" modifier="Abstract" displayLabel="Test Element with Surface Mesh" description="For testing purposes only.">
+        <BaseClass>GeotechnicalInterpretationElement</BaseClass>
+    
+        <ECProperty propertyName="Surface" displayLabel="Surface" typeName="binary" description="For testing surface meshes."/>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="TestVolume" modifier="Abstract" displayLabel="Test Element with BREP Volume" description="For testing purposes only.">
+        <BaseClass>GeotechnicalInterpretationElement</BaseClass>
+
+        <ECProperty propertyName="Volume" displayLabel="Volume" typeName="binary" description="For testing BREP volume performance/strategy."/>
+    </ECEntityClass>
+
+    <!-- ========================================================================================== -->
+    <!-- ========================== SurfaceTransformation-RELATED CLASSES ========================= -->
+    <!-- ========================================================================================== -->
+
+    <!-- THESE CLASSES INTENDED FOR TESTING OF OPERATIONS/IOPERANDS SYSTEM ONLY -->
+
+    <!-- Use GenericSurface for the input and output IOperands in testing -->
+
+
+    <ECEntityClass typeName="SurfaceTransformation" modifier="Sealed" displayLabel="Surface Transformation" description="An Operation that transforms one or more surfaces into another surface">
+        <BaseClass>Operation</BaseClass>
+
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="SurfaceProviderDrivesSurfaceTransformation" strength="referencing" modifier="Sealed" description="Connects a SurfaceTransformation with its input ISurfaceProvider(s).">
+        <BaseClass>InputDrivesOperation</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="is surface input for and drives" polymorphic="true">
+            <Class class="ISurfaceProvider" />
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="has surface input and is driven by" polymorphic="true">
+            <Class class="SurfaceTransformation" />
+        </Target>
+    </ECRelationshipClass>
+
+
+    <ECRelationshipClass typeName="SurfaceTransformationHasSurfaceOutput" strength="referencing" modifier="Sealed" description="Connects a SurfaceTransformation with its output ISurfaceProvider.">
+        <BaseClass>OperationHasOutput</BaseClass>
+        <!-- Every ISurfaceProvider must have come from 0 or 1 SurfaceTransformation -->
+        <Source multiplicity="(0..1)" roleLabel="has output" polymorphic="true">
+            <Class class="SurfaceTransformation" />
+        </Source>
+        <!-- before Operation is run there will not be any result ISurfaceProvider-->
+        <Target multiplicity="(0..1)" roleLabel="is output for" polymorphic="true">
+            <Class class="ISurfaceProvider" />
+        </Target>
+    </ECRelationshipClass>
+
+
+</ECSchema>
