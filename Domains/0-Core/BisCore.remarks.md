@@ -127,6 +127,10 @@ Instances of `SheetIndexFolder` are always contained within a `SheetIndexModel`.
 
 Instances of `SheetReference` are always contained within a `SheetIndexModel`.
 
+### SheetIndexReference
+
+Instances of `SheetIndexReference` are always contained within a `SheetIndexModel`.
+
 ### SheetIndex
 
 Instances of `SheetIndex` are always contained within a `SheetIndexModel`.
