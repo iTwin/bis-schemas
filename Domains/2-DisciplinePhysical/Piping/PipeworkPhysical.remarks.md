@@ -5,13 +5,13 @@ remarksTarget: PipeworkPhysical.ecschema.md
 
 # PipeworkPhysical
 
-This schema contains classes that are commonly used in various types of piping networks.
+This schema contains classes that are commonly used in various types of piping networks, designed for the distribution of matter (e.g. gases, liquids, fluidized solids or slurries).
 
 The following class-diagrams depict the main classes and relationships in the PipeworkPhysical schema:
 
+![System classes](./media/PipeworkPhysical-system_classes.png)
 ![Flow-Element classes](./media/PipeworkPhysical-flow_classes.png)
 ![TypeDef classes](./media/PipeworkPhysical-typedef_classes.png)
-![Mix-in classes](./media/PipeworkPhysical-mixin_classes.png)
 ![Port classes](./media/PipeworkPhysical-port_classes.png)
 
 The following instance-diagram depict a few examples of classes from the PipeworkPhysical schema:
