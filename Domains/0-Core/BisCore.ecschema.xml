@@ -743,6 +743,7 @@
     <ECEntityClass typeName="Subject" modifier="Sealed" description="A bis:Subject is an information element that references (by name) some real-world Object that will be modeled in this BIS repository.">
         <BaseClass>InformationReferenceElement</BaseClass>
         <BaseClass>IParentElement</BaseClass>
+        <BaseClass>IChannelRootElement</BaseClass>
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.01.00.00"/>
         </ECCustomAttributes>
@@ -778,6 +779,7 @@
     <ECEntityClass typeName="InformationPartitionElement" modifier="Abstract" displayLabel="Information Partition" description="An instance of a specialization of bis:InformationPartitionElement establishes a particular Modeling Perspective for its parent bis:Subject. Instances are always sub-modeled by a specialization of bis:Model of the appropriate Modeling Perspective.">
         <BaseClass>InformationContentElement</BaseClass>
         <BaseClass>ISubModeledElement</BaseClass>
+        <BaseClass>IChannelRootElement</BaseClass>
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.01.00.00"/>
             <ShareColumns xmlns="ECDbMap.02.00.00">
@@ -1695,12 +1697,49 @@
         </Target>
     </ECRelationshipClass>
 
-    <ECEntityClass typeName="ChannelRootAspect" displayLabel="Channel Root Aspect" modifier="Sealed" description="A bis:ElementUniqueAspect that identifies a bis:Element as the root of a *channel* which is a subset of the overall iModel hierarchy that is independently maintained.">
+    <ECEntityClass typeName="Channel" modifier ="Sealed" displayLabel="Channel" description="A software artifact that defines data-writing access over hierarchies of elements.">
+        <BaseClass>InformationReferenceElement</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="IChannelRootElement" modifier="Abstract" displayLabel="Channel-Root Element" description="An interface that can be mixed-into a bis:InformationReferenceElement to indicate that it can be used as a root of a Channel that it defines data-writing access over.">
+        <ECCustomAttributes>
+            <IsMixin xmlns="CoreCustomAttributes.01.00.03">
+                <AppliesToEntityClass>InformationContentElement</AppliesToEntityClass>
+            </IsMixin>
+            <NotSubclassableInReferencingSchemas xmlns="CoreCustomAttributes.01.00.03"/>
+        </ECCustomAttributes>
+        <ECNavigationProperty propertyName="Channel" relationshipName="ElementIsRootOfChannel" direction="forward" displayLabel="Channel" description="The bis:Channel that this bis:IChannelRootElement defines a root for.">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03"/>
+            </ECCustomAttributes>
+        </ECNavigationProperty>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="ElementIsRootOfChannel" displayLabel="Element Is Root of Channel" modifier="Sealed" strength="embedding" strengthDirection="forward" description="Relationship between an Element implementing IChannelRootElement and the Channel it defines a root for.">
+        <Source multiplicity="(0..*)" roleLabel="is a root of" polymorphic="true">
+            <Class class="IChannelRootElement"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is rooted by" polymorphic="false">
+            <Class class="Channel"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="ChannelRootAspect" displayLabel="Channel Root Aspect" modifier="Sealed" description="DEPRECATED: A bis:ElementUniqueAspect that identifies a bis:Element as the root of a *channel* which is a subset of the overall iModel hierarchy that is independently maintained.">
         <BaseClass>ElementUniqueAspect</BaseClass>
         <ECProperty propertyName="Owner" typeName="string" description="The owner of the channel"/>
+            <ECCustomAttributes>
+                <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                    <Description>Use bis:Channel and bis:IChannelRootElement instead.</Description>
+                </Deprecated>
+            </ECCustomAttributes>
     </ECEntityClass>
     <ECRelationshipClass typeName="ElementOwnsChannelRootAspect" strength="embedding" modifier="None">
         <BaseClass>ElementOwnsUniqueAspect</BaseClass>
+        <ECCustomAttributes>
+            <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                <Description>Use bis:Channel and bis:IChannelRootElement instead.</Description>
+            </Deprecated>
+        </ECCustomAttributes>
         <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
             <Class class="Element"/>
         </Source>
