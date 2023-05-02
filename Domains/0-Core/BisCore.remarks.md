@@ -198,6 +198,12 @@ The system handler also prevents the "root" `Subject` from ever being deleted.
 
 A `Channel` is associated with one or more `Subject`s and `InformationPartitionElement`s that are a root of the element-hierarchy under its influence, via the `ElementIsRootOfChannel` relationship. It is captured by the `Channel` navigation-property on the `IChannelRootElement` mix-in.
 
+`Channel` instances are always contained in the _RepositoryModel_.
+
+### IChannelRootElement
+
+The `IChannelRootElement` interface is only meant to be mixed-in by `Subject` and `InformationPartitionElement` classes.
+
 ### Category
 
 Categories should be standardized by domain groups where possible. They generally correlate with groups of BIS Element classes, or a single base class.
