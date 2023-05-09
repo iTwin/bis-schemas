@@ -21,6 +21,10 @@ The following instance-diagram depict a few examples of classes from the Pipewor
 ![Valves](./media/PipeworkPhysical-valve_instances.png)
 ![Ports](./media/PipeworkPhysical-instances.png)
 
+Rules and Patterns defined by the _ClassificationSystem_ schema are expected to be used in order to describe the classification of the PhysicalElement and PhysicalType sub-classes in this schema, in terms of International Classification Systems. The following instance-diagram depicts the classification of a `PipeType` instance by _Nominal Pipe Size_ and _Pipe Schedule_, two classification concepts standardized by the American National Standards Institute (ANSI).
+
+![Classification Systems](./media/PipeworkPhysical-classification_systems.png)
+
 ## Entity Classes
 
 ### BendType
@@ -112,12 +116,12 @@ Equivalent to [IfcDistributionPort](http://ifc43-docs.standards.buildingsmart.or
 ### PipingPortType
 
 The `PipingPortType` class captures two important concepts for a set of ports: 
-1) Their diameter.
+1) Their outer and inner diameters.
 1) Their end-condition / end-style treatment.
 
-The diameter of a `PipingPortType` is captured via its `DiameterDefinition` navigation property, whereas its end-condition is captured by specific subclasses of the `PipingPortType` class.
+The outer and inner diameters of a `PipingPortType` are captured via its `OuterDiameter` and `InnerDiameter` properties, whereas its end-condition is captured by specific subclasses of the `PipingPortType` class.
 
-`PipingPortType`s can be associated with PhysicalTypes implementing the `IPipingPhysicalType` mix-in, via the `PipingPhysicalTypeUsesPortTypes` relationship. That way, catalogs of PhysicalTypes can include data about their PipingPortTypes: diameter and end-condition of their ports.
+`PipingPortType`s can be associated with PhysicalTypes implementing the `IPipingPhysicalType` mix-in, via the `PipingPhysicalTypeUsesPortTypes` relationship. That way, catalogs of PhysicalTypes can include data about their PipingPortTypes: diameters and end-condition of their ports.
 
 Concrete `PipingPortType` instances must be contained in `DefinitionModel`s.
 

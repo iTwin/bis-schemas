@@ -51,12 +51,6 @@
         </ECCustomAttributes>        
     </ECEntityClass>
 
-    <ECEntityClass typeName="PipeDiameterDefinition" modifier="Sealed" displayLabel="Pipe Diameter Definition" description="A bis:DefinitionElement that models standard sizes for pipes.">
-        <BaseClass>bis:DefinitionElement</BaseClass>
-        <ECProperty propertyName="NominalDiameter" typeName="double" kindOfQuantity="AECU:LENGTH_SHORT" displayLabel="Nominal Diameter" description="Nominal pipe diameter"/>
-        <ECProperty propertyName="OutsideDiameter" typeName="double" kindOfQuantity="AECU:LENGTH_SHORT" displayLabel="Outside Diameter" description="Outside pipe diameter"/>
-    </ECEntityClass>
-
     <ECEntityClass typeName="PipeElement" modifier="Abstract" displayLabel="Pipe Element" description="A bis:PhysicalElement used to typically join two sections of a piping network.">
         <BaseClass>bis:PhysicalElement</BaseClass>
         <BaseClass>IPipingElement</BaseClass>
@@ -69,7 +63,6 @@
         <ECProperty propertyName="GrossWeight" typeName="double" kindOfQuantity="AECU:WEIGHT" displayLabel="Gross Weight" description="Total Gross Weight of the object without any add-on parts and not taking into account possible processing features (cut-out's, etc.) or openings and recesses. Not including contained matter."/>
         <ECProperty propertyName="PressureRange" typeName="bis:BoundedDoubleValue" kindOfQuantity="AECU:PRESSURE" displayLabel="Pressure Range" description="Allowable maximum, minimum and typical working pressure (relative to ambient pressure)."/>
         <ECProperty propertyName="TemperatureRange" typeName="bis:BoundedDoubleValue" kindOfQuantity="AECU:TEMPERATURE" displayLabel="Temperature Range" description="Allowable maximum, minimum and typical temperature."/>
-        <ECProperty propertyName="WallThickness" typeName="double" kindOfQuantity="AECU:LENGTH_SHORT" displayLabel="Wall Thickness" description="Distance between the internal and external sides of a PipeElement."/>
     </ECEntityClass>
 
     <ECEntityClass typeName="Pipe" modifier="None" displayLabel="Pipe" description="A straight PipeElement used to typically join two sections of a piping network.">
@@ -173,7 +166,8 @@
 
     <ECEntityClass typeName="PipingPortType" modifier="Abstract" displayLabel="Piping Port Type" description="Defines a shared set of properties whose values vary per-type of PipingPort rather than per-instance.">
         <BaseClass>dsys:DistributionPortType</BaseClass>
-        <ECNavigationProperty propertyName="DiameterDefinition" relationshipName="PipingPortTypeIsOfDiameter" direction="Forward" displayLabel="Diameter" description="Diameter Definition of a PipingPortType."/>
+        <ECProperty propertyName="OuterDiameter" typeName="double" kindOfQuantity="AECU:LENGTH_SHORT" displayLabel="Outer Diameter" description="Outer Piping-port diameter"/>
+        <ECProperty propertyName="InnerDiameter" typeName="double" kindOfQuantity="AECU:LENGTH_SHORT" displayLabel="Inner Diameter" description="Inner Piping-port diameter"/>
     </ECEntityClass>
 
     <ECRelationshipClass typeName="PipingPhysicalTypeUsesPortTypes" strength="referencing" modifier="None" description="Relationship that associates a PipingPhysicalType with the PipingPortTypes it uses.">
@@ -183,15 +177,6 @@
         </Source>
         <Target multiplicity="(0..*)" polymorphic="true" roleLabel="is used by">
             <Class class="PipingPortType"/>
-        </Target>
-    </ECRelationshipClass>
-
-    <ECRelationshipClass typeName="PipingPortTypeIsOfDiameter" strength="referencing" modifier="None" description="Relationship between a PipingPortType and its Diameter Definition.">
-        <Source multiplicity="(0..*)" polymorphic="true" roleLabel="is of">
-            <Class class="PipingPortType"/>
-        </Source>
-        <Target multiplicity="(0..1)" polymorphic="true" roleLabel="applies to">
-            <Class class="PipeDiameterDefinition"/>
         </Target>
     </ECRelationshipClass>
 
