@@ -115,6 +115,26 @@ In retrospect, the complexity added by introducing a distinct "Spatial Location"
 
 > Behavior: The system handler (C++) for `SpatialLocationPartition` ensures that it is only ever sub-modeled by a `SpatialLocationModel`.
 
+### SheetIndexPartition
+
+The 'Sheet Index' Modeling Perspective is a subset of the 'Information' Modeling Perspective. It holds Elements that organize Sheets into hierarchies for easier access.
+
+### SheetIndexFolder
+
+Instances of `SheetIndexFolder` are always contained within a `SheetIndexModel`.
+
+### SheetReference
+
+Instances of `SheetReference` are always contained within a `SheetIndexModel`.
+
+### SheetIndexReference
+
+Instances of `SheetIndexReference` are always contained within a `SheetIndexModel`.
+
+### SheetIndex
+
+Instances of `SheetIndex` are always contained within a `SheetIndexModel`.
+
 ### Model
 
 See [Model Fundamentals](../guide/fundamentals/model-fundamentals/).
@@ -248,6 +268,14 @@ See [SheetTemplate.Border ECNavigationProperty](#SheetTemplate) ECNavigationProp
 ### SheetBorderHasSheetBorderTemplate
 
 See [SheetBorder.BorderTemplate ECNavigationProperty](#SheetBorder) ECNavigationProperty
+
+### SheetIndexReferenceRefersToSheetIndex
+
+See [SheetIndexReference.SheetIndex ECNavigationProperty](#SheetIndexReference) ECNavigationProperty
+
+### SheetReferenceRefersToSheet
+
+See [SheetReference.Sheet ECNavigationProperty](#SheetReference) ECNavigationProperty
 
 ### ViewIsAttached
 
