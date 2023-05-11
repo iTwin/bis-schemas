@@ -388,8 +388,15 @@ See [CustomHandledPropertyStatementType](#CustomHandledPropertyStatementType).
 
 ### ChannelRootAspect
 
-An *iModel Bridge* uses the `ChannelRootAspect` to indicate ownership of a *channel*.
-A *channel* is a portion of the iModel's hierarchy that begins at the specified Element and recursively descends down through `ElementOwnsChildElements` and `ModelModelsElement` relationships to include all of the child elements and sub-models.
+Applications create channels to define portions of the model-hierarchy that they "own".
+
+Each Element (typically a `Subject` or `InformationPartitionElement`) that owns a `ChannelRootAspect` defines a root of the model-hierarchy that is included in a particular *channel*. It recursively descends down through `ElementOwnsChildElements` and `ModelModelsElement` relationships to include all of the child elements and sub-models into the specified *channel*. A *channel* is conceptually identified by its _Channel Key_ value of the `Owner` property of a `ChannelRootAspect`. 
+
+There may be more than one root `Subject`s or `InformationPartitionElement`s in a model-hierarchy that are included in the same *channel*. In that case, each `Subject` or `InformationPartitionElement` instance specifies the same _Channel Key_ value in their `ChannelRootAspect`. 
+
+Note that *Channels* do not nest. That is, once a `Subject` or `InformationPartitionElement` instance defines a root to be included in a particular *channel*, no descendant Element of such root in the subject-hierarchy can be used to define a root for a different *channel*.
+
+See [Channels](https://www.itwinjs.org/learning/backend/channel/) for more information on the topic.
 
 ### DefinitionSet
 
