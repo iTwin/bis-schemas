@@ -21,7 +21,7 @@ The following instance-diagram depict a few examples of classes from the Pipewor
 ![Valves](./media/PipeworkPhysical-valve_instances.png)
 ![Ports](./media/PipeworkPhysical-instances.png)
 
-Rules and Patterns defined by the _ClassificationSystem_ schema are expected to be used in order to describe the classification of the PhysicalElement and PhysicalType sub-classes in this schema, in terms of International Classification Systems. The following instance-diagram depicts the classification of a `PipeType` instance by _Nominal Pipe Size_ and _Pipe Schedule_, two classification concepts standardized by the American National Standards Institute (ANSI).
+Rules and Patterns defined by the _ClassificationSystems_ schema are expected to be used in order to describe the classification of the PhysicalElement and PhysicalType sub-classes in this schema, in terms of International Classification Systems. The following instance-diagram depicts the classification of a `PipeType` instance by _Nominal Pipe Size_ and _Pipe Schedule_, two classification concepts standardized by the American National Standards Institute (ANSI).
 
 ![Classification Systems](./media/PipeworkPhysical-classification_systems.png)
 
