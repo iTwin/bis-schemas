@@ -823,6 +823,8 @@
         <BaseClass>bis:DefinitionElement</BaseClass>
         <ECProperty propertyName="Name" typeName="string" description="Name of the MaterialProfile used for identification." />
         <ECProperty propertyName="Description" typeName="string" description="Description of the MaterialProfile." />
+        <ECProperty propertyName="Category" typeName="MaterialProfileCategoryType" description="Role of the MaterialProfile." />
+        <ECNavigationProperty propertyName="Material" relationshipName="MaterialProfileRefersToMaterial" direction="Forward" description="Referenced PhysicalMaterial." />
     </ECEntityClass>
 
     <ECEnumeration typeName="MaterialProfileCategoryType" backingTypeName="int" isStrict="true" displayLabel="Material Profile Category Type" description="Role of the MaterialProfile.">
@@ -833,12 +835,30 @@
 
     <ECEntityClass typeName="MaterialProfile" modifier="Sealed" displayLabel="Material Profile" description="Single pair of Profile and PhysicalMaterial.">
         <BaseClass>MaterialProfileDefinition</BaseClass>
-        <ECProperty propertyName="Category" typeName="MaterialProfileCategoryType" description="Role of the MaterialProfile." />
-        <ECNavigationProperty propertyName="Material" relationshipName="MaterialProfileRefersToMaterial" direction="Forward" description="Referenced PhysicalMaterial." />
         <ECNavigationProperty propertyName="Profile" relationshipName="MaterialProfileRefersToProfile" direction="Forward" description="Referenced Profile." />
     </ECEntityClass>
 
+    <ECRelationshipClass typeName="MaterialProfileDefinitionRefersToMaterial" strength="referencing" strengthDirection="Forward" modifier="None">
+        <ECCustomAttributes>
+            <Deprecated xmlns="CoreCustomAttributes.1.0.3">
+                <Description>.</Description>
+            </Deprecated>
+        </ECCustomAttributes>
+        <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="true">
+            <Class class="MaterialProfileDefinition" />
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="true">
+            <Class class="bis:PhysicalMaterial"/>
+        </Target>
+    </ECRelationshipClass>
+
     <ECRelationshipClass typeName="MaterialProfileRefersToMaterial" strength="referencing" strengthDirection="Forward" modifier="Sealed">
+        <ECCustomAttributes>
+            <Deprecated xmlns="CoreCustomAttributes.1.0.3">
+                <Description>MaterialProfileDefinitionRefersToMaterial should be used instead.</Description>
+            </Deprecated>
+        </ECCustomAttributes>
+        <BaseClass>MaterialProfileDefinitionRefersToMaterial</BaseClass>
         <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="false">
             <Class class="MaterialProfile" />
         </Source>
@@ -850,6 +870,30 @@
     <ECRelationshipClass typeName="MaterialProfileRefersToProfile" strength="referencing" strengthDirection="Forward" modifier="Sealed">
         <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="false">
             <Class class="MaterialProfile" />
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="true">
+            <Class class="prf:Profile"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="TaperedMaterialProfile" modifier="Sealed" displayLabel="Tapered Material Profile" description="Defines a CurveMember with a linearly varying Profile.">
+        <BaseClass>MaterialProfileDefinition</BaseClass>
+        <ECNavigationProperty propertyName="StartProfile" relationshipName="TaperedMaterialProfileRefersToStartProfile" direction="Forward" description="Profile at the Start of CurveMember." />
+        <ECNavigationProperty propertyName="EndProfile" relationshipName="TaperedMaterialProfileRefersToEndProfile" direction="Forward" description="Profile at the End of CurveMember." />
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="TaperedMaterialProfileRefersToStartProfile" strength="referencing" strengthDirection="Forward" modifier="Sealed">
+        <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="false">
+            <Class class="TaperedMaterialProfile" />
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="true">
+            <Class class="prf:Profile"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="TaperedMaterialProfileRefersToEndProfile" strength="referencing" strengthDirection="Forward" modifier="Sealed">
+        <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="false">
+            <Class class="TaperedMaterialProfile" />
         </Source>
         <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="true">
             <Class class="prf:Profile"/>
