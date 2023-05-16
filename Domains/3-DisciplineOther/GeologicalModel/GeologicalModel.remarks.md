@@ -1,8 +1,8 @@
 ---
-remarksTarget: GeotechnicalModel.ecschema.md
+remarksTarget: GeologicalModel.ecschema.md
 ---
 
-# GeotechnicalModel
+# GeologicalModel
 
 **alias:** geomodel
 

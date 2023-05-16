@@ -149,7 +149,6 @@ The iModel Schema Validation tool imports each individual schema in the bis-sche
 
 - **BIS-Rules Validation:** All schemas are validated against [BIS-Rules](https://www.itwinjs.org/bis/intro/bis-schema-validation/) using the `@bentley/schema-validator` package.
 - **Comparison Validation:** All schemas are compared with their similar (exact version match) released schemas within bis-schemas using the `@bentley/schema-comparer` package.
-- **Sha1 Hash Validation:** Sha1 Hash is generated for each exported schema and compared against the set of hashes of released schemas present in [SchemaInventory](https://github.com/iTwin/bis-schemas/blob/master/SchemaInventory.json).
 - **Approval Validation:** Approval status of each schema is checked from [SchemaInventory](https://github.com/iTwin/bis-schemas/blob/master/SchemaInventory.json).  
 
 > The npm script 'iModelSchemaValidation' uses the npm package `@bentley/imodel-schema-validator` to perform the validation.
