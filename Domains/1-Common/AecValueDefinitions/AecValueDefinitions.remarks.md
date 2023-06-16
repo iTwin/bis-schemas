@@ -1,9 +1,9 @@
 ---
 noEditThisPage: true
-remarksTarget: AecValueStructs.ecschema.md
+remarksTarget: AecValueDefinitions.ecschema.md
 ---
 
-# AecValueStructs
+# AecValueDefinitions
 
 This schema contains structs that define a single logical value in terms of all its members together.
 
