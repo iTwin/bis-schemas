@@ -6,9 +6,9 @@ remarksTarget: RoadAttributions.ecschema.md
 
 Contains classes specific to the Road-discipline, capturing Linearly-located attributions.
 
-## Entity Classes
-
 ![RoadAttributions](./media/RoadAttributions-classes.png)
+
+## Entity Classes
 
 ### SuperelevationRange
 
