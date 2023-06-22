@@ -1,7 +1,24 @@
-<ECSchema xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" version="01.00.02" schemaName="Substation" alias="sub" displayLabel="Substation" description="This schema contains classes used for Substation Design.">
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ==================================================================================
+|  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
+|  * See LICENSE.md in the project root for license terms and full copyright notice.
+======================================================================================= -->
+<ECSchema schemaName="Substation" alias="sub" version="01.00.02" displayLabel="Substation" description="This schema contains classes used for Substation Design." xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
+  <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
   <ECSchemaReference name="BisCore" version="01.00.13" alias="bis" />
+  <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
   <ECSchemaReference name="Functional" version="01.00.03" alias="func" />
   <ECSchemaReference name="ConstraintSolver" version="01.00.00" alias="ConSol" />
+ 
+  <ECCustomAttributes>
+    <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
+      <SupportedUse>NotForProduction</SupportedUse>
+    </ProductionStatus>
+    <SchemaLayerInfo xmlns="BisCustomAttributes.01.00.00">
+      <Value>Application</Value>
+    </SchemaLayerInfo>
+  </ECCustomAttributes>
+
   <ECEnumeration typeName="SymbolDrawingAffinity" backingTypeName="int" isStrict="true">
     <ECEnumerator name="Schematic" value="0" displayLabel="Schematic Drawing" />
     <ECEnumerator name="Layout" value="1" displayLabel="Layout Drawing" />
@@ -150,6 +167,15 @@
     <ECProperty propertyName="EquipmentDefinitionCode" displayLabel="Equipment Definition Code" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="SymbolType" displayLabel="Equipment Definition Type" readOnly="false" priority="0" typeName="int" />
   </ECEntityClass>
+  <ECRelationshipClass typeName="PhysicalElementOwnsCompatibleEquipmentDefinitionAspects" strength="embedding" modifier="None">
+    <BaseClass>bis:ElementOwnsMultiAspects</BaseClass>
+    <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+      <Class class="bis:PhysicalElement"/>
+    </Source>
+    <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="true">
+      <Class class="CompatibleEquipmentDefinitionAspect"/>
+    </Target>
+  </ECRelationshipClass>
   <ECEntityClass typeName="GenericEquipmentAspect" displayLabel="Generic Equipment Aspect" description="Contains generic properties of an equipment definition that applies to both Physical and Drawing perspectives. Typically would be part of PhysicalType / GraphicalType2d." modifier="Sealed">
     <BaseClass>bis:ElementUniqueAspect</BaseClass>
     <ECProperty propertyName="Name" displayLabel="Name" readOnly="false" priority="0" typeName="string" />
@@ -175,6 +201,15 @@
     <ECProperty propertyName="DetailedDescription4" displayLabel="Detailed Description 4" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="DetailedDescription5" displayLabel="Detailed Description 5" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
+  <ECRelationshipClass typeName="PhysicalElementOwnsGenericEquipmentAspect" strength="embedding" modifier="None">
+    <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+    <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+      <Class class="bis:PhysicalElement"/>
+    </Source>
+    <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="true">
+      <Class class="GenericEquipmentAspect"/>
+    </Target>
+  </ECRelationshipClass>
   <ECEntityClass typeName="FunctionalContainer" displayLabel="Functional Container" description="Container for definition-oriented functional elements." modifier="None">
     <BaseClass>bis:DefinitionElement</BaseClass>
     <BaseClass>bis:ISubModeledElement</BaseClass>
@@ -328,30 +363,30 @@
   <ECEntityClass typeName="Miscellaneous" displayLabel="Miscellaneous" modifier="None">
     <BaseClass>ElectricalPhysicalEquipment</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="ConductingEquipmentFunctional" displayLabel="Conducting Equipment" modifier="None">
+  <ECEntityClass typeName="ConductingEquipmentFunctional" displayLabel="Conducting Equipment Functional" modifier="None">
     <BaseClass>ElectricalFunctionalEquipment</BaseClass>
     <ECProperty propertyName="BOMDocumentNumber" displayLabel="BOM Document Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="DesignRevisionNumber" displayLabel="Design Revision Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="DesignWorkOrderNumber" displayLabel="Design Work Order Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="CodeValue" displayLabel="Internal Device ID" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
-  <ECEntityClass typeName="NonConductingEquipmentFunctional" displayLabel="Non-conducting Equipment" modifier="None">
+  <ECEntityClass typeName="NonConductingEquipmentFunctional" displayLabel="Non-conducting Equipment Functional" modifier="None">
     <BaseClass>ElectricalFunctionalEquipment</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="MiscellaneousFunctional" displayLabel="Miscellaneous" modifier="None">
+  <ECEntityClass typeName="MiscellaneousFunctional" displayLabel="Miscellaneous Functional" modifier="None">
     <BaseClass>ElectricalFunctionalEquipment</BaseClass>
     <ECProperty propertyName="BOMDocumentNumber" displayLabel="BOM Document Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="DesignRevisionNumber" displayLabel="Design Revision Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="DesignWorkOrderNumber" displayLabel="Design Work Order Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="CodeValue" displayLabel="Internal Device ID" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
-  <ECEntityClass typeName="ConductingEquipmentPhysicalType" displayLabel="Conducting Equipment" modifier="None">
+  <ECEntityClass typeName="ConductingEquipmentPhysicalType" displayLabel="Conducting Equipment Type" modifier="None">
     <BaseClass>ElectricalPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="NonConductingEquipmentPhysicalType" displayLabel="Non-conducting Equipment" modifier="None">
+  <ECEntityClass typeName="NonConductingEquipmentPhysicalType" displayLabel="Non-conducting Equipment Type" modifier="None">
     <BaseClass>ElectricalPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="MiscellaneousPhysicalType" displayLabel="Miscellaneous" modifier="None">
+  <ECEntityClass typeName="MiscellaneousPhysicalType" displayLabel="Miscellaneous Type" modifier="None">
     <BaseClass>ElectricalPhysicalType</BaseClass>
   </ECEntityClass>
   <ECEntityClass typeName="Switch" displayLabel="Switch" description="A generic device designed to close, or open, or both, one or more electric circuits.  All switches are two terminal devices including grounding switches. The ACDCTerminal.connected at the two sides of the switch shall not be considered for assessing switch connectivity, i.e. only Switch.open, .normalOpen and .locked are relevant." modifier="None">
@@ -386,12 +421,22 @@
   </ECEntityClass>
   <ECEntityClass typeName="Structure" displayLabel="Structure" modifier="None">
     <BaseClass>NonConductingEquipment</BaseClass>
+    <ECCustomAttributes>
+      <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+        <Description>Use StructuralPhysical.StructuralMember class instead</Description>
+      </Deprecated>
+    </ECCustomAttributes>
   </ECEntityClass>
   <ECEntityClass typeName="Platform" displayLabel="Platform" modifier="None">
     <BaseClass>NonConductingEquipment</BaseClass>
   </ECEntityClass>
   <ECEntityClass typeName="Foundation" displayLabel="Foundation" modifier="None">
     <BaseClass>NonConductingEquipment</BaseClass>
+    <ECCustomAttributes>
+      <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+        <Description>Use StructuralPhysical.FoundationMember class instead</Description>
+      </Deprecated>
+    </ECCustomAttributes>
   </ECEntityClass>
   <ECEntityClass typeName="CableTrench" displayLabel="Cable Trench" modifier="None">
     <BaseClass>NonConductingEquipment</BaseClass>
@@ -407,6 +452,11 @@
   </ECEntityClass>
   <ECEntityClass typeName="Building" displayLabel="Building" modifier="None">
     <BaseClass>NonConductingEquipment</BaseClass>
+    <ECCustomAttributes>
+      <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+        <Description>Use BuildingSpatial.Building class instead</Description>
+      </Deprecated>
+    </ECCustomAttributes>
   </ECEntityClass>
   <ECEntityClass typeName="LightningProtection" displayLabel="Lightning Protection" modifier="None">
     <BaseClass>NonConductingEquipment</BaseClass>
@@ -441,76 +491,76 @@
   <ECEntityClass typeName="Seal" displayLabel="Seal" description="Engineering seal. Usually provided by the PE after approving the document for construction." modifier="None">
     <BaseClass>Miscellaneous</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="SwitchFunctional" displayLabel="Switch" description="A generic device designed to close, or open, or both, one or more electric circuits.  All switches are two terminal devices including grounding switches. The ACDCTerminal.connected at the two sides of the switch shall not be considered for assessing switch connectivity, i.e. only Switch.open, .normalOpen and .locked are relevant." modifier="None">
+  <ECEntityClass typeName="SwitchFunctional" displayLabel="Switch Functional" description="A generic device designed to close, or open, or both, one or more electric circuits.  All switches are two terminal devices including grounding switches. The ACDCTerminal.connected at the two sides of the switch shall not be considered for assessing switch connectivity, i.e. only Switch.open, .normalOpen and .locked are relevant." modifier="None">
     <BaseClass>ConductingEquipmentFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="AuxiliaryEquipmentFunctional" displayLabel="Auxiliary Equipment" description="AuxiliaryEquipment describe equipment that is not performing any primary functions but support for the equipment performing the primary function.&#x000d; AuxiliaryEquipment is attached to primary equipment via an association with Terminal." modifier="None">
+  <ECEntityClass typeName="AuxiliaryEquipmentFunctional" displayLabel="Auxiliary Equipment Functional" description="AuxiliaryEquipment describe equipment that is not performing any primary functions but support for the equipment performing the primary function.&#x000d; AuxiliaryEquipment is attached to primary equipment via an association with Terminal." modifier="None">
     <BaseClass>ConductingEquipmentFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="EarthFaultCompensatorFunctional" displayLabel="Earth Fault Compensator" modifier="None">
+  <ECEntityClass typeName="EarthFaultCompensatorFunctional" displayLabel="Earth Fault Compensator Functional" modifier="None">
     <BaseClass>ConductingEquipmentFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="TransformerFunctional" displayLabel="Transformer" description="Power transformers are utilized in transmission networks with significantly higher voltage, while distribution transformers function in distribution networks defined by lower voltages" modifier="None">
+  <ECEntityClass typeName="TransformerFunctional" displayLabel="Transformer Functional" description="Power transformers are utilized in transmission networks with significantly higher voltage, while distribution transformers function in distribution networks defined by lower voltages" modifier="None">
     <BaseClass>ConductingEquipmentFunctional</BaseClass>
     <ECProperty propertyName="SerialNumber" displayLabel="Serial Number" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
-  <ECEntityClass typeName="SeriesCompensatorFunctional" displayLabel="Series Compensator" description="A Series Compensator is a series capacitor or reactor or an AC transmission line without charging susceptance.  It is a two terminal device." modifier="None">
+  <ECEntityClass typeName="SeriesCompensatorFunctional" displayLabel="Series Compensator Functional" description="A Series Compensator is a series capacitor or reactor or an AC transmission line without charging susceptance.  It is a two terminal device." modifier="None">
     <BaseClass>ConductingEquipmentFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="ConductorFunctional" displayLabel="Cable" modifier="None">
+  <ECEntityClass typeName="ConductorFunctional" displayLabel="Cable Functional" modifier="None">
     <BaseClass>ConductingEquipmentFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="ClampsConnectorsFunctional" displayLabel="Clamps Connectors" modifier="None">
+  <ECEntityClass typeName="ClampsConnectorsFunctional" displayLabel="Clamps Connectors Functional" modifier="None">
     <BaseClass>ConductingEquipmentFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="ConnectorFunctional" displayLabel="Connector" description="A conductor, or group of conductors, with negligible impedance, that serve to connect other conducting equipment within a single substation and are modelled with a single logical terminal." modifier="None">
+  <ECEntityClass typeName="ConnectorFunctional" displayLabel="Connector Functional" description="A conductor, or group of conductors, with negligible impedance, that serve to connect other conducting equipment within a single substation and are modelled with a single logical terminal." modifier="None">
     <BaseClass>ConductingEquipmentFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="RegulatingCondEqFunctional" displayLabel="Regulating Conducting Equipment" modifier="None">
+  <ECEntityClass typeName="RegulatingCondEqFunctional" displayLabel="Regulating Conducting Equipment Functional" modifier="None">
     <BaseClass>ConductingEquipmentFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="ProtectionAndControlFunctional" displayLabel="Protection And Control" modifier="None">
+  <ECEntityClass typeName="ProtectionAndControlFunctional" displayLabel="Protection And Control Functional" modifier="None">
     <BaseClass>ConductingEquipmentFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="OtherFunctional" displayLabel="Other" modifier="None">
+  <ECEntityClass typeName="OtherFunctional" displayLabel="Other Functional" modifier="None">
     <BaseClass>ConductingEquipmentFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="StructureFunctional" displayLabel="Structure" modifier="None">
+  <ECEntityClass typeName="StructureFunctional" displayLabel="Structure Functional" modifier="None">
     <BaseClass>NonConductingEquipmentFunctional</BaseClass>
     <ECProperty propertyName="BOMDocumentNumber" displayLabel="BOM Document Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="DesignRevisionNumber" displayLabel="Design Revision Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="DesignWorkOrderNumber" displayLabel="Design Work Order Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="CodeValue" displayLabel="Internal Device ID" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
-  <ECEntityClass typeName="PlatformFunctional" displayLabel="Platform" modifier="None">
+  <ECEntityClass typeName="PlatformFunctional" displayLabel="Platform Functional" modifier="None">
     <BaseClass>NonConductingEquipmentFunctional</BaseClass>
     <ECProperty propertyName="BOMDocumentNumber" displayLabel="BOM Document Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="DesignRevisionNumber" displayLabel="Design Revision Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="DesignWorkOrderNumber" displayLabel="Design Work Order Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="CodeValue" displayLabel="Internal Device ID" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
-  <ECEntityClass typeName="FoundationFunctional" displayLabel="Foundation" modifier="None">
+  <ECEntityClass typeName="FoundationFunctional" displayLabel="Foundation Functional" modifier="None">
     <BaseClass>NonConductingEquipmentFunctional</BaseClass>
     <ECProperty propertyName="BOMDocumentNumber" displayLabel="BOM Document Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="DesignRevisionNumber" displayLabel="Design Revision Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="DesignWorkOrderNumber" displayLabel="Design Work Order Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="CodeValue" displayLabel="Internal Device ID" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
-  <ECEntityClass typeName="CableTrenchFunctional" displayLabel="Cable Trench" modifier="None">
+  <ECEntityClass typeName="CableTrenchFunctional" displayLabel="Cable Trench Functional" modifier="None">
     <BaseClass>NonConductingEquipmentFunctional</BaseClass>
     <ECProperty propertyName="BOMDocumentNumber" displayLabel="BOM Document Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="DesignRevisionNumber" displayLabel="Design Revision Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="DesignWorkOrderNumber" displayLabel="Design Work Order Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="CodeValue" displayLabel="Internal Device ID" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
-  <ECEntityClass typeName="DuctbankFunctional" displayLabel="Duct bank" modifier="None">
+  <ECEntityClass typeName="DuctbankFunctional" displayLabel="Duct bank Functional" modifier="None">
     <BaseClass>NonConductingEquipmentFunctional</BaseClass>
     <ECProperty propertyName="BOMDocumentNumber" displayLabel="BOM Document Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="DesignRevisionNumber" displayLabel="Design Revision Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="DesignWorkOrderNumber" displayLabel="Design Work Order Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="CodeValue" displayLabel="Internal Device ID" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
-  <ECEntityClass typeName="CableCarrierFunctional" displayLabel="Raceway" modifier="None">
+  <ECEntityClass typeName="CableCarrierFunctional" displayLabel="Raceway Functional" modifier="None">
     <BaseClass>NonConductingEquipmentFunctional</BaseClass>
     <ECProperty propertyName="YearOfManufacture" displayLabel="Year Of Manufacture" readOnly="false" priority="0" typeName="dateTime" />
     <ECProperty propertyName="BOMDocumentNumber" displayLabel="BOM Document Number" readOnly="false" priority="0" typeName="string" />
@@ -518,90 +568,90 @@
     <ECProperty propertyName="DesignWorkOrderNumber" displayLabel="Design Work Order Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="CodeValue" displayLabel="Internal Device ID" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
-  <ECEntityClass typeName="FenceFunctional" displayLabel="Fence" modifier="None">
+  <ECEntityClass typeName="FenceFunctional" displayLabel="Fence Functional" modifier="None">
     <BaseClass>NonConductingEquipmentFunctional</BaseClass>
     <ECProperty propertyName="BOMDocumentNumber" displayLabel="BOM Document Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="DesignRevisionNumber" displayLabel="Design Revision Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="DesignWorkOrderNumber" displayLabel="Design Work Order Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="CodeValue" displayLabel="Internal Device ID" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
-  <ECEntityClass typeName="BuildingFunctional" displayLabel="Building" modifier="None">
+  <ECEntityClass typeName="BuildingFunctional" displayLabel="Building Functional" modifier="None">
     <BaseClass>NonConductingEquipmentFunctional</BaseClass>
     <ECProperty propertyName="BOMDocumentNumber" displayLabel="BOM Document Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="DesignRevisionNumber" displayLabel="Design Revision Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="DesignWorkOrderNumber" displayLabel="Design Work Order Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="CodeValue" displayLabel="Internal Device ID" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
-  <ECEntityClass typeName="LightningProtectionFunctional" displayLabel="Lightning Protection" modifier="None">
+  <ECEntityClass typeName="LightningProtectionFunctional" displayLabel="Lightning Protection Functional" modifier="None">
     <BaseClass>NonConductingEquipmentFunctional</BaseClass>
     <ECProperty propertyName="BOMDocumentNumber" displayLabel="BOM Document Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="DesignRevisionNumber" displayLabel="Design Revision Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="DesignWorkOrderNumber" displayLabel="Design Work Order Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="CodeValue" displayLabel="Internal Device ID" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
-  <ECEntityClass typeName="EnclosuresFunctional" displayLabel="Enclosures" modifier="None">
+  <ECEntityClass typeName="EnclosuresFunctional" displayLabel="Enclosures Functional" modifier="None">
     <BaseClass>NonConductingEquipmentFunctional</BaseClass>
     <ECProperty propertyName="BOMDocumentNumber" displayLabel="BOM Document Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="DesignRevisionNumber" displayLabel="Design Revision Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="DesignWorkOrderNumber" displayLabel="Design Work Order Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="CodeValue" displayLabel="Internal Device ID" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
-  <ECEntityClass typeName="ConnectorsFunctional" displayLabel="Connectors" modifier="None">
+  <ECEntityClass typeName="ConnectorsFunctional" displayLabel="Connectors Functional" modifier="None">
     <BaseClass>NonConductingEquipmentFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="PhysicalSafetyBarriersFunctional" displayLabel="Physical Safety Barriers" modifier="None">
-    <BaseClass>NonConductingEquipmentFunctional</BaseClass>
-    <ECProperty propertyName="BOMDocumentNumber" displayLabel="BOM Document Number" readOnly="false" priority="0" typeName="string" />
-    <ECProperty propertyName="DesignRevisionNumber" displayLabel="Design Revision Number" readOnly="false" priority="0" typeName="string" />
-    <ECProperty propertyName="DesignWorkOrderNumber" displayLabel="Design Work Order Number" readOnly="false" priority="0" typeName="string" />
-    <ECProperty propertyName="CodeValue" displayLabel="Internal Device ID" readOnly="false" priority="0" typeName="string" />
-  </ECEntityClass>
-  <ECEntityClass typeName="FastenersFunctional" displayLabel="Fasteners" modifier="None">
+  <ECEntityClass typeName="PhysicalSafetyBarriersFunctional" displayLabel="Physical Safety Barriers Functional" modifier="None">
     <BaseClass>NonConductingEquipmentFunctional</BaseClass>
     <ECProperty propertyName="BOMDocumentNumber" displayLabel="BOM Document Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="DesignRevisionNumber" displayLabel="Design Revision Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="DesignWorkOrderNumber" displayLabel="Design Work Order Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="CodeValue" displayLabel="Internal Device ID" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
-  <ECEntityClass typeName="ChannelSectionFunctional" displayLabel="Channel Section" modifier="None">
+  <ECEntityClass typeName="FastenersFunctional" displayLabel="Fasteners Functional" modifier="None">
     <BaseClass>NonConductingEquipmentFunctional</BaseClass>
     <ECProperty propertyName="BOMDocumentNumber" displayLabel="BOM Document Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="DesignRevisionNumber" displayLabel="Design Revision Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="DesignWorkOrderNumber" displayLabel="Design Work Order Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="CodeValue" displayLabel="Internal Device ID" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
-  <ECEntityClass typeName="SupportsFunctional" displayLabel="Supports" modifier="None">
-    <BaseClass>NonConductingEquipmentFunctional</BaseClass>
-    <ECProperty propertyName="BOMDocumentNumber" displayLabel="BOM Document Number" readOnly="false" priority="0" typeName="string" />
-    <ECProperty propertyName="DesignRevisionNumber" displayLabel="Design Revision Number" readOnly="false" priority="0" typeName="string" />
-    <ECProperty propertyName="DesignWorkOrderNumber" displayLabel="Design Work Order Number" readOnly="false" priority="0" typeName="string" />
-  </ECEntityClass>
-  <ECEntityClass typeName="GeneralHardwareFunctional" displayLabel="Geneal Hardware" modifier="None">
-    <BaseClass>NonConductingEquipmentFunctional</BaseClass>
-    <ECProperty propertyName="BOMDocumentNumber" displayLabel="BOM Document Number" readOnly="false" priority="0" typeName="string" />
-    <ECProperty propertyName="DesignRevisionNumber" displayLabel="Design Revision Number" readOnly="false" priority="0" typeName="string" />
-    <ECProperty propertyName="DesignWorkOrderNumber" displayLabel="Design Work Order Number" readOnly="false" priority="0" typeName="string" />
-  </ECEntityClass>
-  <ECEntityClass typeName="NameplateFunctional" displayLabel="Nameplate" description="Mounted on the equipment, and contains most relevant equipment attributes. Can be provided by manufacturer or created by utility using the data from design." modifier="None">
-    <BaseClass>NonConductingEquipmentFunctional</BaseClass>
-    <ECProperty propertyName="BOMDocumentNumber" displayLabel="BOM Document Number" readOnly="false" priority="0" typeName="string" />
-    <ECProperty propertyName="DesignRevisionNumber" displayLabel="Design Revision Number" readOnly="false" priority="0" typeName="string" />
-    <ECProperty propertyName="DesignWorkOrderNumber" displayLabel="Design Work Order Number" readOnly="false" priority="0" typeName="string" />
-  </ECEntityClass>
-  <ECEntityClass typeName="PoleFunctional" displayLabel="Pole" description="Distribution pole used to support the overhead conductors and related equipment" modifier="None">
+  <ECEntityClass typeName="ChannelSectionFunctional" displayLabel="Channel Section Functional" modifier="None">
     <BaseClass>NonConductingEquipmentFunctional</BaseClass>
     <ECProperty propertyName="BOMDocumentNumber" displayLabel="BOM Document Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="DesignRevisionNumber" displayLabel="Design Revision Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="DesignWorkOrderNumber" displayLabel="Design Work Order Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="CodeValue" displayLabel="Internal Device ID" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
-  <ECEntityClass typeName="TableFunctional" displayLabel="Table" description="Automatically created report from design and placed in the construction document/model.&#x000d; table and seal do not need any attributes, but we are adding them so the schema transformation can work properly. We are considering having a separate schema for drawing components only and moving table and seal to that schema" modifier="None">
+  <ECEntityClass typeName="SupportsFunctional" displayLabel="Supports Functional" modifier="None">
+    <BaseClass>NonConductingEquipmentFunctional</BaseClass>
+    <ECProperty propertyName="BOMDocumentNumber" displayLabel="BOM Document Number" readOnly="false" priority="0" typeName="string" />
+    <ECProperty propertyName="DesignRevisionNumber" displayLabel="Design Revision Number" readOnly="false" priority="0" typeName="string" />
+    <ECProperty propertyName="DesignWorkOrderNumber" displayLabel="Design Work Order Number" readOnly="false" priority="0" typeName="string" />
+  </ECEntityClass>
+  <ECEntityClass typeName="GeneralHardwareFunctional" displayLabel="General Hardware Functional" modifier="None">
+    <BaseClass>NonConductingEquipmentFunctional</BaseClass>
+    <ECProperty propertyName="BOMDocumentNumber" displayLabel="BOM Document Number" readOnly="false" priority="0" typeName="string" />
+    <ECProperty propertyName="DesignRevisionNumber" displayLabel="Design Revision Number" readOnly="false" priority="0" typeName="string" />
+    <ECProperty propertyName="DesignWorkOrderNumber" displayLabel="Design Work Order Number" readOnly="false" priority="0" typeName="string" />
+  </ECEntityClass>
+  <ECEntityClass typeName="NameplateFunctional" displayLabel="Nameplate Functional" description="Mounted on the equipment, and contains most relevant equipment attributes. Can be provided by manufacturer or created by utility using the data from design." modifier="None">
+    <BaseClass>NonConductingEquipmentFunctional</BaseClass>
+    <ECProperty propertyName="BOMDocumentNumber" displayLabel="BOM Document Number" readOnly="false" priority="0" typeName="string" />
+    <ECProperty propertyName="DesignRevisionNumber" displayLabel="Design Revision Number" readOnly="false" priority="0" typeName="string" />
+    <ECProperty propertyName="DesignWorkOrderNumber" displayLabel="Design Work Order Number" readOnly="false" priority="0" typeName="string" />
+  </ECEntityClass>
+  <ECEntityClass typeName="PoleFunctional" displayLabel="Pole Functional" description="Distribution pole used to support the overhead conductors and related equipment" modifier="None">
+    <BaseClass>NonConductingEquipmentFunctional</BaseClass>
+    <ECProperty propertyName="BOMDocumentNumber" displayLabel="BOM Document Number" readOnly="false" priority="0" typeName="string" />
+    <ECProperty propertyName="DesignRevisionNumber" displayLabel="Design Revision Number" readOnly="false" priority="0" typeName="string" />
+    <ECProperty propertyName="DesignWorkOrderNumber" displayLabel="Design Work Order Number" readOnly="false" priority="0" typeName="string" />
+    <ECProperty propertyName="CodeValue" displayLabel="Internal Device ID" readOnly="false" priority="0" typeName="string" />
+  </ECEntityClass>
+  <ECEntityClass typeName="TableFunctional" displayLabel="Table Functional" description="Automatically created report from design and placed in the construction document/model.&#x000d; table and seal do not need any attributes, but we are adding them so the schema transformation can work properly. We are considering having a separate schema for drawing components only and moving table and seal to that schema" modifier="None">
     <BaseClass>MiscellaneousFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="SealFunctional" displayLabel="Seal" description="Engineering seal. Usually provided by the PE after approving the document for construction." modifier="None">
+  <ECEntityClass typeName="SealFunctional" displayLabel="Seal Functional" description="Engineering seal. Usually provided by the PE after approving the document for construction." modifier="None">
     <BaseClass>MiscellaneousFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="SwitchPhysicalType" displayLabel="Switch" description="A generic device designed to close, or open, or both, one or more electric circuits.  All switches are two terminal devices including grounding switches. The ACDCTerminal.connected at the two sides of the switch shall not be considered for assessing switch connectivity, i.e. only Switch.open, .normalOpen and .locked are relevant." modifier="None">
+  <ECEntityClass typeName="SwitchPhysicalType" displayLabel="Switch Type" description="A generic device designed to close, or open, or both, one or more electric circuits.  All switches are two terminal devices including grounding switches. The ACDCTerminal.connected at the two sides of the switch shall not be considered for assessing switch connectivity, i.e. only Switch.open, .normalOpen and .locked are relevant." modifier="None">
     <BaseClass>ConductingEquipmentPhysicalType</BaseClass>
     <ECProperty propertyName="Weight" displayLabel="Weight" readOnly="false" priority="0" typeName="int" />
     <ECProperty propertyName="AssemblyTime" displayLabel="Assembly Time" readOnly="false" priority="0" typeName="int" />
@@ -611,20 +661,20 @@
     <ECProperty propertyName="ApplicableStandard" displayLabel="Applicable Standard" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="RatedCurrent" displayLabel="Rated Current" readOnly="false" priority="0" typeName="int" />
   </ECEntityClass>
-  <ECEntityClass typeName="AuxiliaryEquipmentPhysicalType" displayLabel="Auxiliary Equipment" description="AuxiliaryEquipment describe equipment that is not performing any primary functions but support for the equipment performing the primary function.&#x000d; AuxiliaryEquipment is attached to primary equipment via an association with Terminal." modifier="None">
+  <ECEntityClass typeName="AuxiliaryEquipmentPhysicalType" displayLabel="Auxiliary Equipment Type" description="AuxiliaryEquipment describe equipment that is not performing any primary functions but support for the equipment performing the primary function.&#x000d; AuxiliaryEquipment is attached to primary equipment via an association with Terminal." modifier="None">
     <BaseClass>ConductingEquipmentPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="EarthFaultCompensatorPhysicalType" displayLabel="Earth Fault Compensator" modifier="None">
+  <ECEntityClass typeName="EarthFaultCompensatorPhysicalType" displayLabel="Earth Fault Compensator Type" modifier="None">
     <BaseClass>ConductingEquipmentPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="TransformerPhysicalType" displayLabel="Transformer" description="Power transformers are utilized in transmission networks with significantly higher voltage, while distribution transformers function in distribution networks defined by lower voltages" modifier="None">
+  <ECEntityClass typeName="TransformerPhysicalType" displayLabel="Transformer Type" description="Power transformers are utilized in transmission networks with significantly higher voltage, while distribution transformers function in distribution networks defined by lower voltages" modifier="None">
     <BaseClass>ConductingEquipmentPhysicalType</BaseClass>
     <ECProperty propertyName="CIPCompliancerequired" displayLabel="CIP Compliance required" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
-  <ECEntityClass typeName="SeriesCompensatorPhysicalType" displayLabel="Series Compensator" description="A Series Compensator is a series capacitor or reactor or an AC transmission line without charging susceptance.  It is a two terminal device." modifier="None">
+  <ECEntityClass typeName="SeriesCompensatorPhysicalType" displayLabel="Series Compensator Type" description="A Series Compensator is a series capacitor or reactor or an AC transmission line without charging susceptance.  It is a two terminal device." modifier="None">
     <BaseClass>ConductingEquipmentPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="ConductorPhysicalType" displayLabel="Cable" modifier="None">
+  <ECEntityClass typeName="ConductorPhysicalType" displayLabel="Cable Type" modifier="None">
     <BaseClass>ConductingEquipmentPhysicalType</BaseClass>
     <ECProperty propertyName="Length" displayLabel="Length" readOnly="false" priority="0" typeName="int" />
     <ECProperty propertyName="TradeDiameter" displayLabel="Trade Diameter" readOnly="false" priority="0" typeName="int" />
@@ -640,38 +690,48 @@
     <ECProperty propertyName="InsulationType" displayLabel="Insulation Type" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="AllowableAmpacity" displayLabel="Allowable Ampacity" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
-  <ECEntityClass typeName="ClampsConnectorsPhysicalType" displayLabel="Clamps Connectors" modifier="None">
+  <ECEntityClass typeName="ClampsConnectorsPhysicalType" displayLabel="Clamps Connectors Type" modifier="None">
     <BaseClass>ConductingEquipmentPhysicalType</BaseClass>
     <ECProperty propertyName="Material" displayLabel="Material" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
-  <ECEntityClass typeName="ConnectorPhysicalType" displayLabel="Connector" description="A conductor, or group of conductors, with negligible impedance, that serve to connect other conducting equipment within a single substation and are modelled with a single logical terminal." modifier="None">
+  <ECEntityClass typeName="ConnectorPhysicalType" displayLabel="Connector Type" description="A conductor, or group of conductors, with negligible impedance, that serve to connect other conducting equipment within a single substation and are modelled with a single logical terminal." modifier="None">
     <BaseClass>ConductingEquipmentPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="RegulatingCondEqPhysicalType" displayLabel="Regulating Conducting Equipment" modifier="None">
+  <ECEntityClass typeName="RegulatingCondEqPhysicalType" displayLabel="Regulating Conducting Equipment Type" modifier="None">
     <BaseClass>ConductingEquipmentPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="ProtectionAndControlPhysicalType" displayLabel="Protection And Control" modifier="None">
+  <ECEntityClass typeName="ProtectionAndControlPhysicalType" displayLabel="Protection And Control Type" modifier="None">
     <BaseClass>ConductingEquipmentPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="OtherPhysicalType" displayLabel="Other" modifier="None">
+  <ECEntityClass typeName="OtherPhysicalType" displayLabel="OtherType" modifier="None">
     <BaseClass>ConductingEquipmentPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="StructurePhysicalType" displayLabel="Structure" modifier="None">
+  <ECEntityClass typeName="StructurePhysicalType" displayLabel="Structure Type" modifier="None">
+    <BaseClass>NonConductingEquipmentPhysicalType</BaseClass>
+    <ECCustomAttributes>
+      <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+        <Description>Use StructuralPhysical PhysicalType classes instead</Description>
+      </Deprecated>
+    </ECCustomAttributes>
+  </ECEntityClass>
+  <ECEntityClass typeName="PlatformPhysicalType" displayLabel="Platform Type" modifier="None">
     <BaseClass>NonConductingEquipmentPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="PlatformPhysicalType" displayLabel="Platform" modifier="None">
+  <ECEntityClass typeName="FoundationPhysicalType" displayLabel="Foundation Type" modifier="None">
+    <BaseClass>NonConductingEquipmentPhysicalType</BaseClass>
+    <ECCustomAttributes>
+      <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+        <Description>Use StructuralPhysical PhysicalType classes instead</Description>
+      </Deprecated>
+    </ECCustomAttributes>
+  </ECEntityClass>
+  <ECEntityClass typeName="CableTrenchPhysicalType" displayLabel="Cable Trench Type" modifier="None">
     <BaseClass>NonConductingEquipmentPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="FoundationPhysicalType" displayLabel="Foundation" modifier="None">
+  <ECEntityClass typeName="DuctbankPhysicalType" displayLabel="Duct bank Type" modifier="None">
     <BaseClass>NonConductingEquipmentPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="CableTrenchPhysicalType" displayLabel="Cable Trench" modifier="None">
-    <BaseClass>NonConductingEquipmentPhysicalType</BaseClass>
-  </ECEntityClass>
-  <ECEntityClass typeName="DuctbankPhysicalType" displayLabel="Duct bank" modifier="None">
-    <BaseClass>NonConductingEquipmentPhysicalType</BaseClass>
-  </ECEntityClass>
-  <ECEntityClass typeName="CableCarrierPhysicalType" displayLabel="Raceway" modifier="None">
+  <ECEntityClass typeName="CableCarrierPhysicalType" displayLabel="Raceway Type" modifier="None">
     <BaseClass>NonConductingEquipmentPhysicalType</BaseClass>
     <ECProperty propertyName="AssemblyTime" displayLabel="Assembly Time" readOnly="false" priority="0" typeName="int" />
     <ECProperty propertyName="OperatingTemperatureRange" displayLabel="Operating Temperature Range" readOnly="false" priority="0" typeName="string" />
@@ -684,47 +744,47 @@
     <ECProperty propertyName="VoltageLevels" displayLabel="" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="StackNumber" displayLabel="" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
-  <ECEntityClass typeName="FencePhysicalType" displayLabel="Fence" modifier="None">
+  <ECEntityClass typeName="FencePhysicalType" displayLabel="Fence Type" modifier="None">
     <BaseClass>NonConductingEquipmentPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="BuildingPhysicalType" displayLabel="Building" modifier="None">
+  <ECEntityClass typeName="BuildingPhysicalType" displayLabel="Building Type" modifier="None">
     <BaseClass>NonConductingEquipmentPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="LightningProtectionPhysicalType" displayLabel="Lightning Protection" modifier="None">
+  <ECEntityClass typeName="LightningProtectionPhysicalType" displayLabel="Lightning Protection Type" modifier="None">
     <BaseClass>NonConductingEquipmentPhysicalType</BaseClass>
     <ECProperty propertyName="Material" displayLabel="Material" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
-  <ECEntityClass typeName="EnclosuresPhysicalType" displayLabel="Enclosures" modifier="None">
+  <ECEntityClass typeName="EnclosuresPhysicalType" displayLabel="Enclosures Type" modifier="None">
     <BaseClass>NonConductingEquipmentPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="ConnectorsPhysicalType" displayLabel="Connectors" modifier="None">
+  <ECEntityClass typeName="ConnectorsPhysicalType" displayLabel="Connectors Type" modifier="None">
     <BaseClass>NonConductingEquipmentPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="PhysicalSafetyBarriersPhysicalType" displayLabel="Physical Safety Barriers" modifier="None">
+  <ECEntityClass typeName="PhysicalSafetyBarriersPhysicalType" displayLabel="Physical Safety Barriers Type" modifier="None">
     <BaseClass>NonConductingEquipmentPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="FastenersPhysicalType" displayLabel="Fasteners" modifier="None">
+  <ECEntityClass typeName="FastenersPhysicalType" displayLabel="Fasteners Type" modifier="None">
     <BaseClass>NonConductingEquipmentPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="ChannelSectionPhysicalType" displayLabel="Channel Section" modifier="None">
+  <ECEntityClass typeName="ChannelSectionPhysicalType" displayLabel="Channel Section Type" modifier="None">
     <BaseClass>NonConductingEquipmentPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="SupportsPhysicalType" displayLabel="Supports" modifier="None">
+  <ECEntityClass typeName="SupportsPhysicalType" displayLabel="Supports Type" modifier="None">
     <BaseClass>NonConductingEquipmentPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="GeneralHardwarePhysicalType" displayLabel="Geneal Hardware" modifier="None">
+  <ECEntityClass typeName="GeneralHardwarePhysicalType" displayLabel="General Hardware Type" modifier="None">
     <BaseClass>NonConductingEquipmentPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="NameplatePhysicalType" displayLabel="Nameplate" description="Mounted on the equipment, and contains most relevant equipment attributes. Can be provided by manufacturer or created by utility using the data from design." modifier="None">
+  <ECEntityClass typeName="NameplatePhysicalType" displayLabel="Nameplate Type" description="Mounted on the equipment, and contains most relevant equipment attributes. Can be provided by manufacturer or created by utility using the data from design." modifier="None">
     <BaseClass>NonConductingEquipmentPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="PolePhysicalType" displayLabel="Pole" description="Distribution pole used to support the overhead conductors and related equipment" modifier="None">
+  <ECEntityClass typeName="PolePhysicalType" displayLabel="Pole Type" description="Distribution pole used to support the overhead conductors and related equipment" modifier="None">
     <BaseClass>NonConductingEquipmentPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="TablePhysicalType" displayLabel="Table" description="Automatically created report from design and placed in the construction document/model.&#x000d; table and seal do not need any attributes, but we are adding them so the schema transformation can work properly. We are considering having a separate schema for drawing components only and moving table and seal to that schema" modifier="None">
+  <ECEntityClass typeName="TablePhysicalType" displayLabel="Table Type" description="Automatically created report from design and placed in the construction document/model.&#x000d; table and seal do not need any attributes, but we are adding them so the schema transformation can work properly. We are considering having a separate schema for drawing components only and moving table and seal to that schema" modifier="None">
     <BaseClass>MiscellaneousPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="SealPhysicalType" displayLabel="Seal" description="Engineering seal. Usually provided by the PE after approving the document for construction." modifier="None">
+  <ECEntityClass typeName="SealPhysicalType" displayLabel="Seal Type" description="Engineering seal. Usually provided by the PE after approving the document for construction." modifier="None">
     <BaseClass>MiscellaneousPhysicalType</BaseClass>
   </ECEntityClass>
   <ECEntityClass typeName="PowerCable" displayLabel="Power Cable" modifier="None">
@@ -1021,7 +1081,7 @@
   <ECEntityClass typeName="MountingKit" displayLabel="Mounting Kit" description="Additional components needed to mount equipment" modifier="None">
     <BaseClass>Supports</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="SectionaliserFunctional" displayLabel="Sectionalizer" description="Automatic switch that will lock open to isolate a faulted section. It may, or may not, have load breaking capability. Its primary purpose is to provide fault sectionalising at locations where the fault current is either too high, or too low, for proper coordination of fuses." modifier="None">
+  <ECEntityClass typeName="SectionaliserFunctional" displayLabel="Sectionalizer Functional" description="Automatic switch that will lock open to isolate a faulted section. It may, or may not, have load breaking capability. Its primary purpose is to provide fault sectionalising at locations where the fault current is either too high, or too low, for proper coordination of fuses." modifier="None">
     <BaseClass>SwitchFunctional</BaseClass>
     <ECProperty propertyName="Locked" displayLabel="Locked" readOnly="false" priority="0" typeName="boolean" />
     <ECProperty propertyName="Open" displayLabel="Open" readOnly="false" priority="0" typeName="boolean" />
@@ -1029,16 +1089,16 @@
     <ECProperty propertyName="Retained" displayLabel="Retained" readOnly="false" priority="0" typeName="boolean" />
     <ECProperty propertyName="YearOfManufacture" displayLabel="Year Of Manufacture" readOnly="false" priority="0" typeName="dateTime" />
   </ECEntityClass>
-  <ECEntityClass typeName="JumperFunctional" displayLabel="Jumper" description="A short section of conductor with negligible impedance which can be manually removed and replaced if the circuit is de-energized. Note that zero-impedance branches can potentially be modelled by other equipment types." modifier="None">
+  <ECEntityClass typeName="JumperFunctional" displayLabel="Jumper Functional" description="A short section of conductor with negligible impedance which can be manually removed and replaced if the circuit is de-energized. Note that zero-impedance branches can potentially be modelled by other equipment types." modifier="None">
     <BaseClass>SwitchFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="FuseFunctional" displayLabel="Fuse" description="An overcurrent protective device with a circuit opening fusible part that is heated and severed by the passage of overcurrent through it. A fuse is considered a switching device because it breaks current." modifier="None">
+  <ECEntityClass typeName="FuseFunctional" displayLabel="Fuse Functional" description="An overcurrent protective device with a circuit opening fusible part that is heated and severed by the passage of overcurrent through it. A fuse is considered a switching device because it breaks current." modifier="None">
     <BaseClass>SwitchFunctional</BaseClass>
     <ECProperty propertyName="Open" displayLabel="Open" readOnly="false" priority="0" typeName="boolean" />
     <ECProperty propertyName="Retained" displayLabel="Retained" readOnly="false" priority="0" typeName="boolean" />
     <ECProperty propertyName="YearOfManufacture" displayLabel="Year Of Manufacture" readOnly="false" priority="0" typeName="dateTime" />
   </ECEntityClass>
-  <ECEntityClass typeName="GroundDisconnectorFunctional" displayLabel="Ground Disconnector" description="A manually operated or motor operated mechanical switching device used for isolating a circuit or equipment from ground.&#x000d; Also known as earthing switch" modifier="None">
+  <ECEntityClass typeName="GroundDisconnectorFunctional" displayLabel="Ground Disconnector Functional" description="A manually operated or motor operated mechanical switching device used for isolating a circuit or equipment from ground.&#x000d; Also known as earthing switch" modifier="None">
     <BaseClass>SwitchFunctional</BaseClass>
     <ECProperty propertyName="Locked" displayLabel="Locked" readOnly="false" priority="0" typeName="boolean" />
     <ECProperty propertyName="Open" displayLabel="Open" readOnly="false" priority="0" typeName="boolean" />
@@ -1046,7 +1106,7 @@
     <ECProperty propertyName="Retained" displayLabel="Retained" readOnly="false" priority="0" typeName="boolean" />
     <ECProperty propertyName="YearOfManufacture" displayLabel="Year Of Manufacture" readOnly="false" priority="0" typeName="dateTime" />
   </ECEntityClass>
-  <ECEntityClass typeName="DisconnectorFunctional" displayLabel="Disconnector" description="A manually operated or motor operated mechanical switching device used for changing the connections in a circuit, or for isolating a circuit or equipment from a source of power. It is required to open or close circuits when negligible current is broken or made." modifier="None">
+  <ECEntityClass typeName="DisconnectorFunctional" displayLabel="Disconnector Functional" description="A manually operated or motor operated mechanical switching device used for changing the connections in a circuit, or for isolating a circuit or equipment from a source of power. It is required to open or close circuits when negligible current is broken or made." modifier="None">
     <BaseClass>SwitchFunctional</BaseClass>
     <ECProperty propertyName="Locked" displayLabel="Locked" readOnly="false" priority="0" typeName="boolean" />
     <ECProperty propertyName="Open" displayLabel="Open" readOnly="false" priority="0" typeName="boolean" />
@@ -1054,7 +1114,7 @@
     <ECProperty propertyName="Retained" displayLabel="Retained" readOnly="false" priority="0" typeName="boolean" />
     <ECProperty propertyName="YearOfManufacture" displayLabel="Year Of Manufacture" readOnly="false" priority="0" typeName="dateTime" />
   </ECEntityClass>
-  <ECEntityClass typeName="ProtectedSwitchFunctional" displayLabel="Protected Switch" description="Pole-mounted fault interrupter with built-in phase and ground relays, current transformer (CT), and supplemental controls." modifier="None">
+  <ECEntityClass typeName="ProtectedSwitchFunctional" displayLabel="Protected Switch Functional" description="Pole-mounted fault interrupter with built-in phase and ground relays, current transformer (CT), and supplemental controls." modifier="None">
     <BaseClass>SwitchFunctional</BaseClass>
     <ECProperty propertyName="Locked" displayLabel="Locked" readOnly="false" priority="0" typeName="boolean" />
     <ECProperty propertyName="Open" displayLabel="Open" readOnly="false" priority="0" typeName="boolean" />
@@ -1062,354 +1122,354 @@
     <ECProperty propertyName="Retained" displayLabel="Retained" readOnly="false" priority="0" typeName="boolean" />
     <ECProperty propertyName="YearOfManufacture" displayLabel="Year Of Manufacture" readOnly="false" priority="0" typeName="dateTime" />
   </ECEntityClass>
-  <ECEntityClass typeName="SurgeArresterFunctional" displayLabel="Surge Arrestor" description="Shunt device, installed on the network, usually in the proximity of electrical equipment in order to protect the said equipment against transient voltage transients caused by lightning or switching activity." modifier="None">
+  <ECEntityClass typeName="SurgeArresterFunctional" displayLabel="Surge Arrestor Functional" description="Shunt device, installed on the network, usually in the proximity of electrical equipment in order to protect the said equipment against transient voltage transients caused by lightning or switching activity." modifier="None">
     <BaseClass>AuxiliaryEquipmentFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="FaultIndicatorFunctional" displayLabel="Fault Indicator" description="A FaultIndicator is typically only an indicator (which may or may not be remotely monitored), and not a piece of equipment that actually initiates a protection event. It is used for FLISR (Fault Location, Isolation and Restoration) purposes, assisting with the dispatch of crews to &quot;most likely&quot; part of the network (i.e. assists with determining circuit section where the fault most likely happened)." modifier="None">
+  <ECEntityClass typeName="FaultIndicatorFunctional" displayLabel="Fault Indicator Functional" description="A FaultIndicator is typically only an indicator (which may or may not be remotely monitored), and not a piece of equipment that actually initiates a protection event. It is used for FLISR (Fault Location, Isolation and Restoration) purposes, assisting with the dispatch of crews to &quot;most likely&quot; part of the network (i.e. assists with determining circuit section where the fault most likely happened)." modifier="None">
     <BaseClass>AuxiliaryEquipmentFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="WaveTrapFunctional" displayLabel="Wave Tap" description="Line traps are devices that impede high frequency power line carrier signals yet present a negligible impedance at the main power frequency." modifier="None">
+  <ECEntityClass typeName="WaveTrapFunctional" displayLabel="Wave Trap Functional" description="Line traps are devices that impede high frequency power line carrier signals yet present a negligible impedance at the main power frequency." modifier="None">
     <BaseClass>AuxiliaryEquipmentFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="SensorFunctional" displayLabel="Sensor" description="This class describe devices that transform a measured quantity into signals that can be presented at displays, used in control or be recorded." modifier="None">
+  <ECEntityClass typeName="SensorFunctional" displayLabel="Sensor Functional" description="This class describe devices that transform a measured quantity into signals that can be presented at displays, used in control or be recorded." modifier="None">
     <BaseClass>AuxiliaryEquipmentFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="GroundingImpedanceFunctional" displayLabel="Grounding Impedance" modifier="None">
+  <ECEntityClass typeName="GroundingImpedanceFunctional" displayLabel="Grounding Impedance Functional" modifier="None">
     <BaseClass>EarthFaultCompensatorFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="PetersenCoilFunctional" displayLabel="Peterson Coil" description="A variable impedance device normally used to offset line charging during single line faults in an ungrounded section of network." modifier="None">
+  <ECEntityClass typeName="PetersenCoilFunctional" displayLabel="Peterson Coil Functional" description="A variable impedance device normally used to offset line charging during single line faults in an ungrounded section of network." modifier="None">
     <BaseClass>EarthFaultCompensatorFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="PowerTransformerFunctional" displayLabel="Power Transformer" modifier="None">
+  <ECEntityClass typeName="PowerTransformerFunctional" displayLabel="Power Transformer Functional" modifier="None">
     <BaseClass>TransformerFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="DistributionTransformerFunctional" displayLabel="Distribution Transformer" modifier="None">
+  <ECEntityClass typeName="DistributionTransformerFunctional" displayLabel="Distribution Transformer Functional" modifier="None">
     <BaseClass>TransformerFunctional</BaseClass>
     <ECProperty propertyName="YearOfManufacture" displayLabel="Year Of Manufacture" readOnly="false" priority="0" typeName="dateTime" />
   </ECEntityClass>
-  <ECEntityClass typeName="PowerCableFunctional" displayLabel="Power Cable" modifier="None">
+  <ECEntityClass typeName="PowerCableFunctional" displayLabel="Power Cable Functional" modifier="None">
     <BaseClass>ConductorFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="CommunicationCableFunctional" displayLabel="Communication Cable" modifier="None">
+  <ECEntityClass typeName="CommunicationCableFunctional" displayLabel="Communication Cable Functional" modifier="None">
     <BaseClass>ConductorFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="CableConnectorsFunctional" displayLabel="Cable Connectors" modifier="None">
+  <ECEntityClass typeName="CableConnectorsFunctional" displayLabel="Cable Connectors Functional" modifier="None">
     <BaseClass>ClampsConnectorsFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="CableClampsFunctional" displayLabel="Cable Clamps" modifier="None">
+  <ECEntityClass typeName="CableClampsFunctional" displayLabel="Cable Clamps Functional" modifier="None">
     <BaseClass>ClampsConnectorsFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="BusbarSectionFunctional" displayLabel="Busbar Section" description="A conductor, or group of conductors, with negligible impedance, that serve to connect other conducting equipment within a single substation. &#x000d; Voltage measurements are typically obtained from voltage transformers that are connected to busbar sections. A bus bar section may have many physical terminals but for analysis is modelled with exactly one logical terminal." modifier="None">
+  <ECEntityClass typeName="BusbarSectionFunctional" displayLabel="Busbar Section Functional" description="A conductor, or group of conductors, with negligible impedance, that serve to connect other conducting equipment within a single substation. &#x000d; Voltage measurements are typically obtained from voltage transformers that are connected to busbar sections. A bus bar section may have many physical terminals but for analysis is modelled with exactly one logical terminal." modifier="None">
     <BaseClass>ConnectorFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="JunctionFunctional" displayLabel="Junction" modifier="None">
+  <ECEntityClass typeName="JunctionFunctional" displayLabel="Junction Functional" modifier="None">
     <BaseClass>ConnectorFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="ShuntCompensatorFunctional" displayLabel="Shunt Compensator" modifier="None">
+  <ECEntityClass typeName="ShuntCompensatorFunctional" displayLabel="Shunt Compensator Functional" modifier="None">
     <BaseClass>RegulatingCondEqFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="FrequencyConverterFunctional" displayLabel="Frequency Converter" description="A device to convert from one frequency to another (e.g., frequency F1 to F2) comprises a pair of FrequencyConverter instances. One converts from F1 to DC, the other converts the DC to F2." modifier="None">
+  <ECEntityClass typeName="FrequencyConverterFunctional" displayLabel="Frequency Converter Functional" description="A device to convert from one frequency to another (e.g., frequency F1 to F2) comprises a pair of FrequencyConverter instances. One converts from F1 to DC, the other converts the DC to F2." modifier="None">
     <BaseClass>RegulatingCondEqFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="StaticVarCompensatorFunctional" displayLabel="Static Var Compensator" description="A facility for providing variable and controllable shunt reactive power. The SVC typically consists of a stepdown transformer, filter, thyristor-controlled reactor, and thyristor-switched capacitor arms.&#x000d; &#x000d; The SVC may operate in fixed MVar output mode or in voltage control mode. When in voltage control mode, the output of the SVC will be proportional to the deviation of voltage at the controlled bus from the voltage setpoint.  The SVC characteristic slope defines the proportion.  If the voltage at the controlled bus is equal to the voltage setpoint, the SVC MVar output is zero." modifier="None">
+  <ECEntityClass typeName="StaticVarCompensatorFunctional" displayLabel="Static Var Compensator Functional" description="A facility for providing variable and controllable shunt reactive power. The SVC typically consists of a stepdown transformer, filter, thyristor-controlled reactor, and thyristor-switched capacitor arms.&#x000d; &#x000d; The SVC may operate in fixed MVar output mode or in voltage control mode. When in voltage control mode, the output of the SVC will be proportional to the deviation of voltage at the controlled bus from the voltage setpoint.  The SVC characteristic slope defines the proportion.  If the voltage at the controlled bus is equal to the voltage setpoint, the SVC MVar output is zero." modifier="None">
     <BaseClass>RegulatingCondEqFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="ExternalNetworkInjectionFunctional" displayLabel="External Network Injection" description="This class represents the external network and it is used for IEC 60909 calculations." modifier="None">
+  <ECEntityClass typeName="ExternalNetworkInjectionFunctional" displayLabel="External Network Injection Functional" description="This class represents the external network and it is used for IEC 60909 calculations." modifier="None">
     <BaseClass>RegulatingCondEqFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="PowerElectronicsConnectionFunctional" displayLabel="Power Electronic Connection" description="A connection to the AC network for energy production or consumption that uses power electronics rather than rotating machines." modifier="None">
+  <ECEntityClass typeName="PowerElectronicsConnectionFunctional" displayLabel="Power Electronic Connection Functional" description="A connection to the AC network for energy production or consumption that uses power electronics rather than rotating machines." modifier="None">
     <BaseClass>RegulatingCondEqFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="WireFunctional" displayLabel="Wire" description="Usally part of a cable and used for P&amp;C circuits. Another type of wire is a grounding wire" modifier="None">
+  <ECEntityClass typeName="WireFunctional" displayLabel="Wire Functional" description="Usally part of a cable and used for P&amp;C circuits. Another type of wire is a grounding wire" modifier="None">
     <BaseClass>ProtectionAndControlFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="WireLinkFunctional" displayLabel="Wire Link" description="Used to indicate connection between wires that belong to different models. It is not a physical connection, just a visual indication to the user that the same wire continuis in a different model. Wire link also enables navigation between wires in different models" modifier="None">
+  <ECEntityClass typeName="WireLinkFunctional" displayLabel="Wire Link Functional" description="Used to indicate connection between wires that belong to different models. It is not a physical connection, just a visual indication to the user that the same wire continuis in a different model. Wire link also enables navigation between wires in different models" modifier="None">
     <BaseClass>ProtectionAndControlFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="PushbuttonFunctional" displayLabel="Push Button" description="A push button switch is a momentary or non-latching switch which causes a temporary change in the state of an electrical circuit only while the switch is physically actuated" modifier="None">
+  <ECEntityClass typeName="PushbuttonFunctional" displayLabel="Push Button Functional" description="A push button switch is a momentary or non-latching switch which causes a temporary change in the state of an electrical circuit only while the switch is physically actuated" modifier="None">
     <BaseClass>ProtectionAndControlFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="TestSwitchFunctional" displayLabel="Test Switch" description="Test switch is used for quick and easy multi-circuit testing of switchboard relays, meters and instruments" modifier="None">
+  <ECEntityClass typeName="TestSwitchFunctional" displayLabel="Test Switch Functional" description="Test switch is used for quick and easy multi-circuit testing of switchboard relays, meters and instruments" modifier="None">
     <BaseClass>ProtectionAndControlFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="PlugFunctional" displayLabel="Plug" modifier="None">
+  <ECEntityClass typeName="PlugFunctional" displayLabel="Plug Functional" modifier="None">
     <BaseClass>ProtectionAndControlFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="LogicFunctional" displayLabel="Logic" modifier="None">
+  <ECEntityClass typeName="LogicFunctional" displayLabel="Logic Functional" modifier="None">
     <BaseClass>ProtectionAndControlFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="ResistorFunctional" displayLabel="Resistor" modifier="None">
+  <ECEntityClass typeName="ResistorFunctional" displayLabel="Resistor Functional" modifier="None">
     <BaseClass>ProtectionAndControlFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="TerminalFunctional" displayLabel="Terminal" modifier="None">
+  <ECEntityClass typeName="TerminalFunctional" displayLabel="Terminal Functional" modifier="None">
     <BaseClass>ProtectionAndControlFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="TerminationFunctional" displayLabel="Termination" modifier="None">
+  <ECEntityClass typeName="TerminationFunctional" displayLabel="Termination Functional" modifier="None">
     <BaseClass>ProtectionAndControlFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="AlarmFunctional" displayLabel="Alarm" modifier="None">
+  <ECEntityClass typeName="AlarmFunctional" displayLabel="Alarm Functional" modifier="None">
     <BaseClass>ProtectionAndControlFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="DiodeFunctional" displayLabel="Diode" modifier="None">
+  <ECEntityClass typeName="DiodeFunctional" displayLabel="Diode Functional" modifier="None">
     <BaseClass>ProtectionAndControlFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="AmplifierFunctional" displayLabel="Amplifier" modifier="None">
+  <ECEntityClass typeName="AmplifierFunctional" displayLabel="Amplifier Functional" modifier="None">
     <BaseClass>ProtectionAndControlFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="BatteryFunctional" displayLabel="Battery" modifier="None">
+  <ECEntityClass typeName="BatteryFunctional" displayLabel="Battery Functional" modifier="None">
     <BaseClass>ProtectionAndControlFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="HeaterFunctional" displayLabel="Heater" modifier="None">
+  <ECEntityClass typeName="HeaterFunctional" displayLabel="Heater Functional" modifier="None">
     <BaseClass>ProtectionAndControlFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="MeterFunctional" displayLabel="Meter" modifier="None">
+  <ECEntityClass typeName="MeterFunctional" displayLabel="Meter Functional" modifier="None">
     <BaseClass>ProtectionAndControlFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="SCADAFunctional" displayLabel="SCADA" modifier="None">
+  <ECEntityClass typeName="SCADAFunctional" displayLabel="SCADA Functional" modifier="None">
     <BaseClass>ProtectionAndControlFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="PanelComponentsFunctional" displayLabel="Panel Components" modifier="None">
+  <ECEntityClass typeName="PanelComponentsFunctional" displayLabel="Panel Components Functional" modifier="None">
     <BaseClass>ProtectionAndControlFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="ContactFunctional" displayLabel="Contact" modifier="None">
+  <ECEntityClass typeName="ContactFunctional" displayLabel="Contact Functional" modifier="None">
     <BaseClass>ProtectionAndControlFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="RelayFunctional" displayLabel="Relay" modifier="None">
+  <ECEntityClass typeName="RelayFunctional" displayLabel="Relay Functional" modifier="None">
     <BaseClass>ProtectionAndControlFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="VoltageRegulatorFunctional" displayLabel="Voltage Regulator" modifier="None">
+  <ECEntityClass typeName="VoltageRegulatorFunctional" displayLabel="Voltage Regulator Functional" modifier="None">
     <BaseClass>OtherFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="PanelFunctional" displayLabel="Panel" modifier="None">
+  <ECEntityClass typeName="PanelFunctional" displayLabel="Panel Functional" modifier="None">
     <BaseClass>OtherFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="ReactorFunctional" displayLabel="Reactor" modifier="None">
+  <ECEntityClass typeName="ReactorFunctional" displayLabel="Reactor Functional" modifier="None">
     <BaseClass>OtherFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="AnnunciatorFunctional" displayLabel="Annunciator" modifier="None">
+  <ECEntityClass typeName="AnnunciatorFunctional" displayLabel="Annunciator Functional" modifier="None">
     <BaseClass>OtherFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="MotorFunctional" displayLabel="Motor" modifier="None">
+  <ECEntityClass typeName="MotorFunctional" displayLabel="Motor Functional" modifier="None">
     <BaseClass>OtherFunctional</BaseClass>
     <ECProperty propertyName="SerialNumber" displayLabel="Serial Number" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
-  <ECEntityClass typeName="OutletFunctional" displayLabel="Outlet" modifier="None">
+  <ECEntityClass typeName="OutletFunctional" displayLabel="Outlet Functional" modifier="None">
     <BaseClass>OtherFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="FanFunctional" displayLabel="Fan" modifier="None">
+  <ECEntityClass typeName="FanFunctional" displayLabel="Fan Functional" modifier="None">
     <BaseClass>OtherFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="LightFunctional" displayLabel="Light" modifier="None">
+  <ECEntityClass typeName="LightFunctional" displayLabel="Light Functional" modifier="None">
     <BaseClass>OtherFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="OtherInstrumentsFunctional" displayLabel="Other Instruments" modifier="None">
+  <ECEntityClass typeName="OtherInstrumentsFunctional" displayLabel="Other Instruments Functional" modifier="None">
     <BaseClass>OtherFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="GeneralEquipmentFunctional" displayLabel="General Equipment" modifier="None">
+  <ECEntityClass typeName="GeneralEquipmentFunctional" displayLabel="General Equipment Functional" modifier="None">
     <BaseClass>OtherFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="InsulatorFunctional" displayLabel="Insulator" modifier="None">
+  <ECEntityClass typeName="InsulatorFunctional" displayLabel="Insulator Functional" modifier="None">
     <BaseClass>OtherFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="LineHardwareFunctional" displayLabel="Line Hardware" modifier="None">
+  <ECEntityClass typeName="LineHardwareFunctional" displayLabel="Line Hardware Functional" modifier="None">
     <BaseClass>OtherFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="CableTrayFunctional" displayLabel="Cable Tray" modifier="None">
+  <ECEntityClass typeName="CableTrayFunctional" displayLabel="Cable Tray Functional" modifier="None">
     <BaseClass>CableCarrierFunctional</BaseClass>
     <ECProperty propertyName="NumberOfCables" displayLabel="" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
-  <ECEntityClass typeName="CableLadderFunctional" displayLabel="Cable Ladder" modifier="None">
+  <ECEntityClass typeName="CableLadderFunctional" displayLabel="Cable Ladder Functional" modifier="None">
     <BaseClass>CableCarrierFunctional</BaseClass>
     <ECProperty propertyName="NumberOfCables" displayLabel="" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
-  <ECEntityClass typeName="CableLadderFittingsFunctional" displayLabel="Cable Ladder Fittings" modifier="None">
+  <ECEntityClass typeName="CableLadderFittingsFunctional" displayLabel="Cable Ladder Fittings Functional" modifier="None">
     <BaseClass>CableCarrierFunctional</BaseClass>
     <ECProperty propertyName="NumberOfCables" displayLabel="" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
-  <ECEntityClass typeName="CableTrayFittingsFunctional" displayLabel="Cable Tray Fittings" modifier="None">
+  <ECEntityClass typeName="CableTrayFittingsFunctional" displayLabel="Cable Tray Fittings Functional" modifier="None">
     <BaseClass>CableCarrierFunctional</BaseClass>
     <ECProperty propertyName="NumberOfCables" displayLabel="" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
-  <ECEntityClass typeName="CableTrayCoverFunctional" displayLabel="Cable Tray Cover" modifier="None">
+  <ECEntityClass typeName="CableTrayCoverFunctional" displayLabel="Cable Tray Cover Functional" modifier="None">
     <BaseClass>CableCarrierFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="WirewayFunctional" displayLabel="Wireway" modifier="None">
-    <BaseClass>CableCarrierFunctional</BaseClass>
-    <ECProperty propertyName="NumberOfCables" displayLabel="" readOnly="false" priority="0" typeName="string" />
-  </ECEntityClass>
-  <ECEntityClass typeName="ConduitFittingsFunctional" displayLabel="Conduit Fittings" modifier="None">
+  <ECEntityClass typeName="WirewayFunctional" displayLabel="Wireway Functional" modifier="None">
     <BaseClass>CableCarrierFunctional</BaseClass>
     <ECProperty propertyName="NumberOfCables" displayLabel="" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
-  <ECEntityClass typeName="ConduitFunctional" displayLabel="Conduit" modifier="None">
+  <ECEntityClass typeName="ConduitFittingsFunctional" displayLabel="Conduit Fittings Functional" modifier="None">
     <BaseClass>CableCarrierFunctional</BaseClass>
     <ECProperty propertyName="NumberOfCables" displayLabel="" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
-  <ECEntityClass typeName="GroundingRodFunctional" displayLabel="Grounding Rod" modifier="None">
+  <ECEntityClass typeName="ConduitFunctional" displayLabel="Conduit Functional" modifier="None">
+    <BaseClass>CableCarrierFunctional</BaseClass>
+    <ECProperty propertyName="NumberOfCables" displayLabel="" readOnly="false" priority="0" typeName="string" />
+  </ECEntityClass>
+  <ECEntityClass typeName="GroundingRodFunctional" displayLabel="Grounding Rod Functional" modifier="None">
     <BaseClass>LightningProtectionFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="LightningConductorFunctional" displayLabel="Lightning Conductor" modifier="None">
+  <ECEntityClass typeName="LightningConductorFunctional" displayLabel="Lightning Conductor Functional" modifier="None">
     <BaseClass>LightningProtectionFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="LightningArresterFunctional" displayLabel="Lightning Arrester" modifier="None">
+  <ECEntityClass typeName="LightningArresterFunctional" displayLabel="Lightning Arrester Functional" modifier="None">
     <BaseClass>LightningProtectionFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="CoverFunctional" displayLabel="Cover" modifier="None">
+  <ECEntityClass typeName="CoverFunctional" displayLabel="Cover Functional" modifier="None">
     <BaseClass>EnclosuresFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="CabinetFunctional" displayLabel="Cabinet" modifier="None">
+  <ECEntityClass typeName="CabinetFunctional" displayLabel="Cabinet Functional" modifier="None">
     <BaseClass>EnclosuresFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="GasketFunctional" displayLabel="Gasket" modifier="None">
+  <ECEntityClass typeName="GasketFunctional" displayLabel="Gasket Functional" modifier="None">
     <BaseClass>EnclosuresFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="SecondaryCutOutFunctional" displayLabel="Secondary Cut Out" modifier="None">
+  <ECEntityClass typeName="SecondaryCutOutFunctional" displayLabel="Secondary Cut Out Functional" modifier="None">
     <BaseClass>EnclosuresFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="PanelboardAssemblyFunctional" displayLabel="Panel Board Assembly" modifier="None">
+  <ECEntityClass typeName="PanelboardAssemblyFunctional" displayLabel="Panel Board Assembly Functional" modifier="None">
     <BaseClass>EnclosuresFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="OutletBodyFunctional" displayLabel="Outlet Body" modifier="None">
+  <ECEntityClass typeName="OutletBodyFunctional" displayLabel="Outlet Body Functional" modifier="None">
     <BaseClass>EnclosuresFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="AdapterFunctional" displayLabel="Adapter" modifier="None">
+  <ECEntityClass typeName="AdapterFunctional" displayLabel="Adapter Functional" modifier="None">
     <BaseClass>ConnectorsFunctional</BaseClass>
     <ECProperty propertyName="BOMDocumentNumber" displayLabel="BOM Document Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="DesignRevisionNumber" displayLabel="Design Revision Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="DesignWorkOrderNumber" displayLabel="Design Work Order Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="CodeValue" displayLabel="Internal Device ID" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
-  <ECEntityClass typeName="AllAngleConnectorFunctional" displayLabel="All Angle Connector" modifier="None">
+  <ECEntityClass typeName="AllAngleConnectorFunctional" displayLabel="All Angle Connector Functional" modifier="None">
     <BaseClass>ConnectorsFunctional</BaseClass>
     <ECProperty propertyName="BOMDocumentNumber" displayLabel="BOM Document Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="DesignRevisionNumber" displayLabel="Design Revision Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="DesignWorkOrderNumber" displayLabel="Design Work Order Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="CodeValue" displayLabel="Internal Device ID" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
-  <ECEntityClass typeName="BarConnectorFunctional" displayLabel="Bar Connector" modifier="None">
+  <ECEntityClass typeName="BarConnectorFunctional" displayLabel="Bar Connector Functional" modifier="None">
     <BaseClass>ConnectorsFunctional</BaseClass>
     <ECProperty propertyName="BOMDocumentNumber" displayLabel="BOM Document Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="DesignRevisionNumber" displayLabel="Design Revision Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="DesignWorkOrderNumber" displayLabel="Design Work Order Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="CodeValue" displayLabel="Internal Device ID" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
-  <ECEntityClass typeName="BusConnectorFunctional" displayLabel="Bus Connector" modifier="None">
+  <ECEntityClass typeName="BusConnectorFunctional" displayLabel="Bus Connector Functional" modifier="None">
     <BaseClass>ConnectorsFunctional</BaseClass>
     <ECProperty propertyName="BOMDocumentNumber" displayLabel="BOM Document Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="DesignRevisionNumber" displayLabel="Design Revision Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="DesignWorkOrderNumber" displayLabel="Design Work Order Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="CodeValue" displayLabel="Internal Device ID" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
-  <ECEntityClass typeName="BusSupportConnectorFunctional" displayLabel="Bus Support Connector" modifier="None">
+  <ECEntityClass typeName="BusSupportConnectorFunctional" displayLabel="Bus Support Connector Functional" modifier="None">
     <BaseClass>ConnectorsFunctional</BaseClass>
     <ECProperty propertyName="BOMDocumentNumber" displayLabel="BOM Document Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="DesignRevisionNumber" displayLabel="Design Revision Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="DesignWorkOrderNumber" displayLabel="Design Work Order Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="CodeValue" displayLabel="Internal Device ID" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
-  <ECEntityClass typeName="CableConnectorFunctional" displayLabel="Cable Connector" modifier="None">
+  <ECEntityClass typeName="CableConnectorFunctional" displayLabel="Cable Connector Functional" modifier="None">
     <BaseClass>ConnectorsFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="ConduitConnectorFunctional" displayLabel="Conduit Connector" modifier="None">
-    <BaseClass>ConnectorsFunctional</BaseClass>
-    <ECProperty propertyName="BOMDocumentNumber" displayLabel="BOM Document Number" readOnly="false" priority="0" typeName="string" />
-    <ECProperty propertyName="DesignRevisionNumber" displayLabel="Design Revision Number" readOnly="false" priority="0" typeName="string" />
-    <ECProperty propertyName="DesignWorkOrderNumber" displayLabel="Design Work Order Number" readOnly="false" priority="0" typeName="string" />
-    <ECProperty propertyName="CodeValue" displayLabel="Internal Device ID" readOnly="false" priority="0" typeName="string" />
-  </ECEntityClass>
-  <ECEntityClass typeName="CoronaFunctional" displayLabel="Corona" modifier="None">
+  <ECEntityClass typeName="ConduitConnectorFunctional" displayLabel="Conduit Connector Functional" modifier="None">
     <BaseClass>ConnectorsFunctional</BaseClass>
     <ECProperty propertyName="BOMDocumentNumber" displayLabel="BOM Document Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="DesignRevisionNumber" displayLabel="Design Revision Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="DesignWorkOrderNumber" displayLabel="Design Work Order Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="CodeValue" displayLabel="Internal Device ID" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
-  <ECEntityClass typeName="ExtensionFunctional" displayLabel="Extension" modifier="None">
+  <ECEntityClass typeName="CoronaFunctional" displayLabel="Corona Functional" modifier="None">
     <BaseClass>ConnectorsFunctional</BaseClass>
     <ECProperty propertyName="BOMDocumentNumber" displayLabel="BOM Document Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="DesignRevisionNumber" displayLabel="Design Revision Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="DesignWorkOrderNumber" displayLabel="Design Work Order Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="CodeValue" displayLabel="Internal Device ID" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
-  <ECEntityClass typeName="FlexAngleAssemblyFunctional" displayLabel="Flex Angle assembly" modifier="None">
+  <ECEntityClass typeName="ExtensionFunctional" displayLabel="Extension Functional" modifier="None">
     <BaseClass>ConnectorsFunctional</BaseClass>
     <ECProperty propertyName="BOMDocumentNumber" displayLabel="BOM Document Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="DesignRevisionNumber" displayLabel="Design Revision Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="DesignWorkOrderNumber" displayLabel="Design Work Order Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="CodeValue" displayLabel="Internal Device ID" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
-  <ECEntityClass typeName="FlexStrapsFunctional" displayLabel="Flex Straps" modifier="None">
+  <ECEntityClass typeName="FlexAngleAssemblyFunctional" displayLabel="Flex Angle assembly Functional" modifier="None">
     <BaseClass>ConnectorsFunctional</BaseClass>
     <ECProperty propertyName="BOMDocumentNumber" displayLabel="BOM Document Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="DesignRevisionNumber" displayLabel="Design Revision Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="DesignWorkOrderNumber" displayLabel="Design Work Order Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="CodeValue" displayLabel="Internal Device ID" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
-  <ECEntityClass typeName="GroundingConnectorsFunctional" displayLabel="Grounding Connectors" modifier="None">
+  <ECEntityClass typeName="FlexStrapsFunctional" displayLabel="Flex Straps Functional" modifier="None">
     <BaseClass>ConnectorsFunctional</BaseClass>
     <ECProperty propertyName="BOMDocumentNumber" displayLabel="BOM Document Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="DesignRevisionNumber" displayLabel="Design Revision Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="DesignWorkOrderNumber" displayLabel="Design Work Order Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="CodeValue" displayLabel="Internal Device ID" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
-  <ECEntityClass typeName="PlateConnectionFunctional" displayLabel="Plate Connection" modifier="None">
+  <ECEntityClass typeName="GroundingConnectorsFunctional" displayLabel="Grounding Connectors Functional" modifier="None">
     <BaseClass>ConnectorsFunctional</BaseClass>
     <ECProperty propertyName="BOMDocumentNumber" displayLabel="BOM Document Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="DesignRevisionNumber" displayLabel="Design Revision Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="DesignWorkOrderNumber" displayLabel="Design Work Order Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="CodeValue" displayLabel="Internal Device ID" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
-  <ECEntityClass typeName="CableSpacersFunctional" displayLabel="Cable Spacers" modifier="None">
+  <ECEntityClass typeName="PlateConnectionFunctional" displayLabel="Plate Connection Functional" modifier="None">
     <BaseClass>ConnectorsFunctional</BaseClass>
     <ECProperty propertyName="BOMDocumentNumber" displayLabel="BOM Document Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="DesignRevisionNumber" displayLabel="Design Revision Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="DesignWorkOrderNumber" displayLabel="Design Work Order Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="CodeValue" displayLabel="Internal Device ID" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
-  <ECEntityClass typeName="StudConnectorsFunctional" displayLabel="Stud Connectors" modifier="None">
+  <ECEntityClass typeName="CableSpacersFunctional" displayLabel="Cable Spacers Functional" modifier="None">
     <BaseClass>ConnectorsFunctional</BaseClass>
     <ECProperty propertyName="BOMDocumentNumber" displayLabel="BOM Document Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="DesignRevisionNumber" displayLabel="Design Revision Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="DesignWorkOrderNumber" displayLabel="Design Work Order Number" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="CodeValue" displayLabel="Internal Device ID" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
-  <ECEntityClass typeName="AnimalGuardFunctional" displayLabel="Animal Guard" modifier="None">
+  <ECEntityClass typeName="StudConnectorsFunctional" displayLabel="Stud Connectors Functional" modifier="None">
+    <BaseClass>ConnectorsFunctional</BaseClass>
+    <ECProperty propertyName="BOMDocumentNumber" displayLabel="BOM Document Number" readOnly="false" priority="0" typeName="string" />
+    <ECProperty propertyName="DesignRevisionNumber" displayLabel="Design Revision Number" readOnly="false" priority="0" typeName="string" />
+    <ECProperty propertyName="DesignWorkOrderNumber" displayLabel="Design Work Order Number" readOnly="false" priority="0" typeName="string" />
+    <ECProperty propertyName="CodeValue" displayLabel="Internal Device ID" readOnly="false" priority="0" typeName="string" />
+  </ECEntityClass>
+  <ECEntityClass typeName="AnimalGuardFunctional" displayLabel="Animal Guard Functional" modifier="None">
     <BaseClass>PhysicalSafetyBarriersFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="FirewallFunctional" displayLabel="Firewall" modifier="None">
+  <ECEntityClass typeName="FirewallFunctional" displayLabel="Firewall Functional" modifier="None">
     <BaseClass>PhysicalSafetyBarriersFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="VehicleBarrierFunctional" displayLabel="Vehicle Barrier" modifier="None">
+  <ECEntityClass typeName="VehicleBarrierFunctional" displayLabel="Vehicle Barrier Functional" modifier="None">
     <BaseClass>PhysicalSafetyBarriersFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="BoltFunctional" displayLabel="Bolt" modifier="None">
+  <ECEntityClass typeName="BoltFunctional" displayLabel="Bolt Functional" modifier="None">
     <BaseClass>FastenersFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="WasherFunctional" displayLabel="Washer" modifier="None">
+  <ECEntityClass typeName="WasherFunctional" displayLabel="Washer Functional" modifier="None">
     <BaseClass>FastenersFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="NutsFunctional" displayLabel="nuts" modifier="None">
+  <ECEntityClass typeName="NutsFunctional" displayLabel="nuts Functional" modifier="None">
     <BaseClass>FastenersFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="ScrewFunctional" displayLabel="Screw" modifier="None">
+  <ECEntityClass typeName="ScrewFunctional" displayLabel="Screw Functional" modifier="None">
     <BaseClass>FastenersFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="BracketFunctional" displayLabel="Bracket" modifier="None">
+  <ECEntityClass typeName="BracketFunctional" displayLabel="Bracket Functional" modifier="None">
     <BaseClass>SupportsFunctional</BaseClass>
     <ECProperty propertyName="CodeValue" displayLabel="Internal Device ID" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
-  <ECEntityClass typeName="ClampFunctional" displayLabel="Clamp" modifier="None">
+  <ECEntityClass typeName="ClampFunctional" displayLabel="Clamp Functional" modifier="None">
     <BaseClass>SupportsFunctional</BaseClass>
     <ECProperty propertyName="CodeValue" displayLabel="Internal Device ID" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
-  <ECEntityClass typeName="UboltFunctional" displayLabel="U-Bolt" modifier="None">
+  <ECEntityClass typeName="UboltFunctional" displayLabel="U-Bolt Functional" modifier="None">
     <BaseClass>SupportsFunctional</BaseClass>
     <ECProperty propertyName="CodeValue" displayLabel="Internal Device ID" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
-  <ECEntityClass typeName="MountingKitFunctional" displayLabel="Mounting Kit" description="Additional components needed to mount equipment" modifier="None">
+  <ECEntityClass typeName="MountingKitFunctional" displayLabel="Mounting Kit Functional" description="Additional components needed to mount equipment" modifier="None">
     <BaseClass>SupportsFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="SectionaliserPhysicalType" displayLabel="Sectionalizer" description="Automatic switch that will lock open to isolate a faulted section. It may, or may not, have load breaking capability. Its primary purpose is to provide fault sectionalising at locations where the fault current is either too high, or too low, for proper coordination of fuses." modifier="None">
+  <ECEntityClass typeName="SectionaliserPhysicalType" displayLabel="Sectionalizer Type" description="Automatic switch that will lock open to isolate a faulted section. It may, or may not, have load breaking capability. Its primary purpose is to provide fault sectionalising at locations where the fault current is either too high, or too low, for proper coordination of fuses." modifier="None">
     <BaseClass>SwitchPhysicalType</BaseClass>
     <ECProperty propertyName="WeightPerLength" displayLabel="weight per length" readOnly="false" priority="0" typeName="int" />
     <ECProperty propertyName="Type" displayLabel="Type" readOnly="false" priority="0" typeName="string" />
@@ -1422,7 +1482,7 @@
     <ECProperty propertyName="RatedFaultMakingCurrent" displayLabel="Rated fault making current" readOnly="false" priority="0" typeName="int" />
     <ECProperty propertyName="Frequency" displayLabel="Frequency" readOnly="false" priority="0" typeName="int" />
   </ECEntityClass>
-  <ECEntityClass typeName="JumperPhysicalType" displayLabel="Jumper" description="A short section of conductor with negligible impedance which can be manually removed and replaced if the circuit is de-energized. Note that zero-impedance branches can potentially be modelled by other equipment types." modifier="None">
+  <ECEntityClass typeName="JumperPhysicalType" displayLabel="Jumper Type" description="A short section of conductor with negligible impedance which can be manually removed and replaced if the circuit is de-energized. Note that zero-impedance branches can potentially be modelled by other equipment types." modifier="None">
     <BaseClass>SwitchPhysicalType</BaseClass>
     <ECProperty propertyName="TradeDiameter" displayLabel="Trade Diameter" readOnly="false" priority="0" typeName="int" />
     <ECProperty propertyName="RatedResistanceAt20C" displayLabel="Rated Resistance At 20 C" readOnly="false" priority="0" typeName="int" />
@@ -1437,7 +1497,7 @@
     <ECProperty propertyName="CableType" displayLabel="Cable Type" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="CableDiameter" displayLabel="Cable Diameter" readOnly="false" priority="0" typeName="int" />
   </ECEntityClass>
-  <ECEntityClass typeName="FusePhysicalType" displayLabel="Fuse" description="An overcurrent protective device with a circuit opening fusible part that is heated and severed by the passage of overcurrent through it. A fuse is considered a switching device because it breaks current." modifier="None">
+  <ECEntityClass typeName="FusePhysicalType" displayLabel="Fuse Type" description="An overcurrent protective device with a circuit opening fusible part that is heated and severed by the passage of overcurrent through it. A fuse is considered a switching device because it breaks current." modifier="None">
     <BaseClass>SwitchPhysicalType</BaseClass>
     <ECProperty propertyName="Length" displayLabel="Length" readOnly="false" priority="0" typeName="int" />
     <ECProperty propertyName="Compliance" displayLabel="Compliance" readOnly="false" priority="0" typeName="string" />
@@ -1448,7 +1508,7 @@
     <ECProperty propertyName="MaxContCurrent" displayLabel="Max Continuous Current" readOnly="false" priority="0" typeName="int" />
     <ECProperty propertyName="Mounting" displayLabel="Mounting Method" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
-  <ECEntityClass typeName="GroundDisconnectorPhysicalType" displayLabel="Ground Disconnector" description="A manually operated or motor operated mechanical switching device used for isolating a circuit or equipment from ground.&#x000d; Also known as earthing switch" modifier="None">
+  <ECEntityClass typeName="GroundDisconnectorPhysicalType" displayLabel="Ground Disconnector Type" description="A manually operated or motor operated mechanical switching device used for isolating a circuit or equipment from ground.&#x000d; Also known as earthing switch" modifier="None">
     <BaseClass>SwitchPhysicalType</BaseClass>
     <ECProperty propertyName="Compliance" displayLabel="Compliance" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="Type" displayLabel="Type" readOnly="false" priority="0" typeName="string" />
@@ -1463,7 +1523,7 @@ Withstand Voltage" readOnly="false" priority="0" typeName="int" />
     <ECProperty propertyName="RatedPeakWithstandCurrent" displayLabel="Rated Peak Withstand Current" readOnly="false" priority="0" typeName="int" />
     <ECProperty propertyName="CreepageDistance" displayLabel="Creepage Distance" readOnly="false" priority="0" typeName="int" />
   </ECEntityClass>
-  <ECEntityClass typeName="DisconnectorPhysicalType" displayLabel="Disconnector" description="A manually operated or motor operated mechanical switching device used for changing the connections in a circuit, or for isolating a circuit or equipment from a source of power. It is required to open or close circuits when negligible current is broken or made." modifier="None">
+  <ECEntityClass typeName="DisconnectorPhysicalType" displayLabel="Disconnector Type" description="A manually operated or motor operated mechanical switching device used for changing the connections in a circuit, or for isolating a circuit or equipment from a source of power. It is required to open or close circuits when negligible current is broken or made." modifier="None">
     <BaseClass>SwitchPhysicalType</BaseClass>
     <ECProperty propertyName="Compliance" displayLabel="Compliance" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="Type" displayLabel="Type" readOnly="false" priority="0" typeName="string" />
@@ -1479,13 +1539,13 @@ Withstand Voltage" readOnly="false" priority="0" typeName="int" />
     <ECProperty propertyName="CreepageDistance" displayLabel="Creepage Distance" readOnly="false" priority="0" typeName="int" />
     <ECProperty propertyName="CIPCompliancerequired" displayLabel="CIP Compliance required" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
-  <ECEntityClass typeName="ProtectedSwitchPhysicalType" displayLabel="Protected Switch" description="Pole-mounted fault interrupter with built-in phase and ground relays, current transformer (CT), and supplemental controls." modifier="None">
+  <ECEntityClass typeName="ProtectedSwitchPhysicalType" displayLabel="Protected Switch Type" description="Pole-mounted fault interrupter with built-in phase and ground relays, current transformer (CT), and supplemental controls." modifier="None">
     <BaseClass>SwitchPhysicalType</BaseClass>
     <ECProperty propertyName="InterruptingCurrent" displayLabel="Interrupting Current" readOnly="false" priority="0" typeName="int" />
     <ECProperty propertyName="MaxContCurrent" displayLabel="Max Continuous Current" readOnly="false" priority="0" typeName="int" />
     <ECProperty propertyName="CIPCompliancerequired" displayLabel="CIP Compliance required" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
-  <ECEntityClass typeName="SurgeArresterPhysicalType" displayLabel="Surge Arrestor" description="Shunt device, installed on the network, usually in the proximity of electrical equipment in order to protect the said equipment against transient voltage transients caused by lightning or switching activity." modifier="None">
+  <ECEntityClass typeName="SurgeArresterPhysicalType" displayLabel="Surge Arrestor Type" description="Shunt device, installed on the network, usually in the proximity of electrical equipment in order to protect the said equipment against transient voltage transients caused by lightning or switching activity." modifier="None">
     <BaseClass>AuxiliaryEquipmentPhysicalType</BaseClass>
     <ECProperty propertyName="Weight" displayLabel="Weight" readOnly="false" priority="0" typeName="int" />
     <ECProperty propertyName="OperatingTemperatureRange" displayLabel="Operating Temperature Range" readOnly="false" priority="0" typeName="string" />
@@ -1500,7 +1560,7 @@ Withstand Voltage" readOnly="false" priority="0" typeName="int" />
     <ECProperty propertyName="MCOVRating" displayLabel="MCOV Rating" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="Mounting" displayLabel="Mounting Method" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
-  <ECEntityClass typeName="FaultIndicatorPhysicalType" displayLabel="Fault Indicator" description="A FaultIndicator is typically only an indicator (which may or may not be remotely monitored), and not a piece of equipment that actually initiates a protection event. It is used for FLISR (Fault Location, Isolation and Restoration) purposes, assisting with the dispatch of crews to &quot;most likely&quot; part of the network (i.e. assists with determining circuit section where the fault most likely happened)." modifier="None">
+  <ECEntityClass typeName="FaultIndicatorPhysicalType" displayLabel="Fault Indicator Type" description="A FaultIndicator is typically only an indicator (which may or may not be remotely monitored), and not a piece of equipment that actually initiates a protection event. It is used for FLISR (Fault Location, Isolation and Restoration) purposes, assisting with the dispatch of crews to &quot;most likely&quot; part of the network (i.e. assists with determining circuit section where the fault most likely happened)." modifier="None">
     <BaseClass>AuxiliaryEquipmentPhysicalType</BaseClass>
     <ECProperty propertyName="OperatingLineVoltage" displayLabel="Operating Line Voltage" readOnly="false" priority="0" typeName="int" />
     <ECProperty propertyName="MinFaultCurrent" displayLabel="Minimum Fault Current" readOnly="false" priority="0" typeName="int" />
@@ -1509,23 +1569,23 @@ Withstand Voltage" readOnly="false" priority="0" typeName="int" />
     <ECProperty propertyName="PortablePermanentInstalled" displayLabel="Portable or Permanently installed" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="FaultIndication" displayLabel="Fault Indication" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
-  <ECEntityClass typeName="WaveTrapPhysicalType" displayLabel="Wave Tap" description="Line traps are devices that impede high frequency power line carrier signals yet present a negligible impedance at the main power frequency." modifier="None">
+  <ECEntityClass typeName="WaveTrapPhysicalType" displayLabel="Wave Trap Type" description="Line traps are devices that impede high frequency power line carrier signals yet present a negligible impedance at the main power frequency." modifier="None">
     <BaseClass>AuxiliaryEquipmentPhysicalType</BaseClass>
     <ECProperty propertyName="OperatingTemperatureRange" displayLabel="Operating Temperature Range" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
-  <ECEntityClass typeName="SensorPhysicalType" displayLabel="Sensor" description="This class describe devices that transform a measured quantity into signals that can be presented at displays, used in control or be recorded." modifier="None">
+  <ECEntityClass typeName="SensorPhysicalType" displayLabel="Sensor Type" description="This class describe devices that transform a measured quantity into signals that can be presented at displays, used in control or be recorded." modifier="None">
     <BaseClass>AuxiliaryEquipmentPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="GroundingImpedancePhysicalType" displayLabel="Grounding Impedance" modifier="None">
+  <ECEntityClass typeName="GroundingImpedancePhysicalType" displayLabel="Grounding Impedance Type" modifier="None">
     <BaseClass>EarthFaultCompensatorPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="PetersenCoilPhysicalType" displayLabel="Peterson Coil" description="A variable impedance device normally used to offset line charging during single line faults in an ungrounded section of network." modifier="None">
+  <ECEntityClass typeName="PetersenCoilPhysicalType" displayLabel="Peterson Coil Type" description="A variable impedance device normally used to offset line charging during single line faults in an ungrounded section of network." modifier="None">
     <BaseClass>EarthFaultCompensatorPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="PowerTransformerPhysicalType" displayLabel="Power Transformer" modifier="None">
+  <ECEntityClass typeName="PowerTransformerPhysicalType" displayLabel="Power Transformer Type" modifier="None">
     <BaseClass>TransformerPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="DistributionTransformerPhysicalType" displayLabel="Distribution Transformer" modifier="None">
+  <ECEntityClass typeName="DistributionTransformerPhysicalType" displayLabel="Distribution Transformer Type" modifier="None">
     <BaseClass>TransformerPhysicalType</BaseClass>
     <ECProperty propertyName="Weight" displayLabel="Weight" readOnly="false" priority="0" typeName="int" />
     <ECProperty propertyName="AssemblyTime" displayLabel="Assembly Time" readOnly="false" priority="0" typeName="int" />
@@ -1542,137 +1602,137 @@ Withstand Voltage" readOnly="false" priority="0" typeName="int" />
     <ECProperty propertyName="FullLoadKVA" displayLabel="Full Load KVA" readOnly="false" priority="0" typeName="int" />
     <ECProperty propertyName="GallonsFluid" displayLabel="Gallons Fluid" readOnly="false" priority="0" typeName="int" />
   </ECEntityClass>
-  <ECEntityClass typeName="PowerCablePhysicalType" displayLabel="Power Cable" modifier="None">
+  <ECEntityClass typeName="PowerCablePhysicalType" displayLabel="Power Cable Type" modifier="None">
     <BaseClass>ConductorPhysicalType</BaseClass>
     <ECProperty propertyName="MinBendingRadius" displayLabel="Minimum Bending Radius" readOnly="false" priority="0" typeName="int" />
     <ECProperty propertyName="JacketType" displayLabel="Jacket Type" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
-  <ECEntityClass typeName="CommunicationCablePhysicalType" displayLabel="Communication Cable" modifier="None">
+  <ECEntityClass typeName="CommunicationCablePhysicalType" displayLabel="Communication Cable Type" modifier="None">
     <BaseClass>ConductorPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="CableConnectorsPhysicalType" displayLabel="Cable Connectors" modifier="None">
+  <ECEntityClass typeName="CableConnectorsPhysicalType" displayLabel="Cable Connectors Type" modifier="None">
     <BaseClass>ClampsConnectorsPhysicalType</BaseClass>
     <ECProperty propertyName="CableStartEndConnector" displayLabel="" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
-  <ECEntityClass typeName="CableClampsPhysicalType" displayLabel="Cable Clamps" modifier="None">
+  <ECEntityClass typeName="CableClampsPhysicalType" displayLabel="Cable Clamps Type" modifier="None">
     <BaseClass>ClampsConnectorsPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="BusbarSectionPhysicalType" displayLabel="Busbar Section" description="A conductor, or group of conductors, with negligible impedance, that serve to connect other conducting equipment within a single substation. &#x000d; Voltage measurements are typically obtained from voltage transformers that are connected to busbar sections. A bus bar section may have many physical terminals but for analysis is modelled with exactly one logical terminal." modifier="None">
+  <ECEntityClass typeName="BusbarSectionPhysicalType" displayLabel="Busbar Section Type" description="A conductor, or group of conductors, with negligible impedance, that serve to connect other conducting equipment within a single substation. &#x000d; Voltage measurements are typically obtained from voltage transformers that are connected to busbar sections. A bus bar section may have many physical terminals but for analysis is modelled with exactly one logical terminal." modifier="None">
     <BaseClass>ConnectorPhysicalType</BaseClass>
     <ECProperty propertyName="Length" displayLabel="Length" readOnly="false" priority="0" typeName="int" />
     <ECProperty propertyName="Material" displayLabel="Material" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
-  <ECEntityClass typeName="JunctionPhysicalType" displayLabel="Junction" modifier="None">
+  <ECEntityClass typeName="JunctionPhysicalType" displayLabel="Junction Type" modifier="None">
     <BaseClass>ConnectorPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="ShuntCompensatorPhysicalType" displayLabel="Shunt Compensator" modifier="None">
+  <ECEntityClass typeName="ShuntCompensatorPhysicalType" displayLabel="Shunt Compensator Type" modifier="None">
     <BaseClass>RegulatingCondEqPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="FrequencyConverterPhysicalType" displayLabel="Frequency Converter" description="A device to convert from one frequency to another (e.g., frequency F1 to F2) comprises a pair of FrequencyConverter instances. One converts from F1 to DC, the other converts the DC to F2." modifier="None">
+  <ECEntityClass typeName="FrequencyConverterPhysicalType" displayLabel="Frequency Converter Type" description="A device to convert from one frequency to another (e.g., frequency F1 to F2) comprises a pair of FrequencyConverter instances. One converts from F1 to DC, the other converts the DC to F2." modifier="None">
     <BaseClass>RegulatingCondEqPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="StaticVarCompensatorPhysicalType" displayLabel="Static Var Compensator" description="A facility for providing variable and controllable shunt reactive power. The SVC typically consists of a stepdown transformer, filter, thyristor-controlled reactor, and thyristor-switched capacitor arms.&#x000d; &#x000d; The SVC may operate in fixed MVar output mode or in voltage control mode. When in voltage control mode, the output of the SVC will be proportional to the deviation of voltage at the controlled bus from the voltage setpoint.  The SVC characteristic slope defines the proportion.  If the voltage at the controlled bus is equal to the voltage setpoint, the SVC MVar output is zero." modifier="None">
+  <ECEntityClass typeName="StaticVarCompensatorPhysicalType" displayLabel="Static Var Compensator Type" description="A facility for providing variable and controllable shunt reactive power. The SVC typically consists of a stepdown transformer, filter, thyristor-controlled reactor, and thyristor-switched capacitor arms.&#x000d; &#x000d; The SVC may operate in fixed MVar output mode or in voltage control mode. When in voltage control mode, the output of the SVC will be proportional to the deviation of voltage at the controlled bus from the voltage setpoint.  The SVC characteristic slope defines the proportion.  If the voltage at the controlled bus is equal to the voltage setpoint, the SVC MVar output is zero." modifier="None">
     <BaseClass>RegulatingCondEqPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="ExternalNetworkInjectionPhysicalType" displayLabel="External Network Injection" description="This class represents the external network and it is used for IEC 60909 calculations." modifier="None">
+  <ECEntityClass typeName="ExternalNetworkInjectionPhysicalType" displayLabel="External Network Injection Type" description="This class represents the external network and it is used for IEC 60909 calculations." modifier="None">
     <BaseClass>RegulatingCondEqPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="PowerElectronicsConnectionPhysicalType" displayLabel="Power Electronic Connection" description="A connection to the AC network for energy production or consumption that uses power electronics rather than rotating machines." modifier="None">
+  <ECEntityClass typeName="PowerElectronicsConnectionPhysicalType" displayLabel="Power Electronic Connection Type" description="A connection to the AC network for energy production or consumption that uses power electronics rather than rotating machines." modifier="None">
     <BaseClass>RegulatingCondEqPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="WirePhysicalType" displayLabel="Wire" description="Usally part of a cable and used for P&amp;C circuits. Another type of wire is a grounding wire" modifier="None">
+  <ECEntityClass typeName="WirePhysicalType" displayLabel="Wire Type" description="Usally part of a cable and used for P&amp;C circuits. Another type of wire is a grounding wire" modifier="None">
     <BaseClass>ProtectionAndControlPhysicalType</BaseClass>
     <ECProperty propertyName="Length" displayLabel="Length" readOnly="false" priority="0" typeName="int" />
     <ECProperty propertyName="TradeDiameter" displayLabel="Trade Diameter" readOnly="false" priority="0" typeName="int" />
     <ECProperty propertyName="CableDiameter" displayLabel="Cable Diameter" readOnly="false" priority="0" typeName="int" />
   </ECEntityClass>
-  <ECEntityClass typeName="WireLinkPhysicalType" displayLabel="Wire Link" description="Used to indicate connection between wires that belong to different models. It is not a physical connection, just a visual indication to the user that the same wire continuis in a different model. Wire link also enables navigation between wires in different models" modifier="None">
+  <ECEntityClass typeName="WireLinkPhysicalType" displayLabel="Wire Link Type" description="Used to indicate connection between wires that belong to different models. It is not a physical connection, just a visual indication to the user that the same wire continuis in a different model. Wire link also enables navigation between wires in different models" modifier="None">
     <BaseClass>ProtectionAndControlPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="PushbuttonPhysicalType" displayLabel="Push Button" description="A push button switch is a momentary or non-latching switch which causes a temporary change in the state of an electrical circuit only while the switch is physically actuated" modifier="None">
+  <ECEntityClass typeName="PushbuttonPhysicalType" displayLabel="Push Button Type" description="A push button switch is a momentary or non-latching switch which causes a temporary change in the state of an electrical circuit only while the switch is physically actuated" modifier="None">
     <BaseClass>ProtectionAndControlPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="TestSwitchPhysicalType" displayLabel="Test Switch" description="Test switch is used for quick and easy multi-circuit testing of switchboard relays, meters and instruments" modifier="None">
+  <ECEntityClass typeName="TestSwitchPhysicalType" displayLabel="Test Switch Type" description="Test switch is used for quick and easy multi-circuit testing of switchboard relays, meters and instruments" modifier="None">
     <BaseClass>ProtectionAndControlPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="PlugPhysicalType" displayLabel="Plug" modifier="None">
+  <ECEntityClass typeName="PlugPhysicalType" displayLabel="Plug Type" modifier="None">
     <BaseClass>ProtectionAndControlPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="LogicPhysicalType" displayLabel="Logic" modifier="None">
+  <ECEntityClass typeName="LogicPhysicalType" displayLabel="Logic Type" modifier="None">
     <BaseClass>ProtectionAndControlPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="ResistorPhysicalType" displayLabel="Resistor" modifier="None">
+  <ECEntityClass typeName="ResistorPhysicalType" displayLabel="Resistor Type" modifier="None">
     <BaseClass>ProtectionAndControlPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="TerminalPhysicalType" displayLabel="Terminal" modifier="None">
+  <ECEntityClass typeName="TerminalPhysicalType" displayLabel="Terminal Type" modifier="None">
     <BaseClass>ProtectionAndControlPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="TerminationPhysicalType" displayLabel="Termination" modifier="None">
+  <ECEntityClass typeName="TerminationPhysicalType" displayLabel="Termination Type" modifier="None">
     <BaseClass>ProtectionAndControlPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="AlarmPhysicalType" displayLabel="Alarm" modifier="None">
+  <ECEntityClass typeName="AlarmPhysicalType" displayLabel="Alarm Type" modifier="None">
     <BaseClass>ProtectionAndControlPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="DiodePhysicalType" displayLabel="Diode" modifier="None">
+  <ECEntityClass typeName="DiodePhysicalType" displayLabel="Diode Type" modifier="None">
     <BaseClass>ProtectionAndControlPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="AmplifierPhysicalType" displayLabel="Amplifier" modifier="None">
+  <ECEntityClass typeName="AmplifierPhysicalType" displayLabel="Amplifier Type" modifier="None">
     <BaseClass>ProtectionAndControlPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="BatteryPhysicalType" displayLabel="Battery" modifier="None">
+  <ECEntityClass typeName="BatteryPhysicalType" displayLabel="Battery Type" modifier="None">
     <BaseClass>ProtectionAndControlPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="HeaterPhysicalType" displayLabel="Heater" modifier="None">
+  <ECEntityClass typeName="HeaterPhysicalType" displayLabel="Heater Type" modifier="None">
     <BaseClass>ProtectionAndControlPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="MeterPhysicalType" displayLabel="Meter" modifier="None">
+  <ECEntityClass typeName="MeterPhysicalType" displayLabel="Meter Type" modifier="None">
     <BaseClass>ProtectionAndControlPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="SCADAPhysicalType" displayLabel="SCADA" modifier="None">
-    <BaseClass>ProtectionAndControlPhysicalType</BaseClass>
-    <ECProperty propertyName="CIPCompliancerequired" displayLabel="CIP Compliance required" readOnly="false" priority="0" typeName="string" />
-  </ECEntityClass>
-  <ECEntityClass typeName="PanelComponentsPhysicalType" displayLabel="Panel Components" modifier="None">
-    <BaseClass>ProtectionAndControlPhysicalType</BaseClass>
-  </ECEntityClass>
-  <ECEntityClass typeName="ContactPhysicalType" displayLabel="Contact" modifier="None">
-    <BaseClass>ProtectionAndControlPhysicalType</BaseClass>
-  </ECEntityClass>
-  <ECEntityClass typeName="RelayPhysicalType" displayLabel="Relay" modifier="None">
+  <ECEntityClass typeName="SCADAPhysicalType" displayLabel="SCADA Type" modifier="None">
     <BaseClass>ProtectionAndControlPhysicalType</BaseClass>
     <ECProperty propertyName="CIPCompliancerequired" displayLabel="CIP Compliance required" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
-  <ECEntityClass typeName="VoltageRegulatorPhysicalType" displayLabel="Voltage Regulator" modifier="None">
+  <ECEntityClass typeName="PanelComponentsPhysicalType" displayLabel="Panel Components Type" modifier="None">
+    <BaseClass>ProtectionAndControlPhysicalType</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="ContactPhysicalType" displayLabel="Contact Type" modifier="None">
+    <BaseClass>ProtectionAndControlPhysicalType</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="RelayPhysicalType" displayLabel="Relay Type" modifier="None">
+    <BaseClass>ProtectionAndControlPhysicalType</BaseClass>
+    <ECProperty propertyName="CIPCompliancerequired" displayLabel="CIP Compliance required" readOnly="false" priority="0" typeName="string" />
+  </ECEntityClass>
+  <ECEntityClass typeName="VoltageRegulatorPhysicalType" displayLabel="Voltage Regulator Type" modifier="None">
     <BaseClass>OtherPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="PanelPhysicalType" displayLabel="Panel" modifier="None">
+  <ECEntityClass typeName="PanelPhysicalType" displayLabel="Panel Type" modifier="None">
     <BaseClass>OtherPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="ReactorPhysicalType" displayLabel="Reactor" modifier="None">
+  <ECEntityClass typeName="ReactorPhysicalType" displayLabel="Reactor Type" modifier="None">
     <BaseClass>OtherPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="AnnunciatorPhysicalType" displayLabel="Annunciator" modifier="None">
+  <ECEntityClass typeName="AnnunciatorPhysicalType" displayLabel="Annunciator Type" modifier="None">
     <BaseClass>OtherPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="MotorPhysicalType" displayLabel="Motor" modifier="None">
+  <ECEntityClass typeName="MotorPhysicalType" displayLabel="Motor Type" modifier="None">
     <BaseClass>OtherPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="OutletPhysicalType" displayLabel="Outlet" modifier="None">
+  <ECEntityClass typeName="OutletPhysicalType" displayLabel="Outlet Type" modifier="None">
     <BaseClass>OtherPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="FanPhysicalType" displayLabel="Fan" modifier="None">
+  <ECEntityClass typeName="FanPhysicalType" displayLabel="Fan Type" modifier="None">
     <BaseClass>OtherPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="LightPhysicalType" displayLabel="Light" modifier="None">
+  <ECEntityClass typeName="LightPhysicalType" displayLabel="Light Type" modifier="None">
     <BaseClass>OtherPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="OtherInstrumentsPhysicalType" displayLabel="Other Instruments" modifier="None">
+  <ECEntityClass typeName="OtherInstrumentsPhysicalType" displayLabel="Other Instruments Type" modifier="None">
     <BaseClass>OtherPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="GeneralEquipmentPhysicalType" displayLabel="General Equipment" modifier="None">
+  <ECEntityClass typeName="GeneralEquipmentPhysicalType" displayLabel="General Equipment Type" modifier="None">
     <BaseClass>OtherPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="InsulatorPhysicalType" displayLabel="Insulator" modifier="None">
+  <ECEntityClass typeName="InsulatorPhysicalType" displayLabel="Insulator Type" modifier="None">
     <BaseClass>OtherPhysicalType</BaseClass>
     <ECProperty propertyName="Length" displayLabel="Length" readOnly="false" priority="0" typeName="int" />
     <ECProperty propertyName="Weight" displayLabel="Weight" readOnly="false" priority="0" typeName="int" />
@@ -1682,10 +1742,10 @@ Withstand Voltage" readOnly="false" priority="0" typeName="int" />
     <ECProperty propertyName="InsulatorType" displayLabel="Insulator Type" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="LeakageDistance" displayLabel="Leakage Distance" readOnly="false" priority="0" typeName="int" />
   </ECEntityClass>
-  <ECEntityClass typeName="LineHardwarePhysicalType" displayLabel="Line Hardware" modifier="None">
+  <ECEntityClass typeName="LineHardwarePhysicalType" displayLabel="Line Hardware Type" modifier="None">
     <BaseClass>OtherPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="CableTrayPhysicalType" displayLabel="Cable Tray" modifier="None">
+  <ECEntityClass typeName="CableTrayPhysicalType" displayLabel="Cable Tray Type" modifier="None">
     <BaseClass>CableCarrierPhysicalType</BaseClass>
     <ECProperty propertyName="Length" displayLabel="Length" readOnly="false" priority="0" typeName="int" />
     <ECProperty propertyName="WeightPerLength" displayLabel="weight per length" readOnly="false" priority="0" typeName="int" />
@@ -1701,7 +1761,7 @@ Withstand Voltage" readOnly="false" priority="0" typeName="int" />
     <ECProperty propertyName="CableLayingMethod" displayLabel="" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="CableTrayWeightPerUnitLength" displayLabel="" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
-  <ECEntityClass typeName="CableLadderPhysicalType" displayLabel="Cable Ladder" modifier="None">
+  <ECEntityClass typeName="CableLadderPhysicalType" displayLabel="Cable Ladder Type" modifier="None">
     <BaseClass>CableCarrierPhysicalType</BaseClass>
     <ECProperty propertyName="Length" displayLabel="Length" readOnly="false" priority="0" typeName="int" />
     <ECProperty propertyName="WeightPerLength" displayLabel="weight per length" readOnly="false" priority="0" typeName="int" />
@@ -1718,7 +1778,7 @@ Withstand Voltage" readOnly="false" priority="0" typeName="int" />
     <ECProperty propertyName="CableLayingMethod" displayLabel="" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="CableTrayWeightPerUnitLength" displayLabel="" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
-  <ECEntityClass typeName="CableLadderFittingsPhysicalType" displayLabel="Cable Ladder Fittings" modifier="None">
+  <ECEntityClass typeName="CableLadderFittingsPhysicalType" displayLabel="Cable Ladder Fittings Type" modifier="None">
     <BaseClass>CableCarrierPhysicalType</BaseClass>
     <ECProperty propertyName="Weight" displayLabel="Weight" readOnly="false" priority="0" typeName="int" />
     <ECProperty propertyName="Type" displayLabel="Type" readOnly="false" priority="0" typeName="string" />
@@ -1735,7 +1795,7 @@ Withstand Voltage" readOnly="false" priority="0" typeName="int" />
     <ECProperty propertyName="Angle" displayLabel="" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="CableTrayWeightPerUnitLength" displayLabel="" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
-  <ECEntityClass typeName="CableTrayFittingsPhysicalType" displayLabel="Cable Tray Fittings" modifier="None">
+  <ECEntityClass typeName="CableTrayFittingsPhysicalType" displayLabel="Cable Tray Fittings Type" modifier="None">
     <BaseClass>CableCarrierPhysicalType</BaseClass>
     <ECProperty propertyName="Weight" displayLabel="Weight" readOnly="false" priority="0" typeName="int" />
     <ECProperty propertyName="Type" displayLabel="Type" readOnly="false" priority="0" typeName="string" />
@@ -1752,7 +1812,7 @@ Withstand Voltage" readOnly="false" priority="0" typeName="int" />
     <ECProperty propertyName="Angle" displayLabel="" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="CableTrayWeightPerUnitLength" displayLabel="" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
-  <ECEntityClass typeName="CableTrayCoverPhysicalType" displayLabel="Cable Tray Cover" modifier="None">
+  <ECEntityClass typeName="CableTrayCoverPhysicalType" displayLabel="Cable Tray Cover Type" modifier="None">
     <BaseClass>CableCarrierPhysicalType</BaseClass>
     <ECProperty propertyName="Length" displayLabel="Length" readOnly="false" priority="0" typeName="int" />
     <ECProperty propertyName="WeightPerLength" displayLabel="weight per length" readOnly="false" priority="0" typeName="int" />
@@ -1766,7 +1826,7 @@ Withstand Voltage" readOnly="false" priority="0" typeName="int" />
     <ECProperty propertyName="PercentFill_3" displayLabel="" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="CableLayingMethod" displayLabel="" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
-  <ECEntityClass typeName="WirewayPhysicalType" displayLabel="Wireway" modifier="None">
+  <ECEntityClass typeName="WirewayPhysicalType" displayLabel="Wireway Type" modifier="None">
     <BaseClass>CableCarrierPhysicalType</BaseClass>
     <ECProperty propertyName="Length" displayLabel="Length" readOnly="false" priority="0" typeName="int" />
     <ECProperty propertyName="WeightPerLength" displayLabel="weight per length" readOnly="false" priority="0" typeName="int" />
@@ -1778,7 +1838,7 @@ Withstand Voltage" readOnly="false" priority="0" typeName="int" />
     <ECProperty propertyName="CableLayingMethod" displayLabel="" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="CableTrayWeightPerUnitLength" displayLabel="" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
-  <ECEntityClass typeName="ConduitFittingsPhysicalType" displayLabel="Conduit Fittings" modifier="None">
+  <ECEntityClass typeName="ConduitFittingsPhysicalType" displayLabel="Conduit Fittings Type" modifier="None">
     <BaseClass>CableCarrierPhysicalType</BaseClass>
     <ECProperty propertyName="TradeDiameter" displayLabel="Trade Diameter" readOnly="false" priority="0" typeName="int" />
     <ECProperty propertyName="Weight" displayLabel="Weight" readOnly="false" priority="0" typeName="int" />
@@ -1789,7 +1849,7 @@ Withstand Voltage" readOnly="false" priority="0" typeName="int" />
     <ECProperty propertyName="Angle" displayLabel="" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="CableTrayWeightPerUnitLength" displayLabel="" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
-  <ECEntityClass typeName="ConduitPhysicalType" displayLabel="Conduit" modifier="None">
+  <ECEntityClass typeName="ConduitPhysicalType" displayLabel="Conduit Type" modifier="None">
     <BaseClass>CableCarrierPhysicalType</BaseClass>
     <ECProperty propertyName="Length" displayLabel="Length" readOnly="false" priority="0" typeName="int" />
     <ECProperty propertyName="TradeDiameter" displayLabel="Trade Diameter" readOnly="false" priority="0" typeName="int" />
@@ -1799,119 +1859,119 @@ Withstand Voltage" readOnly="false" priority="0" typeName="int" />
     <ECProperty propertyName="OuterDiameter" displayLabel="" readOnly="false" priority="0" typeName="string" />
     <ECProperty propertyName="CableTrayWeightPerUnitLength" displayLabel="" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
-  <ECEntityClass typeName="GroundingRodPhysicalType" displayLabel="Grounding Rod" modifier="None">
+  <ECEntityClass typeName="GroundingRodPhysicalType" displayLabel="Grounding Rod Type" modifier="None">
     <BaseClass>LightningProtectionPhysicalType</BaseClass>
     <ECProperty propertyName="WeightPerLength" displayLabel="weight per length" readOnly="false" priority="0" typeName="int" />
   </ECEntityClass>
-  <ECEntityClass typeName="LightningConductorPhysicalType" displayLabel="Lightning Conductor" modifier="None">
+  <ECEntityClass typeName="LightningConductorPhysicalType" displayLabel="Lightning Conductor Type" modifier="None">
     <BaseClass>LightningProtectionPhysicalType</BaseClass>
     <ECProperty propertyName="WeightPerLength" displayLabel="weight per length" readOnly="false" priority="0" typeName="int" />
     <ECProperty propertyName="CableSize" displayLabel="Cable Size" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
-  <ECEntityClass typeName="LightningArresterPhysicalType" displayLabel="Lightning Arrester" modifier="None">
+  <ECEntityClass typeName="LightningArresterPhysicalType" displayLabel="Lightning Arrester Type" modifier="None">
     <BaseClass>LightningProtectionPhysicalType</BaseClass>
     <ECProperty propertyName="Type" displayLabel="Type" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
-  <ECEntityClass typeName="CoverPhysicalType" displayLabel="Cover" modifier="None">
+  <ECEntityClass typeName="CoverPhysicalType" displayLabel="Cover Type" modifier="None">
     <BaseClass>EnclosuresPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="CabinetPhysicalType" displayLabel="Cabinet" modifier="None">
+  <ECEntityClass typeName="CabinetPhysicalType" displayLabel="Cabinet Type" modifier="None">
     <BaseClass>EnclosuresPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="GasketPhysicalType" displayLabel="Gasket" modifier="None">
+  <ECEntityClass typeName="GasketPhysicalType" displayLabel="Gasket Type" modifier="None">
     <BaseClass>EnclosuresPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="SecondaryCutOutPhysicalType" displayLabel="Secondary Cut Out" modifier="None">
+  <ECEntityClass typeName="SecondaryCutOutPhysicalType" displayLabel="Secondary Cut Out Type" modifier="None">
     <BaseClass>EnclosuresPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="PanelboardAssemblyPhysicalType" displayLabel="Panel Board Assembly" modifier="None">
+  <ECEntityClass typeName="PanelboardAssemblyPhysicalType" displayLabel="Panel Board Assembly Type" modifier="None">
     <BaseClass>EnclosuresPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="OutletBodyPhysicalType" displayLabel="Outlet Body" modifier="None">
+  <ECEntityClass typeName="OutletBodyPhysicalType" displayLabel="Outlet Body Type" modifier="None">
     <BaseClass>EnclosuresPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="AdapterPhysicalType" displayLabel="Adapter" modifier="None">
+  <ECEntityClass typeName="AdapterPhysicalType" displayLabel="Adapter Type" modifier="None">
     <BaseClass>ConnectorsPhysicalType</BaseClass>
     <ECProperty propertyName="FlexConnector" displayLabel="" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
-  <ECEntityClass typeName="AllAngleConnectorPhysicalType" displayLabel="All Angle Connector" modifier="None">
+  <ECEntityClass typeName="AllAngleConnectorPhysicalType" displayLabel="All Angle Connector Type" modifier="None">
     <BaseClass>ConnectorsPhysicalType</BaseClass>
     <ECProperty propertyName="CableStartEndConnector" displayLabel="" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
-  <ECEntityClass typeName="BarConnectorPhysicalType" displayLabel="Bar Connector" modifier="None">
+  <ECEntityClass typeName="BarConnectorPhysicalType" displayLabel="Bar Connector Type" modifier="None">
     <BaseClass>ConnectorsPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="BusConnectorPhysicalType" displayLabel="Bus Connector" modifier="None">
+  <ECEntityClass typeName="BusConnectorPhysicalType" displayLabel="Bus Connector Type" modifier="None">
     <BaseClass>ConnectorsPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="BusSupportConnectorPhysicalType" displayLabel="Bus Support Connector" modifier="None">
+  <ECEntityClass typeName="BusSupportConnectorPhysicalType" displayLabel="Bus Support Connector Type" modifier="None">
     <BaseClass>ConnectorsPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="CableConnectorPhysicalType" displayLabel="Cable Connector" modifier="None">
+  <ECEntityClass typeName="CableConnectorPhysicalType" displayLabel="Cable Connector Type" modifier="None">
     <BaseClass>ConnectorsPhysicalType</BaseClass>
     <ECProperty propertyName="CableStartEndConnector" displayLabel="" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
-  <ECEntityClass typeName="ConduitConnectorPhysicalType" displayLabel="Conduit Connector" modifier="None">
+  <ECEntityClass typeName="ConduitConnectorPhysicalType" displayLabel="Conduit Connector Type" modifier="None">
     <BaseClass>ConnectorsPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="CoronaPhysicalType" displayLabel="Corona" modifier="None">
+  <ECEntityClass typeName="CoronaPhysicalType" displayLabel="Corona Type" modifier="None">
     <BaseClass>ConnectorsPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="ExtensionPhysicalType" displayLabel="Extension" modifier="None">
+  <ECEntityClass typeName="ExtensionPhysicalType" displayLabel="Extension Type" modifier="None">
     <BaseClass>ConnectorsPhysicalType</BaseClass>
     <ECProperty propertyName="FlexConnector" displayLabel="" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
-  <ECEntityClass typeName="FlexAngleAssemblyPhysicalType" displayLabel="Flex Angle assembly" modifier="None">
+  <ECEntityClass typeName="FlexAngleAssemblyPhysicalType" displayLabel="Flex Angle assembly Type" modifier="None">
     <BaseClass>ConnectorsPhysicalType</BaseClass>
     <ECProperty propertyName="CableStartEndConnector" displayLabel="" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
-  <ECEntityClass typeName="FlexStrapsPhysicalType" displayLabel="Flex Straps" modifier="None">
+  <ECEntityClass typeName="FlexStrapsPhysicalType" displayLabel="Flex Straps Type" modifier="None">
     <BaseClass>ConnectorsPhysicalType</BaseClass>
     <ECProperty propertyName="FlexConnector" displayLabel="" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
-  <ECEntityClass typeName="GroundingConnectorsPhysicalType" displayLabel="Grounding Connectors" modifier="None">
+  <ECEntityClass typeName="GroundingConnectorsPhysicalType" displayLabel="Grounding Connectors Type" modifier="None">
     <BaseClass>ConnectorsPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="PlateConnectionPhysicalType" displayLabel="Plate Connection" modifier="None">
+  <ECEntityClass typeName="PlateConnectionPhysicalType" displayLabel="Plate Connection Type" modifier="None">
     <BaseClass>ConnectorsPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="CableSpacersPhysicalType" displayLabel="Cable Spacers" modifier="None">
+  <ECEntityClass typeName="CableSpacersPhysicalType" displayLabel="Cable Spacers Type" modifier="None">
     <BaseClass>ConnectorsPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="StudConnectorsPhysicalType" displayLabel="Stud Connectors" modifier="None">
+  <ECEntityClass typeName="StudConnectorsPhysicalType" displayLabel="Stud Connectors Type" modifier="None">
     <BaseClass>ConnectorsPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="AnimalGuardPhysicalType" displayLabel="Animal Guard" modifier="None">
+  <ECEntityClass typeName="AnimalGuardPhysicalType" displayLabel="Animal Guard Type" modifier="None">
     <BaseClass>PhysicalSafetyBarriersPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="FirewallPhysicalType" displayLabel="Firewall" modifier="None">
+  <ECEntityClass typeName="FirewallPhysicalType" displayLabel="Firewall Type" modifier="None">
     <BaseClass>PhysicalSafetyBarriersPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="VehicleBarrierPhysicalType" displayLabel="Vehicle Barrier" modifier="None">
+  <ECEntityClass typeName="VehicleBarrierPhysicalType" displayLabel="Vehicle Barrier Type" modifier="None">
     <BaseClass>PhysicalSafetyBarriersPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="BoltPhysicalType" displayLabel="Bolt" modifier="None">
+  <ECEntityClass typeName="BoltPhysicalType" displayLabel="Bolt Type" modifier="None">
     <BaseClass>FastenersPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="WasherPhysicalType" displayLabel="Washer" modifier="None">
+  <ECEntityClass typeName="WasherPhysicalType" displayLabel="Washer Type" modifier="None">
     <BaseClass>FastenersPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="NutsPhysicalType" displayLabel="nuts" modifier="None">
+  <ECEntityClass typeName="NutsPhysicalType" displayLabel="nuts Type" modifier="None">
     <BaseClass>FastenersPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="ScrewPhysicalType" displayLabel="Screw" modifier="None">
+  <ECEntityClass typeName="ScrewPhysicalType" displayLabel="Screw Type" modifier="None">
     <BaseClass>FastenersPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="BracketPhysicalType" displayLabel="Bracket" modifier="None">
+  <ECEntityClass typeName="BracketPhysicalType" displayLabel="Bracket Type" modifier="None">
     <BaseClass>SupportsPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="ClampPhysicalType" displayLabel="Clamp" modifier="None">
+  <ECEntityClass typeName="ClampPhysicalType" displayLabel="Clamp Type" modifier="None">
     <BaseClass>SupportsPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="UboltPhysicalType" displayLabel="U-Bolt" modifier="None">
+  <ECEntityClass typeName="UboltPhysicalType" displayLabel="U-Bolt Type" modifier="None">
     <BaseClass>SupportsPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="MountingKitPhysicalType" displayLabel="Mounting Kit" description="Additional components needed to mount equipment" modifier="None">
+  <ECEntityClass typeName="MountingKitPhysicalType" displayLabel="Mounting Kit Type" description="Additional components needed to mount equipment" modifier="None">
     <BaseClass>SupportsPhysicalType</BaseClass>
   </ECEntityClass>
   <ECEntityClass typeName="Recloser" displayLabel="Recloser" description="Pole-mounted fault interrupter with built-in phase and ground relays, current transformer (CT), and supplemental controls." modifier="None">
@@ -1947,48 +2007,48 @@ Withstand Voltage" readOnly="false" priority="0" typeName="int" />
   <ECEntityClass typeName="CapacitorBank" displayLabel="Capacitor Bank" modifier="None">
     <BaseClass>ShuntCompensator</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="RecloserFunctional" displayLabel="Recloser" description="Pole-mounted fault interrupter with built-in phase and ground relays, current transformer (CT), and supplemental controls." modifier="None">
+  <ECEntityClass typeName="RecloserFunctional" displayLabel="Recloser Functional" description="Pole-mounted fault interrupter with built-in phase and ground relays, current transformer (CT), and supplemental controls." modifier="None">
     <BaseClass>ProtectedSwitchFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="LoadBreakSwitchFunctional" displayLabel="Circuit Breaker" description="A mechanical switching device capable of making, carrying, and breaking currents under normal operating conditions." modifier="None">
-    <BaseClass>ProtectedSwitchFunctional</BaseClass>
-    <ECProperty propertyName="SerialNumber" displayLabel="Serial Number" readOnly="false" priority="0" typeName="string" />
-  </ECEntityClass>
-  <ECEntityClass typeName="BreakerFunctional" displayLabel="Breaker" description="A mechanical switching device capable of making, carrying, and breaking currents under normal circuit conditions and also making, carrying for a specified time, and breaking currents under specified abnormal circuit conditions e.g.  those of short circuit." modifier="None">
+  <ECEntityClass typeName="LoadBreakSwitchFunctional" displayLabel="Circuit Breaker Functional" description="A mechanical switching device capable of making, carrying, and breaking currents under normal operating conditions." modifier="None">
     <BaseClass>ProtectedSwitchFunctional</BaseClass>
     <ECProperty propertyName="SerialNumber" displayLabel="Serial Number" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
-  <ECEntityClass typeName="CurrentTransformerFunctional" displayLabel="Current Transformer" description="Instrument transformer used to measure electrical qualities of the circuit that is being protected and/or monitored. Typically used as current transducer for the purpose of metering or protection. A typical secondary current rating would be 5A." modifier="None">
+  <ECEntityClass typeName="BreakerFunctional" displayLabel="Breaker Functional" description="A mechanical switching device capable of making, carrying, and breaking currents under normal circuit conditions and also making, carrying for a specified time, and breaking currents under specified abnormal circuit conditions e.g.  those of short circuit." modifier="None">
+    <BaseClass>ProtectedSwitchFunctional</BaseClass>
+    <ECProperty propertyName="SerialNumber" displayLabel="Serial Number" readOnly="false" priority="0" typeName="string" />
+  </ECEntityClass>
+  <ECEntityClass typeName="CurrentTransformerFunctional" displayLabel="Current Transformer Functional" description="Instrument transformer used to measure electrical qualities of the circuit that is being protected and/or monitored. Typically used as current transducer for the purpose of metering or protection. A typical secondary current rating would be 5A." modifier="None">
     <BaseClass>SensorFunctional</BaseClass>
     <ECProperty propertyName="SerialNumber" displayLabel="Serial Number" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
-  <ECEntityClass typeName="PotentialTransformerFunctional" displayLabel="Voltage Transformer" modifier="None">
+  <ECEntityClass typeName="PotentialTransformerFunctional" displayLabel="Voltage Transformer Functional" modifier="None">
     <BaseClass>SensorFunctional</BaseClass>
     <ECProperty propertyName="SerialNumber" displayLabel="Serial Number" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
-  <ECEntityClass typeName="PostLineSensorFunctional" displayLabel="Post Line Sensor" description="A sensor used mainly in overhead distribution networks as the source of both current and voltage measurements" modifier="None">
+  <ECEntityClass typeName="PostLineSensorFunctional" displayLabel="Post Line Sensor Functional" description="A sensor used mainly in overhead distribution networks as the source of both current and voltage measurements" modifier="None">
     <BaseClass>SensorFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="GroundingConductorFunctional" displayLabel="Grounding Conductor" description="The conductor used to connect the non-current-carrying metal parts of equipment, raceways and other enclosures to the system grounded conductor, grounding electrode conductor, or both, at the service equipment or at the source of a separately-derived system" modifier="None">
+  <ECEntityClass typeName="GroundingConductorFunctional" displayLabel="Grounding Conductor Functional" description="The conductor used to connect the non-current-carrying metal parts of equipment, raceways and other enclosures to the system grounded conductor, grounding electrode conductor, or both, at the service equipment or at the source of a separately-derived system" modifier="None">
     <BaseClass>GroundingImpedanceFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="PullBoxFunctional" displayLabel="Pull Box" modifier="None">
+  <ECEntityClass typeName="PullBoxFunctional" displayLabel="Pull Box Functional" modifier="None">
     <BaseClass>JunctionFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="JunctionBoxFunctional" displayLabel="Junction Box" modifier="None">
+  <ECEntityClass typeName="JunctionBoxFunctional" displayLabel="Junction Box Functional" modifier="None">
     <BaseClass>JunctionFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="CapacitorFunctional" displayLabel="Capacitor" modifier="None">
+  <ECEntityClass typeName="CapacitorFunctional" displayLabel="Capacitor Functional" modifier="None">
     <BaseClass>ShuntCompensatorFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="CapacitorBankFunctional" displayLabel="Capacitor Bank" modifier="None">
+  <ECEntityClass typeName="CapacitorBankFunctional" displayLabel="Capacitor Bank Functional" modifier="None">
     <BaseClass>ShuntCompensatorFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="RecloserPhysicalType" displayLabel="Recloser" description="Pole-mounted fault interrupter with built-in phase and ground relays, current transformer (CT), and supplemental controls." modifier="None">
+  <ECEntityClass typeName="RecloserPhysicalType" displayLabel="Recloser Type" description="Pole-mounted fault interrupter with built-in phase and ground relays, current transformer (CT), and supplemental controls." modifier="None">
     <BaseClass>ProtectedSwitchPhysicalType</BaseClass>
     <ECProperty propertyName="BreakingCapacity" displayLabel="Breaking Capacity" readOnly="false" priority="0" typeName="int" />
   </ECEntityClass>
-  <ECEntityClass typeName="LoadBreakSwitchPhysicalType" displayLabel="Circuit Breaker" description="A mechanical switching device capable of making, carrying, and breaking currents under normal operating conditions." modifier="None">
+  <ECEntityClass typeName="LoadBreakSwitchPhysicalType" displayLabel="Circuit Breaker Type" description="A mechanical switching device capable of making, carrying, and breaking currents under normal operating conditions." modifier="None">
     <BaseClass>ProtectedSwitchPhysicalType</BaseClass>
     <ECProperty propertyName="BreakingCapacity" displayLabel="Breaking Capacity" readOnly="false" priority="0" typeName="int" />
     <ECProperty propertyName="Type" displayLabel="Type" readOnly="false" priority="0" typeName="string" />
@@ -2000,7 +2060,7 @@ Withstand Voltage" readOnly="false" priority="0" typeName="int" />
     <ECProperty propertyName="RatedShortTimeCurrent" displayLabel="Rated Short Time Current" readOnly="false" priority="0" typeName="int" />
     <ECProperty propertyName="Frequency" displayLabel="Frequency" readOnly="false" priority="0" typeName="int" />
   </ECEntityClass>
-  <ECEntityClass typeName="BreakerPhysicalType" displayLabel="Breaker" description="A mechanical switching device capable of making, carrying, and breaking currents under normal circuit conditions and also making, carrying for a specified time, and breaking currents under specified abnormal circuit conditions e.g.  those of short circuit." modifier="None">
+  <ECEntityClass typeName="BreakerPhysicalType" displayLabel="Breaker Type" description="A mechanical switching device capable of making, carrying, and breaking currents under normal circuit conditions and also making, carrying for a specified time, and breaking currents under specified abnormal circuit conditions e.g.  those of short circuit." modifier="None">
     <BaseClass>ProtectedSwitchPhysicalType</BaseClass>
     <ECProperty propertyName="InTransientTime" displayLabel="In Transient Time" readOnly="false" priority="0" typeName="int" />
     <ECProperty propertyName="Type" displayLabel="Type" readOnly="false" priority="0" typeName="string" />
@@ -2011,29 +2071,29 @@ Withstand Voltage" readOnly="false" priority="0" typeName="int" />
     <ECProperty propertyName="ShortCircuitCurrent" displayLabel="Short Circuit Current" readOnly="false" priority="0" typeName="int" />
     <ECProperty propertyName="Frequency" displayLabel="Frequency" readOnly="false" priority="0" typeName="int" />
   </ECEntityClass>
-  <ECEntityClass typeName="CurrentTransformerPhysicalType" displayLabel="Current Transformer" description="Instrument transformer used to measure electrical qualities of the circuit that is being protected and/or monitored. Typically used as current transducer for the purpose of metering or protection. A typical secondary current rating would be 5A." modifier="None">
+  <ECEntityClass typeName="CurrentTransformerPhysicalType" displayLabel="Current Transformer Type" description="Instrument transformer used to measure electrical qualities of the circuit that is being protected and/or monitored. Typically used as current transducer for the purpose of metering or protection. A typical secondary current rating would be 5A." modifier="None">
     <BaseClass>SensorPhysicalType</BaseClass>
     <ECProperty propertyName="OperatingTemperatureRange" displayLabel="Operating Temperature Range" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
-  <ECEntityClass typeName="PotentialTransformerPhysicalType" displayLabel="Voltage Transformer" modifier="None">
+  <ECEntityClass typeName="PotentialTransformerPhysicalType" displayLabel="Voltage Transformer Type" modifier="None">
     <BaseClass>SensorPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="PostLineSensorPhysicalType" displayLabel="Post Line Sensor" description="A sensor used mainly in overhead distribution networks as the source of both current and voltage measurements" modifier="None">
+  <ECEntityClass typeName="PostLineSensorPhysicalType" displayLabel="Post Line Sensor Type" description="A sensor used mainly in overhead distribution networks as the source of both current and voltage measurements" modifier="None">
     <BaseClass>SensorPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="GroundingConductorPhysicalType" displayLabel="Grounding Conductor" description="The conductor used to connect the non-current-carrying metal parts of equipment, raceways and other enclosures to the system grounded conductor, grounding electrode conductor, or both, at the service equipment or at the source of a separately-derived system" modifier="None">
+  <ECEntityClass typeName="GroundingConductorPhysicalType" displayLabel="Grounding Conductor Type" description="The conductor used to connect the non-current-carrying metal parts of equipment, raceways and other enclosures to the system grounded conductor, grounding electrode conductor, or both, at the service equipment or at the source of a separately-derived system" modifier="None">
     <BaseClass>GroundingImpedancePhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="PullBoxPhysicalType" displayLabel="Pull Box" modifier="None">
+  <ECEntityClass typeName="PullBoxPhysicalType" displayLabel="Pull Box Type" modifier="None">
     <BaseClass>JunctionPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="JunctionBoxPhysicalType" displayLabel="Junction Box" modifier="None">
+  <ECEntityClass typeName="JunctionBoxPhysicalType" displayLabel="Junction Box Type" modifier="None">
     <BaseClass>JunctionPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="CapacitorPhysicalType" displayLabel="Capacitor" modifier="None">
+  <ECEntityClass typeName="CapacitorPhysicalType" displayLabel="Capacitor Type" modifier="None">
     <BaseClass>ShuntCompensatorPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="CapacitorBankPhysicalType" displayLabel="Capacitor Bank" modifier="None">
+  <ECEntityClass typeName="CapacitorBankPhysicalType" displayLabel="Capacitor Bank Type" modifier="None">
     <BaseClass>ShuntCompensatorPhysicalType</BaseClass>
   </ECEntityClass>
   <ECEntityClass typeName="DisconnectingCircuitBreaker" displayLabel="Circuit Breaker With Disconnector" description="A circuit breaking device including disconnecting function, eliminating the need for separate disconnectors." modifier="None">
@@ -2045,23 +2105,23 @@ Withstand Voltage" readOnly="false" priority="0" typeName="int" />
   <ECEntityClass typeName="CCVT" displayLabel="CCVT" modifier="None">
     <BaseClass>PotentialTransformer</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="DisconnectingCircuitBreakerFunctional" displayLabel="Circuit Breaker With Disconnector" description="A circuit breaking device including disconnecting function, eliminating the need for separate disconnectors." modifier="None">
+  <ECEntityClass typeName="DisconnectingCircuitBreakerFunctional" displayLabel="Circuit Breaker With Disconnector Functional" description="A circuit breaking device including disconnecting function, eliminating the need for separate disconnectors." modifier="None">
     <BaseClass>BreakerFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="CVTFunctional" displayLabel="CVT" modifier="None">
+  <ECEntityClass typeName="CVTFunctional" displayLabel="CVT Functional" modifier="None">
     <BaseClass>PotentialTransformerFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="CCVTFunctional" displayLabel="CCVT" modifier="None">
+  <ECEntityClass typeName="CCVTFunctional" displayLabel="CCVT Functional" modifier="None">
     <BaseClass>PotentialTransformerFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="DisconnectingCircuitBreakerPhysicalType" displayLabel="Circuit Breaker With Disconnector" description="A circuit breaking device including disconnecting function, eliminating the need for separate disconnectors." modifier="None">
+  <ECEntityClass typeName="DisconnectingCircuitBreakerPhysicalType" displayLabel="Circuit Breaker With Disconnector Type" description="A circuit breaking device including disconnecting function, eliminating the need for separate disconnectors." modifier="None">
     <BaseClass>BreakerPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="CVTPhysicalType" displayLabel="CVT" modifier="None">
+  <ECEntityClass typeName="CVTPhysicalType" displayLabel="CVT Type" modifier="None">
     <BaseClass>PotentialTransformerPhysicalType</BaseClass>
     <ECProperty propertyName="OperatingTemperatureRange" displayLabel="Operating Temperature Range" readOnly="false" priority="0" typeName="string" />
   </ECEntityClass>
-  <ECEntityClass typeName="CCVTPhysicalType" displayLabel="CCVT" modifier="None">
+  <ECEntityClass typeName="CCVTPhysicalType" displayLabel="CCVT Type" modifier="None">
     <BaseClass>PotentialTransformerPhysicalType</BaseClass>
   </ECEntityClass>
 </ECSchema>
