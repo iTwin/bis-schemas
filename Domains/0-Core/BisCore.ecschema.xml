@@ -1712,6 +1712,76 @@
         </Target>
     </ECRelationshipClass>
 
+    <ECEntityClass typeName="MappedElementLinkage" displayLabel="Mapped-Element Linkage" modifier="Abstract" description="TODO"/>
+    <ECEntityClass typeName="MappedFederationGuid" displayLabel="Mapped FederationGuid" modifier="Sealed" description="TODO">
+        <ECCustomAttributes>
+            <ClassMap xmlns="ECDbMap.02.00.00">
+                <MapStrategy>OwnTable</MapStrategy>
+            </ClassMap>
+            <DbIndexList xmlns="ECDbMap.02.00.00">
+                <Indexes>
+                    <DbIndex>
+                        <Name>ix_bis_Element_MappedFederationGuid</Name>
+                        <IsUnique>False</IsUnique>
+                        <Properties>
+                            <string>FederationGuid</string>
+                        </Properties>
+                    </DbIndex>
+                </Indexes>
+            </DbIndexList>
+        </ECCustomAttributes>
+        <ECNavigationProperty propertyName="Element" relationshipName="ElementOwnsMappedElementLinkages" direction="backward" description="TODO">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03"/>
+                <!-- Creates the ElementId foreign key column in the corresponding table -->
+                <ForeignKeyConstraint xmlns="ECDbMap.02.00.00"/>
+            </ECCustomAttributes>
+        </ECNavigationProperty>
+        <ECProperty propertyName="FederationGuid" typeName="binary" extendedTypeName="BeGuid" description="TODO"/>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="MappedLinkTableRelationship" displayLabel="Mapped LinkTable Relationship" modifier="Sealed" description="TODO">
+        <ECCustomAttributes>
+            <LinkTableRelationshipMap xmlns="ECDbMap.02.00.00">
+                <CreateForeignKeyConstraints>False</CreateForeignKeyConstraints>
+            </LinkTableRelationshipMap>
+            <ClassMap xmlns="ECDbMap.02.00.00">
+                <MapStrategy>OwnTable</MapStrategy>
+            </ClassMap>
+            <DbIndexList xmlns="ECDbMap.02.00.00">
+                <Indexes>
+                    <DbIndex>
+                        <Name>ix_bis_Element_MappedLinkTableRelationshipInSource</Name>
+                        <IsUnique>False</IsUnique>
+                        <Properties>
+                            <string>SourceFederationGuidInSource</string>
+                            <string>TargetFederationGuidInSource</string>
+                            <string>RelationshipECClassIdInSource</string>
+                        </Properties>
+                    </DbIndex>
+                </Indexes>
+            </DbIndexList>
+        </ECCustomAttributes>
+        <ECProperty propertyName="SourceFederationGuidInSource" typeName="binary" extendedTypeName="BeGuid" description="TODO"/>
+        <ECProperty propertyName="TargetFederationGuidInSource" typeName="binary" extendedTypeName="BeGuid" description="TODO"/>
+        <ECNavigationProperty propertyName="SourceElementInTarget" relationshipName="SourceElementOwnsMappedLinkTableRelationship" direction="backward" description="TODO">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03"/>
+                <!-- Creates the ElementId foreign key column in the corresponding table -->
+                <ForeignKeyConstraint xmlns="ECDbMap.02.00.00"/>
+            </ECCustomAttributes>
+        </ECNavigationProperty>
+        <ECNavigationProperty propertyName="TargetElementInTarget" relationshipName="TargetElementOwnsMappedLinkTableRelationship" direction="backward" description="TODO">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03"/>
+                <!-- Creates the ElementId foreign key column in the corresponding table -->
+                <ForeignKeyConstraint xmlns="ECDbMap.02.00.00"/>
+            </ECCustomAttributes>
+        </ECNavigationProperty>
+        <ECProperty propertyName="RelationshipECClassIdInSource" typeName="ECInstanceId" description="TODO"/>
+        <ECProperty propertyName="RelationshipECClassIdInTarget" typeName="ECInstanceId" description="TODO"/>
+    </ECEntityClass>
+
     <ECEntityClass typeName="ChannelRootAspect" displayLabel="Channel Root Aspect" modifier="Sealed" description="A bis:ElementUniqueAspect that identifies a bis:Element as one of the roots of a *channel*, specified by its *channel-key*, which is a subset of the overall model-hierarchy and associated data, that is independently maintained.">
         <BaseClass>ElementUniqueAspect</BaseClass>
         <ECProperty propertyName="Owner" typeName="string" description="Channel-key of the channel"/>
