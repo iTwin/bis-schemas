@@ -384,7 +384,7 @@
         </Target>
     </ECRelationshipClass>
 
-    <ECEntityClass typeName="Element" modifier="Abstract" description="A bis:Element is the smallest individually identifiable building block for modeling the real world. Each bis:Element represents an Entity in the real world. Sets of bis:Elements (contained in bis:Models) are used to sub-model other bis:Elements that represent larger scale real world Entities. Using this recursive modeling strategy, bis:Elements can represent Entities at any scale. Elements can represent physical things, abstract concepts or simply be information records.">
+    <ECEntityClass typeName="Element" modifier="Abstract" description="Most abstract class and smallest individually identifiable building block for modeling Entities in a BIS repository.">
         <!-- NOTE: Only platform can directly subclass from Element. Everyone else should pick the most appropriate superclass. -->
         <!-- NOTE: Element subclasses should drop the "Element" suffix from their name once the concept becomes "user facing" -->
         <ECCustomAttributes>
@@ -480,7 +480,7 @@
                 </ForeignKeyConstraint>
             </ECCustomAttributes>
         </ECNavigationProperty>
-        <ECProperty propertyName="CodeValue" typeName="string" displayLabel="Code" description="The CodeValue property stores a human-readable real-world identifier of the Entity represented by the bis:Element. The combination of CodeSpec, CodeScope, and CodeValue properties must be unique for each bis:Element instance.">
+        <ECProperty propertyName="CodeValue" typeName="string" displayLabel="Code" description="Nullable string property that holds the actual text of an Element's Code. The combination of CodeSpec, CodeScope, and CodeValue properties must be unique for each bis:Element instance.">
             <ECCustomAttributes>
                 <PropertyMap xmlns="ECDbMap.02.00.00">
                     <IsNullable>True</IsNullable>
@@ -1142,7 +1142,7 @@
         </ECCustomAttributes>
     </ECEntityClass>
 
-    <ECEntityClass typeName="GeometricElement" modifier="Abstract" displayLabel="Geometric Element" description="bis:GeometricElement is an abstract base class used to model real world Entities that intrinsically have geometry.">
+    <ECEntityClass typeName="GeometricElement" modifier="Abstract" displayLabel="Geometric Element" description="A bis:Element and abstract base class used to model Entities that intrinsically have geometry.">
         <BaseClass>Element</BaseClass>
         <ECCustomAttributes>
             <JoinedTablePerDirectSubclass xmlns="ECDbMap.02.00.00"/>
@@ -1712,9 +1712,9 @@
         </Target>
     </ECRelationshipClass>
 
-    <ECEntityClass typeName="ChannelRootAspect" displayLabel="Channel Root Aspect" modifier="Sealed" description="A bis:ElementUniqueAspect that identifies a bis:Element as the root of a *channel* which is a subset of the overall iModel hierarchy that is independently maintained.">
+    <ECEntityClass typeName="ChannelRootAspect" displayLabel="Channel Root Aspect" modifier="Sealed" description="A bis:ElementUniqueAspect that identifies a bis:Element as one of the roots of a *channel*, specified by its *channel-key*, which is a subset of the overall model-hierarchy and associated data, that is independently maintained.">
         <BaseClass>ElementUniqueAspect</BaseClass>
-        <ECProperty propertyName="Owner" typeName="string" description="The owner of the channel"/>
+        <ECProperty propertyName="Owner" typeName="string" description="Channel-key of the channel"/>
     </ECEntityClass>
     <ECRelationshipClass typeName="ElementOwnsChannelRootAspect" strength="embedding" modifier="None">
         <BaseClass>ElementOwnsUniqueAspect</BaseClass>
@@ -2425,7 +2425,7 @@
         </Target>
     </ECRelationshipClass>
 
-    <ECEntityClass typeName="RoleElement" modifier="Abstract" displayLabel="Role Element" description="A real world Entity is modeled as a bis:RoleElement when a set of external circumstances define an important role (one that is worth tracking) that is not intrinsic to the Entity playing the role. For example, a person can play the role of a teacher or a rock can play the role of a boundary marker.">
+    <ECEntityClass typeName="RoleElement" modifier="Abstract" displayLabel="Role Element" description="A bis:Element and abstract base class used to model roles assumed by an Entity that is not intrinsic to the Entity playing the role.">
         <BaseClass>Element</BaseClass>
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.01.00.00"/>

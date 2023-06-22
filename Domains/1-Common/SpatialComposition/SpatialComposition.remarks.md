@@ -17,8 +17,13 @@ The hierarchy can be thought of as a spatially-oriented "breakdown structure" us
 
 Sometimes there are `bis:SpatialElements` that (for various reasons) need to be associated with a "bucket" in the Spatial Structure, though they are "held" by some other "bucket". The [`SpatialOrganizerReferencesSpatialElements`](#spatialorganizerreferencesspatialelements) allows these secondary associations to be made, although the precise meaning of the association is up to the author of the data.
 
+![SpatialOrganizer](./media/SpatialOrganizer-classes.png)
+
 The SpatialComposition schema also defines abstract base classes for standard discipline-agnostic spatial structure concepts.
 These classes are [`Region`](#region), [`Site`](#site), [`Facility`](#facility), [`FacilityPart`](#facilitypart), and [`Space`](#space).
+
+![SpatialStructureElements](./media/SpatialStructure-classes.png)
+
 All but Region map to the like-named concepts in IFC.
 Region was added to better represent Cities and other geographic concepts.
 As `bis:SpatialLocationElements`, these classes represent the "spatial location perspective" on physical entities of region, site, facility, etc.
@@ -30,6 +35,8 @@ The spatial structure organizes elements in the physical perspective through the
 Generally, the levels of a Spatial Structure will follow the order: Region, Site, Facility, FacilityPart, Space, but there are no ironclad restrictions on what can aggregate what. There may be a small Building located in a FacilityPart of a Bridge. A Space may belong to a Site. Discipline-specific "spatial breakdown rules" may be defined in the future, but are unlikely to be defined in the schema, since they may be project-specific.
 
 [Zones](#zone) are not part of the primary spatial structure, but they are organized by it. `Zone`s mix-in [ISpatialOrganizer](#ispatialorganizer) and thus can serve as a way of organizing `bis:SpatialElements` along some other "dimension" (indicated by their [ZoneType](#zonetype)).
+
+![Zones](./media/Zone-classes.png)
 
 BIS does not have a direct equivalent of IFC's controversial "CompositionType" attribute, which indicates that a given instance of IfcSpatialStructureElement represents a 'complex', an 'element' (a discrete individual), or a "part" (a portion of) for a given entity. BIS allows nesting of Regions within Regions, Sites within Sites, Facilities within Facilities, etc. to cover use-cases like a "building complex" or a "sub-building".
 
