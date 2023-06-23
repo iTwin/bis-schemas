@@ -11,7 +11,7 @@ This schema contains classes that are used to model real-world entities from the
 - classification - cost codes assignment to the constructible components;
 - quantity takeoff - work steps quantities calculation.
 
-<h2>Project breakdown into construction work areas</h2>
+<b>Project breakdown into construction work areas</b>
 
 Construction work areas are used throughout the entire construction project lifecycle: estimation, planning and sequencing, progress reporting and tracking. By breaking a project down into construction work areas some design elements may cross work area boundaries and as a result such elements are split into multiple pieces.
 
@@ -21,7 +21,7 @@ Construction work areas are used throughout the entire construction project life
 
 A portion of a design element that got split because it crossed the construction work area boundary is modeled as `WorkAreaDetailingElement` (Portion 'X' and Portion 'Y' in the example above). This element may or may not be suitable for construction. In cases when engineer decides that it is too big or requires different means and methods assigned, then it will be split further during construction modeling step.
 
-<h2>Construction modeling</h2>
+<b>Construction modeling</b>
 
 During construction modeling step some design elements are split into smaller pieces suitable for construction. Such a sliced portion of a real-world object is modeled as `ConstructionDetailingElement` (Portion 'X1', Portion 'X2', Portion 'S' and Portion 'Z' in the example below).
 
@@ -37,7 +37,7 @@ If a real-world physical object crosses multiple construction work areas and dif
 
 *Picture 3. Construction modeling*
 
-<h2>Data organization in the repository</h2>
+<b>Data organization in the repository</b>
 
 `ConstructionWorkArea` and `WorkAreaDetailingElement` instances are placed in a separate `SpatialLocationModel` under their own `PhysicalPartition`:
 
