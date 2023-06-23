@@ -6,9 +6,9 @@ remarksTarget: RoadRailAlignment.ecschema.md
 
 Contains the main classes to capture Alignment information primarily used in Road & Rail disciplines.
 
-## Entity Classes
-
 ![RoadRailAlignment](./media/RoadRailAlignment-classes.png)
+
+## Entity Classes
 
 ### Alignment
 
