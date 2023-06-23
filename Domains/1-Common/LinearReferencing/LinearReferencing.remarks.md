@@ -6,8 +6,6 @@ remarksTarget: LinearReferencing.ecschema.md
 
 Contains the core classes enabling the specification of positions along linear objects.
 
-## Entity Classes
-
 The following class-diagram depicts the core mix-ins in the LinearReferencing schema:
 
 ![LinearReferencing Mixins](./media/LinearReferencing-mixins.png)
@@ -15,6 +13,8 @@ The following class-diagram depicts the core mix-ins in the LinearReferencing sc
 The following class-diagram depicts the core aspect classes in the LinearReferencing schema:
 
 ![LinearReferencing Aspects](./media/LinearReferencing-aspects.png)
+
+## Entity Classes
 
 ### ILinearElement
 
