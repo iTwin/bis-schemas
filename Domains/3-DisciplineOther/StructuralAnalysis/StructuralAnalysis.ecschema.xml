@@ -3,7 +3,7 @@
 |  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
 |  * See LICENSE.md in the project root for license terms and full copyright notice.
 ======================================================================================= -->
-<ECSchema schemaName="StructuralAnalysis" alias="sa" version="01.00.03" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" displayLabel="Structural Analysis" description="Structural Analysis Schema.">
+<ECSchema schemaName="StructuralAnalysis" alias="sa" version="01.00.02" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" displayLabel="Structural Analysis" description="Structural Analysis Schema.">
     <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
     <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
     <ECSchemaReference name="BisCore" version="01.00.10" alias="bis" />
@@ -815,16 +815,16 @@
             <Class class="MaterialProfileType" />
         </Source>
         <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="false">
-            <Class class="MaterialProfile" />
+            <Class class="MaterialProfileDefinition" />
         </Target>
     </ECRelationshipClass>
 
-    <ECEntityClass typeName="MaterialProfileDefinition" modifier="abstract" displayLabel="Material Profile Definition" description="Base class defining an element that pairs Profiles and PhysicalMaterials.">
+    <ECEntityClass typeName="MaterialProfileDefinition" modifier="None" displayLabel="Material Profile Definition" description="Base class defining an element that pairs Profiles and PhysicalMaterials.">
         <BaseClass>bis:DefinitionElement</BaseClass>
         <ECProperty propertyName="Name" typeName="string" description="Name of the MaterialProfile used for identification." />
         <ECProperty propertyName="Description" typeName="string" description="Description of the MaterialProfile." />
         <ECProperty propertyName="Category" typeName="MaterialProfileCategoryType" description="Role of the MaterialProfile." />
-        <ECNavigationProperty propertyName="Material" relationshipName="MaterialProfileDefinitionRefersToPhysicalMaterial" direction="Forward" description="Referenced PhysicalMaterial." />
+        <ECNavigationProperty propertyName="Material" relationshipName="MaterialProfileRefersToMaterial" direction="Forward" description="Referenced PhysicalMaterial." />
     </ECEntityClass>
 
     <ECEnumeration typeName="MaterialProfileCategoryType" backingTypeName="int" isStrict="true" displayLabel="Material Profile Category Type" description="Role of the MaterialProfile.">
@@ -838,24 +838,9 @@
         <ECNavigationProperty propertyName="Profile" relationshipName="MaterialProfileRefersToProfile" direction="Forward" description="Referenced Profile." />
     </ECEntityClass>
 
-    <ECRelationshipClass typeName="MaterialProfileDefinitionRefersToPhysicalMaterial" strength="referencing" strengthDirection="Forward" modifier="None">
-        <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="true">
-            <Class class="MaterialProfileDefinition" />
-        </Source>
-        <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="true">
-            <Class class="bis:PhysicalMaterial"/>
-        </Target>
-    </ECRelationshipClass>
-
     <ECRelationshipClass typeName="MaterialProfileRefersToMaterial" strength="referencing" strengthDirection="Forward" modifier="Sealed">
-        <ECCustomAttributes>
-            <Deprecated xmlns="CoreCustomAttributes.1.0.3">
-                <Description>MaterialProfileDefinitionRefersToPhysicalMaterial should be used instead.</Description>
-            </Deprecated>
-        </ECCustomAttributes>
-        <BaseClass>MaterialProfileDefinitionRefersToPhysicalMaterial</BaseClass>
         <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="false">
-            <Class class="MaterialProfile" />
+            <Class class="MaterialProfileDefinition" />
         </Source>
         <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="true">
             <Class class="bis:PhysicalMaterial"/>
