@@ -18,6 +18,7 @@
     </ECCustomAttributes>
 
     <ECEntityClass typeName="DistributionSystem" modifier="none" displayLabel="Distribution System" description="A network designed to receive, store, maintain, distribute, or control the flow of a distribution media.">
+        <!-- Note: Should be considered abstract, but is concrete for legacy/compatibility reasons. -->
         <BaseClass>bis:PhysicalSystem</BaseClass>
     </ECEntityClass>
 
@@ -67,6 +68,25 @@
         </ECCustomAttributes>
     </ECEntityClass>
 
+    <ECEntityClass typeName="IDistributionElementType" modifier="Abstract" displayLabel="Distribution Element Type" description="An interface that can be mixed-into a bis:PhysicalType that defines a shared set of properties whose values vary per-type of IDistributionElement rather than per-instance.">
+        <ECCustomAttributes>
+            <IsMixin xmlns="CoreCustomAttributes.01.00.03">
+                <AppliesToEntityClass>bis:PhysicalType</AppliesToEntityClass>
+            </IsMixin>
+        </ECCustomAttributes>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="DistributionElementTypeUsesPortTypes" strength="referencing" modifier="Abstract" description="Relationship that associates an IDistributionElementType with the DistributionPortTypes it uses.">
+        <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <Source multiplicity="(0..*)" polymorphic="true" roleLabel="uses">
+            <Class class="IDistributionElementType"/>
+        </Source>
+        <Target multiplicity="(0..*)" polymorphic="true" roleLabel="is used by">
+            <Class class="DistributionPortType"/>
+        </Target>
+        <ECProperty propertyName="PortCount" typeName="int" displayLabel="Port Count" description="Port-instance count of the referenced DistributionPortType used by the IDistributionElementType."/>
+    </ECRelationshipClass>
+
     <ECEnumeration typeName="PortDirection" backingTypeName="int" isStrict="true">
         <ECEnumerator name="Undefined" value="0" displayLabel="Undefined"/>
         <ECEnumerator name="Input" value="1" displayLabel="Input"/>
@@ -101,7 +121,7 @@
         </ECProperty>
     </ECEntityClass>
     
-    <ECRelationshipClass typeName="DistributionElementOwnsDistributionPorts" strength="embedding" modifier="None" description="A relationship that relates child distribution ports to parent distribution element.">
+    <ECRelationshipClass typeName="DistributionElementOwnsDistributionPorts" strength="embedding" modifier="Abstract" description="A relationship that relates child distribution ports to parent distribution element.">
         <BaseClass>bis:ElementOwnsChildElements</BaseClass>
         <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
             <Class class="IDistributionElement"/>
@@ -110,6 +130,10 @@
             <Class class="DistributionPort"/>
         </Target>
     </ECRelationshipClass>
+
+    <ECEntityClass typeName="DistributionPortType" modifier="Abstract" displayLabel="Distribution Port Type" description="Defines a shared set of properties whose values vary per-type of IDistributionElement rather than per-instance.">
+        <BaseClass>bis:SpatialLocationType</BaseClass>
+    </ECEntityClass>
 
     <ECEntityClass typeName="PortConnection" modifier="None" displayLabel="Port Connection" description="An element that indicates a connection between 2 distribution ports.">
         <BaseClass>bis:InformationRecordElement</BaseClass>

@@ -9,9 +9,9 @@ This schema contains classes that are used to provide *context* terrains. Cuts, 
 
 See the `ITerrain` documentation for details on how terrain is defined in iModels.
 
-## Entity Classes
-
 ![Terrain](./media/Terrain-classes.png)
+
+## Entity Classes
 
 ### ITerrain
 
