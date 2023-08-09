@@ -42,7 +42,7 @@ async function validateIModelSchemas() {
   const output = getOutputPath();  
   let ignoreList = JSON.parse(fs.readFileSync(ignoreFile).toString());
   Logger.initializeToConsole();
-  Logger.setLevelDefault(LogLevel.Error);
+  Logger.setLevelDefault(LogLevel.Info);
 
   if (argv.multiSchema) {
     await validateMultiSchema(output, argv.multiSchema);
@@ -498,8 +498,10 @@ async function importAndExportSchemaToIModel(schemaName, previousSchema, release
 
   let err = "";
   try{
+    console.log("**** Before Import Schemas");
     await imodel.importSchemas(schemaPaths);
     imodel.saveChanges();
+    console.log("**** After Import Schemas");
     imodel.nativeDb.exportSchemas(exportDir);
   } catch (error) {
     err = error;
