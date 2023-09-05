@@ -493,39 +493,6 @@
         </Target>
     </ECRelationshipClass>
 
-    <!-- <ECEntityClass typeName="LogicalPathReleaseAspect" modifier="Sealed" displayLabel="Logical Path Release" description="Path Release of a Member." >
-        <BaseClass>PathReleaseAspect</BaseClass>
-        <ECProperty propertyName="TranslationalRAxis" typeName="ReleaseType" displayLabel="Translational R Axis" description="Release for Translational R Axis." />
-        <ECProperty propertyName="TranslationalSAxis" typeName="ReleaseType" displayLabel="Translational S Axis" description="Release for Translational S Axis." />
-        <ECProperty propertyName="TranslationalTAxis" typeName="ReleaseType" displayLabel="Translational T Axis" description="Release for Translational T Axis." />
-        <ECProperty propertyName="RotationalRAxis" typeName="ReleaseType" displayLabel="Rotational R Axis" description="Release for Rotational R Axis." />
-    </ECEntityClass>
-
-    <ECRelationshipClass typeName="PathReleaseAspectRefersToPath" strength="referencing" modifier="Sealed">
-        <Source multiplicity="(0..*)" roleLabel="references" polymorphic="false">
-            <Class class="PathReleaseAspect" />
-        </Source>
-        <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="true">
-            <Class class="Path" />
-        </Target>
-    </ECRelationshipClass>
-
-    <ECEntityClass typeName="LogicalSheetReleaseAspect" modifier="Sealed" displayLabel="Logical Sheet Release" description="Sheet Release of a Member." >
-        <BaseClass>SheetReleaseAspect</BaseClass>
-        <ECProperty propertyName="TranslationalRAxis" typeName="ReleaseType" displayLabel="Translational R Axis" description="Release for Translational R Axis." />
-        <ECProperty propertyName="TranslationalSAxis" typeName="ReleaseType" displayLabel="Translational S Axis" description="Release for Translational S Axis." />
-        <ECProperty propertyName="TranslationalTAxis" typeName="ReleaseType" displayLabel="Translational T Axis" description="Release for Translational T Axis." />
-    </ECEntityClass>
-
-    <ECRelationshipClass typeName="SheetReleaseAspectRefersToSheet" strength="referencing" modifier="Sealed">
-        <Source multiplicity="(0..*)" roleLabel="references" polymorphic="false">
-            <Class class="SheetReleaseAspect" />
-        </Source>
-        <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="false">
-            <Class class="Sheet" />
-        </Target>
-    </ECRelationshipClass> -->
-
     <ECRelationshipClass typeName="MemberOwnsVertexReleaseAspects" strength="embedding" modifier="Sealed">
         <BaseClass>bis:ElementOwnsMultiAspects</BaseClass>
         <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
@@ -535,36 +502,6 @@
             <Class class="VertexReleaseAspect" />
         </Target>
     </ECRelationshipClass>
-
-    <!-- <ECRelationshipClass typeName="CurveMemberOwnsLogicalPathReleaseAspects" strength="embedding" modifier="Sealed">
-        <BaseClass>bis:ElementOwnsMultiAspects</BaseClass>
-        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
-            <Class class="CurveMember"/>
-        </Source>
-        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
-            <Class class="LogicalPathReleaseAspect" />
-        </Target>
-    </ECRelationshipClass> -->
-
-    <!-- <ECRelationshipClass typeName="SurfaceMemberOwnsLogicalPathReleaseAspects" strength="embedding" modifier="Sealed">
-        <BaseClass>bis:ElementOwnsMultiAspects</BaseClass>
-        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
-            <Class class="SurfaceMember"/>
-        </Source>
-        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="false">
-            <Class class="LogicalPathReleaseAspect" />
-        </Target>
-    </ECRelationshipClass>
-
-    <ECRelationshipClass typeName="SurfaceMemberOwnsLogicalSheetReleaseAspects" strength="embedding" modifier="Sealed">
-        <BaseClass>bis:ElementOwnsMultiAspects</BaseClass>
-        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
-            <Class class="SurfaceMember"/>
-        </Source>
-        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
-            <Class class="LogicalSheetReleaseAspect" />
-        </Target>
-    </ECRelationshipClass> -->
 
     <!-- Member classes -->
 
@@ -649,6 +586,7 @@
         </ECCustomAttributes>
         <ECProperty propertyName="PlacementSurface" typeName="PlacementSurface" displayLabel="Placement Surface" description="Sheet defines area location for IStructuralSurface, the height of IStructuralSurface is defined by thickness(provided by related SurfaceType) which extrudes location area by that thickness. PlacementSurface allows to define how location area should be interpreted for extrusion - ether as start, end or center. These are the most common used cases. More flexibility is achieved by using Offset property." />
         <ECProperty propertyName="Offset" typeName="double" displayLabel="Offset" description="PlacementSurface provides only a few cases for how to interpret the location area (Sheet). Offset provides more flexibility for less common cases, where it provides additional offset along the normal of IStructuralSurface. Both PlacementSurface and Offset properties can be used at the same time." kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="LayoutDirection" typeName="Point3d" displayLabel="Layout Direction" description="Used to define direction for how to place Steel Deck profiles" />
     </ECEntityClass>
 
     <ECRelationshipClass typeName="IStructuralSurfaceRefersToSurfaceType" strength="referencing" modifier="Sealed">
@@ -665,12 +603,6 @@
         <BaseClass>anlyt:AnalyticalType</BaseClass>
     </ECEntityClass>
 
-    <ECEntityClass typeName="SimpleSurfaceType" modifier="Sealed" description="Simple Surface Type.">
-        <BaseClass>SurfaceType</BaseClass>
-        <ECProperty propertyName="Thickness" typeName="double" description="Thickness of IStructuralSurfaces." kindOfQuantity="AECU:LENGTH_SHORT" />
-        <ECNavigationProperty propertyName="Material" relationshipName="SimpleSurfaceTypeRefersToMaterial" direction="Forward" displayLabel="Material" description="Material of all IStructuralSurfaces with this type." />
-    </ECEntityClass>
-
     <ECRelationshipClass typeName="SimpleSurfaceTypeRefersToMaterial" strength="referencing" strengthDirection="Forward" modifier="Sealed">
         <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="true">
             <Class class="SimpleSurfaceType" />
@@ -679,6 +611,63 @@
             <Class class="bis:PhysicalMaterial"/>
         </Target>
     </ECRelationshipClass>
+
+    <ECEntityClass typeName="SimpleSurfaceType" modifier="Sealed" displayLabel="Simple Surface Type" description="Simple Surface Type.">
+        <BaseClass>SurfaceType</BaseClass>
+        <ECProperty propertyName="Thickness" typeName="double" description="Thickness of IStructuralSurfaces." kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECNavigationProperty propertyName="Material" relationshipName="SimpleSurfaceTypeRefersToMaterial" direction="Forward" displayLabel="Material" description="Material of all IStructuralSurfaces with this type." />
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="SteelDeckTypeRefersToProfile" strength="referencing" strengthDirection="Forward" modifier="Sealed">
+        <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="false">
+            <Class class="SteelDeckType" />
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="true">
+            <Class class="prf:Profile"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="SurfaceTypeRefersToPhysicalMaterial" strength="referencing" strengthDirection="Forward" modifier="Sealed">
+        <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="true">
+            <Class class="SurfaceType" />
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="true">
+            <Class class="bis:PhysicalMaterial"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="SteelDeckType" modifier="Sealed" displayLabel="Steel Deck Type" description="Steel Deck Type.">
+        <BaseClass>SurfaceType</BaseClass>
+        <ECNavigationProperty propertyName="Profile" typeName="SteelDeckTypeRefersToProfile" displayLabel="Profile" />
+        <ECNavigationProperty propertyName="Material" typeName="SurfaceTypeRefersToPhysicalMaterial" displayLabel="Material" />
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="CompositeDeckTypeRefersToSteelDeckType" strength="referencing" strengthDirection="Forward" modifier="Sealed">
+        <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="false">
+            <Class class="CompositeDeckType" />
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="false">
+            <Class class="bis:SteelDeckType"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="CompositeDeckType" modifier="Sealed" displayLabel="Composite Deck Type" description="Composite Deck Type.">
+        <BaseClass>SurfaceType</BaseClass>
+        <ECNavigationProperty propertyName="FillingMaterial" typeName="SurfaceTypeRefersToPhysicalMaterial" displayLabel="Filling Material" />
+        <ECProperty propertyName="Thickness" typeName="double" displayLabel="Thickness" />
+        <ECNavigationProperty propertyName="SteelDeck" typeName="CompositeDeckTypeRefersToSteelDeckType" displayLabel="Steel Deck" />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="TaperedSurfaceType" modifier="Sealed" displayLabel="Tapered Surface Type" >
+        <BaseClass>SurfaceType</BaseClass>
+        <ECNavigationProperty propertyName="Material" typeName="SurfaceTypeRefersToPhysicalMaterial" displayLabel="Material" />
+        <ECProperty propertyName="Location1" typeName="Point3d" displayLabel="Location 1" />
+        <ECProperty propertyName="Location2" typeName="Point3d" displayLabel="Location 2" />
+        <ECProperty propertyName="Location3" typeName="Point3d" displayLabel="Location 3" />
+        <ECProperty propertyName="Thickness 1" typeName="double" displayLabel="Thickness  1" />
+        <ECProperty propertyName="Thickness 2" typeName="double" displayLabel="Thickness  2" />
+        <ECProperty propertyName="Thickness 3" typeName="double" displayLabel="Thickness  3" />
+    </ECEntityClass>
 
     <ECEntityClass typeName="SurfaceMember" modifier="Sealed" displayLabel="Surface Member" description="Defines a Member that is located by a Sheet.">
         <BaseClass>Member</BaseClass>
@@ -818,6 +807,11 @@
             <Class class="MaterialProfile" />
         </Target>
     </ECRelationshipClass>
+
+    <ECEntityClass typeName="SteelJoistType" modifier="Sealed" displayLabel="Steel Joist Type">
+        <BaseClass>CurveMemberType</BaseClass>
+        <ECProperty propertyName="Depth" typeName="double" displayLabel="Depth" />
+    </ECEntityClass>
 
     <ECEntityClass typeName="MaterialProfileDefinition" modifier="abstract" displayLabel="Material Profile Definition" description="Base class defining an element that pairs Profiles and PhysicalMaterials.">
         <BaseClass>bis:DefinitionElement</BaseClass>
