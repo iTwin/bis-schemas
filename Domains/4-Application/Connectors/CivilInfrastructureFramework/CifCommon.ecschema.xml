@@ -58,6 +58,12 @@
         <ECEnumerator name="Reverse_Biquadratic" value="7" displayLabel="Reverse Biquadratic"/>
         <ECEnumerator name="Reverse_Cubic" value="8" displayLabel="Reverse Cubic"/>
     </ECEnumeration>
+    <ECEnumeration typeName="DTMEntityAspect_VolumeOption_Enum" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="Design" value="2" displayLabel="Design"/>
+        <ECEnumerator name="Existing" value="1" displayLabel="Existing"/>
+        <ECEnumerator name="None" value="0" displayLabel="None"/>
+        <ECEnumerator name="Subgrade" value="4" displayLabel="Subgrade"/>
+    </ECEnumeration>
     <ECEnumeration typeName="DTMEntityBySelectedElementsSourceProviderAspect_FeatureType_Enum" backingTypeName="int" isStrict="true">
         <ECEnumerator name="Break_Line" value="1" displayLabel="Break Line"/>
         <ECEnumerator name="Contour" value="4" displayLabel="Contour"/>
@@ -365,6 +371,12 @@
         <ECProperty propertyName="ReferenceArcLength2Entry" typeName="double" displayLabel="Arc Length 2" category="DistanceAlongSlopeEntityProperties_Distance_Along_Slope_Entity" priority="299985" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="SlopeStyle" typeName="DistanceAlongSlopeEntityAspect_SlopeStyle_Enum" displayLabel="Slope Style" category="DistanceAlongSlopeEntityProperties_Distance_Along_Slope_Entity" priority="299997"/>
     </ECEntityClass>
+    <ECEntityClass typeName="DTMEntityAspect" displayLabel="Terrain Model">
+        <BaseClass>CivilPresentation</BaseClass>
+        <ECProperty propertyName="VolumeOption" typeName="DTMEntityAspect_VolumeOption_Enum" displayLabel="Volume Option" category="MeshSurfaceEntity_Component_Layer" priority="299925"/>
+        <ECProperty propertyName="TerrainSurfaceEntity_SlopedArea" typeName="double" displayLabel="Top Sloped Area" category="MeshQuantities_Civil_Quantities" priority="299920" kindOfQuantity="cifu:AREA"/>
+        <ECProperty propertyName="TerrainSurfaceEntity_PlanarArea" typeName="double" displayLabel="Planar Area" category="MeshQuantities_Civil_Quantities" priority="299910" kindOfQuantity="cifu:AREA"/>
+    </ECEntityClass>
     <ECEntityClass typeName="DTMEntityBySelectedElementsSourceProviderAspect">
         <BaseClass>CivilPresentation</BaseClass>
         <ECProperty propertyName="FeatureType" typeName="DTMEntityBySelectedElementsSourceProviderAspect_FeatureType_Enum" displayLabel="FeatureType" category="TerrainModelBySelectedElementAttributes_Create_from_Elements_UnLinked" priority="300000"/>
@@ -492,6 +504,15 @@
         </Source>
         <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
             <Class class="DistanceAlongSlopeEntityAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="ElementOwnsDTMEntityAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="DTMEntityAspect"/>
         </Target>
     </ECRelationshipClass>
     <ECRelationshipClass typeName="ElementOwnsDTMEntityBySelectedElementsSourceProviderAspect" modifier="None" strength="embedding">
