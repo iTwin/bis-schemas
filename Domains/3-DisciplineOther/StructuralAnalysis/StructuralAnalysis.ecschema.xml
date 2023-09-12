@@ -627,9 +627,9 @@
         </Target>
     </ECRelationshipClass>
 
-    <ECRelationshipClass typeName="SurfaceTypeRefersToPhysicalMaterial" strength="referencing" strengthDirection="Forward" modifier="Sealed">
+    <ECRelationshipClass typeName="SteelDeckTypeRefersToPhysicalMaterial" strength="referencing" strengthDirection="Forward" modifier="Sealed">
         <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="true">
-            <Class class="SurfaceType" />
+            <Class class="SteelDeckType" />
         </Source>
         <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="true">
             <Class class="bis:PhysicalMaterial"/>
@@ -638,8 +638,8 @@
 
     <ECEntityClass typeName="SteelDeckType" modifier="Sealed" displayLabel="Steel Deck Type" description="Steel Deck Type.">
         <BaseClass>SurfaceType</BaseClass>
-        <ECNavigationProperty propertyName="Profile" typeName="SteelDeckTypeRefersToProfile" displayLabel="Profile" />
-        <ECNavigationProperty propertyName="Material" typeName="SurfaceTypeRefersToPhysicalMaterial" displayLabel="Material" />
+        <ECNavigationProperty propertyName="Profile" relationshipName="SteelDeckTypeRefersToProfile" direction="Forward" displayLabel="Profile" />
+        <ECNavigationProperty propertyName="Material" relationshipName="SteelDeckTypeRefersToPhysicalMaterial" direction="Forward" displayLabel="Material" />
     </ECEntityClass>
 
     <ECRelationshipClass typeName="CompositeDeckTypeRefersToSteelDeckType" strength="referencing" strengthDirection="Forward" modifier="Sealed">
@@ -647,26 +647,44 @@
             <Class class="CompositeDeckType" />
         </Source>
         <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="false">
-            <Class class="bis:SteelDeckType"/>
+            <Class class="SteelDeckType"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="CompositeDeckTypeRefersToPhysicalMaterial" strength="referencing" strengthDirection="Forward" modifier="Sealed">
+        <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="true">
+            <Class class="CompositeDeckType" />
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="true">
+            <Class class="bis:PhysicalMaterial"/>
         </Target>
     </ECRelationshipClass>
 
     <ECEntityClass typeName="CompositeDeckType" modifier="Sealed" displayLabel="Composite Deck Type" description="Composite Deck Type.">
         <BaseClass>SurfaceType</BaseClass>
-        <ECNavigationProperty propertyName="FillingMaterial" typeName="SurfaceTypeRefersToPhysicalMaterial" displayLabel="Filling Material" />
+        <ECNavigationProperty propertyName="FillingMaterial" relationshipName="CompositeDeckTypeRefersToPhysicalMaterial" direction="Forward" displayLabel="Filling Material" />
         <ECProperty propertyName="Thickness" typeName="double" displayLabel="Thickness" />
-        <ECNavigationProperty propertyName="SteelDeck" typeName="CompositeDeckTypeRefersToSteelDeckType" displayLabel="Steel Deck" />
+        <ECNavigationProperty propertyName="SteelDeck" relationshipName="CompositeDeckTypeRefersToSteelDeckType" direction="Forward" displayLabel="Steel Deck" />
     </ECEntityClass>
+
+    <ECRelationshipClass typeName="TaperedSurfaceTypeRefersToPhysicalMaterial" strength="referencing" strengthDirection="Forward" modifier="Sealed">
+        <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="true">
+            <Class class="TaperedSurfaceType" />
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="true">
+            <Class class="bis:PhysicalMaterial"/>
+        </Target>
+    </ECRelationshipClass>
 
     <ECEntityClass typeName="TaperedSurfaceType" modifier="Sealed" displayLabel="Tapered Surface Type" >
         <BaseClass>SurfaceType</BaseClass>
-        <ECNavigationProperty propertyName="Material" typeName="SurfaceTypeRefersToPhysicalMaterial" displayLabel="Material" />
+        <ECNavigationProperty propertyName="Material" relationshipName="TaperedSurfaceTypeRefersToPhysicalMaterial" direction="Forward" displayLabel="Material" />
         <ECProperty propertyName="Location1" typeName="Point3d" displayLabel="Location 1" />
         <ECProperty propertyName="Location2" typeName="Point3d" displayLabel="Location 2" />
         <ECProperty propertyName="Location3" typeName="Point3d" displayLabel="Location 3" />
-        <ECProperty propertyName="Thickness 1" typeName="double" displayLabel="Thickness  1" />
-        <ECProperty propertyName="Thickness 2" typeName="double" displayLabel="Thickness  2" />
-        <ECProperty propertyName="Thickness 3" typeName="double" displayLabel="Thickness  3" />
+        <ECProperty propertyName="Thickness1" typeName="double" displayLabel="Thickness  1" />
+        <ECProperty propertyName="Thickness2" typeName="double" displayLabel="Thickness  2" />
+        <ECProperty propertyName="Thickness3" typeName="double" displayLabel="Thickness  3" />
     </ECEntityClass>
 
     <ECEntityClass typeName="SurfaceMember" modifier="Sealed" displayLabel="Surface Member" description="Defines a Member that is located by a Sheet.">
