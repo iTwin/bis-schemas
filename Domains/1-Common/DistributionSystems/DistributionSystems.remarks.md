@@ -40,11 +40,11 @@ It defines occurence of any HVAC, electrical, sanitary or other element within a
 
 Equivalent to [IfcDistributionElement](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcDistributionElement.htm).
 
-The distribution element should be assigned to the finest granularity [SpatialStructureElement](./SpatialComposition.remarks.md#SpatialStructureElement) element it is fully contained in.
+The distribution element should be assigned to the finest granularity `SpatialComposition.SpatialStructureElement` element it is fully contained in.
 
-- [Space](./BuildingSpatial.remarks.md#Space) is the default container for a distributionElement
-- [Story](./BuildingSpatial.remarks.md#Story) is the container if distribution element spans multiple spaces
-- [Building](./BuildingSpatial.remarks.md#Building) is the default container when a distribution element spans multiple stories.
+- `BuildingSpatial.Space` is the default container for a distributionElement
+- `BuildingSpatial.Story` is the container if distribution element spans multiple spaces
+- `BuildingSpatial.Building` is the default container when a distribution element spans multiple stories.
 
 ### IDistributionFlowElement
 
