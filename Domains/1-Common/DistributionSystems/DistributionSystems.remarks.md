@@ -27,7 +27,7 @@ Equivalent to [IfcDistributionSystem](https://standards.buildingsmart.org/IFC/RE
 
 ### IDistributionElement
 
-`IDistributionElement`` is a generalization of all elements that participate in a distribution system. Typical examples of IDistributionElement are (among others):
+`IDistributionElement` is a generalization of all elements that participate in a distribution system. Typical examples of IDistributionElement are (among others):
 
 - elements within heating systems
 - elements within cooling systems
