@@ -2,41 +2,41 @@
 remarksTarget: Profiles.ecschema.md
 ---
 
-# **Profiles**
+# Profiles
 
 Profiles schema defines classes that represent two dimensional cross sections, used to define geometric shapes. Profiles may be used to extrude structural components like beams and columns.
 
 Most often used Profiles are standard and defined by a specific [Standards Organization](#standardsorganization). Standard Profiles are always shared. Standard profiles should only be deleted in case a mistake was made when creating standard Profile.
 
-## **Entity Classes**
+## Entity Classes
 
-### **Profile**
+### Profile
 
 Base class of all profile definitions.
 Profile may be a [SinglePerimeterProfile](#singleperimeterprofile) or [CompositeProfile](#compositeprofile).
 
-### **StandardsOrganization**
+### StandardsOrganization
 
 Defines standard [Profiles](#profile). This should always be sub-modeled by a model which stores all manufacturers that produce the actual structural members defined by profile rules of standard organization.
 
-### **Manufacturer**
+### Manufacturer
 
 Produces structural members defined by a standard [Profile]. Manufacturer is always stored in a model that models [standards organization](#standardsorganization) whichs' rules are used to define profiles. Manufacturer is always sub-modeled and it's model contains revisions for profiles.
 
-### **Revision**
+### Revision
 
 Stores standard [profiles](#profile) that are used to produce structural members by some specific [manufacturer](#manufacturer).
 
-### **SinglePerimeterProfile**
+### SinglePerimeterProfile
 
 This profile subclass is used to denote a [Profile](#profile) that is composed out of a single perimeter (area). SinglePerimeterProfiles can be referenced by [CompositeProfile](#compositeprofile) to form a [Profile](#profile) with multiple disjoint areas.
 
-### **ParametricProfile**
+### ParametricProfile
 
 [Profile](#profile) whose geometry is defined by a set of properties such as ``Width``, ``Depth``, ``Thickness`` etc.
 In addition, such Profiles have a bounding box which is centered at the center of the coordinate system i.e. (x: 0, y: 0).
 
-### **CShapeProfile**
+### CShapeProfile
 **Derivative properties:**
 - `FlangeInnerEdgeLength` = `FlangeWidth` - `WebThickness`
 - `FlangeSlopeHeight` = `FlangeInnerEdgeLength` * Tan(`FlangeSlope`)
@@ -67,7 +67,7 @@ In addition, such Profiles have a bounding box which is centered at the center o
 ![CShape (only mandatory properties)](media/ProfilePictures/CShape1.png)
 ![CShape (all properties)](media/ProfilePictures/CShape2.png)
 
-### **AsymmetricIShapeProfile**
+### AsymmetricIShapeProfile
 **Derivative properties:**
 - `WebEdgeLength` = `Depth` - `TopFlangeThickness` - `BottomFlangeThickness`
 - `TopFlangeInnerEdgeLength` = (`TopFlangeWidth` - `WebThickness`) / 2
@@ -117,7 +117,7 @@ In addition, such Profiles have a bounding box which is centered at the center o
 ![AsymmetricIShape (only mandatory properties)](media/ProfilePictures/AsymmetricIShape1.png)
 ![AsymmetricIShape (all properties)](media/ProfilePictures/AsymmetricIShape2.png)
 
-### **IShapeProfile**
+### IShapeProfile
 **Derivative properties:**
 - `FlangeInnerEdgeLength` = (`FlangeWidth` - `WebThickness`) / 2
 - `FlangeSlopeHeight` = `FlangeInnerEdgeLength` * Tan(`FlangeSlope`)
@@ -148,7 +148,7 @@ In addition, such Profiles have a bounding box which is centered at the center o
 ![IShape (only mandatory properties)](media/ProfilePictures/IShape1.png)
 ![IShape (all properties)](media/ProfilePictures/IShape2.png)
 
-### **TShapeProfile**
+### TShapeProfile
 **Derivative properties:**
 - `FlangeInnerEdgeLength` = (`FlangeWidth` - `WebThickness`) / 2
 - `FlangeSlopeHeight` = `FlangeInnerEdgeLength` * Tan(`FlangeSlope`)
@@ -188,7 +188,7 @@ In addition, such Profiles have a bounding box which is centered at the center o
 ![TShape (only mandatory properties)](media/ProfilePictures/TShape1.png)
 ![TShape (all properties)](media/ProfilePictures/TShape2.png)
 
-### **LShapeProfile**
+### LShapeProfile
 **Derivative properties:**
 - `HorizontalLegInnerEdgeLength` = `Width` - `Thickness`
 - `HorizontalLegSlopeHeight` = `HorizontalLegInnerEdgeLength` * Tan(`LegSlope`)
@@ -220,7 +220,7 @@ In addition, such Profiles have a bounding box which is centered at the center o
 ![LShape (only mandatory properties)](media/ProfilePictures/LShape1.png)
 ![LShape (all properties)](media/ProfilePictures/LShape2.png)
 
-### **TTShapeProfile**
+### TTShapeProfile
 **Derivative properties:**
 - `FlangeInnerFaceLength` = (`FlangeWidth` - 2 * `WebThickness` - `WebSpacing`) / 2
 - `FlangeSlopeHeight` = `FlangeInnerFaceLength` * Tan(`FlangeSlope`)
@@ -266,7 +266,7 @@ In addition, such Profiles have a bounding box which is centered at the center o
 ![TTShape (only mandatory properties)](media/ProfilePictures/TTShape1.png)
 ![TTShape (all properties)](media/ProfilePictures/TTShape2.png)
 
-### **SchifflerizedLShapeProfile**
+### SchifflerizedLShapeProfile
 **Constraints:**
 - `LegLength` must be greater than zero
 - `Thickness`
@@ -286,7 +286,7 @@ In addition, such Profiles have a bounding box which is centered at the center o
 ![Schifflerized (only mandatory properties)](media/ProfilePictures/Schifflerized1.png)
 ![Schifflerized (all properties)](media/ProfilePictures/Schifflerized2.png)
 
-### **ZShapeProfile**
+### ZShapeProfile
 **Derivative properties:**
 - `FlangeInnerEdgeLength` = (`FlangeWidth` - `WebThickness`) / 2
 - `FlangeSlopeHeight` = `FlangeInnerEdgeLength` * Tan(`FlangeSlope`)
@@ -317,12 +317,12 @@ In addition, such Profiles have a bounding box which is centered at the center o
 ![ZShape (only mandatory properties)](media/ProfilePictures/ZShape2.png)
 ![ZShape (all properties)](media/ProfilePictures/ZShape1.png)
 
-### **DerivedProfile**
+### DerivedProfile
 [SinglePerimeterProfile](#singleperimeterprofile) that is based on another [SinglePerimeterProfile](#singleperimeterprofile) with applied standard transformations (scale, rotation, translation, mirror). This [Profile](#profile) is defined for compatibility reasons with [IFC](#https://standards.buildingsmart.org/IFC/RELEASE/IFC4/FINAL/HTML/) and its **usage is not recommended**.
 
 Note that deletion of the referenced [SinglePerimeterProfile](#singleperimeterprofile) is prohibited if there are [DerivedProfiles](#derivedprofile) that reference it.
 
-### **CenterLineCShapeProfile**
+### CenterLineCShapeProfile
 **Constraints:**
 - `FlangeWidth` must be greater than zero
 - `Depth` must be greater than zero
@@ -341,7 +341,7 @@ Note that deletion of the referenced [SinglePerimeterProfile](#singleperimeterpr
 ![CenterLineCShape (only mandatory properties)](media/ProfilePictures/CenterCShape1.png)
 ![CenterLineCShape (all properties)](media/ProfilePictures/CenterCShape2.png)
 
-### **CenterLineLShapeProfile**
+### CenterLineLShapeProfile
 **Constraints:**
 - `Width` must be greater than zero
 - `Depth` must be greater than zero
@@ -360,7 +360,7 @@ Note that deletion of the referenced [SinglePerimeterProfile](#singleperimeterpr
 ![CenterLineLShape (only mandatory properties)](media/ProfilePictures/CenterLShape1.png)
 ![CenterLineLShape (all properties)](media/ProfilePictures/CenterLShape2.png)
 
-### **CenterLineZShapeProfile**
+### CenterLineZShapeProfile
 **Constraints:**
 - `FlangeWidth` must be greater than zero
 - `Depth` must be greater than zero
@@ -382,7 +382,7 @@ Note that deletion of the referenced [SinglePerimeterProfile](#singleperimeterpr
 ![CenterLineZShape (only mandatory properties)](media/ProfilePictures/CenterZShape1.png)
 ![CenterLineZShape (all properties)](media/ProfilePictures/CenterZShape2.png)
 
-### **BentPlateProfile**
+### BentPlateProfile
 **Derivative properties:**
 - `MaximumWallThickness` = Min(`Width` - `BendOffset`, `BendOffset`) * Tan(`BendAngle` / 2) * 2
 
@@ -403,11 +403,11 @@ Note that deletion of the referenced [SinglePerimeterProfile](#singleperimeterpr
 
 ![BentPlate](media/ProfilePictures/BentPlate.png)
 
-### **CompositeProfile**
+### CompositeProfile
 
 Abstract [Profile](#profile) class that is comprised of multiple [SinglePerimeterProfiles](#singleperimeterprofile). See [ArbitraryCompositeProfile](#arbitrarycompositeprofile), [DoubleLShapeProfile](#doublelshapeprofile) and [DoubleCShapeProfile](#doublecshapeprofile) for instantiable composite [Profiles](#profile).
 
-### **ArbitraryCompositeProfile**
+### ArbitraryCompositeProfile
 Instantiable [CompositeProfile](#compositeprofile) that is used to define an arbitrary [Profile](#profile) with multiple areas.
 
 This Profile is constructed by inserting [ArbitraryCompositeProfileAspects](#arbitrarycompositeprofileaspects) that reference and transform [SinglePerimeterProfiles](#singleperimeterprofile). [ArbitraryCompositeProfile](#arbitrarycompositeprofile) can reference the same [SinglePerimeterProfile](#singleperimeterprofile) multiple times, but apply different transformations.
@@ -418,13 +418,13 @@ This Profile is constructed by inserting [ArbitraryCompositeProfileAspects](#arb
   - [RectangleProfile](#rectangleprofile) - referenced twice with different `Offset`.
   - ![ArbitraryComposite (cross)](media/ProfilePictures/ArbitraryComposite1.png)
 
-### **ArbitraryCompositeProfileAspect**
+### ArbitraryCompositeProfileAspect
 
 Aspect that is used by [ArbitraryCompositeProfile](#arbitrarycompositeprofile) to reference [SinglePerimeterProfile](#singleperimeterprofile) from which it is composed.
 
 This aspect also includes fields for transforming the referenced [SinglePerimeterProfile](#singleperimeterprofile) when creating the geometry of [ArbitraryCompositeProfile](#arbitrarycompositeprofile).
 
-### **DoubleLShapeProfile**
+### DoubleLShapeProfile
 
 Instantiable [CompositeProfile](#compositeprofile) that models a Double L shape profile where the single [LShapeProfiles](#lshapeprofile) are placed back to back with specified gap between them. This [Profile](#profile) references and requires a [LShapeProfile](#lshapeprofile) to exist in the iModel.
 
@@ -436,7 +436,7 @@ Note that deletion of the referenced [LShapeProfile](#lshapeprofile) is prohibit
 ![DoubleLShape (DoubleLLongLegs)](media/ProfilePictures/DoubleLLongLegs.png)
 ![DoubleLShape (DoubleLShortLegs)](media/ProfilePictures/DoubleLShortLegs.png)
 
-### **DoubleCShapeProfile**
+### DoubleCShapeProfile
 Instantiable [CompositeProfile](#compositeprofile) that models a Double C shape profile where the single [CShapeProfiles](#cshapeprofile) are placed back to back with specified gap between them. This [Profile](#profile) references and requires a [CShapeProfile](#cshapeprofile) to exist in the iModel.
 
 Note that deletion of the referenced [CShapeProfile](#cshapeprofile) is prohibited if there are [DoubleCShapeProfiles](#doublelshapeprofile) that reference it.
@@ -446,7 +446,7 @@ Note that deletion of the referenced [CShapeProfile](#cshapeprofile) is prohibit
 
 ![DoubleCShape (DoubleLShortLegs)](media/ProfilePictures/DoubleCShape.png)
 
-### **ArbitraryShapeProfile**
+### ArbitraryShapeProfile
 
 A [SinglePerimeterProfile](#singleperimeterprofile) whose geometry is defined by an arbitrary single perimeter. Geometry of [ArbitraryShapeProfile](#arbitraryshapeprofile) can have voids i.e. it
 can be formed using a [ParityRegion](https://www.itwinjs.org/reference/core-geometry/curve/parityregion/) (see example of a Profile with a void).
@@ -466,7 +466,7 @@ can be formed using a [ParityRegion](https://www.itwinjs.org/reference/core-geom
 ([LineString](https://www.itwinjs.org/reference/core-geometry/curve/linestring3d/)) and the `Shape` of an [IShapeProfile](#ishapeprofile).
   - ![ArbitraryShape (IShapeProfile encasing)](media/ProfilePictures/ArbitraryShape2.png)
 
-### **ArbitraryCenterLineProfile**
+### ArbitraryCenterLineProfile
 
 Extended [ArbitraryShapeProfile](#arbitraryshapeprofile) with an additional constraint that the defined single perimeter (area) must have a non self intersecting centerline. Geometry of such [Profile](#proflile) is created by applying a constant thickness to the centerline.
 
@@ -483,20 +483,20 @@ Extended [ArbitraryShapeProfile](#arbitraryshapeprofile) with an additional cons
   - must not self intersect
   - must be planar and lie on the XY plane
 
-### **EllipseProfile**
+### EllipseProfile
 **Constraints:**
 - `XRadius` must be greater tan zero
 - `YRadius` must be greater tan zero
 
 ![Ellipse](media/ProfilePictures/Ellipse.png)
 
-### **CircleProfile**
+### CircleProfile
 **Constraints:**
 - `Radius` must be greater tan zero
 
 ![Circle](media/ProfilePictures/Circle.png)
 
-### **HollowCircleProfile**
+### HollowCircleProfile
 **Constraints:**
 - `Radius` must be greater than zero
 - `WallThickness`
@@ -505,14 +505,14 @@ Extended [ArbitraryShapeProfile](#arbitraryshapeprofile) with an additional cons
 
 ![HollowCircle](media/ProfilePictures/HollowCircle.png)
 
-### **RectangleProfile**
+### RectangleProfile
 **Constraints:**
 - `Width` must be greater than zero
 - `Depth` must be greater than zero
 
 ![Rectangle](media/ProfilePictures/Rectangle.png)
 
-### **RoundedRectangleProfile**
+### RoundedRectangleProfile
 **Constraints:**
 - `Width` must be greater than zero
 - `Depth` must be greater than zero
@@ -523,7 +523,7 @@ Extended [ArbitraryShapeProfile](#arbitraryshapeprofile) with an additional cons
 
 ![RoundedRectangle](media/ProfilePictures/RoundedRectangle.png)
 
-### **HollowRectangleProfile**
+### HollowRectangleProfile
 **Constraints:**
 - `Width` must be greater than zero
 - `Depth` must be greater than zero
@@ -544,7 +544,7 @@ Extended [ArbitraryShapeProfile](#arbitraryshapeprofile) with an additional cons
 ![HollowRectangle (only mandatory properties)](media/ProfilePictures/HollowRectangle1.png)
 ![HollowRectangle (all properties)](media/ProfilePictures/HollowRectangle2.png)
 
-### **TrapezoidProfile**
+### TrapezoidProfile
 **Constraints:**
 - `TopWidth` must be greater than zero
 - `BottomWidth` must be greater than zero
@@ -552,29 +552,29 @@ Extended [ArbitraryShapeProfile](#arbitraryshapeprofile) with an additional cons
 
 ![Trapezoid](media/ProfilePictures/Trapezoid.png)
 
-### **RegularPolygonProfile**
+### RegularPolygonProfile
 **Constraints:**
 - `SideCount` must be greater or equal to `3` and less or equal to `32`
 - `SideLength` must be greater than zero
 
 ![RegularPolygon (all properties)](media/ProfilePictures/RegularPolygon.png)
 
-### **CapsuleProfile**
+### CapsuleProfile
 **Constraints:**
 - `Width` must be greater than zero
 - `Depth` must be greater than zero
 
 ![Capsule](media/ProfilePictures/Capsule.png)
 
-## **Mixin Classes**
+## Mixin Classes
 
-### **ICenterLineProfile**
+### ICenterLineProfile
 
 Mixin class used to define [Profiles](#profile) with a non self intersecting centerline and a constant thickness. These [Profiles](#profile) are often used to model cold-formed sections. See [CenterLineCShapeProfile](#centerlinecshapeprofile), [CenterLineLShapeProfile](#centerlinelshapeprofile), [CenterLineZShapeProfile](#centerlinezshapeprofile).
 
-## **Struct Classes**
+## Struct Classes
 
-### **CardinalPoint**
+### CardinalPoint
 
 All [Profiles](#profile) have an array of CardinalPoints containing 19 predefined standard cardinal points. In addition, users may define their own custom cardinal points and append them to the end of the array - in such case the name of the custom CardinalPoint must not clash with names of standard cardinal points.
 
@@ -599,13 +599,13 @@ Standard Cardinal points are:
 - **RightInLineWithShearCenter** - Most right point of the profiles geometry thats in-line with **ShearCenter**
 - **TopInLineWithShearCenter** - Most top point of the profiles geometry thats in-line with **ShearCenter**
 
-## **Enumerations**
+## Enumerations
 
-### **DoubleLShapeProfileType**
+### DoubleLShapeProfileType
 
 Enumeration used to specify how [DoubleLShapeProfiles](#doublelshapeprofile) geometry is created - which "legs" of the [LShapeProfile](#lshapeprofile) are placed back to back.
 
-## **Standard Profiles**
+## Standard Profiles
 
 Most often used Profiles are standard and defined in a catalog. This is defined by a Profile and Code hierarchy representing four components:
 

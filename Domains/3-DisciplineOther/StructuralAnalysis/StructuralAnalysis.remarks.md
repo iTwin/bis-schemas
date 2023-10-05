@@ -342,16 +342,28 @@ Multiple [CurveMember](#curvemember) properties might be grouped by a single ent
 
 Available CurveMemberTypes:
 
-- [SingleCurveMemberType](#singlecurvemembertype) - all CurveMembers have same Material and profile which are constant or change linearly along the length
-- [SegmentedCurveMemberType](#segmentedcurvemembertype) (future) - all CurveMembers are segmented, each segment might have different material and profiles
+- [SingleCurveMemberType](#singlecurvemembertype) - used to define CurveMember made of a single segment.
+- [CompositeCurveMemberType](#compositecurvemembertype) (future) - used to define curve members with composite materials.
 
 ### SingleCurveMemberType
 
-[CurveMemberType](#curvemembertype) which defines a type where all [CurveMembers](#curvemember) are not segmented. Structural properties for a CurveMember change linearly or do not change at all.
+A [CurveMemberType](#curvemembertype) which defines a type where all [CurveMembers](#curvemember) are not segmented. Structural properties for a CurveMember change linearly or do not change at all.
 
 ### MaterialProfileType
 
-[CurveMemberType](#curvemembertype) which defines a single Material and Profile for all CurveMembers of that type. CurveMember structural properties are constant along the length of each CurveMember.
+A [CurveMemberType](#curvemembertype) which defines a type of a [CurveMember](#curvemember) that is constructed of a single material. Can be used to define constant profile, tapered and multi-profile Curve Members. Material and Profile data is provided by [MaterialProfileDefinition](#materialprofiledefinition) element.
+
+### MaterialProfileDefinition
+
+A base class defining [CurveMember](#curvemember) Material and Profiles at each end. For a case where Profile does not change along the length - [MaterialProfile](#materialprofile) subclass should be used. For a tapered case - where different Profiles are needed at different Curve Member's ends - use [TaperedMaterialProfile](#materialprofiledefinition).
+
+### MaterialProfile
+
+Defines a [CurveMember](#curvemember) that has a constant Profile along it's length.
+
+### TaperedMaterialProfile
+
+Defines a tapered [CurveMember](#curvemember) that has a varying Profile along it's length.
 
 ### SurfaceType
 
