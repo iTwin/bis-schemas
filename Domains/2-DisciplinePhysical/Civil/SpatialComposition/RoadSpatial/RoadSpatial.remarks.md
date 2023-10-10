@@ -17,7 +17,7 @@ As a subclass of `spcomp:Facility`, a `Road` instance provides the basic element
 
 `Road`s must be contained in `SpatialLocationModel`s or `PhysicalModel`s and can be linearly located, typically along an *Alignment*.
 
-Equivalent to [IfcRoad](https://standards.buildingsmart.org/IFC/DEV/IFC4_3/RC2/HTML/link/ifcroad.htm).
+Equivalent to [IfcRoad](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcRoad.htm).
 
 ### RoadwayPlateau
 
@@ -25,7 +25,7 @@ A `Road` instance typically aggregates only one instance of `RoadwayPlateau`.
 
 `RoadwayPlateau`s must be contained in `SpatialLocationModel`s or `PhysicalModel`s and can be linearly located, typically along an *Alignment*.
 
-Equivalent to [IfcFacilityPart](https://standards.buildingsmart.org/IFC/DEV/IFC4_3/RC2/HTML/link/ifcfacilitypart.htm) with its PredefinedType attribute set to [IfcRoadPartTypeEnum.ROADWAYPLATEAU](https://standards.buildingsmart.org/IFC/DEV/IFC4_3/RC2/HTML/link/ifcroadparttypeenum.htm).
+Equivalent to [IfcFacilityPart](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcFacilityPart.htm) with its PredefinedType attribute set to [IfcRoadPartTypeEnum.ROADWAYPLATEAU](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcRoadPartTypeEnum.htm).
 
 ### CentralReserve
 
@@ -33,7 +33,7 @@ In the typical case, a `CentralReserve` instance models the area that separates 
 
 `CentralReserve`s must be contained in `SpatialLocationModel`s or `PhysicalModel`s.
 
-Equivalent to [IfcFacilityPart](https://standards.buildingsmart.org/IFC/DEV/IFC4_3/RC2/HTML/link/ifcfacilitypart.htm) with its PredefinedType attribute set to [IfcRoadPartTypeEnum.CENTRALRESERVE](https://standards.buildingsmart.org/IFC/DEV/IFC4_3/RC2/HTML/link/ifcroadparttypeenum.htm).
+Equivalent to [IfcFacilityPart](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcFacilityPart.htm) with its PredefinedType attribute set to [IfcRoadPartTypeEnum.CENTRALRESERVE](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcRoadPartTypeEnum.htm).
 
 ### CentralReservePart
 
@@ -47,7 +47,7 @@ A `Road` instance typically aggregates two instances of `RoadSide`. `JunctionEle
 
 `RoadSide`s must be contained in `SpatialLocationModel`s or `PhysicalModel`s.
 
-Equivalent to [IfcFacilityPart](https://standards.buildingsmart.org/IFC/DEV/IFC4_3/RC2/HTML/link/ifcfacilitypart.htm) with its PredefinedType attribute set to [IfcRoadPartTypeEnum.ROADSIDE](https://standards.buildingsmart.org/IFC/DEV/IFC4_3/RC2/HTML/link/ifcroadparttypeenum.htm).
+Equivalent to [IfcFacilityPart](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcFacilityPart.htm) with its PredefinedType attribute set to [IfcRoadPartTypeEnum.ROADSIDE](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcRoadPartTypeEnum.htm).
 
 ### RoadSidePart
 
@@ -55,7 +55,7 @@ Examples of `RoadSidePart` may be side slopes, roadside ditches, back slopes, bu
 
 `RoadSidePart`s must be contained in `SpatialLocationModel`s or `PhysicalModel`s and can be linearly located, typically along an *Alignment*.
 
-Equivalent to [IfcFacilityPart](https://standards.buildingsmart.org/IFC/DEV/IFC4_3/RC2/HTML/link/ifcfacilitypart.htm) with its PredefinedType attribute set to [IfcRoadPartTypeEnum.ROADSIDEPART](https://standards.buildingsmart.org/IFC/DEV/IFC4_3/RC2/HTML/link/ifcroadparttypeenum.htm).
+Equivalent to [IfcFacilityPart](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcFacilityPart.htm) with its PredefinedType attribute set to [IfcRoadPartTypeEnum.ROADSIDEPART](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcRoadPartTypeEnum.htm).
 
 ### Roadway
 
@@ -65,7 +65,7 @@ A `RoadwayPlateau` instance typically aggregates one or more instances of `Roadw
 
 `Roadway`s must be contained in `SpatialLocationModel`s or `PhysicalModel`s. An instance of `Roadway` may hold the `bis:PhysicalElement`s (e.g. `Course`s) directly underneath it, as part of the road's *pavement* structure.
 
-Equivalent to [IfcFacilityPart](https://standards.buildingsmart.org/IFC/DEV/IFC4_3/RC2/HTML/link/ifcfacilitypart.htm) with its PredefinedType attribute set to [IfcRoadPartTypeEnum.CARRIAGEWAY](https://standards.buildingsmart.org/IFC/DEV/IFC4_3/RC2/HTML/link/ifcroadparttypeenum.htm).
+Equivalent to [IfcFacilityPart](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcFacilityPart.htm) with its PredefinedType attribute set to [IfcRoadPartTypeEnum.CARRIAGEWAY](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcRoadPartTypeEnum.htm).
 
 ### TrafficLane
 
@@ -73,7 +73,7 @@ A `Roadway` instance typically aggregates one or more instances of `TrafficLane`
 
 `TrafficLane`s must be contained in `SpatialLocationModel`s or `PhysicalModel`s and can be linearly located, typically along an *Alignment*. An instance of `TrafficLane` may hold the `bis:PhysicalElement`s (e.g. *Course*s) directly underneath it, as part of the road's *pavement* structure.
 
-Equivalent to [IfcFacilityPart](https://standards.buildingsmart.org/IFC/DEV/IFC4_3/RC2/HTML/link/ifcfacilitypart.htm) with its PredefinedType attribute set to [IfcRoadPartTypeEnum.TRAFFICLANE](https://standards.buildingsmart.org/IFC/DEV/IFC4_3/RC2/HTML/link/ifcroadparttypeenum.htm).
+Equivalent to [IfcFacilityPart]https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcFacilityPart.htm) with its PredefinedType attribute set to [IfcRoadPartTypeEnum.TRAFFICLANE](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcRoadPartTypeEnum.htm).
 
 ### Shoulder
 
@@ -83,7 +83,7 @@ Instances of `Shoulder` are typically aggregated by an instance of `RoadwayPlate
 
 `Shoulder`s must be contained in `SpatialLocationModel`s or `PhysicalModel`s and can be linearly located, typically along an *Alignment*. An instance of `Shoulder` may hold the `bis:PhysicalElement`s (e.g. *Course*s) directly underneath it, as part of the road's *pavement* structure.
 
-Equivalent to [IfcFacilityPart](https://standards.buildingsmart.org/IFC/DEV/IFC4_3/RC2/HTML/link/ifcfacilitypart.htm) with its PredefinedType attribute set to [IfcRoadPartTypeEnum.SHOULDER](https://standards.buildingsmart.org/IFC/DEV/IFC4_3/RC2/HTML/link/ifcroadparttypeenum.htm).
+Equivalent to [IfcFacilityPart](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcFacilityPart.htm) with its PredefinedType attribute set to [IfcRoadPartTypeEnum.SHOULDER](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcRoadPartTypeEnum.htm).
 
 ### Sidewalk
 
@@ -93,7 +93,7 @@ A `RoadwayPlateau` instance typically aggregates zero or more instances of `Side
 
 `Sidewalk`s must be contained in `SpatialLocationModel`s or `PhysicalModel`s and can be linearly located, typically along an *Alignment*. An instance of `Sidewalk` typically holds the `bis:PhysicalElement`s (e.g. *Course*s) comprising its *pavement* structure.
 
-Equivalent to [IfcFacilityPart](https://standards.buildingsmart.org/IFC/DEV/IFC4_3/RC2/HTML/link/ifcfacilitypart.htm) with its PredefinedType attribute set to [IfcRoadPartTypeEnum.SIDEWALK](https://standards.buildingsmart.org/IFC/DEV/IFC4_3/RC2/HTML/link/ifcroadparttypeenum.htm).
+Equivalent to [IfcFacilityPart](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcFacilityPart.htm) with its PredefinedType attribute set to [IfcRoadPartTypeEnum.SIDEWALK](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcRoadPartTypeEnum.htm).
 
 ### JunctionElement
 
@@ -107,4 +107,4 @@ A `Road` instance typically aggregates zero or more instances of `Intersection`.
 
 `Intersection`s must be contained in `SpatialLocationModel`s or `PhysicalModel`s. An instance of `Intersection` typically holds the `bis:PhysicalElement`s (e.g. *Course*s) comprising its *pavement* structure.
 
-Equivalent to [IfcFacilityPart](https://standards.buildingsmart.org/IFC/DEV/IFC4_3/RC2/HTML/link/ifcfacilitypart.htm) with its PredefinedType attribute set to [IfcRoadPartTypeEnum.INTERSECTION](https://standards.buildingsmart.org/IFC/DEV/IFC4_3/RC2/HTML/link/ifcroadparttypeenum.htm).
+Equivalent to [IfcFacilityPart](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcFacilityPart.htm) with its PredefinedType attribute set to [IfcRoadPartTypeEnum.INTERSECTION](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcRoadPartTypeEnum.htm).
