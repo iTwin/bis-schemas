@@ -15,25 +15,19 @@ Connection point information will be added in subsequent versions of the schema.
 
 ![Class and Instance Diagrams](./media/distributionsystems.png)
 
-## DistributionSystem
+## Entity Classes
+
+### DistributionSystem
 
 A common example is a heating hot water system that consists of a pump, a tank, and an interconnected piping system for distributing hot water to terminals.
 
 A DistributionSystem groups [DistributionElements](#IDistributionElement) via the `DistributionSystemGroupsDistributionElements` relationship.
 
-### Mapping to and from IFC
+Equivalent to [IfcDistributionSystem](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcDistributionSystem.htm).
 
-| From BIS    | Condition | To IFC    | Condition |
-| ----------- | --------- | --------- | --------- |
-| `DistributionSystem`  | (none) | `IfcDistributionSystem` | (none) |
+### IDistributionElement
 
-| From IFC  | Condition | To BIS    | Condition |
-| --------- | --------- | --------- | --------- |
-| `IfcDistributionSystem` | (none) | `DistributionSystem` | (none) |
-
-## IDistributionElement
-
-IDistributionElement is a generalization of all elements that participate in a distribution system. Typical examples of IDistributionElement are (among others):
+`IDistributionElement` is a generalization of all elements that participate in a distribution system. Typical examples of IDistributionElement are (among others):
 
 - elements within heating systems
 - elements within cooling systems
@@ -44,103 +38,49 @@ IDistributionElement is a generalization of all elements that participate in a d
 
 It defines occurence of any HVAC, electrical, sanitary or other element within a distribution system.
 
-### Mapping to and from IFC
+Equivalent to [IfcDistributionElement](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcDistributionElement.htm).
 
-| From BIS    | Condition | To IFC    | Condition |
-| ----------- | --------- | --------- | --------- |
-| `IDistributionElement`  | (none) | `IfcDistributionElement` | (none) |
+The distribution element should be assigned to the finest granularity [SpatialStructureElement](./spatialcomposition.ecschema/#spatialstructureelement) element it is fully contained in.
 
-| From IFC  | Condition | To BIS    | Condition |
-| --------- | --------- | --------- | --------- |
-| `IfcDistributionElement` | (none) | `IDistributionElement` | (none) |
+- [Space](./buildingspatial.ecschema/#space) is the default container for a distributionElement
+- [Story](./buildingspatial.ecschema/#story) is the container if distribution element spans multiple spaces
+- [Building](./buildingspatial.ecschema/#building) is the default container when a distribution element spans multiple stories.
 
-### Spatial Containment
-
-The distribution element should be assigned to the finest granularity [SpatialStructureElement](./SpatialComposition.remarks.md#SpatialStructureElement) element it is fully contained in.
-
-- [Space](./BuildingSpatial.remarks.md#Space) is the default container for a distributionElement
-- [Story](./BuildingSpatial.remarks.md#Story) is the container if distribution element spans multiple spaces
-- [Building](./BuildingSpatial.remarks.md#Building) is the default container when a distribution element spans multiple stories.
-
-## IDistributionFlowElement
+### IDistributionFlowElement
 
 See [DistributionSystems](#distributionsystems).
 
-### Mapping to and from IFC
+Equivalent to [IfcDistributionFlowElement](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcDistributionFlowElement.htm).
 
-| From BIS    | Condition | To IFC    | Condition |
-| ----------- | --------- | --------- | --------- |
-| `IDistributionFlowElement`  | (none) | `IfcDistributionFlowElement` | (none) |
-
-| From IFC  | Condition | To BIS    | Condition |
-| --------- | --------- | --------- | --------- |
-| `IfcDistributionFlowElement` | (none) | `IDistributionFlowElement` | (none) |
-
-## IDistributionControlElement
+### IDistributionControlElement
 
 These elements are typically used to control distribution system elements and variables such as temperature, pressure, power, lighting levels and similar.
 
 See [DistributionSystems](#distributionsystems).
 
-### Mapping to and from IFC
+Equivalent to [IfcDistributionControlElement](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcDistributionControlElement.htm) for controlling predefined types.
 
-| From BIS    | Condition | To IFC    | Condition |
-| ----------- | --------- | --------- | --------- |
-| `IDistributionControlElement`  | (none) | `IfcDistributionControlElement` | (none) |
-
-| From IFC  | Condition | To BIS    | Condition |
-| --------- | --------- | --------- | --------- |
-| `IfcDistributionControlElement` | (for controlling predefinedtypes) | `IDistributionControlElement` | (none) |
-
-## IDistributionSensorElement
+### IDistributionSensorElement
 
 Distribution sensor elements could be used to measure variables such as temperature, humidity, pressure or flow.
 
 See [DistributionSystems](#distributionsystems).
 
-### Mapping to and from IFC
+Equivalent to [IfcDistributionControlElement](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcDistributionControlElement.htm) for sensing predefined types and <b><u>not</u></b> `IfcSensor`.
 
-| From BIS    | Condition | To IFC    | Condition |
-| ----------- | --------- | --------- | --------- |
-| `IDistributionSensorElement` | (none) | `IfcDistributionControlElement` | (none) |
-
-| From IFC  | Condition | To BIS    | Condition |
-| --------- | --------- | --------- | --------- |
-| `IfcDistributionControlElement` | (for sensing predefinedtypes) | `IDistributionSensorElement` | (none) |
-
-`IDistributionSensorElement` maps to `IfcDistributionControlElement` and <b><u>not</u></b> `IfcSensor`.
-
-
-## DistributionPort
+### DistributionPort
 
 A distribution port is a flow connection point of a distribution element through which a particular substance may flow.
 Distribution ports define the physical connection and substance, electricity or data flow points of a distribution flow element. Subclasses of DistributionPort should specialize distributionport in a given domain by adding relevant properties like FlowVolume for plumbing, or RatedVoltage for electrical.
 Ports are similar to openings in that they do not have any visible geometry, such geometry is captured by the parent distribution element. Ports do have placement to indicate position and orientation of the connection.
 Distribution ports are owned by the `DistributionElement` as they are essentially part of the whole definition of the element, similar to openings in a wall. `DistributionElementOwnsDistributionPorts` relationship is used for `DistributionElement` owning `DistributionPorts`.
 
-### Mapping to and from IFC
+Equivalent to [IfcDistributionPort](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcDistributionPort.htm).
 
-| From BIS    | Condition | To IFC    | Condition |
-| ----------- | --------- | --------- | --------- |
-| `DistributionPort` | (none) | `IfcDistributionPort` | (none) |
-
-| From IFC  | Condition | To BIS    | Condition |
-| --------- | --------- | --------- | --------- |
-| `IfcDistributionPort` | (none) | `DistributionPort` | (none) |
-
-
-## PortConnection
+### PortConnection
 
 A `PortConnection` defines a physical connection between 2 DistributionPorts. In the case where a connection is realized by some other physical element, the realizing element could be found using `PortConnectionIsRealizedByPhysicalElements` relationship.
 
 a PortConnection is always between 2 distribution ports, however this constraint may be removed if a suitable use case is found.
 
-### Mapping to and from IFC
-
-| From BIS    | Condition | To IFC    | Condition |
-| ----------- | --------- | --------- | --------- |
-| `PortConnection` | (none) | `IfcRelConnectsPorts` | (none) |
-
-| From IFC  | Condition | To BIS    | Condition |
-| --------- | --------- | --------- | --------- |
-| `IfcRelConnectsPorts` | (none) | `PortConnection` | (none) |
+Equivalent to [IfcRelConnectsPorts](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcRelConnectsPorts.htm).

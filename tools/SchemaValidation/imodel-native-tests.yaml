@@ -70,7 +70,9 @@ stages:
 
     pool:
       name: iModelTechCI
-      demands: Agent.OS -equals Windows_NT
+      demands:
+        - 'Agent.OS -equals Windows_NT'
+        - 'NUMBER_OF_PROCESSORS -equals 24' # trying to avoid the DESKTOP-U3ENANMA agent
 
     variables:
       BB_V: '-v 4'
@@ -87,6 +89,7 @@ stages:
     - template: build/templates/prebuild.yml@imodel-native-internal
       parameters:
         otherRepo: imodel-native
+        nativePR: 'main'
 
     - script: $(PY_EXE) $(CALL_BB_PATH) pull $(BB_V) -a $(BB_ARCH) $(STRATEGY_OVERRIDE)
       displayName: Pull
@@ -221,6 +224,8 @@ stages:
         nodeVersion: 18.12.x
         runRushAudit: false
         rushBuildCacheEnabled: 0
+        currentBranch: imodel02
+        targetBranch: imodel02
 
 - stage: iModeEvolution
   displayName: iModeEvolution Tests
@@ -253,6 +258,7 @@ stages:
     - template: build/templates/prebuild.yml@imodel-native-internal
       parameters:
         otherRepo: imodel-native
+        nativePR: 'main'
 
     - script: $(PY_EXE) $(CALL_BB_PATH) pull -v $(BB_V) -a $(BB_ARCH) -s $(strategy)
       displayName: Pull
