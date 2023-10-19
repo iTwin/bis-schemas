@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ==================================================================================
+|  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
+|  * See LICENSE.md in the project root for license terms and full copyright notice.
+======================================================================================= -->
+<ECSchema schemaName="SubstationSchematics" alias="substschm" version="01.00.00" displayLabel="Substation Schematics" description="TODO" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
+    <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
+    <ECSchemaReference name="BisCore" version="01.00.13" alias="bis" />
+    <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
+
+    <ECCustomAttributes>
+        <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
+            <SupportedUse>NotForProduction</SupportedUse>
+        </ProductionStatus>
+        <SchemaLayerInfo xmlns="BisCustomAttributes.01.00.00">
+            <Value>Application</Value>
+        </SchemaLayerInfo>
+    </ECCustomAttributes>
+
+    <ECEnumeration typeName="SymbolDrawingAffinity" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="Schematic" value="0" displayLabel="Schematic Drawing" />
+        <ECEnumerator name="Layout" value="1" displayLabel="Layout Drawing" />
+        <ECEnumerator name="Wire" value="2" displayLabel="Wire Drawing" />
+        <ECEnumerator name="SingleLine" value="3" displayLabel="Single Line Drawing" />
+    </ECEnumeration>
+    <ECEnumeration typeName="PropertyElementType" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="Symbol" value="0" displayLabel="Symbol" />
+        <ECEnumerator name="SymbolPoint" value="1" displayLabel="Symbol Point" />
+        <ECEnumerator name="SymbolFunctionalType" value="2" displayLabel="Equipment Functional Type" />
+        <ECEnumerator name="EquipmentFunctional" value="3" displayLabel="Equipment Functional" />
+        <ECEnumerator name="EquipmentPhysical" value="4" displayLabel="Equipment Physical" />
+    </ECEnumeration>
+    <ECEnumeration typeName="SymbolType" displayLabel="Symbol Type" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="Schematic" value="0" displayLabel="Schematic" />
+        <ECEnumerator name="Panel" value="1" displayLabel="Panel" />
+        <ECEnumerator name="SingleLine" value="2" displayLabel="Single Line" />
+        <ECEnumerator name="Physical3D" value="3" displayLabel="3D" />
+        <ECEnumerator name="WireDiagram" value="4" displayLabel="Wire Diagram" />
+        <ECEnumerator name="Hydraulic" value="5" displayLabel="Hydraulic" />
+        <ECEnumerator name="Pneumatic" value="6" displayLabel="Pneumatic" />
+    </ECEnumeration>
+    <ECRelationshipClass typeName="CompoundSymbolRefersToMultiSymbol" modifier="Abstract" strength="Referencing" strengthDirection="Forward">
+        <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <Source polymorphic="true" roleLabel="refers to" multiplicity="(0..*)" abstractConstraint="ElectricalCompoundSymbolDefinition">
+            <Class class="ElectricalCompoundSymbolDefinition" />
+        </Source>
+        <Target polymorphic="true" roleLabel="is referred by" multiplicity="(0..*)" abstractConstraint="ElectricalMultiSymbolDefinition">
+            <Class class="ElectricalMultiSymbolDefinition" />
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="ElectricalCompoundSymbolDefinition" displayLabel="2D Compound Symbol" description="Represents group of related symbols, typically associated with electrical device that consists of an assembly of sub-devices." modifier="Sealed">
+        <BaseClass>ElectricalSymbolDefinition</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="ElectricalSymbolDefinition" displayLabel="Electrical Symbol Definition" description="The definition of a single Symbol or a group of related Symbols. A SymbolDefinition is typically referred to by a single ElectricalEquipmentDefinition Element. A SymbolDefinition may also exist by itself without any ElectricalEquipmentDefinition Element reference. (ToReview: The 'code' of all ElectricalSymbolDefinitions should be unique in the context of a Definition Model" modifier="Abstract">
+        <BaseClass>bis:DefinitionElement</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="ElectricalMultiSymbolDefinition" displayLabel="2D Multi Symbol" description="Represents group of related symbols, typically associated with simple electrical device. A ElectricalMultiSymbolDefinition consists of a single Parent ElectricalSingleSymbolDefinition and one or more Children ElectricalSymbolSymbolDefinitions" modifier="Sealed">
+        <BaseClass>ElectricalSymbolDefinition</BaseClass>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="MultiSymbolRefersToSingleSymbol" modifier="Abstract" strength="Referencing" strengthDirection="Forward">
+        <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <Source polymorphic="true" roleLabel="refers to" multiplicity="(0..*)" abstractConstraint="ElectricalMultiSymbolDefinition">
+            <Class class="ElectricalMultiSymbolDefinition" />
+        </Source>
+        <Target polymorphic="true" roleLabel="is referred by" multiplicity="(0..*)" abstractConstraint="ElectricalSingleSymbolDefinition">
+            <Class class="ElectricalSingleSymbolDefinition" />
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="ElectricalSingleSymbolDefinition" displayLabel="2D Single Symbol" description="Represents the Graphical and Connection data associated with one 2D Electrical Symbol Definition. A ElectricalSingleSymbolDefinition is represented by a ElectricalSymbolGraphic2d and owns one or more ConnectionPointAspect2d Aspects." modifier="Sealed">
+        <BaseClass>ElectricalSymbolDefinition</BaseClass>
+        <ECNavigationProperty propertyName="DrawingType" description="Reference to the Drawing Type. The Elements in the Type's Recipe's template Model are placed when the users selects to place the Symbol in a Drawing Model" readOnly="false" priority="0" relationshipName="DrawingTypeReference" direction="Forward" />
+    </ECEntityClass>
+    <ECRelationshipClass typeName="DrawingTypeReference" modifier="None" strength="Referencing" strengthDirection="Backward">
+        <Source polymorphic="true" roleLabel="refers to" multiplicity="(0..*)" abstractConstraint="ElectricalSingleSymbolDefinition">
+            <Class class="ElectricalSingleSymbolDefinition" />
+        </Source>
+        <Target polymorphic="true" roleLabel="is referred by" multiplicity="(1..1)" abstractConstraint="ElectricalGraphicalType2d">
+            <Class class="ElectricalGraphicalType2d" />
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="ElectricalGraphicalType2d" displayLabel="Electrical Graphical Type" description="Represents the Graphical Type for Electrical Symbols." modifier="None">
+        <BaseClass>bis:GraphicalType2d</BaseClass>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="MultiSymbolRefersToParentSymbol" modifier="None" strength="Referencing" strengthDirection="Forward">
+        <BaseClass>MultiSymbolRefersToSingleSymbol</BaseClass>
+            <Source polymorphic="true" roleLabel="refers to" multiplicity="(0..*)" abstractConstraint="ElectricalMultiSymbolDefinition">
+        <Class class="ElectricalMultiSymbolDefinition" />
+        </Source>
+            <Target polymorphic="true" roleLabel="is referred by" multiplicity="(1..1)" abstractConstraint="ElectricalSingleSymbolDefinition">
+        <Class class="ElectricalSingleSymbolDefinition" />
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="MultiSymbolRefersToChildSymbol" modifier="None" strength="Referencing" strengthDirection="Forward">
+        <BaseClass>MultiSymbolRefersToSingleSymbol</BaseClass>
+        <Source polymorphic="true" roleLabel="refers to" multiplicity="(0..*)" abstractConstraint="ElectricalMultiSymbolDefinition">
+            <Class class="ElectricalMultiSymbolDefinition" />
+        </Source>
+        <Target polymorphic="true" roleLabel="is referred by" multiplicity="(0..*)" abstractConstraint="ElectricalSingleSymbolDefinition">
+            <Class class="ElectricalSingleSymbolDefinition" />
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="CableSymbolRefersToSingleSymbol" modifier="Abstract" strength="Referencing" strengthDirection="Forward">
+        <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <Source polymorphic="true" roleLabel="refers to" multiplicity="(0..*)" abstractConstraint="ElectricalCableSymbolDefinition">
+            <Class class="ElectricalCableSymbolDefinition" />
+        </Source>
+        <Target polymorphic="true" roleLabel="is referred by" multiplicity="(1..1)" abstractConstraint="ElectricalSingleSymbolDefinition">
+            <Class class="ElectricalSingleSymbolDefinition" />
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="ElectricalCableSymbolDefinition" displayLabel="2D Cable Symbol" description="Represents a 2D cable symbol which in turn represents group of wire symbols." modifier="Sealed">
+        <BaseClass>ElectricalSymbolDefinition</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="ElectricalEquipmentDefinition" displayLabel="Electrical Equipment Definition" description="Represents the Functional, 2D Graphical, 3D Physical and Connection data associated with an Electrical Equipment or Device." modifier="None">
+        <BaseClass>bis:DefinitionElement</BaseClass>
+        <ECProperty propertyName="PhysicalClassName" description="Fully Qualified Class-Name of the Equipment's Physical Class." readOnly="false" priority="0" typeName="string" />
+        <ECProperty propertyName="FunctionalClassName" description="Fully Qualified Class-Name of the Equipment's Functional Class." readOnly="false" priority="0" typeName="string" />
+        <ECNavigationProperty propertyName="PhysicalType" description="Reference to the Equipment's Physical Type Class." readOnly="false" priority="0" relationshipName="PhysicalTypeReference" direction="Forward" />
+    </ECEntityClass>
+    <ECRelationshipClass typeName="PhysicalTypeReference" modifier="None" strength="Referencing" strengthDirection="Backward">
+        <Source polymorphic="true" roleLabel="refers to" multiplicity="(1..1)" abstractConstraint="ElectricalEquipmentDefinition">
+        <Class class="ElectricalEquipmentDefinition" />
+        </Source>
+        <Target polymorphic="true" roleLabel="is referred by" multiplicity="(0..1)" abstractConstraint="ElectricalPhysicalType">
+        <Class class="ElectricalPhysicalType" />
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="FunctionalElementSpecifiesPhysicalType" displayLabel="Functional Element Specifies Functional Type" description="Specifies a Physical Type for a Functional Element. Required because a Physical perspective (element) might not exist in early design stages, but a Physical Type needs to be assigned for the object as a whole." modifier="None" strength="Referencing" strengthDirection="Forward">
+        <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <Source polymorphic="true" roleLabel="refers to" multiplicity="(0..*)" abstractConstraint="func:FunctionalElement">
+        <Class class="func:FunctionalElement" />
+        </Source>
+        <Target polymorphic="true" roleLabel="is referred by" multiplicity="(0..*)" abstractConstraint="bis:PhysicalType">
+        <Class class="bis:PhysicalType" />
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="EquipmentDefinitionRefersToSymbol" modifier="None" strength="Referencing" strengthDirection="Forward">
+        <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <ECProperty propertyName="DrawingAffinity" description="The Drawing affinity of the Equipment Definition's Symbol reference" displayLabel="Symbol Drawing Affinity" readOnly="false" priority="0" typeName="SymbolDrawingAffinity" />
+        <Source polymorphic="true" roleLabel="refers to" multiplicity="(0..*)" abstractConstraint="ElectricalEquipmentDefinition">
+            <Class class="ElectricalEquipmentDefinition" />
+        </Source>
+        <Target polymorphic="true" roleLabel="is referred by" multiplicity="(0..*)" abstractConstraint="ElectricalSymbolDefinition">
+            <Class class="ElectricalSymbolDefinition" />
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="CompatibleEquipmentDefinitionAspect" displayLabel="Compatible Equipment Definition Aspect" description="Specifies an equipment definition code, which this Part is compatible with." modifier="Sealed">
+        <BaseClass>bis:ElementMultiAspect</BaseClass>
+        <ECProperty propertyName="EquipmentDefinitionCode" displayLabel="Equipment Definition Code" readOnly="false" priority="0" typeName="string" />
+        <ECProperty propertyName="SymbolType" displayLabel="Equipment Definition Type" readOnly="false" priority="0" typeName="int" />
+    </ECEntityClass>
+    <ECRelationshipClass typeName="PhysicalElementOwnsCompatibleEquipmentDefinitionAspects" strength="embedding" modifier="None">
+        <BaseClass>bis:ElementOwnsMultiAspects</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:PhysicalElement"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="true">
+            <Class class="CompatibleEquipmentDefinitionAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="ElectricalSymbolGraphic2d" displayLabel="2D Symbol Graphic" description="Stores the Graphical data associated with one 2D Electrical Symbol. Its (0,0) the insertion point of the Symbol. A ElectricalSymbolGraphic2d Element is used two ways: (1) As the 'graphical aspect' of a 2D Symbol's definition. In this case the ElectricalSymbolGraphic2d is associated with its ElectricalSingleSymbolDefinition thru' is SingleSymbolRecipe. (2) As an instance of 2D Symbol when placed in a Substation Project's Drawing Model. In this case the SymbolGraphics2d is associated with its ElectricalFunctionalEquipment by the func:DrawingGraphicRepresentsFunctionalElement relationship." modifier="None">
+        <BaseClass>bis:DrawingGraphic</BaseClass>
+        <ECProperty propertyName="ScaleX" description="The X-Scale of the Symbol when placed in a Drawing Model" readOnly="false" priority="0" typeName="double" />
+        <ECProperty propertyName="ScaleY" description="The Y-Scale of the Symbol when placed in a Drawing Model" readOnly="false" priority="0" typeName="double" />
+    </ECEntityClass>
+    <ECEntityClass typeName="ElectricalGeometry3d" displayLabel="3D Symbol Geometry" description="Stores the Geometry data associated with one 3D Electrical Symbol. The Geometry is stored as a GeometryStream. Its (0,0,0) represents the insertion point of the Symbol." modifier="None">
+        <BaseClass>bis:GraphicalElement3d</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="ElectricalAnchorPoint2d" displayLabel="2D Anchor Point" description="A 2D Point associated with a single 2D Symbol. The point is associated with its ElectricalSymbolGraphic2d Element using the bis:ElementOwnsChildElements relationship. The point is a 2D Geometric Element. Its origin = location of the symbol point relative to the Symbol's origin. Code-Value = Point's Default Label Value" modifier="None">
+        <BaseClass>bis:DrawingGraphic</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="ElectricalAnchorPoint3d" displayLabel="3D Anchor Point" description="A 3D Point associated with Equipment Physical Geometry.  The point is associated with its ElectricalPhysicalEquipment Element using the bis:ElementOwnsChildElements relationship. The point is a 3D Geometric Element. Its origin = location of the point relative to the Equipment's origin. The Yaw, Pitch, Roll define the Point's Co-ordinate System relative to its Equipment's Orientation. Code-Value = Point's Default Label Value" modifier="None">
+        <BaseClass>bis:SpatialLocationElement</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="ElectricalPropertyLabel2d" displayLabel="2D Property Label" description="A Property Label refers to some property of a Symbol (that it belongs to) or an Equipment (that the Symbol is used by). The value of the property is displayed by the Property Label in a 2D Model at specified location. (TBD: How to specify text style)" modifier="None">
+        <BaseClass>bis:GraphicalElement2d</BaseClass>
+        <ECProperty propertyName="ElementType" description="The Element Type whose property will be displayed as a Label." displayLabel="Property Element Type" readOnly="false" priority="0" typeName="PropertyElementType" />
+        <ECProperty propertyName="ElementIndex" description="The Element Index. This is relevant to SymbolPoint type" displayLabel="Property Element Index" readOnly="false" priority="0" typeName="int" />
+        <ECProperty propertyName="PropertyName" description="The name of the property whose value will be display as a Label." displayLabel="Property Name" readOnly="false" priority="0" typeName="string" />
+        <ECProperty propertyName="LabelOffset" description="The location of the Property Label (relative to the Symbol's Origin)" displayLabel="Location" readOnly="false" priority="0" typeName="point2d" />
+        <ECProperty propertyName="IsVisible" description="If true, then the label text is drawn at specified location." displayLabel="Is Visible" readOnly="false" priority="0" typeName="boolean" />
+    </ECEntityClass>
+    <ECEntityClass typeName="ElectricalPropertyLabel3d" displayLabel="3D Property Label" description="A Property Label refers to some property of a Symbol (that it belongs to) or an Equipment (that the Symbol is used by). The value of the property is displayed by the Property Label in a 2D Model at specified location. (TBD: How to specify text style)" modifier="None">
+        <BaseClass>bis:GraphicalElement3d</BaseClass>
+        <ECProperty propertyName="ElementType" description="The Element Type whose property will be displayed as a Label." displayLabel="Property Element Type" readOnly="false" priority="0" typeName="PropertyElementType" />
+        <ECProperty propertyName="ElementIndex" description="The Element Index. This is relevant to SymbolPoint type" displayLabel="Property Element Index" readOnly="false" priority="0" typeName="int" />
+        <ECProperty propertyName="PropertyName" description="The name of the property whose value will be display as a Label." displayLabel="Property Name" readOnly="false" priority="0" typeName="string" />
+        <ECProperty propertyName="LabelLocation" description="The location of the Property Label (relative to the Symbol's Origin)" displayLabel="Location" readOnly="false" priority="0" typeName="point3d" />
+        <ECProperty propertyName="IsVisible" description="If true, then the label text is drawn at specified location." displayLabel="Is Visible" readOnly="false" priority="0" typeName="boolean" />
+    </ECEntityClass>
+    <ECEntityClass typeName="ElectricalSymbolRecipe" displayLabel="Symbol Recipe" description="Represents the Graphics, Anchor points and Property Label data associated with an Equipment's Physical (3D) Definition." modifier="Sealed">
+        <BaseClass>bis:TemplateRecipe2d</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="ElectricalSymbolPropertiesDefinition" displayLabel="Electrical Symbol Properties Definition" description="An ElectricalSymbolPropertiesDefinition is a singleton element that consists of a JSON string that lists the standard properties that a symbol might take." modifier="Sealed">
+        <BaseClass>bis:DefinitionElement</BaseClass>
+        <ECProperty propertyName="JsonProperties" description="A place where JSON properties are stored. The JSON string is an array of the following name value pairs .. name, display-prompt" readOnly="false" priority="0" extendedTypeName="Json" typeName="string" />
+    </ECEntityClass>
+    <ECEntityClass typeName="ElectricalLineSegment" displayLabel="Electrical Line Segment" description="An ElectricalLineSegment Element is a 2D element that connects to either a Symbol or another Segment. One or more connected ElectricalLineSegments may represent a (Functional) ElectricalWire." modifier="None">
+        <BaseClass>bis:DrawingGraphic</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="ElectricalDrawingLink" displayLabel="Electrical Drawing Link Element" description="An ElectricalDrawingLink Element is a symbol that at the end of an ElectricalLineSegment in one Drawing and which represents a link to an ElectricalDrawingLink in another Drawing." modifier="None">
+        <BaseClass>bis:DrawingGraphic</BaseClass>
+    </ECEntityClass>
+</ECSchema>
