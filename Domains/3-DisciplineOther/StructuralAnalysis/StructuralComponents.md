@@ -24,7 +24,7 @@ The Manuals are expected to have child Elements (`ClassificationTable`) that div
 - Steel Decks to "Structural Steel Decks"
 - Joists to "Structural Joists"
 
-Each `ClassificationTable` is the broken down by a model that stores separate `Classifaction`s that belong to that table.
+Each `ClassificationTable` is then broken down by a model that stores separate `Classifaction`s that belong to that table.
 
 #### Classifications
 
