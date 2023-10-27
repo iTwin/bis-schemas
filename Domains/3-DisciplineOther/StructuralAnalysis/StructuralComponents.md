@@ -6,7 +6,7 @@
 
 Standard Organizations primary function is developing and maintaining manuals that specify technical standards for various structural components - Beam/Column Sections, Steel Decks, Joists, etc. Examples of standard organizations are - "AISC", "CEN", "VERCO". iModels are not expected to contain Elements that represent Standard Organizations, only specific manuals are defined. 
 
-### Standard Organizations Definiton Container
+### Standard Organizations Definition Container
 
 The top level Element of StandardOrganization structure is defined as a single sub-modeled instance of `DefinitonContainer`. This Element is expected to have a Code with value set to "Standard Organizations", scope set to `Repository` Model id, spec set to "bis:DefinitionContainer". "Standard Organizations" Element is expected to be stored under `DictionaryModel`.
 
@@ -28,8 +28,8 @@ Each `ClassificationTable` is then broken down by a model that stores separate `
 
 #### Classifications
 
-`Classification` Elements define the actual entries of any Standard Catalog, e.g. AISC 7th Edition Structural Profile Catalog entires would be defined as separate `Classifications` containing all entries from that specific catalog edition.
-Each `Classifcation` CodeScope would be set to `Model`, each CodeSpec to `clsf:Classifcation`. The value would be set as Designation of that entry. (e.g. "W44X335"). `Classification` Elements would not define any properties that are defined by the actual real world catalog entries. Instead, such properties would be defined by separate Elements that reference classifications using `ElementHasClassifications` relationship.
+`Classification` Elements define the actual entries of any Standard Catalog, e.g. AISC 7th Edition Structural Profile Catalog entires would be defined as separate `Classification` containing all entries from that specific catalog edition.
+Each `Classifcation` CodeScope would be set to `Model`, each CodeSpec to `clsf:Classifcation`. The value would be set as Designation of that entry. (e.g. "W44X335"). `Classification` Elements would not define any properties that are defined by the actual real world catalog entries. Instead, such properties would be defined by separate Elements that reference classification using `ElementHasClassifications` relationship.
 
 ### Structural Components Catalog Definition Container
 
