@@ -1,6 +1,8 @@
 # Structural Components Hierrarchy
 
-## Overview
+## Profiles Definition Catalog
+
+The top level Element to store Profiles definitions is defined as `DefinitionContainer`. This Element is expected to be stored in `DictionaryModel`. The Code value should be set to "prf:DomainDefinitions", scope is set to `Repository` Model id, spec set to "bis:DefinitionContainer". The Container is expected to store "Standrard Organizations" and "Structural Components Catalog" `DefinitionContainers` which are defined in subsequent sections of this document.
 
 ## Standard Organizations and Structural Components Catalog
 
@@ -8,9 +10,7 @@ Standard Organizations primary function is developing and maintaining manuals th
 
 ### Standard Organizations Definition Container
 
-The top level Element of StandardOrganization structure is defined as a single sub-modeled instance of `DefinitonContainer`. This Element is expected to have a Code with value set to "Standard Organizations", scope set to `Repository` Model id, spec set to "bis:DefinitionContainer". "Standard Organizations" Element is expected to be stored under `DictionaryModel`.
-
-### StandardOrganizations Model
+The top level Element of StandardOrganization structure is defined as a single sub-modeled instance of `DefinitonContainer`. This Element is expected to have a Code with value set to "Standard Organizations", scope set to `Model` Model id, spec set to "bis:DefinitionContainer". "Standard Organizations" Element is expected to be stored under "prf:DomainDefinitions" Model.
 
 #### Classification System
 
@@ -33,7 +33,7 @@ Each `Classifcation` CodeScope would be set to `Model`, each CodeSpec to `clsf:C
 
 ### Structural Components Catalog Definition Container
 
-Structural Compenents Catalog Hierrarchy defines actual structural components - Profiles, Steel Decks, Joists, etc... The top level Element of the hierrarchy is `DefinitionContainer` that is stored under `DictionaryModel`. The Code assigned to it consists of "Structural Components Catalog" value, `Repository` Model id scope, "bis:DefinitionContainer" spec. This container is broken down into case scpecific `DefinitionContainer` Elements - Profiles, Joists, Steel Decks, etc. Each container has a CodeScope set to "Structural Components Catalog" id, CodeSpec set to `bis:DefinitionContainer`. CodeValue depends on container's use case:
+Structural Compenents Catalog Hierrarchy defines actual structural components - Profiles, Steel Decks, Joists, etc... The top level Element of the hierrarchy is `DefinitionContainer` that is stored "prf:DomainDefinitions" Model. The Code assigned to it consists of "Structural Components Catalog" value, `Model` scope, "bis:DefinitionContainer" spec. This container is broken down into case scpecific `DefinitionContainer` Elements - Profiles, Joists, Steel Decks, etc. Each container has a CodeScope set to "Structural Components Catalog" id, CodeSpec set to `bis:DefinitionContainer`. CodeValue depends on container's use case:
 
 - "Structural Profiles" code is used for Profiles
 - "Structural Steel Joists" for Joists
