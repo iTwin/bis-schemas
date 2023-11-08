@@ -8,6 +8,67 @@ Profiles schema defines classes that represent two dimensional cross sections, u
 
 Most often used Profiles are standard and defined by a specific [Standards Organization](#standardsorganization). Standard Profiles are always shared. Standard profiles should only be deleted in case a mistake was made when creating standard Profile.
 
+<b>Standard Profiles</b>
+
+Most often used Profiles are standard and defined in a catalog. This is defined by a Profile and Code hierarchy representing four components:
+
+- `StandardsOrganization` - Name of the standards organization that defines the [Profile](#profile), e.g. "AISC"
+- `Manufacturer` - Name of the manufacturer for the [Profile](#profile). This is usually a country code e.g. "US"
+- `Revision` - Name of the edition or version of the standards organization, e.g. "14"
+- `Name` - Name of the [Profile](#profile) (also called designation) e.g. "W16x40"
+
+Applications will be able to use this information to query detailed properties and geometry of catalog (database) profile.
+
+Applications that don't have access to catalogs will still be able to render the Profiles as they contain their own geometry constructed from available properties - this geometry may not match the detailed geometry from a catalog.
+
+<b>Structural Components Hierarchy</b>
+
+The following instance-diagram presents a simple example of the Structural Components Hierarchy explained next.
+
+![Structural Components Hierarchy](./media/Decks%20&%20Classification%20Systems.png)
+
+<u>Profiles Definition Catalog</u>
+
+The top level Element to store Profiles definitions is defined as `DefinitionContainer`. This Element is expected to be stored in `DictionaryModel`. The Code value should be set to "prf:DomainDefinitions", scope is set to `Repository` Model id, spec set to "bis:DefinitionContainer". The Container is expected to store "Standard Organizations" and "Structural Components Catalog" `DefinitionContainers` which are defined in subsequent sections of this document.
+
+<u>Standard Organizations and Structural Components Catalog</u>
+
+Standard Organizations primary function is developing and maintaining manuals that specify technical standards for various structural components - Beam/Column Sections, Steel Decks, Joists, etc. Examples of standard organizations are - "AISC", "CEN", "VERCO". BIS repositories are not expected to contain Elements that represent Standard Organizations, only specific manuals are defined. 
+
+<u>Standard Organizations Definition Container</u>
+
+The top level Element of StandardOrganization structure is defined as a single sub-modeled instance of `DefinitionContainer`. This Element is expected to have a Code with value set to "Standard Organizations", scope set to `Model` Model id, spec set to "bis:DefinitionContainer". "Standard Organizations" Element is expected to be stored in the "prf:DomainDefinitions" sub-model.
+
+<u>Classification Systems</u>
+
+"Standard Organizations" `DefinitionContainer` is broken down to a model that stores Elements that represents manuals. Manuals are defined as `ClassificationSystem` Elements where each Element represents only a single revision/edition of a catalog released, maintained by Standard Organization. `Code` value of the Manual element is expected to be concatination of StandardOrganization name and the manual name itself, e.g. `ClassificationSystem` that represents Standard Organization "CEN"'s "EU 19-53" Profile catalog edition would have a Code with value "CEN EU 19-53". `CodeScope` is expected to be set to `DictionaryModel` id, `CodeSpec` to `clsf:ClassificationSystem`.
+
+<u>Classification Table</u>
+
+The Manuals are expected to have child Elements (`ClassificationTable`) that divide the manual into groups by use case. e.g. Same manual might define both Beam Profiles and Steel Decks. The CodeScope of each `ClassificationTable` should be set to `ParentElement`. CodeSpec to "bis:ClassificationTable". Code values depend on the `ClassificationTable`'s use case:
+
+- Structural Profile Classifaction Table should have CodeValue set to "Structural Profiles"
+- Steel Decks to "Structural Steel Decks"
+- Joists to "Structural Joists"
+
+Each `ClassificationTable` is then broken down by a model that stores separate `Classification`s that belong to that table.
+
+<u>Classifications</u>
+
+`Classification` Elements define the actual entries of any Standard Catalog, e.g. AISC 7th Edition Structural Profile Catalog entires would be defined as separate `Classification` containing all entries from that specific catalog edition.
+
+Each `Classification` CodeScope would be set to `Model`, each CodeSpec to `clsf:Classification`. The value would be set as Designation of that entry. (e.g. "W44X335"). `Classification` Elements would not define any properties that are defined by the actual real world catalog entries. Instead, such properties would be defined by separate Elements that reference classification using `ElementHasClassifications` relationship.
+
+<b>Structural Components Catalog Definition Container</b>
+
+The Structural Components Catalog Hierarchy defines actual structural components - Profiles, Steel Decks, Joists, etc. The top level Element of the hierarchy is a `DefinitionContainer` that is stored in the "prf:DomainDefinitions" sub-model. The Code assigned to it consists of "Structural Components Catalog" value, `Model` scope, "bis:DefinitionContainer" spec. This container is broken down into case specific `DefinitionContainer` Elements - Profiles, Joists, Steel Decks, etc. Each container has a CodeScope set to "Structural Components Catalog" id, CodeSpec set to `bis:DefinitionContainer`. CodeValue depends on the container's use case:
+
+- "Structural Profiles" code is used for Profiles
+- "Structural Steel Joists" for Joists
+- "Structural Steel Decks" for Steel Decks
+
+Each container is then broken down further. Where each sub-model contains the actual definitions of Structural Components - Profiles, SteelDecks, etc. These Elements are expected to refer to at least one Classification that the component fulfills. `ElementHasClassifications` relationship is used to relate Component with its classification.
+
 ## Entity Classes
 
 ### Profile
@@ -426,7 +487,7 @@ This aspect also includes fields for transforming the referenced [SinglePerimete
 
 ### DoubleLShapeProfile
 
-Instantiable [CompositeProfile](#compositeprofile) that models a Double L shape profile where the single [LShapeProfiles](#lshapeprofile) are placed back to back with specified gap between them. This [Profile](#profile) references and requires a [LShapeProfile](#lshapeprofile) to exist in the iModel.
+Instantiable [CompositeProfile](#compositeprofile) that models a Double L shape profile where the single [LShapeProfiles](#lshapeprofile) are placed back to back with specified gap between them. This [Profile](#profile) references and requires a [LShapeProfile](#lshapeprofile) to exist in the BIS repository.
 
 Note that deletion of the referenced [LShapeProfile](#lshapeprofile) is prohibited if there are [DoubleLShapeProfiles](#doublelshapeprofile) that reference it.
 
@@ -437,7 +498,7 @@ Note that deletion of the referenced [LShapeProfile](#lshapeprofile) is prohibit
 ![DoubleLShape (DoubleLShortLegs)](media/ProfilePictures/DoubleLShortLegs.png)
 
 ### DoubleCShapeProfile
-Instantiable [CompositeProfile](#compositeprofile) that models a Double C shape profile where the single [CShapeProfiles](#cshapeprofile) are placed back to back with specified gap between them. This [Profile](#profile) references and requires a [CShapeProfile](#cshapeprofile) to exist in the iModel.
+Instantiable [CompositeProfile](#compositeprofile) that models a Double C shape profile where the single [CShapeProfiles](#cshapeprofile) are placed back to back with specified gap between them. This [Profile](#profile) references and requires a [CShapeProfile](#cshapeprofile) to exist in the BIS repository.
 
 Note that deletion of the referenced [CShapeProfile](#cshapeprofile) is prohibited if there are [DoubleCShapeProfiles](#doublelshapeprofile) that reference it.
 
@@ -604,17 +665,3 @@ Standard Cardinal points are:
 ### DoubleLShapeProfileType
 
 Enumeration used to specify how [DoubleLShapeProfiles](#doublelshapeprofile) geometry is created - which "legs" of the [LShapeProfile](#lshapeprofile) are placed back to back.
-
-## Standard Profiles
-
-Most often used Profiles are standard and defined in a catalog. This is defined by a Profile and Code hierarchy representing four components:
-
-- `StandardsOrganization` - Name of the standards organization that defines the [Profile](#profile), e.g. "AISC"
-- `Manufacturer` - Name of the manufacturer for the [Profile](#profile). This is usually a country code e.g. "US"
-- `Revision` - Name of the edition or version of the standards organization, e.g. "14"
-- `Name` - Name of the [Profile](#profile) (also called designation) e.g. "W16x40"
-
-
-
-Applications will be able to use this information to query detailed properties and geometry of catalog (database) profile.
-Applications that don't have access to catalogs will still be able to render the Profiles as they contain their own geometry constructed from available properties - this geometry may not match the detailed geometry from a catalog.
