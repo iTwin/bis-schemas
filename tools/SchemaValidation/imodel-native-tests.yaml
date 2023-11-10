@@ -27,39 +27,39 @@ resources:
     name: iTwin/itwinjs-core
 
 stages:
-# - stage: Source_Branch
-#   displayName: Select Source Branch
-#   condition: and(succeeded(), in(variables['Build.Reason'], 'IndividualCI', 'Schedule', 'Manual', 'PullRequest'))
+- stage: Source_Branch
+  displayName: Select Source Branch
+  condition: and(succeeded(), in(variables['Build.Reason'], 'IndividualCI', 'Schedule', 'Manual', 'PullRequest'))
 
-#   jobs:
-#   - job: Find_Branch
+  jobs:
+  - job: Find_Branch
 
-#     workspace:
-#       clean: all
+    workspace:
+      clean: all
 
-#     pool:
-#       vmImage: windows-latest
+    pool:
+      vmImage: windows-latest
 
-#     steps:
-#     - checkout: self
+    steps:
+    - checkout: self
 
-#     - task: PythonScript@0
-#       name: Get_Branch_Name
-#       displayName: 'Get Branch Name'
-#       inputs:
-#         scriptSource: inline
-#         script: |
-#           import sys;
-#           if ( "System.PullRequest.SourceBranch" not in sys.argv[1] ):
-#             branchName = sys.argv[1];
-#           else:
-#             branchName = sys.argv[2];
-#           print ('##vso[task.setvariable variable=sourceBranch;isOutput=true;]' + branchName);
-#         arguments: '$(System.PullRequest.SourceBranch) $(Build.SourceBranchName)'
+    - task: PythonScript@0
+      name: Get_Branch_Name
+      displayName: 'Get Branch Name'
+      inputs:
+        scriptSource: inline
+        script: |
+          import sys;
+          if ( "System.PullRequest.SourceBranch" not in sys.argv[1] ):
+            branchName = sys.argv[1];
+          else:
+            branchName = sys.argv[2];
+          print ('##vso[task.setvariable variable=sourceBranch;isOutput=true;]' + branchName);
+        arguments: '$(System.PullRequest.SourceBranch) $(Build.SourceBranchName)'
 
 - stage: iModelCore_NodeAddon
   displayName: NodeAddon and iModelCore Tests
-  # dependsOn: Source_Branch
+  dependsOn: Source_Branch
   condition: and(succeeded(), in(variables['Build.Reason'], 'IndividualCI', 'Schedule', 'Manual', 'PullRequest'))
 
   jobs:
@@ -233,7 +233,7 @@ stages:
 
 - stage: iModeEvolution
   displayName: iModeEvolution Tests
-  # dependsOn: Source_Branch
+  dependsOn: Source_Branch
   condition: and(succeeded(), in(variables['Build.Reason'], 'IndividualCI', 'Schedule', 'Manual', 'PullRequest'))
 
   jobs:
