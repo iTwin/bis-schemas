@@ -10,15 +10,15 @@ The repository is split up into two main parts; the tooling, used to process and
 
 All tooling will be under the "tools" directory at the root of the repository.
 
-The BIS Domain Schemas all live under the "Domains" directory, organized by domain group. Each domain group has it own directory, allowing permissions control by the domain group owner. If necessary for finer-grained permissions management, domain group owners can create further subdirectories. Otherwise, all domain schemas should be in the top-level domain group directory. There will be a "Released" subdirectory to hold domain schemas that have been publicly released.
+The BIS Domain Schemas all live under the "Domains" directory, organized by [schema-layer](https://www.itwinjs.org/bis/guide/intro/bis-organization/) and then domain group. Each domain group has it own directory, allowing permissions control by the domain group owner. If necessary for finer-grained permissions management, domain group owners can create further subdirectories. Otherwise, all domain schemas should be in the top-level domain group directory. There will be a "Released" subdirectory to hold domain schemas that have been publicly released.
 
 Example:
 
 ```shell
-\Domains\{DomainGroupName}\{Domain1}.ecschema.xml
-\Domains\{DomainGroupName}\{Domain2}.ecschema.xml
-\Domains\{DomainGroupName}\Released\{Domain1.MM.mm.bb}.ecschema.xml
-\Domains\{DomainGroupName}\Released\{Domain2.MM.mm.bb}.ecschema.xml
+\Domains\4-Application\{DomainGroupName}\{Domain1}.ecschema.xml
+\Domains\4-Application\{DomainGroupName}\{Domain2}.ecschema.xml
+\Domains\4-Application\{DomainGroupName}\Released\{Domain1.MM.mm.bb}.ecschema.xml
+\Domains\4-Application\{DomainGroupName}\Released\{Domain2.MM.mm.bb}.ecschema.xml
 ```
 
 ## Contributing
@@ -33,7 +33,7 @@ All other changes made outside of a domain group directory will require review b
 
 1. Create a branch of the bis-schemas repo to make all of your changes.
 1. Identify the owner of the Schema and decide what domain group it goes into.
-1. Add the schema(s) to an existing domain group or create a new directory for your new domain group.
+1. Add the schema(s) to an existing domain group or create a new directory for your new domain group in the appropriate schema-layer folder.
 1. [Update the Schema Inventory](#update-schema-inventory)
 1. Run [Bis Rule Validation](#bis-rule-validation) and [iModel Schema Validation](#imodel-schema-validation) on your new schema and make sure they pass.
 1. Create a PR to merge your branch into master
@@ -46,14 +46,14 @@ All other changes made outside of a domain group directory will require review b
 
 1. Create a branch of the bis-schemas repo to make all of your changes.
 1. Copy the schema to the Released directory for that domain group and change the file name to include the version
-    - e.g. copy `\Domains\Core\BisCore.ecschema.xml` to `\Domains\Core\Released\BisCore.01.00.42.ecschema.xml`
+    - e.g. copy `\Domains\0-Core\BisCore.ecschema.xml` to `\Domains\0-Core\Released\BisCore.01.00.42.ecschema.xml`
 1. [Update the Schema Inventory](#update-schema-inventory)
 1. Find the new entry added by the update schema inventory script it should look something like this:
 
     ```json
     {
     "name": "BisCore",
-    "path": "Domains\\Core\\Released\\BisCore.01.00.42.ecschema.xml",
+    "path": "Domains\\0-Core\\Released\\BisCore.01.00.42.ecschema.xml",
     "released": true,
     "version": "01.00.42",
     "comment": "Answers the question",
