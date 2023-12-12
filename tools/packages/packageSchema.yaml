@@ -12,7 +12,6 @@ pr:
 
 stages:
 - stage: Build
-  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
   jobs:
   - job: build_packages
     displayName: Build Packages
@@ -27,9 +26,11 @@ stages:
 
     steps:
       - task: NodeTool@0
-        displayName: 'Use Node 14.16.0'
+        displayName: 'Install Node 18.x'
         inputs:
-          versionSpec: 14.16.0
+          versionSpec: 18.x
+          checkLatest: true
+
       - checkout: self
         clean: true
 
@@ -56,4 +57,5 @@ stages:
       - publish: $(pkgOut)
         artifact: bis-schemas-packages
         displayName: 'Publish Pipeline Artifact'
+        condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
 

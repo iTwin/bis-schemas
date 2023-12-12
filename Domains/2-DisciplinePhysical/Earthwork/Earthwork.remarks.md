@@ -14,7 +14,7 @@ Contains the classes modeling earthwork activities in BIS. Earthwork involves th
 
 Instances of `FillType` provide an additional classification that can be applied to `Fill`s. Examples include Embankment, Slope Fill or Back Fill. An instance of `FillType` can optionally specify a single *Physical Material* via its `PhysicalMaterial` property.
 
-Equivalent to [IfcEarthworksFillTypeEnum](http://ifc43-docs.standards.buildingsmart.org/IFC/RELEASE/IFC4x3/HTML/lexical/IfcEarthworksFillTypeEnum.htm).
+Equivalent to [IfcEarthworksFillTypeEnum](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcEarthworksFillTypeEnum.htm).
 
 ### Fill
 
@@ -24,13 +24,13 @@ Examples of `Fill` include subgrade or a parts of a structure above it (such as 
 
 `Fill`s must be contained in `PhysicalModel`s. Instances of `Fill`, by default, shall use the Domain-ranked `ew:Volume` category.
 
-Equivalent to [IfcEarthworksFill](http://ifc43-docs.standards.buildingsmart.org/IFC/RELEASE/IFC4x3/HTML/lexical/IfcEarthworksFill.htm).
+Equivalent to [IfcEarthworksFill](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcEarthworksFill.htm).
 
 ### CutType
 
 Instances of `CutType` provide an additional classification that can be applied to `Cut`s. Examples include Excavation, Trench or Dredging. An instance of `CutType` can optionally specify a single *Physical Material* to be removed via its `PhysicalMaterial` property.
 
-Equivalent to [IfcEarthworksCutTypeEnum](http://ifc43-docs.standards.buildingsmart.org/IFC/RELEASE/IFC4x3/HTML/lexical/IfcEarthworksCutTypeEnum.htm).
+Equivalent to [IfcEarthworksCutTypeEnum](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcEarthworksCutTypeEnum.htm).
 
 ### Cut
 
@@ -40,7 +40,7 @@ The material excavated, modeled by `Cut`s, can later be used as fill or discarde
 
 `Cut`s must be contained in `PhysicalModel`s. Instances of `Cut`, by default, shall use the Domain-ranked `ew:Volume` category.
 
-Equivalent to [IfcEarthworksCut](http://ifc43-docs.standards.buildingsmart.org/IFC/RELEASE/IFC4x3/HTML/lexical/IfcEarthworksCut.htm) with the main difference that IFC's equivalent does not model the material excavated, only the resulting void from modification of existing terrain.
+Equivalent to [IfcEarthworksCut](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcEarthworksCut.htm) with the main difference that IFC's equivalent does not model the material excavated, only the resulting void from modification of existing terrain.
 
 ### SurfaceGradeType
 

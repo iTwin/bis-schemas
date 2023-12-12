@@ -11,7 +11,7 @@
 
     <ECCustomAttributes>
         <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
-            <SupportedUse>Production</SupportedUse>
+            <SupportedUse>NotForProduction</SupportedUse>
         </ProductionStatus>
         <SchemaLayerInfo xmlns="BisCustomAttributes.01.00.00">
             <Value>Common</Value>
@@ -267,7 +267,7 @@
         <ECEnumerator name="SLBB" value="1" displayLabel="SLBB" />
     </ECEnumeration>
 
-    <ECEntityClass typeName="DoubleLShapeProfile" modifier="Sealed" displayLabel="Double L-Shape Profile"  description="A CompositeProfile comprised of back-to-back Ls with the horizontal legs at the top of the Profile.">
+    <ECEntityClass typeName="DoubleLShapeProfile" modifier="Sealed" displayLabel="Double L-Shape Profile" description="A CompositeProfile comprised of back-to-back Ls with the horizontal legs at the top of the Profile.">
         <BaseClass>CompositeProfile</BaseClass>
         <ECProperty propertyName="Spacing" typeName="double" description="Distance separating the individual back to back LShapeProfiles." category="ProfileProperties" kindOfQuantity="AECU:LENGTH_SHORT" />
         <ECProperty propertyName="Type" typeName="DoubleLShapeProfileType" description="Enumeration defining which legs are to be placed back to back." category="ProfileProperties" />
@@ -298,15 +298,15 @@
         </Target>
     </ECRelationshipClass>
 
-    <ECEntityClass typeName="ArbitraryShapeProfile" modifier="None" displayLabel="Arbitrary Shape Profile" description="Custom, user defined Profile that can have any shape." >
+    <ECEntityClass typeName="ArbitraryShapeProfile" modifier="None" displayLabel="Arbitrary Shape Profile" description="Custom, user defined Profile that can have any shape.">
         <BaseClass>SinglePerimeterProfile</BaseClass>
     </ECEntityClass>
 
     <ECEntityClass typeName="ArbitraryCenterlineProfile" modifier="Sealed" displayLabel="Arbitrary Centerline Profile" description="Profile whose geometry is defined by user provided centerline and thickness that is uniformly applied to that centerline.">
         <BaseClass>ArbitraryShapeProfile</BaseClass>
         <BaseClass>ICenterlineProfile</BaseClass>
-        <ECProperty propertyName="ArcAngle" typeName="double" displayLabel="Arc Angle" description="Minimum angle for creating an arc. If angle is greater than ArcAngle then arc will be created, otherwise ChamferAngle will be used." category="ProfileProperties" kindOfQuantity="AECU:ANGLE"  />
-        <ECProperty propertyName="ChamferAngle" typeName="double" displayLabel="Chamfer Angle" description="Angle for contructing arcs from tangent lines. If angle is greater than ChamferAngle then curve will be constructed using multiple tangent lines, otherwise lines will be extended until they meet." category="ProfileProperties" kindOfQuantity="AECU:ANGLE"  />
+        <ECProperty propertyName="ArcAngle" typeName="double" displayLabel="Arc Angle" description="Minimum angle for creating an arc. If angle is greater than ArcAngle then arc will be created, otherwise ChamferAngle will be used." category="ProfileProperties" kindOfQuantity="AECU:ANGLE" />
+        <ECProperty propertyName="ChamferAngle" typeName="double" displayLabel="Chamfer Angle" description="Angle for constructing arcs from tangent lines. If angle is greater than ChamferAngle then curve will be constructed using multiple tangent lines, otherwise lines will be extended until they meet." category="ProfileProperties" kindOfQuantity="AECU:ANGLE" />
     </ECEntityClass>
 
     <!-- Geometric shapes -->
@@ -369,5 +369,34 @@
         <BaseClass>ParametricProfile</BaseClass>
         <ECProperty propertyName="Width" typeName="double" description="Extent of the capsule in the direction of the x-axis." category="ProfileProperties" kindOfQuantity="AECU:LENGTH_SHORT" />
         <ECProperty propertyName="Depth" typeName="double" description="Extent of the capsule in the direction of the y-axis." category="ProfileProperties" kindOfQuantity="AECU:LENGTH_SHORT" />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="ParametricDeckProfile" modifier="Abstract" displayLabel="Parametric Deck Profile" description="An open Profile of constant thickness">
+        <BaseClass>ParametricProfile</BaseClass>
+        <ECProperty propertyName="CelluralPlateThickness" typeName="double" displayLabel="Cellural Plate Thickness" description="Additional plate under the rest of the profile (optional)." category="ProfileProperties"  kindOfQuantity="AECU:LENGTH_SHORT" />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="StandardDeckProfile" modifier="Sealed" displayLabel="Standard Deck Profile" description="Standard Deck Shape Profile.">
+        <BaseClass>ParametricDeckProfile</BaseClass>
+        <ECProperty propertyName="Depth" typeName="double" displayLabel="Depth" description="Depth."  kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="TopFlatWidth" typeName="double" displayLabel="Top Flat Width" description="Width of top flat."  kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="BottomRibWidth" typeName="double" displayLabel="Bottom Rib Width" description="Width of bottom rib."  kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="CoverageWidth" typeName="double" displayLabel="Coverage Width" description="Distance between top flat and bottom width."  kindOfQuantity="AECU:LENGTH_SHORT" />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="DeepDeckProfile" modifier="Sealed" displayLabel="Deep Deck Profile" description="Deep Deck Profile.">
+        <BaseClass>ParametricDeckProfile</BaseClass>
+        <ECProperty propertyName="Depth" typeName="double" displayLabel="Depth" description="Depth."  kindOfQuantity="AECU:LENGTH_SHORT" />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="CorrugatedDeckProfile" modifier="Sealed" displayLabel="Corrugated Deck Profile" description="Corrugated Deck Profile.">
+        <BaseClass>ParametricDeckProfile</BaseClass>
+        <ECProperty propertyName="Depth" typeName="double" displayLabel="Depth" description="Depth."  kindOfQuantity="AECU:LENGTH_SHORT" />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="SineWaveDeckProfile" modifier="Sealed" displayLabel="Sine Wave Deck Profile" description="Sine Wave Deck Profile.">
+        <BaseClass>ParametricDeckProfile</BaseClass>
+        <ECProperty propertyName="Depth" typeName="double" displayLabel="Depth" description="Depth."  kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="WaveLength" typeName="double" displayLabel="Wave Length" description="Wave Length." />
     </ECEntityClass>
 </ECSchema>

@@ -183,11 +183,9 @@ AnalysisElements use [TopologyElements](#topologyelement) to define their locati
 
 Derives from [AnalysisElement](#analysiselement) and provides base class for structural elements.
 
-### Structure
+### StructuralAnalysisPartition
 
-A class that represents an entire structure and is sub-modeled by [StructuralAnalysisModel](#stucturalanalysismodel), derives from [StructuralAnalysisElement](#structuralanalysiselement).
-Always has a single property to represent the definition container that is referred by the structure.
-The sub-model of the definition container should be used as a default model for storing related DefinitionElements.
+A partition that defines a Structural Analysis perspective for a Subject. Each partition must be sub-modeled by a [StructuralAnalysisModel]. This model is expected to contain all Structural Analysis Elements that define the Subject. Each Structural Analysis Partition must point to a DefinitionContainer that is by default expected to contain most Definitions Elements related to the Analysis Partition.
 
 ### StructurePart
 
@@ -344,16 +342,28 @@ Multiple [CurveMember](#curvemember) properties might be grouped by a single ent
 
 Available CurveMemberTypes:
 
-- [SingleCurveMemberType](#singlecurvemembertype) - all CurveMembers have same Material and profile which are constant or change linearly along the length
-- [SegmentedCurveMemberType](#segmentedcurvemembertype) (future) - all CurveMembers are segmented, each segment might have different material and profiles
+- [SingleCurveMemberType](#singlecurvemembertype) - used to define CurveMember made of a single segment.
+- [CompositeCurveMemberType](#compositecurvemembertype) (future) - used to define curve members with composite materials.
 
 ### SingleCurveMemberType
 
-[CurveMemberType](#curvemembertype) which defines a type where all [CurveMembers](#curvemember) are not segmented. Structural properties for a CurveMember change linearly or do not change at all.
+A [CurveMemberType](#curvemembertype) which defines a type where all [CurveMembers](#curvemember) are not segmented. Structural properties for a CurveMember change linearly or do not change at all.
 
 ### MaterialProfileType
 
-[CurveMemberType](#curvemembertype) which defines a single Material and Profile for all CurveMembers of that type. CurveMember structural properties are constant along the length of each CurveMember.
+A [CurveMemberType](#curvemembertype) which defines a type of a [CurveMember](#curvemember) that is constructed of a single material. Can be used to define constant profile, tapered and multi-profile Curve Members. Material and Profile data is provided by [MaterialProfileDefinition](#materialprofiledefinition) element.
+
+### MaterialProfileDefinition
+
+A base class defining [CurveMember](#curvemember) Material and Profiles at each end. For a case where Profile does not change along the length - [MaterialProfile](#materialprofile) subclass should be used. For a tapered case - where different Profiles are needed at different Curve Member's ends - use [TaperedMaterialProfile](#materialprofiledefinition).
+
+### MaterialProfile
+
+Defines a [CurveMember](#curvemember) that has a constant Profile along it's length.
+
+### TaperedMaterialProfile
+
+Defines a tapered [CurveMember](#curvemember) that has a varying Profile along it's length.
 
 ### SurfaceType
 
@@ -416,11 +426,17 @@ Two aspects must always be assigned to a Surface Load:
 - [RelativeSurfaceLocationAspect](#relativesurfacelocationaspect) - surface on a host (parent) element where this Load is located.
 - [SurfaceLoadValueAspect](#surfaceloadvalueaspect) - defines force (caused by this Load) for the location surface.
 
-### LoadCombination
+### LoadCombinationInformation
 
-Modeled structure needs to be tested for different events that might occure in the liftime of the structure. Not all [Loads](#load) have same the effect on the structure at different events. For this purpose Loads are given different factors to test the structure for a given event. These groups of loads and factors are called Load Combinations (e.g. [ASCE7-10](https://www.waterboards.ca.gov/waterrights/water_issues/programs/bay_delta/california_waterfix/exhibits/docs/dd_jardins/DDJ-148%20ASCE%207-10.pdf)). Which LoadCombinations need to be used depend not only on the structure itself but also on how or where the structure is located, e.g. In case structure is located in Flood Zone, LoadCombinations would include Flood Loads.
+A load combination is a set of load cases that are applied to the structure simultaneously or sequentially. A load case is a single type of load, such as dead load, live load, wind load, earthquake load, etc. Load combinations are used to represent different design situations, such as serviceability, strength, stability, or extreme events. For example, a load combination for strength design might include the dead load, the live load, and a fraction of the wind load. A load combination for earthquake design might include the dead load, the live load, and the earthquake load in a specific direction.
 
-Defines condition for a [LoadCase](#loadcase). Different structure conditions provided by [LoadCases](#loadcase) access different [Load](#load) types with some specific [factor](#factoredloadconditionaspect). LoadCombinations allow to assign these factors for a given Load Case.
+Loads and Factors are assigned to LoadCombinationInformations using ([LoadConditionFactors])(#loadconditionfactor).
+
+### LoadConditionFactor
+
+A load factor is a numerical coefficient that modifies the magnitude of a load case in a load combination. Load factors are used to account for the uncertainty, variability, or importance of the load cases. For example, a load factor of 1.2 means that the load case is increased by 20%. A load factor of 0.9 means that the load case is reduced by 10%. Load factors are usually specified by codes or standards based on the type of load, the type of structure, and the design criteria.
+
+LoadConditionFactor are subclassed by ([LoadCaseFactor])(#loadcasefactor) and ([LoadCombinationFactor])(#loadcombinationfactor). These subclasses differ only by to which LoadCondition factor is applied - LoadCase or LoadCombination.
 
 ### LoadContainer
 
@@ -552,18 +568,6 @@ This aspect should not be used with [UniformForceSurfaceLoadValueAspect](#unifor
 ### FactoredLoadGroupAspect
 
 [LoadGroups](#loadgroup) can be assigned to a multiple [LoadCases](#loadcase) using this aspect.
-
-### FactoredLoadConditionAspect
-
-Different factors for each of [Load](#load) value are assinged based on the event for which structure is analyzed.
-
-### FactoredLoadCaseAspect
-
-Based on the [LoadType](#loadtype), [Load](loads) values should have different factors based on the event against which the structure is analyzed. [LoadCombinations](#loadcombination) define what factors should be used for each LoadType durring a specific event. These factors are assigned for all Loads in a Load Case using this aspect.
-
-### FactoredLoadCombinationAspect
-
-Allows to group multple [LoadCombinations](#loadcombination) into a single one, assigning a seperate factor for each combination.
 
 ### RelativeLocationAspect
 

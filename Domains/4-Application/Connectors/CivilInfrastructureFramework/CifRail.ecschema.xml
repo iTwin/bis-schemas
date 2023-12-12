@@ -3,15 +3,15 @@
 |  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
 |  * See LICENSE.md in the project root for license terms and full copyright notice.
 ======================================================================================= -->
-<ECSchema schemaName="CifRail" alias="cifrl" version="01.00.03" description="iModel Connector schema containing aspect classes with properties from OpenRail Designer." xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
+<ECSchema schemaName="CifRail" alias="cifrl" version="01.00.07" description="iModel Connector schema containing aspect classes with properties from OpenRail Designer." xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
     <ECSchemaReference name="BisCore" version="01.00.14" alias="bis"/>
+    <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
     <ECSchemaReference name="CifCommon" version="01.00.03" alias="cifcmn"/>
     <ECSchemaReference name="CifUnits" version="01.00.01" alias="cifu"/>
     <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
-    <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
     <ECCustomAttributes>
         <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
-            <SupportedUse>Production</SupportedUse>
+            <SupportedUse>NotForProduction</SupportedUse>
         </ProductionStatus>
         <SchemaLayerInfo xmlns="BisCustomAttributes.01.00.00">
             <Value>Application</Value>
@@ -61,6 +61,17 @@
         <ECEnumerator name="By_Point2" value="2" displayLabel="By Point2"/>
         <ECEnumerator name="By_Point3" value="3" displayLabel="By Point3"/>
     </ECEnumeration>
+    <ECEnumeration typeName="DistanceKeeperComponentAspect_RemainderLengthOption_Enum" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="At_Start" value="0" displayLabel="At Start"/>
+        <ECEnumerator name="At_End" value="1" displayLabel="At End"/>
+        <ECEnumerator name="At_Both_Start_And_End" value="2" displayLabel="At Both Start And End"/>
+        <ECEnumerator name="EqualDistance" value="3" displayLabel="EqualDistance"/>
+    </ECEnumeration>
+    <ECEnumeration typeName="PathwayRouteAspect_Direction_Enum" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="Up" value="0" displayLabel="Up"/>
+        <ECEnumerator name="Down" value="1" displayLabel="Down"/>
+        <ECEnumerator name="Bi_directional" value="2" displayLabel="Bi-directional"/>
+    </ECEnumeration>
     <ECEnumeration typeName="ProfileFromRailsRuleAspect_ProfileFromRailsRule_ElevationMethod_Enum" backingTypeName="int" isStrict="true">
         <ECEnumerator name="Inside_Rail" value="0" displayLabel="Inside Rail"/>
         <ECEnumerator name="Outside_Rail" value="1" displayLabel="Outside Rail"/>
@@ -102,6 +113,12 @@
         <ECEnumerator name="Fixed_Point" value="2" displayLabel="Fixed Point"/>
         <ECEnumerator name="Information_Point" value="3" displayLabel="Information Point"/>
     </ECEnumeration>
+    <ECEnumeration typeName="RegressionDetailsProfileEntityAspect_RegressionDetailsEntity_Status_Enum" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="Use_Point" value="0" displayLabel="Use Point"/>
+        <ECEnumerator name="Ignore_Point" value="1" displayLabel="Ignore Point"/>
+        <ECEnumerator name="Fixed_Point" value="2" displayLabel="Fixed Point"/>
+        <ECEnumerator name="Information_Point" value="3" displayLabel="Information Point"/>
+    </ECEnumeration>
     <ECEnumeration typeName="TurnoutRuleAspect_TurnoutRule_Hand_Enum" backingTypeName="int" isStrict="true">
         <ECEnumerator name="ToThe_Left" value="-1" displayLabel="ToThe Left"/>
         <ECEnumerator name="To_the_Right" value="1" displayLabel="To the Right"/>
@@ -136,6 +153,12 @@
     </ECEnumeration>
     <ECEntityClass typeName="BaseRegressionPointsRuleAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECCustomAttributes>
+            <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                <Description>This aspect has been deprecated.</Description>
+            </Deprecated>
+            <HiddenClass xmlns="CoreCustomAttributes.01.00.03"/>
+        </ECCustomAttributes>
         <ECProperty propertyName="SlewExaggeration" typeName="double" displayLabel="Slew Exaggeration" category="HorizontalRegression_Horizontal_Regression" priority="299990"/>
     </ECEntityClass>
     <ECEntityClass typeName="BaseTurnoutBranchesObjectSettings">
@@ -158,6 +181,12 @@
     </ECEntityClass>
     <ECEntityClass typeName="BaseVerticalRegressionPointsRuleAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECCustomAttributes>
+            <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                <Description>This aspect has been deprecated.</Description>
+            </Deprecated>
+            <HiddenClass xmlns="CoreCustomAttributes.01.00.03"/>
+        </ECCustomAttributes>
         <ECProperty propertyName="SlewExaggeration" typeName="double" displayLabel="Slew Exaggeration" category="VerticalRegression_Vertical_Regression" priority="299990"/>
     </ECEntityClass>
     <ECEntityClass typeName="BendingAxisTableEntryAspect">
@@ -184,16 +213,22 @@
         <ECProperty propertyName="CantStationPoint_AppliedCant" typeName="double" displayLabel="Applied Cant" category="CantStationPoint_Cant_Station_Point" priority="299993" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="CantStationPoint_CantDeficiency" typeName="double" displayLabel="Cant Deficiency" category="CantStationPoint_Cant_Station_Point" priority="299992" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="CantStationPoint_LateralAcceleration" typeName="string" displayLabel="Non-compensating Lateral Acceleration" category="CantStationPoint_Cant_Station_Point" priority="299991"/>
-        <ECProperty propertyName="CantStationPoint_AppliedRateOfChange" typeName="string" displayLabel="Applied Rate Of Change" category="CantStationPoint_Cant_Station_Point" priority="299990"/>
-        <ECProperty propertyName="CantStationPoint_DeficiencyRateOfChange" typeName="string" displayLabel="Deficiency Rate Of Change" category="CantStationPoint_Cant_Station_Point" priority="299989"/>
+        <ECProperty propertyName="CantStationPoint_AppliedRateOfChange" typeName="string" displayLabel="Applied Rate of Change" category="CantStationPoint_Cant_Station_Point" priority="299990"/>
+        <ECProperty propertyName="CantStationPoint_DeficiencyRateOfChange" typeName="string" displayLabel="Deficiency Rate of Change" category="CantStationPoint_Cant_Station_Point" priority="299989"/>
         <ECProperty propertyName="CantStationPoint_AppGrad" typeName="string" displayLabel="Applied Gradient" category="CantStationPoint_Cant_Station_Point" priority="299988"/>
         <ECProperty propertyName="CantStationPoint_LeftRail" typeName="double" displayLabel="Left Rail" category="CantStationPoint_Cant_Station_Point" priority="299987" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="CantStationPoint_RightRail" typeName="double" displayLabel="Right Rail" category="CantStationPoint_Cant_Station_Point" priority="299985" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="CantStationPoint_Center" typeName="double" displayLabel="Center" category="CantStationPoint_Cant_Station_Point" priority="299986" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="CantStationPoint_Status" typeName="string" displayLabel="Fixed" category="CantStationPoint_Cant_Station_Point" priority="299984"/>
+    </ECEntityClass>
+    <ECEntityClass typeName="CantTableEntryAspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="Radius" typeName="double" displayLabel="Radius" category="TableEntry_Cant_Table_Entry" priority="299999" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="Cant" typeName="double" displayLabel="Cant" category="TableEntry_Cant_Table_Entry" priority="299998" kindOfQuantity="cifu:LENGTH"/>
     </ECEntityClass>
     <ECEntityClass typeName="CoachAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
-        <ECProperty propertyName="CoachAtStationRule_Station" typeName="double" displayLabel="Station" category="SweepPathProperties_Sweep_Path" priority="299990" kindOfQuantity="cifu:STATION"/>
+        <ECProperty propertyName="CoachAtStationRule_Station" typeName="double" displayLabel="Station" category="LocationProperties_Location" priority="299990" kindOfQuantity="cifu:STATION"/>
         <ECProperty propertyName="CoachAtStationRule_TemplateName" typeName="string" displayLabel="Template Name" category="CoachProperties_Coach" priority="299980"/>
         <ECProperty propertyName="CoachAtStationRule_BogieBase" typeName="double" displayLabel="Bogie Base" category="CoachProperties_Coach" priority="299970" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="CoachAtStationRule_RearExtension" typeName="double" displayLabel="Rear Extension" category="CoachProperties_Coach" priority="299960" kindOfQuantity="cifu:LENGTH"/>
@@ -290,16 +325,24 @@
         <ECProperty propertyName="CrossoverRule_Turnout2Branch2P3Station" typeName="double" displayLabel="Second Turnout Branch2 P3 Station" category="CrossoverPointsProperties_Crossover_Points" priority="299220" kindOfQuantity="cifu:STATION"/>
         <ECProperty propertyName="CrossoverRule_Turnout2Branch2TheoreticalP1Station" typeName="double" displayLabel="Second Turnout Branch2 Theoretical P1 Station" category="CrossoverPointsProperties_Crossover_Points" priority="299210" kindOfQuantity="cifu:STATION"/>
     </ECEntityClass>
-    <ECEntityClass typeName="DistanceKeeperComponentAspect" displayLabel="Distance Keeper Component">
+    <ECEntityClass typeName="DistanceKeeperComponentAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
         <ECProperty propertyName="StartDistance" typeName="double" displayLabel="Start Distance" category="DistanceKeepersProperties_Distance_Keepers" priority="299990" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="EndDistance" typeName="double" displayLabel="End Distance" category="DistanceKeepersProperties_Distance_Keepers" priority="299980" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="IntervalDistance" typeName="double" displayLabel="Interval Distance" category="DistanceKeepersProperties_Distance_Keepers" priority="299970" kindOfQuantity="cifu:LENGTH"/>
-        <ECProperty propertyName="RemainderLengthOption" typeName="double" displayLabel="Remainder Length Option" category="DistanceKeepersProperties_Distance_Keepers" priority="299960" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="MinDistanceBetweenKeeper" typeName="double" displayLabel="Minimum Distance Between Keepers" category="DistanceKeepersProperties_Distance_Keepers" priority="299950" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="MaxDistanceBetweenKeeper" typeName="double" displayLabel="Maximum Distance Between Keepers" category="DistanceKeepersProperties_Distance_Keepers" priority="299940" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="DistFromStartPoint" typeName="double" displayLabel="Distance From Start Point" category="DistanceKeepersProperties_Distance_Keepers" priority="299930" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="DistFromEndPoint" typeName="double" displayLabel="Distance From End Point" category="DistanceKeepersProperties_Distance_Keepers" priority="299920" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="RemainderLengthOption" typeName="double" displayLabel="Remainder Length Option [Deprecated]" category="DistanceKeepersProperties_Distance_Keepers" priority="299960" kindOfQuantity="cifu:LENGTH">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03"/>
+                <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                    <Description>Use 'RemainderLengthOptionValue' instead</Description>
+                </Deprecated>
+            </ECCustomAttributes>
+        </ECProperty>
+        <ECProperty propertyName="RemainderLengthOptionValue" typeName="DistanceKeeperComponentAspect_RemainderLengthOption_Enum" displayLabel="Remainder Length Option" category="DistanceKeepersProperties_Distance_Keepers" priority="299960"/>
     </ECEntityClass>
     <ECRelationshipClass typeName="ElementOwnsBaseRegressionPointsRuleAspect" modifier="None" strength="embedding">
         <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
@@ -364,6 +407,15 @@
             <Class class="CantStationPointAspect"/>
         </Target>
     </ECRelationshipClass>
+    <ECRelationshipClass typeName="ElementOwnsCantTableEntryAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="CantTableEntryAspect"/>
+        </Target>
+    </ECRelationshipClass>
     <ECRelationshipClass typeName="ElementOwnsCoachAspect" modifier="None" strength="embedding">
         <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
         <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
@@ -400,6 +452,25 @@
             <Class class="DistanceKeeperComponentAspect"/>
         </Target>
     </ECRelationshipClass>
+    <ECEntityClass typeName="ItalianCantTableEntryAspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="MaxCant" typeName="double" displayLabel="Maximum Cant" category="TableEntry_Italian_Cant_Table_Entry" priority="299999" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="Deficiency" typeName="double" displayLabel="Deficiency" category="TableEntry_Italian_Cant_Table_Entry" priority="299998" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="Excess" typeName="double" displayLabel="Excess" category="TableEntry_Italian_Cant_Table_Entry" priority="299997" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="Rounding" typeName="double" displayLabel="Rounding" category="TableEntry_Italian_Cant_Table_Entry" priority="299996" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="LowSpeedLimit" typeName="double" displayLabel="Low Speed Limit" category="TableEntry_Italian_Cant_Table_Entry" priority="299995" kindOfQuantity="cifu:VELOCITY"/>
+        <ECProperty propertyName="MinSpeed" typeName="double" displayLabel="Minimum Speed" category="TableEntry_Italian_Cant_Table_Entry" priority="299994" kindOfQuantity="cifu:VELOCITY"/>
+        <ECProperty propertyName="SpeedThresholdForUse" typeName="double" displayLabel="Speed Threshold For Use" category="TableEntry_Italian_Cant_Table_Entry" priority="299993" kindOfQuantity="cifu:VELOCITY"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsItalianCantTableEntryAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="ItalianCantTableEntryAspect"/>
+        </Target>
+    </ECRelationshipClass>
     <ECEntityClass typeName="PathwayAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
         <ECProperty propertyName="Name" typeName="string" displayLabel="Name" category="Name_General_Category" priority="299999"/>
@@ -428,6 +499,27 @@
             <Class class="PathwayEdgeAssetRuleAspect"/>
         </Target>
     </ECRelationshipClass>
+    <ECEntityClass typeName="PathwayRouteAspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="Direction" typeName="int" displayLabel="Direction [Deprecated]" category="Name_Pathway_Route" priority="299999">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03"/>
+                <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                    <Description>Use 'DirectionValue' instead</Description>
+                </Deprecated>
+            </ECCustomAttributes>
+        </ECProperty>
+        <ECProperty propertyName="DirectionValue" typeName="PathwayRouteAspect_Direction_Enum" displayLabel="Direction" category="Name_Pathway_Route" priority="299999"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsPathwayRouteAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="PathwayRouteAspect"/>
+        </Target>
+    </ECRelationshipClass>
     <ECEntityClass typeName="PointControlExtensionAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
         <ECProperty propertyName="Cant" typeName="string" displayLabel="Cant" category="CantPoints_Cant_Points" priority="299977"/>
@@ -446,7 +538,13 @@
     </ECRelationshipClass>
     <ECEntityClass typeName="ProfileFromRailsRuleAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
-        <ECProperty propertyName="ProfileFromRailsRule_ElevationMethod" typeName="ProfileFromRailsRuleAspect_ProfileFromRailsRule_ElevationMethod_Enum" displayLabel="Elevation Method" category="CenterlineProfile_Track_Centerline_Profile" priority="299990"/>
+        <ECCustomAttributes>
+            <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                <Description>This aspect has been deprecated.</Description>
+            </Deprecated>
+            <HiddenClass xmlns="CoreCustomAttributes.01.00.03"/>
+        </ECCustomAttributes>
+        <ECProperty propertyName="ProfileFromRailsRule_ElevationMethod" typeName="ProfileFromRailsRuleAspect_ProfileFromRailsRule_ElevationMethod_Enum" displayLabel="Elevation Method" category="CenterlineProfile_Centerline_Profile" priority="299990"/>
     </ECEntityClass>
     <ECRelationshipClass typeName="ElementOwnsProfileFromRailsRuleAspect" modifier="None" strength="embedding">
         <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
@@ -457,7 +555,27 @@
             <Class class="ProfileFromRailsRuleAspect"/>
         </Target>
     </ECRelationshipClass>
-    <ECEntityClass typeName="RailJointAspect" displayLabel="&lt;- RailJoint -&gt;">
+    <ECEntityClass typeName="ProjectedSweptCoachRuleAspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="ProjectedSweptCoachRule_StartStation" typeName="double" displayLabel="Start Distance" category="SweepPathProperties_Swept_Path" priority="299990" kindOfQuantity="cifu:STATION"/>
+        <ECProperty propertyName="ProjectedSweptCoachRule_EndStation" typeName="double" displayLabel="End Distance" category="SweepPathProperties_Swept_Path" priority="299980" kindOfQuantity="cifu:STATION"/>
+        <ECProperty propertyName="ProjectedSweptCoachRule_CoachSampling" typeName="double" displayLabel="Coach Sampling" category="SweepPathProperties_Swept_Path" priority="299900" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="ProjectedSweptCoachRule_SectionSampling" typeName="double" displayLabel="Section Sampling" category="SweepPathProperties_Swept_Path" priority="299890" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="ProjectedSweptCoachRule_TemplateName" typeName="string" displayLabel="Template Name" category="CoachProperties_Coach" priority="299970"/>
+        <ECProperty propertyName="ProjectedSweptCoachRule_BogieBase" typeName="double" displayLabel="Bogie Base" category="CoachProperties_Coach" priority="299960" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="ProjectedSweptCoachRule_RearExtension" typeName="double" displayLabel="Rear Extension" category="CoachProperties_Coach" priority="299950" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="ProjectedSweptCoachRule_FrontExtension" typeName="double" displayLabel="Front Extension" category="CoachProperties_Coach" priority="299940" kindOfQuantity="cifu:LENGTH"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsProjectedSweptCoachRuleAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="ProjectedSweptCoachRuleAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="RailJointAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
         <ECProperty propertyName="Length" typeName="double" displayLabel="Length" category="Joint_Joint" priority="299930" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="Station" typeName="double" displayLabel="Station" category="Joint_Joint" priority="299920" kindOfQuantity="cifu:STATION"/>
@@ -474,7 +592,7 @@
             <Class class="RailJointAspect"/>
         </Target>
     </ECRelationshipClass>
-    <ECEntityClass typeName="RailKeyPointsComponentForJointAspect" displayLabel="&lt;- RailKeyPointsComponentForJoint -&gt;">
+    <ECEntityClass typeName="RailKeyPointsComponentForJointAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
         <ECProperty propertyName="MinRailLength" typeName="double" displayLabel="Min Rail Length" category="JointGroup_Joint_Group" priority="299990" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="MaxRailLength" typeName="double" displayLabel="Max Rail Length" category="JointGroup_Joint_Group" priority="299980" kindOfQuantity="cifu:LENGTH"/>
@@ -509,7 +627,7 @@
             <Class class="RailOffsetRuleAspect"/>
         </Target>
     </ECRelationshipClass>
-    <ECEntityClass typeName="RailTrackComponentAspect" displayLabel="&lt;- RailTrackComponent -&gt;">
+    <ECEntityClass typeName="RailTrackComponentAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
         <ECProperty propertyName="RailTrackComponent_StartDistance" typeName="double" displayLabel="Start Distance" category="RailProperties_Rail" priority="299990" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="RailTrackComponent_EndDistance" typeName="double" displayLabel="End Distance" category="RailProperties_Rail" priority="299980" kindOfQuantity="cifu:LENGTH"/>
@@ -531,6 +649,9 @@
         <ECProperty propertyName="Name" typeName="string" displayLabel="Name" category="Name_Railway_Edge" priority="299999"/>
         <ECProperty propertyName="StartDistanceAlong" typeName="double" displayLabel="Distance Along Railway" category="Name_Railway_Edge" priority="299998" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="Length" typeName="double" displayLabel="Length" category="Name_Railway_Edge" priority="299997" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="GeometryName" typeName="string" displayLabel="Geometry" category="Name_Railway_Edge" priority="299996"/>
+        <ECProperty propertyName="StartNode" typeName="string" displayLabel="Start Node" category="Name_Railway_Edge" priority="299995"/>
+        <ECProperty propertyName="EndNode" typeName="string" displayLabel="End Node" category="Name_Railway_Edge" priority="299994"/>
     </ECEntityClass>
     <ECRelationshipClass typeName="ElementOwnsRailwayEdgeAspect" modifier="None" strength="embedding">
         <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
@@ -558,7 +679,10 @@
     </ECRelationshipClass>
     <ECEntityClass typeName="RailwayNodeAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
-        <ECProperty propertyName="Name" typeName="string" displayLabel="Railway Node" category="Name_Railway_Node" priority="299999"/>
+        <ECProperty propertyName="Name" typeName="string" displayLabel="Name" category="Name_Railway_Node" priority="299999"/>
+        <ECProperty propertyName="NodeType" typeName="string" displayLabel="Node Type" category="Name_Railway_Node" priority="299998"/>
+        <ECProperty propertyName="FirstGeometry" typeName="string" displayLabel="First Geometry" category="Name_Railway_Node" priority="299997"/>
+        <ECProperty propertyName="SecondGeometry" typeName="string" displayLabel="Second Geometry" category="Name_Railway_Node" priority="299996"/>
     </ECEntityClass>
     <ECRelationshipClass typeName="ElementOwnsRailwayNodeAspect" modifier="None" strength="embedding">
         <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
@@ -571,6 +695,12 @@
     </ECRelationshipClass>
     <ECEntityClass typeName="RegressionCurvatureRuleAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECCustomAttributes>
+            <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                <Description>This aspect has been deprecated.</Description>
+            </Deprecated>
+            <HiddenClass xmlns="CoreCustomAttributes.01.00.03"/>
+        </ECCustomAttributes>
         <ECProperty propertyName="RemoveOutliers" typeName="RegressionCurvatureRuleAspect_RemoveOutliers_BoolEnum" displayLabel="Remove Outliers" category="HorizontalRegression_Horizontal_Regression" priority="299990"/>
         <ECProperty propertyName="Multiplier" typeName="RegressionCurvatureRuleAspect_Multiplier_Enum" displayLabel="Standard Deviation Multiplier" category="HorizontalRegression_Horizontal_Regression" priority="299980"/>
     </ECEntityClass>
@@ -585,6 +715,12 @@
     </ECRelationshipClass>
     <ECEntityClass typeName="RegressionDetailsEntityAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECCustomAttributes>
+            <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                <Description>This aspect has been deprecated.</Description>
+            </Deprecated>
+            <HiddenClass xmlns="CoreCustomAttributes.01.00.03"/>
+        </ECCustomAttributes>
         <ECProperty propertyName="RegressionDetailsEntity_Slew" typeName="double" displayLabel="Slew" category="RegressionPoint_Regression_Point" priority="299990" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="RegressionDetailsEntity_Weight" typeName="double" displayLabel="Weight" category="RegressionPoint_Regression_Point" priority="299980"/>
         <ECProperty propertyName="RegressionDetailsEntity_Status" typeName="RegressionDetailsEntityAspect_RegressionDetailsEntity_Status_Enum" displayLabel="Status" category="RegressionPoint_Regression_Point" priority="299970"/>
@@ -597,6 +733,22 @@
         </Source>
         <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
             <Class class="RegressionDetailsEntityAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="RegressionDetailsProfileEntityAspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="RegressionDetailsEntity_Slew" typeName="double" displayLabel="Slew" category="RegressionPoint_Regression_Point" priority="299990"/>
+        <ECProperty propertyName="RegressionDetailsEntity_Weight" typeName="double" displayLabel="Weight" category="RegressionPoint_Regression_Point" priority="299980"/>
+        <ECProperty propertyName="RegressionDetailsEntity_Status" typeName="RegressionDetailsProfileEntityAspect_RegressionDetailsEntity_Status_Enum" displayLabel="Status" category="RegressionPoint_Regression_Point" priority="299970"/>
+        <ECProperty propertyName="RegressionDetailsEntity_Offset" typeName="double" displayLabel="Offset" category="RegressionPoint_Regression_Point" priority="299960" kindOfQuantity="cifu:LENGTH"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsRegressionDetailsProfileEntityAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="RegressionDetailsProfileEntityAspect"/>
         </Target>
     </ECRelationshipClass>
     <ECEntityClass typeName="SchemaElemOnPathwayEdgeRuleAspect">
@@ -615,8 +767,8 @@
     </ECRelationshipClass>
     <ECEntityClass typeName="SchemaPathwayEdgeRuleAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
-        <ECProperty propertyName="StartPoint" typeName="point3d" displayLabel="Start Point" category="SchemaLineAttributes_General_Category" priority="299999"/>
-        <ECProperty propertyName="EndPoint" typeName="point3d" displayLabel="End Point" category="SchemaLineAttributes_General_Category" priority="299998"/>
+        <ECProperty propertyName="StartPoint" typeName="point3d" displayLabel="Start Point" category="SchemaLineAttributes_General_Category" priority="299999" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="EndPoint" typeName="point3d" displayLabel="End Point" category="SchemaLineAttributes_General_Category" priority="299998" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="RefLength" typeName="double" displayLabel="Referenced Entity Length" category="SchemaLineAttributes_General_Category" priority="299997" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="ScaleRatio" typeName="double" displayLabel="Scale Ratio" category="SchemaLineAttributes_General_Category" priority="299996" kindOfQuantity="cifu:LENGTH"/>
     </ECEntityClass>
@@ -644,6 +796,12 @@
     </ECRelationshipClass>
     <ECEntityClass typeName="SingleElementFromCurvatureRuleAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECCustomAttributes>
+            <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                <Description>This aspect has been deprecated.</Description>
+            </Deprecated>
+            <HiddenClass xmlns="CoreCustomAttributes.01.00.03"/>
+        </ECCustomAttributes>
         <ECProperty propertyName="MaximumOffset" typeName="double" displayLabel="Maximum Slew" category="HorizontalRegression_Horizontal_Regression" priority="299990" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="StandardError" typeName="double" displayLabel="Standard Error" category="HorizontalRegression_Horizontal_Regression" priority="299980"/>
     </ECEntityClass>
@@ -658,11 +816,17 @@
     </ECRelationshipClass>
     <ECEntityClass typeName="SingleElementHorizontalRegressionRuleAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECCustomAttributes>
+            <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                <Description>This aspect has been deprecated.</Description>
+            </Deprecated>
+            <HiddenClass xmlns="CoreCustomAttributes.01.00.03"/>
+        </ECCustomAttributes>
         <ECProperty propertyName="MaximumOffset" typeName="double" displayLabel="Maximum Slew" category="HorizontalRegression_Horizontal_Regression" priority="299990" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="StandardError" typeName="double" displayLabel="Standard Error" category="HorizontalRegression_Horizontal_Regression" priority="299980"/>
-        <ECProperty propertyName="FirstPoint" typeName="point3d" displayLabel="First Point" category="HorizontalRegression_Horizontal_Regression" priority="299970"/>
-        <ECProperty propertyName="SecondPoint" typeName="point3d" displayLabel="Second Point" category="HorizontalRegression_Horizontal_Regression" priority="299960"/>
-        <ECProperty propertyName="LastPoint" typeName="point3d" displayLabel="Last Point" category="HorizontalRegression_Horizontal_Regression" priority="299950"/>
+        <ECProperty propertyName="FirstPoint" typeName="point3d" displayLabel="First Point" category="HorizontalRegression_Horizontal_Regression" priority="299970" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="SecondPoint" typeName="point3d" displayLabel="Second Point" category="HorizontalRegression_Horizontal_Regression" priority="299960" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="LastPoint" typeName="point3d" displayLabel="Last Point" category="HorizontalRegression_Horizontal_Regression" priority="299950" kindOfQuantity="cifu:LENGTH"/>
     </ECEntityClass>
     <ECRelationshipClass typeName="ElementOwnsSingleElementHorizontalRegressionRuleAspect" modifier="None" strength="embedding">
         <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
@@ -675,11 +839,17 @@
     </ECRelationshipClass>
     <ECEntityClass typeName="SingleElementSectionFromCurvatureRuleAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECCustomAttributes>
+            <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                <Description>This aspect has been deprecated.</Description>
+            </Deprecated>
+            <HiddenClass xmlns="CoreCustomAttributes.01.00.03"/>
+        </ECCustomAttributes>
         <ECProperty propertyName="MaximumOffset" typeName="double" displayLabel="Maximum Slew" category="HorizontalRegression_Horizontal_Regression" priority="299990" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="StandardError" typeName="double" displayLabel="Standard Error" category="HorizontalRegression_Horizontal_Regression" priority="299980"/>
-        <ECProperty propertyName="FirstPoint" typeName="point3d" displayLabel="First Point" category="HorizontalRegression_Horizontal_Regression" priority="299970"/>
-        <ECProperty propertyName="SecondPoint" typeName="point3d" displayLabel="Second Point" category="HorizontalRegression_Horizontal_Regression" priority="299960"/>
-        <ECProperty propertyName="LastPoint" typeName="point3d" displayLabel="Last Point" category="HorizontalRegression_Horizontal_Regression" priority="299950"/>
+        <ECProperty propertyName="FirstPoint" typeName="point3d" displayLabel="First Point" category="HorizontalRegression_Horizontal_Regression" priority="299970" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="SecondPoint" typeName="point3d" displayLabel="Second Point" category="HorizontalRegression_Horizontal_Regression" priority="299960" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="LastPoint" typeName="point3d" displayLabel="Last Point" category="HorizontalRegression_Horizontal_Regression" priority="299950" kindOfQuantity="cifu:LENGTH"/>
     </ECEntityClass>
     <ECRelationshipClass typeName="ElementOwnsSingleElementSectionFromCurvatureRuleAspect" modifier="None" strength="embedding">
         <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
@@ -692,11 +862,17 @@
     </ECRelationshipClass>
     <ECEntityClass typeName="SingleElementVerticalRegressionRuleAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECCustomAttributes>
+            <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                <Description>This aspect has been deprecated.</Description>
+            </Deprecated>
+            <HiddenClass xmlns="CoreCustomAttributes.01.00.03"/>
+        </ECCustomAttributes>
         <ECProperty propertyName="MaximumOffset" typeName="double" displayLabel="Maximum Slew" category="VerticalRegression_Vertical_Regression" priority="299990" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="StandardError" typeName="double" displayLabel="Standard Error" category="VerticalRegression_Vertical_Regression" priority="299980"/>
-        <ECProperty propertyName="FirstPoint" typeName="point3d" displayLabel="First Point" category="VerticalRegression_Vertical_Regression" priority="299970"/>
-        <ECProperty propertyName="SecondPoint" typeName="point3d" displayLabel="Second Point" category="VerticalRegression_Vertical_Regression" priority="299960"/>
-        <ECProperty propertyName="LastPoint" typeName="point3d" displayLabel="Last Point" category="VerticalRegression_Vertical_Regression" priority="299950"/>
+        <ECProperty propertyName="FirstPoint" typeName="point3d" displayLabel="First Point" category="VerticalRegression_Vertical_Regression" priority="299970" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="SecondPoint" typeName="point3d" displayLabel="Second Point" category="VerticalRegression_Vertical_Regression" priority="299960" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="LastPoint" typeName="point3d" displayLabel="Last Point" category="VerticalRegression_Vertical_Regression" priority="299950" kindOfQuantity="cifu:LENGTH"/>
     </ECEntityClass>
     <ECRelationshipClass typeName="ElementOwnsSingleElementVerticalRegressionRuleAspect" modifier="None" strength="embedding">
         <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
@@ -709,6 +885,12 @@
     </ECRelationshipClass>
     <ECEntityClass typeName="SingleProfileFromCurvatureRuleAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECCustomAttributes>
+            <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                <Description>This aspect has been deprecated.</Description>
+            </Deprecated>
+            <HiddenClass xmlns="CoreCustomAttributes.01.00.03"/>
+        </ECCustomAttributes>
         <ECProperty propertyName="MaximumOffset" typeName="double" displayLabel="Maximum Slew" category="VerticalRegression_Vertical_Regression" priority="299990" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="StandardError" typeName="double" displayLabel="Standard Error" category="VerticalRegression_Vertical_Regression" priority="299980"/>
     </ECEntityClass>
@@ -721,7 +903,7 @@
             <Class class="SingleProfileFromCurvatureRuleAspect"/>
         </Target>
     </ECRelationshipClass>
-    <ECEntityClass typeName="SleeperComponentAspect" displayLabel="&lt;- SleeperComponent -&gt;">
+    <ECEntityClass typeName="SleeperComponentAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
         <ECProperty propertyName="StartDistance" typeName="double" displayLabel="Start Distance" category="RailProperties_Rail" priority="299990" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="EndDistance" typeName="double" displayLabel="End Distance" category="RailProperties_Rail" priority="299980" kindOfQuantity="cifu:LENGTH"/>
@@ -756,10 +938,10 @@
     </ECRelationshipClass>
     <ECEntityClass typeName="SweptCoachAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
-        <ECProperty propertyName="SweptCoachRule_StartStation" typeName="double" displayLabel="Start Distance" category="SweepPathProperties_Sweep_Path" priority="299990" kindOfQuantity="cifu:STATION"/>
-        <ECProperty propertyName="SweptCoachRule_EndStation" typeName="double" displayLabel="End Distance" category="SweepPathProperties_Sweep_Path" priority="299980" kindOfQuantity="cifu:STATION"/>
-        <ECProperty propertyName="SweptCoachRule_CoachSampling" typeName="double" displayLabel="Coach Sampling" category="SweepPathProperties_Sweep_Path" priority="299900" kindOfQuantity="cifu:LENGTH"/>
-        <ECProperty propertyName="SweptCoachRule_SectionSampling" typeName="double" displayLabel="Section Sampling" category="SweepPathProperties_Sweep_Path" priority="299890" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="SweptCoachRule_StartStation" typeName="double" displayLabel="Start Distance" category="SweepPathProperties_Swept_Path" priority="299990" kindOfQuantity="cifu:STATION"/>
+        <ECProperty propertyName="SweptCoachRule_EndStation" typeName="double" displayLabel="End Distance" category="SweepPathProperties_Swept_Path" priority="299980" kindOfQuantity="cifu:STATION"/>
+        <ECProperty propertyName="SweptCoachRule_CoachSampling" typeName="double" displayLabel="Coach Sampling" category="SweepPathProperties_Swept_Path" priority="299900" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="SweptCoachRule_SectionSampling" typeName="double" displayLabel="Section Sampling" category="SweepPathProperties_Swept_Path" priority="299890" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="SweptCoachRule_TemplateName" typeName="string" displayLabel="Template Name" category="CoachProperties_Coach" priority="299970"/>
         <ECProperty propertyName="SweptCoachRule_BogieBase" typeName="double" displayLabel="Bogie Base" category="CoachProperties_Coach" priority="299960" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="SweptCoachRule_RearExtension" typeName="double" displayLabel="Rear Extension" category="CoachProperties_Coach" priority="299950" kindOfQuantity="cifu:LENGTH"/>
@@ -779,6 +961,12 @@
     </ECRelationshipClass>
     <ECEntityClass typeName="TrackSleeperRuleAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECCustomAttributes>
+            <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                <Description>TrackSleeperRuleAspect is no longer in use. Use SleeperComponentAspect instead.</Description>
+            </Deprecated>
+            <HiddenClass xmlns="CoreCustomAttributes.01.00.03"/>
+        </ECCustomAttributes>
         <ECProperty propertyName="StartDistance" typeName="double" displayLabel="Start Distance" category="RailProperties_Rail" priority="299990" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="EndDistance" typeName="double" displayLabel="End Distance" category="RailProperties_Rail" priority="299980" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="SleeperLength" typeName="double" displayLabel="Sleeper Length" category="RailProperties_Rail" priority="299970" kindOfQuantity="cifu:LENGTH"/>
@@ -813,8 +1001,8 @@
     </ECRelationshipClass>
     <ECEntityClass typeName="TurnoutGeometryItemPropertyProviderAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
-        <ECProperty propertyName="TurnoutGeometryItemPropertyProvider_StartPoint" typeName="point3d" displayLabel="Start Point" category="TurnoutGeometryProperties_Geometry" priority="299990"/>
-        <ECProperty propertyName="TurnoutGeometryItemPropertyProvider_EndPoint" typeName="point3d" displayLabel="End Point" category="TurnoutGeometryProperties_Geometry" priority="299980"/>
+        <ECProperty propertyName="TurnoutGeometryItemPropertyProvider_StartPoint" typeName="point3d" displayLabel="Start Point" category="TurnoutGeometryProperties_Geometry" priority="299990" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="TurnoutGeometryItemPropertyProvider_EndPoint" typeName="point3d" displayLabel="End Point" category="TurnoutGeometryProperties_Geometry" priority="299980" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="TurnoutGeometryItemPropertyProvider_Length" typeName="double" displayLabel="Length" category="TurnoutGeometryProperties_Geometry" priority="299970" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="TurnoutGeometryItemPropertyProvider_Direction" typeName="double" displayLabel="Direction" category="TurnoutGeometryProperties_Geometry" priority="299960"/>
         <ECProperty propertyName="TurnoutGeometryItemPropertyProvider_Radius" typeName="double" displayLabel="Radius" category="TurnoutGeometryProperties_Geometry" priority="299950" kindOfQuantity="cifu:LENGTH"/>
@@ -872,6 +1060,12 @@
     </ECRelationshipClass>
     <ECEntityClass typeName="TurnoutSleeperRuleAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECCustomAttributes>
+            <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                <Description>TurnoutSleeperRuleAspect is no longer in use. Use SleeperComponentAspect instead.</Description>
+            </Deprecated>
+            <HiddenClass xmlns="CoreCustomAttributes.01.00.03"/>
+        </ECCustomAttributes>
         <ECProperty propertyName="SleeperLength" typeName="double" displayLabel="Sleeper Length" category="RailProperties_Rail" priority="299990" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="SleeperWidth" typeName="double" displayLabel="Sleeper Width" category="RailProperties_Rail" priority="299980" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="SleeperThickness" typeName="double" displayLabel="Sleeper Thickness" category="RailProperties_Rail" priority="299965" kindOfQuantity="cifu:LENGTH"/>
@@ -889,6 +1083,12 @@
     </ECRelationshipClass>
     <ECEntityClass typeName="VerticalRegressionCurvatureRuleAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECCustomAttributes>
+            <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                <Description>This aspect has been deprecated.</Description>
+            </Deprecated>
+            <HiddenClass xmlns="CoreCustomAttributes.01.00.03"/>
+        </ECCustomAttributes>
         <ECProperty propertyName="RemoveOutliers" typeName="VerticalRegressionCurvatureRuleAspect_RemoveOutliers_BoolEnum" displayLabel="Remove Outliers" category="VerticalRegression_Vertical_Regression" priority="299990"/>
         <ECProperty propertyName="Multiplier" typeName="VerticalRegressionCurvatureRuleAspect_Multiplier_Enum" displayLabel="Standard Deviation Multiplier" category="VerticalRegression_Vertical_Regression" priority="299980"/>
     </ECEntityClass>
@@ -904,6 +1104,7 @@
     <PropertyCategory typeName="Cant_Cant" description="Cant" displayLabel="Cant" priority="199800"/>
     <PropertyCategory typeName="CantPoints_Cant_Points" description="CantPoints" displayLabel="Cant Points" priority="199700"/>
     <PropertyCategory typeName="CantStationPoint_Cant_Station_Point" description="CantStationPoint" displayLabel="Cant Station Point" priority="199800"/>
+    <PropertyCategory typeName="CenterlineProfile_Centerline_Profile" description="CenterlineProfile" displayLabel="Centerline Profile" priority="4294967286"/>
     <PropertyCategory typeName="CenterlineProfile_Track_Centerline_Profile" description="CenterlineProfile" displayLabel="Track Centerline Profile" priority="4294967286"/>
     <PropertyCategory typeName="CenterPoint_General_Category" description="CenterPoint" displayLabel="General Category" priority="200000"/>
     <PropertyCategory typeName="CoachProperties_Coach" description="CoachProperties" displayLabel="Coach" priority="4294967286"/>
@@ -915,12 +1116,14 @@
     <PropertyCategory typeName="HorizontalRegression_Horizontal_Regression" description="HorizontalRegression" displayLabel="Horizontal Regression" priority="4294967286"/>
     <PropertyCategory typeName="Joint_Joint" description="Joint" displayLabel="Joint" priority="4294967286"/>
     <PropertyCategory typeName="JointGroup_Joint_Group" description="JointGroup" displayLabel="Joint Group" priority="4294967281"/>
+    <PropertyCategory typeName="LocationProperties_Location" description="LocationProperties" displayLabel="Location" priority="4294967284"/>
     <PropertyCategory typeName="Miscellaneous_Base_Turnout_Branches_Feature" description="Miscellaneous" displayLabel="Base Turnout Branches Feature" priority="401000"/>
     <PropertyCategory typeName="Miscellaneous_Base_Turnout_Elements_Feature" description="Miscellaneous" displayLabel="Base Turnout Elements Feature" priority="401000"/>
     <PropertyCategory typeName="Miscellaneous_LLS_Extension" description="Miscellaneous" displayLabel="LLS Extension" priority="401000"/>
     <PropertyCategory typeName="Miscellaneous_RailwayEdgeSegmentClass" description="Miscellaneous" displayLabel="RailwayEdgeSegmentClass" priority="401000"/>
     <PropertyCategory typeName="Miscellaneous_Sleepers_Stub" description="Miscellaneous" displayLabel="Sleepers Stub" priority="401000"/>
     <PropertyCategory typeName="Name_General_Category" description="Name" displayLabel="General Category" priority="300000"/>
+    <PropertyCategory typeName="Name_Pathway_Route" description="Name" displayLabel="Pathway Route" priority="300000"/>
     <PropertyCategory typeName="Name_Railway_Edge" description="Name" displayLabel="Railway Edge" priority="300000"/>
     <PropertyCategory typeName="Name_Railway_Node" description="Name" displayLabel="Railway Node" priority="300000"/>
     <PropertyCategory typeName="PointControl_Point_Control" description="PointControl" displayLabel="Point Control" priority="199700"/>
@@ -930,7 +1133,10 @@
     <PropertyCategory typeName="SchemaElementAttributes_General_Category" description="SchemaElementAttributes" displayLabel="General Category" priority="200000"/>
     <PropertyCategory typeName="SchemaLineAttributes_General_Category" description="SchemaLineAttributes" displayLabel="General Category" priority="200000"/>
     <PropertyCategory typeName="SweepPathProperties_Sweep_Path" description="SweepPathProperties" displayLabel="Sweep Path" priority="4294967286"/>
+    <PropertyCategory typeName="SweepPathProperties_Swept_Path" description="SweepPathProperties" displayLabel="Swept Path" priority="4294967286"/>
     <PropertyCategory typeName="TableEntry_Bending_Axis_Table_Entry" description="TableEntry" displayLabel="Bending Axis Table Entry" priority="0"/>
+    <PropertyCategory typeName="TableEntry_Cant_Table_Entry" description="TableEntry" displayLabel="Cant Table Entry" priority="0"/>
+    <PropertyCategory typeName="TableEntry_Italian_Cant_Table_Entry" description="TableEntry" displayLabel="Italian Cant Table Entry" priority="0"/>
     <PropertyCategory typeName="TableEntry_Track_Widening_Table_Entry" description="TableEntry" displayLabel="Track Widening Table Entry" priority="0"/>
     <PropertyCategory typeName="TurnoutGeometryProperties_Geometry" description="TurnoutGeometryProperties" displayLabel="Geometry" priority="299990"/>
     <PropertyCategory typeName="TurnoutPointsProperties_Turnout_Points" description="TurnoutPointsProperties" displayLabel="Turnout Points" priority="4294967276"/>

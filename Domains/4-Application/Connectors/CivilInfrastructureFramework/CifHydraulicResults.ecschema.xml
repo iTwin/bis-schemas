@@ -3,15 +3,15 @@
 |  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
 |  * See LICENSE.md in the project root for license terms and full copyright notice.
 ======================================================================================= -->
-<ECSchema schemaName="CifHydraulicResults" alias="cifhydrs" version="01.00.04" description="iModel Connector schema containing aspect classes with result properties from the Subsurface Utilities Design and Analysis module as part of Civil Designer applications." xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
+<ECSchema schemaName="CifHydraulicResults" alias="cifhydrs" version="01.00.07" description="iModel Connector schema containing aspect classes with result properties from the Subsurface Utilities Design and Analysis module as part of Civil Designer applications." xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
     <ECSchemaReference name="BisCore" version="01.00.14" alias="bis"/>
-    <ECSchemaReference name="CifCommon" version="01.00.03" alias="cifcmn"/>
-    <ECSchemaReference name="CifUnits" version="01.00.01" alias="cifu"/>
-    <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
     <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
+    <ECSchemaReference name="CifCommon" version="01.00.03" alias="cifcmn"/>
+    <ECSchemaReference name="CifUnits" version="01.00.02" alias="cifu"/>
+    <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
     <ECCustomAttributes>
         <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
-            <SupportedUse>Production</SupportedUse>
+            <SupportedUse>NotForProduction</SupportedUse>
         </ProductionStatus>
         <SchemaLayerInfo xmlns="BisCustomAttributes.01.00.00">
             <Value>Application</Value>
@@ -300,13 +300,18 @@
         <ECProperty propertyName="DepthStatisticResults_MaximumDepth" typeName="double" displayLabel="Depth (Maximum)" category="Results_Drainage_Results_Drainage" priority="0" kindOfQuantity="cifu:ELEVATION"/>
         <ECProperty propertyName="DepthStatisticResults_TimeToMaximumDepth" typeName="double" displayLabel="Time to Maximum Depth" category="Results_Drainage_Results_Drainage" priority="0" kindOfQuantity="cifu:TIME_EXTENDED"/>
     </ECEntityClass>
+    <ECEntityClass typeName="Derived2DNodeResultsAspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="Derived2DNodeResults_RimElevation" typeName="double" displayLabel="Elevation (Unified 2D Rim)" category="Physical_Drainage_Physical_Drainage" priority="0" kindOfQuantity="cifu:ELEVATION"/>
+    </ECEntityClass>
     <ECEntityClass typeName="DerivedCatchmentResultsAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
-        <ECProperty propertyName="DerivedCatchmentResults_CompositeCn" typeName="double" displayLabel="SCS CN (Composite)" category="Runoff_Drainage_Runoff_Drainage" priority="0" kindOfQuantity="cifu:COEFFICIENT"/>
+        <ECProperty propertyName="DerivedCatchmentResults_CompositeCn" typeName="double" displayLabel="SCS CN (Composite)" category="Runoff_Drainage_Runoff_Drainage" priority="0" kindOfQuantity="cifu:CURVE_NUMBER"/>
         <ECProperty propertyName="DerivedCatchmentResults_PerviousMaximumRetention" typeName="double" displayLabel="Maximum Retention (Pervious)" category="Results_Drainage_Results_Drainage" priority="0" kindOfQuantity="cifu:DEPTH"/>
         <ECProperty propertyName="DerivedCatchmentResults_PerviousMaximumRetentionTwentyPercent" typeName="double" displayLabel="Maximum Retention (Pervious, 20 percent)" category="Results_Drainage_Results_Drainage" priority="0" kindOfQuantity="cifu:DEPTH"/>
         <ECProperty propertyName="DerivedCatchmentResults_ImperviousMaximumRetention" typeName="double" displayLabel="Maximum Retention (Impervious)" category="Results_Drainage_Results_Drainage" priority="0" kindOfQuantity="cifu:DEPTH"/>
         <ECProperty propertyName="DerivedCatchmentResults_ImperviousMaximumRetentionTwentyPercent" typeName="double" displayLabel="Maximum Retention (Impervious, 20 percent)" category="Results_Drainage_Results_Drainage" priority="0" kindOfQuantity="cifu:DEPTH"/>
+        <ECProperty propertyName="DerivedCatchmentResults_CompositeC" typeName="double" displayLabel="Runoff Coefficient (Rational Composite)" category="Runoff_Drainage_Runoff_Drainage" priority="0" kindOfQuantity="cifu:COEFFICIENT"/>
     </ECEntityClass>
     <ECEntityClass typeName="DerivedConduitSizeResultsAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
@@ -316,6 +321,15 @@
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
         <ECProperty propertyName="DerivedDropDepthResults_HasDropStandpipe" typeName="boolean" displayLabel="Has Drop Standpipe?" category="Results_Profile_Drainage_Results_Profile_Drainage" priority="0"/>
         <ECProperty propertyName="DerivedDropDepthResults_DropObservation" typeName="double" displayLabel="Backdrop Height" category="Results_Profile_Drainage_Results_Profile_Drainage" priority="0" kindOfQuantity="cifu:DEPTH_LARGE"/>
+    </ECEntityClass>
+    <ECEntityClass typeName="DerivedGridResultsAspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="DerivedGridResults_NumberCells" typeName="int" displayLabel="Total Cells" category="TwoD_Solver_Drainage_2D_Solver_Drainage" priority="0"/>
+        <ECProperty propertyName="DerivedGridResults_TotalGridArea" typeName="double" displayLabel="Total Grid Area" category="TwoD_Solver_Drainage_2D_Solver_Drainage" priority="0" kindOfQuantity="cifu:AREA"/>
+        <ECProperty propertyName="DerivedGridResults_NumberColumns" typeName="int" displayLabel="Columns" category="TwoD_Solver_Drainage_2D_Solver_Drainage" priority="0"/>
+        <ECProperty propertyName="DerivedGridResults_NumberRows" typeName="int" displayLabel="Rows" category="TwoD_Solver_Drainage_2D_Solver_Drainage" priority="0"/>
+        <ECProperty propertyName="DerivedGridResults_MinimumGroundElevation" typeName="double" displayLabel="Elevation (Minimum)" category="TwoD_Solver_Drainage_2D_Solver_Drainage" priority="0" kindOfQuantity="cifu:ELEVATION"/>
+        <ECProperty propertyName="DerivedGridResults_MaximumGroundElevation" typeName="double" displayLabel="Elevation (Maximum)" category="TwoD_Solver_Drainage_2D_Solver_Drainage" priority="0" kindOfQuantity="cifu:ELEVATION"/>
     </ECEntityClass>
     <ECEntityClass typeName="DerivedLinkResultsAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
@@ -329,12 +343,25 @@
     </ECEntityClass>
     <ECEntityClass typeName="DerivedPhysicalLinkResultsAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
-        <ECProperty propertyName="DerivedPhysicalLinkResults_FullFlowArea" typeName="double" displayLabel="Area (Full Flow)" category="Results_Hydraulic_Summary_Drainage_Results_Hydraulic_Summary_Drainage" priority="0" kindOfQuantity="cifu:AREA"/>
+        <ECProperty propertyName="DerivedPhysicalLinkResults_FullFlowArea" typeName="double" displayLabel="Area (Full Flow)" category="Results_Hydraulic_Summary_Drainage_Results_Hydraulic_Summary_Drainage" priority="0" kindOfQuantity="cifu:AREA_DRAINAGE"/>
         <ECProperty propertyName="DerivedPhysicalLinkResults_UnifiedRise" typeName="double" displayLabel="Rise (Unified)" category="Results_Drainage_Results_Drainage" priority="0" kindOfQuantity="cifu:DEPTH_LARGE"/>
     </ECEntityClass>
     <ECEntityClass typeName="DerivedPumpResultsAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
         <ECProperty propertyName="PumpDefinitionType" typeName="DerivedPumpResultsAspect_PumpDefinitionType_Enum" displayLabel="Pump Definition Type" category="Results_Pump_Definition_Summary_Drainage_Results_Pump_Definition_Summary_Drainage" priority="0"/>
+    </ECEntityClass>
+    <ECEntityClass typeName="DerivedSurfacePolygonResultsAspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="DerivedSurfacePolygonResults_LandCoverCN" typeName="double" displayLabel="SCS CN (Catalog)" category="Land_Cover_Drainage_Land_Cover_Drainage" priority="0" kindOfQuantity="cifu:CURVE_NUMBER"/>
+        <ECProperty propertyName="DerivedSurfacePolygonResults_LandCoverImpermeabilityFraction" typeName="double" displayLabel="Impermeability Fraction (Catalog)" category="Land_Cover_Drainage_Land_Cover_Drainage" priority="0" kindOfQuantity="cifu:FRACTION"/>
+        <ECProperty propertyName="DerivedSurfacePolygonResults_LandCoverMannings" typeName="double" displayLabel="Manning's n (Catalog)" category="Land_Cover_Drainage_Land_Cover_Drainage" priority="0" kindOfQuantity="cifu:ROUGHNESS_MANNINGS"/>
+        <ECProperty propertyName="DerivedSurfacePolygonResults_LandCoverC" typeName="double" displayLabel="Rational C (Catalog)" category="Land_Cover_Drainage_Land_Cover_Drainage" priority="0" kindOfQuantity="cifu:COEFFICIENT"/>
+    </ECEntityClass>
+    <ECEntityClass typeName="DerivedSurfacePolylineResultsAspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="DerivedSurfacePolylineResults_LandCoverCN" typeName="double" displayLabel="SCS CN (Catalog)" category="Land_Cover_Drainage_Land_Cover_Drainage" priority="0" kindOfQuantity="cifu:CURVE_NUMBER"/>
+        <ECProperty propertyName="DerivedSurfacePolylineResults_LandCoverImpermeabilityFraction" typeName="double" displayLabel="Impermeability Fraction (Catalog)" category="Land_Cover_Drainage_Land_Cover_Drainage" priority="0" kindOfQuantity="cifu:FRACTION"/>
+        <ECProperty propertyName="DerivedSurfacePolylineResults_LandCoverMannings" typeName="double" displayLabel="Manning's n (Catalog)" category="Land_Cover_Drainage_Land_Cover_Drainage" priority="0" kindOfQuantity="cifu:ROUGHNESS_MANNINGS"/>
     </ECEntityClass>
     <ECRelationshipClass typeName="ElementOwnsAverageDepthResultsAspect" modifier="None" strength="embedding">
         <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
@@ -606,6 +633,15 @@
             <Class class="DepthStatisticResultsAspect"/>
         </Target>
     </ECRelationshipClass>
+    <ECRelationshipClass typeName="ElementOwnsDerived2DNodeResultsAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="Derived2DNodeResultsAspect"/>
+        </Target>
+    </ECRelationshipClass>
     <ECRelationshipClass typeName="ElementOwnsDerivedCatchmentResultsAspect" modifier="None" strength="embedding">
         <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
         <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
@@ -631,6 +667,15 @@
         </Source>
         <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
             <Class class="DerivedDropDepthResultsAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="ElementOwnsDerivedGridResultsAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="DerivedGridResultsAspect"/>
         </Target>
     </ECRelationshipClass>
     <ECRelationshipClass typeName="ElementOwnsDerivedLinkResultsAspect" modifier="None" strength="embedding">
@@ -667,6 +712,24 @@
         </Source>
         <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
             <Class class="DerivedPumpResultsAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="ElementOwnsDerivedSurfacePolygonResultsAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="DerivedSurfacePolygonResultsAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="ElementOwnsDerivedSurfacePolylineResultsAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="DerivedSurfacePolylineResultsAspect"/>
         </Target>
     </ECRelationshipClass>
     <ECEntityClass typeName="ElementResultsAspect">
@@ -823,7 +886,7 @@
     </ECRelationshipClass>
     <ECEntityClass typeName="GravityDerivedInletResultsAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
-        <ECProperty propertyName="GravityDerivedInletResults_InletDrainageArea" typeName="double" displayLabel="Inlet Drainage Area" category="Results_Drainage_Results_Drainage" priority="0" kindOfQuantity="cifu:AREA"/>
+        <ECProperty propertyName="GravityDerivedInletResults_InletDrainageArea" typeName="double" displayLabel="Inlet Drainage Area" category="Results_Drainage_Results_Drainage" priority="0" kindOfQuantity="cifu:AREA_DRAINAGE"/>
         <ECProperty propertyName="GravityDerivedInletResults_InletC" typeName="double" displayLabel="Inlet C" category="Results_Drainage_Results_Drainage" priority="0" kindOfQuantity="cifu:COEFFICIENT"/>
     </ECEntityClass>
     <ECRelationshipClass typeName="ElementOwnsGravityDerivedInletResultsAspect" modifier="None" strength="embedding">
@@ -837,7 +900,7 @@
     </ECRelationshipClass>
     <ECEntityClass typeName="GravityDerivedPolygonResultsAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
-        <ECProperty propertyName="GravityDerivedPolygonResults_UnifiedArea" typeName="double" displayLabel="Area (Unified)" category="Results_Drainage_Results_Drainage" priority="0" kindOfQuantity="cifu:AREA"/>
+        <ECProperty propertyName="GravityDerivedPolygonResults_UnifiedArea" typeName="double" displayLabel="Area (Unified)" category="Results_Drainage_Results_Drainage" priority="0" kindOfQuantity="cifu:AREA_DRAINAGE"/>
     </ECEntityClass>
     <ECRelationshipClass typeName="ElementOwnsGravityDerivedPolygonResultsAspect" modifier="None" strength="embedding">
         <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
@@ -874,6 +937,123 @@
         </Source>
         <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
             <Class class="GravityStructureResultsAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="GridBoundaryElevationResultsAspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="GridBoundaryElevationResults_HGL" typeName="double" displayLabel="Elevation (Calculated)" category="Results_Drainage_Results_Drainage" priority="0" kindOfQuantity="cifu:ELEVATION"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsGridBoundaryElevationResultsAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="GridBoundaryElevationResultsAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="GridBoundaryFlowResultsAspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="GridBoundaryFlowResults_TotalFlow" typeName="double" displayLabel="Flow (Contributing)" category="Results_Drainage_Results_Drainage" priority="0" kindOfQuantity="cifu:FLOW"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsGridBoundaryFlowResultsAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="GridBoundaryFlowResultsAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="GridElementStatisticsAspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="GridElementStatistics_MaximumDepthX" typeName="double" displayLabel="X (Maximum Depth)" category="Results_Maximum_Values_Drainage_Results_Maximum_Values_Drainage" priority="0" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="GridElementStatistics_MaximumDepthY" typeName="double" displayLabel="Y (Maximum Depth)" category="Results_Maximum_Values_Drainage_Results_Maximum_Values_Drainage" priority="0" kindOfQuantity="cifu:LENGTH"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsGridElementStatisticsAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="GridElementStatisticsAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="GridInfiltrationResultsAspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="GridInfiltrationResults_TotalInfiltration" typeName="double" displayLabel="Infiltration (Total)" category="Results_Drainage_Results_Drainage" priority="0" kindOfQuantity="cifu:DEPTH"/>
+        <ECProperty propertyName="GridInfiltrationResults_TotalInfiltrationVolume" typeName="double" displayLabel="Infiltration (Total Volume)" category="Results_Drainage_Results_Drainage" priority="0" kindOfQuantity="cifu:VOLUME"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsGridInfiltrationResultsAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="GridInfiltrationResultsAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="GridPointResultsAspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="GridPointResults_Depth" typeName="double" displayLabel="Depth on Grid" category="Results_Drainage_Results_Drainage" priority="0" kindOfQuantity="cifu:DEPTH"/>
+        <ECProperty propertyName="GridPointResults_HGL" typeName="double" displayLabel="Hydraulic Grade (Grid)" category="Results_Drainage_Results_Drainage" priority="0" kindOfQuantity="cifu:ELEVATION"/>
+        <ECProperty propertyName="GridPointResults_Velocity" typeName="double" displayLabel="Velocity (Grid)" category="Results_Drainage_Results_Drainage" priority="0" kindOfQuantity="cifu:FLOW_VELOCITY"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsGridPointResultsAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="GridPointResultsAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="GridRainfallResultsAspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="GridRainfallResults_IncrementalPrecip" typeName="double" displayLabel="Precipitation (Incremental)" category="Results_Drainage_Results_Drainage" priority="0" kindOfQuantity="cifu:DEPTH"/>
+        <ECProperty propertyName="GridRainfallResults_CumulativePrecip" typeName="double" displayLabel="Precipitation (Cumulative)" category="Results_Drainage_Results_Drainage" priority="0" kindOfQuantity="cifu:DEPTH"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsGridRainfallResultsAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="GridRainfallResultsAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="GridStatisticsAspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="GridStatistics_MaximumDepth" typeName="double" displayLabel="Depth (Maximum)" category="Results_Maximum_Values_Drainage_Results_Maximum_Values_Drainage" priority="0" kindOfQuantity="cifu:DEPTH"/>
+        <ECProperty propertyName="GridStatistics_TimeToMaximumDepth" typeName="double" displayLabel="Time (Maximum Depth)" category="Results_Maximum_Values_Drainage_Results_Maximum_Values_Drainage" priority="0" kindOfQuantity="cifu:TIME_EXTENDED"/>
+        <ECProperty propertyName="GridStatistics_MaximumHGL" typeName="double" displayLabel="Hydraulic Grade (Maximum)" category="Results_Maximum_Values_Drainage_Results_Maximum_Values_Drainage" priority="0" kindOfQuantity="cifu:ELEVATION"/>
+        <ECProperty propertyName="GridStatistics_VelocityAtMaxDepth" typeName="double" displayLabel="Velocity (Maximum Depth)" category="Results_Maximum_Values_Drainage_Results_Maximum_Values_Drainage" priority="0" kindOfQuantity="cifu:FLOW_VELOCITY"/>
+        <ECProperty propertyName="GridStatistics_FloodHazard" typeName="double" displayLabel="Flood Hazard" category="Results_Maximum_Values_Drainage_Results_Maximum_Values_Drainage" priority="0" kindOfQuantity="cifu:AREA_PER_TIME"/>
+        <ECProperty propertyName="GridStatistics_FloodArrivalTime" typeName="double" displayLabel="Time (Flood Arrival)" category="Results_Drainage_Results_Drainage" priority="0" kindOfQuantity="cifu:TIME_EXTENDED"/>
+        <ECProperty propertyName="GridStatistics_MaximumFloodedArea" typeName="double" displayLabel="Flooded Area (Maximum)" category="Results_Maximum_Values_Drainage_Results_Maximum_Values_Drainage" priority="0" kindOfQuantity="cifu:AREA_DRAINAGE"/>
+        <ECProperty propertyName="GridStatistics_FinalFloodedArea" typeName="double" displayLabel="Flooded Area (Final)" category="Results_Drainage_Results_Drainage" priority="0" kindOfQuantity="cifu:AREA_DRAINAGE"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsGridStatisticsAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="GridStatisticsAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="GridWideStatisticsAspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="GridWideStatistics_MaximumFloodedArea" typeName="double" displayLabel="Flooded Area (Maximum)" category="Results_Maximum_Values_Drainage_Results_Maximum_Values_Drainage" priority="0" kindOfQuantity="cifu:AREA_DRAINAGE"/>
+        <ECProperty propertyName="GridWideStatistics_FinalFloodedArea" typeName="double" displayLabel="Flooded Area (Final)" category="Results_Drainage_Results_Drainage" priority="0" kindOfQuantity="cifu:AREA_DRAINAGE"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsGridWideStatisticsAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="GridWideStatisticsAspect"/>
         </Target>
     </ECRelationshipClass>
     <ECEntityClass typeName="GutterFlowResultsAspect">
@@ -937,7 +1117,7 @@
     </ECRelationshipClass>
     <ECEntityClass typeName="GVFBypassedFlowResultsAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
-        <ECProperty propertyName="GVFBypassedFlowResults_BypassedCA" typeName="double" displayLabel="Bypassed CA" category="Results_Inlet_Bypassed_Flows_Drainage_Results_Inlet_Bypassed_Flows_Drainage" priority="0" kindOfQuantity="cifu:AREA"/>
+        <ECProperty propertyName="GVFBypassedFlowResults_BypassedCA" typeName="double" displayLabel="Bypassed CA" category="Results_Inlet_Bypassed_Flows_Drainage_Results_Inlet_Bypassed_Flows_Drainage" priority="0" kindOfQuantity="cifu:AREA_DRAINAGE"/>
         <ECProperty propertyName="GVFBypassedFlowResults_BypassedTimeOfConcentration" typeName="double" displayLabel="Bypassed Tc" category="Results_Inlet_Bypassed_Flows_Drainage_Results_Inlet_Bypassed_Flows_Drainage" priority="0" kindOfQuantity="cifu:TIME_EXTENDED"/>
         <ECProperty propertyName="GVFBypassedFlowResults_BypassedIntensity" typeName="double" displayLabel="Bypassed Intensity" category="Results_Inlet_Bypassed_Flows_Drainage_Results_Inlet_Bypassed_Flows_Drainage" priority="0" kindOfQuantity="cifu:INTENSITY"/>
         <ECProperty propertyName="GVFBypassedFlowResults_BypassedRationalFlow" typeName="double" displayLabel="Bypassed Rational Flow" category="Results_Inlet_Bypassed_Flows_Drainage_Results_Inlet_Bypassed_Flows_Drainage" priority="0" kindOfQuantity="cifu:FLOW"/>
@@ -958,7 +1138,7 @@
     </ECRelationshipClass>
     <ECEntityClass typeName="GVFCarryoverFlowResultsAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
-        <ECProperty propertyName="GVFCarryoverFlowResults_CarryoverCA" typeName="double" displayLabel="Carryover CA" category="Results_Carryover_Flow_Drainage_Results_Carryover_Flow_Drainage" priority="0" kindOfQuantity="cifu:AREA"/>
+        <ECProperty propertyName="GVFCarryoverFlowResults_CarryoverCA" typeName="double" displayLabel="Carryover CA" category="Results_Carryover_Flow_Drainage_Results_Carryover_Flow_Drainage" priority="0" kindOfQuantity="cifu:AREA_DRAINAGE"/>
         <ECProperty propertyName="GVFCarryoverFlowResults_CarryoverTimeOfConcentration" typeName="double" displayLabel="Carryover Tc" category="Results_Carryover_Flow_Drainage_Results_Carryover_Flow_Drainage" priority="0" kindOfQuantity="cifu:TIME_EXTENDED"/>
         <ECProperty propertyName="GVFCarryoverFlowResults_Carryoverlntensity" typeName="double" displayLabel="Carryover Intensity" category="Results_Carryover_Flow_Drainage_Results_Carryover_Flow_Drainage" priority="0" kindOfQuantity="cifu:INTENSITY"/>
         <ECProperty propertyName="GVFCarryoverFlowResults_CarryoverRationalFlow" typeName="double" displayLabel="Carryover Rational Flow" category="Results_Carryover_Flow_Drainage_Results_Carryover_Flow_Drainage" priority="0" kindOfQuantity="cifu:FLOW"/>
@@ -977,7 +1157,7 @@
     </ECRelationshipClass>
     <ECEntityClass typeName="GVFCatchmentResultsAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
-        <ECProperty propertyName="GVFCatchmentResults_CatchmentCA" typeName="double" displayLabel="Catchment CA" category="Results_Catchment_Drainage_Results_Catchment_Drainage" priority="0" kindOfQuantity="cifu:AREA"/>
+        <ECProperty propertyName="GVFCatchmentResults_CatchmentCA" typeName="double" displayLabel="Catchment CA" category="Results_Catchment_Drainage_Results_Catchment_Drainage" priority="0" kindOfQuantity="cifu:AREA_DRAINAGE"/>
         <ECProperty propertyName="GVFCatchmentResults_CatchmentFlowTime" typeName="double" displayLabel="Catchment Flow Time" category="Results_Catchment_Drainage_Results_Catchment_Drainage" priority="0" kindOfQuantity="cifu:TIME_FLOW"/>
         <ECProperty propertyName="GVFCatchmentResults_CatchmentIntensity" typeName="double" displayLabel="Catchment Intensity" category="Results_Catchment_Drainage_Results_Catchment_Drainage" priority="0" kindOfQuantity="cifu:RAINFALL_INTENSITY"/>
         <ECProperty propertyName="GVFCatchmentResults_CatchmentRationalFlow" typeName="double" displayLabel="Catchment Rational Flow" category="Results_Catchment_Drainage_Results_Catchment_Drainage" priority="0" kindOfQuantity="cifu:FLOW"/>
@@ -1015,7 +1195,7 @@
         <ECProperty propertyName="GVFConduitResults_NormalDepth" typeName="double" displayLabel="Depth (Normal)" category="Results_Hydraulic_Summary_Drainage_Results_Hydraulic_Summary_Drainage" priority="0" kindOfQuantity="cifu:DEPTH_LARGE"/>
         <ECProperty propertyName="GVFConduitResults_CriticalDepth" typeName="double" displayLabel="Depth (Critical)" category="Results_Hydraulic_Summary_Drainage_Results_Hydraulic_Summary_Drainage" priority="0" kindOfQuantity="cifu:DEPTH_LARGE"/>
         <ECProperty propertyName="GVFConduitResults_FroudeNumber" typeName="double" displayLabel="Froude Number (Normal)" category="Results_Hydraulic_Summary_Drainage_Results_Hydraulic_Summary_Drainage" priority="0" kindOfQuantity="cifu:COEFFICIENT"/>
-        <ECProperty propertyName="GVFConduitResults_FrictionSlope" typeName="double" displayLabel="Friction Slope" category="Results_Hydraulic_Summary_Drainage_Results_Hydraulic_Summary_Drainage" priority="0" kindOfQuantity="cifu:SLOPE"/>
+        <ECProperty propertyName="GVFConduitResults_FrictionSlope" typeName="double" displayLabel="Friction Slope" category="Results_Hydraulic_Summary_Drainage_Results_Hydraulic_Summary_Drainage" priority="0" kindOfQuantity="cifu:SLOPE_DRAINAGE"/>
         <ECProperty propertyName="GVFConduitResults_NormalDepthOverRise" typeName="double" displayLabel="Depth (Normal) / Rise" category="Results_Hydraulic_Summary_Drainage_Results_Hydraulic_Summary_Drainage" priority="0" kindOfQuantity="cifu:PERCENT"/>
         <ECProperty propertyName="GVFConduitResults_CriticalVelocity" typeName="double" displayLabel="Velocity (Critical)" category="Results_Hydraulic_Summary_Drainage_Results_Hydraulic_Summary_Drainage" priority="0" kindOfQuantity="cifu:FLOW_VELOCITY"/>
     </ECEntityClass>
@@ -1110,7 +1290,7 @@
     </ECRelationshipClass>
     <ECEntityClass typeName="GVFGutterResultsAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
-        <ECProperty propertyName="GVFGutterResults_GutterCA" typeName="double" displayLabel="CA (Gutter)" category="Results_Drainage_Results_Drainage" priority="0" kindOfQuantity="cifu:AREA"/>
+        <ECProperty propertyName="GVFGutterResults_GutterCA" typeName="double" displayLabel="CA (Gutter)" category="Results_Drainage_Results_Drainage" priority="0" kindOfQuantity="cifu:AREA_DRAINAGE"/>
         <ECProperty propertyName="GVFGutterResults_GutterTc" typeName="double" displayLabel="Tc (Gutter)" category="Results_Drainage_Results_Drainage" priority="0" kindOfQuantity="cifu:TIME_EXTENDED"/>
         <ECProperty propertyName="GVFGutterResults_GutterIntensity" typeName="double" displayLabel="Intensity (Gutter)" category="Results_Drainage_Results_Drainage" priority="0" kindOfQuantity="cifu:INTENSITY"/>
         <ECProperty propertyName="GVFGutterResults_GutterRationalFlow" typeName="double" displayLabel="Rational Flow (Gutter)" category="Results_Drainage_Results_Drainage" priority="0" kindOfQuantity="cifu:FLOW"/>
@@ -1169,7 +1349,7 @@
     </ECRelationshipClass>
     <ECEntityClass typeName="GVFInterceptedFlowResultsAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
-        <ECProperty propertyName="GVFInterceptedFlowResults_InterceptedCA" typeName="double" displayLabel="Intercepted CA" category="Results_Intercepted_Flow_Drainage_Results_Intercepted_Flow_Drainage" priority="0" kindOfQuantity="cifu:AREA"/>
+        <ECProperty propertyName="GVFInterceptedFlowResults_InterceptedCA" typeName="double" displayLabel="Intercepted CA" category="Results_Intercepted_Flow_Drainage_Results_Intercepted_Flow_Drainage" priority="0" kindOfQuantity="cifu:AREA_DRAINAGE"/>
         <ECProperty propertyName="GVFInterceptedFlowResults_InterceptedTimeOfConcentration" typeName="double" displayLabel="Intercepted Tc" category="Results_Intercepted_Flow_Drainage_Results_Intercepted_Flow_Drainage" priority="0" kindOfQuantity="cifu:TIME_EXTENDED"/>
         <ECProperty propertyName="GVFInterceptedFlowResults_InterceptedIntensity" typeName="double" displayLabel="Intercepted Intensity" category="Results_Intercepted_Flow_Drainage_Results_Intercepted_Flow_Drainage" priority="0" kindOfQuantity="cifu:INTENSITY"/>
         <ECProperty propertyName="GVFInterceptedFlowResults_InterceptedRationalFlow" typeName="double" displayLabel="Intercepted Rational Flow" category="Results_Intercepted_Flow_Drainage_Results_Intercepted_Flow_Drainage" priority="0" kindOfQuantity="cifu:FLOW"/>
@@ -1188,7 +1368,7 @@
     </ECRelationshipClass>
     <ECEntityClass typeName="GVFLocalFlowResultsAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
-        <ECProperty propertyName="GVFLocalFlowResults_LocalCA" typeName="double" displayLabel="Local CA" category="Results_Local_Flows_Drainage_Results_Local_Flows_Drainage" priority="0" kindOfQuantity="cifu:AREA"/>
+        <ECProperty propertyName="GVFLocalFlowResults_LocalCA" typeName="double" displayLabel="Local CA" category="Results_Local_Flows_Drainage_Results_Local_Flows_Drainage" priority="0" kindOfQuantity="cifu:AREA_DRAINAGE"/>
         <ECProperty propertyName="GVFLocalFlowResults_LocalFlowTime" typeName="double" displayLabel="Local Flow Time" category="Results_Local_Flows_Drainage_Results_Local_Flows_Drainage" priority="0" kindOfQuantity="cifu:TIME_EXTENDED"/>
         <ECProperty propertyName="GVFLocalFlowResults_LocalIntensity" typeName="double" displayLabel="Local Intensity" category="Results_Local_Flows_Drainage_Results_Local_Flows_Drainage" priority="0" kindOfQuantity="cifu:INTENSITY"/>
         <ECProperty propertyName="GVFLocalFlowResults_LocalRationalFlow" typeName="double" displayLabel="Local Rational Flow" category="Results_Local_Flows_Drainage_Results_Local_Flows_Drainage" priority="0" kindOfQuantity="cifu:FLOW"/>
@@ -1207,7 +1387,7 @@
     </ECRelationshipClass>
     <ECEntityClass typeName="GVFLostSurfaceFlowResultsAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
-        <ECProperty propertyName="GVFLostSurfaceFlowResults_LostSurfaceCA" typeName="double" displayLabel="Lost Surface CA" category="Results_Lost_Flow_Drainage_Results_Lost_Flow_Drainage" priority="0" kindOfQuantity="cifu:AREA"/>
+        <ECProperty propertyName="GVFLostSurfaceFlowResults_LostSurfaceCA" typeName="double" displayLabel="Lost Surface CA" category="Results_Lost_Flow_Drainage_Results_Lost_Flow_Drainage" priority="0" kindOfQuantity="cifu:AREA_DRAINAGE"/>
         <ECProperty propertyName="GVFLostSurfaceFlowResults_LostSurfaceFlowTime" typeName="double" displayLabel="Lost Surface Flow Time" category="Results_Lost_Flow_Drainage_Results_Lost_Flow_Drainage" priority="0" kindOfQuantity="cifu:TIME_FLOW"/>
         <ECProperty propertyName="GVFLostSurfaceFlowResults_LostSurfaceIntensity" typeName="double" displayLabel="Lost Surface Intensity" category="Results_Lost_Flow_Drainage_Results_Lost_Flow_Drainage" priority="0" kindOfQuantity="cifu:INTENSITY"/>
         <ECProperty propertyName="GVFLostSurfaceFlowResults_LostSurfaceRationalFlow" typeName="double" displayLabel="Lost Surface Rational Flow" category="Results_Lost_Flow_Drainage_Results_Lost_Flow_Drainage" priority="0" kindOfQuantity="cifu:FLOW"/>
@@ -1240,7 +1420,7 @@
     </ECRelationshipClass>
     <ECEntityClass typeName="GVFSystemFlowResultsAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
-        <ECProperty propertyName="GVFSystemFlowResults_SystemCA" typeName="double" displayLabel="System CA" category="Results_System_Flow_Drainage_Results_System_Flow_Drainage" priority="0" kindOfQuantity="cifu:AREA"/>
+        <ECProperty propertyName="GVFSystemFlowResults_SystemCA" typeName="double" displayLabel="System CA" category="Results_System_Flow_Drainage_Results_System_Flow_Drainage" priority="0" kindOfQuantity="cifu:AREA_DRAINAGE"/>
         <ECProperty propertyName="GVFSystemFlowResults_SystemFlowTime" typeName="double" displayLabel="System Flow Time" category="Results_System_Flow_Drainage_Results_System_Flow_Drainage" priority="0" kindOfQuantity="cifu:TIME_FLOW"/>
         <ECProperty propertyName="GVFSystemFlowResults_SystemIntensity" typeName="double" displayLabel="System Intensity" category="Results_System_Flow_Drainage_Results_System_Flow_Drainage" priority="0" kindOfQuantity="cifu:INTENSITY"/>
         <ECProperty propertyName="GVFSystemFlowResults_SystemRationalFlow" typeName="double" displayLabel="System Rational Flow" category="Results_System_Flow_Drainage_Results_System_Flow_Drainage" priority="0" kindOfQuantity="cifu:FLOW"/>
@@ -1259,7 +1439,7 @@
     </ECRelationshipClass>
     <ECEntityClass typeName="GVFTotalInletFlowResultsAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
-        <ECProperty propertyName="GVFTotalInletFlowResults_TotalInletCA" typeName="double" displayLabel="Total Inlet CA" category="Results_Inlet_Surface_Flows_Drainage_Results_Inlet_Surface_Flows_Drainage" priority="0" kindOfQuantity="cifu:AREA"/>
+        <ECProperty propertyName="GVFTotalInletFlowResults_TotalInletCA" typeName="double" displayLabel="Total Inlet CA" category="Results_Inlet_Surface_Flows_Drainage_Results_Inlet_Surface_Flows_Drainage" priority="0" kindOfQuantity="cifu:AREA_DRAINAGE"/>
         <ECProperty propertyName="GVFTotalInletFlowResults_TotalInletTimeOfConcentration" typeName="double" displayLabel="Total Inlet Tc" category="Results_Inlet_Surface_Flows_Drainage_Results_Inlet_Surface_Flows_Drainage" priority="0" kindOfQuantity="cifu:TIME_EXTENDED"/>
         <ECProperty propertyName="GVFTotalInletFlowResults_TotalInletIntensity" typeName="double" displayLabel="Total Inlet Intensity" category="Results_Inlet_Surface_Flows_Drainage_Results_Inlet_Surface_Flows_Drainage" priority="0" kindOfQuantity="cifu:INTENSITY"/>
         <ECProperty propertyName="GVFTotalInletFlowResults_TotalInletRationalFlow" typeName="double" displayLabel="Total Rational Flow to Inlet" category="Results_Inlet_Surface_Flows_Drainage_Results_Inlet_Surface_Flows_Drainage" priority="0" kindOfQuantity="cifu:FLOW"/>
@@ -1473,7 +1653,7 @@
     </ECRelationshipClass>
     <ECEntityClass typeName="IdahoPipeResultsAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
-        <ECProperty propertyName="IdahoPipeResults_PipeHeadlossGradient" typeName="double" displayLabel="Headloss Gradient" category="Results_Hydraulic_Drainage_Results_Hydraulic_Drainage" priority="0" kindOfQuantity="cifu:SLOPE"/>
+        <ECProperty propertyName="IdahoPipeResults_PipeHeadlossGradient" typeName="double" displayLabel="Headloss Gradient" category="Results_Hydraulic_Drainage_Results_Hydraulic_Drainage" priority="0" kindOfQuantity="cifu:SLOPE_DRAINAGE"/>
         <ECProperty propertyName="IdahoPipeResults_PipeAbsoluteFlow" typeName="double" displayLabel="Flow (Absolute)" category="Results_Hydraulic_Drainage_Results_Hydraulic_Drainage" priority="0" kindOfQuantity="cifu:FLOW"/>
         <ECProperty propertyName="IdahoPipeResults_PipeTravelTime" typeName="double" displayLabel="Travel Time" category="Results_Hydraulic_Drainage_Results_Hydraulic_Drainage" priority="0" kindOfQuantity="cifu:TIME_SHORT"/>
         <ECProperty propertyName="IdahoPipeResults_PipeMinorHeadloss" typeName="double" displayLabel="Headloss (Minor)" category="Results_Hydraulic_Drainage_Results_Hydraulic_Drainage" priority="0" kindOfQuantity="cifu:HEADLOSS"/>
@@ -1636,6 +1816,24 @@
             <Class class="IdahoStorageResultsAspect"/>
         </Target>
     </ECRelationshipClass>
+    <ECEntityClass typeName="ILSAXCatchmentResultsAspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="ILSAXCatchmentResults_fi" typeName="double" displayLabel="fi (ILSAX) (Calculated)" category="ILSAX_Hydrologic_Model_Drainage_ILSAX_Hydrologic_Model_Drainage" priority="0" kindOfQuantity="cifu:DEPTH"/>
+        <ECProperty propertyName="ILSAXCatchmentResults_fo" typeName="double" displayLabel="fo (ILSAX) (Calculated)" category="ILSAX_Hydrologic_Model_Drainage_ILSAX_Hydrologic_Model_Drainage" priority="0" kindOfQuantity="cifu:INFILTRATION_RATE"/>
+        <ECProperty propertyName="ILSAXCatchmentResults_fc" typeName="double" displayLabel="fc (ILSAX) (Calculated)" category="ILSAX_Hydrologic_Model_Drainage_ILSAX_Hydrologic_Model_Drainage" priority="0" kindOfQuantity="cifu:INFILTRATION_RATE"/>
+        <ECProperty propertyName="ILSAXCatchmentResults_k" typeName="double" displayLabel="k (ILSAX) (Calculated)" category="ILSAX_Hydrologic_Model_Drainage_ILSAX_Hydrologic_Model_Drainage" priority="0" kindOfQuantity="cifu:REACTION_RATE"/>
+        <ECProperty propertyName="ILSAXCatchmentResults_fID" typeName="double" displayLabel="Accumulated Diminishing Infiltration (ILSAX) (Calculated)" category="ILSAX_Hydrologic_Model_Drainage_ILSAX_Hydrologic_Model_Drainage" priority="0" kindOfQuantity="cifu:DEPTH"/>
+        <ECProperty propertyName="ILSAXCatchmentResults_InitialRate" typeName="double" displayLabel="Initial Rate (Calculated)" category="ILSAX_Hydrologic_Model_Drainage_ILSAX_Hydrologic_Model_Drainage" priority="0" kindOfQuantity="cifu:INFILTRATION_RATE"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsILSAXCatchmentResultsAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="ILSAXCatchmentResultsAspect"/>
+        </Target>
+    </ECRelationshipClass>
     <ECEntityClass typeName="InfiltrationResultsAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
         <ECProperty propertyName="InfiltrationResults_InfiltrationFlow" typeName="double" displayLabel="Infiltration" category="Results_Infiltration_Drainage_Results_Infiltration_Drainage" priority="0" kindOfQuantity="cifu:FLOW"/>
@@ -1684,8 +1882,8 @@
     <ECEntityClass typeName="LIDDerivedResultsAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
         <ECProperty propertyName="LIDDerivedResults_CatchmentPortionArea" typeName="double" displayLabel="Portion of Parent Catchment Area" category="Results_Misc_Drainage_Results_Misc_Drainage" priority="0" kindOfQuantity="cifu:PERCENT"/>
-        <ECProperty propertyName="LIDDerivedResults_UnifiedAreaPerLID" typeName="double" displayLabel="Area Per Low Impact Development (Unified)" category="Results_Misc_Drainage_Results_Misc_Drainage" priority="0" kindOfQuantity="cifu:AREA"/>
-        <ECProperty propertyName="LIDDerivedResults_TotalLIDArea" typeName="double" displayLabel="Area (Total)" category="Results_Misc_Drainage_Results_Misc_Drainage" priority="0" kindOfQuantity="cifu:AREA"/>
+        <ECProperty propertyName="LIDDerivedResults_UnifiedAreaPerLID" typeName="double" displayLabel="Area Per Low Impact Development (Unified)" category="Results_Misc_Drainage_Results_Misc_Drainage" priority="0" kindOfQuantity="cifu:AREA_DRAINAGE"/>
+        <ECProperty propertyName="LIDDerivedResults_TotalLIDArea" typeName="double" displayLabel="Area (Total)" category="Results_Misc_Drainage_Results_Misc_Drainage" priority="0" kindOfQuantity="cifu:AREA_DRAINAGE"/>
     </ECEntityClass>
     <ECRelationshipClass typeName="ElementOwnsLIDDerivedResultsAspect" modifier="None" strength="embedding">
         <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
@@ -1963,7 +2161,7 @@
     </ECRelationshipClass>
     <ECEntityClass typeName="PressurePipeResultsAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
-        <ECProperty propertyName="PressurePipeResults_HeadlossGradient" typeName="double" displayLabel="Headloss Gradient" category="Results_Drainage_Results_Drainage" priority="0" kindOfQuantity="cifu:SLOPE"/>
+        <ECProperty propertyName="PressurePipeResults_HeadlossGradient" typeName="double" displayLabel="Headloss Gradient" category="Results_Drainage_Results_Drainage" priority="0" kindOfQuantity="cifu:SLOPE_DRAINAGE"/>
         <ECProperty propertyName="PressurePipeResults_FrictionHeadloss" typeName="double" displayLabel="Headloss (Friction)" category="Results_Drainage_Results_Drainage" priority="0" kindOfQuantity="cifu:HEADLOSS"/>
         <ECProperty propertyName="PressurePipeResults_MinorHeadloss" typeName="double" displayLabel="Headloss (Minor)" category="Results_Drainage_Results_Drainage" priority="0" kindOfQuantity="cifu:HEADLOSS"/>
         <ECProperty propertyName="PressurePipeResults_Headloss" typeName="double" displayLabel="Headloss" category="Results_Drainage_Results_Drainage" priority="0" kindOfQuantity="cifu:HEADLOSS"/>
@@ -2041,7 +2239,7 @@
     </ECRelationshipClass>
     <ECEntityClass typeName="RatConduitResultsAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
-        <ECProperty propertyName="RatConduitResults_UpstreamInletDrainageArea" typeName="double" displayLabel="Upstream Inlet Area" category="Results_Drainage_Results_Drainage" priority="0" kindOfQuantity="cifu:AREA"/>
+        <ECProperty propertyName="RatConduitResults_UpstreamInletDrainageArea" typeName="double" displayLabel="Upstream Inlet Area" category="Results_Drainage_Results_Drainage" priority="0" kindOfQuantity="cifu:AREA_DRAINAGE"/>
         <ECProperty propertyName="RatConduitResults_UpstreamInletC" typeName="double" displayLabel="Upstream Inlet C" category="Results_Drainage_Results_Drainage" priority="0" kindOfQuantity="cifu:COEFFICIENT"/>
         <ECProperty propertyName="RatConduitResults_InletTime" typeName="double" displayLabel="Upstream Inlet Tc" category="Results_Upstream_Structure_Drainage_Results_Upstream_Structure_Drainage" priority="0" kindOfQuantity="cifu:TIME_EXTENDED"/>
         <ECProperty propertyName="RatConduitResults_TotalRationalFlowToInlet" typeName="double" displayLabel="Upstream Structure Flow (Total Surface)" category="Results_Upstream_Structure_Drainage_Results_Upstream_Structure_Drainage" priority="0" kindOfQuantity="cifu:FLOW"/>
@@ -2055,7 +2253,7 @@
         <ECProperty propertyName="RatConduitResults_UpstreamStructureEnergyGradeLineIn" typeName="double" displayLabel="Upstream Structure Energy Grade Line (In)" category="Results_Upstream_Structure_Drainage_Results_Upstream_Structure_Drainage" priority="0" kindOfQuantity="cifu:ELEVATION"/>
         <ECProperty propertyName="RatConduitResults_UpstreamStructureLabel" typeName="int" displayLabel="Upstream Structure" category="Results_Upstream_Structure_Hydraulic_Analysis_Results_Upstream_Structure_Hydraulic_Analysis" priority="0"/>
         <ECProperty propertyName="RatConduitResults_BranchElementID" typeName="int" displayLabel="Branch Element ID" category="Results_Engine_Parsing_Drainage_Results_Engine_Parsing_Drainage" priority="0"/>
-        <ECProperty propertyName="RatConduitResults_FlowArea" typeName="double" displayLabel="Area (Flow)" category="Results_Hydraulic_Summary_Drainage_Results_Hydraulic_Summary_Drainage" priority="0" kindOfQuantity="cifu:AREA"/>
+        <ECProperty propertyName="RatConduitResults_FlowArea" typeName="double" displayLabel="Area (Flow)" category="Results_Hydraulic_Summary_Drainage_Results_Hydraulic_Summary_Drainage" priority="0" kindOfQuantity="cifu:AREA_DRAINAGE"/>
         <ECProperty propertyName="RatConduitResults_WettedPerimeter" typeName="double" displayLabel="Wetted Perimeter" category="Results_Hydraulic_Summary_Drainage_Results_Hydraulic_Summary_Drainage" priority="0" kindOfQuantity="cifu:LENGTH"/>
     </ECEntityClass>
     <ECRelationshipClass typeName="ElementOwnsRatConduitResultsAspect" modifier="None" strength="embedding">
@@ -2065,6 +2263,19 @@
         </Source>
         <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
             <Class class="RatConduitResultsAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="RationalMethodQPeakResultsAspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="RationalMethodQPeakResults_Tc" typeName="double" displayLabel="Time of Concentration" category="Category_Drainage_Category_Drainage" priority="0" kindOfQuantity="cifu:TIME_EXTENDED"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsRationalMethodQPeakResultsAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="RationalMethodQPeakResultsAspect"/>
         </Target>
     </ECRelationshipClass>
     <ECEntityClass typeName="RatioResultsAspect">
@@ -2138,11 +2349,11 @@
         <ECProperty propertyName="SectionalLinkResults_StartSection_Discharge" typeName="double" displayLabel="Flow (Start)" category="Results_Drainage_Results_Drainage" priority="0" kindOfQuantity="cifu:FLOW"/>
         <ECProperty propertyName="SectionalLinkResults_StopSection_Discharge" typeName="double" displayLabel="Flow (Stop)" category="Results_Drainage_Results_Drainage" priority="0" kindOfQuantity="cifu:FLOW"/>
         <ECProperty propertyName="SectionalLinkResults_MiddleSection_Discharge" typeName="double" displayLabel="Flow (Middle)" category="Results_Drainage_Results_Drainage" priority="0" kindOfQuantity="cifu:FLOW"/>
-        <ECProperty propertyName="SectionalLinkResults_StartSection_FlowArea" typeName="double" displayLabel="Flow-Area (Start)" category="Results_Drainage_Results_Drainage" priority="0" kindOfQuantity="cifu:AREA"/>
+        <ECProperty propertyName="SectionalLinkResults_StartSection_FlowArea" typeName="double" displayLabel="Flow-Area (Start)" category="Results_Drainage_Results_Drainage" priority="0" kindOfQuantity="cifu:AREA_DRAINAGE"/>
         <ECProperty propertyName="SectionalLinkResults_StartSection_FlowWidth" typeName="double" displayLabel="Flow-Width (Start)" category="Results_Drainage_Results_Drainage" priority="0" kindOfQuantity="cifu:LENGTH"/>
-        <ECProperty propertyName="SectionalLinkResults_MiddleSection_FlowArea" typeName="double" displayLabel="Flow-Area (Middle)" category="Results_Drainage_Results_Drainage" priority="0" kindOfQuantity="cifu:AREA"/>
+        <ECProperty propertyName="SectionalLinkResults_MiddleSection_FlowArea" typeName="double" displayLabel="Flow-Area (Middle)" category="Results_Drainage_Results_Drainage" priority="0" kindOfQuantity="cifu:AREA_DRAINAGE"/>
         <ECProperty propertyName="SectionalLinkResults_MiddleSection_FlowWidth" typeName="double" displayLabel="Flow-Width (Middle)" category="Results_Drainage_Results_Drainage" priority="0" kindOfQuantity="cifu:LENGTH"/>
-        <ECProperty propertyName="SectionalLinkResults_StopSection_FlowArea" typeName="double" displayLabel="Flow-Area (Stop)" category="Results_Drainage_Results_Drainage" priority="0" kindOfQuantity="cifu:AREA"/>
+        <ECProperty propertyName="SectionalLinkResults_StopSection_FlowArea" typeName="double" displayLabel="Flow-Area (Stop)" category="Results_Drainage_Results_Drainage" priority="0" kindOfQuantity="cifu:AREA_DRAINAGE"/>
         <ECProperty propertyName="SectionalLinkResults_StopSection_FlowWidth" typeName="double" displayLabel="Flow-Width (Stop)" category="Results_Drainage_Results_Drainage" priority="0" kindOfQuantity="cifu:LENGTH"/>
     </ECEntityClass>
     <ECRelationshipClass typeName="ElementOwnsSectionalLinkResultsAspect" modifier="None" strength="embedding">
@@ -2181,7 +2392,7 @@
         <ECProperty propertyName="StandardCatchmentResults_IncrementalPrecip" typeName="double" displayLabel="Precipitation (Incremental)" category="Results_Extended_Catchment_Drainage_Results_Extended_Catchment_Drainage" priority="0" kindOfQuantity="cifu:DEPTH"/>
         <ECProperty propertyName="StandardCatchmentResults_CumulativePrecip" typeName="double" displayLabel="Precipitation (Cumulative)" category="Results_Extended_Catchment_Drainage_Results_Extended_Catchment_Drainage" priority="0" kindOfQuantity="cifu:DEPTH"/>
         <ECProperty propertyName="StandardCatchmentResults_CompositeTc" typeName="double" displayLabel="Time of Concentration (Composite)" category="Runoff_Drainage_Runoff_Drainage" priority="0" kindOfQuantity="cifu:TIME_EXTENDED"/>
-        <ECProperty propertyName="StandardCatchmentResults_CompositeCn" typeName="double" displayLabel="SCS CN (Composite)" category="Runoff_Drainage_Runoff_Drainage" priority="0" kindOfQuantity="cifu:COEFFICIENT"/>
+        <ECProperty propertyName="StandardCatchmentResults_CompositeCn" typeName="double" displayLabel="SCS CN (Composite)" category="Runoff_Drainage_Runoff_Drainage" priority="0" kindOfQuantity="cifu:CURVE_NUMBER"/>
         <ECProperty propertyName="StandardCatchmentResults_RunoffVolume" typeName="double" displayLabel="Volume (Total Runoff)" category="Results_Drainage_Results_Drainage" priority="0" kindOfQuantity="cifu:VOLUME"/>
         <ECProperty propertyName="StandardCatchmentResults_TotalSurfaceRunoff" typeName="double" displayLabel="Flow (Total Surface Runoff)" category="Results_Flow_Drainage_Results_Flow_Drainage" priority="0" kindOfQuantity="cifu:FLOW"/>
     </ECEntityClass>
@@ -2209,7 +2420,7 @@
     </ECRelationshipClass>
     <ECEntityClass typeName="StandardCxNodeResultsAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
-        <ECProperty propertyName="StandardCxNodeResults_FlowArea" typeName="double" displayLabel="Flow-Area" category="Results_Drainage_Results_Drainage" priority="0" kindOfQuantity="cifu:AREA"/>
+        <ECProperty propertyName="StandardCxNodeResults_FlowArea" typeName="double" displayLabel="Flow-Area" category="Results_Drainage_Results_Drainage" priority="0" kindOfQuantity="cifu:AREA_DRAINAGE"/>
         <ECProperty propertyName="StandardCxNodeResults_FlowWidth" typeName="double" displayLabel="Flow-Width" category="Results_Drainage_Results_Drainage" priority="0" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="StandardCxNodeResults_FroudeNumber" typeName="double" displayLabel="Froude Number" category="Results_Drainage_Results_Drainage" priority="0" kindOfQuantity="cifu:COEFFICIENT"/>
     </ECEntityClass>
@@ -2438,6 +2649,25 @@
             <Class class="TapNodeDerivedResultsAspect"/>
         </Target>
     </ECRelationshipClass>
+    <ECEntityClass typeName="Tr55GraphicalPeakAndStorageResultsAspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="Tr55GraphicalPeakAndStorageResults_DrainageArea" typeName="double" displayLabel="Drainage Area" category="Category_Drainage_Category_Drainage" priority="0" kindOfQuantity="cifu:AREA"/>
+        <ECProperty propertyName="Tr55GraphicalPeakAndStorageResults_RunoffCurveNumber" typeName="double" displayLabel="Runoff Curve Number" category="Category_Drainage_Category_Drainage" priority="0" kindOfQuantity="cifu:COEFFICIENT"/>
+        <ECProperty propertyName="Tr55GraphicalPeakAndStorageResults_TimeOfConcentration" typeName="double" displayLabel="Time of Concentration" category="Category_Drainage_Category_Drainage" priority="0" kindOfQuantity="cifu:TIME_EXTENDED"/>
+        <ECProperty propertyName="Tr55GraphicalPeakAndStorageResults_PondAndSwampPercent" typeName="double" displayLabel="Pond and Swamp percent" category="Category_Drainage_Category_Drainage" priority="0" kindOfQuantity="cifu:PERCENT"/>
+        <ECProperty propertyName="Tr55GraphicalPeakAndStorageResults_PondAndSwampArea" typeName="double" displayLabel="Pond and Swamp Area" category="Category_Drainage_Category_Drainage" priority="0" kindOfQuantity="cifu:AREA"/>
+        <ECProperty propertyName="Tr55GraphicalPeakAndStorageResults_PondAndSwampMessage" typeName="string" displayLabel="Tr55GraphicalPeakAndStorageResults_PondAndSwampMessage" category="Category_Drainage_Category_Drainage" priority="0"/>
+        <ECProperty propertyName="Tr55GraphicalPeakAndStorageResults_RainfallDistribution" typeName="string" displayLabel="Rainfall Distribution" category="Category_Drainage_Category_Drainage" priority="0"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsTr55GraphicalPeakAndStorageResultsAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="Tr55GraphicalPeakAndStorageResultsAspect"/>
+        </Target>
+    </ECRelationshipClass>
     <ECEntityClass typeName="UKCatchmentResultsAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
         <ECProperty propertyName="UKCatchmentResults_ModifiedRationalUKC" typeName="double" displayLabel="Modified Rational (United Kingdom) C" category="Results_System_Flow_Drainage_Results_System_Flow_Drainage" priority="0" kindOfQuantity="cifu:COEFFICIENT"/>
@@ -2454,7 +2684,7 @@
     </ECRelationshipClass>
     <ECEntityClass typeName="UpstreamElementResultsAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
-        <ECProperty propertyName="UpstreamElementResults_UpstreamDrainageArea" typeName="double" displayLabel="System Drainage Area" category="Results_System_Flow_Drainage_Results_System_Flow_Drainage" priority="0" kindOfQuantity="cifu:AREA"/>
+        <ECProperty propertyName="UpstreamElementResults_UpstreamDrainageArea" typeName="double" displayLabel="System Drainage Area" category="Results_System_Flow_Drainage_Results_System_Flow_Drainage" priority="0" kindOfQuantity="cifu:AREA_DRAINAGE"/>
     </ECEntityClass>
     <ECRelationshipClass typeName="ElementOwnsUpstreamElementResultsAspect" modifier="None" strength="embedding">
         <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
@@ -2516,6 +2746,8 @@
     <PropertyCategory typeName="Geometry_Drainage_Geometry_Drainage" description="&lt;Geometry&gt; [Drainage]" displayLabel="&lt;Geometry&gt; [Drainage]" priority="4294899186"/>
     <PropertyCategory typeName="Geometry_Hydraulic_Analysis_Geometry_Hydraulic_Analysis" description="&lt;Geometry&gt; [Hydraulic Analysis]" displayLabel="&lt;Geometry&gt; [Hydraulic Analysis]" priority="4294899186"/>
     <PropertyCategory typeName="Hydraulic_Analysis_Hydraulic_Analysis" description="# [Hydraulic Analysis]" displayLabel="# [Hydraulic Analysis]" priority="4294928186"/>
+    <PropertyCategory typeName="ILSAX_Hydrologic_Model_Drainage_ILSAX_Hydrologic_Model_Drainage" description="ILSAX Hydrologic Model [Drainage]" displayLabel="ILSAX Hydrologic Model [Drainage]" priority="4294885866"/>
+    <PropertyCategory typeName="Land_Cover_Drainage_Land_Cover_Drainage" description="Land Cover [Drainage]" displayLabel="Land Cover [Drainage]" priority="4294880496"/>
     <PropertyCategory typeName="Physical_Drainage_Physical_Drainage" description="Physical [Drainage]" displayLabel="Physical [Drainage]" priority="4294875686"/>
     <PropertyCategory typeName="Physical_Headwall_Drainage_Physical_Headwall_Drainage" description="Physical (Headwall) [Drainage]" displayLabel="Physical (Headwall) [Drainage]" priority="4294875686"/>
     <PropertyCategory typeName="Physical_Headwall_Hydraulic_Analysis_Physical_Headwall_Hydraulic_Analysis" description="Physical (Headwall) [Hydraulic Analysis]" displayLabel="Physical (Headwall) [Hydraulic Analysis]" priority="4294875686"/>
@@ -2604,4 +2836,5 @@
     <PropertyCategory typeName="SCADA_Hydraulic_Analysis_SCADA_Hydraulic_Analysis" description="SCADA [Hydraulic Analysis]" displayLabel="SCADA [Hydraulic Analysis]" priority="4294876946"/>
     <PropertyCategory typeName="SWMM_Results_Drainage_SWMM_Results_Drainage" description="SWMM Results [Drainage]" displayLabel="SWMM Results [Drainage]" priority="4294874826"/>
     <PropertyCategory typeName="SWMM_Results_Hydraulic_Analysis_SWMM_Results_Hydraulic_Analysis" description="SWMM Results [Hydraulic Analysis]" displayLabel="SWMM Results [Hydraulic Analysis]" priority="4294874826"/>
+    <PropertyCategory typeName="TwoD_Solver_Drainage_2D_Solver_Drainage" description="2D Solver [Drainage]" displayLabel="2D Solver [Drainage]" priority="4294910176"/>
 </ECSchema>
