@@ -13,6 +13,7 @@ resources:
     type: github
     endpoint: imodel-native
     name: iTwin/imodel-native
+    ref: 'aks/modify-tests-for-decanewton-unit'
 
   - repository: imodel-native-internal
     type: github
@@ -22,7 +23,7 @@ resources:
   - repository: itwinjs-core
     type: github
     endpoint: imodel-native
-    ref: imodel02
+    ref: 'aks/modify-tests-for-decanewton-unit'
     name: iTwin/itwinjs-core
 
 stages:
@@ -89,7 +90,7 @@ stages:
     - template: build/templates/prebuild.yml@imodel-native-internal
       parameters:
         otherRepo: imodel-native
-        nativePR: 'main'
+        nativePR: 'aks/modify-tests-for-decanewton-unit'
 
     - script: $(PY_EXE) $(CALL_BB_PATH) pull $(BB_V) -a $(BB_ARCH) $(STRATEGY_OVERRIDE)
       displayName: Pull
@@ -98,17 +99,13 @@ stages:
         AZURE_DEVOPS_EXT_PAT: $(System.AccessToken)
 
     - script: |
-        if not "%BRANCH_NAME%" == "" (
-          cd /d $(BB_SRC_ROOT)/BisSchemas
-          git checkout %BRANCH_NAME%
-        )
+        cd /d $(BB_SRC_ROOT)/BisSchemas
+        git checkout aks/Units-010008-Release
       displayName: 'Set Source Branch'
 
     - script: |
-        if not "%BRANCH_NAME%" == "" (
-          cd /d $(BB_SRC_ROOT)/BisSchemas
-          git branch
-        )
+        cd /d $(BB_SRC_ROOT)/BisSchemas
+        git branch
       displayName: 'Display Source Branch'
 
     - script: $(PY_EXE) $(CALL_BB_PATH) build $(BB_V) -a $(BB_ARCH) -s $(STRATEGY) -N 6
@@ -227,8 +224,8 @@ stages:
         nodeVersion: 18.12.x
         runRushAudit: false
         rushBuildCacheEnabled: 0
-        currentBranch: imodel02
-        targetBranch: imodel02
+        currentBranch: 'aks/modify-tests-for-decanewton-unit'
+        targetBranch: 'aks/modify-tests-for-decanewton-unit'
 
 - stage: iModeEvolution
   displayName: iModeEvolution Tests
