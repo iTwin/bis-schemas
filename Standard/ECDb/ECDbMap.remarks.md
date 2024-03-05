@@ -83,3 +83,67 @@ Example for directly applying this to an entity class, restricting its ECSql ver
 ```
 
 Class `Bar` in the example above will also be affected by the restriction since it derives from `Foo`.
+
+### View
+Allows defining an abstract entity class which is not backed by actual data but rather by an ECSql query which is executed to obtain instances of the class.
+Please see ECSqlReference for details on how to use views.
+
+Example of a schema using a view:
+
+```xml
+<ECSchema schemaName="TestSchema" alias="ts" version="1.0.0" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
+    <ECSchemaReference name='ECDbMap' version='02.00.03' alias='ecdbmap' />
+    <ECEntityClass typeName="JsonObject">
+        <ECProperty propertyName="json" typeName="string" extendedTypeName="Json" />
+    </ECEntityClass>
+    <ECEntityClass typeName="Pipe" modifier="Abstract">
+        <ECCustomAttributes>
+            <View xmlns="ECDbMap.02.00.03">
+                <Query>
+                    SELECT
+                        jo.ECInstanceId,
+                        CAST(json_extract(jo.json, '$.diameter') AS INTEGER) [Diameter],
+                        CAST(json_extract(jo.json, '$.length') AS INTEGER) [Length],
+                        json_extract(jo.json, '$.material') [Material]
+                    FROM ts.JsonObject jo
+                    WHERE json_extract(jo.json, '$.type') = 'pipe'
+                </Query>
+            </View>
+        </ECCustomAttributes>
+        <ECProperty propertyName="Diameter" typeName="int" />
+        <ECProperty propertyName="Length"  typeName="int"/>
+        <ECProperty propertyName="Material" typeName="string" />
+    </ECEntityClass>
+</ECSchema>
+```
+
+`JsonObject` could be filled with this data:
+
+```
+{"type": "pipe", "diameter": 10, "length": 100, "material": "steel"}
+{"type": "pipe", "diameter": 15, "length": 200, "material": "copper"}
+{"type": "pipe", "diameter": 20, "length": 150, "material": "plastic"}
+{"type": "cable", "diameter": 5, "length": 500, "material": "copper","type": "coaxial"}
+{"type": "cable", "diameter": 2, "length": 1000, "material": "fiber optic","type": "single-mode"}
+{"type": "cable", "diameter": 3, "length": 750, "material": "aluminum","type": "twisted pair"}
+```
+
+Running this query:
+
+```sql
+SELECT Length, Diameter, Material FROM ts.Pipe
+```
+
+Will return this result:
+
+```
+Length   |Diameter |Material
+----------------------------------------
+100      |10       |steel
+200      |15       |copper
+150      |20       |plastic
+```
+
+### ForeignKeyBasedView
+
+This CA can be applied to an abstract ECRelationship class which will then attempt to find a matching navigation property on one of the constraint classes and dynamically generate a view query based on that information. Basically turns the relationship into a view.
