@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ==================================================================================
+|  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
+|  * See LICENSE.md in the project root for license terms and full copyright notice.
+======================================================================================= -->
+<ECSchema schemaName="Connector" alias="connector" version="01.00.00" description="ECClasses used by all connectors" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
+    <ECSchemaReference name="BisCore" version="01.00.13" alias="bis" />
+    <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
+    <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
+    <ECSchemaReference name="ECDbMap" version="02.00.00" alias="ecdbmap"/>
+
+    <ECCustomAttributes>
+        <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
+            <SupportedUse>NotForProduction</SupportedUse>
+        </ProductionStatus>
+        <SchemaLayerInfo xmlns="BisCustomAttributes.01.00.00">
+            <Value>Application</Value>
+        </SchemaLayerInfo>
+    </ECCustomAttributes>
+
+    <ECEntityClass typeName="RuleViolation" displayLabel="Rule Violation" description="A violation of a connector rule by an external entity">
+        <BaseClass>bis:InformationRecordElement</BaseClass>
+
+        <ECCustomAttributes>
+            <DbIndexList xmlns="ECDbMap.02.00.00">
+                <Indexes>
+                    <DbIndex>
+                        <Name>ix_connector_ruleViolation</Name>
+                        <IsUnique>False</IsUnique>
+                        <Properties>
+                            <string>Repository.id</string>
+                            <string>Kind</string>
+                            <string>Identifier</string>
+                            <string>Rule.id</string>
+                        </Properties>
+                    </DbIndex>
+                </Indexes>
+            </DbIndexList>
+        </ECCustomAttributes>
+
+        <!-- The rule that was violated -->
+        <ECNavigationProperty propertyName="Rule" relationshipName="RuleViolationRefersToDefinition" direction="forward" description="The rule that has been violated."/>
+        
+        <!-- When the violation occurred -->
+        <ECProperty propertyName="UpdateId" typeName="string" description="Identifies the update in which the violation was most recently detected. This is merely a unique identifier. It is not related to a changeset.">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03">
+                    <Show>False</Show>
+                </HiddenProperty>
+            </ECCustomAttributes>
+        </ECProperty>
+
+        <!-- The external entity that caused the violation -->
+        <ECNavigationProperty propertyName="Repository" relationshipName="RuleViolationConcernsRepository" direction="forward" description="The RepositoryLink representing the external file or repository that contains the external entity. Required."/>
+        <ECNavigationProperty propertyName="Source" relationshipName="RuleViolationConcernsSource" direction="forward" description="The ExternalSource that contains the external entity. Optional. Must be within the Repository."/>
+        <ECProperty propertyName="Kind" typeName="string" description="The kind of the external entity."/>
+        <ECProperty propertyName="Identifier" typeName="string" description="The identifier of the external entity."/>
+
+        <!-- More information about how the entity caused the violation -->
+        <ECProperty propertyName="Properties" typeName="string" description="The names of the specific properties of the external entity that caused the violation. CSV. Optional."/>
+        <ECProperty propertyName="Details" typeName="string" description="Additional information about this particular violation. Human-readable. Optional."/>
+        
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName ="RuleViolationConcernsRepository" modifier="Sealed" strength="referencing" strengthDirection="forward" description="Relates a RuleViolation to the repository that contains the offending entity.">
+        <Source multiplicity="(0..*)" roleLabel="is from" polymorphic="true">
+            <Class class="RuleViolation"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel ="is source of" polymorphic="true" >
+            <Class class="bis:RepositoryLink"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName ="RuleViolationConcernsSource" modifier="Sealed" strength="referencing" strengthDirection="forward" description="Relates a RuleViolation to the ExternalSource that contains the offending entity.">
+        <Source multiplicity="(0..*)" roleLabel="is from" polymorphic="true">
+            <Class class="RuleViolation"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel ="is source of" polymorphic="true" >
+            <Class class="bis:ExternalSource"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName ="RuleViolationRefersToDefinition" modifier="Sealed" strength="referencing" strengthDirection="forward" description="Relates a RuleViolation to a RuleDefinition.">
+        <Source multiplicity="(0..*)" roleLabel="of rule" polymorphic="true">
+            <Class class="RuleViolation"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel ="has" polymorphic="true" >
+            <Class class="RuleDefinition"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="RuleDefinition" modifier="Sealed" displayLabel="Connector Rule Definition" description="A standard, constraint, or other condition that a connector imposes on external entities before writing them to an iModel">
+        <BaseClass>bis:DefinitionElement</BaseClass>
+        <ECProperty propertyName="Description" typeName="string" description="A human-readable description of the rule"/>
+        <ECProperty propertyName="Violation" typeName="string" description="A human-readable description of a violation of the rule"/>
+        <ECProperty propertyName="Solutions" typeName="string" description="A human-readable description of how a violation of the rule can be solved. Individual solutions are separated by the newline character."/>
+    </ECEntityClass>
+
+</ECSchema>
