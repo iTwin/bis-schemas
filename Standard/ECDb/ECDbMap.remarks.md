@@ -88,6 +88,8 @@ Class `Bar` in the example above will also be affected by the restriction since 
 Allows defining an abstract entity class which is not backed by actual data but rather by an ECSql query which is executed to obtain instances of the class.
 Please see ECSqlReference for details on how to use views.
 
+A view must return an ECInstanceId and ECClassId.
+
 Example of a schema using a view:
 
 ```xml
@@ -102,6 +104,7 @@ Example of a schema using a view:
                 <Query>
                     SELECT
                         jo.ECInstanceId,
+                        ec_classid('TestSchema', 'Pipe') as [ECClassId]
                         CAST(json_extract(jo.json, '$.diameter') AS INTEGER) [Diameter],
                         CAST(json_extract(jo.json, '$.length') AS INTEGER) [Length],
                         json_extract(jo.json, '$.material') [Material]
