@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ==================================================================================
+|  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
+|  * See LICENSE.md in the project root for license terms and full copyright notice.
+======================================================================================= -->
+<ECSchema schemaName="SynchroModeler" alias="synchromod" version="01.00.00" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
+    <ECSchemaReference name="BisCore" version="01.00.06" alias="bis" />
+    <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
+    <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
+
+    <ECCustomAttributes>
+        <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
+            <SupportedUse>NotForProduction</SupportedUse>
+        </ProductionStatus>
+        <SchemaLayerInfo xmlns="BisCustomAttributes.01.00.00">
+            <Value>Application</Value>
+        </SchemaLayerInfo>
+    </ECCustomAttributes>
+
+    <ECEntityClass typeName="Operation" modifier="abstract">
+        <BaseClass>bis:InformationRecordElement</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="SubdivisionOperation">
+        <BaseClass>Operation</BaseClass>
+        <ECNavigationProperty propertyName="original" relationshipName="SubdivisionOperationRefersToOriginalElement" direction="Forward"></ECNavigationProperty>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="SubdivisionOperationRefersToOriginalElement" strength="referencing" strengthDirection="Forward" modifier="Sealed">
+        <Source multiplicity="(0..*)" roleLabel="divides" polymorphic="true">
+            <Class class="SubdivisionOperation"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is divided by" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="OperationOutputsElements" strength="referencing" strengthDirection="Forward" modifier="Sealed">
+        <BaseClass>bis:ElementGroupsMembers</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="outputs" polymorphic="true">
+            <Class class="Operation"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is output of" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Target>
+    </ECRelationshipClass>
+
+</ECSchema>
