@@ -95,14 +95,14 @@
             <Class class="AlignmentType"/>
         </Target>
     </ECRelationshipClass>
-    <ECEntityClass typeName="DesignAlignments" description="Entry-point element into an AlignmentModel containing Alignments used for design purposes in given Spatial Model.">
+    <ECEntityClass typeName="DesignAlignments" description="Entry-point element into a bis:SpatialLocationModel containing Alignments used primarily for design purposes.">
         <BaseClass>bis:SpatialLocationElement</BaseClass>
         <BaseClass>bis:ISubModeledElement</BaseClass>
         <ECCustomAttributes>
             <HiddenClass xmlns="CoreCustomAttributes.01.00.00"/>
         </ECCustomAttributes>
     </ECEntityClass>
-    <ECEntityClass typeName="HorizontalAlignments" description="Horizontal/Top perspective on Alignments in an AlignmentModel that will be broken down in more detail in a separate HorizontalAlignmentModel.">
+    <ECEntityClass typeName="HorizontalAlignments" description="Entry-point element into a bis:SpatialLocationModel capturing the Horizontal/Top perspective on Alignment instances.">
         <BaseClass>bis:SpatialLocationElement</BaseClass>
         <BaseClass>bis:ISubModeledElement</BaseClass>
         <ECCustomAttributes>
@@ -166,6 +166,22 @@
         </Source>
         <Target multiplicity="(0..*)" polymorphic="true" roleLabel="is owned by">
             <Class class="lr:ReferentElement"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="VerticalAlignmentViewDefinition" displayLabel="Vertical Alignment View Definition"  description="A VerticalAlignmentViewDefinition specifies parameters for a view of a VerticalAlignmentModel.">
+        <BaseClass>bis:ViewDefinition2d</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="ProfileDrawing" displayLabel="Profile Drawing" description="A ProfileDrawing is a bis:Drawing based on a view of a VerticalAlignmentModel. A ProfileDrawing can be sub-modeled by a DrawingModel.">
+        <BaseClass>bis:Drawing</BaseClass>
+        <ECNavigationProperty propertyName="VerticalAlignmentView" relationshipName="ProfileDrawingIsBasedOnVerticalAlignmentView" direction="forward" displayLabel="Vertical Alignment View" description="The VerticalAlignmentViewDefinition that this ProfileDrawing is based on."/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ProfileDrawingIsBasedOnVerticalAlignmentView" strengthDirection="backward" strength="referencing" modifier="Sealed" description="Identifies the VerticalAlignmentViewDefinition that the ProfileDrawing is based on.">
+        <!-- @see SectionDrawing.SpatialView ECNavigationProperty -->
+        <Source multiplicity="(0..*)" polymorphic="true" roleLabel="is based on">
+            <Class class="ProfileDrawing"/>
+        </Source>
+        <Target multiplicity="(1..1)" polymorphic="true" roleLabel="is used by">
+            <Class class="VerticalAlignmentViewDefinition"/>
         </Target>
     </ECRelationshipClass>
 </ECSchema>
