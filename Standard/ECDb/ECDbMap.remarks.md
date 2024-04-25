@@ -84,7 +84,7 @@ Example for directly applying this to an entity class, restricting its ECSql ver
 
 Class `Bar` in the example above will also be affected by the restriction since it derives from `Foo`.
 
-### View
+### QueryView
 Allows defining an abstract entity class which is not backed by actual data but rather by an ECSql query which is executed to obtain instances of the class.
 Please see ECSqlReference for details on how to use views.
 
@@ -100,7 +100,7 @@ Example of a schema using a view:
     </ECEntityClass>
     <ECEntityClass typeName="Pipe" modifier="Abstract">
         <ECCustomAttributes>
-            <View xmlns="ECDbMap.02.00.03">
+            <QueryView xmlns="ECDbMap.02.00.04">
                 <Query>
                     SELECT
                         jo.ECInstanceId,
@@ -111,7 +111,7 @@ Example of a schema using a view:
                     FROM ts.JsonObject jo
                     WHERE json_extract(jo.json, '$.type') = 'pipe'
                 </Query>
-            </View>
+            </QueryView>
         </ECCustomAttributes>
         <ECProperty propertyName="Diameter" typeName="int" />
         <ECProperty propertyName="Length"  typeName="int"/>
@@ -147,6 +147,6 @@ Length   |Diameter |Material
 150      |20       |plastic
 ```
 
-### ForeignKeyBasedView
+### ForeignKeyView
 
 This CA can be applied to an abstract ECRelationship class which will then attempt to find a matching navigation property on one of the constraint classes and dynamically generate a view query based on that information. Basically turns the relationship into a view.
