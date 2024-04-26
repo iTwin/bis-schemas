@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ==================================================================================
+|  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
+|  * See LICENSE.md in the project root for license terms and full copyright notice.
+======================================================================================= -->
+<ECSchema schemaName="StormSewerPhysical" alias="stmswrphys" version="01.00.00" description="Main schema for the physical modeling of elements used in Storm Water and Sewer Systems." xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
+    <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
+    <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
+    <ECSchemaReference name="BisCore" version="01.00.10" alias="bis"/>
+    <ECSchemaReference name="DistributionSystems" version="01.00.01" alias="dsys"/>
+    <ECSchemaReference name="PipeworkPhysical" version="01.00.00" alias="pipphys"/>
+    <ECSchemaReference name="AecUnits" version="01.00.00" alias="AECU"/>
+
+    <ECCustomAttributes>
+        <ProductionStatus xmlns="CoreCustomAttributes.01.00.00">
+            <SupportedUse>NotForProduction</SupportedUse>
+        </ProductionStatus>
+        <SchemaLayerInfo xmlns="BisCustomAttributes.01.00.00">
+            <Value>DisciplinePhysical</Value>
+        </SchemaLayerInfo>
+    </ECCustomAttributes>
+
+    <ECEntityClass typeName="StormwaterSystem" modifier="None" displayLabel="Stormwater System" description="A pipphys:PipingSystem that models a pipe network designed for the management of rainfall water which runs off or travels over the ground surface.">
+        <BaseClass>pipphys:PipingSystem</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="DistributionChamber" displayLabel="Distribution Chamber" description="A bis:PhysicalElement modeling .">
+        <BaseClass>bis:PhysicalElement</BaseClass>
+        <BaseClass>dsys:IDistributionFlowElement</BaseClass>
+        <BaseClass>pipphys:IPipingElement</BaseClass>
+        <ECProperty propertyName="InvertElevation" typeName="double" kindOfQuantity="AECU:LENGTH" description="Elevation of the inside bottom of the Distribution Chamber"/>
+    </ECEntityClass>
+    <ECEntityClass typeName="DistributionChamberType" modifier="Abstract" displayLabel="Distribution Chamber Type" description="Defines a shared set of properties whose values vary per-type of DistributionChamber rather than per-instance.">
+        <BaseClass>bis:PhysicalType</BaseClass>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="DistributionChamberIsOfType" strength="referencing" modifier="None" description="A type-instance relation; one that indicates that the specific DistributionChamber is an instance of the defined DistributionChamberType.">
+        <BaseClass>bis:PhysicalElementIsOfType</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="is of" polymorphic="true">
+            <Class class="DistributionChamber" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is type of" polymorphic="true">
+            <Class class="DistributionChamberType"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="ManholeType" modifier="None" displayLabel="Manhole Type" description="Defines a shared set of properties whose values vary per-type of Manhole rather than per-instance.">
+        <BaseClass>DistributionChamberType</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="CatchbasinType" modifier="None" displayLabel="Catchbasin Type" description="Defines a shared set of properties whose values vary per-type of Catchbasin rather than per-instance.">
+        <BaseClass>DistributionChamberType</BaseClass>
+    </ECEntityClass>
+    <!--ECRelationshipClass typeName="DistributionChamberTypeComposesSubTypes" modifier="None" strength="referencing" strengthDirection="forward" description="A relationship used to identify the bis:PhysicalTypes that are sub-parts to compose a DistributionChamberType.">
+        <BaseClass>bis:PhysicalTypeComposesSubTypes</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="composes" polymorphic="true">
+            <Class class="DistributionChamberType"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is composed by" polymorphic="true">
+            <Class class="bis:PhysicalType"/>
+        </Target>
+    </ECRelationshipClass-->
+</ECSchema>
