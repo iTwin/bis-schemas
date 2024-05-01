@@ -7,11 +7,21 @@ remarksTarget: StormSewerPhysical.ecschema.md
 
 This schema contains classes that model Stormwater and Sewage collection systems.
 
+The following class-diagrams depict the main classes and relationships in the StormSewerPhysical schema:
+
+![System classes](./media/StormSewerPhysical-system_classes.png)
+![Flow-Element classes](./media/StormSewerPhysical-flow_classes.png)
+![TypeDef classes](./media/StormSewerPhysical-typedef_classes.png)
+
+The following instance-diagram depict a few examples of classes from the StormSewerPhysical schema:
+
+![DistributionChambers](./media/StormSewerPhysical-distributionchamber_instances.png)
+
 ## Entity Classes
 
 ### DistributionChamber
 
-A `DistributionChamber` instance owns its `PipeworkPhysical:PipingPort`s via the `DistributionChamberOwnsPipingPorts` relationship. _Invert Elevations_ at those `PipingPort`s can be computed as:
+A `DistributionChamber` instance owns its `PipeworkPhysical:PipingPort`s via the `PipeworkPhysical:PipingElementOwnsPorts` relationship. _Invert Elevations_ at those `PipingPort`s can be computed as:
 
 ```
 InvertElevation at a PipingPort = (DistributionChamber.Origin.z + PipingPort.LocalOrigin.z) - (PipingPort.PipingPortType.InnerDiameter / 2)
