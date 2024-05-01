@@ -113,9 +113,11 @@ It is expected that the `LocalOrigin` property, inherited from `dsys:Distributio
 
 `PipingPort`s shall be associated with an instance of `PipingPortType` as its TypeDefinition via the `PipingPortIsOfType` relationship. 
 
-_Invert Elevations_ at individual `PipingPort` instances can be computed as:
+_Crown and Invert Elevations_ at individual `PipingPort` instances can be computed as:
 
 ```
+CrownElevation at a PipingPort = (Parent_IPipingElement.Origin.z + PipingPort.LocalOrigin.z) + (PipingPort.PipingPortType.InnerDiameter / 2)
+
 InvertElevation at a PipingPort = (Parent_IPipingElement.Origin.z + PipingPort.LocalOrigin.z) - (PipingPort.PipingPortType.InnerDiameter / 2)
 ```
 
