@@ -107,9 +107,17 @@ Equivalent to [IfcPipeSegmentType](http://ifc43-docs.standards.buildingsmart.org
 
 ### PipingPort
 
-It is expected that the `LocalOrigin` property, inherited from `dsys:DistributionPort`, can be used to derive centerlines across `IPipingElement`s when needed.
+`PipingPort`s must be contained in `PhysicalModel`s and are owned by `IPipingElement` instances via the `PipingElementOwnsPorts` relationship.
+
+It is expected that the `LocalOrigin` property, inherited from `dsys:DistributionPort`, can be used to derive centerlines across a parent `IPipingElement`s when needed.
 
 `PipingPort`s shall be associated with an instance of `PipingPortType` as its TypeDefinition via the `PipingPortIsOfType` relationship. 
+
+_Invert Elevations_ at individual `PipingPort` instances can be computed as:
+
+```
+InvertElevation at a PipingPort = (Parent_IPipingElement.Origin.z + PipingPort.LocalOrigin.z) - (PipingPort.PipingPortType.InnerDiameter / 2)
+```
 
 Equivalent to [IfcDistributionPort](http://ifc43-docs.standards.buildingsmart.org/IFC/RELEASE/IFC4x3/HTML/lexical/IfcDistributionPort.htm), with its _PredefinedType_ property set to _IfcDistributionPortTypeEnum.PIPE_.
 
