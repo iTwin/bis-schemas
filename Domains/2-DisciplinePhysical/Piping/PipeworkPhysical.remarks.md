@@ -77,7 +77,7 @@ Equivalent to an [IfcDistributionPort](http://ifc43-docs.standards.buildingsmart
 
 ### Pipe
 
-The length of a `Pipe` instance can be obtained by calculating the distance between the two `PipingPort`s that it owns, via their _LocalOrigin_ properties.
+The length of a `Pipe` instance can be obtained by calculating the distance between the two `PipingPort`s that it owns, via their _Origin_ properties.
 
 `Pipe`s must be contained in `PhysicalModel`s and optionally associated with its corresponding `PipingSystem` instance via a `PipingSystemGroupsPipingElements` relationship.
 
@@ -109,16 +109,16 @@ Equivalent to [IfcPipeSegmentType](http://ifc43-docs.standards.buildingsmart.org
 
 `PipingPort`s must be contained in `PhysicalModel`s and are owned by `IPipingElement` instances via the `PipingElementOwnsPorts` relationship.
 
-It is expected that the `LocalOrigin` property, inherited from `dsys:DistributionPort`, can be used to derive centerlines across a parent `IPipingElement`s when needed.
+It is expected that the `Origin` property can be used to derive centerlines across a parent `IPipingElement`s when needed.
 
 `PipingPort`s shall be associated with an instance of `PipingPortType` as its TypeDefinition via the `PipingPortIsOfType` relationship. 
 
 _Crown and Invert Elevations_ at individual `PipingPort` instances can be computed as:
 
 ```
-CrownElevation at a PipingPort = (Parent_IPipingElement.Origin.z + PipingPort.LocalOrigin.z) + (PipingPort.PipingPortType.InnerDiameter / 2)
+CrownElevation at a PipingPort = PipingPort.Origin.z + (PipingPort.PipingPortType.InnerDiameter / 2)
 
-InvertElevation at a PipingPort = (Parent_IPipingElement.Origin.z + PipingPort.LocalOrigin.z) - (PipingPort.PipingPortType.InnerDiameter / 2)
+InvertElevation at a PipingPort = PipingPort.Origin.z - (PipingPort.PipingPortType.InnerDiameter / 2)
 ```
 
 Equivalent to [IfcDistributionPort](http://ifc43-docs.standards.buildingsmart.org/IFC/RELEASE/IFC4x3/HTML/lexical/IfcDistributionPort.htm), with its _PredefinedType_ property set to _IfcDistributionPortTypeEnum.PIPE_.
