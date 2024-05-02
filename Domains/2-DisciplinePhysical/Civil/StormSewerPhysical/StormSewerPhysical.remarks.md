@@ -40,3 +40,11 @@ Equivalent to [IfcDistributionChamberElementType](https://standards.buildingsmar
 ### ManholeType
 
 Equivalent to [IfcDistributionChamberElementType](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcDistributionChamberElementType.htm) with PredefinedType = [IfcDistributionChamberElementTypeEnum.MANHOLE](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcDistributionChamberElementTypeEnum.htm).
+
+### DistributionChamberTopType
+
+An instance of `DistributionChamberTopType` can optionally specify a single *Physical Material* via its `PhysicalMaterial` property.
+
+### DistributionChamberBottomType
+
+An instance of `DistributionChamberBottomType` can optionally specify a single *Physical Material* via its `PhysicalMaterial` property.
