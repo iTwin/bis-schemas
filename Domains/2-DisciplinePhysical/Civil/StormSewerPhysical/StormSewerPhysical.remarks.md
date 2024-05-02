@@ -24,7 +24,7 @@ The following instance-diagram depict a few examples of classes from the StormSe
 A `DistributionChamber` instance owns its `PipeworkPhysical:PipingPort`s via the `PipeworkPhysical:PipingElementOwnsPorts` relationship. _Invert Elevations_ at those `PipingPort`s can be computed as:
 
 ```
-InvertElevation at a PipingPort = (DistributionChamber.Origin.z + PipingPort.LocalOrigin.z) - (PipingPort.PipingPortType.InnerDiameter / 2)
+InvertElevation at a PipingPort = PipingPort.Origin.z - (PipingPort.PipingPortType.InnerDiameter / 2)
 ```
 
 `DistributionChamber`s must be contained in `PhysicalModel`s. Further classification of `DistributionChamber` instances can be achieved via instances of `DistributionChamberType`.
