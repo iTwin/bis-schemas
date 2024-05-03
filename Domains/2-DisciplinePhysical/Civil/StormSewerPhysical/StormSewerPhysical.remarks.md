@@ -13,7 +13,7 @@ The following class-diagrams depict the main classes and relationships in the St
 ![Flow-Element classes](./media/StormSewerPhysical-flow_classes.png)
 ![TypeDef classes](./media/StormSewerPhysical-typedef_classes.png)
 
-The following instance-diagram depict a few examples of classes from the StormSewerPhysical schema:
+The following instance-diagram depict an example of the classes from the StormSewerPhysical schema:
 
 ![DistributionChambers](./media/StormSewerPhysical-distributionchamber_instances.png)
 
@@ -41,10 +41,10 @@ Equivalent to [IfcDistributionChamberElementType](https://standards.buildingsmar
 
 Equivalent to [IfcDistributionChamberElementType](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcDistributionChamberElementType.htm) with PredefinedType = [IfcDistributionChamberElementTypeEnum.MANHOLE](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcDistributionChamberElementTypeEnum.htm).
 
-### DistributionChamberTopType
+### DistributionChamberComponent
 
-An instance of `DistributionChamberTopType` can optionally specify a single *Physical Material* via its `PhysicalMaterial` property.
+`DistributionChamberComponent`s are assembled by a `DistributionChamber` via the `DistributionChamberAssemblesComponents` relationship and they must be contained in `PhysicalModel`s. Further classification of `DistributionChamberComponent` instances can be achieved via instances of `DistributionChamberComponentType`.
 
-### DistributionChamberBottomType
+### DistributionChamberComponentType
 
-An instance of `DistributionChamberBottomType` can optionally specify a single *Physical Material* via its `PhysicalMaterial` property.
+An instance of `DistributionChamberComponentType` can optionally specify a single *Physical Material* via its `PhysicalMaterial` property.

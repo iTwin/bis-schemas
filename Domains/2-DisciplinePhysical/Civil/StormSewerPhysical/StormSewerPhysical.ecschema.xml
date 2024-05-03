@@ -25,6 +25,7 @@
     </ECEntityClass>
     <ECEntityClass typeName="DistributionChamber" displayLabel="Distribution Chamber" description="A bis:PhysicalElement modeling enclosed spaces at which Storm and Sewer systems and their constituent components may be inspected and through which Stormwater or Sewage travel.">
         <BaseClass>bis:PhysicalElement</BaseClass>
+        <BaseClass>bis:IParentElement</BaseClass>
         <BaseClass>dsys:IDistributionFlowElement</BaseClass>
         <BaseClass>pipphys:IPipingElement</BaseClass>
         <ECProperty propertyName="InvertElevation" typeName="double" kindOfQuantity="AECU:LENGTH" description="Elevation of the inside bottom of the Distribution Chamber"/>
@@ -47,15 +48,30 @@
     <ECEntityClass typeName="CatchbasinType" modifier="None" displayLabel="Catchbasin Type" description="A DistributionChamberType with a reservoir or well into which surface water may drain off.">
         <BaseClass>DistributionChamberType</BaseClass>
     </ECEntityClass>
-    <ECEntityClass typeName="DistributionChamberComponentType" modifier="Abstract" displayLabel="Distribution Chamber Component Type" description="Defines a shared set of properties whose values vary per-type of DistributionChamberComponent rather than per-instance.">
+    <ECEntityClass typeName="DistributionChamberComponent" displayLabel="Distribution Chamber Component" description="A bis:PhysicalElement modeling a part or component of a Distribution Chamber.">
+        <BaseClass>bis:PhysicalElement</BaseClass>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="DistributionChamberAssemblesComponents" strength="embedding" modifier="None" description="A relationship that indicates a physical assembly of child DistributionChamberComponents.">
+        <BaseClass>bis:PhysicalElementAssemblesElements</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="assembles" polymorphic="true">
+            <Class class="DistributionChamber"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is assembled by" polymorphic="true">
+            <Class class="DistributionChamberComponent"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="DistributionChamberComponentType" modifier="None" displayLabel="Distribution Chamber Component Type" description="Defines a shared set of properties whose values vary per-type of DistributionChamberComponent rather than per-instance.">
         <BaseClass>bis:PhysicalType</BaseClass>
     </ECEntityClass>
-    <ECEntityClass typeName="DistributionChamberTopType" modifier="None" displayLabel="Distribution Chamber Top Type" description="A DistributionChamberComponentType meant to be the top part of a DistributionChamber">
-        <BaseClass>DistributionChamberComponentType</BaseClass>
-    </ECEntityClass>
-    <ECEntityClass typeName="DistributionChamberBottomType" modifier="None" displayLabel="Distribution Chamber Bottom Type" description="A DistributionChamberComponentType meant to be the bottom part of a DistributionChamber">
-        <BaseClass>DistributionChamberComponentType</BaseClass>
-    </ECEntityClass>
+    <ECRelationshipClass typeName="DistributionChamberComponentIsOfType" strength="referencing" modifier="None" description="A type-instance relation; one that indicates that the specific DistributionChamber is an instance of the defined DistributionChamberType.">
+        <BaseClass>bis:PhysicalElementIsOfType</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="is of" polymorphic="true">
+            <Class class="DistributionChamberComponent" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is type of" polymorphic="true">
+            <Class class="DistributionChamberComponentType"/>
+        </Target>
+    </ECRelationshipClass>
     <!--ECRelationshipClass typeName="DistributionChamberTypeComposesSubTypes" modifier="None" strength="referencing" strengthDirection="forward" description="A relationship used to identify the bis:PhysicalTypes that are sub-parts to compose a DistributionChamberType.">
         <BaseClass>bis:PhysicalTypeComposesSubTypes</BaseClass>
         <Source multiplicity="(0..*)" roleLabel="composes" polymorphic="true">
