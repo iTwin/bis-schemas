@@ -15,25 +15,25 @@ The following class-diagrams depict the main classes and relationships in the St
 
 The following instance-diagram depict an example of the classes from the StormSewerPhysical schema:
 
-![DistributionChambers](./media/StormSewerPhysical-distributionchamber_instances.png)
+![DistributionStructures](./media/StormSewerPhysical-distributionstructure_instances.png)
 
 ## Entity Classes
 
-### DistributionChamber
+### DistributionStructure
 
-A `DistributionChamber` instance owns its `PipeworkPhysical:PipingPort`s via the `PipeworkPhysical:PipingElementOwnsPorts` relationship. _Invert Elevations_ at those `PipingPort`s can be computed as:
+A `DistributionStructure` instance owns its `PipeworkPhysical:PipingPort`s via the `PipeworkPhysical:PipingElementOwnsPorts` relationship. _Invert Elevations_ at those `PipingPort`s can be computed as:
 
 ```
 InvertElevation at a PipingPort = PipingPort.Origin.z - (PipingPort.PipingPortType.InnerDiameter / 2)
 ```
 
-`DistributionChamber`s must be contained in `PhysicalModel`s. Further classification of `DistributionChamber` instances can be achieved via instances of `DistributionChamberType`.
+`DistributionStructure`s must be contained in `PhysicalModel`s. Further classification of `DistributionStructure` instances can be achieved via instances of `DistributionStructureType`.
 
 Equivalent to [IfcDistributionChamberElement](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcDistributionChamberElement.htm).
 
-### DistributionChamberType
+### DistributionStructureType
 
-An instance of `DistributionChamberType` can optionally specify a single *Physical Material* via its `PhysicalMaterial` property.
+An instance of `DistributionStructureType` can optionally specify a single *Physical Material* via its `PhysicalMaterial` property.
 
 Equivalent to [IfcDistributionChamberElementType](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcDistributionChamberElementType.htm).
 
@@ -41,16 +41,16 @@ Equivalent to [IfcDistributionChamberElementType](https://standards.buildingsmar
 
 Equivalent to [IfcDistributionChamberElementType](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcDistributionChamberElementType.htm) with PredefinedType = [IfcDistributionChamberElementTypeEnum.MANHOLE](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcDistributionChamberElementTypeEnum.htm).
 
-### DistributionChamberComponent
+### DistributionStructureComponent
 
-`DistributionChamberComponent`s are assembled by a `DistributionChamber` via the `DistributionChamberAssemblesComponents` relationship and they must be contained in `PhysicalModel`s. Further classification of `DistributionChamberComponent` instances can be achieved via instances of `DistributionChamberComponentType`.
+`DistributionStructureComponent`s are assembled by a `DistributionStructure` via the `DistributionStructureAssemblesComponents` relationship and they must be contained in `PhysicalModel`s. Further classification of `DistributionStructureComponent` instances can be achieved via instances of `DistributionStructureComponentType`.
 
-### DistributionChamberComponentType
+### DistributionStructureComponentType
 
-An instance of `DistributionChamberComponentType` can optionally specify a single *Physical Material* via its `PhysicalMaterial` property.
+An instance of `DistributionStructureComponentType` can optionally specify a single *Physical Material* via its `PhysicalMaterial` property.
 
 ## Relationship Classes
 
-### DistributionChamberTypeComposesSubTypes
+### DistributionStructureTypeComposesSubTypes
 
-`DistributionChamberComponentType` instances composed by a `DistributionChamberType` are organized based on its vertical placement. That is, a `DistributionChamberComponentType` instance at the *Bottom* of a `DistributionChamberType` shall be grouped with a `DistributionChamberTypeComposesSubTypes` relationship whose _memberPriority_ is set to 1. Similarly, a `DistributionChamberComponentType` instance at its *Top* shall be composed with a _memberPriority_ is set to the highest number among the members grouped by a `DistributionChamberType`.
+`DistributionStructureComponentType` instances composed by a `DistributionStructureType` are organized based on its vertical placement. That is, a `DistributionStructureComponentType` instance at the *Bottom* of a `DistributionStructureType` shall be grouped with a `DistributionStructureTypeComposesSubTypes` relationship whose _memberPriority_ is set to 1. Similarly, a `DistributionStructureComponentType` instance at its *Top* shall be composed with a _memberPriority_ is set to the highest number among the members grouped by a `DistributionStructureType`.
