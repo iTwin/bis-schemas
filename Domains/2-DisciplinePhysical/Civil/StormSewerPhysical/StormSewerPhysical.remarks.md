@@ -48,3 +48,9 @@ Equivalent to [IfcDistributionChamberElementType](https://standards.buildingsmar
 ### DistributionChamberComponentType
 
 An instance of `DistributionChamberComponentType` can optionally specify a single *Physical Material* via its `PhysicalMaterial` property.
+
+## Relationship Classes
+
+### DistributionChamberTypeComposesSubTypes
+
+`DistributionChamberComponentType` instances composed by a `DistributionChamberType` are organized based on its vertical placement. That is, a `DistributionChamberComponentType` instance at the *Bottom* of a `DistributionChamberType` shall be grouped with a `DistributionChamberTypeComposesSubTypes` relationship whose _memberPriority_ is set to 1. Similarly, a `DistributionChamberComponentType` instance at its *Top* shall be composed with a _memberPriority_ is set to the highest number among the members grouped by a `DistributionChamberType`.
