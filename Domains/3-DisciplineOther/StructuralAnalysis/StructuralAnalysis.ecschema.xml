@@ -3,7 +3,7 @@
 |  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
 |  * See LICENSE.md in the project root for license terms and full copyright notice.
 ======================================================================================= -->
-<ECSchema schemaName="StructuralAnalysis" alias="sa" version="01.00.03" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" displayLabel="Structural Analysis" description="Structural Analysis Schema.">
+<ECSchema schemaName="StructuralAnalysis" alias="sa" version="01.00.05" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" displayLabel="Structural Analysis" description="Structural Analysis Schema.">
     <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
     <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
     <ECSchemaReference name="BisCore" version="01.00.10" alias="bis" />
@@ -13,7 +13,7 @@
 
     <ECCustomAttributes>
         <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
-            <SupportedUse>Production</SupportedUse>
+            <SupportedUse>NotForProduction</SupportedUse>
         </ProductionStatus>
         <SchemaLayerInfo xmlns="BisCustomAttributes.01.00.00">
             <Value>DisciplineOther</Value>
@@ -493,39 +493,6 @@
         </Target>
     </ECRelationshipClass>
 
-    <!-- <ECEntityClass typeName="LogicalPathReleaseAspect" modifier="Sealed" displayLabel="Logical Path Release" description="Path Release of a Member." >
-        <BaseClass>PathReleaseAspect</BaseClass>
-        <ECProperty propertyName="TranslationalRAxis" typeName="ReleaseType" displayLabel="Translational R Axis" description="Release for Translational R Axis." />
-        <ECProperty propertyName="TranslationalSAxis" typeName="ReleaseType" displayLabel="Translational S Axis" description="Release for Translational S Axis." />
-        <ECProperty propertyName="TranslationalTAxis" typeName="ReleaseType" displayLabel="Translational T Axis" description="Release for Translational T Axis." />
-        <ECProperty propertyName="RotationalRAxis" typeName="ReleaseType" displayLabel="Rotational R Axis" description="Release for Rotational R Axis." />
-    </ECEntityClass>
-
-    <ECRelationshipClass typeName="PathReleaseAspectRefersToPath" strength="referencing" modifier="Sealed">
-        <Source multiplicity="(0..*)" roleLabel="references" polymorphic="false">
-            <Class class="PathReleaseAspect" />
-        </Source>
-        <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="true">
-            <Class class="Path" />
-        </Target>
-    </ECRelationshipClass>
-
-    <ECEntityClass typeName="LogicalSheetReleaseAspect" modifier="Sealed" displayLabel="Logical Sheet Release" description="Sheet Release of a Member." >
-        <BaseClass>SheetReleaseAspect</BaseClass>
-        <ECProperty propertyName="TranslationalRAxis" typeName="ReleaseType" displayLabel="Translational R Axis" description="Release for Translational R Axis." />
-        <ECProperty propertyName="TranslationalSAxis" typeName="ReleaseType" displayLabel="Translational S Axis" description="Release for Translational S Axis." />
-        <ECProperty propertyName="TranslationalTAxis" typeName="ReleaseType" displayLabel="Translational T Axis" description="Release for Translational T Axis." />
-    </ECEntityClass>
-
-    <ECRelationshipClass typeName="SheetReleaseAspectRefersToSheet" strength="referencing" modifier="Sealed">
-        <Source multiplicity="(0..*)" roleLabel="references" polymorphic="false">
-            <Class class="SheetReleaseAspect" />
-        </Source>
-        <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="false">
-            <Class class="Sheet" />
-        </Target>
-    </ECRelationshipClass> -->
-
     <ECRelationshipClass typeName="MemberOwnsVertexReleaseAspects" strength="embedding" modifier="Sealed">
         <BaseClass>bis:ElementOwnsMultiAspects</BaseClass>
         <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
@@ -535,36 +502,6 @@
             <Class class="VertexReleaseAspect" />
         </Target>
     </ECRelationshipClass>
-
-    <!-- <ECRelationshipClass typeName="CurveMemberOwnsLogicalPathReleaseAspects" strength="embedding" modifier="Sealed">
-        <BaseClass>bis:ElementOwnsMultiAspects</BaseClass>
-        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
-            <Class class="CurveMember"/>
-        </Source>
-        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
-            <Class class="LogicalPathReleaseAspect" />
-        </Target>
-    </ECRelationshipClass> -->
-
-    <!-- <ECRelationshipClass typeName="SurfaceMemberOwnsLogicalPathReleaseAspects" strength="embedding" modifier="Sealed">
-        <BaseClass>bis:ElementOwnsMultiAspects</BaseClass>
-        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
-            <Class class="SurfaceMember"/>
-        </Source>
-        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="false">
-            <Class class="LogicalPathReleaseAspect" />
-        </Target>
-    </ECRelationshipClass>
-
-    <ECRelationshipClass typeName="SurfaceMemberOwnsLogicalSheetReleaseAspects" strength="embedding" modifier="Sealed">
-        <BaseClass>bis:ElementOwnsMultiAspects</BaseClass>
-        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
-            <Class class="SurfaceMember"/>
-        </Source>
-        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
-            <Class class="LogicalSheetReleaseAspect" />
-        </Target>
-    </ECRelationshipClass> -->
 
     <!-- Member classes -->
 
@@ -649,6 +586,7 @@
         </ECCustomAttributes>
         <ECProperty propertyName="PlacementSurface" typeName="PlacementSurface" displayLabel="Placement Surface" description="Sheet defines area location for IStructuralSurface, the height of IStructuralSurface is defined by thickness(provided by related SurfaceType) which extrudes location area by that thickness. PlacementSurface allows to define how location area should be interpreted for extrusion - ether as start, end or center. These are the most common used cases. More flexibility is achieved by using Offset property." />
         <ECProperty propertyName="Offset" typeName="double" displayLabel="Offset" description="PlacementSurface provides only a few cases for how to interpret the location area (Sheet). Offset provides more flexibility for less common cases, where it provides additional offset along the normal of IStructuralSurface. Both PlacementSurface and Offset properties can be used at the same time." kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="LayoutDirection" typeName="Point3d" displayLabel="Layout Direction" description="Used to define direction for how to place Steel Deck profiles" />
     </ECEntityClass>
 
     <ECRelationshipClass typeName="IStructuralSurfaceRefersToSurfaceType" strength="referencing" modifier="Sealed">
@@ -665,12 +603,6 @@
         <BaseClass>anlyt:AnalyticalType</BaseClass>
     </ECEntityClass>
 
-    <ECEntityClass typeName="SimpleSurfaceType" modifier="Sealed" description="Simple Surface Type.">
-        <BaseClass>SurfaceType</BaseClass>
-        <ECProperty propertyName="Thickness" typeName="double" description="Thickness of IStructuralSurfaces." kindOfQuantity="AECU:LENGTH_SHORT" />
-        <ECNavigationProperty propertyName="Material" relationshipName="SimpleSurfaceTypeRefersToMaterial" direction="Forward" displayLabel="Material" description="Material of all IStructuralSurfaces with this type." />
-    </ECEntityClass>
-
     <ECRelationshipClass typeName="SimpleSurfaceTypeRefersToMaterial" strength="referencing" strengthDirection="Forward" modifier="Sealed">
         <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="true">
             <Class class="SimpleSurfaceType" />
@@ -679,6 +611,81 @@
             <Class class="bis:PhysicalMaterial"/>
         </Target>
     </ECRelationshipClass>
+
+    <ECEntityClass typeName="SimpleSurfaceType" modifier="Sealed" displayLabel="Simple Surface Type" description="Simple Surface Type.">
+        <BaseClass>SurfaceType</BaseClass>
+        <ECProperty propertyName="Thickness" typeName="double" description="Thickness of IStructuralSurfaces." kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECNavigationProperty propertyName="Material" relationshipName="SimpleSurfaceTypeRefersToMaterial" direction="Forward" displayLabel="Material" description="Material of all IStructuralSurfaces with this type." />
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="SteelDeckTypeRefersToProfile" strength="referencing" strengthDirection="Forward" modifier="Sealed">
+        <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="false">
+            <Class class="SteelDeckType" />
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="true">
+            <Class class="prf:Profile"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="SteelDeckTypeRefersToPhysicalMaterial" strength="referencing" strengthDirection="Forward" modifier="Sealed">
+        <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="true">
+            <Class class="SteelDeckType" />
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="true">
+            <Class class="bis:PhysicalMaterial"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="SteelDeckType" modifier="Sealed" displayLabel="Steel Deck Type" description="Steel Deck Type.">
+        <BaseClass>SurfaceType</BaseClass>
+        <ECNavigationProperty propertyName="Profile" relationshipName="SteelDeckTypeRefersToProfile" direction="Forward" displayLabel="Profile" />
+        <ECNavigationProperty propertyName="Material" relationshipName="SteelDeckTypeRefersToPhysicalMaterial" direction="Forward" displayLabel="Material" />
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="CompositeDeckTypeRefersToSteelDeckType" strength="referencing" strengthDirection="Forward" modifier="Sealed">
+        <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="false">
+            <Class class="CompositeDeckType" />
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="false">
+            <Class class="SteelDeckType"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="CompositeDeckTypeRefersToPhysicalMaterial" strength="referencing" strengthDirection="Forward" modifier="Sealed">
+        <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="true">
+            <Class class="CompositeDeckType" />
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="true">
+            <Class class="bis:PhysicalMaterial"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="CompositeDeckType" modifier="Sealed" displayLabel="Composite Deck Type" description="Composite Deck Type.">
+        <BaseClass>SurfaceType</BaseClass>
+        <ECNavigationProperty propertyName="FillingMaterial" relationshipName="CompositeDeckTypeRefersToPhysicalMaterial" direction="Forward" displayLabel="Filling Material" />
+        <ECProperty propertyName="Thickness" typeName="double" displayLabel="Thickness" />
+        <ECNavigationProperty propertyName="SteelDeck" relationshipName="CompositeDeckTypeRefersToSteelDeckType" direction="Forward" displayLabel="Steel Deck" />
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="TaperedSurfaceTypeRefersToPhysicalMaterial" strength="referencing" strengthDirection="Forward" modifier="Sealed">
+        <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="true">
+            <Class class="TaperedSurfaceType" />
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="true">
+            <Class class="bis:PhysicalMaterial"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="TaperedSurfaceType" modifier="Sealed" displayLabel="Tapered Surface Type" >
+        <BaseClass>SurfaceType</BaseClass>
+        <ECNavigationProperty propertyName="Material" relationshipName="TaperedSurfaceTypeRefersToPhysicalMaterial" direction="Forward" displayLabel="Material" />
+        <ECProperty propertyName="Location1" typeName="Point2d" displayLabel="Location 1" />
+        <ECProperty propertyName="Location2" typeName="Point2d" displayLabel="Location 2" />
+        <ECProperty propertyName="Location3" typeName="Point2d" displayLabel="Location 3" />
+        <ECProperty propertyName="Thickness1" typeName="double" displayLabel="Thickness 1" />
+        <ECProperty propertyName="Thickness2" typeName="double" displayLabel="Thickness 2" />
+        <ECProperty propertyName="Thickness3" typeName="double" displayLabel="Thickness 3" />
+    </ECEntityClass>
 
     <ECEntityClass typeName="SurfaceMember" modifier="Sealed" displayLabel="Surface Member" description="Defines a Member that is located by a Sheet.">
         <BaseClass>Member</BaseClass>
@@ -814,15 +821,32 @@
         <Source multiplicity="(0..*)" roleLabel="has" polymorphic="true">
             <Class class="MaterialProfileType" />
         </Source>
-        <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="false">
-            <Class class="MaterialProfile" />
+        <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="true">
+            <Class class="MaterialProfileDefinition" />
         </Target>
     </ECRelationshipClass>
 
-    <ECEntityClass typeName="MaterialProfileDefinition" modifier="abstract" displayLabel="Material Profile Definition" description="Base class defining an element that pairs Profiles and PhysicalMaterials.">
+    <ECEntityClass typeName="SteelJoistType" modifier="Sealed" displayLabel="Steel Joist Type">
+        <BaseClass>CurveMemberType</BaseClass>
+        <ECProperty propertyName="Depth" typeName="double" displayLabel="Depth" />
+        <ECNavigationProperty propertyName="Material" relationshipName="SteelJoistTypeRefersToMaterial" direction="Forward" description="Referenced PhysicalMaterial." />
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="SteelJoistTypeRefersToMaterial" strength="referencing" strengthDirection="Forward" modifier="Sealed">
+        <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="true">
+            <Class class="SteelJoistType" />
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="true">
+            <Class class="bis:PhysicalMaterial"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="MaterialProfileDefinition" modifier="Abstract" displayLabel="Material Profile Definition" description="Base class defining an element that pairs Profiles and PhysicalMaterials.">
         <BaseClass>bis:DefinitionElement</BaseClass>
         <ECProperty propertyName="Name" typeName="string" description="Name of the MaterialProfile used for identification." />
         <ECProperty propertyName="Description" typeName="string" description="Description of the MaterialProfile." />
+        <ECProperty propertyName="Category" typeName="MaterialProfileCategoryType" description="Role of the MaterialProfile." />
+        <ECNavigationProperty propertyName="Material" relationshipName="MaterialProfileRefersToMaterial" direction="Forward" description="Referenced PhysicalMaterial." />
     </ECEntityClass>
 
     <ECEnumeration typeName="MaterialProfileCategoryType" backingTypeName="int" isStrict="true" displayLabel="Material Profile Category Type" description="Role of the MaterialProfile.">
@@ -833,14 +857,14 @@
 
     <ECEntityClass typeName="MaterialProfile" modifier="Sealed" displayLabel="Material Profile" description="Single pair of Profile and PhysicalMaterial.">
         <BaseClass>MaterialProfileDefinition</BaseClass>
+        <ECNavigationProperty propertyName="Profile" relationshipName="MaterialProfileRefersToProfile" direction="Forward" description="Referenced Profile." />
         <ECProperty propertyName="Category" typeName="MaterialProfileCategoryType" description="Role of the MaterialProfile." />
         <ECNavigationProperty propertyName="Material" relationshipName="MaterialProfileRefersToMaterial" direction="Forward" description="Referenced PhysicalMaterial." />
-        <ECNavigationProperty propertyName="Profile" relationshipName="MaterialProfileRefersToProfile" direction="Forward" description="Referenced Profile." />
     </ECEntityClass>
 
     <ECRelationshipClass typeName="MaterialProfileRefersToMaterial" strength="referencing" strengthDirection="Forward" modifier="Sealed">
-        <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="false">
-            <Class class="MaterialProfile" />
+        <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="true">
+            <Class class="MaterialProfileDefinition" />
         </Source>
         <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="true">
             <Class class="bis:PhysicalMaterial"/>
@@ -850,6 +874,30 @@
     <ECRelationshipClass typeName="MaterialProfileRefersToProfile" strength="referencing" strengthDirection="Forward" modifier="Sealed">
         <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="false">
             <Class class="MaterialProfile" />
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="true">
+            <Class class="prf:Profile"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="TaperedMaterialProfile" modifier="Sealed" displayLabel="Tapered Material Profile" description="Defines a CurveMember with a linearly varying Profile.">
+        <BaseClass>MaterialProfileDefinition</BaseClass>
+        <ECNavigationProperty propertyName="StartProfile" relationshipName="TaperedMaterialProfileRefersToStartProfile" direction="Forward" description="Profile at the Start of CurveMember." />
+        <ECNavigationProperty propertyName="EndProfile" relationshipName="TaperedMaterialProfileRefersToEndProfile" direction="Forward" description="Profile at the End of CurveMember." />
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="TaperedMaterialProfileRefersToStartProfile" strength="referencing" strengthDirection="Forward" modifier="Sealed">
+        <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="false">
+            <Class class="TaperedMaterialProfile" />
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="true">
+            <Class class="prf:Profile"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="TaperedMaterialProfileRefersToEndProfile" strength="referencing" strengthDirection="Forward" modifier="Sealed">
+        <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="false">
+            <Class class="TaperedMaterialProfile" />
         </Source>
         <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="true">
             <Class class="prf:Profile"/>
@@ -1134,8 +1182,17 @@
         <BaseClass>LoadContainer</BaseClass>
     </ECEntityClass>
 
+    <ECEntityClass typeName="ILoadCondition" modifier="Abstract" displayLabel="Load Condition" description="A load case or a combination of multiple factored load containers used for analysis.">
+        <ECCustomAttributes>
+            <IsMixin xmlns="CoreCustomAttributes.01.00.00">
+                <AppliesToEntityClass>bis:Element</AppliesToEntityClass>
+            </IsMixin>
+        </ECCustomAttributes>
+    </ECEntityClass>
+
     <ECEntityClass typeName="LoadCase" modifier="Sealed" displayLabel="Load Case" description="Collection of loads that act over the structure as a case.">
         <BaseClass>LoadContainer</BaseClass>
+        <BaseClass>ILoadCondition</BaseClass>
     </ECEntityClass>
 
     <ECRelationshipClass typeName="LoadCaseOwnsFactoredLoadGroupAspects" strength="embedding" modifier="Sealed">
@@ -1148,17 +1205,77 @@
         </Target>
     </ECRelationshipClass>
 
-    <ECEntityClass typeName="LoadCombination" modifier="Sealed" displayLabel="Load Combination" description="Combination of LoadConditions.">
+    <ECEntityClass typeName="LoadCombination" modifier="Sealed" displayLabel="Load Combination (Deprecated)" description="DEPRECATED">
+        <ECCustomAttributes>
+            <Deprecated xmlns="CoreCustomAttributes.1.0.3">
+                <Description>Instances of LoadCombination are no longer created. LoadCombinationInformation should be used instead.</Description>
+            </Deprecated>
+        </ECCustomAttributes>
         <BaseClass>StructuralAnalysisElement</BaseClass>
     </ECEntityClass>
 
+    <ECEntityClass typeName="LoadCombinationInformation" modifier="Sealed" displayLabel="Load Combination" description="Element that groups a set of load cases that are applied to the structure simultaneously or sequentially">
+        <BaseClass>bis:InformationRecordElement</BaseClass>
+        <BaseClass>ILoadCondition</BaseClass>
+        <ECProperty propertyName="SrssFactor" typeName="double" description="A factor to multiply the product of SRSS added Load Conditions." />
+    </ECEntityClass>
+
     <ECRelationshipClass typeName="LoadCombinationOwnsFactoredLoadConditionAspects" strength="embedding" modifier="Sealed">
+        <ECCustomAttributes>
+            <Deprecated xmlns="CoreCustomAttributes.1.0.3">
+                <Description>Instances of LoadCombination are no longer created. LoadCombinationInformation should be used instead.</Description>
+            </Deprecated>
+        </ECCustomAttributes>
         <BaseClass>bis:ElementOwnsMultiAspects</BaseClass>
         <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
             <Class class="LoadCombination"/>
         </Source>
         <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="true">
             <Class class="FactoredLoadConditionAspect" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="LoadCombinationOwnsFactoredLoadConditions" strength="embedding" modifier="Sealed">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="LoadCombinationInformation"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="true">
+            <Class class="FactoredLoadCondition" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="FactoredLoadCondition" modifier="Abstract" displayLabel="Factored Load Condition">
+        <BaseClass>bis:InformationRecordElement</BaseClass>
+        <ECProperty propertyName="Factor" typeName="double" description="Factor to be applied to the group." />
+        <ECProperty propertyName="LoadCombinationType" typeName="LoadCombinationType" description="Type of load combination." />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="FactoredLoadCase" modifier="Sealed" displayLabel="Factored Load Case">
+        <BaseClass>FactoredLoadCondition</BaseClass>
+        <ECNavigationProperty propertyName="LoadCase" relationshipName="FactoredLoadCaseRefersToLoadCase" direction="Forward" displayLabel="Load Case" description="Load Case."/>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="FactoredLoadCaseRefersToLoadCase" strength="referencing" strengthDirection="Forward" modifier="Sealed">
+        <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="false">
+            <Class class="FactoredLoadCase"/>
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="false">
+            <Class class="LoadCase" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="FactoredLoadCombination" modifier="Sealed" displayLabel="Factored Load Combination">
+        <BaseClass>FactoredLoadCondition</BaseClass>
+        <ECNavigationProperty propertyName="LoadCombination" relationshipName="FactoredLoadCombinationRefersToLoadCombination" direction="Forward" displayLabel="Load Combination" description="Load Combination."/>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="FactoredLoadCombinationRefersToLoadCombination" strength="referencing" strengthDirection="Forward" modifier="Sealed">
+        <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="false">
+            <Class class="FactoredLoadCombination"/>
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="false">
+            <Class class="LoadCombination" />
         </Target>
     </ECRelationshipClass>
 
@@ -1177,18 +1294,33 @@
         </Target>
     </ECRelationshipClass>
 
-    <ECEntityClass typeName="FactoredLoadConditionAspect" modifier="Abstract" displayLabel="Factored Load Condition Aspect" description="Adds a factor to a specified LoadCondition.">
+    <ECEntityClass typeName="FactoredLoadConditionAspect" modifier="Abstract" displayLabel="Factored Load Condition Aspect" description="DEPRECATED">
         <BaseClass>bis:ElementMultiAspect</BaseClass>
+        <ECCustomAttributes>
+            <Deprecated xmlns="CoreCustomAttributes.1.0.3">
+                <Description>Instances of LoadCombination and it's aspects are no longer created. LoadCombinationInformation should be used instead.</Description>
+            </Deprecated>
+        </ECCustomAttributes>
         <ECProperty propertyName="Factor" typeName="double" description="Factor to be applied to the group." />
         <ECProperty propertyName="LoadCombinationType" typeName="LoadCombinationType" description="Type of load combination." />
     </ECEntityClass>
 
-    <ECEntityClass typeName="FactoredLoadCaseAspect" modifier="Sealed" displayLabel="Factored Load Case Aspect" description="Adds a factor to a specified LoadCase.">
+    <ECEntityClass typeName="FactoredLoadCaseAspect" modifier="Sealed" displayLabel="Factored Load Case Aspect" description="DEPRECATED">
+        <ECCustomAttributes>
+            <Deprecated xmlns="CoreCustomAttributes.1.0.3">
+                <Description>Instances of LoadCombination and it's aspects are no longer created. LoadCombinationInformation should be used instead.</Description>
+            </Deprecated>
+        </ECCustomAttributes>
         <BaseClass>FactoredLoadConditionAspect</BaseClass>
         <ECNavigationProperty propertyName="LoadCase" relationshipName="FactoredLoadCaseAspectRefersToLoadCase" direction="Forward" displayLabel="Load Case" description="Load Case."/>
     </ECEntityClass>
 
     <ECRelationshipClass typeName="FactoredLoadCaseAspectRefersToLoadCase" strength="referencing" strengthDirection="Forward" modifier="Sealed">
+        <ECCustomAttributes>
+            <Deprecated xmlns="CoreCustomAttributes.1.0.3">
+                <Description>Instances of LoadCombination and it's aspects are no longer created. LoadCombinationInformation should be used instead.</Description>
+            </Deprecated>
+        </ECCustomAttributes>
         <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="false">
             <Class class="FactoredLoadCaseAspect"/>
         </Source>
@@ -1197,12 +1329,22 @@
         </Target>
     </ECRelationshipClass>
 
-    <ECEntityClass typeName="FactoredLoadCombinationAspect" modifier="Sealed" displayLabel="Factored Load Combination Aspect" description="Adds a factor to a specified LoadCase.">
+    <ECEntityClass typeName="FactoredLoadCombinationAspect" modifier="Sealed" displayLabel="Factored Load Combination Aspect" description="DEPRECATED">
         <BaseClass>FactoredLoadConditionAspect</BaseClass>
+        <ECCustomAttributes>
+            <Deprecated xmlns="CoreCustomAttributes.1.0.3">
+                <Description>Instances of LoadCombination and it's aspects are no longer created. LoadCombinationInformation should be used instead.</Description>
+            </Deprecated>
+        </ECCustomAttributes>
         <ECNavigationProperty propertyName="LoadCombination" relationshipName="FactoredLoadCombinationAspectRefersToLoadCombination" direction="Forward" displayLabel="Load Combination" description="Load Combination."/>
     </ECEntityClass>
 
     <ECRelationshipClass typeName="FactoredLoadCombinationAspectRefersToLoadCombination" strength="referencing" strengthDirection="Forward" modifier="Sealed">
+        <ECCustomAttributes>
+            <Deprecated xmlns="CoreCustomAttributes.1.0.3">
+                <Description>Instances of LoadCombination and it's aspects are no longer created. LoadCombinationInformation should be used instead.</Description>
+            </Deprecated>
+        </ECCustomAttributes>
         <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="false">
             <Class class="FactoredLoadCombinationAspect"/>
         </Source>

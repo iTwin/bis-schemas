@@ -12,7 +12,7 @@
 
     <ECCustomAttributes>
         <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
-            <SupportedUse>Production</SupportedUse>
+            <SupportedUse>NotForProduction</SupportedUse>
         </ProductionStatus>
         <SchemaLayerInfo xmlns="BisCustomAttributes.01.00.00">
             <Value>Common</Value>
@@ -27,8 +27,18 @@
         </ECCustomAttributes>
     </ECEntityClass>
 
-    <ECRelationshipClass typeName="SpatialOrganizerHoldsSpatialElements" modifier="None" strength="referencing" displayLabel="Spatial Organizer Holds Spatial Elements" description="Organizes bis:SpatialElements such that each bis:SpatialElement is 'held' by zero or one 'organizer'.">
+    <ECRelationshipClass typeName="SpatialOrganizerOrganizesSpatialElements" modifier="Abstract" strength="referencing" displayLabel="Spatial Organizer Organizes Spatial Elements" description="Base class for relationships that organize bis:SpatialElements by 'spatial organizers'.">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="spatially-organizes" polymorphic="true">
+            <Class class="ISpatialOrganizer"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is spatially-organized by" polymorphic="true">
+            <Class class="bis:SpatialElement"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="SpatialOrganizerHoldsSpatialElements" modifier="None" strength="referencing" displayLabel="Spatial Organizer Holds Spatial Elements" description="Organizes bis:SpatialElements such that each bis:SpatialElement is 'held' by zero or one 'organizer'.">
+        <BaseClass>SpatialOrganizerOrganizesSpatialElements</BaseClass>
         <Source multiplicity="(0..*)" roleLabel="holds" polymorphic="true">
             <Class class="ISpatialOrganizer"/>
         </Source>
@@ -38,7 +48,7 @@
     </ECRelationshipClass>
 
     <ECRelationshipClass typeName="SpatialOrganizerReferencesSpatialElements" modifier="None" strength="referencing" displayLabel="Spatial Organizer References Spatial Elements" description="Organizes bis:SpatialElements such that each bis:SpatialElement can be 'referenced' by zero or more 'organizers'.">
-        <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <BaseClass>SpatialOrganizerOrganizesSpatialElements</BaseClass>
         <Source multiplicity="(0..*)" roleLabel="references" polymorphic="true">
             <Class class="ISpatialOrganizer"/>
         </Source>
@@ -178,6 +188,7 @@
     <ECEntityClass typeName="Zone" modifier="Abstract" description="Defines a region of space associated with a specific purpose. As an ISpatialOrganizer, it may explicitly 'hold' or 'reference' SpatialElements.">
         <BaseClass>bis:SpatialLocationElement</BaseClass>
         <BaseClass>ISpatialOrganizer</BaseClass>
+        <ECProperty propertyName="Description" typeName="string" description="A human-readable description of this Zone."/>
     </ECEntityClass>
 
     <ECEntityClass typeName="ZoneType" modifier="Abstract" displayLabel="Zone Type" description="Further specializes a particular subclass of a Zone by associating a custom Type that can be defined by users.">
@@ -198,6 +209,7 @@
 
     <ECEntityClass typeName="ZonalSystem" modifier="None" displayLabel="Zonal System" description="Defines a group of spaces, partial spaces or other zones that may or may not be adjacent, associated with a specific purpose.">
         <BaseClass>bis:PhysicalSystem</BaseClass>
+        <ECProperty propertyName="Description" typeName="string" description="A human-readable description of this ZonalSystem"/>
     </ECEntityClass>
 
     <ECRelationshipClass typeName="ZonalSystemGroupsMembers" strength="referencing" modifier="None" displayLabel="Zonal System Groups Spatial Elements" description="A relationship used to identify the bis:SpatialElements that are members of a ZonalSystem.">

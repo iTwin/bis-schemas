@@ -3,9 +3,9 @@
 |  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
 |  * See LICENSE.md in the project root for license terms and full copyright notice.
 ======================================================================================= -->
-<ECSchema schemaName="CoreCustomAttributes" alias="CoreCA" version="01.00.04" description="Custom attributes to indicate core EC concepts, may include struct classes intended for use in core custom attributes." displayLabel="Core Custom Attributes" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
+<ECSchema schemaName="CoreCustomAttributes" alias="CoreCA" version="01.00.05" description="Custom attributes to indicate core EC concepts, may include struct classes intended for use in core custom attributes." displayLabel="Core Custom Attributes" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
     <ECCustomAttributes>
-        <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
+        <ProductionStatus xmlns="CoreCustomAttributes.01.00.04">
             <SupportedUse>NotForProduction</SupportedUse>
         </ProductionStatus>
     </ECCustomAttributes>
@@ -19,7 +19,7 @@
         <ECProperty propertyName="SchemaName" typeName="string" description="Name of schema, excluding version" displayLabel="Schema Name"/>
         <ECProperty propertyName="MajorVersion" typeName="int" description="[This].[Write].[Minor]" displayLabel="Major Version"/>
         <ECProperty propertyName="MinorVersion" typeName="int" description="[Major].[Write].[This]" displayLabel="Minor Version"/>
-        <ECProperty propertyName="WriteVersion" typeName="int" description="[Major].[This].[Minor]"/>
+        <ECProperty propertyName="WriteVersion" typeName="int" description="[Major].[This].[Minor]" displayLabel="Write Version"/>
     </ECStructClass>
     <ECCustomAttributeClass typeName="SupplementalProvenance" appliesTo="Schema" modifier="Sealed">
         <ECStructArrayProperty propertyName="SupplementalSchemaNamesAndPurposes" typeName="SchemaNameAndPurpose" minOccurs="0" maxOccurs="unbounded"/>
@@ -47,17 +47,17 @@
         <ECProperty propertyName="PropertyName" typeName="string"/>
     </ECCustomAttributeClass>
     <ECCustomAttributeClass typeName="Localizable" description="Applied to a property to indicate that custom attributes using this property can be localized." displayLabel="Localizable" appliesTo="PrimitiveProperty" modifier="Sealed"/>
-    <ECCustomAttributeClass typeName="IsMixin" description="Applied to abstract ECEntityClasses which serve as secondary base classes for normal ECEntityClasses." displayLabel="Is Mixin" appliesTo="EntityClass" modifier="Sealed" >
-        <ECProperty propertyName="AppliesToEntityClass" typeName="string" description="This mixin may only be applied to entity classes which derive from this class.  Class Name should be fully specified as 'alias:ClassName'" />
+    <ECCustomAttributeClass typeName="IsMixin" description="Applied to abstract ECEntityClasses which serve as secondary base classes for normal ECEntityClasses." displayLabel="Is Mixin" appliesTo="EntityClass" modifier="Sealed">
+        <ECProperty propertyName="AppliesToEntityClass" typeName="string" description="This mixin may only be applied to entity classes which derive from this class.  Class Name should be fully specified as 'alias:ClassName'"/>
     </ECCustomAttributeClass>
     <ECCustomAttributeClass typeName="NotSubclassableInReferencingSchemas" appliesTo="AnyClass" modifier="Sealed" description="Makes a class 'sealed' outside of the schema containing the class">
-        <ECArrayProperty propertyName="Exceptions" typeName="string" description="Optionally allows specific classes in other schemas to subclass this class.  Use format '[SchemaName]:[ClassName]', e.g. 'Fruit:Banana'" />
+        <ECArrayProperty propertyName="Exceptions" typeName="string" description="Optionally allows specific classes in other schemas to subclass this class.  Use format '[SchemaName]:[ClassName]', e.g. 'Fruit:Banana'"/>
     </ECCustomAttributeClass>
     <ECCustomAttributeClass typeName="HiddenProperty" appliesTo="AnyProperty" modifier="Sealed" description="Identifies a property which is designed to be hidden from the user interface">
-        <ECProperty propertyName="Show" typeName="boolean" description="If set to true show the hidden property. Defaults to False.  Allows a property override to show a hidden property in a derived class" />
+        <ECProperty propertyName="Show" typeName="boolean" description="If set to true show the hidden property. Defaults to False.  Allows a property override to show a hidden property in a derived class"/>
     </ECCustomAttributeClass>
     <ECCustomAttributeClass typeName="HiddenSchema" appliesTo="Schema" modifier="Sealed" description="Identifies a schema which is designed to be hidden from the user interface.  By default all classes in the schema are hidden as well.">
-        <ECProperty propertyName="ShowClasses" typeName="boolean" description="If true classe in the schema will be shown.  Default is False.  If set to true individual classes may be hidden using the HiddenClass custom attribute" />
+        <ECProperty propertyName="ShowClasses" typeName="boolean" description="If true classe in the schema will be shown.  Default is False.  If set to true individual classes may be hidden using the HiddenClass custom attribute"/>
     </ECCustomAttributeClass>
     <ECCustomAttributeClass typeName="HiddenClass" appliesTo="AnyClass" modifier="Sealed" description="Identifies a class which is designed to be hidden from teh user interface.  Hides the class it is applied to and all derived classes">
         <ECProperty propertyName="Show" typeName="boolean" description="If set to true show the hidden class.  Defaults to False.  Allows a derived class to be shown even though it's base class is hidden"/>
@@ -66,19 +66,19 @@
         <ECProperty propertyName="Description" typeName="string" description="Gives advice about avoiding the deprecated item or other helpful information related to the deprecation of the item."/>
     </ECCustomAttributeClass>
     <ECCustomAttributeClass typeName="Extension" appliesTo="AnyProperty" modifier="Sealed" description="Used to indicate that the property this custom attribute is applied to is an extension property.">
-        <ECProperty propertyName="Origin" typeName="string" description="Extension origin." />
+        <ECProperty propertyName="Origin" typeName="string" description="Extension origin."/>
     </ECCustomAttributeClass>
 
     <ECEnumeration typeName="ProductionStatusValue" backingTypeName="string" isStrict="true" description="Used with ProductionStatus to declare the schema author's intended and supported workflows for the schema.">
-        <ECEnumerator name="NotForProduction" value="NotForProduction"/> <!-- description="This schema is under development and should not be used for production workflows. Data created using this schema is not supported and may not be upgradable." -->
-        <ECEnumerator name="FieldTesting"     value="FieldTesting" />  <!--   description="This schema is suitable for field testing of production workflows. Data created with the schema is not supported long-term and may not be upgradable." -->
-        <ECEnumerator name="Production"       value="Production" />  <!--    description="This schema is suitable for production workflows. Data created using this schema will be supported long term (possibly through transformation)." -->
-        <ECEnumerator name="Deprecated"       value="Deprecated" />  <!--    description="This schema is no longer recommended for production workflows. Better alternatives exist and should be used instead." -->
+        <ECEnumerator name="NotForProduction" value="NotForProduction" description="This schema is under development and should not be used for production workflows. Data created using this schema is not supported and may not be upgradable."/>
+        <ECEnumerator name="FieldTesting"     value="FieldTesting"     description="This schema is suitable for field testing of production workflows. Data created with the schema is not supported long-term and may not be upgradable."/>
+        <ECEnumerator name="Production"       value="Production"       description="This schema is suitable for production workflows. Data created using this schema will be supported long term (possibly through transformation)."/>
+        <ECEnumerator name="Deprecated"       value="Deprecated"       description="This schema is no longer recommended for production workflows. Better alternatives exist and should be used instead."/>
     </ECEnumeration>
 
     <ECCustomAttributeClass typeName="ProductionStatus" appliesTo="Schema" modifier="Sealed" description="Declares the suitability of this schema for use in production and other workflows.">
         <ECProperty propertyName="SupportedUse" typeName="ProductionStatusValue" description="Indicates the suitability of this schema for production or other usage."/>
-        <ECProperty propertyName="Checksum"     typeName="string"                description="Set when the schema ProductionStatus is set. Used to verify that a validated schema has not been modified after that point." />
+        <ECProperty propertyName="Checksum"     typeName="string"                description="Set when the schema ProductionStatus is set. Used to verify that a validated schema has not been modified after that point."/>
     </ECCustomAttributeClass>
 
 </ECSchema>
