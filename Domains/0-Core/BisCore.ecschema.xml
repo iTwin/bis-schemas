@@ -68,6 +68,14 @@
         <ECEnumerator value="7" name="All" displayLabel="All = Select | Insert | Update"/>
     </ECEnumeration>
 
+    <!-- Rank enum introduced as not-strict for backwards compatibility -->
+    <ECEnumeration typeName="DefinitionElementRank" backingTypeName="int" isStrict="false">
+        <ECEnumerator value="0" name="System" displayLabel="System"/>
+        <ECEnumerator value="1" name="Domain" displayLabel="Domain"/>
+        <ECEnumerator value="2" name="Application" displayLabel="Application"/>
+        <ECEnumerator value="3" name="User" displayLabel="User"/>
+    </ECEnumeration>
+
     <ECCustomAttributeClass typeName="AutoHandledProperty" description="Applied to an element's property to indicate that select, update, and insert of the property's value are handled automatically by the platform." appliesTo="AnyProperty">
         <ECProperty propertyName="StatementTypes" typeName="AutoHandledPropertyStatementType" description="Indicates the statement types that are relevant for a particular auto-handled property." />
     </ECCustomAttributeClass>
@@ -589,6 +597,12 @@
     <ECEntityClass typeName="DefinitionSet" modifier="Abstract" displayLabel="Definition Set" description="This abstract class unifies DefinitionGroup and DefinitionContainer for relationship endpoint purposes.">
         <!-- NOTE: Only DefinitionGroup and DefinitionContainer should subclass DefinitionSet -->
         <BaseClass>DefinitionElement</BaseClass>
+        <ECProperty propertyName="Rank" typeName="DefinitionElementRank" description="The Rank of a DefinitionSet indicates how it was created, who is aware of it and where it can be used.">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03"/>
+                <CustomHandledProperty xmlns="BisCore.01.00.16"/>
+            </ECCustomAttributes>
+        </ECProperty>
     </ECEntityClass>
     <ECEntityClass typeName="DefinitionContainer" displayLabel="Definition Container" description="A set of DefinitionElements that are exclusively owned by the DefinitionContainer and contained within its sub-model.">
         <BaseClass>DefinitionSet</BaseClass>
@@ -1892,7 +1906,7 @@
                 <CustomHandledProperty xmlns="BisCore.01.00.16"/>
             </ECCustomAttributes>
         </ECProperty>
-        <ECProperty propertyName="Rank" typeName="int" description="The Rank of a category indicates how it was created and where it can be used. 0=System; 1=Domain; 2=Application; 3=User.">
+        <ECProperty propertyName="Rank" typeName="DefinitionElementRank" description="The Rank of a category indicates how it was created, who is aware of it and where it can be used.">
             <ECCustomAttributes>
                 <HiddenProperty xmlns="CoreCustomAttributes.01.00.03"/>
                 <CustomHandledProperty xmlns="BisCore.01.00.16"/>
@@ -1932,6 +1946,12 @@
         </ECProperty>
         <ECProperty propertyName="Properties" typeName="string" extendedTypeName="Json" description="Contains the display properties (color, style, weight, etc.) for the SubCategory. It should not be used for the persistence of application-specific information.">
             <ECCustomAttributes>
+                <CustomHandledProperty xmlns="BisCore.01.00.16"/>
+            </ECCustomAttributes>
+        </ECProperty>
+        <ECProperty propertyName="Rank" typeName="DefinitionElementRank" description="The Rank of a SubCategory indicates how it was created, who is aware of it and where it can be used.">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03"/>
                 <CustomHandledProperty xmlns="BisCore.01.00.16"/>
             </ECCustomAttributes>
         </ECProperty>
