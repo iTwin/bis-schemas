@@ -41,6 +41,6 @@ BIS schemas should be tagged with the `SchemaLayerInfo` `CustomAttribute` to ena
 
 ### AggregateRelationship
 
-Under this _aggregate_ semantics, the element at the source end of the relationship (the whole) can be described as being composed of the elements at the target end (its parts). As a result, relationship classes tagged with the `AggregateRelationship` `CustomAttribute` lead to a strict hierarchy in which the parts decompose one and only one whole-element.
+Under this _aggregate_ semantics, read in the _forward_ direction, the element at the source end of the relationship (the whole) can be described as being composed of the elements at the target end (its parts). As a result, relationship classes tagged with the `AggregateRelationship` `CustomAttribute` lead to a strict hierarchy in which the parts decompose one and only one whole-element.
 
 Note that the `AggregateRelationship` `CustomAttribute` does not imply by itself that the element at the source end of the relationship (the whole) controls the lifetime of its parts. A relationship class tagged with it shall use its **strength** attribute in order to advertise the expected behavior regarding lifetime control. The two typical values in that case are _embedding_ (whole controls lifetime of parts) and _referencing_ (no lifetime control is expected).
