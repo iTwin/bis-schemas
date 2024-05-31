@@ -38,3 +38,9 @@ Other technology-specific schemas not meant to be referenced by other schemas be
 ### SchemaLayerInfo
 
 BIS schemas should be tagged with the `SchemaLayerInfo` `CustomAttribute` to enable validation and error checking related to schema-references.
+
+### TypeDefinitionRelationship
+
+Under this _type definition_ semantics, the element at the source end of the relationship is subclassified by the element at the target end (its Type-Definition). That is, the latter provides a finer classification of the former than what its _element class_ targets. Furthermore, any business properties and their values captured by the element at the target end of the relationship are considered shared among all the elements at the source of the relationship.
+
+Note that the `TypeDefinitionRelationship` `CustomAttribute` implies that a relationship tagged with it uses a _referencing_ **strenght**, has a _0..*_ **multiplicity** on its source end, and a _0..1_ **multiplicity** on its target end-point.
