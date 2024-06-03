@@ -36,7 +36,7 @@ Equivalent to [IfcDistributionSystem](https://standards.buildingsmart.org/IFC/RE
 - elements within electrical systems
 - elements within communication network systems
 
-It defines occurence of any HVAC, electrical, sanitary or other element within a distribution system.
+It defines occurence of any HVAC, electrical, sanitary or other element within a distribution system. An `IDistributionElement` is expected to own at least one `DistributionPort` via the `DistributionElementOwnsDistributionPorts` relationship class.
 
 Equivalent to [IfcDistributionElement](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcDistributionElement.htm).
 
@@ -81,6 +81,6 @@ Equivalent to [IfcDistributionPort](https://standards.buildingsmart.org/IFC/RELE
 
 A `PortConnection` defines a physical connection between 2 DistributionPorts. In the case where a connection is realized by some other physical element, the realizing element could be found using `PortConnectionIsRealizedByPhysicalElements` relationship.
 
-a PortConnection is always between 2 distribution ports, however this constraint may be removed if a suitable use case is found.
+A `PortConnection` generally connects two distribution ports via the `PortConnectionConnectsTwoPorts`. However, its base `PortConnectionConnectsPorts` relationship class can be used when modeling port-connections at a higher level of detail.
 
 Equivalent to [IfcRelConnectsPorts](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcRelConnectsPorts.htm).
