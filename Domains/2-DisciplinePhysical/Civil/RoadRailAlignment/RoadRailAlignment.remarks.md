@@ -6,9 +6,9 @@ remarksTarget: RoadRailAlignment.ecschema.md
 
 Contains the main classes to capture Alignment information primarily used in Road & Rail disciplines.
 
-## Entity Classes
-
 ![RoadRailAlignment](./media/RoadRailAlignment-classes.png)
+
+## Entity Classes
 
 ### Alignment
 
@@ -22,13 +22,13 @@ The `Alignment` class inherits its `LengthValue` property from the `ILinearEleme
 
 An `Alignment` stores its visible geometry, typically a 3D approximation calculated as a stroked line-string, in its `GeometryStream` encoded as a *Path*.
 
-Equivalent to [IfcAlignment](https://standards.buildingsmart.org/IFC/DEV/IFC4_3/RC2/HTML/link/ifcalignment.htm). The 3D approximation stored in its `GeometryStream` is equivalent to an [IfcGradientCurve](https://standards.buildingsmart.org/IFC/DEV/IFC4_3/RC2/HTML/link/ifcgradientcurve.htm).
+Equivalent to [IfcAlignment](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcAlignment.htm). The 3D approximation stored in its `GeometryStream` is equivalent to an [IfcGradientCurve](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcGradientCurve.htm).
 
 ### AlignmentType
 
 Instances of `AlignmentType` provide an additional classification that can be applied to `Alignment`s.
 
-Equivalent to [IfcAlignmentTypeEnum](https://standards.buildingsmart.org/IFC/DEV/IFC4_3/RC2/HTML/link/ifcalignmenttypeenum.htm).
+Equivalent to [IfcAlignmentTypeEnum](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcAlignmentTypeEnum.htm).
 
 ### DesignAlignments
 
@@ -54,22 +54,22 @@ A `HorizontalAlignment` stores its visual geometry separately from geometry used
 
 The Z-coordinate of all of these primitives shall be zero.
 
-Equivalent to [IfcAlignment.Axis](https://standards.buildingsmart.org/IFC/DEV/IFC4_3/RC2/HTML/link/ifcalignment.htm) set to either an [IfcGradientCurve](https://standards.buildingsmart.org/IFC/DEV/IFC4_3/RC2/HTML/link/ifcgradientcurve.htm) (via its `BaseCurve` attribute), an [IfcCompositeCurve](https://standards.buildingsmart.org/IFC/DEV/IFC4_3/RC2/HTML/link/ifccompositecurve.htm) or an [IfcPolyline](https://standards.buildingsmart.org/IFC/DEV/IFC4_3/RC2/HTML/link/ifcpolyline.htm).
+Equivalent to [IfcAlignment.Axis](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcAlignment.htm) set to either an [IfcGradientCurve](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcGradientCurve.htm) (via its `BaseCurve` attribute), an [IfcCompositeCurve](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcCompositeCurve.htm) or an [IfcPolyline](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcPolyline.htm).
 
-Individual segments along the `HorizontalAlignment` encoded as a *Path* are equivalent to [IfcCompositeCurveSegment](https://standards.buildingsmart.org/IFC/DEV/IFC4_3/RC2/HTML/link/ifccompositecurvesegment.htm)s with the following *Parent Curve*s:
+Individual segments along the `HorizontalAlignment` encoded as a *Path* are equivalent to [IfcCompositeCurveSegment](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcCompositeCurveSegment.htm)s with the following *Parent Curve*s:
 
-- Linear segments encoded as *LineSegment3d* are equivalent to [IfcPolyline](https://standards.buildingsmart.org/IFC/DEV/IFC4_3/RC2/HTML/link/ifcpolyline.htm).
-- Circular arc segments encoded as *Arc3d* are equivalent to [IfcTrimmedCurve](https://standards.buildingsmart.org/IFC/DEV/IFC4_3/RC2/HTML/link/ifctrimmedcurve.htm) based on an [IfcCircle](https://standards.buildingsmart.org/IFC/DEV/IFC4_3/RC2/HTML/link/ifccircle.htm).
-- Transition segments (spirals) encoded as *TransitionSpiral3d* are equivalent to the corresponding [IfcSpiral](https://standards.buildingsmart.org/IFC/DEV/IFC4_3/RC4/HTML/link/ifcspiral.htm) subclasses as follows:
+- Linear segments encoded as *LineSegment3d* are equivalent to [IfcPolyline](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcPolyline.htm).
+- Circular arc segments encoded as *Arc3d* are equivalent to [IfcTrimmedCurve](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcTrimmedCurve.htm) based on an [IfcCircle](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcCircle.htm).
+- Transition segments (spirals) encoded as *TransitionSpiral3d* are equivalent to the corresponding [IfcSpiral](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcSpiral.htm) subclasses as follows:
 
 | *TransitionSpiral3d* subclass | *TransitionSpiral3d* subtype | IFC-equivalent |
 | ----------------------------- | ---------------------------- | -------------- |
-| *IntegratedSpiral3d* | "clothoid" | [IfcClothoid](https://standards.buildingsmart.org/IFC/DEV/IFC4_3/RC4/HTML/link/ifcclothoid.htm) |
-| *IntegratedSpiral3d* | "cosine" | [IfcCosine](https://standards.buildingsmart.org/IFC/DEV/IFC4_3/RC4/HTML/link/ifccosine.htm) |
-| *IntegratedSpiral3d* | "sine" | [IfcSine](https://standards.buildingsmart.org/IFC/DEV/IFC4_3/RC4/HTML/link/ifcsine.htm) |
-| *IntegratedSpiral3d* | "biquadratic" | [IfcSecondOrderPolynomialSpiral](https://standards.buildingsmart.org/IFC/DEV/IFC4_3/RC4/HTML/link/ifcsecondorderpolynomialspiral.htm) |
-| *IntegratedSpiral3d* | "bloss" | [IfcThirdOrderPolynomialSpiral](https://standards.buildingsmart.org/IFC/DEV/IFC4_3/RC4/HTML/link/ifcthirdorderpolynomialspiral.htm) |
-| *IntegratedSpiral3d* | "vienna" | [IfcSeventhOrderPolynomialSpiral](https://standards.buildingsmart.org/IFC/DEV/IFC4_3/RC4/HTML/link/ifcseventhorderpolynomialspiral.htm) |
+| *IntegratedSpiral3d* | "clothoid" | [IfcClothoid](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcClothoid.htm) |
+| *IntegratedSpiral3d* | "cosine" | [IfcCosine](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcCosine.htm) |
+| *IntegratedSpiral3d* | "sine" | [IfcSine](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcSine.htm) |
+| *IntegratedSpiral3d* | "biquadratic" | [IfcSecondOrderPolynomialSpiral](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcSecondOrderPolynomialSpiral.htm) |
+| *IntegratedSpiral3d* | "bloss" | [IfcThirdOrderPolynomialSpiral](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcThirdOrderPolynomialSpiral.htm) |
+| *IntegratedSpiral3d* | "vienna" | [IfcSeventhOrderPolynomialSpiral](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcSeventhOrderPolynomialSpiral.htm) |
 | *DirectSpiral3d* | any | Not Available |
 
 ### VerticalAlignment
@@ -88,9 +88,9 @@ The X-coordinate of all of these primitives shall indicate *distance along* meas
 
 It is not uncommon for a `VerticalAlignment` instance to capture *elevations* only for a partial range of its corresponding `HorizontalAlignment` instance. Note that the opposite situation, a `VerticalAlignment` instance capturing *elevations* before or after the range of its corresponding `HorizontalAlignment`, while possible in theory is typically considered invalid in practice. This schema leaves the decision to validate against such case to particular implementations, however.
 
-Equivalent to [IfcAlignment.Axis](https://standards.buildingsmart.org/IFC/DEV/IFC4_3/RC2/HTML/link/ifcalignment.htm) set to an [IfcGradientCurve](https://standards.buildingsmart.org/IFC/DEV/IFC4_3/RC2/HTML/link/ifcgradientcurve.htm) (via its `Segments` attribute).
+Equivalent to [IfcAlignment.Axis](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcAlignment.htm) set to an [IfcGradientCurve](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcGradientCurve.htm) (via its `Segments` attribute).
 
-Individual segments along the `VerticalAlignment` encoded as a *Path* are equivalent to [IfcCurveSegment](https://standards.buildingsmart.org/IFC/DEV/IFC4_3/RC2/HTML/link/ifccurvesegment.htm)s.
+Individual segments along the `VerticalAlignment` encoded as a *Path* are equivalent to [IfcCurveSegment](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcCurveSegment.htm)s.
 
 ### AlignmentStation
 
@@ -98,4 +98,4 @@ Individual segments along the `VerticalAlignment` encoded as a *Path* are equiva
 
 `AlignmentStation`s are linearly-located elements along an `Alignment`. They shall carry the *distance along* measurement in a `LinearlyReferencedAtLocation` aspect whereas the mapped *station value* shall be stored in their `Station` property. `Alignment`s shall define its initial *station value* in their `StartStation` property.
 
-Equivalent to [IfcReferent](https://standards.buildingsmart.org/IFC/DEV/IFC4_3/RC2/HTML/link/ifcreferent.htm) with a non-zero `StartDistance` attribute and relative measurements used by linear-locations referencing it.
+Equivalent to [IfcReferent](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcReferent.htm) with a non-zero `StartDistance` attribute and relative measurements used by linear-locations referencing it.

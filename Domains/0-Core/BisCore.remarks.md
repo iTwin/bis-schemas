@@ -115,6 +115,26 @@ In retrospect, the complexity added by introducing a distinct "Spatial Location"
 
 > Behavior: The system handler (C++) for `SpatialLocationPartition` ensures that it is only ever sub-modeled by a `SpatialLocationModel`.
 
+### SheetIndexPartition
+
+The 'Sheet Index' Modeling Perspective is a subset of the 'Information' Modeling Perspective. It holds Elements that organize Sheets into hierarchies for easier access.
+
+### SheetIndexFolder
+
+Instances of `SheetIndexFolder` are always contained within a `SheetIndexModel`.
+
+### SheetReference
+
+Instances of `SheetReference` are always contained within a `SheetIndexModel`.
+
+### SheetIndexReference
+
+Instances of `SheetIndexReference` are always contained within a `SheetIndexModel`.
+
+### SheetIndex
+
+Instances of `SheetIndex` are always contained within a `SheetIndexModel`.
+
 ### Model
 
 See [Model Fundamentals](../guide/fundamentals/model-fundamentals/).
@@ -150,6 +170,8 @@ A more consistent name for this relationship would have been 'SheetModelSubModel
 A `bis:Subject` can be referenced by zero or more `bis:Subject` instances as opposed to the `bis:SubjectOwnsSubjects` relationship that leads to a strict hierarchy. This relationship is typically needed when the referencing and referenced `bis:Subject`s are located in different branches of the Subject hierarchy. With this relationship, the referencing `bis:Subject` is stating an association with the referenced `bis:Subject`s without duplicating them into its own branch. The concrete semantics behind such association is left for the data-writer or a human being to interpret, as it is generally the case with all `bis:Subject` instances on the Subject hierarchy as a whole.
 
 ### Element
+
+Sets of `bis:Element`s (contained in `bis:Model`s) are used to sub-model other `bis:Element`s that represent larger scale real world Entities. Using this recursive modeling strategy, `bis:Element`s can represent Entities at any scale. Elements can represent physical things, abstract concepts or simply be information records.
 
 See [Element Fundamentals](../guide/fundamentals/element-fundamentals/).
 
@@ -246,6 +268,14 @@ See [SheetTemplate.Border ECNavigationProperty](#SheetTemplate) ECNavigationProp
 ### SheetBorderHasSheetBorderTemplate
 
 See [SheetBorder.BorderTemplate ECNavigationProperty](#SheetBorder) ECNavigationProperty
+
+### SheetIndexReferenceRefersToSheetIndex
+
+See [SheetIndexReference.SheetIndex ECNavigationProperty](#SheetIndexReference) ECNavigationProperty
+
+### SheetReferenceRefersToSheet
+
+See [SheetReference.Sheet ECNavigationProperty](#SheetReference) ECNavigationProperty
 
 ### ViewIsAttached
 
@@ -358,8 +388,15 @@ See [CustomHandledPropertyStatementType](#CustomHandledPropertyStatementType).
 
 ### ChannelRootAspect
 
-An *iModel Bridge* uses the `ChannelRootAspect` to indicate ownership of a *channel*.
-A *channel* is a portion of the iModel's hierarchy that begins at the specified Element and recursively descends down through `ElementOwnsChildElements` and `ModelModelsElement` relationships to include all of the child elements and sub-models.
+Applications create channels to define portions of the model-hierarchy that they "own".
+
+Each Element (typically a `Subject` or `InformationPartitionElement`) that owns a `ChannelRootAspect` defines a root of the model-hierarchy that is included in a particular *channel*. It recursively descends down through `ElementOwnsChildElements` and `ModelModelsElement` relationships to include all of the child elements and sub-models into the specified *channel*. A *channel* is conceptually identified by its _Channel Key_ value of the `Owner` property of a `ChannelRootAspect`. 
+
+There may be more than one root `Subject`s or `InformationPartitionElement`s in a model-hierarchy that are included in the same *channel*. In that case, each `Subject` or `InformationPartitionElement` instance specifies the same _Channel Key_ value in their `ChannelRootAspect`. 
+
+Note that *Channels* do not nest. That is, once a `Subject` or `InformationPartitionElement` instance defines a root to be included in a particular *channel*, no descendant Element of such root in the subject-hierarchy can be used to define a root for a different *channel*.
+
+See [Channels](https://www.itwinjs.org/learning/backend/channel/) for more information on the topic.
 
 ### DefinitionSet
 
@@ -404,7 +441,7 @@ A Physical System can define as many levels of hierarchy as needed.
 
 ### SynchronizationConfigLink
 
-A Link to the Configuration for a Synchronization Job.  By convention, a unique Id for the SynchronizationConfigLink such as a job Id should be set in the CodeValue property and a name should be set in in the UserLabel property.
+A Link to the Configuration for a Synchronization Job.  By convention, a unique Id for the SynchronizationConfigLink such as a job Id should be set in the `CodeValue` property and a name should be set in in the UserLabel property.
 
 ### ExternalSourceGroup
 
@@ -497,6 +534,8 @@ This behavior applies to all `RoleModel` subclasses.
 `FunctionalModel` (from the `Functional` schema) is the most widely known subclass of `RoleModel`.
 
 ### RoleElement
+
+An Entity is modeled as a `bis:RoleElement` when a set of external circumstances define an important role (one that is worth tracking) that is not intrinsic to the Entity playing the role. For example, a person can play the role of a teacher or a rock can play the role of a boundary marker.
 
 > Behavior: The system handler (C++) for `RoleElement` will only permit instances to be inserted into a `RoleModel`.
 This behavior applies to all `RoleElement` subclasses.

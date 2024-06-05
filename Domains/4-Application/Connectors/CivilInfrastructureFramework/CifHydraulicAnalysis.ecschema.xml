@@ -3,7 +3,7 @@
 |  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
 |  * See LICENSE.md in the project root for license terms and full copyright notice.
 ======================================================================================= -->
-<ECSchema schemaName="CifHydraulicAnalysis" alias="cifhydan" version="01.00.05" description="iModel Connector schema containing aspect classes with input properties from the Subsurface Utilities Design and Analysis module as part of Civil Designer applications." xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
+<ECSchema schemaName="CifHydraulicAnalysis" alias="cifhydan" version="01.00.08" description="iModel Connector schema containing aspect classes with input properties from the Subsurface Utilities Design and Analysis module as part of Civil Designer applications." xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
     <ECSchemaReference name="BisCore" version="01.00.14" alias="bis"/>
     <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
     <ECSchemaReference name="CifCommon" version="01.00.03" alias="cifcmn"/>
@@ -47,6 +47,7 @@
     <ECEnumeration typeName="CatchBasin_Physical_InletGutterTypeAspect_InletGutterType_Enum" backingTypeName="int" isStrict="true">
         <ECEnumerator name="User_Defined" value="0" displayLabel="User Defined"/>
         <ECEnumerator name="Catalog_Gutter" value="1" displayLabel="Catalog Gutter"/>
+        <ECEnumerator name="Use_Upstream_Channel" value="2" displayLabel="Use Upstream Channel"/>
     </ECEnumeration>
     <ECEnumeration typeName="CatchBasin_Physical_InletLocationAspect_InletLocation_Enum" backingTypeName="int" isStrict="true">
         <ECEnumerator name="On_Grade" value="0" displayLabel="On Grade"/>
@@ -184,6 +185,10 @@
     <ECEnumeration typeName="Conduit_Physical_IsCulvertAspect_UpstreamHeadwallDefinitionType_Enum" backingTypeName="int" isStrict="true">
         <ECEnumerator name="Use_Start_Node" value="0" displayLabel="Use Start Node"/>
         <ECEnumerator name="Use_Conduit" value="1" displayLabel="Use Conduit"/>
+    </ECEnumeration>
+    <ECEnumeration typeName="Conduit_PhysicalAspect_HeadwaterMaximumType_Enum" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="Use_Elevation_Ground" value="0" displayLabel="Use Elevation (Ground)"/>
+        <ECEnumerator name="UserDefined" value="1" displayLabel="UserDefined"/>
     </ECEnumeration>
     <ECEnumeration typeName="Conduit_Shape_ArchAspect_ArchDataType_Enum" backingTypeName="int" isStrict="true">
         <ECEnumerator name="Rise_and_Span" value="0" displayLabel="Rise and Span"/>
@@ -583,6 +588,7 @@
         <ECProperty propertyName="Conduit1Size" typeName="double" displayLabel="Conduit 1 Size" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0" kindOfQuantity="cifu:LENGTH_DIAMETER"/>
         <ECProperty propertyName="Conduit1Invert" typeName="double" displayLabel="Conduit 1 Invert" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0" kindOfQuantity="cifu:ELEVATION"/>
         <ECProperty propertyName="Conduit1Angle" typeName="double" displayLabel="Conduit 1 Angle" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0" kindOfQuantity="cifu:ANGLE"/>
+		<ECProperty propertyName="Conduit1DrainageID" typeName="int" displayLabel="Conduit 1 Drainage ID" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0"/>
     </ECEntityClass>
     <ECEntityClass typeName="BaseNode_Physical_Conduit2Aspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
@@ -592,6 +598,7 @@
         <ECProperty propertyName="Conduit2Size" typeName="double" displayLabel="Conduit 2 Size" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0" kindOfQuantity="cifu:LENGTH_DIAMETER"/>
         <ECProperty propertyName="Conduit2Invert" typeName="double" displayLabel="Conduit 2 Invert" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0" kindOfQuantity="cifu:ELEVATION"/>
         <ECProperty propertyName="Conduit2Angle" typeName="double" displayLabel="Conduit 2 Angle" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0" kindOfQuantity="cifu:ANGLE"/>
+		<ECProperty propertyName="Conduit2DrainageID" typeName="int" displayLabel="Conduit 2 Drainage ID" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0"/>
     </ECEntityClass>
     <ECEntityClass typeName="BaseNode_Physical_Conduit3Aspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
@@ -601,6 +608,7 @@
         <ECProperty propertyName="Conduit3Size" typeName="double" displayLabel="Conduit 3 Size" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0" kindOfQuantity="cifu:LENGTH_DIAMETER"/>
         <ECProperty propertyName="Conduit3Invert" typeName="double" displayLabel="Conduit 3 Invert" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0" kindOfQuantity="cifu:ELEVATION"/>
         <ECProperty propertyName="Conduit3Angle" typeName="double" displayLabel="Conduit 3 Angle" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0" kindOfQuantity="cifu:ANGLE"/>
+		<ECProperty propertyName="Conduit3DrainageID" typeName="int" displayLabel="Conduit 3 Drainage ID" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0"/>
     </ECEntityClass>
     <ECEntityClass typeName="BaseNode_Physical_Conduit4Aspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
@@ -610,6 +618,7 @@
         <ECProperty propertyName="Conduit4Size" typeName="double" displayLabel="Conduit 4 Size" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0" kindOfQuantity="cifu:LENGTH_DIAMETER"/>
         <ECProperty propertyName="Conduit4Invert" typeName="double" displayLabel="Conduit 4 Invert" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0" kindOfQuantity="cifu:ELEVATION"/>
         <ECProperty propertyName="Conduit4Angle" typeName="double" displayLabel="Conduit 4 Angle" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0" kindOfQuantity="cifu:ANGLE"/>
+		<ECProperty propertyName="Conduit4DrainageID" typeName="int" displayLabel="Conduit 4 Drainage ID" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0"/>
     </ECEntityClass>
     <ECEntityClass typeName="BaseNode_Physical_Conduit5Aspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
@@ -619,6 +628,7 @@
         <ECProperty propertyName="Conduit5Size" typeName="double" displayLabel="Conduit 5 Size" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0" kindOfQuantity="cifu:LENGTH_DIAMETER"/>
         <ECProperty propertyName="Conduit5Invert" typeName="double" displayLabel="Conduit 5 Invert" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0" kindOfQuantity="cifu:ELEVATION"/>
         <ECProperty propertyName="Conduit5Angle" typeName="double" displayLabel="Conduit 5 Angle" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0" kindOfQuantity="cifu:ANGLE"/>
+		<ECProperty propertyName="Conduit5DrainageID" typeName="int" displayLabel="Conduit 5 Drainage ID" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0"/>
     </ECEntityClass>
     <ECEntityClass typeName="BaseNode_Physical_DiversionAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
@@ -628,6 +638,7 @@
         <ECProperty propertyName="DiversionSize" typeName="double" displayLabel="Diversion Size" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0" kindOfQuantity="cifu:LENGTH_DIAMETER"/>
         <ECProperty propertyName="DiversionInvert" typeName="double" displayLabel="Diversion Invert" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0" kindOfQuantity="cifu:ELEVATION"/>
         <ECProperty propertyName="DiversionAngle" typeName="double" displayLabel="Diversion Angle" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0" kindOfQuantity="cifu:ANGLE"/>
+		<ECProperty propertyName="DiversionDrainageID" typeName="int" displayLabel="Diversion Drainage ID" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0"/>
     </ECEntityClass>
     <ECEntityClass typeName="BaseNode_Physical_OutgoingAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
@@ -637,6 +648,7 @@
         <ECProperty propertyName="OutgoingSize" typeName="double" displayLabel="Outgoing Size" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0" kindOfQuantity="cifu:LENGTH_DIAMETER"/>
         <ECProperty propertyName="OutgoingInvert" typeName="double" displayLabel="Outgoing Invert" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0" kindOfQuantity="cifu:ELEVATION"/>
         <ECProperty propertyName="OutgoingAngle" typeName="double" displayLabel="Outgoing Angle" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0" kindOfQuantity="cifu:ANGLE"/>
+        <ECProperty propertyName="OutgoingDrainageID" typeName="int" displayLabel="Outgoing Drainage ID" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0"/>
     </ECEntityClass>
     <ECEntityClass typeName="BaseNode_PhysicalAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
@@ -668,8 +680,92 @@
         <ECProperty propertyName="InitialSettings_RelativeSpeedFactor" typeName="double" displayLabel="Relative Speed Factor (Initial)" category="Initial_Settings_Drainage_Initial_Settings_Drainage" priority="0" kindOfQuantity="cifu:COEFFICIENT"/>
         <ECProperty propertyName="PumpStatus" typeName="BasePump_InitialSettingsAspect_PumpStatus_Enum" displayLabel="Status (Initial)" category="Initial_Settings_Drainage_Initial_Settings_Drainage" priority="0"/>
     </ECEntityClass>
+    <ECEntityClass typeName="BasePump_Physical_Conduit1Aspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="Conduit1Label" typeName="string" displayLabel="Conduit 1 Label" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0"/>
+        <ECProperty propertyName="Conduit1SectionType" typeName="string" displayLabel="Conduit 1 Section Type" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0"/>
+        <ECProperty propertyName="Conduit1Material" typeName="string" displayLabel="Conduit 1 Material" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0"/>
+        <ECProperty propertyName="Conduit1Size" typeName="double" displayLabel="Conduit 1 Size" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0" kindOfQuantity="cifu:LENGTH_DIAMETER"/>
+        <ECProperty propertyName="Conduit1Invert" typeName="double" displayLabel="Conduit 1 Invert" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0" kindOfQuantity="cifu:ELEVATION"/>
+        <ECProperty propertyName="Conduit1Angle" typeName="double" displayLabel="Conduit 1 Angle" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0" kindOfQuantity="cifu:ANGLE"/>
+        <ECProperty propertyName="Conduit1DrainageID" typeName="int" displayLabel="Conduit 1 Drainage ID" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0"/>
+    </ECEntityClass>
+    <ECEntityClass typeName="BasePump_Physical_Conduit2Aspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="Conduit2Label" typeName="string" displayLabel="Conduit 2 Label" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0"/>
+        <ECProperty propertyName="Conduit2SectionType" typeName="string" displayLabel="Conduit 2 Section Type" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0"/>
+        <ECProperty propertyName="Conduit2Material" typeName="string" displayLabel="Conduit 2 Material" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0"/>
+        <ECProperty propertyName="Conduit2Size" typeName="double" displayLabel="Conduit 2 Size" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0" kindOfQuantity="cifu:LENGTH_DIAMETER"/>
+        <ECProperty propertyName="Conduit2Invert" typeName="double" displayLabel="Conduit 2 Invert" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0" kindOfQuantity="cifu:ELEVATION"/>
+        <ECProperty propertyName="Conduit2Angle" typeName="double" displayLabel="Conduit 2 Angle" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0" kindOfQuantity="cifu:ANGLE"/>
+        <ECProperty propertyName="Conduit2DrainageID" typeName="int" displayLabel="Conduit 2 Drainage ID" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0"/>
+    </ECEntityClass>
+    <ECEntityClass typeName="BasePump_Physical_Conduit3Aspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="Conduit3Label" typeName="string" displayLabel="Conduit 3 Label" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0"/>
+        <ECProperty propertyName="Conduit3SectionType" typeName="string" displayLabel="Conduit 3 Section Type" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0"/>
+        <ECProperty propertyName="Conduit3Material" typeName="string" displayLabel="Conduit 3 Material" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0"/>
+        <ECProperty propertyName="Conduit3Size" typeName="double" displayLabel="Conduit 3 Size" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0" kindOfQuantity="cifu:LENGTH_DIAMETER"/>
+        <ECProperty propertyName="Conduit3Invert" typeName="double" displayLabel="Conduit 3 Invert" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0" kindOfQuantity="cifu:ELEVATION"/>
+        <ECProperty propertyName="Conduit3Angle" typeName="double" displayLabel="Conduit 3 Angle" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0" kindOfQuantity="cifu:ANGLE"/>
+        <ECProperty propertyName="Conduit3DrainageID" typeName="int" displayLabel="Conduit 3 Drainage ID" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0"/>
+    </ECEntityClass>
+    <ECEntityClass typeName="BasePump_Physical_Conduit4Aspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="Conduit4Label" typeName="string" displayLabel="Conduit 4 Label" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0"/>
+        <ECProperty propertyName="Conduit4SectionType" typeName="string" displayLabel="Conduit 4 Section Type" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0"/>
+        <ECProperty propertyName="Conduit4Material" typeName="string" displayLabel="Conduit 4 Material" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0"/>
+        <ECProperty propertyName="Conduit4Size" typeName="double" displayLabel="Conduit 4 Size" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0" kindOfQuantity="cifu:LENGTH_DIAMETER"/>
+        <ECProperty propertyName="Conduit4Invert" typeName="double" displayLabel="Conduit 4 Invert" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0" kindOfQuantity="cifu:ELEVATION"/>
+        <ECProperty propertyName="Conduit4Angle" typeName="double" displayLabel="Conduit 4 Angle" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0" kindOfQuantity="cifu:ANGLE"/>
+        <ECProperty propertyName="Conduit4DrainageID" typeName="int" displayLabel="Conduit 4 Drainage ID" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0"/>
+    </ECEntityClass>
+    <ECEntityClass typeName="BasePump_Physical_Conduit5Aspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="Conduit5Label" typeName="string" displayLabel="Conduit 5 Label" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0"/>
+        <ECProperty propertyName="Conduit5SectionType" typeName="string" displayLabel="Conduit 5 Section Type" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0"/>
+        <ECProperty propertyName="Conduit5Material" typeName="string" displayLabel="Conduit 5 Material" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0"/>
+        <ECProperty propertyName="Conduit5Size" typeName="double" displayLabel="Conduit 5 Size" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0" kindOfQuantity="cifu:LENGTH_DIAMETER"/>
+        <ECProperty propertyName="Conduit5Invert" typeName="double" displayLabel="Conduit 5 Invert" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0" kindOfQuantity="cifu:ELEVATION"/>
+        <ECProperty propertyName="Conduit5Angle" typeName="double" displayLabel="Conduit 5 Angle" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0" kindOfQuantity="cifu:ANGLE"/>
+        <ECProperty propertyName="Conduit5DrainageID" typeName="int" displayLabel="Conduit 5 Drainage ID" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0"/>
+    </ECEntityClass>
+    <ECEntityClass typeName="BasePump_Physical_DiversionAspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="DiversionLabel" typeName="string" displayLabel="Diversion Label" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0"/>
+        <ECProperty propertyName="DiversionSectionType" typeName="string" displayLabel="Diversion Section Type" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0"/>
+        <ECProperty propertyName="DiversionMaterial" typeName="string" displayLabel="Diversion Material" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0"/>
+        <ECProperty propertyName="DiversionSize" typeName="double" displayLabel="Diversion Size" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0" kindOfQuantity="cifu:LENGTH_DIAMETER"/>
+        <ECProperty propertyName="DiversionInvert" typeName="double" displayLabel="Diversion Invert" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0" kindOfQuantity="cifu:ELEVATION"/>
+        <ECProperty propertyName="DiversionAngle" typeName="double" displayLabel="Diversion Angle" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0" kindOfQuantity="cifu:ANGLE"/>
+        <ECProperty propertyName="DiversionDrainageID" typeName="int" displayLabel="Diversion Drainage ID" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0"/>
+    </ECEntityClass>
+    <ECEntityClass typeName="BasePump_Physical_OutgoingAspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="OutgoingLabel" typeName="string" displayLabel="Outgoing Label" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0"/>
+        <ECProperty propertyName="OutgoingSectionType" typeName="string" displayLabel="Outgoing Section Type" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0"/>
+        <ECProperty propertyName="OutgoingMaterial" typeName="string" displayLabel="Outgoing Material" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0"/>
+        <ECProperty propertyName="OutgoingSize" typeName="double" displayLabel="Outgoing Size" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0" kindOfQuantity="cifu:LENGTH_DIAMETER"/>
+        <ECProperty propertyName="OutgoingInvert" typeName="double" displayLabel="Outgoing Invert" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0" kindOfQuantity="cifu:ELEVATION"/>
+        <ECProperty propertyName="OutgoingAngle" typeName="double" displayLabel="Outgoing Angle" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0" kindOfQuantity="cifu:ANGLE"/>
+        <ECProperty propertyName="OutgoingDrainageID" typeName="int" displayLabel="Outgoing Drainage ID" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0"/>
+    </ECEntityClass>
+    <ECEntityClass typeName="BasePump_PhysicalAspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="NodeMicroStationID" typeName="string" displayLabel="MicroStation 3D ID" category="General_Drainage_General_Drainage" priority="0"/>
+        <ECProperty propertyName="NodeMicroStation2dID" typeName="string" displayLabel="MicroStation 2D ID" category="General_Drainage_General_Drainage" priority="0"/>
+        <ECProperty propertyName="SetOutPointX" typeName="double" displayLabel="Set Out X" category="Geometry_Drainage_Geometry_Drainage" priority="0" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="SetOutPointY" typeName="double" displayLabel="Set Out Y" category="Geometry_Drainage_Geometry_Drainage" priority="0" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="SetOutPointElevation" typeName="double" displayLabel="Set Out Elevation" category="Geometry_Drainage_Geometry_Drainage" priority="0" kindOfQuantity="cifu:ELEVATION"/>
+        <ECProperty propertyName="LargestSize" typeName="double" displayLabel="Largest Connected Conduit" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0" kindOfQuantity="cifu:LENGTH_DIAMETER"/>
+        <ECProperty propertyName="SmallestSize" typeName="double" displayLabel="Smallest Connected Conduit" category="Connecting_Links_Drainage_Connecting_Links_Drainage" priority="0" kindOfQuantity="cifu:LENGTH_DIAMETER"/>
+    </ECEntityClass>
     <ECEntityClass typeName="BasePumpAspect">
         <BaseClass>BaseDirectedNodeAspect</BaseClass>
+        <ECProperty propertyName="BaselineFeature" typeName="string" displayLabel="Baseline Feature" category="References_Drainage_References_Drainage" priority="0"/>
+        <ECProperty propertyName="BaselineOffset" typeName="double" displayLabel="Baseline Offset" category="References_Drainage_References_Drainage" priority="0" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="BaselineStation" typeName="double" displayLabel="Baseline Station" category="References_Drainage_References_Drainage" priority="0" kindOfQuantity="cifu:STATION"/>
+        <ECProperty propertyName="ElevationReference" typeName="string" displayLabel="Elevation Reference" category="References_Drainage_References_Drainage" priority="0"/>
     </ECEntityClass>
     <ECEntityClass typeName="BaseSimplePolyline_HMIActiveTopologyAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
@@ -1306,7 +1402,9 @@
         <ECProperty propertyName="Physical_NumberOfBarrels" typeName="int" displayLabel="Number of Barrels" category="Physical_Drainage_Physical_Drainage" priority="0"/>
         <ECProperty propertyName="Physical_ConduitShapeLabel" typeName="string" displayLabel="Conduit Description" category="Physical_Drainage_Physical_Drainage" priority="0"/>
         <ECProperty propertyName="Physical_UseLocalConduitShapeLabel" typeName="boolean" displayLabel="Use Local Conduit Description?" category="Physical_Drainage_Physical_Drainage" priority="0"/>
-        <ECProperty propertyName="MultiBarrelGapDistance" typeName="double" displayLabel="Multiple Barrel Gap" category="Physical_Drainage_Physical_Drainage" priority="0" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="MultiBarrelGapDistance" typeName="double" displayLabel="Multiple Barrel Gap Distance" category="Physical_Drainage_Physical_Drainage" priority="0" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="HeadwaterMaxUserDefined" typeName="double" displayLabel="Elevation (Maximum Headwater)" category="Physical_Culvert_Drainage_Physical_Culvert_Drainage" priority="0" kindOfQuantity="cifu:ELEVATION"/>
+        <ECProperty propertyName="HeadwaterMaximumType" typeName="Conduit_PhysicalAspect_HeadwaterMaximumType_Enum" displayLabel="Headwater Range Type" category="Physical_Culvert_Drainage_Physical_Culvert_Drainage" priority="0"/>
     </ECEntityClass>
     <ECEntityClass typeName="Conduit_ShapeAspect" modifier="Abstract">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
@@ -1709,6 +1807,78 @@
         </Source>
         <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
             <Class class="BasePump_InitialSettingsAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="ElementOwnsBasePump_Physical_Conduit1Aspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="BasePump_Physical_Conduit1Aspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="ElementOwnsBasePump_Physical_Conduit2Aspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="BasePump_Physical_Conduit2Aspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="ElementOwnsBasePump_Physical_Conduit3Aspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="BasePump_Physical_Conduit3Aspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="ElementOwnsBasePump_Physical_Conduit4Aspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="BasePump_Physical_Conduit4Aspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="ElementOwnsBasePump_Physical_Conduit5Aspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="BasePump_Physical_Conduit5Aspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="ElementOwnsBasePump_Physical_DiversionAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="BasePump_Physical_DiversionAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="ElementOwnsBasePump_Physical_OutgoingAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="BasePump_Physical_OutgoingAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="ElementOwnsBasePump_PhysicalAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="BasePump_PhysicalAspect"/>
         </Target>
     </ECRelationshipClass>
     <ECRelationshipClass typeName="ElementOwnsBasePumpAspect" modifier="None" strength="embedding">
@@ -3033,7 +3203,7 @@
     <ECEntityClass typeName="GravityNode_DesignAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
         <ECProperty propertyName="Design_DesignStructureElevation" typeName="boolean" displayLabel="Design Structure Elevation?" category="Design_Drainage_Design_Drainage" priority="0"/>
-        <ECProperty propertyName="Design_DesiredSumpDepth" typeName="double" displayLabel="Desired Sump Depth" category="Design_Drainage_Design_Drainage" priority="0" kindOfQuantity="cifu:DEPTH_LARGE"/>
+        <ECProperty propertyName="Design_DesiredSumpDepth" typeName="double" displayLabel="Sump Depth" category="Design_Drainage_Design_Drainage" priority="0" kindOfQuantity="cifu:DEPTH_LARGE"/>
     </ECEntityClass>
     <ECRelationshipClass typeName="ElementOwnsGravityNode_DesignAspect" modifier="None" strength="embedding">
         <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
@@ -3494,7 +3664,7 @@
     <ECEntityClass typeName="Headwall_DesignAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
         <ECProperty propertyName="Design_DesignStructureElevation" typeName="boolean" displayLabel="Design Structure Elevation?" category="Design_Drainage_Design_Drainage" priority="0"/>
-        <ECProperty propertyName="Design_DesiredSumpDepth" typeName="double" displayLabel="Desired Sump Depth" category="Design_Drainage_Design_Drainage" priority="0" kindOfQuantity="cifu:DEPTH_LARGE"/>
+        <ECProperty propertyName="Design_DesiredSumpDepth" typeName="double" displayLabel="Sump Depth" category="Design_Drainage_Design_Drainage" priority="0" kindOfQuantity="cifu:DEPTH_LARGE"/>
         <ECProperty propertyName="Design_NodeMinimumCover" typeName="double" displayLabel="Conduit Cover at Node (Minimum)" category="Design_Drainage_Design_Drainage" priority="0" kindOfQuantity="cifu:ELEVATION"/>
         <ECProperty propertyName="Design_NodeMaximumCover" typeName="double" displayLabel="Conduit Cover at Node (Maximum)" category="Design_Drainage_Design_Drainage" priority="0" kindOfQuantity="cifu:ELEVATION"/>
         <ECProperty propertyName="Design_LocalPipeMatchingConstraints" typeName="boolean" displayLabel="Local Pipe Matching Constraints?" category="Design_Drainage_Design_Drainage" priority="0"/>
@@ -3737,6 +3907,7 @@
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
         <ECProperty propertyName="Physical_IsBolted" typeName="boolean" displayLabel="Bolted Cover?" category="Physical_Drainage_Physical_Drainage" priority="0"/>
         <ECProperty propertyName="Physical_SurchargedDepth" typeName="double" displayLabel="Depth (Surcharged)" category="SWMM_Extended_Data_Drainage_SWMM_Extended_Data_Drainage" priority="0" kindOfQuantity="cifu:DEPTH_LARGE"/>
+        <ECProperty propertyName="Physical_TreatAsStorage" typeName="boolean" displayLabel="Treat as Storage Unit" category="Physical_Drainage_Physical_Drainage" priority="0"/>
     </ECEntityClass>
     <ECRelationshipClass typeName="ElementOwnsManhole_PhysicalAspect" modifier="None" strength="embedding">
         <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
@@ -4598,6 +4769,19 @@
         </Source>
         <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
             <Class class="VariableSpeedPumpBatteryAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="WetWell_DesignAspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="Design_RequiredFreeboard" typeName="double" displayLabel="Freeboard (Required)" category="Design_Drainage_Design_Drainage" priority="0" kindOfQuantity="cifu:DEPTH_LARGE"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsWetWell_DesignAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="WetWell_DesignAspect"/>
         </Target>
     </ECRelationshipClass>
     <ECEntityClass typeName="WetWell_InfiltrationAndInflowAspect">

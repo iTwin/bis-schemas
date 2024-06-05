@@ -15,7 +15,7 @@ NOTE: Currently under development. This schema should not be used for production
 
 Instances of `BearingType` provide an additional classification that can be applied to `Bearing`s. Examples include Cylindrical, Spherical and Elastomeric. An instance of `BearingType` can optionally specify a single *Physical Material* via its `PhysicalMaterial` property.
 
-Equivalent to [IfcBearingType](https://standards.buildingsmart.org/IFC/DEV/IFC4_3/RC2/HTML/link/ifcbearingtype.htm).
+Equivalent to [IfcBearingType](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcBearingType.htm).
 
 ### Bearing
 
@@ -25,13 +25,13 @@ The purpose of a bearing is to allow controlled movement and thereby reduce the 
 
 `Bearing`s must be contained in `PhysicalModel`s.
 
-Equivalent to [IfcBearing](https://standards.buildingsmart.org/IFC/DEV/IFC4_3/RC2/HTML/link/ifcbearing.htm).
+Equivalent to [IfcBearing](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcBearing.htm).
 
 ### BearingSeatType
 
 Instances of `BearingSeatType` provide an additional classification that can be applied to `BearingSeat`s. Examples include Grout-pad and Beam-seat. An instance of `BearingSeatType` can optionally specify a single *Physical Material* via its `PhysicalMaterial` property.
 
-Equivalent to [IfcPlateType](https://standards.buildingsmart.org/IFC/DEV/IFC4_3/RC2/HTML/link/ifcplatetype.htm).
+Equivalent to [IfcPlateType](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcPlateType.htm).
 
 ### BearingSeat
 
@@ -39,7 +39,7 @@ Equivalent to [IfcPlateType](https://standards.buildingsmart.org/IFC/DEV/IFC4_3/
 
 `BearingSeat`s must be contained in `PhysicalModel`s.
 
-Equivalent to [IfcPlate](https://standards.buildingsmart.org/IFC/DEV/IFC4_3/RC2/HTML/link/ifcplate.htm).
+Equivalent to [IfcPlate](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcPlate.htm).
 
 ### PierType
 
@@ -51,7 +51,7 @@ Instances of `PierType` provide an additional classification that can be applied
 
 `Pier`s must be contained in `PhysicalModel`s.
 
-Equivalent to [IfcElementAssembly](https://standards.buildingsmart.org/IFC/DEV/IFC4_3/RC2/HTML/link/ifcelementassembly.htm) with its PredefinedType attribute set to [IfcElementAssemblyTypeEnum.PIER](https://standards.buildingsmart.org/IFC/DEV/IFC4_3/RC2/HTML/link/ifcelementassemblytypeenum.htm).
+Equivalent to [IfcElementAssembly](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcElementAssembly.htm) with its PredefinedType attribute set to [IfcElementAssemblyTypeEnum.PIER](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcElementAssemblyTypeEnum.htm).
 
 ### AbutmentType
 
@@ -63,7 +63,7 @@ Instances of `AbutmentType` provide an additional classification that can be app
 
 `Abutment`s must be contained in `PhysicalModel`s.
 
-Equivalent to [IfcElementAssembly](https://standards.buildingsmart.org/IFC/DEV/IFC4_3/RC2/HTML/link/ifcelementassembly.htm) with its PredefinedType attribute set to [IfcElementAssemblyTypeEnum.ABUTMENT](https://standards.buildingsmart.org/IFC/DEV/IFC4_3/RC2/HTML/link/ifcelementassemblytypeenum.htm).
+Equivalent to [IfcElementAssembly](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcElementAssembly.htm) with its PredefinedType attribute set to [IfcElementAssemblyTypeEnum.ABUTMENT](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcElementAssemblyTypeEnum.htm).
 
 ### WingWallType
 
@@ -85,7 +85,7 @@ Instances of `AbutmentType` provide an additional classification that can be app
 
 `CrossFrame`s must be contained in `PhysicalModel`s.
 
-Equivalent to [IfcElementAssembly](https://standards.buildingsmart.org/IFC/DEV/IFC4_3/RC2/HTML/link/ifcelementassembly.htm) with its PredefinedType attribute set to [IfcElementAssemblyTypeEnum.CROSS_BRACING](https://standards.buildingsmart.org/IFC/DEV/IFC4_3/RC2/HTML/link/ifcelementassemblytypeenum.htm).
+Equivalent to [IfcElementAssembly](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcElementAssembly.htm) with its PredefinedType attribute set to [IfcElementAssemblyTypeEnum.CROSS_BRACING](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcElementAssemblyTypeEnum.htm).
 
 ### GirderType
 
@@ -97,4 +97,4 @@ Instances of `GirderType` provide an additional classification that can be appli
 
 `Girder`s must be contained in `PhysicalModel`s.
 
-Equivalent to [IfcElementAssembly](https://standards.buildingsmart.org/IFC/DEV/IFC4_3/RC2/HTML/link/ifcelementassembly.htm) with its PredefinedType attribute set to [IfcElementAssemblyTypeEnum.GIRDER](https://standards.buildingsmart.org/IFC/DEV/IFC4_3/RC2/HTML/link/ifcelementassemblytypeenum.htm).
+Equivalent to [IfcElementAssembly](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcElementAssembly.htm) with its PredefinedType attribute set to [IfcElementAssemblyTypeEnum.GIRDER](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcElementAssemblyTypeEnum.htm).

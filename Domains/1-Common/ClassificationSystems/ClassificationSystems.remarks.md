@@ -11,7 +11,9 @@ In BIS, a [ClassificationSystem](#classificationsystem) consists of one or more 
 
 ![Class and Instance Diagrams](./media/classification-systems.png)
 
-## ClassificationSystem
+## Entity Classes
+
+### ClassificationSystem
 
 `ClassificationSystem` identifies the classification system to which the individual `Classifications` belong.
 For well-known and externally defined standards, the name (CodeValue) is typically enough to identify the classification system. A consuming application just needs to create or use an instance with the appropriate name. For these cases, the `ClassificationSystem` class can be used directly.
@@ -28,17 +30,9 @@ See [Overview](#classificationsystems).
 
 It is expected that any iModel will not contain all known classification systems. Instead, an iModel will only contain those classification systems that are used by that iModel and possibly only those parts of the classification system hierarchy that are used.
 
-### Mapping to and from IFC
+The combination of a `ClassificationSystem` and a `ClassificationTable` are equivalent to [IfcClassification](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcClassification.htm).
 
-| From BIS    | Condition | To IFC    | Condition |
-| ----------- | --------- | --------- | --------- |
-| `ClassificationTable` + `ClassificationSystem`  | (none) | `IfcClassification` | (none) |
-
-| From IFC  | Condition | To BIS    | Condition |
-| --------- | --------- | --------- | --------- |
-| `IfcClassification` | (none) | `ClassificationTable` + `ClassificationSystem` | (none) |
-
-## ClassificationTable
+### ClassificationTable
 
 `ClassificationTable` defines a table in a `ClassificationSystem` as defined in the original ClassificationSystem source. A Classification Table represents a division of classification system into classifications for different purposes.
 
@@ -52,17 +46,9 @@ A `ClassificationTable` will contain `Classification` and `ClassificationGroup` 
 
 See [Overview](#classificationsystems).
 
-### Mapping to and from IFC
+The combination of a `ClassificationSystem` and a `ClassificationTable` are equivalent to [IfcClassification](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcClassification.htm).
 
-| From BIS    | Condition | To IFC    | Condition |
-| ----------- | --------- | --------- | --------- |
-| `ClassificationTable` + `ClassificationSystem`  | (none) | `IfcClassification` | (none) |
-
-| From IFC  | Condition | To BIS    | Condition |
-| --------- | --------- | --------- | --------- |
-| `IfcClassification` | (none) | `ClassificationTable` + `ClassificationSystem` | (none) |
-
-## ClassificationGroup
+### ClassificationGroup
 
 A `ClassificationGroup` is a group of `Classification` elements, as grouped originally in the source classification system. The `Classification` elements are assigned to a group via `ClassificationGroupGroupsClassifications` relationship.
 
@@ -72,11 +58,9 @@ A `ClassificationGroup` element is intended to be persisted in a `bis:Definition
 
 See [Overview](#classificationsystems).
 
-### Mapping to and from IFC
-
 Is not mapped to or from IFC, as the group concept does not exist in IFC
 
-## Classification
+### Classification
 
 A `Classification` element represents one 'class' or 'category' into which the classification system classifies real-world Objects.
 
@@ -98,16 +82,8 @@ An element may be classified as multiple Classifications through the `ElementHas
 
 See [Overview](#classificationsystems).
 
-### Mapping to and from IFC
+Equivalent to [IfcClassificationReference](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcClassificationReference.htm).
 
-| From BIS    | Condition | To IFC    | Condition |
-| ----------- | --------- | --------- | --------- |
-| `Classification`  | (none) | `IfcClassificationReference` | (none) |
-
-| From IFC  | Condition | To BIS    | Condition |
-| --------- | --------- | --------- | --------- |
-| `IfcClassificationReference` | (none) | `Classification` | (none) |
-
-## ClassificationSystemOwnsClassificationTable
+### ClassificationSystemOwnsClassificationTable
 
 Following the naming convention, this relationship class should have been named `ClassificationSystemOwnsClassificationTables` (plural), but was released with the a non-compliant name that would be disruptive to change post-release.

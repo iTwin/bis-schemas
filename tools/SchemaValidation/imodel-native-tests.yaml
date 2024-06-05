@@ -6,6 +6,11 @@ pr:
   branches:
     include:
       - master
+  paths:
+    exclude:
+      - .github/CODEOWNERS
+      - docs/**
+      - cmaps/**
 
 resources:
   repositories:
@@ -18,6 +23,12 @@ resources:
     type: github
     endpoint: imodel-native
     name: iTwin/imodel-native-internal
+
+  - repository: itwinjs-core
+    type: github
+    endpoint: imodel-native
+    ref: master
+    name: iTwin/itwinjs-core
 
 stages:
 - stage: Source_Branch
@@ -50,9 +61,6 @@ stages:
           print ('##vso[task.setvariable variable=sourceBranch;isOutput=true;]' + branchName);
         arguments: '$(System.PullRequest.SourceBranch) $(Build.SourceBranchName)'
 
-    - script: 'echo %sourceBranch%'
-      displayName: 'Display Source Branch'
-
 - stage: iModelCore_NodeAddon
   displayName: NodeAddon and iModelCore Tests
   dependsOn: Source_Branch
@@ -67,28 +75,31 @@ stages:
 
     pool:
       name: iModelTechCI
-      demands: Agent.OS -equals Windows_NT
+      demands:
+        - 'Agent.OS -equals Windows_NT'
+        - 'NUMBER_OF_PROCESSORS -equals 24' # trying to avoid the DESKTOP-U3ENANMA agent
 
     variables:
-      BB_V: 4
+      BB_V: '-v 4'
       BB_ARCH: x64
       PY_EXE: py -3
       BB_SRC_ROOT: $(Agent.BuildDirectory)/bbsrc
-      bb: $(BB_SRC_ROOT)/BentleyBuild/BentleyBuild.py
+      BB: $(BB_SRC_ROOT)/BentleyBuild/BentleyBuild.py
       Branch_Name: $[ stageDependencies.Source_Branch.Find_Branch.outputs['Get_Branch_Name.sourceBranch'] ]
-      strategy: 'iModelCore;SkipPull_imodel-native-internal+iModelJsNodeAddon;SkipPull_imodel-native-internal'
+      STRATEGY: 'iModelCore;SkipPull_imodel-native-internal+iModelJsNodeAddon;SkipPull_imodel-native-internal'
 
     steps:
-    - checkout: imodel-native
     - checkout: imodel-native-internal
 
     - template: build/templates/prebuild.yml@imodel-native-internal
       parameters:
         otherRepo: imodel-native
+        nativePR: 'main'
 
-    - script: $(PY_EXE) $(BB_SRC_ROOT)/imodel-native-internal/build/call_bb.py pull -v $(BB_V) -a $(BB_ARCH) -s $(strategy)
+    - script: $(PY_EXE) $(CALL_BB_PATH) pull $(BB_V) -a $(BB_ARCH) $(STRATEGY_OVERRIDE)
       displayName: Pull
       env:
+        CALL_BB_PATH: $(CALL_BB_PATH)
         AZURE_DEVOPS_EXT_PAT: $(System.AccessToken)
 
     - script: |
@@ -105,8 +116,124 @@ stages:
         )
       displayName: 'Display Source Branch'
 
-    - script: $(PY_EXE) $(bb) -v $(BB_V) -a $(BB_ARCH) -s $(strategy) build
+    - script: $(PY_EXE) $(CALL_BB_PATH) build $(BB_V) -a $(BB_ARCH) -s $(STRATEGY) -N 6
       displayName: Build
+      env:
+        CALL_BB_PATH: $(CALL_BB_PATH)
+        AZURE_DEVOPS_EXT_PAT: $(System.AccessToken)
+
+    - task: ArchiveFiles@2
+      displayName: Archive imodeljs-native
+      inputs:
+        rootFolderOrFile: '$(Build.BinariesDirectory)/WinX64/imodeljsnodeaddon_pkgs/imodeljs-native'
+        includeRootFolder: true
+        archiveType: 'zip'
+        archiveFile: '$(Build.ArtifactStagingDirectory)/iModelJsNodeAddon/imodeljs-native.zip'
+
+    - task: ArchiveFiles@2
+      displayName: Archive imodeljs-win32-x64
+      inputs:
+        rootFolderOrFile: '$(Build.BinariesDirectory)/WinX64/imodeljsnodeaddon_pkgs/imodeljs-win32-x64'
+        includeRootFolder: true
+        archiveType: 'zip'
+        archiveFile: '$(Build.ArtifactStagingDirectory)/iModelJsNodeAddon/imodeljs-win32-x64.zip'
+
+    - task: PublishPipelineArtifact@1
+      displayName: Publish imodeljs-native
+      inputs:
+        path: '$(Build.ArtifactStagingDirectory)/iModelJsNodeAddon/imodeljs-native.zip' 
+        artifactName: 'imodeljs-native' 
+        artifactType: 'pipeline'
+
+    - task: PublishPipelineArtifact@1
+      displayName: Publish imodeljs-win32-x64
+      inputs:
+        path: '$(Build.ArtifactStagingDirectory)/iModelJsNodeAddon/imodeljs-win32-x64.zip' 
+        artifactName: 'imodeljs-win32-x64' 
+        artifactType: 'pipeline'
+
+- stage: iTwinjsCore
+  displayName: iTwin.js-Core Tests
+  dependsOn: iModelCore_NodeAddon
+  condition: and(succeeded(), in(variables['Build.Reason'], 'IndividualCI', 'Schedule', 'Manual', 'PullRequest'))
+
+  jobs:
+  - job: iTwinjsCoreTests
+    timeoutInMinutes: 90
+
+    workspace:
+      clean: all
+
+    pool:
+      name: iModelTechCI
+      demands: Agent.OS -equals Windows_NT
+
+    variables:
+      DOWNLOAD_PATH: $(Build.ArtifactStagingDirectory)/iModelJsNodeAddon
+
+    steps:
+    - checkout: itwinjs-core
+      fetchDepth: 0
+      
+    - task: DownloadPipelineArtifact@2
+      displayName: Download imodeljs-native artifact
+      inputs:
+        buildType: 'current'
+        project: $(project)
+        definition: $(definition)
+        downloadPath: $(DOWNLOAD_PATH)
+        artifactName: 'imodeljs-native'
+        allowPartiallySucceededBuilds: true
+        
+    - task: DownloadPipelineArtifact@2
+      displayName: Download imodeljs-win32-x64 artifact
+      inputs:
+        buildType: 'current'
+        project: $(project)
+        definition: $(definition)
+        downloadPath: $(DOWNLOAD_PATH)
+        artifactName: 'imodeljs-win32-x64'
+        allowPartiallySucceededBuilds: true
+
+    - task: ExtractFiles@1
+      displayName: 'Extract imodeljs-native artifact'
+      inputs:
+        archiveFilePatterns: '$(DOWNLOAD_PATH)/imodeljs-native.zip'
+        destinationFolder: $(DOWNLOAD_PATH)
+        cleanDestinationFolder: false
+
+    - task: ExtractFiles@1
+      displayName: 'Extract imodeljs-win32-x64 artifact'
+      inputs:
+        archiveFilePatterns: '$(DOWNLOAD_PATH)/imodeljs-win32-x64.zip'
+        destinationFolder: '$(DOWNLOAD_PATH)/imodeljs-native'
+        cleanDestinationFolder: false
+        overwriteExistingFiles: true
+
+    - task: PythonScript@0
+      inputs:
+        scriptSource: inline
+        script: |
+          print(r"##vso[task.setvariable variable=IMODELJS_NATIVE_OVERRIDE]$(DOWNLOAD_PATH)/imodeljs-native")
+      displayName: 'Set environment variable IMODELJS_NATIVE_OVERRIDE'
+      
+    - task: PythonScript@0
+      inputs:
+        scriptSource: inline
+        script: |
+          import os
+          nativeOverridePath = os.getenv("IMODELJS_NATIVE_OVERRIDE", "None")
+          print("IMODELJS_NATIVE_OVERRIDE path is " + nativeOverridePath)
+      displayName: 'Print IMODELJS_NATIVE_OVERRIDE path'
+    
+    #should validate the imodeljs-win32-x64
+    - template: common/config/azure-pipelines/templates/core-build.yaml@itwinjs-core
+      parameters:
+        nodeVersion: 18.12.x
+        runRushAudit: false
+        rushBuildCacheEnabled: 0
+        currentBranch: master
+        targetBranch: master
 
 - stage: iModeEvolution
   displayName: iModeEvolution Tests
@@ -115,7 +242,7 @@ stages:
 
   jobs:
   - job: RuniModeEvolutionTests
-    timeoutInMinutes: 90
+    timeoutInMinutes: 240
 
     workspace:
       clean: all
@@ -134,16 +261,17 @@ stages:
       BRANCH_NAME: $[ stageDependencies.Source_Branch.Find_Branch.outputs['Get_Branch_Name.sourceBranch'] ]
 
     steps:
-    - checkout: imodel-native
     - checkout: imodel-native-internal
 
     - template: build/templates/prebuild.yml@imodel-native-internal
       parameters:
         otherRepo: imodel-native
+        nativePR: 'main'
 
-    - script: $(PY_EXE) $(BB_SRC_ROOT)/imodel-native-internal/build/call_bb.py pull -v $(BB_V) -a $(BB_ARCH) -s $(strategy)
+    - script: $(PY_EXE) $(CALL_BB_PATH) pull -v $(BB_V) -a $(BB_ARCH) -s $(strategy)
       displayName: Pull
       env:
+        CALL_BB_PATH: $(CALL_BB_PATH)
         AZURE_DEVOPS_EXT_PAT: $(System.AccessToken)
 
     - script: |

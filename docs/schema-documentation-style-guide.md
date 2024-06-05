@@ -71,7 +71,8 @@ A `Thing` is a generic object. Instances of `Thing` shall be contained in a `Phy
 ### Schema diagrams
 
 1. Add .cmap in media folder
-1. Export .cmap as .png file
+1. Capture appropriate screenshot(s) of the .cmap and save them as .png file(s) in the same media folder
+1. Compress the .png file(s) with [Squoosh](https://squoosh.app/), by applying the following settings: Reduce pallete, 256 colors, 1 dithering, OxiPNG, no Interlace and maximum effort
 1. .cmap style guide and examples can be found [here](schema-cmap-style-guide.md)
 1. For complex schemas, it is a good idea to provide more than one diagram. The initial diagram can cover only the core pattern or structure of the schema while other diagrams can depict additional subsystems or subclasses.
 1. Add links to class and instance screenshots of associated cmaps at the end of the schema overview remarks.
