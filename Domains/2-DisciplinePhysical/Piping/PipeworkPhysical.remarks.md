@@ -109,16 +109,24 @@ Equivalent to [IfcPipeSegmentType](http://ifc43-docs.standards.buildingsmart.org
 
 `PipingPort`s must be contained in `PhysicalModel`s and are owned by `IPipingElement` instances via the `PipingElementOwnsPorts` relationship.
 
-It is expected that the `Origin` property can be used to derive centerlines across a parent `IPipingElement`s when needed.
+Even though `PipingPort` instances are not generally expected to carry any Geometry, it is expected that their `Origin` property is assigned and can be used to derive centerlines across a parent `IPipingElement`s, when applicable. Furthermore, it is also expected that their *Placement angles* (`Yaw`, `Pitch` and `Roll`) are assigned accordingly in order to capture their orientation in 3D space. 
+
+Note that it is assumed by convention that a `PipingPort` with no rotation around any axes is oriented perpendicular to the X-axis, as shown below.
+
+![PipingPort default Orientation](./media/PipeworkPhysical-PipingPortDefOrientation.png)
 
 `PipingPort`s shall be associated with an instance of `PipingPortType` as its TypeDefinition via the `PipingPortIsOfType` relationship. 
 
 _Crown and Invert Elevations_ at individual `PipingPort` instances can be computed as:
 
 ```
-CrownElevation at a PipingPort = PipingPort.Origin.z + (PipingPort.PipingPortType.InnerDiameter / 2)
+CrownElevation at a PipingPort = PipingPort.Origin.z + 
+                                (PipingPort.PipingPortType.InnerDiameter / 2) * 
+                                cos(PipingPort.Placement.Pitch)
 
-InvertElevation at a PipingPort = PipingPort.Origin.z - (PipingPort.PipingPortType.InnerDiameter / 2)
+InvertElevation at a PipingPort = PipingPort.Origin.z - 
+                                (PipingPort.PipingPortType.InnerDiameter / 2) * 
+                                cos(PipingPort.Placement.Pitch)
 ```
 
 Equivalent to [IfcDistributionPort](http://ifc43-docs.standards.buildingsmart.org/IFC/RELEASE/IFC4x3/HTML/lexical/IfcDistributionPort.htm), with its _PredefinedType_ property set to _IfcDistributionPortTypeEnum.PIPE_.
