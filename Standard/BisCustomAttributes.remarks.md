@@ -38,3 +38,7 @@ Other technology-specific schemas not meant to be referenced by other schemas be
 ### SchemaLayerInfo
 
 BIS schemas should be tagged with the `SchemaLayerInfo` `CustomAttribute` to enable validation and error checking related to schema-references.
+
+### CrossPerspectiveRelationship
+
+Note that the `CrossPerspectiveRelationship` `CustomAttribute` does not imply by itself a particular multiplicity among the elements of the two associated modeling perspectives. A relationship class tagged with it shall specify the expected multiplicity at each end-point.
