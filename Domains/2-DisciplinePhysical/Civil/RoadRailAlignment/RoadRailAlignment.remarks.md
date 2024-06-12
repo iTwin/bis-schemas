@@ -12,11 +12,17 @@ Contains the main classes to capture Alignment information primarily used in Roa
 
 ### Alignment
 
-When an `Alignment` drives the design of a linear asset, it is referred to as a *Design Alignment*. `Alignment`s used for design purposes shall be contained in a `SpatialLocationModel`, submodel of a `DesignAlignments` instance, and by default, shall use the Domain-ranked `Alignment` category.
+An `Alignment` that drives the design of a linear asset, it is referred to as a *Design Alignment*. Whereas an `Alignment` that describes a secondary entity of a linear asset, but it is still expected to capture the kind of data typically associated to Alignments, it is referred to as a *Linear*.
 
-On the other hand, when an `Alignment` describes a secondary entity of a linear asset, it is referred to as a *Linear*. `Alignment`s created for the purpose of a *Linear* shall be contained in any `SpatialModel`, and by default, shall use the Domain-ranked `Linear` category.
+By default, *Design Alignments* may use the Domain-ranked `Alignment` category, while *Linears* by default may use the Domain-ranked `Linear` category.
 
-An `Alignment` shall always have an associated `HorizontalAlignment`, but `VerticalAlignment`s are optional. When an `Alignment` has one or more associated `VerticalAlignment`s, it refers to the one used to describe its profile as being the *Main Vertical*.
+Data-writers need to decide the most appropriate organization for Alignment data. `Alignment` instances can be stored in either SpatialLocationModels or PhysicalModels. 
+
+A data-writer may choose to organize `Alignment` instances in a direct submodel of the corresponding `InformationPartitionElement`  (i.e. `PhysicalPartition` or `SpatialLocationPartition`) at the leaves of the Subject Hierarchy. That is the most typical approach. Another strategy involves storing them in models deeper in the overall Information Hierarchy in a BIS repository.
+
+In the latter strategy, `Alignment`s used for design purposes can be stored in a `SpatialLocationModel`, submodel of a `DesignAlignments` instance. Moreover `Alignment`s created for the purpose of a *Linear* can be contained in any `SpatialModel` (i.e. `PhysicalModel` or `SpatialLocationModel`).
+
+An `Alignment` shall always have one and only one associated `HorizontalAlignment`, but `VerticalAlignment`s are optional. When an `Alignment` has one or more associated `VerticalAlignment`s, it refers to the one used to describe its profile as being the *Main Vertical*.
 
 The `Alignment` class inherits its `LengthValue` property from the `ILinearElement` mix-in. In the case of `Alignment`s, such property shall store its horizontal length rather than its 3D length. Such horizontal length is computed from the associated `HorizontalAlignment` instance and cached into the `LengthValue` property of the `Alignment`.
 
@@ -32,17 +38,19 @@ Equivalent to [IfcAlignmentTypeEnum](https://standards.buildingsmart.org/IFC/REL
 
 ### DesignAlignments
 
-A `DesignAlignments` instance, by default, shall use the Domain-ranked `Alignment` category.
+A `DesignAlignments` instance is mainly used by data-writers who do not organize Alignment data directly from the Subject hierarchy, via a PhysicalPartition or SpatialLocationPartition, but wish to do so at a deeper level of the overall Information Hierarchy. 
+
+By default, a `DesignAlignments` instace may use the Domain-ranked `Alignment` category.
 
 ### HorizontalAlignments
 
-Every set of `Alignment`s, contained in a `SpatialModel`, shall have one and only one instance of `HorizontalAlignments` leading to a *Plan-projection* `SpatialLocationModel` containing one `HorizontalAlignment` instance for each `Alignment` in the parent model. 
+A data-writer may choose to organize `HorizontalAlignment` instances in a direct submodel of the corresponding `InformationPartitionElement`  (i.e. `PhysicalPartition` or `SpatialLocationPartition`) at the leaves of the Subject Hierarchy. That is the most typical approach. Another strategy involves storing them in models deeper in the overall Information Hierarchy in a BIS repository. A `HorizontalAlignments` instance is used in the latter case. That is, every set of `Alignment`s, contained in a `SpatialModel`, shall have one and only one instance of `HorizontalAlignments` leading to a *Plan-projection* `SpatialLocationModel` (i.e. with its *IsPlanProjection* property set to *true*) containing one `HorizontalAlignment` instance for each `Alignment` in the parent model.
 
-Each `HorizontalAlignments` instance shall set its `CodeValue` property to "Horizontal Alignments", and by default, shall use the Domain-ranked `Alignment` category in the case of *Design Alignments* or the `Linear` category in the case of *Linears*.
+Each `HorizontalAlignments` instance shall set its `CodeValue` property to "Horizontal Alignments", and by default, may use the Domain-ranked `Alignment` category in the case of *Design Alignments* or the `Linear` category in the case of *Linears*.
 
 ### HorizontalAlignment
 
-A `HorizontalAlignment` instance shall be contained in a *Plan-projection* `SpatialLocationModel` submodel of a `HorizontalAlignments` instance, and shall be associated with one `Alignment` on such parent model via the `AlignmentRefersToHorizontal` relationship.
+A `HorizontalAlignment` instance shall be contained in a *Plan-projection* `SpatialLocationModel` or `PhysicalModel` (i.e. with its *IsPlanProjection* property set to *true*), submodel of the corresponding `InformationPartitionElement`, or a `HorizontalAlignments` instance, depending upon the chosen data-organization strategy. A `HorizontalAlignment` instance shall be associated with one and only one `Alignment` via the `AlignmentRefersToHorizontal` relationship.
 
 A `HorizontalAlignment` typically has the same `CodeValue` and Category as its associated `Alignment`.
 
