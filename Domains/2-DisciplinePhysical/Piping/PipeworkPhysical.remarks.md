@@ -45,7 +45,7 @@ Equivalent to an [IfcDistributionPort](http://ifc43-docs.standards.buildingsmart
 
 ### CrossType
 
-A _Cross_ is a `PipeFitting`with more than three `PipingPort`s used to redistribute flow among them and/or to change the direction of flow between connected `IPipingElement`s.
+A _Cross_ is a `PipeFitting` with more than three `PipingPort`s used to redistribute flow among them and/or to change the direction of flow between connected `IPipingElement`s.
 
 `PipeFitting`s modeling _Crosses_ shall be associated with an instance of `CrossType` as its PhysicalType via the `PipeFittingIsOfType` relationship. `CrossType`s must be contained in `DefinitionModel`s.
 
@@ -77,7 +77,7 @@ Equivalent to an [IfcDistributionPort](http://ifc43-docs.standards.buildingsmart
 
 ### Pipe
 
-The length of a `Pipe` instance can be obtained by calculating the distance between the two `PipingPort`s that it owns, via their _LocalOrigin_ properties.
+The length of a `Pipe` instance can be obtained by calculating the distance between the two `PipingPort`s that it owns, via their _Origin_ properties.
 
 `Pipe`s must be contained in `PhysicalModel`s and optionally associated with its corresponding `PipingSystem` instance via a `PipingSystemGroupsPipingElements` relationship.
 
@@ -107,9 +107,27 @@ Equivalent to [IfcPipeSegmentType](http://ifc43-docs.standards.buildingsmart.org
 
 ### PipingPort
 
-It is expected that the `LocalOrigin` property, inherited from `dsys:DistributionPort`, can be used to derive centerlines across `IPipingElement`s when needed.
+`PipingPort`s must be contained in `PhysicalModel`s and are owned by `IPipingElement` instances via the `PipingElementOwnsPorts` relationship.
+
+Even though `PipingPort` instances are not generally expected to carry any Geometry, it is expected that their `Origin` property is assigned and can be used to derive centerlines across a parent `IPipingElement`s, when applicable. Furthermore, it is also expected that their *Placement angles* (`Yaw`, `Pitch` and `Roll`) are assigned accordingly in order to capture their orientation in 3D space. 
+
+Note that it is assumed by convention that a `PipingPort` with no rotation around any axes is oriented perpendicular to the X-axis, as shown below.
+
+![PipingPort default Orientation](./media/PipeworkPhysical-PipingPortDefOrientation.png)
 
 `PipingPort`s shall be associated with an instance of `PipingPortType` as its TypeDefinition via the `PipingPortIsOfType` relationship. 
+
+_Crown and Invert Elevations_ at individual `PipingPort` instances can be computed as:
+
+```
+CrownElevation at a PipingPort = PipingPort.Origin.z + 
+                                (PipingPort.PipingPortType.InnerDiameter / 2) * 
+                                cos(PipingPort.Placement.Pitch)
+
+InvertElevation at a PipingPort = PipingPort.Origin.z - 
+                                (PipingPort.PipingPortType.InnerDiameter / 2) * 
+                                cos(PipingPort.Placement.Pitch)
+```
 
 Equivalent to [IfcDistributionPort](http://ifc43-docs.standards.buildingsmart.org/IFC/RELEASE/IFC4x3/HTML/lexical/IfcDistributionPort.htm), with its _PredefinedType_ property set to _IfcDistributionPortTypeEnum.PIPE_.
 
@@ -143,7 +161,7 @@ Equivalent to an [IfcDistributionPort](http://ifc43-docs.standards.buildingsmart
 
 ### TeeType
 
-A _Tee_ is a `PipeFitting`with three `PipingPort`s used to redistribute flow among them and/or to change the direction of flow between connected `IPipingElement`s.
+A _Tee_ is a `PipeFitting` with three `PipingPort`s used to redistribute flow among them and/or to change the direction of flow between connected `IPipingElement`s.
 
 `PipeFitting`s modeling _Tees_ shall be associated with an instance of `TeeType` as its PhysicalType via the `PipeFittingIsOfType` relationship. `TeeType`s must be contained in `DefinitionModel`s.
 
@@ -178,3 +196,11 @@ A _WeldedPort_ is a `PipingPort` that is connected to another `PipingPort` by we
 `PipingPort`s modeling _WeldedPorts_ shall be associated with an instance of `WeldedPortType` as its TypeDefinition via the `PipingPortIsOfType` relationship. `WeldedPortType`s must be contained in `DefinitionModel`s.
 
 Equivalent to an [IfcDistributionPort](http://ifc43-docs.standards.buildingsmart.org/IFC/RELEASE/IFC4x3/HTML/lexical/IfcDistributionPort.htm), with its [Pset_DistributionPortTypePipe.ConnectionType](https://ifc43-docs.standards.buildingsmart.org/IFC/RELEASE/IFC4x3/HTML/lexical/Pset_DistributionPortTypePipe.htm) property set to _PEnum_PipeEndStyleTreatment.WELDED_.
+
+### WyeType
+
+A _Wye_ is a `PipeFitting` with three `PipingPort`s used to split or merge flow among the connected `IPipingElement`s, and shaped like the letter 'Y' in order to significantly decrease friction and turbulence.
+
+`PipeFitting`s modeling _Wyes_ shall be associated with an instance of `WyeType` as its PhysicalType via the `PipeFittingIsOfType` relationship. `WyeType`s must be contained in `DefinitionModel`s.
+
+Equivalent to [IfcPipeFittingType](http://ifc43-docs.standards.buildingsmart.org/IFC/RELEASE/IFC4x3/HTML/lexical/IfcPipeFittingType.htm), with its _PredefinedType_ property set to _IfcPipeFittingTypeEnum.JUNCTION_.
