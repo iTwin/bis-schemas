@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- ==================================================================================
 |  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
-|  * See LICENSE.md in the project root for license terms and full copyright notice.
+|  * See LICENSE.md in the project root for license terms and full copyright notice. 
 ======================================================================================= -->
 <ECSchema schemaName="SewerHydraulicAnalysis" alias="swrhyd" version="01.00.00"
 	xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" displayLabel="Gravity Sewer Analysis" description="Sewer Hydraulic Analysis Schema.">
 	<ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA" />
 	<ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
 	<ECSchemaReference name="BisCore" version="01.00.10" alias="bis" />
-	<ECSchemaReference name="Analytical" version="01.00.02" alias="anlyt" />
+	<ECSchemaReference name="Analytical" version="01.00.01" alias="anlyt" />
 	<ECSchemaReference name="AecUnits" version="01.00.03" alias="AECU"/>
+	<ECSchemaReference name="RoadRailUnits" version="01.00.01" alias="rru"/>
 	<ECSchemaReference name="NetworkTopology" version="01.00.00" alias="net"/>
 
 	<ECCustomAttributes>
@@ -21,17 +22,17 @@
 		</SchemaLayerInfo>
 	</ECCustomAttributes>
 
-	<ECEnumeration typeName="GravityStructureShapeType" backingTypeName="int" isStrict="true" description="Set the shape of a gravity structure.">
+	<ECEnumeration typeName="GravityStructureShape" backingTypeName="int" isStrict="true" description="Set the shape of a gravity structure.">
 		<ECEnumerator value="0" name="Circular" displayLabel="Circular" />
 		<ECEnumerator value="1" name="Box" displayLabel="Box" />
 	</ECEnumeration>
 
-	<ECEnumeration typeName="PipeShapeType" backingTypeName="int" isStrict="true" description="Set the shape of a pipe element.">
+	<ECEnumeration typeName="PipeShape" backingTypeName="int" isStrict="true" description="Set the shape of a pipe element.">
 		<ECEnumerator value="0" name="Circular" displayLabel="Circular" />
 		<ECEnumerator value="1" name="Box" displayLabel="Box" />
 	</ECEnumeration>
 
-	<ECEnumeration typeName="RainfallDepthType" backingTypeName="int" isStrict="true">
+	<ECEnumeration typeName="RainfallDepthMethod" backingTypeName="int" isStrict="true">
 		<ECEnumerator value="0" name="Cumulative" displayLabel="Cumulative"/>
 		<ECEnumerator value="1" name="Incremental" displayLabel="Incremental"/>
 	</ECEnumeration>
@@ -49,9 +50,9 @@
 	<ECEntityClass typeName="GravityStructure" modifier="Abstract" displayLabel="Gravity Structure">
 		<BaseClass>anlyt:AnalyticalElement</BaseClass>
 		<BaseClass>net:INode</BaseClass>
-		<ECProperty propertyName="StructureShape" typeName="GravityStructureShapeType" displayLabel="Structure Shape" category="HydraulicData"/>
-		<ECProperty propertyName="InvertElevation" typeName="double" displayLabel="Elevation (Invert)" category="HydraulicData" kindOfQuantity="AECU:LENGTH"/>
-		<ECProperty propertyName="RimElevation" typeName="double" displayLabel="Elevation (Rim)" category="HydraulicData" kindOfQuantity="AECU:LENGTH"/>
+		<ECProperty propertyName="StructureShape" typeName="GravityStructureShape" displayLabel="Structure Shape" category="HydraulicData"/>
+		<ECProperty propertyName="InvertElevation" typeName="double" displayLabel="Elevation (Invert)" category="HydraulicData" kindOfQuantity="rru:LENGTH"/>
+		<ECProperty propertyName="RimElevation" typeName="double" displayLabel="Elevation (Rim)" category="HydraulicData" kindOfQuantity="rru:LENGTH"/>
 		<ECProperty propertyName="FixedLoad" typeName='double' category="HydraulicData" kindOfQuantity="AECU:FLOW"/>
 	</ECEntityClass>
 
@@ -71,8 +72,8 @@
 
 	<ECEntityClass typeName="BoxGravityStructureShapeAspect" modifier="Sealed" displayLabel="Box Structure">
 		<BaseClass>GravityStructureShapeAspect</BaseClass>
-		<ECProperty propertyName="StructureLength" typeName="double" displayLabel="Length" category="HydraulicData" kindOfQuantity="AECU:LENGTH"/>
-		<ECProperty propertyName="StructureWidth" typeName="double" displayLabel="Width" category="HydraulicData" kindOfQuantity="AECU:LENGTH"/>
+		<ECProperty propertyName="StructureLength" typeName="double" displayLabel="Length" category="HydraulicData" kindOfQuantity="rru:LENGTH"/>
+		<ECProperty propertyName="StructureWidth" typeName="double" displayLabel="Width" category="HydraulicData" kindOfQuantity="rru:LENGTH"/>
 	</ECEntityClass>
 
 
@@ -119,11 +120,11 @@
 	<ECEntityClass typeName="Pipe" modifier="Sealed" displayLabel="Pipe">
 		<BaseClass>anlyt:AnalyticalElement</BaseClass>
 		<BaseClass>net:IEdge</BaseClass>
-		<ECProperty propertyName="Shape" typeName="PipeShapeType" displayLabel="Shape" category="HydraulicData"/>
-		<ECProperty propertyName="StartInvert" typeName="double" displayLabel="Invert (Start)" category="HydraulicData" kindOfQuantity="AECU:LENGTH"/>
-		<ECProperty propertyName="StopInvert" typeName="double" displayLabel="Invert (Stop)" category="HydraulicData" kindOfQuantity="AECU:LENGTH"/>
+		<ECProperty propertyName="Shape" typeName="PipeShape" displayLabel="Shape" category="HydraulicData"/>
+		<ECProperty propertyName="StartInvert" typeName="double" displayLabel="Invert (Start)" category="HydraulicData" kindOfQuantity="rru:LENGTH"/>
+		<ECProperty propertyName="StopInvert" typeName="double" displayLabel="Invert (Stop)" category="HydraulicData" kindOfQuantity="rru:LENGTH"/>
 		<ECProperty propertyName="ManningsN" typeName="double" displayLabel="Mannings n" category="HydraulicData"/>
-		<ECProperty propertyName="PlanLength" typeName="double" displayLabel="Length" category="HydraulicData" kindOfQuantity="AECU:LENGTH"/>
+		<ECProperty propertyName="PlanLength" typeName="double" displayLabel="Length" category="HydraulicData" kindOfQuantity="rru:LENGTH"/>
 	</ECEntityClass>
 
 	<ECEntityClass typeName="PipeShapeAspect" modifier="Abstract" displayLabel="Pipe Shape">
@@ -157,8 +158,8 @@
 
 	<ECEntityClass typeName="BoxPipeShapeAspect" modifier="Sealed" displayLabel="Box">
 		<BaseClass>PipeShapeAspect</BaseClass>
-		<ECProperty propertyName="PipeRise" typeName="double" displayLabel="Rise" category="HydraulicData" kindOfQuantity="AECU:LENGTH"/>
-		<ECProperty propertyName="PipeSpan" typeName="double" displayLabel="Span" category="HydraulicData" kindOfQuantity="AECU:LENGTH"/>
+		<ECProperty propertyName="PipeRise" typeName="double" displayLabel="Rise" category="HydraulicData" kindOfQuantity="rru:LENGTH"/>
+		<ECProperty propertyName="PipeSpan" typeName="double" displayLabel="Span" category="HydraulicData" kindOfQuantity="rru:LENGTH"/>
 	</ECEntityClass>
 
 	<ECRelationshipClass typeName="PipeOwnsBoxShapeAspect" strength="embedding" strengthDirection="Forward" modifier="Sealed">
@@ -209,7 +210,7 @@
 		<BaseClass>RainfallEventAspect</BaseClass>
 		<ECProperty propertyName="Duration" typeName="double" displayLabel="Storm Duration" category="HydraulicData" kindOfQuantity="AECU:TIME"/>
 		<ECProperty propertyName="TimeIncrement" typeName="double" displayLabel="Duration" category="HydraulicData" kindOfQuantity="AECU:TIME"/>
-		<ECProperty propertyName="DepthType" typeName="RainfallDepthType" displayLabel="Depth Type" category="HydraulicData"/>
+		<ECProperty propertyName="DepthMethod" typeName="RainfallDepthMethod" displayLabel="Depth Method" category="HydraulicData"/>
 		<ECArrayProperty propertyName="Depths" typeName="double" displayLabel="Depths" category="HydraulicData" kindOfQuantity="AECU:LENGTH"/>
 	</ECEntityClass>
 
