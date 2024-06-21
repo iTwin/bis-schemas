@@ -36,7 +36,7 @@ Equivalent to [IfcDistributionSystem](https://standards.buildingsmart.org/IFC/RE
 - elements within electrical systems
 - elements within communication network systems
 
-It defines occurence of any HVAC, electrical, sanitary or other element within a distribution system.
+It defines occurence of any HVAC, electrical, sanitary or other element within a distribution system. An `IDistributionElement` is expected to own at least one `DistributionPort` via the `DistributionElementOwnsDistributionPorts` relationship class.
 
 Equivalent to [IfcDistributionElement](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcDistributionElement.htm).
 
@@ -71,9 +71,9 @@ Equivalent to [IfcDistributionControlElement](https://standards.buildingsmart.or
 ### DistributionPort
 
 A distribution port is a flow connection point of a distribution element through which a particular substance may flow.
-Distribution ports define the physical connection and substance, electricity or data flow points of a distribution flow element. Subclasses of DistributionPort should specialize distributionport in a given domain by adding relevant properties like FlowVolume for plumbing, or RatedVoltage for electrical.
-Ports are similar to openings in that they do not have any visible geometry, such geometry is captured by the parent distribution element. Ports do have placement to indicate position and orientation of the connection.
-Distribution ports are owned by the `DistributionElement` as they are essentially part of the whole definition of the element, similar to openings in a wall. `DistributionElementOwnsDistributionPorts` relationship is used for `DistributionElement` owning `DistributionPorts`.
+Distribution ports define the physical connection and substance, electricity or data flow points of a distribution flow element. Subclasses of DistributionPort should specialize distributionport in a given domain by adding relevant properties like FlowVolume for plumbing, or RatedVoltage for electrical. Even though `DistributionPort`, as a subclass of `bis:SpatialLocationElement`, may have geometry on its own if needed, Ports typically do not have any visible geometry. Such geometry is usually captured by the parent distribution element. However, `DistributionPort` instances must have their _Origin_ and _Placement_ properties set in order to indicate their position and orientation.
+
+Distribution ports are owned by a `DistributionElement` as they are essentially part of the whole definition of such element, similar to openings in a wall. `DistributionElementOwnsDistributionPorts` relationship is used for `DistributionElement` owning `DistributionPorts`.
 
 Equivalent to [IfcDistributionPort](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcDistributionPort.htm).
 
@@ -81,6 +81,6 @@ Equivalent to [IfcDistributionPort](https://standards.buildingsmart.org/IFC/RELE
 
 A `PortConnection` defines a physical connection between 2 DistributionPorts. In the case where a connection is realized by some other physical element, the realizing element could be found using `PortConnectionIsRealizedByPhysicalElements` relationship.
 
-a PortConnection is always between 2 distribution ports, however this constraint may be removed if a suitable use case is found.
+A `PortConnection` generally connects two distribution ports via the `PortConnectionConnectsTwoPorts`. However, its base `PortConnectionConnectsPorts` relationship class can be used when modeling port-connections at a higher level of detail.
 
 Equivalent to [IfcRelConnectsPorts](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcRelConnectsPorts.htm).

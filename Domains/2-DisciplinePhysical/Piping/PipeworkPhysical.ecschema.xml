@@ -35,7 +35,7 @@
 
     <ECRelationshipClass typeName="PipingSystemGroupsPipingElements" strength="referencing" modifier="None" displayLabel="Distribution System Groups Distribution Elements" description="A relationship used to identify the IPipingElements that are members of a PipingSystem.">
         <BaseClass>dsys:DistributionSystemGroupsDistributionElements</BaseClass>
-        <Source multiplicity="(0..*)" roleLabel="groups" polymorphic="true">
+        <Source multiplicity="(1..*)" roleLabel="groups" polymorphic="true">
             <Class class="PipingSystem"/>
         </Source>
         <Target multiplicity="(0..*)" roleLabel="is grouped by" polymorphic="true">
@@ -52,7 +52,7 @@
         </ECCustomAttributes>        
     </ECEntityClass>
 
-    <ECEntityClass typeName="PipeElement" modifier="Abstract" displayLabel="Pipe Element" description="A bis:PhysicalElement used to typically join two sections of a piping network.">
+    <ECEntityClass typeName="PipeElement" modifier="Abstract" displayLabel="Pipe Element" description="A bis:PhysicalElement that models a tube used to typically join two sections of a piping network.">
         <BaseClass>bis:PhysicalElement</BaseClass>
         <BaseClass>IPipingElement</BaseClass>
         <BaseClass>dsys:IDistributionFlowElement</BaseClass>
@@ -66,7 +66,7 @@
         <ECProperty propertyName="TemperatureRange" typeName="aecvdef:BoundedTemperatureValue" displayLabel="Temperature Range" description="Allowable maximum, minimum and typical temperature."/>
     </ECEntityClass>
 
-    <ECEntityClass typeName="Pipe" modifier="None" displayLabel="Pipe" description="A straight PipeElement used to typically join two sections of a piping network.">
+    <ECEntityClass typeName="Pipe" modifier="None" displayLabel="Pipe" description="A cylindrical PipeElement used to typically join two sections of a piping network.">
         <BaseClass>PipeElement</BaseClass>
     </ECEntityClass>
 
@@ -102,7 +102,7 @@
         <Source multiplicity="(0..*)" roleLabel="is of" polymorphic="true">
             <Class class="PipeFitting" />
         </Source>
-        <Target multiplicity="(0..1)" roleLabel="is type of" polymorphic="true">
+        <Target multiplicity="(1..1)" roleLabel="is type of" polymorphic="true">
             <Class class="PipeFittingType"/>
         </Target>
     </ECRelationshipClass>
@@ -133,6 +133,10 @@
         <BaseClass>BranchType</BaseClass>
     </ECEntityClass>
 
+    <ECEntityClass typeName="WyeType" modifier="None" displayLabel="Wye Type" description="A BranchType that classifies associated PipeFitting instances as Wyes.">
+        <BaseClass>BranchType</BaseClass>
+    </ECEntityClass>
+
     <ECEntityClass typeName="CrossType" modifier="None" displayLabel="Cross Type" description="A BranchType that classifies associated PipeFitting instances as Crosses.">
         <BaseClass>BranchType</BaseClass>
     </ECEntityClass>
@@ -146,7 +150,7 @@
         <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
             <Class class="IPipingElement"/>
         </Source>
-        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="true">
+        <Target multiplicity="(1..*)" roleLabel="is owned by" polymorphic="true">
             <Class class="PipingPortElement"/>
         </Target>
     </ECRelationshipClass>
@@ -156,7 +160,7 @@
         <Source multiplicity="(0..1)" roleLabel="connects" polymorphic="true">
             <Class class="dsys:PortConnection"/>
         </Source>
-        <Target multiplicity="(0..2)" roleLabel="is connected by" polymorphic="true">
+        <Target multiplicity="(2..2)" roleLabel="is connected by" polymorphic="true">
             <Class class="PipingPortElement"/>
         </Target>
     </ECRelationshipClass>
@@ -186,7 +190,7 @@
         <Source multiplicity="(0..*)" roleLabel="is of" polymorphic="true">
             <Class class="PipingPort" />
         </Source>
-        <Target multiplicity="(0..1)" roleLabel="is type of" polymorphic="true">
+        <Target multiplicity="(1..1)" roleLabel="is type of" polymorphic="true">
             <Class class="PipingPortType"/>
         </Target>
     </ECRelationshipClass>

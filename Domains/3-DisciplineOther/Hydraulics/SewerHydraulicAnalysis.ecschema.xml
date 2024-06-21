@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ==================================================================================
+|  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
+|  * See LICENSE.md in the project root for license terms and full copyright notice. 
+======================================================================================= -->
+<ECSchema schemaName="SewerHydraulicAnalysis" alias="swrhyd" version="01.00.00"
+	xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" displayLabel="Gravity Sewer Analysis" description="Sewer Hydraulic Analysis Schema.">
+	<ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA" />
+	<ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
+	<ECSchemaReference name="BisCore" version="01.00.10" alias="bis" />
+	<ECSchemaReference name="Analytical" version="01.00.01" alias="anlyt" />
+	<ECSchemaReference name="AecUnits" version="01.00.03" alias="AECU"/>
+	<ECSchemaReference name="RoadRailUnits" version="01.00.01" alias="rru"/>
+	<ECSchemaReference name="NetworkTopology" version="01.00.00" alias="net"/>
+
+	<ECCustomAttributes>
+		<ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
+			<SupportedUse>NotForProduction</SupportedUse>
+		</ProductionStatus>
+		<SchemaLayerInfo xmlns="BisCustomAttributes.01.00.00">
+			<Value>DisciplineOther</Value>
+		</SchemaLayerInfo>
+	</ECCustomAttributes>
+
+	<ECEnumeration typeName="GravityStructureShape" backingTypeName="int" isStrict="true" description="Set the shape of a gravity structure.">
+		<ECEnumerator value="0" name="Circular" displayLabel="Circular" />
+		<ECEnumerator value="1" name="Box" displayLabel="Box" />
+	</ECEnumeration>
+
+	<ECEnumeration typeName="PipeShape" backingTypeName="int" isStrict="true" description="Set the shape of a pipe element.">
+		<ECEnumerator value="0" name="Circular" displayLabel="Circular" />
+		<ECEnumerator value="1" name="Box" displayLabel="Box" />
+	</ECEnumeration>
+
+	<ECEnumeration typeName="RainfallDepthMethod" backingTypeName="int" isStrict="true">
+		<ECEnumerator value="0" name="Cumulative" displayLabel="Cumulative"/>
+		<ECEnumerator value="1" name="Incremental" displayLabel="Incremental"/>
+	</ECEnumeration>
+
+	<PropertyCategory typeName="HydraulicData" priority="1"/>
+
+	<ECEntityClass typeName="SewerHydraulicAnalysisModel" modifier="Sealed" displayLabel="Sewer Hydraulics Analysis Model" description="Model containing all Sewer Hydraulic Analysis elements.">
+		<BaseClass>anlyt:AnalyticalModel</BaseClass>
+	</ECEntityClass>
+
+	<ECEntityClass typeName="SewerHydraulicAnalysisPartition" modifier="Sealed" displayLabel="Sewer Hydraulics Analysis Partition" description="Specializied Sewer Hydraulics perspective in the hierarchy">
+		<BaseClass>anlyt:AnalyticalPartition</BaseClass>
+	</ECEntityClass>
+
+	<ECEntityClass typeName="GravityStructure" modifier="Abstract" displayLabel="Gravity Structure">
+		<BaseClass>anlyt:AnalyticalElement</BaseClass>
+		<BaseClass>net:INode</BaseClass>
+		<ECProperty propertyName="StructureShape" typeName="GravityStructureShape" displayLabel="Structure Shape" category="HydraulicData"/>
+		<ECProperty propertyName="InvertElevation" typeName="double" displayLabel="Elevation (Invert)" category="HydraulicData" kindOfQuantity="rru:LENGTH"/>
+		<ECProperty propertyName="RimElevation" typeName="double" displayLabel="Elevation (Rim)" category="HydraulicData" kindOfQuantity="rru:LENGTH"/>
+		<ECProperty propertyName="FixedLoad" typeName='double' category="HydraulicData" kindOfQuantity="AECU:FLOW"/>
+	</ECEntityClass>
+
+	<ECEntityClass typeName="GravityStructureShapeAspect" modifier="Abstract" displayLabel="Structure Shape">
+		<BaseClass>bis:ElementUniqueAspect</BaseClass>
+	</ECEntityClass>
+
+	<ECRelationshipClass typeName="GravityStructureOwnsShapeAspect" strength="embedding" modifier="Sealed">
+		<BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+		<Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+			<Class class="GravityStructure"/>
+		</Source>
+		<Target multiplicity="(1..1)" roleLabel="is owned by" polymorphic="true">
+			<Class class="GravityStructureShapeAspect" />
+		</Target>
+	</ECRelationshipClass>
+
+	<ECEntityClass typeName="BoxGravityStructureShapeAspect" modifier="Sealed" displayLabel="Box Structure">
+		<BaseClass>GravityStructureShapeAspect</BaseClass>
+		<ECProperty propertyName="StructureLength" typeName="double" displayLabel="Length" category="HydraulicData" kindOfQuantity="rru:LENGTH"/>
+		<ECProperty propertyName="StructureWidth" typeName="double" displayLabel="Width" category="HydraulicData" kindOfQuantity="rru:LENGTH"/>
+	</ECEntityClass>
+
+
+	<ECRelationshipClass typeName="GravityStructureOwnsBoxShapeAspect" strength="embedding" strengthDirection="Forward" modifier="Sealed">
+		<BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+		<Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+			<Class class="GravityStructure" />
+		</Source>
+		<Target multiplicity="(0..1)" roleLabel="owned by" polymorphic="true">
+			<Class class="BoxGravityStructureShapeAspect" />
+		</Target>
+	</ECRelationshipClass>
+
+	<ECEntityClass typeName="CircularGravityStructureShapeAspect" modifier="Sealed" displayLabel="Circular Structure">
+		<BaseClass>GravityStructureShapeAspect</BaseClass>
+		<ECProperty propertyName="StructureDiameter" typeName="double" displayLabel="Length" category="HydraulicData" kindOfQuantity="AECU:LENGTH"/>
+	</ECEntityClass>
+
+	<ECRelationshipClass typeName="GravityStructureOwnsCircularShapeAspect" strength="embedding" strengthDirection="Forward" modifier="Sealed">
+		<BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+		<Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+			<Class class="GravityStructure" />
+		</Source>
+		<Target multiplicity="(0..1)" roleLabel="owned by" polymorphic="true">
+			<Class class="CircularGravityStructureShapeAspect" />
+		</Target>
+	</ECRelationshipClass>
+
+	<ECEntityClass typeName="Manhole" modifier="Sealed" displayLabel="Manhole">
+		<BaseClass>GravityStructure</BaseClass>
+		<ECProperty propertyName="TreatAsStorage" typeName="boolean" displayLabel="Treat As Storage" category="HydraulicData"/>
+		<ECProperty propertyName="ManholeIsBolted" typeName="boolean" displayLabel="Is Bolted" category="HydraulicData"/>
+	</ECEntityClass>
+
+	<ECEntityClass typeName="CatchBasin" modifier="Sealed" displayLabel="Catch Basin">
+		<BaseClass>GravityStructure</BaseClass>
+	</ECEntityClass>
+
+	<ECEntityClass typeName="Outfall" modifier="Sealed" displayLabel="Outfall">
+		<BaseClass>anlyt:AnalyticalElement</BaseClass>
+		<BaseClass>net:INode</BaseClass>
+	</ECEntityClass>
+
+	<ECEntityClass typeName="Pipe" modifier="Sealed" displayLabel="Pipe">
+		<BaseClass>anlyt:AnalyticalElement</BaseClass>
+		<BaseClass>net:IEdge</BaseClass>
+		<ECProperty propertyName="Shape" typeName="PipeShape" displayLabel="Shape" category="HydraulicData"/>
+		<ECProperty propertyName="StartInvert" typeName="double" displayLabel="Invert (Start)" category="HydraulicData" kindOfQuantity="rru:LENGTH"/>
+		<ECProperty propertyName="StopInvert" typeName="double" displayLabel="Invert (Stop)" category="HydraulicData" kindOfQuantity="rru:LENGTH"/>
+		<ECProperty propertyName="ManningsN" typeName="double" displayLabel="Mannings n" category="HydraulicData"/>
+		<ECProperty propertyName="PlanLength" typeName="double" displayLabel="Length" category="HydraulicData" kindOfQuantity="rru:LENGTH"/>
+	</ECEntityClass>
+
+	<ECEntityClass typeName="PipeShapeAspect" modifier="Abstract" displayLabel="Pipe Shape">
+		<BaseClass>bis:ElementUniqueAspect</BaseClass>
+	</ECEntityClass>
+
+	<ECRelationshipClass typeName="PipeOwnsShapeAspect" strength="embedding" modifier="Sealed">
+		<BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+		<Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+			<Class class="Pipe"/>
+		</Source>
+		<Target multiplicity="(1..1)" roleLabel="is owned by" polymorphic="true">
+			<Class class="PipeShapeAspect" />
+		</Target>
+	</ECRelationshipClass>
+
+	<ECEntityClass typeName="CircularPipeShapeAspect" modifier="Sealed" displayLabel="Circular">
+		<BaseClass>PipeShapeAspect</BaseClass>
+		<ECProperty propertyName="PipeDiameter" typeName="double" displayLabel="Diameter" category="HydraulicData" kindOfQuantity="AECU:LENGTH"/>
+	</ECEntityClass>
+
+	<ECRelationshipClass typeName="PipeOwnsCircularShapeAspect" strength="embedding" strengthDirection="Forward" modifier="Sealed">
+		<BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+		<Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+			<Class class="GravityStructure" />
+		</Source>
+		<Target multiplicity="(0..1)" roleLabel="owned by" polymorphic="true">
+			<Class class="CircularPipeShapeAspect" />
+		</Target>
+	</ECRelationshipClass>
+
+	<ECEntityClass typeName="BoxPipeShapeAspect" modifier="Sealed" displayLabel="Box">
+		<BaseClass>PipeShapeAspect</BaseClass>
+		<ECProperty propertyName="PipeRise" typeName="double" displayLabel="Rise" category="HydraulicData" kindOfQuantity="rru:LENGTH"/>
+		<ECProperty propertyName="PipeSpan" typeName="double" displayLabel="Span" category="HydraulicData" kindOfQuantity="rru:LENGTH"/>
+	</ECEntityClass>
+
+	<ECRelationshipClass typeName="PipeOwnsBoxShapeAspect" strength="embedding" strengthDirection="Forward" modifier="Sealed">
+		<BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+		<Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+			<Class class="Pipe" />
+		</Source>
+		<Target multiplicity="(0..1)" roleLabel="owned by" polymorphic="true">
+			<Class class="BoxPipeShapeAspect" />
+		</Target>
+	</ECRelationshipClass>
+
+
+	<ECEntityClass typeName="RainfallSet" modifier="Sealed" displayLabel="Rainfall Set">
+		<BaseClass>bis:DefinitionElement</BaseClass>
+	</ECEntityClass>
+
+	<ECEntityClass typeName="RainfallEvent" modifier="Sealed" displayLabel="Rainfall Event">
+		<BaseClass>bis:DefinitionElement</BaseClass>
+		<ECProperty propertyName="ReturnEvent" typeName="double" displayLabel="Return Event" category="HydraulicData" kindOfQuantity="AECU:TIME"/>
+	</ECEntityClass>
+
+	<ECRelationshipClass typeName="RainfallSetOwnsRainfallEvents" strength="embedding" strengthDirection="Forward" modifier="Sealed">
+		<BaseClass>bis:ElementOwnsChildElements</BaseClass>
+		<Source multiplicity="(1..1)" roleLabel="owns child" polymorphic="false">
+			<Class class="RainfallSet" />
+		</Source>
+		<Target multiplicity="(0..*)" roleLabel="is owned by parent" polymorphic="true">
+			<Class class="RainfallEvent" />
+		</Target>
+	</ECRelationshipClass>
+
+	<ECEntityClass typeName="RainfallEventAspect" modifier="Abstract" displayLabel="Rainfall Event Aspect">
+		<BaseClass>bis:ElementUniqueAspect</BaseClass>
+	</ECEntityClass>
+
+	<ECRelationshipClass typeName="RainfallEventOwnsRainfallEventAspect" strength="embedding" modifier="Sealed">
+		<BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+		<Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+			<Class class="RainfallEvent"/>
+		</Source>
+		<Target multiplicity="(1..1)" roleLabel="is owned by" polymorphic="true">
+			<Class class="RainfallEventAspect" />
+		</Target>
+	</ECRelationshipClass>
+
+	<ECEntityClass typeName="TimeDepthRainfallEventAspect" modifier="Sealed" displayLabel="Time-Depth Rainfall">
+		<BaseClass>RainfallEventAspect</BaseClass>
+		<ECProperty propertyName="Duration" typeName="double" displayLabel="Storm Duration" category="HydraulicData" kindOfQuantity="AECU:TIME"/>
+		<ECProperty propertyName="TimeIncrement" typeName="double" displayLabel="Duration" category="HydraulicData" kindOfQuantity="AECU:TIME"/>
+		<ECProperty propertyName="DepthMethod" typeName="RainfallDepthMethod" displayLabel="Depth Method" category="HydraulicData"/>
+		<ECArrayProperty propertyName="Depths" typeName="double" displayLabel="Depths" category="HydraulicData" kindOfQuantity="AECU:LENGTH"/>
+	</ECEntityClass>
+
+	<ECRelationshipClass typeName="RainfallEventToTimeDepthsAspect" strength="embedding" strengthDirection="Forward" modifier="Sealed">
+		<BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+		<Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+			<Class class="RainfallEvent" />
+		</Source>
+		<Target multiplicity="(0..1)" roleLabel="owned by" polymorphic="true">
+			<Class class="TimeDepthRainfallEventAspect" />
+		</Target>
+	</ECRelationshipClass>
+
+	<ECStructClass typeName="IDFPoint" description="Point of IDF Curve" modifier="Sealed">
+		<ECProperty propertyName="Duration" typeName="double" description="Duration of storm" kindOfQuantity="AECU:TIME" />
+		<ECProperty propertyName="Intensity" typeName="double" description="Intensity at duration" />
+	</ECStructClass>
+
+	<ECEntityClass typeName="IDFRainfallEventAspect" modifier="Sealed" displayLabel="IDF Curve">
+		<BaseClass>RainfallEventAspect</BaseClass>
+		<ECStructArrayProperty propertyName="IDFPoints" typeName="IDFPoint" displayLabel="IDF Points" minOccurs="0" maxOccurs="unbounded" description="Array of Duration-Intensity Points" />
+	</ECEntityClass>
+
+	<ECRelationshipClass typeName="RainfallEventToIDFAspect" strength="embedding" strengthDirection="Forward" modifier="Sealed">
+		<BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+		<Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+			<Class class="RainfallEvent" />
+		</Source>
+		<Target multiplicity="(0..1)" roleLabel="owned by" polymorphic="true">
+			<Class class="IDFRainfallEventAspect" />
+		</Target>
+	</ECRelationshipClass>
+
+</ECSchema>
