@@ -88,7 +88,6 @@ async function schemaUpgradeTest(ignoreList, output, checkAllVersions) {
   let previousSchema;
 
   for (const releasedSchema of testSchemas) {
-    await IModelHost.startup();
     console.log("\nSchema: " + releasedSchema);
     writeLogsToFile(`\nSchema:  ${releasedSchema}\n`, output);
   
@@ -97,7 +96,6 @@ async function schemaUpgradeTest(ignoreList, output, checkAllVersions) {
     const schemaVersion = getVersionString(key.readVersion, key.writeVersion, key.minorVersion);
 
     if (excludeSchema(schemaName, schemaVersion, ignoreList)) {
-      await IModelHost.shutdown();
       continue;
     }
 
