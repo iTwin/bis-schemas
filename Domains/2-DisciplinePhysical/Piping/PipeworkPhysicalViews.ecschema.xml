@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ==================================================================================
+|  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
+|  * See LICENSE.md in the project root for license terms and full copyright notice.
+======================================================================================= -->
+<ECSchema schemaName="PipeworkPhysicalViews" alias="pipphysViews" version="01.00.00" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" displayLabel="BIS Core Views" description="Views that facilitate querying of derived concepts based on the PipeworkPhysical schema.">
+    <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
+    <ECSchemaReference name="BisCustomAttributes" version="01.00.01" alias="bisCA"/>
+    <ECSchemaReference name="ECDbMap" version="02.00.04" alias="ecdbmap"/>
+    <ECSchemaReference name="PipeworkPhysical" version="01.00.00" alias="pipphys"/>
+    <ECSchemaReference name="AecUnits" version="01.00.04" alias="aecu"/>
+
+    <ECCustomAttributes>
+        <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
+            <SupportedUse>NotForProduction</SupportedUse>
+        </ProductionStatus>
+        <SchemaLayerInfo xmlns="BisCustomAttributes.01.00.00">
+            <Value>DisciplinePhysical</Value>
+        </SchemaLayerInfo>
+    </ECCustomAttributes>
+
+    <ECEntityClass typeName="PipeView" modifier="Abstract" displayLabel="Pipe View" description="View that adds derived properties to the definition of a Pipe.">
+        <ECCustomAttributes>
+            <QueryView xmlns="ECDbMap.02.00.04">
+                <Query>
+                    SELECT
+                        [pg].[ECInstanceId],
+                        [pg].[ECClassId],
+                        pow(pow([pg].[MaxX] - [pg].[MinX], 2) + 
+                            pow([pg].[MaxY] - [pg].[MinY], 2) +
+                            pow([pg].[MaxZ] - [pg].[MinZ], 2), 0.5) [Length]
+                    FROM
+                        (SELECT 
+                            [p].[ECInstanceId], 
+                            [p].[ECClassId],
+                            MIN([pp].[Origin].[X]) [MinX],
+                            MIN([pp].[Origin].[Y]) [MinY],
+                            MIN([pp].[Origin].[Z]) [MinZ],
+                            MAX([pp].[Origin].[X]) [MaxX],
+                            MAX([pp].[Origin].[Y]) [MaxY],
+                            MAX([pp].[Origin].[Z]) [MaxZ]
+                        FROM [pipphys].[Pipe] [p]
+                        INNER JOIN [pipphys].[PipingPort] [pp] ON [pp].[Parent].[Id] = [p].[ECInstanceId]
+                        GROUP BY [p].[ECInstanceId]
+                        HAVING COUNT(*) = 2) [pg]
+                </Query>
+            </QueryView>
+        </ECCustomAttributes>
+        <ECProperty propertyName="Length" typeName="double" kindOfQuantity="aecu:LENGTH" description="Length of the Pipe">
+            <ECCustomAttributes>
+                <LengthQuantity xmlns="BisCustomAttributes.01.00.01">
+                    <Kind>Length</Kind>
+                </LengthQuantity>
+            </ECCustomAttributes>
+        </ECProperty>
+    </ECEntityClass>
+ </ECSchema>

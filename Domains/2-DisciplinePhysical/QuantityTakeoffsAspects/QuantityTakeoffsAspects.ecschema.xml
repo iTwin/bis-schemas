@@ -5,7 +5,7 @@
 ======================================================================================= -->
 <ECSchema schemaName="QuantityTakeoffsAspects" alias="qto" version="01.00.03" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
     <ECSchemaReference name="CoreCustomAttributes" version="01.00.04" alias="CoreCA"/>
-    <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
+    <ECSchemaReference name="BisCustomAttributes" version="01.00.01" alias="bisCA"/>
     <ECSchemaReference name="BisCore" version="01.00.15" alias="bis" />
     <ECSchemaReference name="AecUnits" version="01.00.03" alias="AECU" />
 
@@ -347,8 +347,20 @@
 
     <ECEntityClass typeName="VolumeAspect" displayLabel="Volume Aspect" description="An aspect that defines gross and net volumes of an object." >
         <BaseClass>QuantityTakeoffAspect</BaseClass>
-        <ECProperty propertyName="GrossVolume" displayLabel="Gross Volume" typeName="double" kindOfQuantity="AECU:VOLUME" description="Total volume of an object with packaging."/>
-        <ECProperty propertyName="NetVolume" displayLabel="Net Volume" typeName="double" kindOfQuantity="AECU:VOLUME" description="Volume of an object alone."/>
+        <ECProperty propertyName="GrossVolume" displayLabel="Gross Volume" typeName="double" kindOfQuantity="AECU:VOLUME" description="Total volume of an object with packaging.">
+            <ECCustomAttributes>
+                <VolumeQuantity xmlns="BisCustomAttributes.01.00.01">
+                    <LevelOfInformation>Gross</LevelOfInformation>
+                </VolumeQuantity>
+            </ECCustomAttributes>
+        </ECProperty>
+        <ECProperty propertyName="NetVolume" displayLabel="Net Volume" typeName="double" kindOfQuantity="AECU:VOLUME" description="Volume of an object alone.">
+            <ECCustomAttributes>
+                <VolumeQuantity xmlns="BisCustomAttributes.01.00.01">
+                    <LevelOfInformation>Net</LevelOfInformation>
+                </VolumeQuantity>
+            </ECCustomAttributes>
+        </ECProperty>
     </ECEntityClass>
     
     <ECRelationshipClass typeName="ElementOwnsVolumeAspect" strength="embedding" modifier="None" description="A relationship tieing the specialized quantity takeoff aspect with an element">

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ==================================================================================
+|  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
+|  * See LICENSE.md in the project root for license terms and full copyright notice.
+======================================================================================= -->
+<ECSchema schemaName="BisCoreViews" alias="bisViews" version="01.00.00" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" displayLabel="BIS Core Views" description="Views that facilitate querying of concepts defined in the BIS core schema.">
+    <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
+    <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
+    <ECSchemaReference name="ECDbMap" version="02.00.04" alias="ecdbmap"/>
+    <ECSchemaReference name="BisCore" version="01.00.11" alias="bis"/>
+    <ECSchemaReference name="AecUnits" version="01.00.03" alias="AECU"/>
+
+    <ECCustomAttributes>
+        <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
+            <SupportedUse>NotForProduction</SupportedUse>
+        </ProductionStatus>
+        <SchemaLayerInfo xmlns="BisCustomAttributes.01.00.00">
+            <Value>Core</Value>
+        </SchemaLayerInfo>
+    </ECCustomAttributes>
+
+    <ECEntityClass typeName="PhysicalElementMaterialView" modifier="Abstract" displayLabel="PhysicalElementId MaterialId View" description="View that returns that PhysicalMaterial of every PhysicalElement, disregarding whether it is defined through its PhysicalType or overriden from the PhysicalElement instance.">
+        <ECCustomAttributes>
+            <QueryView xmlns="ECDbMap.02.00.04">
+                <Query>
+                    SELECT 
+                        [pe].[ECInstanceId], 
+                        [pe].[ECClassId],
+                        NAVIGATION_VALUE(bisViews.PhysicalElementMaterialView.PhysicalMaterial, 
+                            coalesce([pe].[PhysicalMaterial].[Id], [pt].[PhysicalMaterial].[Id]))
+                    FROM [bis].[PhysicalElement] [pe] 
+                        LEFT JOIN [bis].[PhysicalType] [pt] ON [pe].[TypeDefinition].[Id] = [pt].[ECInstanceId]
+                </Query>
+            </QueryView>
+        </ECCustomAttributes>
+        <ECNavigationProperty propertyName="PhysicalMaterial" relationshipName="PhysicalElementIsOfPhysicalMaterial" direction="forward"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="PhysicalElementIsOfPhysicalMaterial" strength="referencing" modifier="Sealed" description="A relationship indicating the bis:PhysicalMaterial of which the bis:PhysicalElement is made.">
+        <!-- @see PhysicalElementMaterialView.PhysicalMaterial ECNavigationProperty -->
+        <Source multiplicity="(0..*)" roleLabel="is of" polymorphic="true">
+            <Class class="PhysicalElementMaterialView" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is material of" polymorphic="true">
+            <Class class="bis:PhysicalMaterial"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="PhysicalElementVolumeQuantitiesView" modifier="Abstract" displayLabel="PhysicalElementId MaterialId View" description="View that returns that PhysicalMaterial of every PhysicalElement, disregarding whether it is defined through its PhysicalType or overriden from the PhysicalElement instance.">
+        <ECCustomAttributes>
+            <QueryView xmlns="ECDbMap.02.00.04">
+                <Query>
+                    SELECT 
+                        [pe].[ECInstanceId], 
+                        [pe].[ECClassId],
+                        [pd].[Name] [PropertyName],
+                        json_extract([pca].[Instance], '$.VolumeQuantity.LevelOfInformation') [LevelOfInformation],
+                        cast(extract_prop([pe].[ECClassId], [pe].[ECInstanceId], [pd].[Name]) as double) [Value]
+                    FROM [bis].[PhysicalElement] [pe]
+                        INNER JOIN [meta].[ClassHasAllBaseClasses] [chabc] ON [pe].[ECClassId] = [chabc].[SourceECInstanceId]
+                        INNER JOIN [meta].[ECPropertyDef] [pd] ON [chabc].[TargetECInstanceId] = [pd].[Class].[Id]
+                        INNER JOIN [meta].[PropertyCustomAttribute] [pca] ON [pca].[Property].[Id] = [pd].[ECInstanceId]
+                        INNER JOIN [meta].[ECClassDef] [cacd] ON [cacd].[ECInstanceId] = [pca].[CustomAttributeClass].[Id]
+                    WHERE
+                        [cacd].[Name] = 'VolumeQuantity'
+                    UNION
+                    SELECT 
+                        [ge].[ECInstanceId], 
+                        [ge].[ECClassId],
+                        [pd].[Name] [PropertyName],
+                        json_extract([pca].[Instance], '$.VolumeQuantity.LevelOfInformation') [LevelOfInformation],
+                        cast(extract_prop([ea].[ECClassId], [ea].[ECInstanceId], [pd].[Name]) as double) [Value]
+                    FROM [bis].[GeometricElement3d] [ge]
+                        INNER JOIN [bis].[ElementUniqueAspect] [ea] ON [ea].[Element].[Id] = [ge].[ECInstanceId]
+                        INNER JOIN [meta].[ClassHasAllBaseClasses] [chabc] ON [ea].[ECClassId] = [chabc].[SourceECInstanceId]
+                        INNER JOIN [meta].[ECPropertyDef] [pd] ON [chabc].[TargetECInstanceId] = [pd].[Class].[Id]
+                        INNER JOIN [meta].[PropertyCustomAttribute] [pca] ON [pca].[Property].[Id] = [pd].[ECInstanceId]
+                        INNER JOIN [meta].[ECClassDef] [cacd] ON [cacd].[ECInstanceId] = [pca].[CustomAttributeClass].[Id]
+                    WHERE
+                        [cacd].[Name] = 'VolumeQuantity'
+                </Query>
+            </QueryView>
+        </ECCustomAttributes>
+        <ECProperty propertyName="PropertyName" typeName="string" />
+        <ECProperty propertyName="LevelOfInformation" typeName="string" />
+        <ECProperty propertyName="Value" typeName="double" kindOfQuantity="AECU:VOLUME"/>
+    </ECEntityClass>
+ </ECSchema>

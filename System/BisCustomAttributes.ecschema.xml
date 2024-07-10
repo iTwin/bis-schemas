@@ -3,7 +3,7 @@
 |  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
 |  * See LICENSE.md in the project root for license terms and full copyright notice.
 ======================================================================================= -->
-<ECSchema schemaName="BisCustomAttributes" alias="bisCA" version="01.00.00" description="Custom attributes to indicate BIS concepts." displayLabel="BIS Custom Attributes" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
+<ECSchema schemaName="BisCustomAttributes" alias="bisCA" version="01.00.01" description="Custom attributes to indicate BIS concepts." displayLabel="BIS Custom Attributes" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
     <ECEnumeration typeName="SchemaLayer" backingTypeName="string" isStrict="true" description="Defines the layers in the BIS schema hierarchy.">
         <ECEnumerator name="Core"               displayLabel="Core"                value="Core"               description="Layer for schemas that define the most fundamental concepts and key organizational strategies for all other BIS schemas."/>
         <ECEnumerator name="Common"             displayLabel="Common"              value="Common"             description="Layer for schemas that define abstract concepts and patterns used by multiple disciplines."/>
@@ -14,5 +14,37 @@
 
     <ECCustomAttributeClass typeName="SchemaLayerInfo" appliesTo="Schema" modifier="Sealed" description="Declares the target layer in the BIS schema hierarchy for a schema.">
         <ECProperty propertyName="Value" typeName="SchemaLayer" description="Layer in the BIS schema hierarchy that a schema targets." />
+    </ECCustomAttributeClass>
+
+    <ECEnumeration typeName="LengthQuantityKind" backingTypeName="string" isStrict="true" description="Defines the kind of linear measurement captured on an Entity.">
+        <ECEnumerator name="GreatestEndToEnd"   displayLabel="Length"       value="GreatestEndToEnd"    description="Measurement of an Entity from end to end; the greatest of its dimensions."/>
+        <ECEnumerator name="SideToSide"         displayLabel="Width"        value="SideToSide"          description="Measurement of an Entity from side to side."/>
+        <ECEnumerator name="BaseToTop"          displayLabel="Height"       value="BaseToTop"           description="Measurement of an Entity between its base and its top."/>
+        <ECEnumerator name="Perimeter"          displayLabel="Perimeter"    value="Perimeter"           description="Measurement of the outermost boundary of a plan-projected Entity."/>
+    </ECEnumeration>
+
+    <ECCustomAttributeClass typeName="LengthQuantity" appliesTo="AnyProperty" modifier="Sealed" description="Declares a property captures a linear measurement of an Entity.">
+        <ECProperty propertyName="Kind" typeName="LengthQuantityKind" description="Kind of linear measurement captured on an Entity." />
+    </ECCustomAttributeClass>
+
+    <ECEnumeration typeName="QuantityLevelOfInformation" backingTypeName="string" isStrict="true" description="Defines the levels of information for measurement values.">
+        <ECEnumerator name="Gross"       displayLabel="Gross"    value="Gross"   description="Level of information for measurement values without considering detailed deductions."/>
+        <ECEnumerator name="Net"         displayLabel="Net"      value="Net"     description="Level of information for measurement values considering detailed deductions."/>
+        <ECEnumerator name="Unspecified" displayLabel="Unknown"  value="Unknown" description="Unspecified level of information for measurement values."/>
+    </ECEnumeration>
+
+    <ECCustomAttributeClass typeName="VolumeQuantity" appliesTo="AnyProperty" modifier="Sealed" description="Declares a property captures a volumetric measurement of an Entity.">
+        <ECProperty propertyName="LevelOfInformation" typeName="QuantityLevelOfInformation" description="Level of information for the volumetric measurements captured by the property." />
+    </ECCustomAttributeClass>
+
+    <ECEnumeration typeName="AreaQuantityFace" backingTypeName="string" isStrict="true" description="Defines the faces of an Entity that area measurements are captured">
+        <ECEnumerator name="PlanProjected"  displayLabel="Plan Projection"  value="PlanProjected"   description="Declares that area measurements correspond to the projection of the Entity onto the X-Y plane."/>
+        <ECEnumerator name="Top"            displayLabel="Top"              value="Top"             description="Declares that area measurements correspond to the 3D/unprojected surfaces of the Entity visible from the top."/>
+        <ECEnumerator name="Sides"          displayLabel="Sides"            value="Sides"           description="Declares that area measurements correspond to the 3D/unprojected surfaces of the Entity visible any of its sides."/>
+    </ECEnumeration>
+
+    <ECCustomAttributeClass typeName="AreaQuantity" appliesTo="AnyProperty" modifier="Sealed" description="Declares a property captures an area measurement of an Entity.">
+        <ECProperty propertyName="Face" typeName="AreaQuantityFace" description="Face of an Entity that the area measurements captured by the property apply to." />
+        <ECProperty propertyName="LevelOfInformation" typeName="QuantityLevelOfInformation" description="Level of Information for the area measurements captured by the property." />
     </ECCustomAttributeClass>
 </ECSchema>
