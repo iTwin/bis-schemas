@@ -67,6 +67,8 @@ All other changes made outside of a domain group directory will require review b
     },
     ```
 
+    >NOTE: If a verifier is set as a required reviewer it is ok to set `verified` to `Yes` when you create the PR.  As their approval of the PR indicates that they have verified the schema.
+
 1. Update entry to fill out all fields correctly, the only optional field is 'comment'.
 1. Run [Bis Rule Validation](#bis-rule-validation) and [iModel Schema Validation](#imodel-schema-validation) on your new schema and make sure they pass.
 1. Create a PR to merge your branch into master
