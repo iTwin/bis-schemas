@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ==================================================================================
+|  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
+|  * See LICENSE.md in the project root for license terms and full copyright notice.
+======================================================================================= -->
+<ECSchema schemaName="SewerHydraulicAnalysisViews" alias="swrhydViews" version="01.00.00" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" displayLabel="BIS Core Views" description="Views that facilitate querying of derived concepts based on the StormSewerPhysical schema.">
+    <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
+    <ECSchemaReference name="BisCustomAttributes" version="01.00.01" alias="bisCA"/>
+    <ECSchemaReference name="ECDbMap" version="02.00.04" alias="ecdbmap"/>
+    <ECSchemaReference name="BisCore" version="01.00.11" alias="bis"/>
+    <ECSchemaReference name="SewerHydraulicAnalysis" version="01.00.00" alias="swrhyd"/>
+    <ECSchemaReference name="RoadRailUnits" version="01.00.01" alias="rru"/>
+
+    <ECCustomAttributes>
+        <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
+            <SupportedUse>NotForProduction</SupportedUse>
+        </ProductionStatus>
+        <SchemaLayerInfo xmlns="BisCustomAttributes.01.00.00">
+            <Value>DisciplinePhysical</Value>
+        </SchemaLayerInfo>
+    </ECCustomAttributes>
+
+    <ECEntityClass typeName="GravityStructureView" modifier="Abstract" displayLabel="Gravity Structure View" description="View that adds derived properties to the definition of a Pipe.">
+        <ECCustomAttributes>
+            <QueryView xmlns="ECDbMap.02.00.04">
+                <Query>
+                    SELECT 
+                        [g].[ECInstanceId],
+                        [g].[ECClassId],
+                        NAVIGATION_VALUE(swrhydViews.GravityStructureView.GravityStructure, [g].[ECInstanceId]),
+                        [a].[ECClassId] [ShapeClassId],
+                        [c].[DisplayLabel] [ShapeDisplayLabel]
+                    FROM
+                        [swrhyd].[GravityStructureShapeAspect] [a] 
+                        INNER JOIN [swrhyd].[GravityStructure] [g] ON [a].[Element].[Id] = [g].[ECInstanceId]
+                        INNER JOIN [meta].[ECClassDef] [c] ON [c].[ECInstanceId] = [a].[ECClassId]
+                </Query>
+            </QueryView>
+        </ECCustomAttributes>
+        <ECNavigationProperty propertyName="GravityStructure" relationshipName="ViewRefersToGravityStructure" direction="Forward">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03"/>
+            </ECCustomAttributes>
+        </ECNavigationProperty>
+        <ECProperty propertyName="ShapeClassId" typeName="long">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03"/>
+            </ECCustomAttributes>
+        </ECProperty>
+        <ECProperty propertyName="ShapeDisplayLabel" typeName="string" displayLabel="Structure Type" category="swrhyd:HydraulicData"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ViewRefersToGravityStructure" strength="referencing" modifier="None" strengthDirection="Backward">
+        <Source multiplicity="(0..1)" polymorphic="true" roleLabel="refers to">
+            <Class class="GravityStructureView"/>
+        </Source>
+        <Target multiplicity="(0..1)" polymorphic="true" roleLabel="is referenced by">
+            <Class class="swrhyd:GravityStructure"/>
+        </Target>
+    </ECRelationshipClass>
+ </ECSchema>
