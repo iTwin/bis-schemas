@@ -4,13 +4,13 @@
 |  * See LICENSE.md in the project root for license terms and full copyright notice.
 ======================================================================================= -->
 <ECSchema schemaName="CifSubsurfaceConflictAnalysis" alias="cifsscfan" version="01.00.08" description="iModel Connector schema containing aspect classes with properties from the Subsurface Utilities Engineering module as part of Civil Designer applications." xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
-    <ECSchemaReference name="BisCore" version="01.00.14" alias="bis"/>
+    <ECSchemaReference name="BisCore" version="01.00.16" alias="bis"/>
     <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
-    <ECSchemaReference name="CifCommon" version="01.00.03" alias="cifcmn"/>
-    <ECSchemaReference name="CifUnits" version="01.00.01" alias="cifu"/>
-    <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
+    <ECSchemaReference name="CifCommon" version="01.00.09" alias="cifcmn"/>
+    <ECSchemaReference name="CifUnits" version="01.00.08" alias="cifu"/>
+    <ECSchemaReference name="CoreCustomAttributes" version="01.00.04" alias="CoreCA"/>
     <ECCustomAttributes>
-        <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
+        <ProductionStatus xmlns="CoreCustomAttributes.01.00.04">
             <SupportedUse>NotForProduction</SupportedUse>
         </ProductionStatus>
         <SchemaLayerInfo xmlns="BisCustomAttributes.01.00.00">
@@ -42,6 +42,7 @@
         <ECEnumerator name="Temporary" value="4" displayLabel="Temporary"/>
         <ECEnumerator name="Under_Construction" value="5" displayLabel="Under Construction"/>
         <ECEnumerator name="Abandon_In_Place" value="6" displayLabel="Abandon In Place"/>
+        <ECEnumerator name="Abandon_Filled_In" value="7" displayLabel="Abandon Filled In"/>
     </ECEnumeration>
     <ECEnumeration typeName="BaseLink_Physical_SegmentShapeTypeAspect_SegmentShapeType_Enum" backingTypeName="int" isStrict="true">
         <ECEnumerator name="Circle" value="2" displayLabel="Circle"/>
@@ -83,6 +84,7 @@
         <ECEnumerator name="Temporary" value="4" displayLabel="Temporary"/>
         <ECEnumerator name="Under_Construction" value="5" displayLabel="Under Construction"/>
         <ECEnumerator name="Abandon_In_Place" value="6" displayLabel="Abandon In Place"/>
+        <ECEnumerator name="Abandon_Filled_In" value="7" displayLabel="Abandon Filled In"/>
     </ECEnumeration>
     <ECEnumeration typeName="CommunicationNode_NetworkDataAspect_CommNodeType_Enum" backingTypeName="int" isStrict="true">
         <ECEnumerator name="Access_Point" value="0" displayLabel="Access Point"/>
@@ -551,6 +553,12 @@
     <ECEntityClass typeName="BaseLinkAspect">
         <BaseClass>GlobalBase_SUE_Aspect</BaseClass>
         <ECProperty propertyName="ElevationReference" typeName="string" displayLabel="Elevation Reference" category="References_Utilities_References_Utilities" priority="0"/>
+        <ECProperty propertyName="StartBaselineFeature" typeName="string" displayLabel="Start Baseline Feature" category="References_Utilities_References_Utilities" priority="0"/>
+        <ECProperty propertyName="StartBaselineOffset" typeName="double" displayLabel="Start Baseline Offset" category="References_Utilities_References_Utilities" priority="0" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="StartBaselineStation" typeName="double" displayLabel="Start Baseline Station" category="References_Utilities_References_Utilities" priority="0" kindOfQuantity="cifu:STATION"/>
+        <ECProperty propertyName="StopBaselineFeature" typeName="string" displayLabel="Stop Baseline Feature" category="References_Utilities_References_Utilities" priority="0"/>
+        <ECProperty propertyName="StopBaselineOffset" typeName="double" displayLabel="Stop Baseline Offset" category="References_Utilities_References_Utilities" priority="0" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="StopBaselineStation" typeName="double" displayLabel="Stop Baseline Station" category="References_Utilities_References_Utilities" priority="0" kindOfQuantity="cifu:STATION"/>
     </ECEntityClass>
     <ECEntityClass typeName="BaseNode_HmiDataSetGeometryAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
@@ -575,90 +583,6 @@
         <ECProperty propertyName="NetworkData_UserDefinedNetworkType" typeName="string" displayLabel="Network Type (User Defined)" category="Utility_Data_Utilities_Utility_Data_Utilities" priority="0"/>
         <ECProperty propertyName="UtiltityOperationalStatus" typeName="BaseNode_NetworkDataAspect_UtiltityOperationalStatus_Enum" displayLabel="Operational Status" category="Utility_Data_Utilities_Utility_Data_Utilities" priority="0"/>
     </ECEntityClass>
-    <ECEntityClass typeName="BaseNode_PhysicalAspect">
-        <BaseClass>cifcmn:CivilPresentation</BaseClass>
-        <ECProperty propertyName="NodeLength" typeName="double" displayLabel="Length" category="Utility_Footprint_Utilities_Utility_Footprint_Utilities" priority="0" kindOfQuantity="cifu:LENGTH"/>
-        <ECProperty propertyName="NodeWidth" typeName="double" displayLabel="Width" category="Utility_Footprint_Utilities_Utility_Footprint_Utilities" priority="0" kindOfQuantity="cifu:LENGTH"/>
-        <ECProperty propertyName="Physical_Elevation" typeName="double" displayLabel="Elevation" category="Physical_Utilities_Physical_Utilities" priority="0" kindOfQuantity="cifu:ELEVATION"/>
-        <ECProperty propertyName="Physical_TopElevation" typeName="double" displayLabel="Elevation (Top)" category="Physical_Utilities_Physical_Utilities" priority="0" kindOfQuantity="cifu:ELEVATION"/>
-        <ECProperty propertyName="NodeMicroStationID" typeName="string" displayLabel="MicroStation 3D ID" category="General_Utilities_General_Utilities" priority="0"/>
-        <ECProperty propertyName="NodeMicroStation2dID" typeName="string" displayLabel="MicroStation 2D ID" category="General_Utilities_General_Utilities" priority="0"/>
-    </ECEntityClass>
-    <ECEntityClass typeName="BaseNodeAspect">
-        <BaseClass>GlobalBase_SUE_Aspect</BaseClass>
-        <ECProperty propertyName="BaselineFeature" typeName="string" displayLabel="Baseline Feature" category="References_Utilities_References_Utilities" priority="0"/>
-        <ECProperty propertyName="BaselineOffset" typeName="double" displayLabel="Baseline Offset" category="References_Utilities_References_Utilities" priority="0" kindOfQuantity="cifu:LENGTH"/>
-        <ECProperty propertyName="BaselineStation" typeName="double" displayLabel="Baseline Station" category="References_Utilities_References_Utilities" priority="0" kindOfQuantity="cifu:STATION"/>
-        <ECProperty propertyName="ElevationReference" typeName="string" displayLabel="Elevation Reference" category="References_Utilities_References_Utilities" priority="0"/>
-    </ECEntityClass>
-    <ECEntityClass typeName="CommunicationNode_NetworkDataAspect">
-        <BaseClass>cifcmn:CivilPresentation</BaseClass>
-        <ECProperty propertyName="CommunicationNetworkType" typeName="CommunicationNode_NetworkDataAspect_CommunicationNetworkType_Enum" displayLabel="Network Type" category="Utility_Data_Utilities_Utility_Data_Utilities" priority="0"/>
-        <ECProperty propertyName="CommNodeType" typeName="CommunicationNode_NetworkDataAspect_CommNodeType_Enum" displayLabel="Node Type" category="Utility_Data_Utilities_Utility_Data_Utilities" priority="0"/>
-    </ECEntityClass>
-    <ECEntityClass typeName="CommunicationNodeAspect">
-        <BaseClass>BaseNodeAspect</BaseClass>
-    </ECEntityClass>
-    <ECEntityClass typeName="CommunicationSegment_NetworkDataAspect">
-        <BaseClass>cifcmn:CivilPresentation</BaseClass>
-        <ECProperty propertyName="CommunicationNetworkType" typeName="CommunicationSegment_NetworkDataAspect_CommunicationNetworkType_Enum" displayLabel="Network Type" category="Utility_Data_Utilities_Utility_Data_Utilities" priority="0"/>
-        <ECProperty propertyName="CommSegmentType" typeName="CommunicationSegment_NetworkDataAspect_CommSegmentType_Enum" displayLabel="Function" category="Utility_Data_Utilities_Utility_Data_Utilities" priority="0"/>
-        <ECProperty propertyName="ComConduitType" typeName="CommunicationSegment_NetworkDataAspect_ComConduitType_Enum" displayLabel="Conduit Type" category="Utility_Data_Utilities_Utility_Data_Utilities" priority="0"/>
-    </ECEntityClass>
-    <ECEntityClass typeName="CommunicationSegmentAspect">
-        <BaseClass>BaseLinkAspect</BaseClass>
-    </ECEntityClass>
-    <ECEntityClass typeName="ConflictNode_ConflictAspect">
-        <BaseClass>cifcmn:CivilPresentation</BaseClass>
-        <ECProperty propertyName="Conflict_StartStation" typeName="double" displayLabel="Station (Start)" category="Geometry_Utilities_Geometry_Utilities" priority="0" kindOfQuantity="cifu:STATION"/>
-        <ECProperty propertyName="Conflict_StopStation" typeName="double" displayLabel="Station (Stop)" category="Geometry_Utilities_Geometry_Utilities" priority="0" kindOfQuantity="cifu:STATION"/>
-        <ECProperty propertyName="Conflict_LeftOffset" typeName="double" displayLabel="Offset (Left)" category="Geometry_Utilities_Geometry_Utilities" priority="0" kindOfQuantity="cifu:LENGTH"/>
-        <ECProperty propertyName="Conflict_RightOffset" typeName="double" displayLabel="Offset (Right)" category="Geometry_Utilities_Geometry_Utilities" priority="0" kindOfQuantity="cifu:LENGTH"/>
-        <ECProperty propertyName="Conflict_ResponsibleParty" typeName="string" displayLabel="Responsible Party" category="Utility_Data_Utilities_Utility_Data_Utilities" priority="0"/>
-        <ECProperty propertyName="Conflict_Conflicter" typeName="int" displayLabel="Feature A" category="Utility_Data_Subsurface_Utilities_Utility_Data_Subsurface_Utilities" priority="0"/>
-        <ECProperty propertyName="Conflict_Conflictee" typeName="int" displayLabel="Feature B" category="Utility_Data_Subsurface_Utilities_Utility_Data_Subsurface_Utilities" priority="0"/>
-        <ECProperty propertyName="Conflict_Elevation" typeName="double" displayLabel="Elevation" category="Geometry_Utilities_Geometry_Utilities" priority="0" kindOfQuantity="cifu:ELEVATION"/>
-        <ECProperty propertyName="CurrentStatus" typeName="ConflictNode_ConflictAspect_CurrentStatus_Enum" displayLabel="Current Status" category="Utility_Data_Utilities_Utility_Data_Utilities" priority="0"/>
-        <ECProperty propertyName="RecommendedResolution" typeName="ConflictNode_ConflictAspect_RecommendedResolution_Enum" displayLabel="Recommended Resolution" category="Utility_Data_Utilities_Utility_Data_Utilities" priority="0"/>
-        <ECProperty propertyName="OtherResolutionDescription" typeName="string" displayLabel="Other Resolution Description" category="Utility_Data_Utilities_Utility_Data_Utilities" priority="0"/>
-        <ECProperty propertyName="ConflictType" typeName="ConflictNode_ConflictAspect_ConflictType_Enum" displayLabel="Conflict Type" category="Utility_Data_Utilities_Utility_Data_Utilities" priority="0"/>
-        <ECProperty propertyName="RequiresTestHole" typeName="boolean" displayLabel="Requires Test Hole?" category="Utility_Data_Utilities_Utility_Data_Utilities" priority="0"/>
-        <ECProperty propertyName="NodeMicroStationID" typeName="string" displayLabel="MicroStation 3D ID" category="General_Utilities_General_Utilities" priority="0"/>
-        <ECProperty propertyName="NodeMicroStation2dID" typeName="string" displayLabel="MicroStation 2D ID" category="General_Utilities_General_Utilities" priority="0"/>
-        <ECProperty propertyName="ConflicteeName" typeName="string" displayLabel="Conflictee (Feature A)" category="Utility_Data_Utilities_Utility_Data_Utilities" priority="0"/>
-        <ECProperty propertyName="ConflicterName" typeName="string" displayLabel="Conflicter (Feature B)" category="Utility_Data_Utilities_Utility_Data_Utilities" priority="0"/>
-    </ECEntityClass>
-    <ECEntityClass typeName="ConflictNode_HmiDataSetGeometryAspect">
-        <BaseClass>cifcmn:CivilPresentation</BaseClass>
-        <ECProperty propertyName="FeatureA_QualityLevel" typeName="ConflictNode_HmiDataSetGeometryAspect_FeatureA_QualityLevel_Enum" displayLabel="Quality Level (Feature A)" category="Utility_Data_Utilities_Utility_Data_Utilities" priority="0"/>
-        <ECProperty propertyName="FeatureB_QualityLevel" typeName="ConflictNode_HmiDataSetGeometryAspect_FeatureB_QualityLevel_Enum" displayLabel="Quality Level (Feature B)" category="Utility_Data_Utilities_Utility_Data_Utilities" priority="0"/>
-    </ECEntityClass>
-    <ECEntityClass typeName="ConflictNodeAspect">
-        <BaseClass>GlobalBase_SUE_Aspect</BaseClass>
-        <ECProperty propertyName="BaselineFeature" typeName="string" displayLabel="Baseline Feature" category="References_Utilities_References_Utilities" priority="0"/>
-        <ECProperty propertyName="BaselineOffset" typeName="double" displayLabel="Baseline Offset" category="References_Utilities_References_Utilities" priority="0" kindOfQuantity="cifu:ELEVATION"/>
-        <ECProperty propertyName="BaselineStation" typeName="double" displayLabel="Baseline Station" category="References_Utilities_References_Utilities" priority="0" kindOfQuantity="cifu:ELEVATION"/>
-        <ECProperty propertyName="ElevationReference" typeName="string" displayLabel="Elevation Reference" category="References_Utilities_References_Utilities" priority="0"/>
-        <ECProperty propertyName="FeatureDefinitionA" typeName="string" displayLabel="Feature Definition (A)" category="Utility_Data_Utilities_Utility_Data_Utilities" priority="0"/>
-        <ECProperty propertyName="FeatureDefinitionB" typeName="string" displayLabel="Feature Definition (B)" category="Utility_Data_Utilities_Utility_Data_Utilities" priority="0"/>
-    </ECEntityClass>
-    <ECEntityClass typeName="ElectricalNode_NetworkDataAspect">
-        <BaseClass>cifcmn:CivilPresentation</BaseClass>
-        <ECProperty propertyName="ElectricNetworkType" typeName="ElectricalNode_NetworkDataAspect_ElectricNetworkType_Enum" displayLabel="Network Type" category="Utility_Data_Utilities_Utility_Data_Utilities" priority="0"/>
-        <ECProperty propertyName="ElectricNodeDataType" typeName="ElectricalNode_NetworkDataAspect_ElectricNodeDataType_Enum" displayLabel="Node Type" category="Utility_Data_Utilities_Utility_Data_Utilities" priority="0"/>
-    </ECEntityClass>
-    <ECEntityClass typeName="ElectricalNodeAspect">
-        <BaseClass>BaseNodeAspect</BaseClass>
-    </ECEntityClass>
-    <ECEntityClass typeName="ElectricalSegment_NetworkDataAspect">
-        <BaseClass>cifcmn:CivilPresentation</BaseClass>
-        <ECProperty propertyName="ElectricNetworkType" typeName="ElectricalSegment_NetworkDataAspect_ElectricNetworkType_Enum" displayLabel="Network Type" category="Utility_Data_Utilities_Utility_Data_Utilities" priority="0"/>
-        <ECProperty propertyName="ElectricSegmentType" typeName="ElectricalSegment_NetworkDataAspect_ElectricSegmentType_Enum" displayLabel="Function" category="Utility_Data_Utilities_Utility_Data_Utilities" priority="0"/>
-        <ECProperty propertyName="ElectricConduitType" typeName="ElectricalSegment_NetworkDataAspect_ElectricConduitType_Enum" displayLabel="Conduit Type" category="Utility_Data_Utilities_Utility_Data_Utilities" priority="0"/>
-    </ECEntityClass>
-    <ECEntityClass typeName="ElectricalSegmentAspect">
-        <BaseClass>BaseLinkAspect</BaseClass>
-    </ECEntityClass>
     <ECEntityClass typeName="BaseNode_Physical_Conduit1Aspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
         <ECProperty propertyName="Conduit1Label" typeName="string" displayLabel="Conduit 1 Label" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
@@ -667,7 +591,7 @@
         <ECProperty propertyName="Conduit1Size" typeName="double" displayLabel="Conduit 1 Size" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:LENGTH_DIAMETER"/>
         <ECProperty propertyName="Conduit1Invert" typeName="double" displayLabel="Conduit 1 Invert" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ELEVATION"/>
         <ECProperty propertyName="Conduit1Angle" typeName="double" displayLabel="Conduit 1 Angle" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ANGLE"/>
-		<ECProperty propertyName="Conduit1UtilityID" typeName="int" displayLabel="Conduit 1 Utility ID" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Conduit1UtilityID" typeName="int" displayLabel="Conduit 1 Utility ID" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
     </ECEntityClass>
     <ECEntityClass typeName="BaseNode_Physical_Conduit2Aspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
@@ -677,7 +601,7 @@
         <ECProperty propertyName="Conduit2Size" typeName="double" displayLabel="Conduit 2 Size" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:LENGTH_DIAMETER"/>
         <ECProperty propertyName="Conduit2Invert" typeName="double" displayLabel="Conduit 2 Invert" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ELEVATION"/>
         <ECProperty propertyName="Conduit2Angle" typeName="double" displayLabel="Conduit 2 Angle" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ANGLE"/>
-		<ECProperty propertyName="Conduit2UtilityID" typeName="int" displayLabel="Conduit 2 Utility ID" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Conduit2UtilityID" typeName="int" displayLabel="Conduit 2 Utility ID" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
     </ECEntityClass>
     <ECEntityClass typeName="BaseNode_Physical_Conduit3Aspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
@@ -687,7 +611,7 @@
         <ECProperty propertyName="Conduit3Size" typeName="double" displayLabel="Conduit 3 Size" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:LENGTH_DIAMETER"/>
         <ECProperty propertyName="Conduit3Invert" typeName="double" displayLabel="Conduit 3 Invert" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ELEVATION"/>
         <ECProperty propertyName="Conduit3Angle" typeName="double" displayLabel="Conduit 3 Angle" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ANGLE"/>
-		<ECProperty propertyName="Conduit3UtilityID" typeName="int" displayLabel="Conduit 3 Utility ID" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Conduit3UtilityID" typeName="int" displayLabel="Conduit 3 Utility ID" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
     </ECEntityClass>
     <ECEntityClass typeName="BaseNode_Physical_Conduit4Aspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
@@ -697,7 +621,7 @@
         <ECProperty propertyName="Conduit4Size" typeName="double" displayLabel="Conduit 4 Size" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:LENGTH_DIAMETER"/>
         <ECProperty propertyName="Conduit4Invert" typeName="double" displayLabel="Conduit 4 Invert" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ELEVATION"/>
         <ECProperty propertyName="Conduit4Angle" typeName="double" displayLabel="Conduit 4 Angle" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ANGLE"/>
-		<ECProperty propertyName="Conduit4UtilityID" typeName="int" displayLabel="Conduit 4 Utility ID" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Conduit4UtilityID" typeName="int" displayLabel="Conduit 4 Utility ID" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
     </ECEntityClass>
     <ECEntityClass typeName="BaseNode_Physical_Conduit5Aspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
@@ -707,7 +631,7 @@
         <ECProperty propertyName="Conduit5Size" typeName="double" displayLabel="Conduit 5 Size" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:LENGTH_DIAMETER"/>
         <ECProperty propertyName="Conduit5Invert" typeName="double" displayLabel="Conduit 5 Invert" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ELEVATION"/>
         <ECProperty propertyName="Conduit5Angle" typeName="double" displayLabel="Conduit 5 Angle" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ANGLE"/>
-		<ECProperty propertyName="Conduit5UtilityID" typeName="int" displayLabel="Conduit 5 Utility ID" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Conduit5UtilityID" typeName="int" displayLabel="Conduit 5 Utility ID" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
     </ECEntityClass>
     <ECEntityClass typeName="BaseNode_Physical_Conduit6Aspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
@@ -717,7 +641,7 @@
         <ECProperty propertyName="Conduit6Size" typeName="double" displayLabel="Conduit 6 Size" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:LENGTH_DIAMETER"/>
         <ECProperty propertyName="Conduit6Invert" typeName="double" displayLabel="Conduit 6 Invert" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ELEVATION"/>
         <ECProperty propertyName="Conduit6Angle" typeName="double" displayLabel="Conduit 6 Angle" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ANGLE"/>
-		<ECProperty propertyName="Conduit6UtilityID" typeName="int" displayLabel="Conduit 6 Utility ID" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Conduit6UtilityID" typeName="int" displayLabel="Conduit 6 Utility ID" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
     </ECEntityClass>
     <ECEntityClass typeName="BaseNode_Physical_Conduit7Aspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
@@ -727,7 +651,7 @@
         <ECProperty propertyName="Conduit7Size" typeName="double" displayLabel="Conduit 7 Size" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:LENGTH_DIAMETER"/>
         <ECProperty propertyName="Conduit7Invert" typeName="double" displayLabel="Conduit 7 Invert" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ELEVATION"/>
         <ECProperty propertyName="Conduit7Angle" typeName="double" displayLabel="Conduit 7 Angle" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ANGLE"/>
-		<ECProperty propertyName="Conduit7UtilityID" typeName="int" displayLabel="Conduit 7 Utility ID" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Conduit7UtilityID" typeName="int" displayLabel="Conduit 7 Utility ID" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
     </ECEntityClass>
     <ECEntityClass typeName="BaseNode_Physical_Conduit8Aspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
@@ -737,88 +661,218 @@
         <ECProperty propertyName="Conduit8Size" typeName="double" displayLabel="Conduit 8 Size" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:LENGTH_DIAMETER"/>
         <ECProperty propertyName="Conduit8Invert" typeName="double" displayLabel="Conduit 8 Invert" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ELEVATION"/>
         <ECProperty propertyName="Conduit8Angle" typeName="double" displayLabel="Conduit 8 Angle" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ANGLE"/>
-		<ECProperty propertyName="Conduit8UtilityID" typeName="int" displayLabel="Conduit 8 Utility ID" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Conduit8UtilityID" typeName="int" displayLabel="Conduit 8 Utility ID" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
     </ECEntityClass>
-	<ECEntityClass typeName="BaseNode_Physical_Outgoing1Aspect">
-		<BaseClass>cifcmn:CivilPresentation</BaseClass>
-		<ECProperty propertyName="Outgoing1Label" typeName="string" displayLabel="Outgoing 1 Label" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
-		<ECProperty propertyName="Outgoing1SectionType" typeName="string" displayLabel="Outgoing 1 Section Type" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
-		<ECProperty propertyName="Outgoing1FeatureDefinitionDescription" typeName="string" displayLabel="Outgoing 1 Feature Definition Description" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
-		<ECProperty propertyName="Outgoing1Size" typeName="double" displayLabel="Outgoing 1 Size" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:LENGTH_DIAMETER"/>
-		<ECProperty propertyName="Outgoing1Invert" typeName="double" displayLabel="Outgoing 1 Invert" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ELEVATION"/>
-		<ECProperty propertyName="Outgoing1Angle" typeName="double" displayLabel="Outgoing 1 Angle" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ANGLE"/>
-		<ECProperty propertyName="Outgoing1UtilityID" typeName="int" displayLabel="Outgoing 1 Utility ID" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
-	</ECEntityClass>
-	<ECEntityClass typeName="BaseNode_Physical_Outgoing2Aspect">
-		<BaseClass>cifcmn:CivilPresentation</BaseClass>
-		<ECProperty propertyName="Outgoing2Label" typeName="string" displayLabel="Outgoing 2 Label" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
-		<ECProperty propertyName="Outgoing2SectionType" typeName="string" displayLabel="Outgoing 2 Section Type" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
-		<ECProperty propertyName="Outgoing2FeatureDefinitionDescription" typeName="string" displayLabel="Outgoing 2 Feature Definition Description" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
-		<ECProperty propertyName="Outgoing2Size" typeName="double" displayLabel="Outgoing 2 Size" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:LENGTH_DIAMETER"/>
-		<ECProperty propertyName="Outgoing2Invert" typeName="double" displayLabel="Outgoing 2 Invert" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ELEVATION"/>
-		<ECProperty propertyName="Outgoing2Angle" typeName="double" displayLabel="Outgoing 2 Angle" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ANGLE"/>
-		<ECProperty propertyName="Outgoing2UtilityID" typeName="int" displayLabel="Outgoing 2 Utility ID" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
-	</ECEntityClass>
-	<ECEntityClass typeName="BaseNode_Physical_Outgoing3Aspect">
-		<BaseClass>cifcmn:CivilPresentation</BaseClass>
-		<ECProperty propertyName="Outgoing3Label" typeName="string" displayLabel="Outgoing 3 Label" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
-		<ECProperty propertyName="Outgoing3SectionType" typeName="string" displayLabel="Outgoing 3 Section Type" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
-		<ECProperty propertyName="Outgoing3FeatureDefinitionDescription" typeName="string" displayLabel="Outgoing 3 Feature Definition Description" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
-		<ECProperty propertyName="Outgoing3Size" typeName="double" displayLabel="Outgoing 3 Size" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:LENGTH_DIAMETER"/>
-		<ECProperty propertyName="Outgoing3Invert" typeName="double" displayLabel="Outgoing 3 Invert" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ELEVATION"/>
-		<ECProperty propertyName="Outgoing3Angle" typeName="double" displayLabel="Outgoing 3 Angle" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ANGLE"/>
-		<ECProperty propertyName="Outgoing3UtilityID" typeName="int" displayLabel="Outgoing 3 Utility ID" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
-	</ECEntityClass>
-	<ECEntityClass typeName="BaseNode_Physical_Outgoing4Aspect">
-		<BaseClass>cifcmn:CivilPresentation</BaseClass>
-		<ECProperty propertyName="Outgoing4Label" typeName="string" displayLabel="Outgoing 4 Label" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
-		<ECProperty propertyName="Outgoing4SectionType" typeName="string" displayLabel="Outgoing 4 Section Type" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
-		<ECProperty propertyName="Outgoing4FeatureDefinitionDescription" typeName="string" displayLabel="Outgoing 4 Feature Definition Description" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
-		<ECProperty propertyName="Outgoing4Size" typeName="double" displayLabel="Outgoing 4 Size" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:LENGTH_DIAMETER"/>
-		<ECProperty propertyName="Outgoing4Invert" typeName="double" displayLabel="Outgoing 4 Invert" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ELEVATION"/>
-		<ECProperty propertyName="Outgoing4Angle" typeName="double" displayLabel="Outgoing 4 Angle" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ANGLE"/>
-		<ECProperty propertyName="Outgoing4UtilityID" typeName="int" displayLabel="Outgoing 4 Utility ID" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
-	</ECEntityClass>
-	<ECEntityClass typeName="BaseNode_Physical_Outgoing5Aspect">
-		<BaseClass>cifcmn:CivilPresentation</BaseClass>
-		<ECProperty propertyName="Outgoing5Label" typeName="string" displayLabel="Outgoing 5 Label" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
-		<ECProperty propertyName="Outgoing5SectionType" typeName="string" displayLabel="Outgoing 5 Section Type" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
-		<ECProperty propertyName="Outgoing5FeatureDefinitionDescription" typeName="string" displayLabel="Outgoing 5 Feature Definition Description" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
-		<ECProperty propertyName="Outgoing5Size" typeName="double" displayLabel="Outgoing 5 Size" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:LENGTH_DIAMETER"/>
-		<ECProperty propertyName="Outgoing5Invert" typeName="double" displayLabel="Outgoing 5 Invert" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ELEVATION"/>
-		<ECProperty propertyName="Outgoing5Angle" typeName="double" displayLabel="Outgoing 5 Angle" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ANGLE"/>
-		<ECProperty propertyName="Outgoing5UtilityID" typeName="int" displayLabel="Outgoing 5 Utility ID" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
-	</ECEntityClass>
-	<ECEntityClass typeName="BaseNode_Physical_Outgoing6Aspect">
-		<BaseClass>cifcmn:CivilPresentation</BaseClass>
-		<ECProperty propertyName="Outgoing6Label" typeName="string" displayLabel="Outgoing 6 Label" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
-		<ECProperty propertyName="Outgoing6SectionType" typeName="string" displayLabel="Outgoing 6 Section Type" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
-		<ECProperty propertyName="Outgoing6FeatureDefinitionDescription" typeName="string" displayLabel="Outgoing 6 Feature Definition Description" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
-		<ECProperty propertyName="Outgoing6Size" typeName="double" displayLabel="Outgoing 6 Size" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:LENGTH_DIAMETER"/>
-		<ECProperty propertyName="Outgoing6Invert" typeName="double" displayLabel="Outgoing 6 Invert" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ELEVATION"/>
-		<ECProperty propertyName="Outgoing6Angle" typeName="double" displayLabel="Outgoing 6 Angle" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ANGLE"/>
-		<ECProperty propertyName="Outgoing6UtilityID" typeName="int" displayLabel="Outgoing 6 Utility ID" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
-	</ECEntityClass>
-	<ECEntityClass typeName="BaseNode_Physical_Outgoing7Aspect">
-		<BaseClass>cifcmn:CivilPresentation</BaseClass>
-		<ECProperty propertyName="Outgoing7Label" typeName="string" displayLabel="Outgoing 7 Label" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
-		<ECProperty propertyName="Outgoing7SectionType" typeName="string" displayLabel="Outgoing 7 Section Type" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
-		<ECProperty propertyName="Outgoing7FeatureDefinitionDescription" typeName="string" displayLabel="Outgoing 7 Feature Definition Description" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
-		<ECProperty propertyName="Outgoing7Size" typeName="double" displayLabel="Outgoing 7 Size" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:LENGTH_DIAMETER"/>
-		<ECProperty propertyName="Outgoing7Invert" typeName="double" displayLabel="Outgoing 7 Invert" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ELEVATION"/>
-		<ECProperty propertyName="Outgoing7Angle" typeName="double" displayLabel="Outgoing 7 Angle" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ANGLE"/>
-		<ECProperty propertyName="Outgoing7UtilityID" typeName="int" displayLabel="Outgoing 7 Utility ID" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
-	</ECEntityClass>
-	<ECEntityClass typeName="BaseNode_Physical_Outgoing8Aspect">
-		<BaseClass>cifcmn:CivilPresentation</BaseClass>
-		<ECProperty propertyName="Outgoing8Label" typeName="string" displayLabel="Outgoing 8 Label" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
-		<ECProperty propertyName="Outgoing8SectionType" typeName="string" displayLabel="Outgoing 8 Section Type" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
-		<ECProperty propertyName="Outgoing8FeatureDefinitionDescription" typeName="string" displayLabel="Outgoing 8 Feature Definition Description" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
-		<ECProperty propertyName="Outgoing8Size" typeName="double" displayLabel="Outgoing 8 Size" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:LENGTH_DIAMETER"/>
-		<ECProperty propertyName="Outgoing8Invert" typeName="double" displayLabel="Outgoing 8 Invert" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ELEVATION"/>
-		<ECProperty propertyName="Outgoing8Angle" typeName="double" displayLabel="Outgoing 8 Angle" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ANGLE"/>
-		<ECProperty propertyName="Outgoing8UtilityID" typeName="int" displayLabel="Outgoing 8 Utility ID" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
-	</ECEntityClass>
+    <ECEntityClass typeName="BaseNode_Physical_Outgoing1Aspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="Outgoing1Label" typeName="string" displayLabel="Outgoing 1 Label" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Outgoing1SectionType" typeName="string" displayLabel="Outgoing 1 Section Type" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Outgoing1FeatureDefinitionDescription" typeName="string" displayLabel="Outgoing 1 Feature Definition Description" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Outgoing1Size" typeName="double" displayLabel="Outgoing 1 Size" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:LENGTH_DIAMETER"/>
+        <ECProperty propertyName="Outgoing1Invert" typeName="double" displayLabel="Outgoing 1 Invert" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ELEVATION"/>
+        <ECProperty propertyName="Outgoing1Angle" typeName="double" displayLabel="Outgoing 1 Angle" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ANGLE"/>
+        <ECProperty propertyName="Outgoing1UtilityID" typeName="int" displayLabel="Outgoing 1 Utility ID" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+    </ECEntityClass>
+    <ECEntityClass typeName="BaseNode_Physical_Outgoing2Aspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="Outgoing2Label" typeName="string" displayLabel="Outgoing 2 Label" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Outgoing2SectionType" typeName="string" displayLabel="Outgoing 2 Section Type" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Outgoing2FeatureDefinitionDescription" typeName="string" displayLabel="Outgoing 2 Feature Definition Description" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Outgoing2Size" typeName="double" displayLabel="Outgoing 2 Size" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:LENGTH_DIAMETER"/>
+        <ECProperty propertyName="Outgoing2Invert" typeName="double" displayLabel="Outgoing 2 Invert" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ELEVATION"/>
+        <ECProperty propertyName="Outgoing2Angle" typeName="double" displayLabel="Outgoing 2 Angle" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ANGLE"/>
+        <ECProperty propertyName="Outgoing2UtilityID" typeName="int" displayLabel="Outgoing 2 Utility ID" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+    </ECEntityClass>
+    <ECEntityClass typeName="BaseNode_Physical_Outgoing3Aspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="Outgoing3Label" typeName="string" displayLabel="Outgoing 3 Label" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Outgoing3SectionType" typeName="string" displayLabel="Outgoing 3 Section Type" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Outgoing3FeatureDefinitionDescription" typeName="string" displayLabel="Outgoing 3 Feature Definition Description" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Outgoing3Size" typeName="double" displayLabel="Outgoing 3 Size" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:LENGTH_DIAMETER"/>
+        <ECProperty propertyName="Outgoing3Invert" typeName="double" displayLabel="Outgoing 3 Invert" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ELEVATION"/>
+        <ECProperty propertyName="Outgoing3Angle" typeName="double" displayLabel="Outgoing 3 Angle" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ANGLE"/>
+        <ECProperty propertyName="Outgoing3UtilityID" typeName="int" displayLabel="Outgoing 3 Utility ID" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+    </ECEntityClass>
+    <ECEntityClass typeName="BaseNode_Physical_Outgoing4Aspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="Outgoing4Label" typeName="string" displayLabel="Outgoing 4 Label" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Outgoing4SectionType" typeName="string" displayLabel="Outgoing 4 Section Type" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Outgoing4FeatureDefinitionDescription" typeName="string" displayLabel="Outgoing 4 Feature Definition Description" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Outgoing4Size" typeName="double" displayLabel="Outgoing 4 Size" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:LENGTH_DIAMETER"/>
+        <ECProperty propertyName="Outgoing4Invert" typeName="double" displayLabel="Outgoing 4 Invert" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ELEVATION"/>
+        <ECProperty propertyName="Outgoing4Angle" typeName="double" displayLabel="Outgoing 4 Angle" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ANGLE"/>
+        <ECProperty propertyName="Outgoing4UtilityID" typeName="int" displayLabel="Outgoing 4 Utility ID" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+    </ECEntityClass>
+    <ECEntityClass typeName="BaseNode_Physical_Outgoing5Aspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="Outgoing5Label" typeName="string" displayLabel="Outgoing 5 Label" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Outgoing5SectionType" typeName="string" displayLabel="Outgoing 5 Section Type" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Outgoing5FeatureDefinitionDescription" typeName="string" displayLabel="Outgoing 5 Feature Definition Description" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Outgoing5Size" typeName="double" displayLabel="Outgoing 5 Size" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:LENGTH_DIAMETER"/>
+        <ECProperty propertyName="Outgoing5Invert" typeName="double" displayLabel="Outgoing 5 Invert" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ELEVATION"/>
+        <ECProperty propertyName="Outgoing5Angle" typeName="double" displayLabel="Outgoing 5 Angle" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ANGLE"/>
+        <ECProperty propertyName="Outgoing5UtilityID" typeName="int" displayLabel="Outgoing 5 Utility ID" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+    </ECEntityClass>
+    <ECEntityClass typeName="BaseNode_Physical_Outgoing6Aspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="Outgoing6Label" typeName="string" displayLabel="Outgoing 6 Label" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Outgoing6SectionType" typeName="string" displayLabel="Outgoing 6 Section Type" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Outgoing6FeatureDefinitionDescription" typeName="string" displayLabel="Outgoing 6 Feature Definition Description" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Outgoing6Size" typeName="double" displayLabel="Outgoing 6 Size" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:LENGTH_DIAMETER"/>
+        <ECProperty propertyName="Outgoing6Invert" typeName="double" displayLabel="Outgoing 6 Invert" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ELEVATION"/>
+        <ECProperty propertyName="Outgoing6Angle" typeName="double" displayLabel="Outgoing 6 Angle" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ANGLE"/>
+        <ECProperty propertyName="Outgoing6UtilityID" typeName="int" displayLabel="Outgoing 6 Utility ID" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+    </ECEntityClass>
+    <ECEntityClass typeName="BaseNode_Physical_Outgoing7Aspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="Outgoing7Label" typeName="string" displayLabel="Outgoing 7 Label" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Outgoing7SectionType" typeName="string" displayLabel="Outgoing 7 Section Type" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Outgoing7FeatureDefinitionDescription" typeName="string" displayLabel="Outgoing 7 Feature Definition Description" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Outgoing7Size" typeName="double" displayLabel="Outgoing 7 Size" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:LENGTH_DIAMETER"/>
+        <ECProperty propertyName="Outgoing7Invert" typeName="double" displayLabel="Outgoing 7 Invert" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ELEVATION"/>
+        <ECProperty propertyName="Outgoing7Angle" typeName="double" displayLabel="Outgoing 7 Angle" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ANGLE"/>
+        <ECProperty propertyName="Outgoing7UtilityID" typeName="int" displayLabel="Outgoing 7 Utility ID" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+    </ECEntityClass>
+    <ECEntityClass typeName="BaseNode_Physical_Outgoing8Aspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="Outgoing8Label" typeName="string" displayLabel="Outgoing 8 Label" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Outgoing8SectionType" typeName="string" displayLabel="Outgoing 8 Section Type" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Outgoing8FeatureDefinitionDescription" typeName="string" displayLabel="Outgoing 8 Feature Definition Description" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Outgoing8Size" typeName="double" displayLabel="Outgoing 8 Size" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:LENGTH_DIAMETER"/>
+        <ECProperty propertyName="Outgoing8Invert" typeName="double" displayLabel="Outgoing 8 Invert" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ELEVATION"/>
+        <ECProperty propertyName="Outgoing8Angle" typeName="double" displayLabel="Outgoing 8 Angle" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ANGLE"/>
+        <ECProperty propertyName="Outgoing8UtilityID" typeName="int" displayLabel="Outgoing 8 Utility ID" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+    </ECEntityClass>
+    <ECEntityClass typeName="BaseNode_PhysicalAspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="NodeLength" typeName="double" displayLabel="Length" category="Utility_Footprint_Utilities_Utility_Footprint_Utilities" priority="0" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="NodeWidth" typeName="double" displayLabel="Width" category="Utility_Footprint_Utilities_Utility_Footprint_Utilities" priority="0" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="Physical_Elevation" typeName="double" displayLabel="Elevation" category="Physical_Utilities_Physical_Utilities" priority="0" kindOfQuantity="cifu:ELEVATION"/>
+        <ECProperty propertyName="Physical_TopElevation" typeName="double" displayLabel="Elevation (Top)" category="Physical_Utilities_Physical_Utilities" priority="0" kindOfQuantity="cifu:ELEVATION"/>
+        <ECProperty propertyName="NodeMicroStationID" typeName="string" displayLabel="MicroStation 3D ID" category="General_Utilities_General_Utilities" priority="0"/>
+        <ECProperty propertyName="NodeMicroStation2dID" typeName="string" displayLabel="MicroStation 2D ID" category="General_Utilities_General_Utilities" priority="0"/>
+        <ECProperty propertyName="Conduit1Label" typeName="string" displayLabel="Conduit 1 Label" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Conduit1SectionType" typeName="string" displayLabel="Conduit 1 Section Type" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Conduit1FeatureDefinitionDescription" typeName="string" displayLabel="Conduit 1 Feature Definition Description" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Conduit1Size" typeName="double" displayLabel="Conduit 1 Size" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:LENGTH_DIAMETER"/>
+        <ECProperty propertyName="Conduit1Invert" typeName="double" displayLabel="Conduit 1 Invert" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ELEVATION"/>
+        <ECProperty propertyName="Conduit1Angle" typeName="double" displayLabel="Conduit 1 Angle" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ANGLE"/>
+        <ECProperty propertyName="Conduit1UtilityID" typeName="int" displayLabel="Conduit 1 Utility ID" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Conduit2Label" typeName="string" displayLabel="Conduit 2 Label" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Conduit2SectionType" typeName="string" displayLabel="Conduit 2 Section Type" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Conduit2FeatureDefinitionDescription" typeName="string" displayLabel="Conduit 2 Feature Definition Description" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Conduit2Size" typeName="double" displayLabel="Conduit 2 Size" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:LENGTH_DIAMETER"/>
+        <ECProperty propertyName="Conduit2Invert" typeName="double" displayLabel="Conduit 2 Invert" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ELEVATION"/>
+        <ECProperty propertyName="Conduit2Angle" typeName="double" displayLabel="Conduit 2 Angle" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ANGLE"/>
+        <ECProperty propertyName="Conduit2UtilityID" typeName="int" displayLabel="Conduit 2 Utility ID" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Conduit3Label" typeName="string" displayLabel="Conduit 3 Label" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Conduit3SectionType" typeName="string" displayLabel="Conduit 3 Section Type" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Conduit3FeatureDefinitionDescription" typeName="string" displayLabel="Conduit 3 Feature Definition Description" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Conduit3Size" typeName="double" displayLabel="Conduit 3 Size" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:LENGTH_DIAMETER"/>
+        <ECProperty propertyName="Conduit3Invert" typeName="double" displayLabel="Conduit 3 Invert" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ELEVATION"/>
+        <ECProperty propertyName="Conduit3Angle" typeName="double" displayLabel="Conduit 3 Angle" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ANGLE"/>
+        <ECProperty propertyName="Conduit3UtilityID" typeName="int" displayLabel="Conduit 3 Utility ID" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Conduit4Label" typeName="string" displayLabel="Conduit 4 Label" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Conduit4SectionType" typeName="string" displayLabel="Conduit 4 Section Type" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Conduit4FeatureDefinitionDescription" typeName="string" displayLabel="Conduit 4 Feature Definition Description" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Conduit4Size" typeName="double" displayLabel="Conduit 4 Size" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:LENGTH_DIAMETER"/>
+        <ECProperty propertyName="Conduit4Invert" typeName="double" displayLabel="Conduit 4 Invert" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ELEVATION"/>
+        <ECProperty propertyName="Conduit4Angle" typeName="double" displayLabel="Conduit 4 Angle" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ANGLE"/>
+        <ECProperty propertyName="Conduit4UtilityID" typeName="int" displayLabel="Conduit 4 Utility ID" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Conduit5Label" typeName="string" displayLabel="Conduit 5 Label" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Conduit5SectionType" typeName="string" displayLabel="Conduit 5 Section Type" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Conduit5FeatureDefinitionDescription" typeName="string" displayLabel="Conduit 5 Feature Definition Description" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Conduit5Size" typeName="double" displayLabel="Conduit 5 Size" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:LENGTH_DIAMETER"/>
+        <ECProperty propertyName="Conduit5Invert" typeName="double" displayLabel="Conduit 5 Invert" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ELEVATION"/>
+        <ECProperty propertyName="Conduit5Angle" typeName="double" displayLabel="Conduit 5 Angle" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ANGLE"/>
+        <ECProperty propertyName="Conduit5UtilityID" typeName="int" displayLabel="Conduit 5 Utility ID" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Conduit6Label" typeName="string" displayLabel="Conduit 6 Label" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Conduit6SectionType" typeName="string" displayLabel="Conduit 6 Section Type" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Conduit6FeatureDefinitionDescription" typeName="string" displayLabel="Conduit 6 Feature Definition Description" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Conduit6Size" typeName="double" displayLabel="Conduit 6 Size" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:LENGTH_DIAMETER"/>
+        <ECProperty propertyName="Conduit6Invert" typeName="double" displayLabel="Conduit 6 Invert" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ELEVATION"/>
+        <ECProperty propertyName="Conduit6Angle" typeName="double" displayLabel="Conduit 6 Angle" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ANGLE"/>
+        <ECProperty propertyName="Conduit6UtilityID" typeName="int" displayLabel="Conduit 6 Utility ID" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Conduit7Label" typeName="string" displayLabel="Conduit 7 Label" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Conduit7SectionType" typeName="string" displayLabel="Conduit 7 Section Type" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Conduit7FeatureDefinitionDescription" typeName="string" displayLabel="Conduit 7 Feature Definition Description" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Conduit7Size" typeName="double" displayLabel="Conduit 7 Size" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:LENGTH_DIAMETER"/>
+        <ECProperty propertyName="Conduit7Invert" typeName="double" displayLabel="Conduit 7 Invert" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ELEVATION"/>
+        <ECProperty propertyName="Conduit7Angle" typeName="double" displayLabel="Conduit 7 Angle" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ANGLE"/>
+        <ECProperty propertyName="Conduit7UtilityID" typeName="int" displayLabel="Conduit 7 Utility ID" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Conduit8Label" typeName="string" displayLabel="Conduit 8 Label" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Conduit8SectionType" typeName="string" displayLabel="Conduit 8 Section Type" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Conduit8FeatureDefinitionDescription" typeName="string" displayLabel="Conduit 8 Feature Definition Description" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Conduit8Size" typeName="double" displayLabel="Conduit 8 Size" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:LENGTH_DIAMETER"/>
+        <ECProperty propertyName="Conduit8Invert" typeName="double" displayLabel="Conduit 8 Invert" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ELEVATION"/>
+        <ECProperty propertyName="Conduit8Angle" typeName="double" displayLabel="Conduit 8 Angle" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ANGLE"/>
+        <ECProperty propertyName="Conduit8UtilityID" typeName="int" displayLabel="Conduit 8 Utility ID" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Outgoing1Label" typeName="string" displayLabel="Outgoing 1 Label" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Outgoing1SectionType" typeName="string" displayLabel="Outgoing 1 Section Type" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Outgoing1FeatureDefinitionDescription" typeName="string" displayLabel="Outgoing 1 Feature Definition Description" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Outgoing1Size" typeName="double" displayLabel="Outgoing 1 Size" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:LENGTH_DIAMETER"/>
+        <ECProperty propertyName="Outgoing1Invert" typeName="double" displayLabel="Outgoing 1 Invert" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ELEVATION"/>
+        <ECProperty propertyName="Outgoing1Angle" typeName="double" displayLabel="Outgoing 1 Angle" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ANGLE"/>
+        <ECProperty propertyName="Outgoing1UtilityID" typeName="int" displayLabel="Outgoing 1 Utility ID" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Outgoing2Label" typeName="string" displayLabel="Outgoing 2 Label" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Outgoing2SectionType" typeName="string" displayLabel="Outgoing 2 Section Type" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Outgoing2FeatureDefinitionDescription" typeName="string" displayLabel="Outgoing 2 Feature Definition Description" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Outgoing2Size" typeName="double" displayLabel="Outgoing 2 Size" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:LENGTH_DIAMETER"/>
+        <ECProperty propertyName="Outgoing2Invert" typeName="double" displayLabel="Outgoing 2 Invert" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ELEVATION"/>
+        <ECProperty propertyName="Outgoing2Angle" typeName="double" displayLabel="Outgoing 2 Angle" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ANGLE"/>
+        <ECProperty propertyName="Outgoing2UtilityID" typeName="int" displayLabel="Outgoing 2 Utility ID" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Outgoing3Label" typeName="string" displayLabel="Outgoing 3 Label" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Outgoing3SectionType" typeName="string" displayLabel="Outgoing 3 Section Type" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Outgoing3FeatureDefinitionDescription" typeName="string" displayLabel="Outgoing 3 Feature Definition Description" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Outgoing3Size" typeName="double" displayLabel="Outgoing 3 Size" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:LENGTH_DIAMETER"/>
+        <ECProperty propertyName="Outgoing3Invert" typeName="double" displayLabel="Outgoing 3 Invert" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ELEVATION"/>
+        <ECProperty propertyName="Outgoing3Angle" typeName="double" displayLabel="Outgoing 3 Angle" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ANGLE"/>
+        <ECProperty propertyName="Outgoing3UtilityID" typeName="int" displayLabel="Outgoing 3 Utility ID" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Outgoing4Label" typeName="string" displayLabel="Outgoing 4 Label" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Outgoing4SectionType" typeName="string" displayLabel="Outgoing 4 Section Type" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Outgoing4FeatureDefinitionDescription" typeName="string" displayLabel="Outgoing 4 Feature Definition Description" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Outgoing4Size" typeName="double" displayLabel="Outgoing 4 Size" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:LENGTH_DIAMETER"/>
+        <ECProperty propertyName="Outgoing4Invert" typeName="double" displayLabel="Outgoing 4 Invert" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ELEVATION"/>
+        <ECProperty propertyName="Outgoing4Angle" typeName="double" displayLabel="Outgoing 4 Angle" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ANGLE"/>
+        <ECProperty propertyName="Outgoing4UtilityID" typeName="int" displayLabel="Outgoing 4 Utility ID" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Outgoing5Label" typeName="string" displayLabel="Outgoing 5 Label" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Outgoing5SectionType" typeName="string" displayLabel="Outgoing 5 Section Type" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Outgoing5FeatureDefinitionDescription" typeName="string" displayLabel="Outgoing 5 Feature Definition Description" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Outgoing5Size" typeName="double" displayLabel="Outgoing 5 Size" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:LENGTH_DIAMETER"/>
+        <ECProperty propertyName="Outgoing5Invert" typeName="double" displayLabel="Outgoing 5 Invert" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ELEVATION"/>
+        <ECProperty propertyName="Outgoing5Angle" typeName="double" displayLabel="Outgoing 5 Angle" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ANGLE"/>
+        <ECProperty propertyName="Outgoing5UtilityID" typeName="int" displayLabel="Outgoing 5 Utility ID" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Outgoing6Label" typeName="string" displayLabel="Outgoing 6 Label" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Outgoing6SectionType" typeName="string" displayLabel="Outgoing 6 Section Type" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Outgoing6FeatureDefinitionDescription" typeName="string" displayLabel="Outgoing 6 Feature Definition Description" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Outgoing6Size" typeName="double" displayLabel="Outgoing 6 Size" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:LENGTH_DIAMETER"/>
+        <ECProperty propertyName="Outgoing6Invert" typeName="double" displayLabel="Outgoing 6 Invert" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ELEVATION"/>
+        <ECProperty propertyName="Outgoing6Angle" typeName="double" displayLabel="Outgoing 6 Angle" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ANGLE"/>
+        <ECProperty propertyName="Outgoing6UtilityID" typeName="int" displayLabel="Outgoing 6 Utility ID" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Outgoing7Label" typeName="string" displayLabel="Outgoing 7 Label" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Outgoing7SectionType" typeName="string" displayLabel="Outgoing 7 Section Type" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Outgoing7FeatureDefinitionDescription" typeName="string" displayLabel="Outgoing 7 Feature Definition Description" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Outgoing7Size" typeName="double" displayLabel="Outgoing 7 Size" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:LENGTH_DIAMETER"/>
+        <ECProperty propertyName="Outgoing7Invert" typeName="double" displayLabel="Outgoing 7 Invert" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ELEVATION"/>
+        <ECProperty propertyName="Outgoing7Angle" typeName="double" displayLabel="Outgoing 7 Angle" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ANGLE"/>
+        <ECProperty propertyName="Outgoing7UtilityID" typeName="int" displayLabel="Outgoing 7 Utility ID" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Outgoing8Label" typeName="string" displayLabel="Outgoing 8 Label" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Outgoing8SectionType" typeName="string" displayLabel="Outgoing 8 Section Type" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Outgoing8FeatureDefinitionDescription" typeName="string" displayLabel="Outgoing 8 Feature Definition Description" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="Outgoing8Size" typeName="double" displayLabel="Outgoing 8 Size" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:LENGTH_DIAMETER"/>
+        <ECProperty propertyName="Outgoing8Invert" typeName="double" displayLabel="Outgoing 8 Invert" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ELEVATION"/>
+        <ECProperty propertyName="Outgoing8Angle" typeName="double" displayLabel="Outgoing 8 Angle" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ANGLE"/>
+        <ECProperty propertyName="Outgoing8UtilityID" typeName="int" displayLabel="Outgoing 8 Utility ID" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+    </ECEntityClass>
+    <ECEntityClass typeName="BaseNodeAspect">
+        <BaseClass>GlobalBase_SUE_Aspect</BaseClass>
+        <ECProperty propertyName="BaselineFeature" typeName="string" displayLabel="Baseline Feature" category="References_Utilities_References_Utilities" priority="0"/>
+        <ECProperty propertyName="BaselineOffset" typeName="double" displayLabel="Baseline Offset" category="References_Utilities_References_Utilities" priority="0" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="BaselineStation" typeName="double" displayLabel="Baseline Station" category="References_Utilities_References_Utilities" priority="0" kindOfQuantity="cifu:STATION"/>
+        <ECProperty propertyName="ElevationReference" typeName="string" displayLabel="Elevation Reference" category="References_Utilities_References_Utilities" priority="0"/>
+        <ECProperty propertyName="BaselineOffsetSetOut" typeName="double" displayLabel="Baseline Offset (Set Out)" category="References_Utilities_References_Utilities" priority="0" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="BaselineStationSetOut" typeName="double" displayLabel="Baseline Station (Set Out)" category="References_Utilities_References_Utilities" priority="0" kindOfQuantity="cifu:STATION"/>
+    </ECEntityClass>
     <ECEntityClass typeName="BasePump_Physical_Conduit1Aspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
         <ECProperty propertyName="Conduit1Label" typeName="string" displayLabel="Conduit 1 Label" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
@@ -979,6 +1033,146 @@
         <ECProperty propertyName="Outgoing8Angle" typeName="double" displayLabel="Outgoing 8 Angle" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ANGLE"/>
         <ECProperty propertyName="Outgoing8UtilityID" typeName="int" displayLabel="Outgoing 8 Utility ID" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
     </ECEntityClass>
+    <ECEntityClass typeName="CommunicationNode_NetworkDataAspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="CommunicationNetworkType" typeName="CommunicationNode_NetworkDataAspect_CommunicationNetworkType_Enum" displayLabel="Network Type" category="Utility_Data_Utilities_Utility_Data_Utilities" priority="0"/>
+        <ECProperty propertyName="CommNodeType" typeName="CommunicationNode_NetworkDataAspect_CommNodeType_Enum" displayLabel="Node Type" category="Utility_Data_Utilities_Utility_Data_Utilities" priority="0"/>
+    </ECEntityClass>
+    <ECEntityClass typeName="CommunicationNodeAspect">
+        <BaseClass>BaseNodeAspect</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="CommunicationSegment_NetworkDataAspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="CommunicationNetworkType" typeName="CommunicationSegment_NetworkDataAspect_CommunicationNetworkType_Enum" displayLabel="Network Type" category="Utility_Data_Utilities_Utility_Data_Utilities" priority="0"/>
+        <ECProperty propertyName="CommSegmentType" typeName="CommunicationSegment_NetworkDataAspect_CommSegmentType_Enum" displayLabel="Function" category="Utility_Data_Utilities_Utility_Data_Utilities" priority="0"/>
+        <ECProperty propertyName="ComConduitType" typeName="CommunicationSegment_NetworkDataAspect_ComConduitType_Enum" displayLabel="Conduit Type" category="Utility_Data_Utilities_Utility_Data_Utilities" priority="0"/>
+    </ECEntityClass>
+    <ECEntityClass typeName="CommunicationSegmentAspect">
+        <BaseClass>BaseLinkAspect</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="ConflictNode_ConflictAspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="Conflict_StartStation" typeName="double" displayLabel="Station (Start)" category="Geometry_Utilities_Geometry_Utilities" priority="0" kindOfQuantity="cifu:STATION"/>
+        <ECProperty propertyName="Conflict_StopStation" typeName="double" displayLabel="Station (Stop)" category="Geometry_Utilities_Geometry_Utilities" priority="0" kindOfQuantity="cifu:STATION"/>
+        <ECProperty propertyName="Conflict_LeftOffset" typeName="double" displayLabel="Offset (Left)" category="Geometry_Utilities_Geometry_Utilities" priority="0" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="Conflict_RightOffset" typeName="double" displayLabel="Offset (Right)" category="Geometry_Utilities_Geometry_Utilities" priority="0" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="Conflict_ResponsibleParty" typeName="string" displayLabel="Responsible Party" category="Utility_Data_Utilities_Utility_Data_Utilities" priority="0"/>
+        <ECProperty propertyName="Conflict_Conflicter" typeName="int" displayLabel="Feature A" category="Utility_Data_Subsurface_Utilities_Utility_Data_Subsurface_Utilities" priority="0"/>
+        <ECProperty propertyName="Conflict_Conflictee" typeName="int" displayLabel="Feature B" category="Utility_Data_Subsurface_Utilities_Utility_Data_Subsurface_Utilities" priority="0"/>
+        <ECProperty propertyName="Conflict_Elevation" typeName="double" displayLabel="Elevation" category="Geometry_Utilities_Geometry_Utilities" priority="0" kindOfQuantity="cifu:ELEVATION"/>
+        <ECProperty propertyName="CurrentStatus" typeName="ConflictNode_ConflictAspect_CurrentStatus_Enum" displayLabel="Current Status" category="Utility_Data_Utilities_Utility_Data_Utilities" priority="0"/>
+        <ECProperty propertyName="RecommendedResolution" typeName="ConflictNode_ConflictAspect_RecommendedResolution_Enum" displayLabel="Recommended Resolution" category="Utility_Data_Utilities_Utility_Data_Utilities" priority="0"/>
+        <ECProperty propertyName="OtherResolutionDescription" typeName="string" displayLabel="Other Resolution Description" category="Utility_Data_Utilities_Utility_Data_Utilities" priority="0"/>
+        <ECProperty propertyName="ConflictType" typeName="ConflictNode_ConflictAspect_ConflictType_Enum" displayLabel="Conflict Type" category="Utility_Data_Utilities_Utility_Data_Utilities" priority="0"/>
+        <ECProperty propertyName="RequiresTestHole" typeName="boolean" displayLabel="Requires Test Hole?" category="Utility_Data_Utilities_Utility_Data_Utilities" priority="0"/>
+        <ECProperty propertyName="NodeMicroStationID" typeName="string" displayLabel="MicroStation 3D ID" category="General_Utilities_General_Utilities" priority="0"/>
+        <ECProperty propertyName="NodeMicroStation2dID" typeName="string" displayLabel="MicroStation 2D ID" category="General_Utilities_General_Utilities" priority="0"/>
+        <ECProperty propertyName="ConflicteeName" typeName="string" displayLabel="Conflictee (Feature A)" category="Utility_Data_Utilities_Utility_Data_Utilities" priority="0"/>
+        <ECProperty propertyName="ConflicterName" typeName="string" displayLabel="Conflicter (Feature B)" category="Utility_Data_Utilities_Utility_Data_Utilities" priority="0"/>
+    </ECEntityClass>
+    <ECEntityClass typeName="ConflictNode_HmiDataSetGeometryAspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="FeatureA_QualityLevel" typeName="ConflictNode_HmiDataSetGeometryAspect_FeatureA_QualityLevel_Enum" displayLabel="Quality Level (Feature A)" category="Utility_Data_Utilities_Utility_Data_Utilities" priority="0"/>
+        <ECProperty propertyName="FeatureB_QualityLevel" typeName="ConflictNode_HmiDataSetGeometryAspect_FeatureB_QualityLevel_Enum" displayLabel="Quality Level (Feature B)" category="Utility_Data_Utilities_Utility_Data_Utilities" priority="0"/>
+    </ECEntityClass>
+    <ECEntityClass typeName="ConflictNodeAspect">
+        <BaseClass>GlobalBase_SUE_Aspect</BaseClass>
+        <ECProperty propertyName="BaselineFeature" typeName="string" displayLabel="Baseline Feature" category="References_Utilities_References_Utilities" priority="0"/>
+        <ECProperty propertyName="BaselineOffset" typeName="double" displayLabel="Baseline Offset" category="References_Utilities_References_Utilities" priority="0" kindOfQuantity="cifu:ELEVATION"/>
+        <ECProperty propertyName="BaselineStation" typeName="double" displayLabel="Baseline Station" category="References_Utilities_References_Utilities" priority="0" kindOfQuantity="cifu:ELEVATION"/>
+        <ECProperty propertyName="ElevationReference" typeName="string" displayLabel="Elevation Reference" category="References_Utilities_References_Utilities" priority="0"/>
+        <ECProperty propertyName="FeatureDefinitionA" typeName="string" displayLabel="Feature Definition (A)" category="Utility_Data_Utilities_Utility_Data_Utilities" priority="0"/>
+        <ECProperty propertyName="FeatureDefinitionB" typeName="string" displayLabel="Feature Definition (B)" category="Utility_Data_Utilities_Utility_Data_Utilities" priority="0"/>
+    </ECEntityClass>
+    <ECEntityClass typeName="ElectricalNode_NetworkDataAspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="ElectricNetworkType" typeName="ElectricalNode_NetworkDataAspect_ElectricNetworkType_Enum" displayLabel="Network Type" category="Utility_Data_Utilities_Utility_Data_Utilities" priority="0"/>
+        <ECProperty propertyName="ElectricNodeDataType" typeName="ElectricalNode_NetworkDataAspect_ElectricNodeDataType_Enum" displayLabel="Node Type" category="Utility_Data_Utilities_Utility_Data_Utilities" priority="0"/>
+    </ECEntityClass>
+    <ECEntityClass typeName="ElectricalNodeAspect">
+        <BaseClass>BaseNodeAspect</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="ElectricalSegment_NetworkDataAspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="ElectricNetworkType" typeName="ElectricalSegment_NetworkDataAspect_ElectricNetworkType_Enum" displayLabel="Network Type" category="Utility_Data_Utilities_Utility_Data_Utilities" priority="0"/>
+        <ECProperty propertyName="ElectricSegmentType" typeName="ElectricalSegment_NetworkDataAspect_ElectricSegmentType_Enum" displayLabel="Function" category="Utility_Data_Utilities_Utility_Data_Utilities" priority="0"/>
+        <ECProperty propertyName="ElectricConduitType" typeName="ElectricalSegment_NetworkDataAspect_ElectricConduitType_Enum" displayLabel="Conduit Type" category="Utility_Data_Utilities_Utility_Data_Utilities" priority="0"/>
+    </ECEntityClass>
+    <ECEntityClass typeName="ElectricalSegmentAspect">
+        <BaseClass>BaseLinkAspect</BaseClass>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsBaseLink_HmiDataSetGeometryAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="BaseLink_HmiDataSetGeometryAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="ElementOwnsBaseLink_NetworkDataAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="BaseLink_NetworkDataAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="ElementOwnsBaseLink_Physical_SegmentShapeType_CircularAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="BaseLink_Physical_SegmentShapeType_CircularAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="ElementOwnsBaseLink_Physical_SegmentShapeType_NonCircularAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="BaseLink_Physical_SegmentShapeType_NonCircularAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="ElementOwnsBaseLink_PhysicalAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="BaseLink_PhysicalAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="ElementOwnsBaseLinkAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="BaseLinkAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="ElementOwnsBaseNode_HmiDataSetGeometryAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="BaseNode_HmiDataSetGeometryAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="ElementOwnsBaseNode_NetworkDataAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="BaseNode_NetworkDataAspect"/>
+        </Target>
+    </ECRelationshipClass>
     <ECRelationshipClass typeName="ElementOwnsBaseNode_Physical_Conduit1Aspect" modifier="None" strength="embedding">
         <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
         <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
@@ -1123,6 +1317,24 @@
             <Class class="BaseNode_Physical_Outgoing8Aspect"/>
         </Target>
     </ECRelationshipClass>
+    <ECRelationshipClass typeName="ElementOwnsBaseNode_PhysicalAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="BaseNode_PhysicalAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="ElementOwnsBaseNodeAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="BaseNodeAspect"/>
+        </Target>
+    </ECRelationshipClass>
     <ECRelationshipClass typeName="ElementOwnsBasePump_Physical_Conduit1Aspect" modifier="None" strength="embedding">
         <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
         <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
@@ -1265,96 +1477,6 @@
         </Source>
         <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
             <Class class="BasePump_Physical_Outgoing8Aspect"/>
-        </Target>
-    </ECRelationshipClass>
-    <ECRelationshipClass typeName="ElementOwnsBaseLink_HmiDataSetGeometryAspect" modifier="None" strength="embedding">
-        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
-        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
-            <Class class="bis:GeometricElement3d"/>
-        </Source>
-        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
-            <Class class="BaseLink_HmiDataSetGeometryAspect"/>
-        </Target>
-    </ECRelationshipClass>
-    <ECRelationshipClass typeName="ElementOwnsBaseLink_NetworkDataAspect" modifier="None" strength="embedding">
-        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
-        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
-            <Class class="bis:GeometricElement3d"/>
-        </Source>
-        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
-            <Class class="BaseLink_NetworkDataAspect"/>
-        </Target>
-    </ECRelationshipClass>
-    <ECRelationshipClass typeName="ElementOwnsBaseLink_Physical_SegmentShapeType_CircularAspect" modifier="None" strength="embedding">
-        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
-        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
-            <Class class="bis:GeometricElement3d"/>
-        </Source>
-        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
-            <Class class="BaseLink_Physical_SegmentShapeType_CircularAspect"/>
-        </Target>
-    </ECRelationshipClass>
-    <ECRelationshipClass typeName="ElementOwnsBaseLink_Physical_SegmentShapeType_NonCircularAspect" modifier="None" strength="embedding">
-        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
-        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
-            <Class class="bis:GeometricElement3d"/>
-        </Source>
-        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
-            <Class class="BaseLink_Physical_SegmentShapeType_NonCircularAspect"/>
-        </Target>
-    </ECRelationshipClass>
-    <ECRelationshipClass typeName="ElementOwnsBaseLink_PhysicalAspect" modifier="None" strength="embedding">
-        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
-        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
-            <Class class="bis:GeometricElement3d"/>
-        </Source>
-        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
-            <Class class="BaseLink_PhysicalAspect"/>
-        </Target>
-    </ECRelationshipClass>
-    <ECRelationshipClass typeName="ElementOwnsBaseLinkAspect" modifier="None" strength="embedding">
-        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
-        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
-            <Class class="bis:GeometricElement3d"/>
-        </Source>
-        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
-            <Class class="BaseLinkAspect"/>
-        </Target>
-    </ECRelationshipClass>
-    <ECRelationshipClass typeName="ElementOwnsBaseNode_HmiDataSetGeometryAspect" modifier="None" strength="embedding">
-        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
-        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
-            <Class class="bis:GeometricElement3d"/>
-        </Source>
-        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
-            <Class class="BaseNode_HmiDataSetGeometryAspect"/>
-        </Target>
-    </ECRelationshipClass>
-    <ECRelationshipClass typeName="ElementOwnsBaseNode_NetworkDataAspect" modifier="None" strength="embedding">
-        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
-        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
-            <Class class="bis:GeometricElement3d"/>
-        </Source>
-        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
-            <Class class="BaseNode_NetworkDataAspect"/>
-        </Target>
-    </ECRelationshipClass>
-    <ECRelationshipClass typeName="ElementOwnsBaseNode_PhysicalAspect" modifier="None" strength="embedding">
-        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
-        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
-            <Class class="bis:GeometricElement3d"/>
-        </Source>
-        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
-            <Class class="BaseNode_PhysicalAspect"/>
-        </Target>
-    </ECRelationshipClass>
-    <ECRelationshipClass typeName="ElementOwnsBaseNodeAspect" modifier="None" strength="embedding">
-        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
-        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
-            <Class class="bis:GeometricElement3d"/>
-        </Source>
-        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
-            <Class class="BaseNodeAspect"/>
         </Target>
     </ECRelationshipClass>
     <ECRelationshipClass typeName="ElementOwnsCommunicationNode_NetworkDataAspect" modifier="None" strength="embedding">
