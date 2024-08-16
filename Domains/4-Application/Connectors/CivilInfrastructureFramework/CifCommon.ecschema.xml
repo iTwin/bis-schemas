@@ -1400,6 +1400,30 @@
             <Class class="ReadOnlySpiralAspect"/>
         </Target>
     </ECRelationshipClass>
+    <ECStructClass typeName="SpeedSection" displayLabel="Speed Section" modifier="Sealed">
+        <ECProperty propertyName="StartStation" typeName="double" displayLabel="Start Station" kindOfQuantity="cifu:STATION" priority="299997"/>
+        <ECProperty propertyName="EndStation" typeName="double" displayLabel="End Station" kindOfQuantity="cifu:STATION" priority="299996"/>
+        <ECProperty propertyName="StartSpeed" typeName="double" displayLabel="Start Speed" kindOfQuantity="cifu:VELOCITY" priority="299995"/>
+        <ECProperty propertyName="EndSpeed" typeName="double" displayLabel="End Speed" kindOfQuantity="cifu:VELOCITY" priority="299994"/>
+        <ECProperty propertyName="Description" typeName="string" displayLabel="Description" priority="299993"/>
+    </ECStructClass>
+    <ECStructClass typeName="SpeedScheme" displayLabel="Speed Scheme" modifier="Sealed">
+        <ECProperty propertyName="SpeedSchemeName" typeName="string" displayLabel="Speed Scheme"/>
+        <ECStructArrayProperty propertyName="SpeedSections" typeName="SpeedSection" displayLabel="Speed Sections" description="Speed Section Values"/>
+    </ECStructClass>
+    <ECEntityClass typeName="SpeedInformationClassAspect" displayLabel="Speed Information">
+        <BaseClass>CivilPresentation</BaseClass>
+        <ECStructArrayProperty propertyName="SpeedSchemes" typeName="SpeedScheme" displayLabel="Speed Schemes" description="Speed Scheme Values"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsSpeedInformationClassAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="SpeedInformationClassAspect"/>
+        </Target>
+    </ECRelationshipClass>
     <ECEntityClass typeName="SecondaryAlignmentAspect">
         <BaseClass>CivilPresentation</BaseClass>
         <ECProperty propertyName="SecondaryAlignmentName" typeName="string" displayLabel="Name" category="SecondaryAlignment_Secondary_Alignment" priority="299999"/>
