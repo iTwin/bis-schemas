@@ -89,7 +89,7 @@
 
 	<ECEntityClass typeName="CircularGravityStructureShapeAspect" modifier="Sealed" displayLabel="Circular Structure">
 		<BaseClass>GravityStructureShapeAspect</BaseClass>
-		<ECProperty propertyName="StructureDiameter" typeName="double" displayLabel="Length" category="HydraulicData" kindOfQuantity="AECU:LENGTH"/>
+		<ECProperty propertyName="StructureDiameter" typeName="double" displayLabel="Diameter" category="HydraulicData" kindOfQuantity="AECU:LENGTH"/>
 	</ECEntityClass>
 
 	<ECRelationshipClass typeName="GravityStructureOwnsCircularShapeAspect" strength="embedding" strengthDirection="Forward" modifier="Sealed">
@@ -172,6 +172,22 @@
 		</Target>
 	</ECRelationshipClass>
 
+	<ECEntityClass typeName="Catchment" modifier="Sealed" displayLabel="Catchment">
+		<BaseClass>anlyt:AnalyticalElement</BaseClass>
+		<ECProperty propertyName="Area" typeName="double" displayLabel="Area" category="HydraulicData" kindOfQuantity="rru:AREA"/>
+		<ECProperty propertyName="Tc" typeName="double" displayLabel="Time of Concentration" category="HydraulicData" kindOfQuantity="AECU:TIME"/>
+		<ECProperty propertyName="RationalC" typeName="double" displayLabel="Rational C" category="HydraulicData"/>
+    <ECNavigationProperty propertyName="OutflowNode" relationshipName="CatchmentDischargesToOutflowNode" direction="Forward" />
+	</ECEntityClass>
+
+	<ECRelationshipClass typeName="CatchmentDischargesToOutflowNode" strength="referencing" modifier="Sealed">
+		<Source multiplicity="(0..*)" roleLabel="discharges from" polymorphic="false">
+			<Class class="Catchment"/>
+		</Source>
+		<Target multiplicity="(0..1)" roleLabel="discharges to" polymorphic="true">
+			<Class class="net:INode"/>
+		</Target>
+	</ECRelationshipClass>
 
 	<ECEntityClass typeName="RainfallSet" modifier="Sealed" displayLabel="Rainfall Set">
 		<BaseClass>bis:DefinitionElement</BaseClass>
