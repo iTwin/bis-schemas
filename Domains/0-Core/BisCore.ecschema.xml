@@ -86,6 +86,35 @@
     <!-- ////////////////////////////////////////////////////////////////////////////// -->
     <!-- // BIS-related core classes -->
     <!-- ////////////////////////////////////////////////////////////////////////////// -->
+    <ECEnumeration typeName="CodeScopeSpecTypeJson" backingTypeName="int" isStrict="false">
+        <ECEnumerator value="1" name="Repository"/>
+        <ECEnumerator value="2" name="Model"/>
+        <ECEnumerator value="3" name="ParentElement"/>
+        <ECEnumerator value="4" name="RelatedElement"/>
+    </ECEnumeration>
+
+    <ECStructClass typeName="CodeScopeSpecJson">
+        <ECProperty propertyName="type" typeName="CodeScopeSpecTypeJson" />
+        <ECProperty propertyName="fGuidRequired" typeName="boolean" description="If true, the federationGuid of the scope element identifies the scope, for Codes that are globally unique. Otherwise, the ElementId of the scopeElement is used, for Codes that are scoped only within a single iModel."/>
+        <ECProperty propertyName="relationship" typeName="string" description="The relationship className (in the form 'schema:class'), when `type` is set to 4 (RelatedElement)"/>
+    </ECStructClass>
+
+    <ECStructClass typeName="CodeSpecPropsJson">
+        <ECProperty propertyName="isManagedWithDgnDb" typeName="boolean" />
+    </ECStructClass>
+
+    <ECStructClass typeName="CodeSpecJson" description="Additional CodeSpec settings">
+        <ECProperty propertyName="scopeSpec" typeName="CodeScopeSpecJson" description="Scope of uniqueness for CodeValues associated to this CodeSpec.">
+            <ECCustomAttributes>
+                <JsonProperty xmlns="CoreCustomAttributes.01.00.05">
+                    <IsRequired>True</IsRequired>
+                </JsonProperty>
+            <ECCustomAttributes>
+        </ECProperty>
+        <ECProperty propertyName="spec" typeName="CodeSpecPropsJson" description="Additional settings associated to the CodeSpec"/>
+        <ECProperty propertyName="version" typeName="string" description="Version of the CodeSpec"/>
+    </ECStructClass>
+
     <ECEntityClass typeName="CodeSpec" modifier="Sealed" displayLabel="Code Specification" description="A bis:CodeSpec (code specification) captures the rules for encoding and decoding significant business information into and from a Code (string). This specification is used to generate and validate Codes.">
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.01.00.00"/>
@@ -99,7 +128,56 @@
                 </PropertyMap>
             </ECCustomAttributes>
         </ECProperty>
-        <ECProperty propertyName="JsonProperties" typeName="string" extendedTypeName="Json" description="A JSON string containing scope and fragment specifications used to generate and validate code values"/>
+        <ECProperty propertyName="JsonProperties" typeName="string" extendedTypeName="bis:CodeSpecJson" description="A JSON string containing scope and fragment specifications used to generate and validate code values">
+            <ECCustomAttributes>
+                <JsonProperty xmlns="CoreCustomAttributes.01.00.05">                    
+                    <JsonSchema>{
+                        "$schema": "https://json-schema.org/draft/2020-12/schema",
+                        "$id": "https://bentley.com/json_schemas/bis/codespec.json",
+                        "title": "CodeSpec",
+                        "description": "Additional CodeSpec settings",
+                        "type": "object",
+                        "properties": {
+                            "scopeSpec": {
+                                "description": "Scope of uniqueness for CodeValues associated to this CodeSpec.",
+                                "type": "object",
+                                "properties": {
+                                    "type": {
+                                        "description": "1 = Repository, 2 = Model, 3 = ParentElement, 4 = RelatedElement",
+                                        "type": "number",
+                                        "enum": [1, 2, 3, 4]
+                                    },
+                                    "fGuidRequired": {
+                                        "description": "If true, the federationGuid of the scope element identifies the scope, for Codes that are globally unique. Otherwise, the ElementId of the scopeElement is used, for Codes that are scoped only within a single iModel.",
+                                        "type": "boolean"
+                                    },
+                                    "relationship": {
+                                        "description": "The relationship className (in the form 'schema:class'), when `type` is set to 4 (RelatedElement)",
+                                        "type": "string"
+                                    }
+                                }
+                            },
+                            "spec": {
+                                "description": "Additional settings associated to the CodeSpec",
+                                "type": "object",
+                                "properties": {
+                                    "isManagedWithDgnDb": {
+                                        "description": "Deprecated",
+                                        "type": "boolean"
+                                    }
+                                }
+                            },
+                            "version": {
+                                "description": "Version of the CodeSpec",
+                                "type": "string"
+                            }
+                        },
+                        "required": [ "scopeSpec" ]
+                    }</JsonSchema>
+                    <DocumentationUrl>https://www.itwinjs.org/reference/core-common/codes/codespecproperties/</DocumentationUrl>
+                </JsonProperty>
+            </ECCustomAttributes>
+        </ECProperty>
     </ECEntityClass>
 
     <ECRelationshipClass typeName="CodeSpecSpecifiesCode" strength="referencing" modifier="Sealed">
@@ -2356,6 +2434,47 @@
         <ECProperty propertyName="Script" typeName="string" extendedTypeName="Json" description="A JSON string containing the timeline and rendering instructions"/>
     </ECEntityClass>
 
+    <ECStructClass typeName="ViewDetailsClipPlaneJson">
+        <ECArrayProperty propertyName="normal" typeName="double" minOccurs="3" maxOccurs="3"/>
+        <ECProperty propertyName="dist" typeName="double"/>
+        <ECProperty propertyName="interior" typeName="boolean" />
+        <ECProperty propertyName="invisible" typeName="boolean" />
+    </ECStructClass>
+
+    <ECStructClass typeName="ViewDetailsConvexClipPlaneSetJson">
+        <ECStructArrayProperty propertyName="clips" typeName="ViewDetailsClipPlaneJson" />
+    </ECStructClass>
+
+    <ECStructClass typeName="ViewDetailsClipPlaneJson">
+        <ECStructArrayProperty propertyName="clips" typeName="ViewDetailsConvexClipPlaneSetJson" />
+        <ECProperty propertyName="invisible" typeName="boolean" />
+    </ECStructClass>
+
+    <ECStructClass typeName="ViewDetailsClipPrimitiveJson">
+    </ECStructClass>
+
+    <ECStructClass typeName="ViewDetailsClipPrimitivePlanesJson">
+        <ECProperty propertyName="planes" typeName="ViewDetailsClipPlaneJson" />
+    </ECStructClass>
+
+    <ECEnumeration typeName="ViewDetailsGridOrientationTypeJson" backingTypeName="int" isStrict="false">
+        <ECEnumerator value="0" name="View"/>
+        <ECEnumerator value="1" name="WorldXY"/>
+        <ECEnumerator value="2" name="WorldYZ"/>
+        <ECEnumerator value="3" name="WorldXZ"/>
+        <ECEnumerator value="4" name="AuxCoord"/>
+    </ECEnumeration>
+
+    <ECStructClass typeName="ViewDetailsJson" description="Additional ViewDefinition settings">
+        <ECStructArrayProperty propertyName="clip" typeName="ViewDetailsClipPrimitiveJson" />
+        <ECProperty propertyName="gridOrient" typeName="ViewDetailsGridOrientationTypeJson" />
+        <ECProperty propertyName="gridPerRef" typeName="double" />
+        <ECProperty propertyName="gridSpaceX" typeName="double" />
+        <ECProperty propertyName="gridSpaceY" typeName="double" />
+        <ECProperty propertyName="acs" typeName="string" />
+        <ECProperty propertyName="aspectSkew" typeName="double" />
+    </ECStructClass>
+
     <ECEntityClass typeName="ViewDefinition" modifier="Abstract" displayLabel="View Definition" description="A bis:ViewDefinition specifies the area/volume that is viewed, and refers to a bis:DisplayStyle and a bis:CategorySelector to be used. Subclasses of bis:ViewDefinition determine which model(s) are viewed.">
         <BaseClass>DefinitionElement</BaseClass>
         <ECCustomAttributes>
@@ -2369,6 +2488,137 @@
         <ECNavigationProperty propertyName="DisplayStyle" relationshipName="ViewDefinitionUsesDisplayStyle" direction="forward" displayLabel="Display Style">
             <ECCustomAttributes><CustomHandledProperty xmlns="BisCore.01.00.16"/></ECCustomAttributes>
         </ECNavigationProperty>
+        <ECProperty propertyName="JsonProperties" typeName="string" extendedTypeName="ViewDetailsJson">
+            <ECCustomAttributes>
+                <Json xmlns="CoreCustomAttributes.01.00.05">
+                    <Namespace>viewDetails</Namespace>
+                </Json>
+                <JsonProperty xmlns="CoreCustomAttributes.01.00.05">
+                    <JsonSchema>{
+                        "$schema": "https://json-schema.org/draft/2020-12/schema",
+                        "$id": "https://bentley.com/BisCore/ViewDefinition/JsonProperties",
+                        "title": "ViewDefinition",
+                        "description": "Additional ViewDefinition settings",
+                        "type": "object",
+                        "properties": {
+                            "viewDetails": { "$ref": "#/$defs/viewDetails" }
+                        },
+                        "$defs": {
+                            "clipVector": {
+                                "type": "array",
+                                "items": {
+                                    "anyOf": [
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "planes": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "invisible": { "type": "boolean" },
+                                                        "clips": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "type": "array",
+                                                                "items": {
+                                                                    "type": "object",
+                                                                    "properties": {
+                                                                        "normal": { "$ref": "#/$defs/XYZ" },
+                                                                        "dist": { "type": "number" },
+                                                                        "interior": { "type": "boolean" },
+                                                                        "invisible": { "type": "boolean" }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "shape": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "invisible": { "type": "boolean" },
+                                                        "points": { "type": "array", "items": { "$ref": "#/$defs/XYZ"} },
+                                                        "zlow": { "type": "number" },
+                                                        "zhigh": { "type": "number" },
+                                                        "mask": { "type": "boolean" },
+                                                        "trans": {
+                                                            "oneOf": [
+                                                                { "$ref": "#/$defs/Matrix3d" },
+                                                                {
+                                                                    "type": "object",
+                                                                    "properties": {
+                                                                        "origin": { "$ref": "#/$defs/XYZ" },
+                                                                        "matrix": { "$ref": "#/$defs/Matrix3d" }
+                                                                    },
+                                                                    "required": ["origin", "matrix"]
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            },
+                            "viewDetails": {
+                                "type": "object",
+                                "properties": {
+                                    "clip": { "$ref": "#/$defs/clipVector" },
+                                    "gridOrient": {
+                                        "type": "number",
+                                        "enum": [0, 1, 2, 3, 4]
+                                    },
+                                    "gridPerRef": { "type": "number" },
+                                    "gridSpaceX": { "type": "number" },
+                                    "gridSpaceY": { "type": "number" },
+                                    "acs": { "type": "string" },
+                                    "aspectSkew": { "type": "number" }
+                                }
+                            },
+                            "XYZ": {
+                                "oneOf": [
+                                    {
+                                        "type": "array",
+                                        "items": { "type": "number" },
+                                        "minItems": 3,
+                                        "maxItems": 3
+                                    },
+                                    {
+                                        "type": "object",
+                                        "properties": {
+                                            "x": { "type": "number" },
+                                            "y": { "type": "number" },
+                                            "z": { "type": "number" }
+                                        }
+                                    }
+                                ]
+                            },
+                            "Matrix3d": {
+                                "oneOf": [
+                                    {
+                                        "type": "array",
+                                        "items": { "type": "number" }
+                                    },
+                                    {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "array",
+                                            "items": { "type": "number" }
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }</JsonSchema>
+                    <DocumentationUrl>https://www.itwinjs.org/reference/core-common/views/viewdetailsprops/</DocumentationUrl>
+                </JsonProperty>
+            </ECCustomAttributes>
+        </ECProperty>
     </ECEntityClass>
 
     <ECEntityClass typeName="ViewDefinition3d" modifier="Abstract" displayLabel="3D View Definition" description="A bis:ViewDefinition3d specifies the volume that is viewed on referenced 3D bis:Models. It refers to a bis:DisplayStyle3d and a bis:CategorySelector to be used.">
@@ -2400,6 +2650,45 @@
         </ECProperty>
         <ECProperty propertyName="FocusDistance" typeName="double" displayLabel="Focus Distance" description="Camera focus distance">
             <ECCustomAttributes><CustomHandledProperty xmlns="BisCore.01.00.16"/></ECCustomAttributes>
+        </ECProperty>
+        <ECProperty propertyName="JsonProperties" typeName="string" extendedTypeName="Json">
+            <ECCustomAttributes>
+                <JsonProperty xmlns="CoreCustomAttributes.01.00.05">
+                    <JsonSchema>{
+                        "$schema": "https://json-schema.org/draft/2020-12/schema",
+                        "$id": "https://bentley.com/BisCore/ViewDefinition3d/JsonProperties",
+                        "title": "ViewDefinition3d",
+                        "description": "Additional ViewDefinition3d settings",
+                        "type": "object",
+                        "properties": {
+                            "viewDetails": { "$ref": "#/$defs/viewDetails3d" }
+                        },
+                        "$defs": {
+                            "viewDetails3d": {
+                                "allOf": [
+                                    { "$ref": "/BisCore/ViewDefinition/JsonProperties/$defs/viewDetails" },
+                                    { 
+                                        "type": "object",
+                                        "properties": {
+                                            "disable3dManipulations": { "type": "boolean" },
+                                            "modelClipGroups": { 
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "models": { "type": "array", "items": { "type": "string" }},
+                                                        "clip": { "$ref": "/BisCore/ViewDefinition/JsonProperties/$defs/clipVector" }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }</JsonSchema>
+                </JsonProperty>
+            </ECCustomAttributes>
         </ECProperty>
     </ECEntityClass>
 
