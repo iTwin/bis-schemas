@@ -72,11 +72,15 @@
 		<BaseClass>anlyt:AnalyticalPartition</BaseClass>
 	</ECEntityClass>
 
-	<ECEntityClass typeName="GravityStructure" modifier="Abstract" displayLabel="Gravity Structure">
+	<ECEntityClass typeName="BaseStructure" modifier="Abstract" displayLabel="Base Structure">
 		<BaseClass>anlyt:AnalyticalElement</BaseClass>
 		<BaseClass>net:INode</BaseClass>
-		<ECProperty propertyName="StructureShape" typeName="GravityStructureShape" displayLabel="Structure Shape" category="HydraulicData"/>
 		<ECProperty propertyName="InvertElevation" typeName="double" displayLabel="Elevation (Invert)" category="HydraulicData" kindOfQuantity="rru:LENGTH"/>
+	</ECEntityClass>
+
+	<ECEntityClass typeName="GravityStructure" modifier="Abstract" displayLabel="Gravity Structure">
+		<BaseClass>BaseStructure</BaseClass>
+		<ECProperty propertyName="StructureShape" typeName="GravityStructureShape" displayLabel="Structure Shape" category="HydraulicData"/>
 		<ECProperty propertyName="RimElevation" typeName="double" displayLabel="Elevation (Rim)" category="HydraulicData" kindOfQuantity="rru:LENGTH"/>
 		<ECProperty propertyName="FixedLoad" typeName='double' category="HydraulicData" kindOfQuantity="AECU:FLOW"/>
 	</ECEntityClass>
@@ -138,8 +142,7 @@
 	</ECEntityClass>
 
 	<ECEntityClass typeName="Outfall" modifier="Sealed" displayLabel="Outfall">
-		<BaseClass>anlyt:AnalyticalElement</BaseClass>
-		<BaseClass>net:INode</BaseClass>
+		<BaseClass>BaseStructure</BaseClass>
 	</ECEntityClass>
 
 	<ECEntityClass typeName="Pipe" modifier="Sealed" displayLabel="Pipe">
@@ -213,6 +216,18 @@
 			<Class class="net:INode"/>
 		</Target>
 	</ECRelationshipClass>
+
+	<ECEntityClass typeName="Pond" modifier="Sealed" displayLabel="Pond">
+    <BaseClass >anlyt:AnalyticalElement</BaseClass>
+    <BaseClass >net:INode</BaseClass>
+    <ECProperty propertyName="StartingWaterSurfaceElevation" typeName="double" displayLabel="Starting Water Surface Elevation" category="HydraulicData" kindOfQuantity="rru:LENGTH"/>
+    <ECStructArrayProperty propertyName="StorageElevationAreaCurve" typeName="ElevationAreaPoint" displayLabel="Elevation-Area Curve" category="HydraulicData"  minOccurs="0" maxOccurs="unbounded"/>
+  </ECEntityClass>
+  
+	<ECStructClass typeName="ElevationAreaPoint" modifier="Sealed">
+    <ECProperty propertyName="Elevation" typeName="double" displayLabel="Elevation" category="HydraulicData" kindOfQuantity="rru:LENGTH"/>
+    <ECProperty propertyName="Area" typeName="double" displayLabel="Area" category="HydraulicData" kindOfQuantity="rru:AREA"/>
+  </ECStructClass>
 
 	<ECEntityClass typeName="RainfallSet" modifier="Sealed" displayLabel="Rainfall Set">
 		<BaseClass>bis:DefinitionElement</BaseClass>
