@@ -25,6 +25,10 @@ Rules and Patterns defined by the _ClassificationSystems_ schema are expected to
 
 ![Classification Systems](./media/PipeworkPhysical-classification_systems.png)
 
+The following instance-diagram depicts the classification of the `PipingPortType` instances in a `ReducerType` by _Nominal Pipe Size_, according to the American National Standards Institute (ANSI).
+
+![Classification Systems](./media/PipeworkPhysical-classification_systems2.png)
+
 ## Entity Classes
 
 ### BendType
@@ -35,11 +39,11 @@ A _Bend_ is a `PipeFitting` with typically two `PipingPort`s used to change the 
 
 Equivalent to [IfcPipeFittingType](http://ifc43-docs.standards.buildingsmart.org/IFC/RELEASE/IFC4x3/HTML/lexical/IfcPipeFittingType.htm), with its _PredefinedType_ property set to _IfcPipeFittingTypeEnum.BEND_.
 
-### CompressionPortType
+### CompressionEndStyle
 
-A _CompressionPort_ is a `PipingPort` that allows connections among `Piping Element`s just by compression. Additional accessories may be used to further seal or strengthen each connection.
+A _Compression Port_ is a `PipingPort` that exhibits an _End-Style Treatment_ that allows connections among `Piping Element`s just by compression. Additional accessories may be used to further seal or strengthen each connection.
 
-`PipingPort`s modeling _CompressionPorts_ shall be associated with an instance of `CompressionPortType` as its TypeDefinition via the `PipingPortIsOfType` relationship. `CompressionPortType`s must be contained in `DefinitionModel`s.
+`PipingPort`s modeling _Compression Ports_ shall be associated with an instance of `CompressionPortType` as its TypeDefinition via the `PipingPortIsOfType` relationship, with its _EndStyle_ navigation property set to the appropriate instance of `CompressionEndStyle`. `CompressionEndStyle`s must be contained in `DefinitionModel`s.
 
 Equivalent to an [IfcDistributionPort](http://ifc43-docs.standards.buildingsmart.org/IFC/RELEASE/IFC4x3/HTML/lexical/IfcDistributionPort.htm), with its [Pset_DistributionPortTypePipe.ConnectionType](https://ifc43-docs.standards.buildingsmart.org/IFC/RELEASE/IFC4x3/HTML/lexical/Pset_DistributionPortTypePipe.htm) property set to _PEnum_PipeEndStyleTreatment.COMPRESSION_.
 
@@ -51,11 +55,11 @@ A _Cross_ is a `PipeFitting` with more than three `PipingPort`s used to redistri
 
 Equivalent to [IfcPipeFittingType](http://ifc43-docs.standards.buildingsmart.org/IFC/RELEASE/IFC4x3/HTML/lexical/IfcPipeFittingType.htm), with its _PredefinedType_ property set to _IfcPipeFittingTypeEnum.JUNCTION_.
 
-### FlangedPortType
+### FlangedPortEndStyle
 
-A _FlangedPort_ is a `PipingPort` that has a flange, typically with bolt holes, that enable connections among `IPipingElement`s.
+A _Flanged Port_ is a `PipingPort` that exhibits an _End-Style Treatment_ based on a flange, typically with bolt holes, that enable connections among `IPipingElement`s.
 
-`PipingPort`s modeling _FlangedPorts_ shall be associated with an instance of `FlangedPortType` as its TypeDefinition via the `PipingPortIsOfType` relationship. `FlangedPortType`s must be contained in `DefinitionModel`s.
+`PipingPort`s modeling _Flanged Ports_ shall be associated with an instance of `PipingPortType` as its TypeDefinition via the `PipingPortIsOfType` relationship, with its _EndStyle_ navigation property set to the appropriate instance of `FlangedPortEndStyle`. `FlangedPortEndStyle`s must be contained in `DefinitionModel`s.
 
 Equivalent to an [IfcDistributionPort](http://ifc43-docs.standards.buildingsmart.org/IFC/RELEASE/IFC4x3/HTML/lexical/IfcDistributionPort.htm), with its [Pset_DistributionPortTypePipe.ConnectionType](https://ifc43-docs.standards.buildingsmart.org/IFC/RELEASE/IFC4x3/HTML/lexical/Pset_DistributionPortTypePipe.htm) property set to _PEnum_PipeEndStyleTreatment.FLANGED_.
 
@@ -67,13 +71,21 @@ A _Flange_ is a `PipeFitting` that uses Flanged `PipingPort`s as their main conn
 
 Equivalent to [IfcPipeFittingType](http://ifc43-docs.standards.buildingsmart.org/IFC/RELEASE/IFC4x3/HTML/lexical/IfcPipeFittingType.htm), with its _PredefinedType_ property set to _IfcPipeFittingTypeEnum.CONNECTOR_.
 
-### GroovedPortType
+### GroovedPortEndStyle
 
-A _GroovedPort_ is a `PipingPort` that exhibits a groove that, by using additional accessories, enable connections among `IPipingElement`s.
+A _GroovedPort_ is a `PipingPort` that exhibits an _End-Style Treatment_  with a groove that, by using additional accessories, enable connections among `IPipingElement`s.
 
-`PipingPort`s modeling _GroovedPorts_ shall be associated with an instance of `GroovedPortType` as its TypeDefinition via the `PipingPortIsOfType` relationship. `GroovedPortType`s must be contained in `DefinitionModel`s.
+`PipingPort`s modeling _Grooved Ports_ shall be associated with an instance of `PipingPortType` as its TypeDefinition via the `PipingPortIsOfType` relationship, with its _EndStyle_ navigation property set to the appropriate instance of `GroovedPortEndStyle`. `GroovedPortEndStyle`s must be contained in `DefinitionModel`s.
 
 Equivalent to an [IfcDistributionPort](http://ifc43-docs.standards.buildingsmart.org/IFC/RELEASE/IFC4x3/HTML/lexical/IfcDistributionPort.htm), with its [Pset_DistributionPortTypePipe.ConnectionType](https://ifc43-docs.standards.buildingsmart.org/IFC/RELEASE/IFC4x3/HTML/lexical/Pset_DistributionPortTypePipe.htm) property set to _PEnum_PipeEndStyleTreatment.GROOVED_.
+
+### OutsideSleevePortEndStyle
+
+An _Outside Sleeve Port_ is a `PipingPort` that exhibits an _End-Style Treatment_ with a protective cover to safeguard the pipe.
+
+`PipingPort`s modeling _Outside Sleeve Ports_ shall be associated with an instance of `PipingPortType` as its TypeDefinition via the `PipingPortIsOfType` relationship, with its _EndStyle_ navigation property set to the appropriate instance of `OutsideSleevePortEndStyle`. `OutsideSleevePortEndStyle`s must be contained in `DefinitionModel`s.
+
+Equivalent to an [IfcDistributionPort](http://ifc43-docs.standards.buildingsmart.org/IFC/RELEASE/IFC4x3/HTML/lexical/IfcDistributionPort.htm), with its [Pset_DistributionPortTypePipe.ConnectionType](https://ifc43-docs.standards.buildingsmart.org/IFC/RELEASE/IFC4x3/HTML/lexical/Pset_DistributionPortTypePipe.htm) property set to _PEnum_PipeEndStyleTreatment.OUTSIDESLEEVE_.
 
 ### Pipe
 
@@ -117,15 +129,15 @@ Note that it is assumed by convention that a `PipingPort` with no rotation aroun
 
 `PipingPort`s shall be associated with an instance of `PipingPortType` as its TypeDefinition via the `PipingPortIsOfType` relationship. 
 
-_Crown and Invert Elevations_ at individual `PipingPort` instances can be computed as:
+_Crown and Invert Elevations_ at individual `PipingPort` instances can be derived according to its _Shape_. For example, they can be computed on `CircularPortType`s as:
 
 ```
 CrownElevation at a PipingPort = PipingPort.Origin.z + 
-                                (PipingPort.PipingPortType.InnerDiameter / 2) * 
+                                (PipingPort.CircularPortType.InnerDiameter / 2) * 
                                 cos(PipingPort.Placement.Pitch)
 
 InvertElevation at a PipingPort = PipingPort.Origin.z - 
-                                (PipingPort.PipingPortType.InnerDiameter / 2) * 
+                                (PipingPort.CircularPortType.InnerDiameter / 2) * 
                                 cos(PipingPort.Placement.Pitch)
 ```
 
@@ -134,10 +146,14 @@ Equivalent to [IfcDistributionPort](http://ifc43-docs.standards.buildingsmart.or
 ### PipingPortType
 
 The `PipingPortType` class captures two important concepts for a set of ports: 
-1) Their outer and inner diameters.
+1) Their shape and associated dimensions.
 1) Their end-condition / end-style treatment.
 
-The outer and inner diameters of a `PipingPortType` are captured via its `OuterDiameter` and `InnerDiameter` properties, whereas its end-condition is captured by specific subclasses of the `PipingPortType` class.
+For _Circular_ Port types, inner diameters are captured via the `InnerDiameter` property of the `CircularPortType` class.
+For _Rectangular_ Port types, inner dimension values are captured via the `SmallerDimension` and `LargerDimension` properties of the `RectangularPortType` class.
+The `WallThickness` property of the base `PipingPortType` class captures thickness values across all shapes.
+
+End-Style Treatment is generally captured by the `PipePortType.EndStyle` navigation property.
 
 `PipingPortType`s can be associated with PhysicalTypes implementing the `IPipingPhysicalType` mix-in, via the `PipingPhysicalTypeUsesPortTypes` relationship. That way, catalogs of PhysicalTypes can include data about their PipingPortTypes: diameters and end-condition of their ports.
 
@@ -151,11 +167,11 @@ A _Reducer_ is a `PipeFitting` with typically two `PipingPort`s having different
 
 Equivalent to [IfcPipeFittingType](http://ifc43-docs.standards.buildingsmart.org/IFC/RELEASE/IFC4x3/HTML/lexical/IfcPipeFittingType.htm), with its _PredefinedType_ property set to _IfcPipeFittingTypeEnum.TRANSITION_.
 
-### SolderedPortType
+### SolderedPortEndStyle
 
-A _SolderedPort_ is a `PipingPort` that is connected with another `PipingPort` by using soldering.
+A _Soldered Port_ is a `PipingPort` that exhibits an _End-Style Treatment_ connected with another `PipingPort` by using soldering.
 
-`PipingPort`s modeling _SolderedPorts_ shall be associated with an instance of `SolderedPortType` as its TypeDefinition via the `PipingPortIsOfType` relationship. `SolderedPortType`s must be contained in `DefinitionModel`s.
+`PipingPort`s modeling _Soldered Ports_ shall be associated with an instance of `PipingPortType` as its TypeDefinition via the `PipingPortIsOfType` relationship, with its _EndStyle_ navigation property set to the appropriate instance of `SolderedPortEndStyle`. `SolderedPortEndStyle`s must be contained in `DefinitionModel`s.
 
 Equivalent to an [IfcDistributionPort](http://ifc43-docs.standards.buildingsmart.org/IFC/RELEASE/IFC4x3/HTML/lexical/IfcDistributionPort.htm), with its [Pset_DistributionPortTypePipe.ConnectionType](https://ifc43-docs.standards.buildingsmart.org/IFC/RELEASE/IFC4x3/HTML/lexical/Pset_DistributionPortTypePipe.htm) property set to _PEnum_PipeEndStyleTreatment.SOLDERED_.
 
@@ -167,11 +183,11 @@ A _Tee_ is a `PipeFitting` with three `PipingPort`s used to redistribute flow am
 
 Equivalent to [IfcPipeFittingType](http://ifc43-docs.standards.buildingsmart.org/IFC/RELEASE/IFC4x3/HTML/lexical/IfcPipeFittingType.htm), with its _PredefinedType_ property set to _IfcPipeFittingTypeEnum.JUNCTION_.
 
-### ThreadedPortType
+### ThreadedPortEndStyle
 
-A _ThreadedPort_ is a `PipingPort` that exhibits either a male or female threaded end connection into which an opposite _ThreadedPort_ fits.
+A _Threaded Port_ is a `PipingPort` that exhibits either a male or female threaded _End-Style Treatment_ connection into which an opposite _Threaded Port_ fits.
 
-`PipingPort`s modeling _ThreadedPorts_ shall be associated with an instance of `ThreadedPortType` as its TypeDefinition via the `PipingPortIsOfType` relationship. `ThreadedPortType`s must be contained in `DefinitionModel`s.
+`PipingPort`s modeling _Threaded Ports_ shall be associated with an instance of `PipingPortType` as its TypeDefinition via the `PipingPortIsOfType` relationship, with its _EndStyle_ navigation property set to the appropriate instance of `ThreadedPortEndStyle`. `ThreadedPortEndStyle`s must be contained in `DefinitionModel`s.
 
 Equivalent to an [IfcDistributionPort](http://ifc43-docs.standards.buildingsmart.org/IFC/RELEASE/IFC4x3/HTML/lexical/IfcDistributionPort.htm), with its [Pset_DistributionPortTypePipe.ConnectionType](https://ifc43-docs.standards.buildingsmart.org/IFC/RELEASE/IFC4x3/HTML/lexical/Pset_DistributionPortTypePipe.htm) property set to _PEnum_PipeEndStyleTreatment.THREADED_.
 
@@ -189,11 +205,11 @@ Equivalent to [IfcValve](http://ifc43-docs.standards.buildingsmart.org/IFC/RELEA
 
 Equivalent to [IfcValveType](http://ifc43-docs.standards.buildingsmart.org/IFC/RELEASE/IFC4x3/HTML/lexical/IfcValveType.htm).
 
-### WeldedPortType
+### WeldedPortEndStyle
 
-A _WeldedPort_ is a `PipingPort` that is connected to another `PipingPort` by welding means.
+A _Welded Port_ is a `PipingPort` that exhibits an _End-Style Treatment_ connected to another `PipingPort` by welding means.
 
-`PipingPort`s modeling _WeldedPorts_ shall be associated with an instance of `WeldedPortType` as its TypeDefinition via the `PipingPortIsOfType` relationship. `WeldedPortType`s must be contained in `DefinitionModel`s.
+`PipingPort`s modeling _Welded Ports_ shall be associated with an instance of `PipingPortType` as its TypeDefinition via the `PipingPortIsOfType` relationship, with its _EndStyle_ navigation property set to the appropriate instance of `WeldedPortEndStyle`. `WeldedPortEndStyle`s must be contained in `DefinitionModel`s.
 
 Equivalent to an [IfcDistributionPort](http://ifc43-docs.standards.buildingsmart.org/IFC/RELEASE/IFC4x3/HTML/lexical/IfcDistributionPort.htm), with its [Pset_DistributionPortTypePipe.ConnectionType](https://ifc43-docs.standards.buildingsmart.org/IFC/RELEASE/IFC4x3/HTML/lexical/Pset_DistributionPortTypePipe.htm) property set to _PEnum_PipeEndStyleTreatment.WELDED_.
 
