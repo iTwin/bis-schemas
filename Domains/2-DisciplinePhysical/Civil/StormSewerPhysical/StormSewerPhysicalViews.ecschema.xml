@@ -60,12 +60,26 @@
                     SELECT 
                         [pp].[ECInstanceId], 
                         [pp].[ECClassId],
-                        [pp].[Origin].[Z] + (([ppt].[InnerDiameter] / 2) * cos([pp].[Pitch])) [CrownElevation],
-                        [pp].[Origin].[Z] - (([ppt].[InnerDiameter] / 2) * cos([pp].[Pitch])) [InvertElevation],
+                        CASE 
+                            WHEN ([cpt].[ECInstanceId] IS NOT NULL)
+                                THEN ([pp].[Origin].[Z] + (([cpt].[InnerDiameter] / 2) * cos([pp].[Pitch]))) 
+                            WHEN ([rpt].[ECInstanceId] IS NOT NULL)
+                                THEN ([pp].[Origin].[Z] + (([rpt].[SmallerDimension] / 2) * cos([pp].[Pitch])))
+                            ELSE NULL
+                        END [CrownElevation],
+                        CASE 
+                            WHEN ([cpt].[ECInstanceId] IS NOT NULL)
+                                THEN ([pp].[Origin].[Z] - (([cpt].[InnerDiameter] / 2) * cos([pp].[Pitch]))) 
+                            WHEN ([rpt].[ECInstanceId] IS NOT NULL)
+                                THEN ([pp].[Origin].[Z] - (([rpt].[SmallerDimension] / 2) * cos([pp].[Pitch])))
+                            ELSE NULL
+                        END [InvertElevation],
                         NAVIGATION_VALUE(stmswrphysViews.PipingPortView.Parent, [pp].[Parent].[Id]),
                         NAVIGATION_VALUE(stmswrphysViews.PipingPortView.TypeDefinition, [pp].[TypeDefinition].[Id])
                     FROM [pipphys].[PipingPort] [pp] 
                     INNER JOIN [pipphys].[PipingPortType] [ppt] ON [pp].[TypeDefinition].[Id] = [ppt].[ECInstanceId]
+                    LEFT JOIN [pipphys].[CircularPortType] [cpt] ON [ppt].[ECInstanceId] = [cpt].[ECInstanceId]
+                    LEFT JOIN [pipphys].[RectangularPortType] [rpt] ON [ppt].[ECInstanceId] = [rpt].[ECInstanceId]
                 </Query>
             </QueryView>
         </ECCustomAttributes>
