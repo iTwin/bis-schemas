@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ==================================================================================
+|  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
+|  * See LICENSE.md in the project root for license terms and full copyright notice.
+======================================================================================= -->
+<ECSchema schemaName="BisCoreViews" alias="bisViews" version="01.00.00" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" displayLabel="BIS Core Views" description="Views that facilitate querying of concepts defined in the BIS core schema.">
+    <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
+    <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
+    <ECSchemaReference name="ECDbMap" version="02.00.04" alias="ecdbmap"/>
+    <ECSchemaReference name="BisCore" version="01.00.11" alias="bis"/>
+
+    <ECCustomAttributes>
+        <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
+            <SupportedUse>NotForProduction</SupportedUse>
+        </ProductionStatus>
+        <SchemaLayerInfo xmlns="BisCustomAttributes.01.00.00">
+            <Value>Core</Value>
+        </SchemaLayerInfo>
+    </ECCustomAttributes>
+
+    <ECEntityClass typeName="PhysicalElementMaterialView" modifier="Abstract" displayLabel="PhysicalElementId MaterialId View" description="View that returns PhysicalMaterial of PhysicalElement instances, disregarding whether it is defined through their PhysicalType or overriden at the PhysicalElement instance.">
+        <ECCustomAttributes>
+            <QueryView xmlns="ECDbMap.02.00.04">
+                <Query>
+                    SELECT 
+                        [pe].[ECInstanceId], 
+                        [pe].[ECClassId],
+                        NAVIGATION_VALUE(bisViews.PhysicalElementMaterialView.PhysicalMaterial, 
+                            coalesce([pe].[PhysicalMaterial].[Id], [pt].[PhysicalMaterial].[Id]))
+                    FROM [bis].[PhysicalElement] [pe] 
+                        LEFT JOIN [bis].[PhysicalType] [pt] ON [pe].[TypeDefinition].[Id] = [pt].[ECInstanceId]
+                </Query>
+            </QueryView>
+        </ECCustomAttributes>
+        <ECNavigationProperty propertyName="PhysicalMaterial" relationshipName="PhysicalElementIsOfPhysicalMaterial" direction="forward"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="PhysicalElementIsOfPhysicalMaterial" strength="referencing" modifier="Sealed" description="A relationship indicating the bis:PhysicalMaterial of which the bis:PhysicalElement is made.">
+        <!-- @see PhysicalElementMaterialView.PhysicalMaterial ECNavigationProperty -->
+        <Source multiplicity="(0..*)" roleLabel="is of" polymorphic="true">
+            <Class class="PhysicalElementMaterialView" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is material of" polymorphic="true">
+            <Class class="bis:PhysicalMaterial"/>
+        </Target>
+    </ECRelationshipClass>
+ </ECSchema>
