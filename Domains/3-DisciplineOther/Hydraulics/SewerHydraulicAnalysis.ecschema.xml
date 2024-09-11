@@ -22,6 +22,12 @@
 		</SchemaLayerInfo>
 	</ECCustomAttributes>
 
+  <ECEnumeration typeName="InletCaptureMethod" backingTypeName="int" isStrict="true" >
+    <ECEnumerator value="0" name="FullCapture" displayLabel="Full Capture"/>
+    <ECEnumerator value="1" name="PercentCapture" displayLabel="Percent Capture"/>
+    <ECEnumerator value="2" name="MaximumCapacity" displayLabel="Maximum Capacity"/>
+  </ECEnumeration>
+
 	<ECEnumeration typeName="GravityStructureShape" backingTypeName="int" isStrict="true" description="Set the shape of a gravity structure.">
 		<ECEnumerator value="0" name="Circular" displayLabel="Circular" />
 		<ECEnumerator value="1" name="Box" displayLabel="Box" />
@@ -142,9 +148,34 @@
 		<ECProperty propertyName="ManholeIsBolted" typeName="boolean" displayLabel="Is Bolted" category="HydraulicData"/>
 	</ECEntityClass>
 
-	<ECEntityClass typeName="CatchBasin" modifier="Sealed" displayLabel="Catch Basin">
-		<BaseClass>GravityStructure</BaseClass>
-	</ECEntityClass>
+  <ECEntityClass typeName="CatchBasin" modifier="Sealed" displayLabel="Catch Basin">
+    <BaseClass>GravityStructure</BaseClass>
+    <ECProperty propertyName="InletCaptureMethod" typeName="InletCaptureMethod" displayLabel="Inlet Capture Method" description="Method used to determine the rate of flow capture by the inlet." category="HydraulicData"/>
+  </ECEntityClass>
+  
+	<ECEntityClass typeName="InletCaptureMethodAspect" modifier="Abstract" displayLabel="InletCaptureMethodAspect">
+    <BaseClass>bis:ElementUniqueAspect</BaseClass>
+  </ECEntityClass>
+  
+	<ECRelationshipClass typeName="CatchBasinOwnsInletCaptureMethodAspect" strength="embedding" modifier="Sealed">
+	  <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+    <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+      <Class class="CatchBasin"/>
+    </Source>
+    <Target multiplicity="(1..1)" roleLabel="owned by" polymorphic="true">
+      <Class class="InletCaptureMethodAspect"/>
+    </Target>
+  </ECRelationshipClass>
+
+  <ECEntityClass typeName="PercentCapture" modifier="Sealed" displayLabel="Percent Capture">
+    <BaseClass>InletCaptureMethodAspect</BaseClass>
+    <ECProperty propertyName="CapturePercent" typeName="double" displayLabel="Capture Percent" description="Set the percent of incoming inflow to be captured by the inlet." category="HydraulicData"/>
+  </ECEntityClass>
+
+  <ECEntityClass typeName="MaximumCapacity" modifier="Sealed" displayLabel="Maximum Capacity">
+    <BaseClass>InletCaptureMethodAspect</BaseClass>
+    <ECProperty propertyName="InletFlowThreshold" typeName="double" displayLabel="Inlet Flow Threshold" description="The inlet will capture all incoming flow up the specified threshold, all excess flow will be bypassed." category="HydraulicData" kindOfQuantity="rru:FLOW"/>
+  </ECEntityClass>
 
 	<ECEntityClass typeName="Outfall" modifier="Sealed" displayLabel="Outfall">
 		<BaseClass>BaseStructure</BaseClass>
@@ -336,5 +367,8 @@
     <ECProperty propertyName="LimitSectionSize" typeName="boolean" displayLabel="Limit Section Size" category="HydraulicData"/>
     <ECProperty propertyName="MaximumRise" typeName="double" displayLabel="Rise (Maximum)" category="HydraulicData"/>
     <ECProperty propertyName="MeasureCoverTo" typeName="MeasureCoverTo" displayLabel="Measure Cover To" category="HydraulicData"/>
-  </ECEntityClass>
+		<ECProperty propertyName="IsPartFullDesign" typeName"boolean", displayLabel="Is Part Full Design" category="HydraulicData"/>
+		<ECProperty propertyName="ConduitPercentageFull" typeName="double" displayLabel="Percentage Full" category="HydraulicData"/>
+
+	</ECEntityClass>
 </ECSchema>
