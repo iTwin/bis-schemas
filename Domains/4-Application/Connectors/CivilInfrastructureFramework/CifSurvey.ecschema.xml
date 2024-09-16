@@ -1,0 +1,571 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ==================================================================================
+|  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
+|  * See LICENSE.md in the project root for license terms and full copyright notice.
+======================================================================================= -->
+<ECSchema schemaName="CifSurvey" alias="cifsurvey" version="01.00.01" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
+    <ECSchemaReference name="BisCore" version="01.00.16" alias="bis"/>
+    <ECSchemaReference name="CifCommon" version="01.00.09" alias="cifcmn"/>
+    <ECSchemaReference name="CifUnits" version="01.00.08" alias="cifu"/>
+    <ECSchemaReference name="CoreCustomAttributes" version="01.00.04" alias="CoreCA"/>
+    <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
+    <ECCustomAttributes>
+        <ProductionStatus xmlns="CoreCustomAttributes.01.00.04">
+            <SupportedUse>NotForProduction</SupportedUse>
+        </ProductionStatus>
+        <SchemaLayerInfo xmlns="BisCustomAttributes.01.00.00">
+            <Value>Application</Value>
+        </SchemaLayerInfo>
+    </ECCustomAttributes>
+    <ECEnumeration typeName="NetworkAdjustmentAspect_AdjustmentMethod_Enum" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="Least_Square" value="1" displayLabel="Least Square"/>
+        <ECEnumerator name="Compass_Rule_Bowditch" value="2" displayLabel="Compass Rule (Bowditch)"/>
+        <ECEnumerator name="Crandall" value="3" displayLabel="Crandall"/>
+        <ECEnumerator name="Transit" value="4" displayLabel="Transit"/>
+    </ECEnumeration>
+    <ECEnumeration typeName="NetworkAdjustmentAspect_AngleBalance_Enum" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="True" value="1" displayLabel="True"/>
+        <ECEnumerator name="False" value="2" displayLabel="False"/>
+    </ECEnumeration>
+    <ECEnumeration typeName="NetworkAdjustmentAspect_CombinedScaleFactorOption_Enum" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="Do_Not_Use" value="1" displayLabel="Do Not Use"/>
+        <ECEnumerator name="Compute_Global_Using_Control_Points" value="2" displayLabel="Compute Global Using Control Points"/>
+        <ECEnumerator name="Compute_Each_Setup" value="3" displayLabel="Compute Each Setup"/>
+        <ECEnumerator name="Use_Global_Combined_Factor" value="4" displayLabel="Use Global Combined Factor"/>
+        <ECEnumerator name="Use_Setup_Combined_Factor" value="5" displayLabel="Use Setup Combined Factor"/>
+    </ECEnumeration>
+    <ECEnumeration typeName="NetworkAdjustmentAspect_ComputeCoord_Enum" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="True" value="1" displayLabel="True"/>
+        <ECEnumerator name="False" value="2" displayLabel="False"/>
+    </ECEnumeration>
+    <ECEnumeration typeName="NetworkAdjustmentAspect_DisplayErrorsInMessageCenter_Enum" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="True" value="1" displayLabel="True"/>
+        <ECEnumerator name="False" value="2" displayLabel="False"/>
+    </ECEnumeration>
+    <ECEnumeration typeName="NetworkAdjustmentAspect_EarthCurvature_Enum" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="True" value="1" displayLabel="True"/>
+        <ECEnumerator name="False" value="2" displayLabel="False"/>
+    </ECEnumeration>
+    <ECEnumeration typeName="NetworkAdjustmentAspect_ElevAdjust_Enum" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="True" value="1" displayLabel="True"/>
+        <ECEnumerator name="False" value="2" displayLabel="False"/>
+    </ECEnumeration>
+    <ECEnumeration typeName="NetworkAdjustmentAspect_Error_Enum" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="True" value="1" displayLabel="True"/>
+        <ECEnumerator name="False" value="2" displayLabel="False"/>
+    </ECEnumeration>
+    <ECEnumeration typeName="NetworkAdjustmentAspect_UseSetupCollimation_Enum" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="True" value="1" displayLabel="True"/>
+        <ECEnumerator name="False" value="2" displayLabel="False"/>
+    </ECEnumeration>
+    <ECEnumeration typeName="NetworkAdjustmentAspect_XYZDecPlaces_Enum" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="Zero_1" value="1" displayLabel="0.1"/>
+        <ECEnumerator name="Zero_01" value="2" displayLabel="0.01"/>
+        <ECEnumerator name="Zero_001" value="3" displayLabel="0.001"/>
+        <ECEnumerator name="Zero_0001" value="4" displayLabel="0.0001"/>
+    </ECEnumeration>
+    <ECEnumeration typeName="NetworkObservationAspect_DTMAttribute_Enum" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="Not_Set" value="1" displayLabel="Not Set"/>
+        <ECEnumerator name="Determine_By_Feature_Definition" value="2" displayLabel="Determine By Feature Definition"/>
+        <ECEnumerator name="Do_Not_Include" value="3" displayLabel="Do Not Include"/>
+        <ECEnumerator name="Spot" value="4" displayLabel="Spot"/>
+    </ECEnumeration>
+    <ECEnumeration typeName="NetworkObservationAspect_InstrumentOrientation_Enum" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="Not_Set" value="1" displayLabel="Not Set"/>
+        <ECEnumerator name="Direct" value="2" displayLabel="Direct"/>
+        <ECEnumerator name="Reverse" value="3" displayLabel="Reverse"/>
+    </ECEnumeration>
+    <ECEnumeration typeName="NetworkObservationAspect_LinkCode_Enum" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="None" value="1" displayLabel="None"/>
+        <ECEnumerator name="Start" value="2" displayLabel="Start"/>
+        <ECEnumerator name="StartPC" value="3" displayLabel="StartPC"/>
+        <ECEnumerator name="ArcPC" value="4" displayLabel="ArcPC"/>
+        <ECEnumerator name="NonTanPC" value="5" displayLabel="NonTanPC"/>
+        <ECEnumerator name="ArcSingle" value="6" displayLabel="ArcSingle"/>
+        <ECEnumerator name="ArcToArc" value="7" displayLabel="ArcToArc"/>
+        <ECEnumerator name="NonTanPT" value="8" displayLabel="NonTanPT"/>
+        <ECEnumerator name="ArcPT" value="9" displayLabel="ArcPT"/>
+        <ECEnumerator name="ArcToggle" value="10" displayLabel="ArcToggle"/>
+        <ECEnumerator name="End" value="11" displayLabel="End"/>
+        <ECEnumerator name="CloseShape" value="12" displayLabel="CloseShape"/>
+        <ECEnumerator name="Close" value="13" displayLabel="Close"/>
+    </ECEnumeration>
+    <ECEnumeration typeName="NetworkSetupAspect_BacksightType_Enum" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="Point_Feature" value="1" displayLabel="Point Feature"/>
+        <ECEnumerator name="Direction_Value" value="2" displayLabel="Direction Value"/>
+    </ECEnumeration>
+    <ECEnumeration typeName="SurveyChainAspect_Display_Enum" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="True" value="1" displayLabel="True"/>
+        <ECEnumerator name="False" value="2" displayLabel="False"/>
+    </ECEnumeration>
+    <ECEnumeration typeName="SurveyChainAspect_DTMAttribute_Enum" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="Not_Set" value="1" displayLabel="Not Set"/>
+        <ECEnumerator name="Determine_By_Feature_Definition" value="2" displayLabel="Determine By Feature Definition"/>
+        <ECEnumerator name="Do_Not_Include" value="3" displayLabel="Do Not Include"/>
+        <ECEnumerator name="Break_Line" value="4" displayLabel="Break Line"/>
+        <ECEnumerator name="Soft_Break_Line" value="5" displayLabel="Soft Break Line"/>
+        <ECEnumerator name="Boundary" value="6" displayLabel="Boundary"/>
+        <ECEnumerator name="Drape_Boundary" value="7" displayLabel="Drape Boundary"/>
+        <ECEnumerator name="Void" value="8" displayLabel="Void"/>
+        <ECEnumerator name="Drape_Void" value="9" displayLabel="Drape Void"/>
+        <ECEnumerator name="Break_Void" value="10" displayLabel="Break Void"/>
+        <ECEnumerator name="Island" value="11" displayLabel="Island"/>
+        <ECEnumerator name="Contour" value="12" displayLabel="Contour"/>
+        <ECEnumerator name="Hole" value="13" displayLabel="Hole"/>
+    </ECEnumeration>
+    <ECEnumeration typeName="SurveyFilterAspect_UseFence_Enum" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="True" value="1" displayLabel="True"/>
+        <ECEnumerator name="False" value="2" displayLabel="False"/>
+    </ECEnumeration>
+    <ECEnumeration typeName="SurveyNetworkAspect_ProcessObservationRules_Enum" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="True" value="1" displayLabel="True"/>
+        <ECEnumerator name="False" value="2" displayLabel="False"/>
+    </ECEnumeration>
+    <ECEnumeration typeName="SurveyPointAspect_Display_Enum" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="True" value="1" displayLabel="True"/>
+        <ECEnumerator name="False" value="2" displayLabel="False"/>
+    </ECEnumeration>
+    <ECEnumeration typeName="SurveyPointAspect_DTMAttribute_Enum" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="Not_Set" value="1" displayLabel="Not Set"/>
+        <ECEnumerator name="Determine_By_Feature_Definition" value="2" displayLabel="Determine By Feature Definition"/>
+        <ECEnumerator name="Do_Not_Include" value="3" displayLabel="Do Not Include"/>
+        <ECEnumerator name="Spot" value="4" displayLabel="Spot"/>
+    </ECEnumeration>
+    <ECEnumeration typeName="SurveyPointAspect_LinkCode_Enum" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="None" value="1" displayLabel="None"/>
+        <ECEnumerator name="Start" value="2" displayLabel="Start"/>
+        <ECEnumerator name="StartPC" value="3" displayLabel="StartPC"/>
+        <ECEnumerator name="ArcPC" value="4" displayLabel="ArcPC"/>
+        <ECEnumerator name="NonTanPC" value="5" displayLabel="NonTanPC"/>
+        <ECEnumerator name="ArcSingle" value="6" displayLabel="ArcSingle"/>
+        <ECEnumerator name="ArcToArc" value="7" displayLabel="ArcToArc"/>
+        <ECEnumerator name="NonTanPT" value="8" displayLabel="NonTanPT"/>
+        <ECEnumerator name="ArcPT" value="9" displayLabel="ArcPT"/>
+        <ECEnumerator name="ArcToggle" value="10" displayLabel="ArcToggle"/>
+        <ECEnumerator name="End" value="11" displayLabel="End"/>
+        <ECEnumerator name="CloseShape" value="12" displayLabel="CloseShape"/>
+        <ECEnumerator name="Close" value="13" displayLabel="Close"/>
+    </ECEnumeration>
+    <ECEnumeration typeName="SurveySettingsAspect_AppendNotesToAttributes_Enum" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="True" value="1" displayLabel="True"/>
+        <ECEnumerator name="False" value="2" displayLabel="False"/>
+    </ECEnumeration>
+    <ECEnumeration typeName="SurveySettingsAspect_AppendNotesToDescription_Enum" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="True" value="1" displayLabel="True"/>
+        <ECEnumerator name="False" value="2" displayLabel="False"/>
+    </ECEnumeration>
+    <ECEnumeration typeName="SurveySettingsAspect_ApplyDrawingScaleToFixedCells_Enum" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="True" value="1" displayLabel="True"/>
+        <ECEnumerator name="False" value="2" displayLabel="False"/>
+    </ECEnumeration>
+    <ECEnumeration typeName="SurveySettingsAspect_BestMatchFieldCodeOption_Enum" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="MatchExact" value="1" displayLabel="&lt;- MatchExact -&gt;"/>
+        <ECEnumerator name="MatchStart" value="2" displayLabel="&lt;- MatchStart -&gt;"/>
+        <ECEnumerator name="MatchAlpha" value="3" displayLabel="&lt;- MatchAlpha -&gt;"/>
+        <ECEnumerator name="MatchTruncate" value="4" displayLabel="&lt;- MatchTruncate -&gt;"/>
+    </ECEnumeration>
+    <ECEnumeration typeName="SurveySettingsAspect_ImportCoordinatesAsControlPoints_Enum" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="As_Control" value="1" displayLabel="As Control"/>
+        <ECEnumerator name="As_Control_By_Feature_Definition" value="2" displayLabel="As Control By Feature Definition"/>
+        <ECEnumerator name="Always" value="3" displayLabel="Always"/>
+        <ECEnumerator name="Never" value="4" displayLabel="Never"/>
+    </ECEnumeration>
+    <ECEnumeration typeName="SurveySettingsAspect_LinearConversionPrompt_Enum" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="True" value="1" displayLabel="True"/>
+        <ECEnumerator name="False" value="2" displayLabel="False"/>
+    </ECEnumeration>
+    <ECEnumeration typeName="SurveySettingsAspect_LinkCodeBeforeFeature_Enum" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="Before_Point_Feature_Definition" value="1" displayLabel="Before Point Feature Definition"/>
+        <ECEnumerator name="After_Point_Feature_Definition" value="2" displayLabel="After Point Feature Definition"/>
+    </ECEnumeration>
+    <ECEnumeration typeName="SurveySettingsAspect_LinkingMethod_Enum" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="By_Field_Code" value="1" displayLabel="By Field Code"/>
+        <ECEnumerator name="By_Consecutive_Field_Code" value="2" displayLabel="By Consecutive Field Code"/>
+        <ECEnumerator name="Connect_All_Matching_Field_Codes" value="3" displayLabel="Connect All Matching Field Codes"/>
+    </ECEnumeration>
+    <ECEnumeration typeName="SurveySettingsAspect_LogChanges_Enum" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="True" value="1" displayLabel="True"/>
+        <ECEnumerator name="False" value="2" displayLabel="False"/>
+    </ECEnumeration>
+    <ECEnumeration typeName="SurveySettingsAspect_PublishEC_Enum" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="True" value="1" displayLabel="True"/>
+        <ECEnumerator name="False" value="2" displayLabel="False"/>
+    </ECEnumeration>
+    <ECEnumeration typeName="SurveySettingsAspect_StopDynamicChainExceptOnImport_Enum" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="By_Linking_Codes" value="1" displayLabel="By Linking Codes"/>
+        <ECEnumerator name="Force_Point_List_Features" value="2" displayLabel="Force Point List Features"/>
+    </ECEnumeration>
+    <ECEnumeration typeName="SurveySettingsAspect_UseSmartObjects_Enum" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="True" value="1" displayLabel="True"/>
+        <ECEnumerator name="False" value="2" displayLabel="False"/>
+    </ECEnumeration>
+    <ECEnumeration typeName="SurveySettingsAspect_UseSubstituteStrings_Enum" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="True" value="1" displayLabel="True"/>
+        <ECEnumerator name="False" value="2" displayLabel="False"/>
+    </ECEnumeration>
+    <ECEnumeration typeName="SurveyTraverseAspect_Display_Enum" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="True" value="1" displayLabel="True"/>
+        <ECEnumerator name="False" value="2" displayLabel="False"/>
+    </ECEnumeration>
+    <ECEntityClass typeName="ErrorEllipseAspect" displayLabel="Error Ellipse">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="Name" typeName="string" displayLabel="Name" category="GeneralCategory_Error_Ellipse" priority="299990"/>
+        <ECProperty propertyName="SemiMajor" typeName="string" displayLabel="SemiMajor" category="GeneralCategory_Error_Ellipse" priority="299980"/>
+        <ECProperty propertyName="SemiMinor" typeName="string" displayLabel="SemiMinor" category="GeneralCategory_Error_Ellipse" priority="299970"/>
+        <ECProperty propertyName="MajorDirection" typeName="string" displayLabel="Major Direction" category="GeneralCategory_Error_Ellipse" priority="299960"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsErrorEllipseAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="ErrorEllipseAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="NetworkAdjustmentAspect" displayLabel="Adjustment">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="AdjustmentMethod" typeName="NetworkAdjustmentAspect_AdjustmentMethod_Enum" displayLabel="Adjustment Type" category="GeneralCategory_Adjustment" priority="299990"/>
+        <ECProperty propertyName="CombinedScaleFactorOption" typeName="NetworkAdjustmentAspect_CombinedScaleFactorOption_Enum" displayLabel="Combined Scale Factor Option" category="GeneralCategory_Adjustment" priority="299980"/>
+        <ECProperty propertyName="CombinedScaleFactorValue" typeName="string" displayLabel="Combined Scale Factor Global" category="GeneralCategory_Adjustment" priority="299970"/>
+        <ECProperty propertyName="UseSetupCollimation" typeName="NetworkAdjustmentAspect_UseSetupCollimation_Enum" displayLabel="Use Setup Collimation" category="GeneralCategory_Adjustment" priority="299960"/>
+        <ECProperty propertyName="DisplayErrorsInMessageCenter" typeName="NetworkAdjustmentAspect_DisplayErrorsInMessageCenter_Enum" displayLabel="Display Errors In Message Center" category="GeneralCategory_Adjustment" priority="299950"/>
+        <ECProperty propertyName="AddDistConst" typeName="string" displayLabel="Add-on for Distance constant" category="GeneralCategory_Adjustment" priority="299940"/>
+        <ECProperty propertyName="AddDistPpm" typeName="string" displayLabel="Add-on for Distance PPM" category="GeneralCategory_Adjustment" priority="299930"/>
+        <ECProperty propertyName="AddHorzAngle" typeName="string" displayLabel="Add-on for Horizontal angle" category="GeneralCategory_Adjustment" priority="299920"/>
+        <ECProperty propertyName="AddAzimuth" typeName="string" displayLabel="Add-on for Azimuth" category="GeneralCategory_Adjustment" priority="299910"/>
+        <ECProperty propertyName="AddTrigLevConst" typeName="string" displayLabel="Add-on for Trig level constant" category="GeneralCategory_Adjustment" priority="299900"/>
+        <ECProperty propertyName="AddTrigLevPpm" typeName="string" displayLabel="Add-on for Trig level PPM" category="GeneralCategory_Adjustment" priority="299890"/>
+        <ECProperty propertyName="AddDiffLevConst" typeName="string" displayLabel="Add-on for Differential leveling constant" category="GeneralCategory_Adjustment" priority="299880"/>
+        <ECProperty propertyName="ErrDistConst" typeName="string" displayLabel="Default Distance constant error estimate" category="GeneralCategory_Adjustment" priority="299870"/>
+        <ECProperty propertyName="ErrDistPpm" typeName="string" displayLabel="Default Distance PPM" category="GeneralCategory_Adjustment" priority="299860"/>
+        <ECProperty propertyName="ErrHorzAngle" typeName="string" displayLabel="Default Horizontal angle error estimate" category="GeneralCategory_Adjustment" priority="299850"/>
+        <ECProperty propertyName="ErrAzimuth" typeName="string" displayLabel="Default Azimuth error estimate" category="GeneralCategory_Adjustment" priority="299840"/>
+        <ECProperty propertyName="ErrTrigLevConst" typeName="string" displayLabel="Default Trig Level Constant error estimate" category="GeneralCategory_Adjustment" priority="299830"/>
+        <ECProperty propertyName="ErrDiffLevConst" typeName="string" displayLabel="Default Differential Leveling Constant error estimate" category="GeneralCategory_Adjustment" priority="299820"/>
+        <ECProperty propertyName="TolDistance" typeName="string" displayLabel="Distance tolerance" category="GeneralCategory_Adjustment" priority="299810"/>
+        <ECProperty propertyName="TolAngle" typeName="string" displayLabel="Angle tolerance" category="GeneralCategory_Adjustment" priority="299800"/>
+        <ECProperty propertyName="TolElevation" typeName="string" displayLabel="Elevation tolerance" category="GeneralCategory_Adjustment" priority="299790"/>
+        <ECProperty propertyName="SetupError" typeName="string" displayLabel="Setup error estimate" category="GeneralCategory_Adjustment" priority="299780"/>
+        <ECProperty propertyName="XYZDecPlaces" typeName="NetworkAdjustmentAspect_XYZDecPlaces_Enum" displayLabel="XYZ Decimal Places" category="GeneralCategory_Adjustment" priority="299770"/>
+        <ECProperty propertyName="Error" typeName="NetworkAdjustmentAspect_Error_Enum" displayLabel="Use repetition errors PLUS add-ons for error estimation" category="GeneralCategory_Adjustment" priority="299760"/>
+        <ECProperty propertyName="ComputeCoord" typeName="NetworkAdjustmentAspect_ComputeCoord_Enum" displayLabel="Compute Coordinate standard error and error ellipses" category="GeneralCategory_Adjustment" priority="299750"/>
+        <ECProperty propertyName="AngleBalance" typeName="NetworkAdjustmentAspect_AngleBalance_Enum" displayLabel="Balance Angles" category="GeneralCategory_Adjustment" priority="299740"/>
+        <ECProperty propertyName="EarthCurvature" typeName="NetworkAdjustmentAspect_EarthCurvature_Enum" displayLabel="Compute earth curvature and atmospheric refraction" category="GeneralCategory_Adjustment" priority="299730"/>
+        <ECProperty propertyName="RefractionConstant" typeName="string" displayLabel="Refraction Constant" category="GeneralCategory_Adjustment" priority="299720"/>
+        <ECProperty propertyName="ElevAdjust" typeName="NetworkAdjustmentAspect_ElevAdjust_Enum" displayLabel="Adjust elevations" category="GeneralCategory_Adjustment" priority="299710"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsNetworkAdjustmentAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="NetworkAdjustmentAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="NetworkControlPointAspect" displayLabel="Control Point">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="Name" typeName="string" displayLabel="Name" category="GeneralCategory_Control_Point" priority="299990"/>
+        <ECProperty propertyName="Feature" typeName="string" displayLabel="Field Code" category="GeneralCategory_Control_Point" priority="299980"/>
+        <ECProperty propertyName="X" typeName="double" displayLabel="Easting" category="GeneralCategory_Control_Point" priority="299970" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="Y" typeName="double" displayLabel="Northing" category="GeneralCategory_Control_Point" priority="299960" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="Z" typeName="double" displayLabel="Elevation" category="GeneralCategory_Control_Point" priority="299950" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="StdErrorX" typeName="double" displayLabel="Std. Error X" category="GeneralCategory_Control_Point" priority="299940" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="StdErrorY" typeName="double" displayLabel="Std. Error Y" category="GeneralCategory_Control_Point" priority="299930" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="StdErrorZ" typeName="double" displayLabel="Std. Error Z" category="GeneralCategory_Control_Point" priority="299920" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="NetworkName" typeName="string" displayLabel="Data File Name" category="GeneralCategory_Control_Point" priority="299910"/>
+        <ECProperty propertyName="DatasetName" typeName="string" displayLabel="Field Book Name" category="GeneralCategory_Control_Point" priority="299900"/>
+        <ECProperty propertyName="DirectionName" typeName="string" displayLabel="Direction Name" category="GeneralCategory_Control_Point" priority="299890"/>
+        <ECProperty propertyName="DirectionValue" typeName="double" displayLabel="Direction Value" category="GeneralCategory_Control_Point" priority="299880" kindOfQuantity="cifu:BEARING"/>
+        <ECProperty propertyName="StdErrorDirection" typeName="string" displayLabel="StdErrorDirection" category="GeneralCategory_Control_Point" priority="299870"/>
+        <ECProperty propertyName="TimeStamp" typeName="string" displayLabel="Time Stamp" category="GeneralCategory_Control_Point" priority="299860"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsNetworkControlPointAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="NetworkControlPointAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="NetworkObservationAspect" displayLabel="Observation">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="Name" typeName="string" displayLabel="Name" category="GeneralCategory_Observation" priority="299990"/>
+        <ECProperty propertyName="Feature" typeName="string" displayLabel="Field Code" category="GeneralCategory_Observation" priority="299980"/>
+        <ECProperty propertyName="LinkCode" typeName="NetworkObservationAspect_LinkCode_Enum" displayLabel="LinkCode" category="GeneralCategory_Observation" priority="299970"/>
+        <ECProperty propertyName="Zone" typeName="string" displayLabel="Zone" category="GeneralCategory_Observation" priority="299960"/>
+        <ECProperty propertyName="Description" typeName="string" displayLabel="Description" category="GeneralCategory_Observation" priority="299950"/>
+        <ECProperty propertyName="DTMAttribute" typeName="NetworkObservationAspect_DTMAttribute_Enum" displayLabel="Terrain Model Attribute" category="GeneralCategory_Observation" priority="299940"/>
+        <ECProperty propertyName="AttributesPair" typeName="string" displayLabel="Attributes Pair" category="GeneralCategory_Observation" priority="299930"/>
+        <ECProperty propertyName="ControlCodesPair" typeName="string" displayLabel="Control Codes" category="GeneralCategory_Observation" priority="299920"/>
+        <ECProperty propertyName="InstrumentOrientation" typeName="NetworkObservationAspect_InstrumentOrientation_Enum" displayLabel="Instrument Orientation" category="GeneralCategory_Observation" priority="299910"/>
+        <ECProperty propertyName="SetNumber" typeName="string" displayLabel="Set Number" category="GeneralCategory_Observation" priority="299900"/>
+        <ECProperty propertyName="RodHeight" typeName="double" displayLabel="Rod Height" category="GeneralCategory_Observation" priority="299890" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="HorizontalAngle" typeName="double" displayLabel="Horizontal Angle" category="GeneralCategory_Observation" priority="299880" kindOfQuantity="cifu:ANGLE"/>
+        <ECProperty propertyName="VerticalAngle" typeName="double" displayLabel="Vertical Angle" category="GeneralCategory_Observation" priority="299870" kindOfQuantity="cifu:ANGLE"/>
+        <ECProperty propertyName="SlopeDistance" typeName="double" displayLabel="Slope Distance" category="GeneralCategory_Observation" priority="299860" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="SetupName" typeName="string" displayLabel="Setup Name" category="GeneralCategory_Observation" priority="299850"/>
+        <ECProperty propertyName="NetworkName" typeName="string" displayLabel="Data File Name" category="GeneralCategory_Observation" priority="299840"/>
+        <ECProperty propertyName="MacroParameters" typeName="string" displayLabel="VBA Macro" category="GeneralCategory_Observation" priority="299830"/>
+        <ECProperty propertyName="DatasetName" typeName="string" displayLabel="Field Book Name" category="GeneralCategory_Observation" priority="299820"/>
+        <ECProperty propertyName="StyleName" typeName="string" displayLabel="Feature Definition" category="GeneralCategory_Observation" priority="299810"/>
+        <ECProperty propertyName="TimeStamp" typeName="string" displayLabel="Time Stamp" category="GeneralCategory_Observation" priority="299800"/>
+        <ECProperty propertyName="RodStadia" typeName="double" displayLabel="Rod Stadia" category="GeneralCategory_Observation" priority="299790" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="LowerStadia" typeName="double" displayLabel="Lower Stadia" category="GeneralCategory_Observation" priority="299780" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="UpperStadia" typeName="double" displayLabel="Upper Stadia" category="GeneralCategory_Observation" priority="299770" kindOfQuantity="cifu:LENGTH"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsNetworkObservationAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="NetworkObservationAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="NetworkSetupAspect" displayLabel="Setup">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="Name" typeName="string" displayLabel="Name" category="GeneralCategory_Setup" priority="299990"/>
+        <ECProperty propertyName="Height" typeName="double" displayLabel="Height" category="GeneralCategory_Setup" priority="299980" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="Occupy" typeName="string" displayLabel="Occupy" category="GeneralCategory_Setup" priority="299970"/>
+        <ECProperty propertyName="Backsight" typeName="string" displayLabel="Backsight" category="GeneralCategory_Setup" priority="299960"/>
+        <ECProperty propertyName="BacksightDirection" typeName="double" displayLabel="BacksightDirection" category="GeneralCategory_Setup" priority="299950" kindOfQuantity="cifu:BEARING"/>
+        <ECProperty propertyName="BacksightType" typeName="NetworkSetupAspect_BacksightType_Enum" displayLabel="BacksightType" category="GeneralCategory_Setup" priority="299940"/>
+        <ECProperty propertyName="Circle" typeName="double" displayLabel="Circle" category="GeneralCategory_Setup" priority="299930" kindOfQuantity="cifu:ANGLE"/>
+        <ECProperty propertyName="CollimationHorizontal" typeName="double" displayLabel="Horizontal Collimation" category="GeneralCategory_Setup" priority="299920" kindOfQuantity="cifu:ANGLE"/>
+        <ECProperty propertyName="CollimationVertical" typeName="double" displayLabel="Vertical Collimation" category="GeneralCategory_Setup" priority="299910" kindOfQuantity="cifu:ANGLE"/>
+        <ECProperty propertyName="CombinedScaleFactor" typeName="string" displayLabel="Combined Scale Factor" category="GeneralCategory_Setup" priority="299900"/>
+        <ECProperty propertyName="StdErrorDirection" typeName="string" displayLabel="StdErrorDirection" category="GeneralCategory_Setup" priority="299890"/>
+        <ECProperty propertyName="NetworkName" typeName="string" displayLabel="Data File Name" category="GeneralCategory_Setup" priority="299880"/>
+        <ECProperty propertyName="DatasetName" typeName="string" displayLabel="Field Book Name" category="GeneralCategory_Setup" priority="299870"/>
+        <ECProperty propertyName="TimeStamp" typeName="string" displayLabel="Time Stamp" category="GeneralCategory_Setup" priority="299860"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsNetworkSetupAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="NetworkSetupAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="SurveyChainAspect" displayLabel="Linear Feature">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="Name" typeName="string" displayLabel="Name" category="GeneralCategory_Linear_Feature" priority="299990"/>
+        <ECProperty propertyName="Display" typeName="SurveyChainAspect_Display_Enum" displayLabel="Display" category="GeneralCategory_Linear_Feature" priority="299980"/>
+        <ECProperty propertyName="Feature" typeName="string" displayLabel="Field Code" category="GeneralCategory_Linear_Feature" priority="299970"/>
+        <ECProperty propertyName="Zone" typeName="string" displayLabel="Zone" category="GeneralCategory_Linear_Feature" priority="299960"/>
+        <ECProperty propertyName="Description" typeName="string" displayLabel="Description" category="GeneralCategory_Linear_Feature" priority="299950"/>
+        <ECProperty propertyName="DTMAttribute" typeName="SurveyChainAspect_DTMAttribute_Enum" displayLabel="Terrain Model Attribute" category="GeneralCategory_Linear_Feature" priority="299940"/>
+        <ECProperty propertyName="AttributesPair" typeName="string" displayLabel="Attributes Pair" category="GeneralCategory_Linear_Feature" priority="299930"/>
+        <ECProperty propertyName="Length" typeName="double" displayLabel="Length" category="GeneralCategory_Linear_Feature" priority="299920" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="NetworkName" typeName="string" displayLabel="Data File Name" category="GeneralCategory_Linear_Feature" priority="299910"/>
+        <ECProperty propertyName="MacroParameters" typeName="string" displayLabel="VBA Macro" category="GeneralCategory_Linear_Feature" priority="299900"/>
+        <ECProperty propertyName="DatasetName" typeName="string" displayLabel="Field Book Name" category="GeneralCategory_Linear_Feature" priority="299890"/>
+        <ECProperty propertyName="StyleName" typeName="string" displayLabel="Feature Definition" category="GeneralCategory_Linear_Feature" priority="299880"/>
+        <ECProperty propertyName="FeatureDescription" typeName="string" displayLabel="Feature Description" category="GeneralCategory_Linear_Feature" priority="299870"/>
+        <ECProperty propertyName="CreationType" typeName="string" displayLabel="Creation Type" category="GeneralCategory_Linear_Feature" priority="299860"/>
+        <ECProperty propertyName="MediaFile" typeName="string" displayLabel="Media File" category="GeneralCategory_Linear_Feature" priority="299850"/>
+        <ECProperty propertyName="TimeStamp" typeName="string" displayLabel="Time Stamp" category="GeneralCategory_Linear_Feature" priority="299840"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsSurveyChainAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="SurveyChainAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="SurveyCollectionAspect" displayLabel="List">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="Count" typeName="string" displayLabel="Count" category="GeneralCategory_List" priority="299990"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsSurveyCollectionAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="SurveyCollectionAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="SurveyDatasetAspect" displayLabel="Field Book">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="Name" typeName="string" displayLabel="Name" category="GeneralCategory_Field_Book" priority="299990"/>
+        <ECProperty propertyName="ControlPoints" typeName="string" displayLabel="Control Points" category="GeneralCategory_Field_Book" priority="299980"/>
+        <ECProperty propertyName="Networks" typeName="string" displayLabel="Data Files" category="GeneralCategory_Field_Book" priority="299970"/>
+        <ECProperty propertyName="SurveyChains" typeName="string" displayLabel="Linear Features" category="GeneralCategory_Field_Book" priority="299960"/>
+        <ECProperty propertyName="SurveyPoints" typeName="string" displayLabel="Point Features" category="GeneralCategory_Field_Book" priority="299950"/>
+        <ECProperty propertyName="SetupPoints" typeName="string" displayLabel="Setup Points" category="GeneralCategory_Field_Book" priority="299940"/>
+        <ECProperty propertyName="ObservationPoints" typeName="string" displayLabel="Observation Points" category="GeneralCategory_Field_Book" priority="299930"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsSurveyDatasetAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="SurveyDatasetAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="SurveyFilterAspect" displayLabel="Survey Filter">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="Name" typeName="string" displayLabel="Name" category="GeneralCategory_Survey_Filter" priority="299990"/>
+        <ECProperty propertyName="Category" typeName="string" displayLabel="Category" category="GeneralCategory_Survey_Filter" priority="299980"/>
+        <ECProperty propertyName="Description" typeName="string" displayLabel="Description" category="GeneralCategory_Survey_Filter" priority="299970"/>
+        <ECProperty propertyName="UseFence" typeName="SurveyFilterAspect_UseFence_Enum" displayLabel="Use Fence" category="GeneralCategory_Survey_Filter" priority="299960"/>
+        <ECProperty propertyName="FilterValue" typeName="string" displayLabel="Filter Value" category="GeneralCategory_Survey_Filter" priority="299950"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsSurveyFilterAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="SurveyFilterAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="SurveyNetworkAspect" displayLabel="Data File">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="Name" typeName="string" displayLabel="Name" category="GeneralCategory_Data_File" priority="299990"/>
+        <ECProperty propertyName="Setups" typeName="string" displayLabel="Setups" category="GeneralCategory_Data_File" priority="299980"/>
+        <ECProperty propertyName="ControlPoints" typeName="string" displayLabel="Control Points" category="GeneralCategory_Data_File" priority="299970"/>
+        <ECProperty propertyName="Points" typeName="string" displayLabel="Point Features" category="GeneralCategory_Data_File" priority="299960"/>
+        <ECProperty propertyName="Chains" typeName="string" displayLabel="Linear Features" category="GeneralCategory_Data_File" priority="299950"/>
+        <ECProperty propertyName="Observations" typeName="string" displayLabel="Observations" category="GeneralCategory_Data_File" priority="299940"/>
+        <ECProperty propertyName="FileName" typeName="string" displayLabel="File Name" category="GeneralCategory_Data_File" priority="299930"/>
+        <ECProperty propertyName="Description" typeName="string" displayLabel="Description" category="GeneralCategory_Data_File" priority="299920"/>
+        <ECProperty propertyName="DateTime" typeName="string" displayLabel="Date Time" category="GeneralCategory_Data_File" priority="299910"/>
+        <ECProperty propertyName="UserName" typeName="string" displayLabel="User Name" category="GeneralCategory_Data_File" priority="299900"/>
+        <ECProperty propertyName="ProcessObservationRules" typeName="SurveyNetworkAspect_ProcessObservationRules_Enum" displayLabel="Process Observation Rules" category="GeneralCategory_Data_File" priority="299890"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsSurveyNetworkAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="SurveyNetworkAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="SurveyPointAspect" displayLabel="Point Feature">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="Name" typeName="string" displayLabel="Name" category="GeneralCategory_Point_Feature" priority="299990"/>
+        <ECProperty propertyName="Display" typeName="SurveyPointAspect_Display_Enum" displayLabel="Display" category="GeneralCategory_Point_Feature" priority="299980"/>
+        <ECProperty propertyName="Feature" typeName="string" displayLabel="Field Code" category="GeneralCategory_Point_Feature" priority="299970"/>
+        <ECProperty propertyName="LinkCode" typeName="SurveyPointAspect_LinkCode_Enum" displayLabel="Link Code" category="GeneralCategory_Point_Feature" priority="299960"/>
+        <ECProperty propertyName="Zone" typeName="string" displayLabel="Zone" category="GeneralCategory_Point_Feature" priority="299950"/>
+        <ECProperty propertyName="Description" typeName="string" displayLabel="Description" category="GeneralCategory_Point_Feature" priority="299940"/>
+        <ECProperty propertyName="DTMAttribute" typeName="SurveyPointAspect_DTMAttribute_Enum" displayLabel="Terrain Model Attribute" category="GeneralCategory_Point_Feature" priority="299930"/>
+        <ECProperty propertyName="AttributesPair" typeName="string" displayLabel="Attributes Pair" category="GeneralCategory_Point_Feature" priority="299920"/>
+        <ECProperty propertyName="ControlCodesPair" typeName="string" displayLabel="Control Codes" category="GeneralCategory_Point_Feature" priority="299910"/>
+        <ECProperty propertyName="X" typeName="double" displayLabel="Easting" category="GeneralCategory_Point_Feature" priority="299900" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="Y" typeName="double" displayLabel="Northing" category="GeneralCategory_Point_Feature" priority="299890" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="Z" typeName="double" displayLabel="Elevation" category="GeneralCategory_Point_Feature" priority="299880" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="NetworkName" typeName="string" displayLabel="Data File Name" category="GeneralCategory_Point_Feature" priority="299870"/>
+        <ECProperty propertyName="MacroParameters" typeName="string" displayLabel="VBA Macro" category="GeneralCategory_Point_Feature" priority="299860"/>
+        <ECProperty propertyName="DatasetName" typeName="string" displayLabel="Field Book Name" category="GeneralCategory_Point_Feature" priority="299850"/>
+        <ECProperty propertyName="StyleName" typeName="string" displayLabel="Feature Definition" category="GeneralCategory_Point_Feature" priority="299840"/>
+        <ECProperty propertyName="FeatureDescription" typeName="string" displayLabel="Feature Description" category="GeneralCategory_Point_Feature" priority="299830"/>
+        <ECProperty propertyName="MediaFile" typeName="string" displayLabel="Media File" category="GeneralCategory_Point_Feature" priority="299820"/>
+        <ECProperty propertyName="TimeStamp" typeName="string" displayLabel="Time Stamp" category="GeneralCategory_Point_Feature" priority="299810"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsSurveyPointAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="SurveyPointAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="SurveyProjectAspect" displayLabel="Survey Project">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="Name" typeName="string" displayLabel="Name" category="GeneralCategory_Survey_Project" priority="299990"/>
+        <ECProperty propertyName="Datasets" typeName="string" displayLabel="Datasets" category="GeneralCategory_Survey_Project" priority="299980"/>
+        <ECProperty propertyName="CurrentSettings" typeName="string" displayLabel="Current Settings" category="GeneralCategory_Survey_Project" priority="299970"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsSurveyProjectAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="SurveyProjectAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="SurveySettingsAspect" displayLabel="Settings">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="UseSmartObjects" typeName="SurveySettingsAspect_UseSmartObjects_Enum" displayLabel="Use VBA Macros" category="GeneralCategory_Settings" priority="299990"/>
+        <ECProperty propertyName="FeatureMacros" typeName="string" displayLabel="VBA Feature Macros" category="GeneralCategory_Settings" priority="299980"/>
+        <ECProperty propertyName="AttributeOverrides" typeName="string" displayLabel="Attribute Overrides" category="GeneralCategory_Settings" priority="299970"/>
+        <ECProperty propertyName="DescriptionSeparator" typeName="string" displayLabel="Description Separator" category="GeneralCategory_Settings" priority="299960"/>
+        <ECProperty propertyName="AttributeSeparator" typeName="string" displayLabel="Attribute Separator" category="GeneralCategory_Settings" priority="299950"/>
+        <ECProperty propertyName="SurveyValidators" typeName="string" displayLabel="Validating Rules" category="GeneralCategory_Settings" priority="299940"/>
+        <ECProperty propertyName="LinkCodeBeforeFeature" typeName="SurveySettingsAspect_LinkCodeBeforeFeature_Enum" displayLabel="Link Code Position" category="GeneralCategory_Settings" priority="299930"/>
+        <ECProperty propertyName="UseSubstituteStrings" typeName="SurveySettingsAspect_UseSubstituteStrings_Enum" displayLabel="Use Substitute Strings" category="GeneralCategory_Settings" priority="299920"/>
+        <ECProperty propertyName="LinkCodes" typeName="string" displayLabel="Link Codes" category="GeneralCategory_Settings" priority="299910"/>
+        <ECProperty propertyName="SubstituteStrings" typeName="string" displayLabel="Substitute Strings" category="GeneralCategory_Settings" priority="299900"/>
+        <ECProperty propertyName="DataImportItems" typeName="string" displayLabel="Data Import Items" category="GeneralCategory_Settings" priority="299890"/>
+        <ECProperty propertyName="StyleFilePath" typeName="string" displayLabel="Style File Path" category="GeneralCategory_Settings" priority="299880"/>
+        <ECProperty propertyName="ControlPointFeatures" typeName="string" displayLabel="Control Point Features" category="GeneralCategory_Settings" priority="299870"/>
+        <ECProperty propertyName="ImportCoordinatesAsControlPoints" typeName="SurveySettingsAspect_ImportCoordinatesAsControlPoints_Enum" displayLabel="Import Coordinate Records" category="GeneralCategory_Settings" priority="299860"/>
+        <ECProperty propertyName="LinearConversionPrompt" typeName="SurveySettingsAspect_LinearConversionPrompt_Enum" displayLabel="Linear Conversion Prompt" category="GeneralCategory_Settings" priority="299850"/>
+        <ECProperty propertyName="LinkingMethod" typeName="SurveySettingsAspect_LinkingMethod_Enum" displayLabel="Linear Feature Linking Method" category="GeneralCategory_Settings" priority="299840"/>
+        <ECProperty propertyName="FeatureExclusions" typeName="string" displayLabel="Feature  Exclusions" category="GeneralCategory_Settings" priority="299830"/>
+        <ECProperty propertyName="LogChanges" typeName="SurveySettingsAspect_LogChanges_Enum" displayLabel="Create Log File" category="GeneralCategory_Settings" priority="299820"/>
+        <ECProperty propertyName="StopDynamicChainExceptOnImport" typeName="SurveySettingsAspect_StopDynamicChainExceptOnImport_Enum" displayLabel="Linear Feature Linking" category="GeneralCategory_Settings" priority="299810"/>
+        <ECProperty propertyName="AppendNotesToDescription" typeName="SurveySettingsAspect_AppendNotesToDescription_Enum" displayLabel="Append Notes to Description" category="GeneralCategory_Settings" priority="299800"/>
+        <ECProperty propertyName="AppendNotesToAttributes" typeName="SurveySettingsAspect_AppendNotesToAttributes_Enum" displayLabel="Append Notes to Attributes" category="GeneralCategory_Settings" priority="299790"/>
+        <ECProperty propertyName="ApplyDrawingScaleToFixedCells" typeName="SurveySettingsAspect_ApplyDrawingScaleToFixedCells_Enum" displayLabel="Apply Drawing Scale To Fixed Cells" category="GeneralCategory_Settings" priority="299780"/>
+        <ECProperty propertyName="BestMatchFieldCodeOption" typeName="SurveySettingsAspect_BestMatchFieldCodeOption_Enum" displayLabel="Best Match Field Code Option" category="GeneralCategory_Settings" priority="299770"/>
+        <ECProperty propertyName="Name" typeName="string" displayLabel="Name" category="GeneralCategory_Settings" priority="299760"/>
+        <ECProperty propertyName="PublishEC" typeName="SurveySettingsAspect_PublishEC_Enum" displayLabel="Publish ECData" category="GeneralCategory_Settings" priority="299750"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsSurveySettingsAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="SurveySettingsAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="SurveyTraverseAspect" displayLabel="Survey Traverse">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="Name" typeName="string" displayLabel="Name" category="GeneralCategory_Survey_Traverse" priority="299990"/>
+        <ECProperty propertyName="PointList" typeName="string" displayLabel="Point List" category="GeneralCategory_Survey_Traverse" priority="299980"/>
+        <ECProperty propertyName="Display" typeName="SurveyTraverseAspect_Display_Enum" displayLabel="Display" category="GeneralCategory_Survey_Traverse" priority="299970"/>
+        <ECProperty propertyName="Description" typeName="string" displayLabel="Description" category="GeneralCategory_Survey_Traverse" priority="299960"/>
+        <ECProperty propertyName="Length" typeName="double" displayLabel="Length" category="GeneralCategory_Survey_Traverse" priority="299950" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="DatasetName" typeName="string" displayLabel="Field Book Name" category="GeneralCategory_Survey_Traverse" priority="299940"/>
+        <ECProperty propertyName="MediaFile" typeName="string" displayLabel="Media File" category="GeneralCategory_Survey_Traverse" priority="299930"/>
+        <ECProperty propertyName="TimeStamp" typeName="string" displayLabel="Time Stamp" category="GeneralCategory_Survey_Traverse" priority="299920"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsSurveyTraverseAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="SurveyTraverseAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <PropertyCategory typeName="GeneralCategory_Adjustment" description="GeneralCategory" displayLabel="Adjustment" priority="300000"/>
+    <PropertyCategory typeName="GeneralCategory_Control_Point" description="GeneralCategory" displayLabel="Control Point" priority="300000"/>
+    <PropertyCategory typeName="GeneralCategory_Data_File" description="GeneralCategory" displayLabel="Data File" priority="300000"/>
+    <PropertyCategory typeName="GeneralCategory_Error_Ellipse" description="GeneralCategory" displayLabel="Error Ellipse" priority="300000"/>
+    <PropertyCategory typeName="GeneralCategory_Field_Book" description="GeneralCategory" displayLabel="Field Book" priority="300000"/>
+    <PropertyCategory typeName="GeneralCategory_Linear_Feature" description="GeneralCategory" displayLabel="Linear Feature" priority="300000"/>
+    <PropertyCategory typeName="GeneralCategory_List" description="GeneralCategory" displayLabel="List" priority="300000"/>
+    <PropertyCategory typeName="GeneralCategory_Observation" description="GeneralCategory" displayLabel="Observation" priority="300000"/>
+    <PropertyCategory typeName="GeneralCategory_Point_Feature" description="GeneralCategory" displayLabel="Point Feature" priority="300000"/>
+    <PropertyCategory typeName="GeneralCategory_Settings" description="GeneralCategory" displayLabel="Settings" priority="300000"/>
+    <PropertyCategory typeName="GeneralCategory_Setup" description="GeneralCategory" displayLabel="Setup" priority="300000"/>
+    <PropertyCategory typeName="GeneralCategory_Survey_Filter" description="GeneralCategory" displayLabel="Survey Filter" priority="300000"/>
+    <PropertyCategory typeName="GeneralCategory_Survey_Project" description="GeneralCategory" displayLabel="Survey Project" priority="300000"/>
+    <PropertyCategory typeName="GeneralCategory_Survey_Traverse" description="GeneralCategory" displayLabel="Survey Traverse" priority="300000"/>
+</ECSchema>
