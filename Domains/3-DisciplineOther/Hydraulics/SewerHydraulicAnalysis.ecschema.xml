@@ -369,4 +369,35 @@
     <ECProperty propertyName="MeasureCoverTo" typeName="MeasureCoverTo" displayLabel="Measure Cover To" category="HydraulicData"/>
 		<ECProperty propertyName="IsPartFullDesign" typeName="boolean" displayLabel="Is Part Full Design" category="HydraulicData"/>
 	</ECEntityClass>
+
+	  <ECEntityClass typeName="PipeSizeSet" modifier="Sealed" displayLabel="Pipe Sizes">
+    <BaseClass>bis:DefinitionElement</BaseClass>
+    <ECProperty propertyName="Shape" typeName="PipeShape" displayLabel="Shape"  category="HydraulicData"/>
+    <ECProperty propertyName="Material" typeName="string" displayLabel="Material"  category="HydraulicData"/>
+  </ECEntityClass>
+  
+  <ECRelationshipClass typeName="PipeSetOwnsPipeSetItem" strength="embedding" modifier="Sealed">
+    <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+    <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+      <Class class="PipeSizeSet"/>
+    </Source>
+    <Target multiplicity="(0..*)" roleLabel="owned by" polymorphic="false">
+      <Class class="PipeSize"/>
+    </Target>
+  </ECRelationshipClass>
+  
+  <ECEntityClass typeName="PipeSize" modifier="Sealed" displayLabel="Pipe Item">
+    <BaseClass>bis:DefinitionElement</BaseClass>
+    <ECProperty propertyName="Manningsn" typeName="double" displayLabel="Manning's n" category="HydraulicData"/>
+  </ECEntityClass>
+  
+  <ECRelationshipClass typeName="PipeSetItemOwnsPipeShapeAspect" strength="embedding" modifier="Sealed">
+    <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+    <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+      <Class class="PipeSize"/>
+    </Source>
+    <Target multiplicity="(1..1)" roleLabel="owned by" polymorphic="true">
+      <Class class="PipeShapeAspect"/>
+    </Target>
+  </ECRelationshipClass>
 </ECSchema>
