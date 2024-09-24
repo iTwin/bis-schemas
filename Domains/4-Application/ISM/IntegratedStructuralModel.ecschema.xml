@@ -14,6 +14,37 @@
         <BaseClass>anlyt:AnalyticalModel</BaseClass>
     </ECEntityClass>
 
+    <ECEnumeration typeName="IsmGeometryType" backingTypeName="string" isStrict="true" description="Geometry Type.">
+        <ECEnumerator value="ismLineSegment2d" name="IsmLineSegment2d" displayLabel="Ism Line Segment 2d" />
+        <ECEnumerator value="ismLineSegment3d" name="IsmLineSegment3d" displayLabel="Ism LineSegment 3d" />
+        <ECEnumerator value="ismCircularArc2d" name="IsmCircularArc2d" displayLabel="Ism Circular Arc 2d" />
+        <ECEnumerator value="ismCircularArc3d" name="IsmCircularArc3d" displayLabel="Ism Circular Arc 3d" />
+        <ECEnumerator value="ismEllipticalArc3d" name="IsmEllipticalArc3d" displayLabel="Ism Elliptical Arc 3d" />
+        <ECEnumerator value="ismCylinder3d" name="IsmCylinder3d" displayLabel="Ism Cylinder 3d" />
+        <ECEnumerator value="ismBsplineCurve3d" name="IsmBsplineCurve3d" displayLabel="Ism Bspline Curve 3d" />
+        <ECEnumerator value="ismVolumeExtrusion3d" name="IsmVolumeExtrusion3d" displayLabel="Ism Volume Extrusion 3d" />
+        <ECEnumerator value="ismEllipticalCylinder3d" name="IsmEllipticalCylinder3d" displayLabel="Ism Elliptical Cylinder 3d" />
+        <ECEnumerator value="ismSolidExtrusion3d" name="IsmSolidExtrusion3d" displayLabel="Ism Solid Extrusion 3d" />
+        <ECEnumerator value="ismPolyline2d" name="IsmPolyline2d" displayLabel="Ism Polyline 2d" />
+        <ECEnumerator value="ismPolyline3d" name="IsmPolyline3d" displayLabel="Ism Polyline 3d" />
+        <ECEnumerator value="ismCurveChain3d" name="IsmCurveChain3d" displayLabel="Ism CurveChain 3d" />
+        <ECEnumerator value="ismCurveChain2d" name="IsmCurveChain2d" displayLabel="Ism CurveChain 2d" />
+        <ECEnumerator value="ismPerimeterSurface2d" name="IsmPerimeterSurface2d" displayLabel="Ism PerimeterSurface 2d" />
+        <ECEnumerator value="ismPoint3dArray" name="IsmPoint3dArray" displayLabel="Ism Point 3d Array" />
+        <ECEnumerator value="ismMultiSurface2d" name="IsmMultiSurface2d" displayLabel="Ism Multi Surface 2d" />
+        <ECEnumerator value="ismTrimmedSurface3d" name="IsmTrimmedSurface3d" displayLabel="Ism Trimmed Surface 3d" />
+    </ECEnumeration>
+
+    <ECStructClass typeName="IsmPrimitiveGeometry" description="Primitive Geometry" modifier="Sealed">
+        <ECProperty propertyName="type" typeName="IsmGeometryType" description="Type of Geoemetry." />
+        <ECProperty propertyName="geometry" typeName="Bentley.Geometry.Common.IGeometry" displayLabel="Geometry" kindOfQuantity="AECU:LENGTH" />
+    </ECStructClass>
+
+    <ECStructClass typeName="IsmArrayGeometry" description="Array Geometry" modifier="Sealed">
+        <ECProperty propertyName="type" typeName="IsmGeometryType" description="Type of Geoemetry." />
+        <ECArrayProperty propertyName="geometry" typeName="Bentley.Geometry.Common.IGeometry" displayLabel="Geometry" kindOfQuantity="AECU:LENGTH" />
+    </ECStructClass>
+
     <ECCustomAttributes>
         <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
             <SupportedUse>NotForProduction</SupportedUse>
@@ -101,8 +132,8 @@
 
     <ECEntityClass typeName="IsmAnalysisResults" modifier="None" displayLabel="Analysis Results">
         <BaseClass>IsmResults</BaseClass>
-        <ECProperty propertyName="MaxDisplacedLocation" typeName="point3d" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="MaxDisplacement" typeName="point3d" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="MaxDisplacedLocation" typeName="Point3d" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="MaxDisplacement" typeName="Point3d" kindOfQuantity="AECU:LENGTH" />
     </ECEntityClass>
 
     <ECRelationshipClass typeName="IsmAnalysisResults_MaxDisplacementLoadContainer" modifier="None" strength="referencing" strengthDirection="forward">
@@ -142,7 +173,7 @@
 
     <ECEntityClass typeName="IsmCurveMemberAnalysisResults" modifier="None" displayLabel="Curve Member Analysis Results">
         <BaseClass>IsmMemberAnalysisResults</BaseClass>
-        <ECProperty propertyName="MaxDisplacement" typeName="point3d" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="MaxDisplacement" typeName="Point3d" kindOfQuantity="AECU:LENGTH" />
         <ECProperty propertyName="MaxDisplacedLinearDistance" typeName="double" displayLabel="Max Displacement Location Ratio" kindOfQuantity="AECU:LENGTH" />
     </ECEntityClass>
 
@@ -333,7 +364,7 @@
 
     <ECEntityClass typeName="IsmConstantSection" displayLabel="Ism Constant Section" modifier="Abstract">
         <BaseClass>IsmSection</BaseClass>
-        <ECProperty propertyName="Shape" typeName="Bentley.Geometry.Common.IGeometry" />
+        <ECStructProperty propertyName="Shape" typeName="IsmPrimitiveGeometry" />
     </ECEntityClass>
 
     <ECEntityClass typeName="IsmVaryingSection" displayLabel="Varying Section" modifier="Sealed">
@@ -404,7 +435,7 @@
     <ECEntityClass typeName="IsmBuiltUpSectionComponent" displayLabel="Built-Up Section Component" modifier="Sealed">
         <BaseClass>bis:DefinitionElement</BaseClass>
         <BaseClass>IIsmSubObject</BaseClass>
-        <ECProperty propertyName="Offset" typeName="Bentley.Geometry.Common.IGeometry" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="Offset" typeName="Point2d" kindOfQuantity="AECU:LENGTH_SHORT" />
         <ECProperty propertyName="Index" typeName="int" />
         <ECProperty propertyName="MirrorShapeAboutYAxis" typeName="boolean" displayLabel="Mirror Shape About Y-Axis" />
         <ECProperty propertyName="PlacementPoint" typeName="int" displayLabel="Placement Point" />
@@ -570,7 +601,7 @@
     <ECEntityClass typeName="IsmSurfaceRebar" modifier="None" displayLabel="Surface Rebar">
         <BaseClass>IsmRebar</BaseClass>
         <ECProperty propertyName="LayoutPlacement" typeName="LayoutPlacementType" displayLabel="Layout Placement" />
-        <ECProperty propertyName="BarDirection" typeName="point3d" displayLabel="Bar Direction" />
+        <ECProperty propertyName="BarDirection" typeName="Point3d" displayLabel="Bar Direction" />
         <ECProperty propertyName="BarSpacing" typeName="double" displayLabel="Bar Spacing" kindOfQuantity="AECU:LENGTH" />
         <ECProperty propertyName="EndHookDirection" typeName="double" displayLabel="End Hook Direction" kindOfQuantity="AECU:ANGLE" />
         <ECProperty propertyName="StartHookDirection" typeName="double" displayLabel="Start Hook Direction" kindOfQuantity="AECU:ANGLE" />
@@ -584,8 +615,8 @@
 
     <ECEntityClass typeName="IsmConcentratedSurfaceRebar" modifier="Sealed" displayLabel="Concentrated Surface Rebar">
         <BaseClass>IsmSurfaceRebar</BaseClass>
-        <ECProperty propertyName="LayoutPoint" typeName="point3d" displayLabel="Layout Point" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="LayoutDirection" typeName="point3d" displayLabel="Layout Direction" />
+        <ECProperty propertyName="LayoutPoint" typeName="Point3d" displayLabel="Layout Point" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="LayoutDirection" typeName="Point3d" displayLabel="Layout Direction" />
         <ECProperty propertyName="BarLength" typeName="double" displayLabel="Bar Length" kindOfQuantity="AECU:LENGTH" />
         <ECProperty propertyName="AutoDetailedLength" typeName="double" displayLabel="Detailed Length" kindOfQuantity="AECU:LENGTH" />
         <ECProperty propertyName="AutoGroupBarWeight" typeName="double" displayLabel="Group Bar Weight" kindOfQuantity="AECU:WEIGHT" />
@@ -597,7 +628,7 @@
 
     <ECEntityClass typeName="IsmAreaSurfaceRebar" modifier="Sealed" displayLabel="Area Surface Rebar">
         <BaseClass>IsmSurfaceRebar</BaseClass>
-        <ECProperty propertyName="LayoutBoundary" typeName="Bentley.Geometry.Common.IGeometry" displayLabel="Layout Boundary" />
+        <ECStructProperty propertyName="LayoutBoundary" typeName="IsmPrimitiveGeometry" displayLabel="Layout Boundary" />
         <ECProperty propertyName="ConsiderMemberOpenings" typeName="boolean" displayLabel="Consider Member Openings" />
         <ECProperty propertyName="EndAndSideCover" typeName="double" displayLabel="End and Side Cover" />
     </ECEntityClass>
@@ -605,9 +636,9 @@
     <ECEntityClass typeName="IsmGrid" modifier="Abstract" displayLabel="Grid" >
         <BaseClass>anlyt:AnalyticalElement</BaseClass>
         <BaseClass>IIsmObject</BaseClass>
-        <ECProperty propertyName="RAxis" typeName="point3d" displayLabel="R Axis" />
-        <ECProperty propertyName="SAxis" typeName="point3d" displayLabel="S Axis" />
-        <ECProperty propertyName="Location" typeName="point3d" displayLabel="Origin" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="RAxis" typeName="Point3d" displayLabel="R Axis" />
+        <ECProperty propertyName="SAxis" typeName="Point3d" displayLabel="S Axis" />
+        <ECProperty propertyName="Location" typeName="Point3d" displayLabel="Origin" kindOfQuantity="AECU:LENGTH" />
     </ECEntityClass>
 
     <ECEntityClass typeName="IsmCartesianGrid" modifier="Sealed" displayLabel="Cartesian Grid">
@@ -634,8 +665,8 @@
 
     <ECEntityClass typeName="IsmParallelRebar" modified="Abstract" displayLabel="Parallel Rebar">
         <BaseClass>IsmRebar</BaseClass>
-        <ECProperty propertyName="LayoutPath" typeName="Bentley.Geometry.Common.IGeometry" displayLabel="Layout Path" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="TAxis" typeName="point3d" displayLabel="T Axis" />
+        <ECStructProperty propertyName="LayoutPath" typeName="IsmPrimitiveGeometry" displayLabel="Layout Path" />
+        <ECProperty propertyName="TAxis" typeName="Point3d" displayLabel="T Axis" />
         <ECProperty propertyName="AutoBarCount" typeName="double" displayLabel="Auto Bar Count" />
         <ECProperty propertyName="AutoLayoutLength" typeName="double" displayLabel="Auto Layout Length" kindOfQuantity="AECU:LENGTH" />
         <ECProperty propertyName="AutoDetailedLength" typeName="double" displayLabel="Auto Detailed Length" kindOfQuantity="AECU:LENGTH" />
@@ -654,7 +685,7 @@
         <BaseClass>IsmRebar</BaseClass>
         <ECProperty propertyName="SAxis" typeName="Point3d" displayLabel="S Axis" />
         <ECProperty propertyName="TAxis" typeName="Point3d" displayLabel="T Axis" />
-        <ECProperty propertyName="LayoutPath" typeName="Bentley.Geometry.Common.IGeometry" displayLabel="Layout Path" kindOfQuantity="AECU:LENGTH" />
+        <ECStructProperty propertyName="LayoutPath" typeName="IsmPrimitiveGeometry" displayLabel="Layout Path" />
         <ECProperty propertyName="AutoBarCount" typeName="double" displayLabel="Auto Bar Count" />
         <ECProperty propertyName="AutoLayoutLength" typeName="double" displayLabel="Auto Layout Length" kindOfQuantity="AECU:LENGTH" />
         <ECProperty propertyName="AutoDetailedLength" typeName="double" displayLabel="Auto Detailed Length" kindOfQuantity="AECU:LENGTH" />
@@ -749,11 +780,11 @@
 
     <ECEntityClass typeName="IsmCurveForceMemberLoad" modifier="Sealed" displayLabel="Curve Force Member Load">
         <BaseClass>IsmLoad</BaseClass>
-        <ECProperty propertyName="Force0" typeName="point3d" displayLabel="Force #0" kindOfQuantity="AECU:LINEAR_FORCE" />
-        <ECProperty propertyName="Force1" typeName="point3d" displayLabel="Force #1" kindOfQuantity="AECU:LINEAR_FORCE" />
-        <ECProperty propertyName="Moment0" typeName="point3d" displayLabel="Moment #0" kindOfQuantity="AECU:LINEAR_MOMENT" />
-        <ECProperty propertyName="Moment1" typeName="point3d" displayLabel="Moment #1" kindOfQuantity="AECU:LINEAR_MOMENT" />
-        <ECProperty propertyName="Location" typeName="Bentley.Geometry.Common.IGeometry" displayLabel="Location" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="Force0" typeName="Point3d" displayLabel="Force #0" kindOfQuantity="AECU:LINEAR_FORCE" />
+        <ECProperty propertyName="Force1" typeName="Point3d" displayLabel="Force #1" kindOfQuantity="AECU:LINEAR_FORCE" />
+        <ECProperty propertyName="Moment0" typeName="Point3d" displayLabel="Moment #0" kindOfQuantity="AECU:LINEAR_MOMENT" />
+        <ECProperty propertyName="Moment1" typeName="Point3d" displayLabel="Moment #1" kindOfQuantity="AECU:LINEAR_MOMENT" />
+        <ECStructProperty propertyName="Location" typeName="IsmPrimitiveGeometry" displayLabel="Location" />
     </ECEntityClass>
 
     <ECEnumeration typeName="IsmCurveMemberPlacementPoint" backingTypeName="int" isStrict="true" description="Placement Point.">
@@ -840,15 +871,15 @@
 
     <ECEntityClass typeName="IsmCurveMember" displayLabel="Curve Member" modifier="Sealed">
         <BaseClass>IsmSpanningMember</BaseClass>
-        <ECProperty propertyName="Location" typeName="Bentley.Geometry.Common.IGeometry" displayLabel="Location (ICurve)" kindOfQuantity="AECU:LENGTH" />
+        <ECStructProperty propertyName="Location" typeName="IsmPrimitiveGeometry" displayLabel="Location (ICurve)" />
         <ECProperty propertyName="AxialBehavior" typeName="AxialBehavior" displayLabel="Axial Behavior" />
         <ECProperty propertyName="Camber" typeName="double" displayLabel="Camber" kindOfQuantity="AECU:LENGTH_SHORT" />
         <ECProperty propertyName="MirrorShapeAboutYAxis" typeName="boolean" displayLabel="Mirror Shape about Y-Axis" />
         <ECProperty propertyName="Orientation" typeName="Point3d" displayLabel="Orientation" />
         <ECProperty propertyName="PlacementPoint" typeName="IsmCurveMemberPlacementPoint" displayLabel="Placement Point" />
         <ECProperty propertyName="SystemKind" typeName="IsmCurveMemberSystemKind" displayLabel="System Kind" />
-        <ECArrayProperty propertyName="SteelConnectionTagAtStart" typeName="string" displayLabel="Steel Connection Tag at Start" minOccurs="0" maxOccurs="unbounded" />
-        <ECArrayProperty propertyName="SteelConnectionTagAtEnd" typeName="string" displayLabel="Steel Connection Tag at End" minOccurs="0" maxOccurs="unbounded" />
+        <ECArrayProperty propertyName="SteelConnectionTagAtStart" typeName="string" displayLabel="Steel Connection Tag at Start" />
+        <ECArrayProperty propertyName="SteelConnectionTagAtEnd" typeName="string" displayLabel="Steel Connection Tag at End" />
         <ECProperty propertyName="Use" typeName="IsmCurveMemberUse" displayLabel="Use" />
         <ECProperty propertyName="RAxisTranslationFixity1" typeName="boolean" displayLabel="R-Axis Translation Fixity #1" />
         <ECProperty propertyName="SAxisTranslationFixity1" typeName="boolean" displayLabel="S-Axis Translation Fixity #1" />
@@ -898,7 +929,7 @@
 
     <ECEntityClass typeName="IsmCurveSupport" displayLabel="Curve Support" modifier="Sealed">
         <BaseClass>IsmSupportMember</BaseClass>
-        <ECProperty propertyName="Location" typeName="Bentley.Geometry.Common.IGeometry" kindOfQuantity="AECU:LENGTH" />
+        <ECStructProperty propertyName="Location" typeName="IsmPrimitiveGeometry" displayLabel="Location" />
         <ECProperty propertyName="TAxis" typeName="Point3d" displayLabel="T-Axis" />
         <ECProperty propertyName="TAxisTranslationStiffness" typeName="double" displayLabel="T-Axis Translation Stiffness" kindOfQuantity="AECU:SPRING_CONSTANT" />
         <ECProperty propertyName="RAxisRotationStiffness" typeName="double" displayLabel="R-Axis Rotation Stiffness" kindOfQuantity="AECU:SPRING_CONSTANT" />
@@ -926,18 +957,18 @@
 
     <ECEntityClass typeName="IsmCustomGridLine" modified="Sealed" displayLabel="Custom Grid Line">
         <BaseClass>IsmGridLine</BaseClass>
-        <ECArrayProperty propertyName="Location" typeName="Bentley.Geometry.Common.IGeometry" displayLabel="Location" kindOfQuantity="AECU:LENGTH" />
+        <ECStructProperty propertyName="Location" typeName="IsmPrimitiveGeometry" displayLabel="Location" />
         <ECProperty propertyName="AxisGroup" typeName="string" displayLabel="Axis Group" />
     </ECEntityClass>
 
     <ECEntityClass typeName="IsmCustomParallelRebar" modified="Sealed" displayLabel="Custom Parallel Rebar">
         <BaseClass>IsmParallelRebar</BaseClass>
-        <ECArrayProperty propertyName="BarPositions" typeName="point2d" displayLabel="Bar Positions" kindOfQuantity="AECU:LENGTH" />
+        <ECArrayProperty propertyName="BarPositions" typeName="Point2d" displayLabel="Bar Positions" kindOfQuantity="AECU:LENGTH" />
     </ECEntityClass>
 
     <ECEntityClass typeName="IsmCustomPerpendicularRebar" modified="Sealed" displayLabel="Custom Perpendicular Rebar">
         <BaseClass>IsmPerpendicularRebar</BaseClass>
-        <ECArrayProperty propertyName="BarShape" typeName="Bentley.Geometry.Common.IGeometry" displayLabel="Bar Shape" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECStrucProperty propertyName="BarShape" typeName="IsmPrimitiveGeometry" displayLabel="Bar Shape" kindOfQuantity="AECU:LENGTH_SHORT" />
     </ECEntityClass>
 
     <ECEntityClass typeName="IsmCustomSection" modifier="Sealed" displayLabel="Custom Section" >
@@ -946,7 +977,7 @@
 
     <ECEntityClass typeName="IsmCustomSteelDeck" modifier="Sealed" displayLabel="Custom Steel Deck">
         <BaseClass>IsmSteelDeck</BaseClass>
-        <ECProperty propertyName="Profile" typeName="Bentley.Geometry.Common.IGeometry" displayLabel="Bar Shape" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECStrucProperty propertyName="Profile" typeName="IsmPrimitiveGeometry" displayLabel="Bar Shape" kindOfQuantity="AECU:LENGTH_SHORT" />
         <ECProperty propertyName="OverlapWidth" typeName="double" displayLabel="Overlap Width" kindOfQuantity="AECU:LENGTH_SHORT" />
     </ECEntityClass>
 
@@ -1031,7 +1062,7 @@
 
     <ECEntityClass typeName="IsmFeatureAddition" modifier="Sealed" displayLabel="Feature Addition">
         <BaseClass>IsmFeature</BaseClass>
-        <ECArrayProperty propertyName="Location" typeName="Bentley.Geometry.Common.IGeometry" displayLabel="Location" kindOfQuantity="AECU:LENGTH" />
+        <ECStructProperty propertyName="Location" typeName="IsmArrayGeometry" displayLabel="Location" />
         <ECProperty propertyName="Use" typeName="FeatureUse" displayLabel="Use" />
     </ECEntityClass>
 
@@ -1057,7 +1088,7 @@
 
     <ECEntityClass typeName="IsmFeatureSubtraction" modifier="Sealed" displayLabel="Feature Subtraction">
         <BaseClass>IsmFeature</BaseClass>
-        <ECProperty propertyName="Location" typeName="Bentley.Geometry.Common.IGeometry" displayLabel="Location" kindOfQuantity="AECU:LENGTH" />
+        <ECStructProperty propertyName="Location" typeName="IsmArrayGeometry" displayLabel="Location" />
         <ECProperty propertyName="Use" typeName="SubstractionUse" displayLabel="Use" />
     </ECEntityClass>            
 
@@ -1323,11 +1354,10 @@
     <ECEntityClass typeName="IsmPipingComponent" modifier="Abstract" displayLabel="Piping Component">
         <BaseClass>IsmPipingMember</BaseClass>
         <ECProperty propertyName="IsRigid" typeName="boolean" displayLabel="Is Rigid" />
-        <ECProperty propertyName="Location" typeName="Bentley.Geometry.Common.IGeometry" displayLabel="Location" kindOfQuantity="AECU:LENGTH" />
         <ECProperty propertyName="Diameter" typeName="double" displayLabel="Diameter" kindOfQuantity="AECU:LENGTH_SHORT" />
         <ECProperty propertyName="NominalDiameter" typeName="double" displayLabel="Nominal Diameter" kindOfQuantity="AECU:LENGTH_SHORT" />
         <ECProperty propertyName="WallThickness" typeName="double" displayLabel="Wall Thickness" kindOfQuantity="AECU:LENGTH_SHORT" />
-        <ECProperty propertyName="Orientation" typeName="point3d" displayLabel="Orientation" />
+        <ECProperty propertyName="Orientation" typeName="Point3d" displayLabel="Orientation" />
     </ECEntityClass>
 
     <ECEnumeration typeName="PipingBranchingType" backingTypeName="int" isStrict="true" description="Piping Branching Type.">
@@ -1342,6 +1372,7 @@
 
     <ECEntityClass typeName="IsmPipingRunComponent" modifier="Sealed" displayLabel="Piping Run Component">
         <BaseClass>IsmPipingComponent</BaseClass>
+        <ECStructProperty propertyName="Location" typeName="IsmPrimitiveGeometry" displayLabel="Location" />
         <ECProperty propertyName="StartBranchingType" typeName="PipingBranchingType" displayLabel="Start Branching Type" />
         <ECProperty propertyName="EndBranchingType" typeName="PipingBranchingType" displayLabel="End Branching Type" />
     </ECEntityClass>
@@ -1388,13 +1419,14 @@
 
     <ECEntityClass typeName="IsmPipingFlangeComponent" modifier="Sealed" displayLabel="Piping Flange Component">
         <BaseClass>IsmPipingComponent</BaseClass>
+        <ECProperty propertyName="Location" typeName="Point3d" displayLabel="Location" />
         <ECProperty propertyName="BoltNutWeight" typeName="double" displayLabel="Bolt Nut Weight" kindOfQuantity="AECU:WEIGHT" />
         <ECProperty propertyName="Weight" typeName="double" displayLabel="Weight" kindOfQuantity="AECU:WEIGHT" />
         <ECProperty propertyName="FlangeType" typeName="PipingFlangeType" displayLabel="Flange Type" />
         <ECProperty propertyName="Tag" typeName="string" displayLabel="Tag" />
         <ECProperty propertyName="PressureRating" typeName="string" displayLabel="Pressure Rating" />
         <ECProperty propertyName="FlangePlacement" typeName="PipingFlangeComponentPlacement" displayLabel="Placement" />
-        <ECProperty propertyName="Direction" typeName="point3d" displayLabel="Direction" />
+        <ECProperty propertyName="Direction" typeName="Point3d" displayLabel="Direction" />
         <ECProperty propertyName="Series" typeName="string" displayLabel="Series" />
         <ECProperty propertyName="OffsetJoint" typeName="double" displayLabel="Offset Joint" kindOfQuantity="AECU:LENGTH_SHORT" />
         <ECProperty propertyName="OffsetAverage" typeName="double" displayLabel="Offset Average" kindOfQuantity="AECU:LENGTH_SHORT" />
@@ -1403,7 +1435,7 @@
         <ECProperty propertyName="JointType" typeName="PipingJoint" displayLabel="Joint Type" />
     </ECEntityClass>
 
-    <ECEnumeration typeName="PippingBendComponentType" backingTypeName="int" isStrict="true" description="Piping Flange Component Joint.">
+    <ECEnumeration typeName="PipingBendComponentType" backingTypeName="int" isStrict="true" description="Piping Flange Component Joint.">
         <ECEnumerator value="10" name="Elbow" displayLabel="Elbow" description="Elbow." />
         <ECEnumerator value="20" name="Close" displayLabel="Close" description="Close." />
         <ECEnumerator value="30" name="Wide" displayLabel="Wide" description="Wide." />
@@ -1411,7 +1443,8 @@
 
     <ECEntityClass typeName="IsmPipingBendComponent" modifier="Sealed" displayLabel="Piping Bend Component">
         <BaseClass>IsmPipingComponent</BaseClass>
-        <ECProperty propertyName="Type" typeName="PippingBendComponentType" displayLabel="Type" />
+        <ECStructProperty propertyName="Location" typeName="IsmPrimitiveGeometry" displayLabel="Location" />
+        <ECProperty propertyName="BendType" typeName="PipingBendComponentType" displayLabel="Type" />
     </ECEntityClass>
 
     <ECEntityClass typeName="IsmPipingNode" modifier="Sealed" displayLabel="Piping Node">
@@ -1441,6 +1474,7 @@
 
     <ECEntityClass typeName="IsmPipingValveComponent" modifier="Sealed" displayLabel="Piping Valve Component">
         <BaseClass>IsmPipingComponent</BaseClass>
+        <ECStructProperty propertyName="Location" typeName="IsmPrimitiveGeometry" displayLabel="Location" />
         <ECProperty propertyName="Tag" typeName="string" displayLabel="Tag" />
         <ECProperty propertyName="ValveType" typeName="ValveType" displayLabel="Valve Type" />
         <ECProperty propertyName="ValveWeight" typeName="double" displayLabel="Valve Weight" kindOfQuantity="AECU:WEIGHT" />
@@ -1452,11 +1486,13 @@
 
     <ECEntityClass typeName="IsmPipingReducerComponent" modifier="Sealed" displayLabel="Piping Reducer Component">
         <BaseClass>IsmPipingComponent</BaseClass>
+        <ECStructProperty propertyName="Location" typeName="IsmPrimitiveGeometry" displayLabel="Location" />
         <ECProperty propertyName="EndDiameter" typeName="double" displayLabel="End Diameter" kindOfQuantity="AECU:LENGTH" />
         <ECProperty propertyName="EndNominalDiameter" typeName="double" displayLabel="End Nominal Diameter" />
     </ECEntityClass>
 
     <ECEntityClass typeName="IsmPipingFlexibleJointComponent" modifier="Sealed" displayLabel="Piping Flexible Joint Component">
+        <ECStructProperty propertyName="Location" typeName="IsmPrimitiveGeometry" displayLabel="Location" />
         <BaseClass>IsmPipingComponent</BaseClass>
     </ECEntityClass>
 
@@ -1471,8 +1507,9 @@
 
     <ECEntityClass typeName="IsmPipingNozzleComponent" modifier="Sealed" displayLabel="Piping Nozzle Component">
         <BaseClass>IsmPipingComponent</BaseClass>
+        <ECStructProperty propertyName="Location" typeName="IsmPrimitiveGeometry" displayLabel="Location" />
         <ECProperty propertyName="VesselDiameter" typeName="double" displayLabel="Vessel Diameter" kindOfQuantity="AECU:LENGTH_SHORT" />
-        <ECProperty propertyName="VesselDirection" typeName="point3d" displayLabel="Vessel Direction" />
+        <ECProperty propertyName="VesselDirection" typeName="Point3d" displayLabel="Vessel Direction" />
         <ECProperty propertyName="FlexibilityMethod" typeName="FlexibilityMethod" displayLabel="Flexibility Method" />
         <ECProperty propertyName="RadialStiffness" typeName="double" displayLabel="Radial Stiffness" kindOfQuantity="AECU:ROTATIONAL_SPRING_CONSTANT" />
         <ECProperty propertyName="CircularStiffness" typeName="double" displayLabel="Circular Stiffness" kindOfQuantity="AECU:ROTATIONAL_SPRING_CONSTANT" />
@@ -1483,13 +1520,13 @@
         <BaseClass>IsmPipingMember</BaseClass>
         <ECProperty propertyName="Tag" typeName="string" displayLabel="Tag" />
         <ECProperty propertyName="AttachmentId" typeName="string" displayLabel="Attachment Id" />
-        <ECProperty propertyName="ComponentWeight" typeName="string" displayLabel="Component Weight" />
+        <ECProperty propertyName="ComponentWeight" typeName="double" displayLabel="Component Weight" />
         <ECProperty propertyName="IsConnectedToGround" typeName="boolean" displayLabel="Is Connected To Ground" />
-        <ECProperty propertyName="StartPoint" typeName="point3d" displayLabel="Start Point" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="EndPoint" typeName="point3d" displayLabel="End Point" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="StartPoint" typeName="Point3d" displayLabel="Start Point" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="EndPoint" typeName="Point3d" displayLabel="End Point" kindOfQuantity="AECU:LENGTH" />
         <ECProperty propertyName="PipeDiameter" typeName="double" displayLabel="PipeDiameter" kindOfQuantity="AECU:LENGTH_SHORT" />
-        <ECProperty propertyName="RAxis" typeName="point3d" displayLabel="R Axis" />
-        <ECProperty propertyName="SAxis" typeName="point3d" displayLabel="S Axis" />
+        <ECProperty propertyName="RAxis" typeName="Point3d" displayLabel="R Axis" />
+        <ECProperty propertyName="SAxis" typeName="Point3d" displayLabel="S Axis" />
     </ECEntityClass>
 
     <ECEnumeration typeName="PipingSupportDesignMethod" backingTypeName="int" isStrict="true" description="Piping Spring Support Design Method.">
@@ -1558,7 +1595,7 @@
 
     <ECEntityClass typeName="IsmPipingInclineSupport" modifier="Sealed" displayLabel="Piping Incline Support">
         <BaseClass>IsmPipingSupport</BaseClass>
-        <ECProperty propertyName="Direction" typeName="point3d" displayLabel="Direction" />
+        <ECProperty propertyName="Direction" typeName="Point3d" displayLabel="Direction" />
         <ECProperty propertyName="Stiffness" typeName="double" displayLabel="Stiffness" kindOfQuantity="AECU:SPRING_CONSTANT" />
         <ECProperty propertyName="GapForward" typeName="double" displayLabel="Gap Forward" kindOfQuantity="AECU:LENGTH_SHORT" />
         <ECProperty propertyName="GapBackward" typeName="double" displayLabel="Gap Backward" kindOfQuantity="AECU:LENGTH_SHORT" />
@@ -1587,13 +1624,13 @@
 
     <ECEntityClass typeName="IsmPipingRotationSupport" modifier="Sealed" displayLabel="Piping Rotation Support">
         <BaseClass>IsmPipingSupport</BaseClass>
-        <ECProperty propertyName="Direction" typeName="point3d" displayLabel="Direction" />
+        <ECProperty propertyName="Direction" typeName="Point3d" displayLabel="Direction" />
         <ECProperty propertyName="Stiffness" typeName="double" displayLabel="Stiffness" kindOfQuantity="AECU:SPRING_CONSTANT" />
     </ECEntityClass>
 
     <ECEntityClass typeName="IsmPipingDamperSupport" modifier="Sealed" displayLabel="Piping Damper Support">
         <BaseClass>IsmPipingSupport</BaseClass>
-        <ECProperty propertyName="Direction" typeName="point3d" displayLabel="Direction" />
+        <ECProperty propertyName="Direction" typeName="Point3d" displayLabel="Direction" />
         <ECProperty propertyName="Stiffness" typeName="double" displayLabel="Stiffness" kindOfQuantity="AECU:SPRING_CONSTANT" />
     </ECEntityClass>
 
@@ -1709,7 +1746,7 @@
     <ECEntityClass typeName="IsmTendonNode" modifier="None" displayLabel="Tendon Node">
         <BaseClass>anlyt:AnalyticalElement</BaseClass>
         <BaseClass>IIsmSubObject</BaseClass>
-        <ECProperty propertyName="Location" typeName="point3d" displayLabel="Location" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="Location" typeName="Point3d" displayLabel="Location" kindOfQuantity="AECU:LENGTH" />
     </ECEntityClass>
 
     <ECRelationshipClass typeName="IsmTendonSet_Nodes" modifier="None" strength="referencing" strengthDirection="forward">
@@ -1756,14 +1793,7 @@
 
     <ECEntityClass typeName="IsmTendonDuctedSystem" modifier="None" displayLabel="Tendon Ducted System">
         <BaseClass>IsmTendonSystem</BaseClass>
-        <ECProperty propertyName="DuctShape" typeName="TendonDuctShapeType" displayLabel="Duct Shape">
-            <ECCustomAttributes>
-                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03"/>
-                <Deprecated xmlns="CoreCustomAttributes.01.00.03">
-                    <Description>Deprecated renamed property. Use 'DuctProfile' instead.</Description>
-                </Deprecated>
-            </ECCustomAttributes>
-        </ECProperty>
+        <ECProperty propertyName="DuctShape" typeName="TendonDuctShapeType" displayLabel="Duct Shape" />
         <ECProperty propertyName="DuctProfile" typeName="TendonDuctProfile" displayLabel="Duct Profile" />
         <ECProperty propertyName="DuctWidth" typeName="double" displayLabel="Duct Width" kindOfQuantity="AECU:LENGTH_SHORT" />
         <ECProperty propertyName="DuctHeight" typeName="double" displayLabel="Duct Height" kindOfQuantity="AECU:LENGTH_SHORT" />
@@ -1799,7 +1829,7 @@
     <ECEntityClass typeName="IsmTendonPart" modifier="Abstract" displayLabel="Tendon Part">
         <BaseClass>anlyt:AnalyticalElement</BaseClass>
         <BaseClass>IIsmSubObject</BaseClass>
-        <ECProperty propertyName="Orientation" typeName="point3d" displayLabel="Orientation" />
+        <ECProperty propertyName="Orientation" typeName="Point3d" displayLabel="Orientation" />
     </ECEntityClass>
 
     <ECRelationshipClass typeName="IsmTendon_TendonPart" modifier="None" strength="referencing" strengthDirection="forward">
@@ -1816,8 +1846,8 @@
         <BaseClass>IsmTendonPart</BaseClass>
         <ECProperty propertyName="Harped" typeName="boolean" displayLabel="Harped" />
         <ECProperty propertyName="InflectionRatio" typeName="double" displayLabel="Inflection Ratio" />
-        <ECProperty propertyName="Location" typeName="Bentley.Geometry.Common.IGeometry" displayLabel="Location" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="DuctLocation" typeName="Bentley.Geometry.Common.IGeometry" displayLabel="Duct Location" kindOfQuantity="AECU:LENGTH" />
+        <ECStructProperty propertyName="Location" typeName="IsmPrimitiveGeometry" displayLabel="Location" />
+        <ECStructProperty propertyName="DuctLocation" typeName="IsmPrimitiveGeometry" displayLabel="Duct Location" />
         <ECProperty propertyName="StartStress" typeName="double" displayLabel="Start Stress" kindOfQuantity="AECU:PRESSURE" />
         <ECProperty propertyName="EndStress" typeName="double" displayLabel="End Stress" kindOfQuantity="AECU:PRESSURE" />
     </ECEntityClass>
@@ -1846,7 +1876,7 @@
         <BaseClass>IsmTendonPart</BaseClass>
         <ECProperty propertyName="AnchorFriction" typeName="double" displayLabel="Anchor Friction" />
         <ECProperty propertyName="AnchorType" typeName="AnchorType" displayLabel="Anchor Type" />
-        <ECProperty propertyName="Direction" typeName="point3d" displayLabel="Direction" />
+        <ECProperty propertyName="Direction" typeName="Point3d" displayLabel="Direction" />
     </ECEntityClass>
 
     <ECRelationshipClass typeName="IsmTendonAnchor_Node" modifier="None" strength="referencing" strengthDirection="forward">
@@ -1919,9 +1949,9 @@
 
     <ECEntityClass typeName="IsmPointForceMemberLoad" modifier="None" displayLabel="Point Force Member Load">
         <BaseClass>IsmForceMemberLoad</BaseClass>
-        <ECProperty propertyName="Force" typeName="point3d" displayLabel="Force" kindOfQuantity="AECU:FORCE" />
-        <ECProperty propertyName="Moment" typeName="point3d" displayLabel="Moment" kindOfQuantity="AECU:MOMENT" />
-        <ECProperty propertyName="Location" typeName="point3d" displayLabel="Location" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="Force" typeName="Point3d" displayLabel="Force" kindOfQuantity="AECU:FORCE" />
+        <ECProperty propertyName="Moment" typeName="Point3d" displayLabel="Moment" kindOfQuantity="AECU:MOMENT" />
+        <ECProperty propertyName="Location" typeName="Point3d" displayLabel="Location" kindOfQuantity="AECU:LENGTH" />
         <ECProperty propertyName="IsNodalLoad" typeName="boolean" displayLabel="Is Nodal Load" />
     </ECEntityClass>
 
@@ -2134,16 +2164,16 @@
 
     <ECEntityClass typeName="IsmSurfaceForceMemberLoad" modifier="Sealed" displayLabel="Surface Force Member Load" >
         <BaseClass>IsmForceMemberLoad</BaseClass>
-        <ECProperty propertyName="Force0" typeName="point3d" displayLabel="Force0" kindOfQuantity="AECU:AREA_FORCE" />
-        <ECProperty propertyName="Force1" typeName="point3d" displayLabel="Force1" kindOfQuantity="AECU:AREA_FORCE" />
-        <ECProperty propertyName="Force2" typeName="point3d" displayLabel="Force2" kindOfQuantity="AECU:AREA_FORCE" />
-        <ECProperty propertyName="Moment0" typeName="point3d" displayLabel="Moment0" kindOfQuantity="AECU:AREA_MOMENT" />
-        <ECProperty propertyName="Moment1" typeName="point3d" displayLabel="Moment1" kindOfQuantity="AECU:AREA_MOMENT" />
-        <ECProperty propertyName="Moment2" typeName="point3d" displayLabel="Moment2" kindOfQuantity="AECU:AREA_MOMENT" />
-        <ECProperty propertyName="Location" typeName="Bentley.Geometry.Common.IGeometry" displayLabel="Location" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="ReferencePoint0" typeName="point3d" displayLabel="ReferencePoint0" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="ReferencePoint1" typeName="point3d" displayLabel="ReferencePoint1" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="ReferencePoint2" typeName="point3d" displayLabel="ReferencePoint2" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="Force0" typeName="Point3d" displayLabel="Force0" kindOfQuantity="AECU:AREA_FORCE" />
+        <ECProperty propertyName="Force1" typeName="Point3d" displayLabel="Force1" kindOfQuantity="AECU:AREA_FORCE" />
+        <ECProperty propertyName="Force2" typeName="Point3d" displayLabel="Force2" kindOfQuantity="AECU:AREA_FORCE" />
+        <ECProperty propertyName="Moment0" typeName="Point3d" displayLabel="Moment0" kindOfQuantity="AECU:AREA_MOMENT" />
+        <ECProperty propertyName="Moment1" typeName="Point3d" displayLabel="Moment1" kindOfQuantity="AECU:AREA_MOMENT" />
+        <ECProperty propertyName="Moment2" typeName="Point3d" displayLabel="Moment2" kindOfQuantity="AECU:AREA_MOMENT" />
+        <ECStructProperty propertyName="Location" typeName="IsmPrimitiveGeometry" displayLabel="Location" />
+        <ECProperty propertyName="ReferencePoint0" typeName="Point3d" displayLabel="ReferencePoint0" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="ReferencePoint1" typeName="Point3d" displayLabel="ReferencePoint1" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="ReferencePoint2" typeName="Point3d" displayLabel="ReferencePoint2" kindOfQuantity="AECU:LENGTH" />
     </ECEntityClass>
 
     <ECEnumeration typeName="SurfaceMemberBendingBehavior" backingTypeName="int" isStrict="true">
@@ -2179,19 +2209,19 @@
 
     <ECEntityClass typeName="IsmSurfaceMember" modifier="Sealed" displayLabel="Surface Member" >
         <BaseClass>IsmSpanningMember</BaseClass>
-        <ECArrayProperty propertyName="Location" typeName="Bentley.Geometry.Common.IGeometry" displayLabel="Location" kindOfQuantity="AECU:LENGTH" />
+        <ECStructProperty propertyName="Location" typeName="IsmArrayGeometry" displayLabel="Location" />
         <ECProperty propertyName="BendingBehavior" typeName="SurfaceMemberBendingBehavior" displayLabel="Bending Behavior" />
         <ECProperty propertyName="SurfaceOffset" typeName="double" displayLabel="Surface Offset" kindOfQuantity="AECU:LENGTH_SHORT" />
         <ECProperty propertyName="PlacementSurface" typeName="PlacementSurface" displayLabel="Placement Surface" />
-        <ECProperty propertyName="RAxisOrientation" typeName="point3d" displayLabel="R-Axis Orientation" />
+        <ECProperty propertyName="RAxisOrientation" typeName="Point3d" displayLabel="R-Axis Orientation" />
         <ECProperty propertyName="SystemKind" typeName="SurfaceMemberSystemKind" displayLabel="System Kind" />
         <ECProperty propertyName="Thickness" typeName="double" displayLabel="Thickness" kindOfQuantity="AECU:LENGTH_SHORT" />
         <ECProperty propertyName="Thickness1" typeName="double" displayLabel="Thickness 1" kindOfQuantity="AECU:LENGTH_SHORT" />
         <ECProperty propertyName="Thickness2" typeName="double" displayLabel="Thickness 2" kindOfQuantity="AECU:LENGTH_SHORT" />
         <ECProperty propertyName="Thickness3" typeName="double" displayLabel="Thickness 3" kindOfQuantity="AECU:LENGTH_SHORT" />
-        <ECProperty propertyName="Location1" typeName="point3d" displayLabel="Location 1" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="Location2" typeName="point3d" displayLabel="Location 2" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="Location3" typeName="point3d" displayLabel="Location 3" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="Location1" typeName="Point3d" displayLabel="Location 1" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="Location2" typeName="Point3d" displayLabel="Location 2" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="Location3" typeName="Point3d" displayLabel="Location 3" kindOfQuantity="AECU:LENGTH" />
         <ECProperty propertyName="Use" typeName="SurfaceMemberUse" displayLabel="Use" />
         <ECProperty propertyName="AutoArea" typeName="double" displayLabel="Auto Area"  kindOfQuantity="AECU:AREA" />
         <ECProperty propertyName="AutoVolume" typeName="double" displayLabel="Auto Volume" kindOfQuantity="AECU:VOLUME" />
@@ -2215,16 +2245,16 @@
     <ECEntityClass typeName="IsmSurfaceMemberModifier" modifier="Sealed" displayLabel="Surface Member Modifier" >
         <BaseClass>anlyt:AnalyticalElement</BaseClass>
         <BaseClass>IIsmSubObject</BaseClass>
-        <ECProperty propertyName="RAxisOrientation" typeName="point3d" displayLabel="R-Axis Orientation" />
+        <ECProperty propertyName="RAxisOrientation" typeName="Point3d" displayLabel="R-Axis Orientation" />
         <ECProperty propertyName="Use" typeName="SurfaceMemberUse" displayLabel="Use" />
         <ECProperty propertyName="Thickness" typeName="double" displayLabel="Thickness" kindOfQuantity="AECU:LENGTH_SHORT" />
-        <ECArrayProperty propertyName="Location" typeName="Bentley.Geometry.Common.IGeometry" displayLabel="Location" kindOfQuantity="AECU:LENGTH" />
+        <ECStructProperty propertyName="Location" typeName="IsmArrayGeometry" displayLabel="Location" />
         <ECProperty propertyName="Thickness1" typeName="double" displayLabel="Thickness 1" kindOfQuantity="AECU:LENGTH_SHORT" />
         <ECProperty propertyName="Thickness2" typeName="double" displayLabel="Thickness 2" kindOfQuantity="AECU:LENGTH_SHORT" />
         <ECProperty propertyName="Thickness3" typeName="double" displayLabel="Thickness 3" kindOfQuantity="AECU:LENGTH_SHORT" />
-        <ECProperty propertyName="Location1" typeName="point3d" displayLabel="Location 1" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="Location2" typeName="point3d" displayLabel="Location 2" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="Location3" typeName="point3d" displayLabel="Location 3" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="Location1" typeName="Point3d" displayLabel="Location 1" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="Location2" typeName="Point3d" displayLabel="Location 2" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="Location3" typeName="Point3d" displayLabel="Location 3" kindOfQuantity="AECU:LENGTH" />
         <ECProperty propertyName="BendingBehavior" typeName="SurfaceMemberBendingBehavior" displayLabel="Bending Behavior" />
         <ECProperty propertyName="ModificationPriority" typeName="int" displayLabel="Modification Priority" />
         <ECProperty propertyName="SurfaceOffset" typeName="double" displayLabel="Surface Offset" kindOfQuantity="AECU:LENGTH_SHORT" />
@@ -2254,7 +2284,7 @@
     <ECEntityClass typeName="IsmSurfaceMemberOpening" modifier="Sealed" displayLabel="Surface Member Opening" >
         <BaseClass>anlyt:AnalyticalElement</BaseClass>
         <BaseClass>IIsmSubObject</BaseClass>
-        <ECArrayProperty propertyName="Location" typeName="Bentley.Geometry.Common.IGeometry" displayLabel="Location" kindOfQuantity="AECU:LENGTH" />
+        <ECStructProperty propertyName="Location" typeName="IsmArrayGeometry" displayLabel="Location" />
     </ECEntityClass>
 
     <ECRelationshipClass typeName="IsmSurfaceMemberOpening_SurfaceMember" modifier="None" strength="referencing" strengthDirection="forward">
