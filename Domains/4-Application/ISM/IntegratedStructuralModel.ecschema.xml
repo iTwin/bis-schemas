@@ -6,6 +6,8 @@
     <ECSchemaReference name="Analytical" version="01.00.00" alias="anlyt" />
     <ECSchemaReference name="AecUnits" version="01.00.03" alias="AECU" />
 
+    <PropertyCategory typeName="Calculated_category" displayLabel="Calculated" priority="0" />
+
     <ECEntityClass typeName="IsmPartition" modifier="Sealed" displayLabel="Ism Partition" description="">
         <BaseClass>anlyt:AnalyticalPartition</BaseClass>
     </ECEntityClass>
@@ -571,17 +573,18 @@
         <ECEnumerator value="30" name="Tie" displayLabel="Tie" description="This is a stirrup, tie, link, ligature or fitment bar." />
     </ECEnumeration>
 
+    <PropertyCategory typeName="IsmRebar_category" displayLabel="Rebar" priority="190" />
     <ECEntityClass typeName="IsmRebar" modifier="None" displayLabel="Rebar">
         <BaseClass>anlyt:AnalyticalElement</BaseClass>
         <BaseClass>IIsmSubObject</BaseClass>
-        <ECArrayProperty propertyName="CustomBendRadii" typeName="double" displayLabel="Custom Bend Radii" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="CustomEndHookExtension" typeName="double" displayLabel="Custom End Hook Extension" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="CustomEndHookRadius" typeName="double" displayLabel="Custom End Hook Radius" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="CustomStartHookExtension" typeName="double" displayLabel="Custom Start Hook Extension" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="CustomStartHookRadius" typeName="double" displayLabel="Custom Start Hook Radius" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="EndHook" typeName="HookType" displayLabel="End Hook" />
-        <ECProperty propertyName="StartHook" typeName="HookType" displayLabel="Start Hook" />
-        <ECProperty propertyName="Use" typeName="RebarUseType" />
+        <ECArrayProperty propertyName="CustomBendRadii" typeName="double" displayLabel="Custom Bend Radii" category="IsmRebar_Category" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="CustomEndHookExtension" typeName="double" displayLabel="Custom End Hook Extension" category="IsmRebar_Category" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="CustomEndHookRadius" typeName="double" displayLabel="Custom End Hook Radius" category="IsmRebar_Category" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="CustomStartHookExtension" typeName="double" displayLabel="Custom Start Hook Extension" category="IsmRebar_Category" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="CustomStartHookRadius" typeName="double" displayLabel="Custom Start Hook Radius" category="IsmRebar_Category" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="EndHook" typeName="HookType" displayLabel="End Hook" category="IsmRebar_Category" />
+        <ECProperty propertyName="StartHook" typeName="HookType" displayLabel="Start Hook" category="IsmRebar_Category" />
+        <ECProperty propertyName="Use" typeName="RebarUseType" category="IsmRebar_Category" />
     </ECEntityClass>
 
     <ECEnumeration typeName="LayoutPlacementType" backingTypeName="int" isStrict="true" description="Defines placement surface on the host.">
@@ -599,13 +602,14 @@
         <ECEnumerator value="120" name="WallFace2MinorDirection" displayLabel="Wall Face2 Minor Direction" description="Rebar is placed at the Face2 of a wall along Minor direction." />
     </ECEnumeration>
 
+    <PropertyCategory typeName="IsmSurfaceRebar_category" displayLabel="Surface Rebar" priority="180" />
     <ECEntityClass typeName="IsmSurfaceRebar" modifier="None" displayLabel="Surface Rebar">
         <BaseClass>IsmRebar</BaseClass>
-        <ECProperty propertyName="LayoutPlacement" typeName="LayoutPlacementType" displayLabel="Layout Placement" />
-        <ECProperty propertyName="BarDirection" typeName="Point3d" displayLabel="Bar Direction" />
-        <ECProperty propertyName="BarSpacing" typeName="double" displayLabel="Bar Spacing" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="EndHookDirection" typeName="double" displayLabel="End Hook Direction" kindOfQuantity="AECU:ANGLE" />
-        <ECProperty propertyName="StartHookDirection" typeName="double" displayLabel="Start Hook Direction" kindOfQuantity="AECU:ANGLE" />
+        <ECProperty propertyName="LayoutPlacement" typeName="LayoutPlacementType" displayLabel="Layout Placement" category="IsmSurfaceRebar_category" />
+        <ECProperty propertyName="BarDirection" typeName="Point3d" displayLabel="Bar Direction" category="IsmSurfaceRebar_category" />
+        <ECProperty propertyName="BarSpacing" typeName="double" displayLabel="Bar Spacing" category="IsmSurfaceRebar_category" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="EndHookDirection" typeName="double" displayLabel="End Hook Direction" category="IsmSurfaceRebar_category" kindOfQuantity="AECU:ANGLE" />
+        <ECProperty propertyName="StartHookDirection" typeName="double" displayLabel="Start Hook Direction" category="IsmSurfaceRebar_category" kindOfQuantity="AECU:ANGLE" />
     </ECEntityClass>
 
     <ECEnumeration typeName="ConstrainedDimensionType" backingTypeName="int" isStrict="true" description="This enumeration defines which property is auto-calculated.">
@@ -614,24 +618,28 @@
         <ECEnumerator value="30" name="LayoutWidth" displayLabel="Layout width" description="LayoutWidth is auto-calculated." />
     </ECEnumeration>
 
+    <PropertyCategory typeName="IsmConcentratedSurfaceRebar_category" displayLabel="Concentrated Surface Rebar" priority="170" />
     <ECEntityClass typeName="IsmConcentratedSurfaceRebar" modifier="Sealed" displayLabel="Concentrated Surface Rebar">
         <BaseClass>IsmSurfaceRebar</BaseClass>
-        <ECProperty propertyName="LayoutPoint" typeName="Point3d" displayLabel="Layout Point" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="LayoutDirection" typeName="Point3d" displayLabel="Layout Direction" />
-        <ECProperty propertyName="BarLength" typeName="double" displayLabel="Bar Length" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="AutoDetailedLength" typeName="double" displayLabel="Detailed Length" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="AutoGroupBarWeight" typeName="double" displayLabel="Group Bar Weight" kindOfQuantity="AECU:WEIGHT" />
-        <ECProperty propertyName="BarCount" typeName="int" displayLabel="Bar Count" />
-        <ECProperty propertyName="LayoutWidth" typeName="double" displayLabel="Layout Width" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="ConstrainedDimension" typeName="ConstrainedDimensionType" displayLabel="Constrained Dimension" />
-        <ECProperty propertyName="StaggerLength" typeName="double" displayLabel="Stagger Length" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="LayoutPoint" typeName="Point3d" displayLabel="Layout Point" category="IsmConcentratedSurfaceRebar_category" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="LayoutDirection" typeName="Point3d" displayLabel="Layout Direction" category="IsmConcentratedSurfaceRebar_category" />
+        <ECProperty propertyName="BarLength" typeName="double" displayLabel="Bar Length" category="IsmConcentratedSurfaceRebar_category" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="AutoDetailedLength" typeName="double" displayLabel="Detailed Length" category="Calculated_category" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="AutoGroupBarWeight" typeName="double" displayLabel="Group Bar Weight" category="Calculated_category" kindOfQuantity="AECU:WEIGHT" />
+        <ECProperty propertyName="BarCount" typeName="int" displayLabel="Bar Count" category="IsmConcentratedSurfaceRebar_category" />
+        <ECProperty propertyName="LayoutWidth" typeName="double" displayLabel="Layout Width" category="IsmConcentratedSurfaceRebar_category" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="ConstrainedDimension" typeName="ConstrainedDimensionType" category="IsmConcentratedSurfaceRebar_category" displayLabel="Constrained Dimension" />
+        <ECProperty propertyName="StaggerLength" typeName="double" displayLabel="Stagger Length" category="IsmConcentratedSurfaceRebar_category" kindOfQuantity="AECU:LENGTH" />
     </ECEntityClass>
 
+    <PropertyCategory typeName="IsmAreaSurfaceRebar_category" displayLabel="Area Surface Rebar" priority="170" />
     <ECEntityClass typeName="IsmAreaSurfaceRebar" modifier="Sealed" displayLabel="Area Surface Rebar">
         <BaseClass>IsmSurfaceRebar</BaseClass>
-        <ECStructProperty propertyName="LayoutBoundary" typeName="IsmPrimitiveGeometry" displayLabel="Layout Boundary" />
-        <ECProperty propertyName="ConsiderMemberOpenings" typeName="boolean" displayLabel="Consider Member Openings" />
-        <ECProperty propertyName="EndAndSideCover" typeName="double" displayLabel="End and Side Cover" />
+        <ECStructProperty propertyName="LayoutBoundary" typeName="IsmPrimitiveGeometry" displayLabel="Layout Boundary" category="IsmAreaSurfaceRebar_category" />
+        <ECProperty propertyName="ConsiderMemberOpenings" typeName="boolean" displayLabel="Consider Member Openings" category="IsmAreaSurfaceRebar_category" />
+        <ECProperty propertyName="EndAndSideCover" typeName="double" displayLabel="End and Side Cover" category="IsmAreaSurfaceRebar_category" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="AutoBarCount" typeName="int" displayLabel="Bar Count" category="Calculated_category" />
+        <ECProperty propertyName="AutoGroupBarWeight" typeName="double" displayLabel="Group Bar Weight" category="Calculated_category" kindOfQuantity="AECU:WEIGHT" />
     </ECEntityClass>
 
     <ECEntityClass typeName="IsmGrid" modifier="Abstract" displayLabel="Grid" >
@@ -664,41 +672,45 @@
         <ECProperty propertyName="MinimumExtent" typeName="double" displayLabel="Minimum Extent" kindOfQuantity="AECU:LENGTH" />
     </ECEntityClass>
 
+    <PropertyCategory typeName="IsmParallelRebar_category" displayLabel="Parallel Rebar" priority="180" />
     <ECEntityClass typeName="IsmParallelRebar" modifier="Abstract" displayLabel="Parallel Rebar">
         <BaseClass>IsmRebar</BaseClass>
-        <ECStructProperty propertyName="LayoutPath" typeName="IsmPrimitiveGeometry" displayLabel="Layout Path" />
-        <ECProperty propertyName="TAxis" typeName="Point3d" displayLabel="T Axis" />
-        <ECProperty propertyName="AutoBarCount" typeName="double" displayLabel="Auto Bar Count" />
-        <ECProperty propertyName="AutoLayoutLength" typeName="double" displayLabel="Auto Layout Length" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="AutoDetailedLength" typeName="double" displayLabel="Auto Detailed Length" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="AutoGroupBarWeight" typeName="double" displayLabel="Auto Group Bar Weight" kindOfQuantity="AECU:WEIGHT" />
-        <ECArrayProperty propertyName="StartHookDirections" typeName="double" displayLabel="Start Hook Directions" kindOfQuantity="AECU:ANGLE" />
-        <ECArrayProperty propertyName="EndHookDirections" typeName="double" displayLabel="End Hook Directions" kindOfQuantity="AECU:ANGLE" />
+        <ECStructProperty propertyName="LayoutPath" typeName="IsmPrimitiveGeometry" displayLabel="Layout Path" category="IsmParallelRebar_category" />
+        <ECProperty propertyName="TAxis" typeName="Point3d" displayLabel="T Axis" category="IsmParallelRebar_category" />
+        <ECProperty propertyName="AutoBarCount" typeName="int" displayLabel="Bar Count" category="Calculated_category" />
+        <ECProperty propertyName="AutoLayoutLength" typeName="double" displayLabel="Layout Length" category="Calculated_category" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="AutoDetailedLength" typeName="double" displayLabel="Detailed Length" category="Calculated_category" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="AutoGroupBarWeight" typeName="double" displayLabel="Group Bar Weight" category="Calculated_category" kindOfQuantity="AECU:WEIGHT" />
+        <ECArrayProperty propertyName="StartHookDirections" typeName="double" displayLabel="Start Hook Directions" category="IsmParallelRebar_category" kindOfQuantity="AECU:ANGLE" />
+        <ECArrayProperty propertyName="EndHookDirections" typeName="double" displayLabel="End Hook Directions" category="IsmParallelRebar_category" kindOfQuantity="AECU:ANGLE" />
     </ECEntityClass>
 
+    <PropertyCategory typeName="IsmCircleParallelRebar_category" displayLabel="Circle Parallel Rebar" priority="170" />
     <ECEntityClass typeName="IsmCircleParallelRebar" modifier="Sealed" displayLabel="Circle Parallel Rebar">
         <BaseClass>IsmParallelRebar</BaseClass>
-        <ECProperty propertyName="BarCount" typeName="int" displayLabel="Bar Count" />
-        <ECProperty propertyName="Diameter" typeName="double" displayLabel="Diameter" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="BarCount" typeName="int" displayLabel="Bar Count" category="IsmCircleParallelRebar_category" />
+        <ECProperty propertyName="Diameter" typeName="double" displayLabel="Diameter" category="IsmCircleParallelRebar_category" kindOfQuantity="AECU:LENGTH_SHORT" />
     </ECEntityClass>
 
+    <PropertyCategory typeName="IsmPerpendicularRebar_category" displayLabel="Perpendicular Rebar" priority="180" />
     <ECEntityClass typeName="IsmPerpendicularRebar" modifier="Abstract" displayLabel="Perpendicular Rebar">
         <BaseClass>IsmRebar</BaseClass>
-        <ECProperty propertyName="SAxis" typeName="Point3d" displayLabel="S Axis" />
-        <ECProperty propertyName="TAxis" typeName="Point3d" displayLabel="T Axis" />
-        <ECStructProperty propertyName="LayoutPath" typeName="IsmPrimitiveGeometry" displayLabel="Layout Path" />
-        <ECProperty propertyName="AutoBarCount" typeName="double" displayLabel="Auto Bar Count" />
-        <ECProperty propertyName="AutoLayoutLength" typeName="double" displayLabel="Auto Layout Length" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="AutoDetailedLength" typeName="double" displayLabel="Auto Detailed Length" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="AutoGroupBarWeight" typeName="double" displayLabel="Auto Group Bar Weight" kindOfQuantity="AECU:WEIGHT" />
-        <ECProperty propertyName="StartHookDirection" typeName="double" displayLabel="Start Hook Direction" />
-        <ECProperty propertyName="Spacing" typeName="double" displayLabel="Spacing" kindOfQuantity="AECU:LENGTH_SHORT" />
-        <ECProperty propertyName="EndHookDirection" typeName="double" displayLabel="End Hook Direction" />
+        <ECProperty propertyName="SAxis" typeName="Point3d" displayLabel="S Axis" category="IsmPerpendicularRebar_category" />
+        <ECProperty propertyName="TAxis" typeName="Point3d" displayLabel="T Axis" category="IsmPerpendicularRebar_category" />
+        <ECStructProperty propertyName="LayoutPath" typeName="IsmPrimitiveGeometry" displayLabel="Layout Path" category="IsmPerpendicularRebar_category" />
+        <ECProperty propertyName="AutoBarCount" typeName="int" displayLabel="Bar Count" category="Calculated_category" />
+        <ECProperty propertyName="AutoLayoutLength" typeName="double" displayLabel="Layout Length" category="Calculated_category" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="AutoDetailedLength" typeName="double" displayLabel="Detailed Length" category="Calculated_category" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="AutoGroupBarWeight" typeName="double" displayLabel="Group Bar Weight" category="Calculated_category" kindOfQuantity="AECU:WEIGHT" />
+        <ECProperty propertyName="StartHookDirection" typeName="double" displayLabel="Start Hook Direction" category="IsmPerpendicularRebar_category" kindOfQuantity="AECU:ANGLE" />
+        <ECProperty propertyName="Spacing" typeName="double" displayLabel="Spacing" category="IsmPerpendicularRebar_category" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="EndHookDirection" typeName="double" displayLabel="End Hook Direction" category="IsmPerpendicularRebar_category" kindOfQuantity="AECU:ANGLE" />
     </ECEntityClass>
 
+    <PropertyCategory typeName="IsmCircleTieRebar_category" displayLabel="Circle Tie Rebar" priority="170" />
     <ECEntityClass typeName="IsmCircleTieRebar" modifier="None" displayLabel="Circle Tie Rebar">
         <BaseClass>IsmPerpendicularRebar</BaseClass>
-        <ECProperty propertyName="Diameter" typeName="double" displayLabel="Diameter" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="Diameter" typeName="double" displayLabel="Diameter" category="IsmCircleTieRebar_category" kindOfQuantity="AECU:LENGTH_SHORT" />
     </ECEntityClass>
 
     <ECEntityClass typeName="IsmCircularGridLine" modifier="None" displayLabel="Circular Grid Line">
@@ -970,9 +982,10 @@
         <ECArrayProperty propertyName="BarPositions" typeName="Point2d" displayLabel="Bar Positions" kindOfQuantity="AECU:LENGTH" />
     </ECEntityClass>
 
+    <PropertyCategory typeName="IsmCustomPerpendicularRebar_category" displayLabel="Custom Perpendicular Rebar" priority="170" />
     <ECEntityClass typeName="IsmCustomPerpendicularRebar" modifier="Sealed" displayLabel="Custom Perpendicular Rebar">
         <BaseClass>IsmPerpendicularRebar</BaseClass>
-        <ECStructProperty propertyName="BarShape" typeName="IsmPrimitiveGeometry" displayLabel="Bar Shape" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECStructProperty propertyName="BarShape" typeName="IsmPrimitiveGeometry" displayLabel="Bar Shape" category="IsmCustomPerpendicularRebar_category" kindOfQuantity="AECU:LENGTH_SHORT" />
     </ECEntityClass>
 
     <ECEntityClass typeName="IsmCustomSection" modifier="Sealed" displayLabel="Custom Section" >
@@ -985,10 +998,11 @@
         <ECProperty propertyName="OverlapWidth" typeName="double" displayLabel="Overlap Width" kindOfQuantity="AECU:LENGTH_SHORT" />
     </ECEntityClass>
 
+    <PropertyCategory typeName="IsmDiamondTieRebar_category" displayLabel="Diamond Tie Rebar" priority="170" />
     <ECEntityClass typeName="IsmDiamondTieRebar" modifier="Sealed" displayLabel="Diamond Tie Rebar" >
         <BaseClass>IsmPerpendicularRebar</BaseClass>
-        <ECProperty propertyName="Depth" typeName="double" displayLabel="Depth" kindOfQuantity="AECU:LENGTH_SHORT" />
-        <ECProperty propertyName="Width" typeName="double" displayLabel="Width" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="Depth" typeName="double" displayLabel="Depth" category="IsmDiamondTieRebar_category" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="Width" typeName="double" displayLabel="Width" category="IsmDiamondTieRebar_category" kindOfQuantity="AECU:LENGTH_SHORT" />
     </ECEntityClass>
 
     <ECEntityClass typeName="IsmModelRule" modifier="Abstract" displayLabel="Model Rule" >
@@ -1106,24 +1120,27 @@
         </Target>
     </ECRelationshipClass>
 
+    <PropertyCategory typeName="IsmGridParallelRebar_category" displayLabel="Grid Parallel Rebar" priority="170" />
     <ECEntityClass typeName="IsmGridParallelRebar" modifier="Sealed" displayLabel="Grid Parallel Rebar">
         <BaseClass>IsmParallelRebar</BaseClass>
-        <ECProperty propertyName="LayerCount" typeName="int" displayLabel="Layer Count" />
-        <ECProperty propertyName="BarsPerLayer" typeName="int" displayLabel="Bars Per Layer" />
-        <ECProperty propertyName="Depth" typeName="double" displayLabel="Depth" kindOfQuantity="AECU:LENGTH_SHORT" />
-        <ECProperty propertyName="Width" typeName="double" displayLabel="Width" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="LayerCount" typeName="int" displayLabel="Layer Count" category="IsmGridParallelRebar_category" />
+        <ECProperty propertyName="BarsPerLayer" typeName="int" displayLabel="Bars Per Layer" category="IsmGridParallelRebar_category" />
+        <ECProperty propertyName="Depth" typeName="double" displayLabel="Depth" category="IsmGridParallelRebar_category" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="Width" typeName="double" displayLabel="Width" category="IsmGridParallelRebar_category" kindOfQuantity="AECU:LENGTH_SHORT" />
     </ECEntityClass>
 
+    <PropertyCategory typeName="IsmLappedTopRectangleTieRebar_category" displayLabel="Lapped Top Rectangle Tie Rebar" priority="170" />
     <ECEntityClass typeName="IsmLappedTopRectangleTieRebar" modifier="Sealed" displayLabel="Lapped Top Rectangle Tie Rebar">
         <BaseClass>IsmPerpendicularRebar</BaseClass>
-        <ECProperty propertyName="Depth" typeName="double" displayLabel="Depth" kindOfQuantity="AECU:LENGTH_SHORT" />
-        <ECProperty propertyName="Width" typeName="double" displayLabel="Width" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="Depth" typeName="double" displayLabel="Depth" category="IsmLappedTopRectangleTieRebar_category" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="Width" typeName="double" displayLabel="Width" category="IsmLappedTopRectangleTieRebar_category" kindOfQuantity="AECU:LENGTH_SHORT" />
     </ECEntityClass>
 
+    <PropertyCategory typeName="IsmLayerParallelRebar_category" displayLabel="Layer Parallel Rebar" priority="170" />
     <ECEntityClass typeName="IsmLayerParallelRebar" modifier="Sealed" displayLabel="Layer Parallel Rebar">
         <BaseClass>IsmParallelRebar</BaseClass>
-        <ECProperty propertyName="Width" typeName="double" displayLabel="Width" kindOfQuantity="AECU:LENGTH_SHORT" />
-        <ECProperty propertyName="BarCount" typeName="int" displayLabel="Bar Count" />
+        <ECProperty propertyName="Width" typeName="double" displayLabel="Width" category="IsmLayerParallelRebar_category" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="BarCount" typeName="int" displayLabel="Bar Count" category="IsmLayerParallelRebar_category" />
     </ECEntityClass>
 
     <ECEnumeration typeName="LoadAdditionMethod" backingTypeName="int" isStrict="true" description="Load Addition Method.">
@@ -1331,10 +1348,11 @@
         </Target>
     </ECRelationshipClass>
 
+    <PropertyCategory typeName="IsmOpenUTieRebar_category" displayLabel="Open-U Tie Rebar" priority="170" />
     <ECEntityClass typeName="IsmOpenUTieRebar" displayLabel="Open-U Tie Rebar" modifier="Sealed">
         <BaseClass>IsmPerpendicularRebar</BaseClass>
-        <ECProperty propertyName="Depth" typeName="double" displayLabel="Depth" kindOfQuantity="AECU:LENGTH_SHORT" />
-        <ECProperty propertyName="Width" typeName="double" displayLabel="Width" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="Depth" typeName="double" displayLabel="Depth" category="IsmOpenUTieRebar_category" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="Width" typeName="double" displayLabel="Width" category="IsmOpenUTieRebar_category" kindOfQuantity="AECU:LENGTH_SHORT" />
     </ECEntityClass>
 
     <ECEntityClass typeName="IsmOtherMaterial" modifier="Sealed" displayLabel="Other Material">
@@ -2052,21 +2070,23 @@
         </Target>
     </ECRelationshipClass>
 
+    <PropertyCategory typeName="IsmRectangleParallelRebar_category" displayLabel="Rectangle Parallel Rebar" priority="170" />
     <ECEntityClass typeName="IsmRectangleParallelRebar" modifier="None" displayLabel="Rectangle Parallel Rebar" >
         <BaseClass>IsmParallelRebar</BaseClass>
-        <ECProperty propertyName="BottomBarCount" typeName="int" displayLabel="Bottom Bar Count" />
-        <ECProperty propertyName="CornerBarCount" typeName="int" displayLabel="Corner Bar Count" />
-        <ECProperty propertyName="Depth" typeName="double" displayLabel="Depth" kindOfQuantity="AECU:LENGTH_SHORT" />
-        <ECProperty propertyName="LeftBarCount" typeName="int" displayLabel="Left Bar Count" />
-        <ECProperty propertyName="RightBarCount" typeName="int" displayLabel="Right Bar Count" />
-        <ECProperty propertyName="TopBarCount" typeName="int" displayLabel="Top Bar Count" />
-        <ECProperty propertyName="Width" typeName="double" displayLabel="Width" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="BottomBarCount" typeName="int" displayLabel="Bottom Bar Count" category="IsmRectangleParallelRebar_category" />
+        <ECProperty propertyName="CornerBarCount" typeName="int" displayLabel="Corner Bar Count" category="IsmRectangleParallelRebar_category" />
+        <ECProperty propertyName="Depth" typeName="double" displayLabel="Depth" category="IsmRectangleParallelRebar_category" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="LeftBarCount" typeName="int" displayLabel="Left Bar Count" category="IsmRectangleParallelRebar_category" />
+        <ECProperty propertyName="RightBarCount" typeName="int" displayLabel="Right Bar Count" category="IsmRectangleParallelRebar_category" />
+        <ECProperty propertyName="TopBarCount" typeName="int" displayLabel="Top Bar Count" category="IsmRectangleParallelRebar_category" />
+        <ECProperty propertyName="Width" typeName="double" displayLabel="Width" category="IsmRectangleParallelRebar_category" kindOfQuantity="AECU:LENGTH_SHORT" />
     </ECEntityClass>
 
+    <PropertyCategory typeName="IsmRectangleTieRebar_category" displayLabel="Rectangle Tie Rebar" priority="170" />
     <ECEntityClass typeName="IsmRectangleTieRebar" modifier="None" displayLabel="Rectangle Tie Rebar" >
         <BaseClass>IsmPerpendicularRebar</BaseClass>
-        <ECProperty propertyName="Depth" typeName="double" displayLabel="Depth" kindOfQuantity="AECU:LENGTH_SHORT" />
-        <ECProperty propertyName="Width" typeName="double" displayLabel="Width" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="Depth" typeName="double" displayLabel="Depth" category="IsmRectangleTieRebar_category" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="Width" typeName="double" displayLabel="Width" category="IsmRectangleTieRebar_category" kindOfQuantity="AECU:LENGTH_SHORT" />
     </ECEntityClass>
 
     <ECEntityClass typeName="IsmShearStudZone" modifier="None" displayLabel="Shear Stud Zone" >
@@ -2113,9 +2133,10 @@
         <ECProperty propertyName="Spaces" typeName="int" displayLabel="Spaces" />
     </ECEntityClass>
 
+    <PropertyCategory typeName="IsmSpiralTieRebar_category" displayLabel="Spiral Tie Rebar" priority="170" />
     <ECEntityClass typeName="IsmSpiralTieRebar" modifier="None" displayLabel="Spiral Tie Rebar" >
         <BaseClass>IsmPerpendicularRebar</BaseClass>
-        <ECProperty propertyName="Diameter" typeName="double" displayLabel="Diameter" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="Diameter" typeName="double" displayLabel="Diameter" category="IsmSpiralTieRebar_category" kindOfQuantity="AECU:LENGTH_SHORT" />
     </ECEntityClass>
 
     <ECEntityClass typeName="IsmStandardSteelDeck" modifier="None" displayLabel="Standard Steel Deck" >
@@ -2136,9 +2157,10 @@
         </Target>
     </ECRelationshipClass>
 
+    <PropertyCategory typeName="IsmStraightPerpendicularRebar_category" displayLabel="Straight Perpendicular Rebar" priority="170" />
     <ECEntityClass typeName="IsmStraightPerpendicularRebar" modifier="None" displayLabel="Straight Perpendicular Rebar" >
         <BaseClass>IsmPerpendicularRebar</BaseClass>
-        <ECProperty propertyName="Length" typeName="double" displayLabel="Length" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="Length" typeName="double" displayLabel="Length" category="IsmStraightPerpendicularRebar_category" kindOfQuantity="AECU:LENGTH_SHORT" />
     </ECEntityClass>
 
     <ECEntityClass typeName="IsmSubStructure" modifier="None" displayLabel="Sub Structure" >
@@ -2230,9 +2252,9 @@
         <ECProperty propertyName="Location2" typeName="Point3d" displayLabel="Location 2" kindOfQuantity="AECU:LENGTH" category="IsmSurfaceMember_category" />
         <ECProperty propertyName="Location3" typeName="Point3d" displayLabel="Location 3" kindOfQuantity="AECU:LENGTH" category="IsmSurfaceMember_category" />
         <ECProperty propertyName="Use" typeName="SurfaceMemberUse" displayLabel="Use" category="IsmSurfaceMember_category" />
-        <ECProperty propertyName="AutoArea" typeName="double" displayLabel="Auto Area"  kindOfQuantity="AECU:AREA" category="IsmSurfaceMember_category" />
-        <ECProperty propertyName="AutoVolume" typeName="double" displayLabel="Auto Volume" kindOfQuantity="AECU:VOLUME" category="IsmSurfaceMember_category" />
-        <ECProperty propertyName="AutoWeight" typeName="double" displayLabel="Auto Weight" kindOfQuantity="AECU:WEIGHT" category="IsmSurfaceMember_category" />
+        <ECProperty propertyName="AutoArea" typeName="double" displayLabel="Auto Area"  kindOfQuantity="AECU:AREA" category="Calculated_category" />
+        <ECProperty propertyName="AutoVolume" typeName="double" displayLabel="Auto Volume" kindOfQuantity="AECU:VOLUME" category="Calculated_category" />
+        <ECProperty propertyName="AutoWeight" typeName="double" displayLabel="Auto Weight" kindOfQuantity="AECU:WEIGHT" category="Calculated_category" />
     </ECEntityClass>
 
     <ECRelationshipClass typeName="IsmSurfaceMember_Material" modifier="None" strength="referencing" strengthDirection="forward">
