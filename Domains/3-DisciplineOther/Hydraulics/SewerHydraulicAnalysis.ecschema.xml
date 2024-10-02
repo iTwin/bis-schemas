@@ -22,6 +22,12 @@
 		</SchemaLayerInfo>
 	</ECCustomAttributes>
 
+  <ECEnumeration typeName="InletCaptureMethod" backingTypeName="int" isStrict="true" >
+    <ECEnumerator value="0" name="FullCapture" displayLabel="Full Capture"/>
+    <ECEnumerator value="1" name="PercentCapture" displayLabel="Percent Capture"/>
+    <ECEnumerator value="2" name="MaximumCapacity" displayLabel="Maximum Capacity"/>
+  </ECEnumeration>
+
 	<ECEnumeration typeName="GravityStructureShape" backingTypeName="int" isStrict="true" description="Set the shape of a gravity structure.">
 		<ECEnumerator value="0" name="Circular" displayLabel="Circular" />
 		<ECEnumerator value="1" name="Box" displayLabel="Box" />
@@ -96,6 +102,11 @@
 		<ECProperty propertyName="FixedLoad" typeName='double' category="HydraulicData" kindOfQuantity="AECU:FLOW"/>
 	</ECEntityClass>
 
+  <ECEntityClass typeName="Gutter" modifier="Sealed" displayLabel="Gutter">
+    <BaseClass>anlyt:AnalyticalElement</BaseClass>
+    <BaseClass>net:IEdge</BaseClass>
+  </ECEntityClass>
+
 	<ECEntityClass typeName="GravityStructureShapeAspect" modifier="Abstract" displayLabel="Structure Shape">
 		<BaseClass>bis:ElementUniqueAspect</BaseClass>
 	</ECEntityClass>
@@ -148,9 +159,34 @@
 		<ECProperty propertyName="ManholeIsBolted" typeName="boolean" displayLabel="Is Bolted" category="HydraulicData"/>
 	</ECEntityClass>
 
-	<ECEntityClass typeName="CatchBasin" modifier="Sealed" displayLabel="Catch Basin">
-		<BaseClass>GravityStructure</BaseClass>
-	</ECEntityClass>
+  <ECEntityClass typeName="CatchBasin" modifier="Sealed" displayLabel="Catch Basin">
+    <BaseClass>GravityStructure</BaseClass>
+    <ECProperty propertyName="InletCaptureMethod" typeName="InletCaptureMethod" displayLabel="Inlet Capture Method" description="Method used to determine the rate of flow capture by the inlet." category="HydraulicData"/>
+  </ECEntityClass>
+  
+	<ECEntityClass typeName="InletCaptureMethodAspect" modifier="Abstract" displayLabel="InletCaptureMethodAspect">
+    <BaseClass>bis:ElementUniqueAspect</BaseClass>
+  </ECEntityClass>
+  
+	<ECRelationshipClass typeName="CatchBasinOwnsInletCaptureMethodAspect" strength="embedding" modifier="Sealed">
+	  <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+    <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+      <Class class="CatchBasin"/>
+    </Source>
+    <Target multiplicity="(1..1)" roleLabel="owned by" polymorphic="true">
+      <Class class="InletCaptureMethodAspect"/>
+    </Target>
+  </ECRelationshipClass>
+
+  <ECEntityClass typeName="PercentCaptureAspect" modifier="Sealed" displayLabel="Percent Capture">
+    <BaseClass>InletCaptureMethodAspect</BaseClass>
+    <ECProperty propertyName="CapturePercent" typeName="double" displayLabel="Capture Percent" description="Set the percent of incoming inflow to be captured by the inlet." category="HydraulicData" kindOfQuantity="rru:PERCENTAGE"/>
+  </ECEntityClass>
+
+  <ECEntityClass typeName="MaximumCapacityAspect" modifier="Sealed" displayLabel="Maximum Capacity">
+    <BaseClass>InletCaptureMethodAspect</BaseClass>
+    <ECProperty propertyName="InletFlowThreshold" typeName="double" displayLabel="Inlet Flow Threshold" description="The inlet will capture all incoming flow up the specified threshold, all excess flow will be bypassed." category="HydraulicData" kindOfQuantity="rru:FLOW"/>
+  </ECEntityClass>
 
 	<ECEntityClass typeName="Outfall" modifier="Sealed" displayLabel="Outfall">
 		<BaseClass>BaseStructure</BaseClass>
@@ -247,6 +283,7 @@
 	<ECEntityClass typeName="RainfallEvent" modifier="Sealed" displayLabel="Rainfall Event">
 		<BaseClass>bis:DefinitionElement</BaseClass>
 		<ECProperty propertyName="ReturnEvent" typeName="double" displayLabel="Return Event" category="HydraulicData" kindOfQuantity="AECU:TIME"/>
+		<ECProperty propertyName="IncludeInAnalysis" typeName="boolean" displayLabel="Include In Analysis" category="HydraulicData"/>
 	</ECEntityClass>
 
 	<ECRelationshipClass typeName="RainfallSetOwnsRainfallEvents" strength="embedding" strengthDirection="Forward" modifier="Sealed">
@@ -335,11 +372,43 @@
     <ECProperty propertyName="MaxCover" typeName="double" displayLabel="Cover (Maximum)" category="HydraulicData"/>
     <ECProperty propertyName="MinSlope" typeName="double" displayLabel="Slope (Minimum)" category="HydraulicData"/>
     <ECProperty propertyName="MaxSlope" typeName="double" displayLabel="Slope (Maximum)" category="HydraulicData"/>
-    <ECProperty propertyName="PercentageFull" typeName="double" displayLabel="Percentage Full" category="HydraulicData"/>
+    <ECProperty propertyName="PercentageFull" typeName="double" displayLabel="Percentage Full" category="HydraulicData" kindOfQuantity="rru:PERCENTAGE"/>
     <ECProperty propertyName="AllowMultipleBarrels" typeName="boolean" displayLabel="Allow Multiple Barrels" category="HydraulicData"/>
     <ECProperty propertyName="MaxBarrels" typeName="int" displayLabel="Maximum Number of Barrels" category="HydraulicData"/>
     <ECProperty propertyName="LimitSectionSize" typeName="boolean" displayLabel="Limit Section Size" category="HydraulicData"/>
     <ECProperty propertyName="MaximumRise" typeName="double" displayLabel="Rise (Maximum)" category="HydraulicData"/>
     <ECProperty propertyName="MeasureCoverTo" typeName="MeasureCoverTo" displayLabel="Measure Cover To" category="HydraulicData"/>
+		<ECProperty propertyName="IsPartFullDesign" typeName="boolean" displayLabel="Is Part Full Design" category="HydraulicData"/>
+	</ECEntityClass>
+
+	  <ECEntityClass typeName="PipeSizeSet" modifier="Sealed" displayLabel="Pipe Sizes">
+    <BaseClass>bis:DefinitionElement</BaseClass>
+    <ECProperty propertyName="Shape" typeName="PipeShape" displayLabel="Shape"  category="HydraulicData"/>
+    <ECProperty propertyName="Material" typeName="string" displayLabel="Material"  category="HydraulicData"/>
   </ECEntityClass>
+  
+  <ECRelationshipClass typeName="PipeSetOwnsPipeSetItem" strength="embedding" modifier="Sealed">
+    <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+    <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+      <Class class="PipeSizeSet"/>
+    </Source>
+    <Target multiplicity="(0..*)" roleLabel="owned by" polymorphic="false">
+      <Class class="PipeSize"/>
+    </Target>
+  </ECRelationshipClass>
+  
+  <ECEntityClass typeName="PipeSize" modifier="Sealed" displayLabel="Pipe Item">
+    <BaseClass>bis:DefinitionElement</BaseClass>
+    <ECProperty propertyName="Manningsn" typeName="double" displayLabel="Manning's n" category="HydraulicData"/>
+  </ECEntityClass>
+  
+  <ECRelationshipClass typeName="PipeSetItemOwnsPipeShapeAspect" strength="embedding" modifier="Sealed">
+    <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+    <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+      <Class class="PipeSize"/>
+    </Source>
+    <Target multiplicity="(1..1)" roleLabel="owned by" polymorphic="true">
+      <Class class="PipeShapeAspect"/>
+    </Target>
+  </ECRelationshipClass>
 </ECSchema>
