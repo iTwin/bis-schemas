@@ -68,6 +68,13 @@
     <ECEnumerator value="1" name="PipeTop" displayLabel="Pipe Top"/>
   </ECEnumeration>
 
+  <ECEnumeration typeName="BoundaryConditionType" backingTypeName="int" isStrict="true" >
+    <ECEnumerator value="0" name="FreeOutfall" displayLabel="Free Outfall"/>
+    <ECEnumerator value="1" name="Crown" displayLabel="Crown"/>
+    <ECEnumerator value="2" name="UserDefinedTw" displayLabel="User Defined Tailwater"/>
+    <ECEnumerator value="3" name="BoundaryConnection" displayLabel="Boundary Connection"/>
+  </ECEnumeration>
+
 	<PropertyCategory typeName="HydraulicData" priority="1"/>
 
 	<ECEntityClass typeName="SewerHydraulicAnalysisModel" modifier="Sealed" displayLabel="Sewer Hydraulics Analysis Model" description="Model containing all Sewer Hydraulic Analysis elements.">
@@ -179,7 +186,38 @@
 
 	<ECEntityClass typeName="Outfall" modifier="Sealed" displayLabel="Outfall">
 		<BaseClass>BaseStructure</BaseClass>
+    <ECProperty propertyName="BoundaryConditionType" typeName="BoundaryConditionType" displayLabel="Boundary Condition Type" description="Select method to establish bounding tailwater for the network." category="HydraulicData"/>
 	</ECEntityClass>
+
+  <ECEntityClass typeName="BoundaryConditionTypeAspect" modifier="Abstract" displayLabel="BoundaryConditionTypeAspect">
+    <BaseClass>bis:ElementUniqueAspect</BaseClass>
+  </ECEntityClass>
+
+  <ECRelationshipClass typeName="OutfallOwnsBoundaryConditionTypeAspect" strength="embedding" modifier="Sealed">
+    <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+    <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+      <Class class="Outfall"/>
+    </Source>
+    <Target multiplicity="(1..1)" roleLabel="owned by" polymorphic="true">
+      <Class class="BoundaryConditionTypeAspect"/>
+    </Target>
+  </ECRelationshipClass>
+
+	<ECEntityClass typeName="FreeOutfallAspect" modifier="Sealed" displayLabel="Free Outfall">
+    <BaseClass>BoundaryConditionTypeAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="CrownAspect" modifier="Sealed" displayLabel="Crown">
+    <BaseClass>BoundaryConditionTypeAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="UserDefinedTwAspect" modifier="Sealed" displayLabel="User Defined Tailwater">
+    <BaseClass>BoundaryConditionTypeAspect</BaseClass>
+  	<ECProperty propertyName="TailwaterElevation" typeName="double" displayLabel="Elevation (Tailwater)" description=" " category="HydraulicData" kindOfQuantity="rru:LENGTH"/>
+  </ECEntityClass>
+  
+	<ECEntityClass typeName="BoundaryConnectionAspect" modifier="Sealed" displayLabel="Boundary Connection">
+    <BaseClass>BoundaryConditionTypeAspect</BaseClass>
+    <ECProperty propertyName="BoundingElement" displayLabel="Bounding Element"  category="HydraulicData" direction="Forward" relationshipName="HydraulicData"/>
+  </ECEntityClass>
 
 	<ECEntityClass typeName="Pipe" modifier="Sealed" displayLabel="Pipe">
 		<BaseClass>anlyt:AnalyticalElement</BaseClass>
@@ -398,6 +436,21 @@
     </Source>
     <Target multiplicity="(1..1)" roleLabel="owned by" polymorphic="true">
       <Class class="PipeShapeAspect"/>
+    </Target>
+  </ECRelationshipClass>
+	
+	<ECEntityClass typeName="HydraulicMaterialAspect" modifier="Sealed" displayLabel="Hydraulic Material Aspect">
+		<BaseClass>bis:ElementUniqueAspect</BaseClass>
+    <ECProperty propertyName="Manningsn" typeName="double" displayLabel="Manning's n" category="HydraulicData"/>
+	</ECEntityClass>
+
+	<ECRelationshipClass typeName="PhysicalMaterialOwnsHydraulicMaterialAspect" strength="embedding" modifier="Sealed">
+    <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+    <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+      <Class class="bis:PhysicalMaterial"/>
+    </Source>
+    <Target multiplicity="(1..1)" roleLabel="owned by" polymorphic="false">
+      <Class class="HydraulicMaterialAspect"/>
     </Target>
   </ECRelationshipClass>
 </ECSchema>
