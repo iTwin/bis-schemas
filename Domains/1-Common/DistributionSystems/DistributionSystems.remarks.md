@@ -13,7 +13,7 @@ A given bis:PhysicalElement can implement more that one of [IDistributionFlowEle
 
 Connection point information will be added in subsequent versions of the schema.
 
-![Class and Instance Diagrams](./media/distributionsystems.png)
+![Class and Instance Diagrams](./media/DistributionSystems.png)
 
 ## Entity Classes
 
