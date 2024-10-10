@@ -16,12 +16,12 @@ This schema contains classes that are used to model the real-world physical enti
 Applications, services and components should never create instances of this class. Use `PhysicalModel` instead.
 
 ### StructuralElement
-The abstract class `StructuralElement` is the generalization of structural member.
+The abstract class `StructuralElement` is the generalization of `StructuralMember`.
 
 Equivalent to [IfcStructuralItem](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcStructuralItem.htm).
 
 ### StructuralMember
-The class `StructuralMember` is the base class of all structural items. This class is not abstract and could be used to define any genral element, but it is recommended to use any defined subclass if available.
+The class `StructuralMember` is the base class of all structural items. This class is not abstract and could be used to define any general element, but it is recommended to use any defined subclass if available. `StructuralMember` instances must be contained in `PhysicalModels`.
 
 Classification of `StructuralMember` instances can be achieved via instances of `StructuralMemberType`.
 
