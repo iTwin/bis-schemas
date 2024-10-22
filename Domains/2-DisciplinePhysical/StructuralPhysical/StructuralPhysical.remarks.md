@@ -45,7 +45,7 @@ Equivalent to [IfcSlab](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/H
 
 ### Wall
 
-A `Wall` is a vertical construction element that can enclose or divide spaces. Walls are typically vertical or nearly vertical, planar elements, often designed to bear structural loads. However, a wall does not have to be load-bearing.
+A `Wall` is a vertical construction element that can enclose or divide spaces. Walls are typically vertical or nearly vertical, planar elements, often designed to bear structural loads.
 
 Classification of `Wall` instances can be achieved via instances of `WallType`. `Wall`s must be contained in `PhysicalModel`s.
 
@@ -53,7 +53,7 @@ Equivalent to [IfcWall](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/H
 
 ### Beam
 
-A `Beam` is generally a horizontal, or almost horizontal, structural member intended to endure loads primarily by resisting bending. It can also be considered as an architectural element.
+A `Beam` is generally a horizontal, or almost horizontal, structural member intended to endure loads primarily by resisting bending.
 
 Classification of `Beam` instances can be achieved via instances of `BeamType`. `Beam`s must be contained in `PhysicalModel`s
 
@@ -61,7 +61,7 @@ Equivalent to [IfcBeam](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/H
 
 ### Column
 
-A `Column` is a vertical structural or architectural member typically aligned with a structural grid intersection. Generally, it serves as a vertical or nearly vertical structural member that transfers the weight of the structure above to other elements below through compression. From an architectural perspective, it can also represent a non-load-bearing element.
+A `Column` is a vertical structural member typically aligned with a structural grid intersection. Generally, it serves as a vertical or nearly vertical structural member that transfers the weight of the structure above to other elements below through compression.
 
 Classification of `Column` instances can be achieved via instances of `ColumnType`. `Column`s must be contained in `PhysicalModel`s.
 
@@ -69,7 +69,7 @@ Equivalent to [IfcColumn](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3
 
 ### Brace
 
-A `Brace` is a structural member designed to provide lateral support to a structure, ensuring stability by resisting sideways forces. It typically serves as a diagonal element, connecting to other members. As an `StructuralMember`, it contributes to the overall integrity and rigidity of the structural system, whether for load-bearing or non-load-bearing purposes.
+A `Brace` is a structural member designed to provide lateral support to a structure, ensuring stability by resisting sideways forces. It typically serves as a diagonal element, connecting to other members. As an `StructuralMember`, it contributes to the overall integrity and rigidity of the structural system for load-bearing purposes.
 
 Classification of `Brace` instances can be achieved via instances of `BraceType`. `Brace`s must be contained in `PhysicalModel`s.
 
