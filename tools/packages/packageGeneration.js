@@ -124,7 +124,7 @@ function getMediaFromRemarksFile(remarkFile) {
 }
 
 /**
- * Add the remarks file and the relavent media files to the package
+ * Add the remarks file and the relevant media files to the package
  * @param schemaInfo Object containing schema information from the inventory
  * @param packageDir Schema package directory
  */
@@ -298,4 +298,4 @@ async function createPackages(inventoryPath, skipListPath, outDir, packageTempla
   }
 }
 
-module.exports = {parseNpmOutputAndSort, formatPackageVersion, createPackages, shouldPublish, parseVersionString};
+module.exports = {parseNpmOutputAndSort, formatPackageVersion, createPackages, shouldPublish, parseVersionString, addDocsToPackage};
