@@ -2,6 +2,8 @@
 * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
 * See LICENSE.md in the project root for license terms and full copyright notice.
 *--------------------------------------------------------------------------------------------*/
+const fs = require('fs');
+const path = require('path');
 const chai = require('chai');
 const pkgGen = require('../packageGeneration.js');
 
@@ -97,6 +99,90 @@ describe('Package Generation', function() {
       chai.expect(pkgGen.shouldPublish(schemaInfo, versionInfo)).to.be.true;
       versionInfo.isBeta = false;
       chai.expect(pkgGen.shouldPublish(schemaInfo, versionInfo)).to.be.false;
+    });
+  });
+
+  describe('Add documentation (remarks file and relevant media) to the schema package', function() {
+    let packageDir;
+
+    beforeEach(function() {
+      packageDir = path.join(__dirname, 'testPkg');
+
+      if (fs.existsSync(packageDir)) {
+        fs.rmSync(packageDir, { recursive: true, force: true });
+      }
+
+      fs.mkdirSync(packageDir, { recursive: true });
+    });
+
+    after(function() {
+      if (fs.existsSync(packageDir)) {
+        fs.rmSync(packageDir, { recursive: true, force: true });
+      }
+    });
+
+    it('Should attach remarks file to the wip schema package', function() {
+      const schemaInfo = {
+        name: 'SchemaA',
+        path: 'tools\\packages\\test\\assets\\SchemaA.ecschema.xml',
+        released: false,
+      };
+
+      pkgGen.addDocsToPackage(schemaInfo, packageDir);
+      const remarksFile = path.join(packageDir, 'SchemaA.remarks.md');
+      const isExists = fs.existsSync(remarksFile)
+      chai.expect(isExists).to.be.true;
+    });
+
+    it('Should attach remarks file to the released schema package', function() {
+      const schemaInfo = {
+        name: 'SchemaA',
+        path: 'tools\\packages\\test\\assets\\Released\\SchemaA.ecschema.xml',
+        released: true,
+      };
+
+      pkgGen.addDocsToPackage(schemaInfo, packageDir);
+      const remarksFile = path.join(packageDir, 'SchemaA.remarks.md');
+      const isExists = fs.existsSync(remarksFile)
+      chai.expect(isExists).to.be.true;
+    });
+
+    it('Should attach remarks file and media to the schema package', function() {
+      const schemaInfo = {
+        name: 'SchemaB',
+        path: 'tools\\packages\\test\\assets\\SchemaB.ecschema.xml',
+        released: false,
+      };
+
+      pkgGen.addDocsToPackage(schemaInfo, packageDir);
+      const remarksFile = path.join(packageDir, 'SchemaB.remarks.md');
+      let isExists = fs.existsSync(remarksFile)
+      chai.expect(isExists).to.be.true;
+
+      const image1 = path.join(packageDir, 'media', 'image-1.png');
+      isExists = fs.existsSync(image1)
+      chai.expect(isExists).to.be.true;
+
+      const image2 = path.join(packageDir, 'media', 'Shapes', 'image2.png');
+      isExists = fs.existsSync(image2)
+      chai.expect(isExists).to.be.true;
+    });
+
+    it('Should not attach remarks file and media to the schema package', function() {
+      const schemaInfo = {
+        name: 'SchemaC',
+        path: 'tools\\packages\\test\\assets\\SchemaC.ecschema.xml',
+        released: false,
+      };
+
+      pkgGen.addDocsToPackage(schemaInfo, packageDir);
+      const remarksFile = path.join(packageDir, 'SchemaC.remarks.md');
+      let isExists = fs.existsSync(remarksFile)
+      chai.expect(isExists).to.be.false;
+
+      const media = path.join(packageDir, 'media');
+      isExists = fs.existsSync(media)
+      chai.expect(isExists).to.be.false;
     });
   });
 
