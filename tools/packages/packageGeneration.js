@@ -82,6 +82,47 @@ function formatPackageVersion(versionInfo) {
   return `${versionInfo.read}.${versionInfo.write}.${versionInfo.patch}${versionInfo.isBeta ? "-dev." + versionInfo.beta : ""}`;
 }
 
+/**
+ * Generate the remarks file path
+ * @param schemaPath Schema XML path
+ * @returns Remarks file path
+ */
+function getRemarksFilePath(schemaPath) {
+  let remarksFile = "";
+  let remarksFileDir = "";
+  const schemaFile = path.basename(schemaPath);
+  const schemaDir = path.dirname(schemaPath);
+  
+  if (schemaDir.endsWith("Released")) {
+    remarksFile = schemaFile.replace(/\.\d+\.\d+\.\d+\.ecschema\.xml$/, ".remarks.md");;
+    remarksFileDir = path.dirname(schemaDir);
+  }
+  else {
+    remarksFile = schemaFile.replace(".ecschema.xml", ".remarks.md");
+    remarksFileDir = schemaDir;
+  }
+
+  const remarksFilePath = path.join(remarksFileDir, remarksFile);
+  return remarksFilePath;
+}
+
+/**
+ * Gets the media files information from a remarks file
+ * @param remarkFile Remarks file path
+ * @returns List of media files
+ */
+function getMediaFromRemarksFile(remarkFile) {
+  let mediaFiles = [];
+  const content = fs.readFileSync(remarkFile, 'utf8');
+  const mediaPattern = /\(((?:\.\/)?media\/[^\s)]+)\)/g;
+  let rawData = content.match(mediaPattern);
+
+  if (rawData)
+    mediaFiles = rawData.map(x => x.replace(/^\((\.\/|\.\\)?(media\/[^\s)]+)\)$/, '$2'));
+
+  return mediaFiles;
+}
+
 async function buildPackage(outPath, packageJsonTemplate, versionInfo, schemaInfo) {
   console.log (`Building package ${versionInfo.packageName}.${versionInfo.packageVersion} for file ${schemaInfo.path}`);
   const packageDir = path.join(outPath, `${schemaInfo.name}.${versionInfo.packageVersion}`);
@@ -96,6 +137,28 @@ async function buildPackage(outPath, packageJsonTemplate, versionInfo, schemaInf
   const packageSchemaPath = path.join(packageDir, schemaFileName);
   fs.copyFileSync(schemaInfo.path, packageSchemaPath);
   fs.copyFileSync(path.resolve("./tools/packages/LICENSE.md"), path.join(packageDir, "LICENSE.md"));
+
+  const remarkFile = getRemarksFilePath(schemaInfo.path)
+  if (fs.existsSync(remarkFile)) {
+    const pkgRemarksPath = path.join(packageDir, `${schemaInfo.name}.remarks.md`)
+    fs.copyFileSync(remarkFile, pkgRemarksPath);
+
+    const media = getMediaFromRemarksFile(remarkFile);
+    if (media.length != 0) {
+      const remarkFileDir = path.dirname(remarkFile);
+      for (const item of media) {
+        const mediaFileSrc = path.resolve(path.join(remarkFileDir, item));
+        if (fs.existsSync(mediaFileSrc)) {
+          const mediaFileDest = path.resolve(path.join(packageDir, item));
+          const mediaFileDestDir = path.dirname(mediaFileDest);
+          if (!fs.existsSync(mediaFileDestDir)) {
+            fs.mkdirSync(mediaFileDestDir, { recursive: true });
+          }
+          fs.copyFileSync(mediaFileSrc, mediaFileDest);
+        }
+      }
+    }
+  }
 
   // create json schema
   await createSchemaJson(schemaInfo, packageDir);
