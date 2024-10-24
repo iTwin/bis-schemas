@@ -125,7 +125,7 @@ If you just need json schemas of latest released versions:
 
 ### **BIS Rule Validation**
 
-BIS rule validation consists of checking all schemas in the bis-schemas repository against a set of [validation rules](https://www.itwinjs.org/bis/intro/bis-schema-validation/). The npm script 'validateSchemas' uses the npm package `@bentley/schema-validator` to perform the validation.
+BIS rule validation consists of checking all schemas in the bis-schemas repository against a set of [validation rules](https://www.itwinjs.org/bis/guide/other-topics/bis-schema-validation/). The npm script 'validateSchemas' uses the npm package `@bentley/schema-validator` to perform the validation.
 
 To run the 'validateSchemas' script follow these steps:
 
@@ -149,7 +149,7 @@ To run the 'compareSchemas' script, follow these steps:
 
 The iModel Schema Validation tool imports each individual schema in the bis-schema repository (along with schema references) into an local snapshot iModel. The schemas are then exported to a temp directory in order to perform the required validations. The following checks are performed:
 
-- **BIS-Rules Validation:** All schemas are validated against [BIS-Rules](https://www.itwinjs.org/bis/intro/bis-schema-validation/) using the `@bentley/schema-validator` package.
+- **BIS-Rules Validation:** All schemas are validated against [BIS-Rules](https://www.itwinjs.org/bis/guide/other-topics/bis-schema-validation/) using the `@bentley/schema-validator` package.
 - **Comparison Validation:** All schemas are compared with their similar (exact version match) released schemas within bis-schemas using the `@bentley/schema-comparer` package.
 - **Approval Validation:** Approval status of each schema is checked from [SchemaInventory](https://github.com/iTwin/bis-schemas/blob/master/SchemaInventory.json).  
 
