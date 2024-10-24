@@ -123,21 +123,12 @@ function getMediaFromRemarksFile(remarkFile) {
   return mediaFiles;
 }
 
-async function buildPackage(outPath, packageJsonTemplate, versionInfo, schemaInfo) {
-  console.log (`Building package ${versionInfo.packageName}.${versionInfo.packageVersion} for file ${schemaInfo.path}`);
-  const packageDir = path.join(outPath, `${schemaInfo.name}.${versionInfo.packageVersion}`);
-  if (!fs.existsSync(packageDir)) fs.mkdirSync(packageDir, {recursive: true});
-
-  const pkgJson = packageJsonTemplate.replace('${PACKAGE_NAME}', versionInfo.packageName)
-                                     .replace('${DOMAIN_NAME}', schemaInfo.name)
-                                     .replace('${PACKAGE_VERSION}', versionInfo.packageVersion);
-
-  fs.writeFileSync(path.join(packageDir, "package.json"), pkgJson);
-  const schemaFileName = `${schemaInfo.name}.ecschema.xml`;
-  const packageSchemaPath = path.join(packageDir, schemaFileName);
-  fs.copyFileSync(schemaInfo.path, packageSchemaPath);
-  fs.copyFileSync(path.resolve("./tools/packages/LICENSE.md"), path.join(packageDir, "LICENSE.md"));
-
+/**
+ * Add the remarks file and the relavent media files to the package
+ * @param schemaInfo Object containing schema information from the inventory
+ * @param packageDir Schema package directory
+ */
+function addDocsToPackage(schemaInfo, packageDir) {
   const remarkFile = getRemarksFilePath(schemaInfo.path)
   if (fs.existsSync(remarkFile)) {
     const pkgRemarksPath = path.join(packageDir, `${schemaInfo.name}.remarks.md`)
@@ -159,6 +150,24 @@ async function buildPackage(outPath, packageJsonTemplate, versionInfo, schemaInf
       }
     }
   }
+}
+
+async function buildPackage(outPath, packageJsonTemplate, versionInfo, schemaInfo) {
+  console.log (`Building package ${versionInfo.packageName}.${versionInfo.packageVersion} for file ${schemaInfo.path}`);
+  const packageDir = path.join(outPath, `${schemaInfo.name}.${versionInfo.packageVersion}`);
+  if (!fs.existsSync(packageDir)) fs.mkdirSync(packageDir, {recursive: true});
+
+  const pkgJson = packageJsonTemplate.replace('${PACKAGE_NAME}', versionInfo.packageName)
+                                     .replace('${DOMAIN_NAME}', schemaInfo.name)
+                                     .replace('${PACKAGE_VERSION}', versionInfo.packageVersion);
+
+  fs.writeFileSync(path.join(packageDir, "package.json"), pkgJson);
+  const schemaFileName = `${schemaInfo.name}.ecschema.xml`;
+  const packageSchemaPath = path.join(packageDir, schemaFileName);
+  fs.copyFileSync(schemaInfo.path, packageSchemaPath);
+  fs.copyFileSync(path.resolve("./tools/packages/LICENSE.md"), path.join(packageDir, "LICENSE.md"));
+  addDocsToPackage(schemaInfo, packageDir);
+
 
   // create json schema
   await createSchemaJson(schemaInfo, packageDir);
