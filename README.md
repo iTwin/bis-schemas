@@ -67,6 +67,8 @@ All other changes made outside of a domain group directory will require review b
     },
     ```
 
+    >NOTE: If a verifier is set as a required reviewer it is ok to set `verified` to `Yes` when you create the PR.  As their approval of the PR indicates that they have verified the schema.
+
 1. Update entry to fill out all fields correctly, the only optional field is 'comment'.
 1. Run [Bis Rule Validation](#bis-rule-validation) and [iModel Schema Validation](#imodel-schema-validation) on your new schema and make sure they pass.
 1. Create a PR to merge your branch into master
@@ -123,14 +125,18 @@ If you just need json schemas of latest released versions:
 
 ### **BIS Rule Validation**
 
-BIS rule validation consists of checking all schemas in the bis-schemas repository against a set of [validation rules](https://www.itwinjs.org/bis/intro/bis-schema-validation/). The npm script 'validateSchemas' uses the npm package `@bentley/schema-validator` to perform the validation.
+BIS rule validation consists of checking all schemas in the bis-schemas repository against a set of [validation rules](https://www.itwinjs.org/bis/guide/other-topics/bis-schema-validation/). The npm script 'validateSchemas' uses the npm package `@bentley/schema-validator` to perform the validation.
 
 To run the 'validateSchemas' script follow these steps:
 
 1. Navigate to the bis-schemas folder from the command line or VS Code Terminal
 1. Run `npm run validateSchemas`
-    - To validate a single schema use this syntax: `npm run validateSchemas -- --name SCHEMA-NAME`
+    - To validate a group of same schemas (wip and all released versions) use this syntax: `npm run validateSchemas -- --name SCHEMA-NAME`
         - For example to validate BisCore: `npm run validateSchemas -- --name BisCore`
+    - To validate a single released schema, use this syntax: `npm run validateSchemas -- --name SCHEMA-NAME --version SCHEMA-VERSION`
+        - For example to validate BisCore.01.00.15.ecschema.xml: `npm run validateSchemas -- --name BisCore --version 01.00.15`
+    - To validate a single work-in-progress (wip) schema, use this syntax: `npm run validateSchemas -- --name SCHEMA-NAME --wip`
+        - For example to validate BisCore: `npm run validateSchemas -- --name BisCore --wip`
 
 ### **Schema Differencing**
 
@@ -147,7 +153,7 @@ To run the 'compareSchemas' script, follow these steps:
 
 The iModel Schema Validation tool imports each individual schema in the bis-schema repository (along with schema references) into an local snapshot iModel. The schemas are then exported to a temp directory in order to perform the required validations. The following checks are performed:
 
-- **BIS-Rules Validation:** All schemas are validated against [BIS-Rules](https://www.itwinjs.org/bis/intro/bis-schema-validation/) using the `@bentley/schema-validator` package.
+- **BIS-Rules Validation:** All schemas are validated against [BIS-Rules](https://www.itwinjs.org/bis/guide/other-topics/bis-schema-validation/) using the `@bentley/schema-validator` package.
 - **Comparison Validation:** All schemas are compared with their similar (exact version match) released schemas within bis-schemas using the `@bentley/schema-comparer` package.
 - **Approval Validation:** Approval status of each schema is checked from [SchemaInventory](https://github.com/iTwin/bis-schemas/blob/master/SchemaInventory.json).  
 

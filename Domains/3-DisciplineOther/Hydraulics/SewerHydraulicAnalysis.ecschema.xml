@@ -1,0 +1,500 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ==================================================================================
+|  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
+|  * See LICENSE.md in the project root for license terms and full copyright notice. 
+======================================================================================= -->
+<ECSchema schemaName="SewerHydraulicAnalysis" alias="swrhyd" version="01.00.00"
+	xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" displayLabel="Gravity Sewer Analysis" description="Sewer Hydraulic Analysis Schema.">
+	<ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA" />
+	<ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
+	<ECSchemaReference name="BisCore" version="01.00.10" alias="bis" />
+	<ECSchemaReference name="Analytical" version="01.00.01" alias="anlyt" />
+	<ECSchemaReference name="AecUnits" version="01.00.03" alias="AECU"/>
+	<ECSchemaReference name="RoadRailUnits" version="01.00.01" alias="rru"/>
+	<ECSchemaReference name="NetworkTopology" version="01.00.00" alias="net"/>
+
+	<ECCustomAttributes>
+		<ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
+			<SupportedUse>NotForProduction</SupportedUse>
+		</ProductionStatus>
+		<SchemaLayerInfo xmlns="BisCustomAttributes.01.00.00">
+			<Value>DisciplineOther</Value>
+		</SchemaLayerInfo>
+	</ECCustomAttributes>
+
+  <ECEnumeration typeName="InletCaptureMethod" backingTypeName="int" isStrict="true" >
+    <ECEnumerator value="0" name="FullCapture" displayLabel="Full Capture"/>
+    <ECEnumerator value="1" name="PercentCapture" displayLabel="Percent Capture"/>
+    <ECEnumerator value="2" name="MaximumCapacity" displayLabel="Maximum Capacity"/>
+  </ECEnumeration>
+
+	<ECEnumeration typeName="GravityStructureShape" backingTypeName="int" isStrict="true" description="Set the shape of a gravity structure.">
+		<ECEnumerator value="0" name="Circular" displayLabel="Circular" />
+		<ECEnumerator value="1" name="Box" displayLabel="Box" />
+	</ECEnumeration>
+
+	<ECEnumeration typeName="PipeShape" backingTypeName="int" isStrict="true" description="Set the shape of a pipe element.">
+		<ECEnumerator value="0" name="Circular" displayLabel="Circular" />
+		<ECEnumerator value="1" name="Box" displayLabel="Box" />
+	</ECEnumeration>
+
+	<ECEnumeration typeName="RainfallDepthMethod" backingTypeName="int" isStrict="true">
+		<ECEnumerator value="0" name="Cumulative" displayLabel="Cumulative"/>
+		<ECEnumerator value="1" name="Incremental" displayLabel="Incremental"/>
+	</ECEnumeration>
+	  <ECEnumeration typeName="CalculationType" backingTypeName="int" isStrict="true" description="">
+    <ECEnumerator value="0" name="Analysis" displayLabel="Analysis"/>
+    <ECEnumerator value="1" name="Design" displayLabel="Design"/>
+    <ECEnumerator value="2" name="DesignInvertsOnly" displayLabel="Design Inverts Only"/>
+  </ECEnumeration>
+  <ECEnumeration typeName="FlowProfileMethod" backingTypeName="int" isStrict="true" description="">
+    <ECEnumerator value="0" name="BackwaterAnalysis" displayLabel="Backwater Analysis"/>
+    <ECEnumerator value="1" name="CapacityAnalysis" displayLabel="Capacity Analysis"/>
+  </ECEnumeration>
+  <ECEnumeration typeName="AverageVelocityMethod" backingTypeName="int" isStrict="true" description="">
+    <ECEnumerator value="0" name="ActualUniformVelocity" displayLabel="Actual Uniform Velocity"/>
+    <ECEnumerator value="1" name="FullDepthVelocity" displayLabel="Full Depth Velocity"/>
+    <ECEnumerator value="2" name="FullFlowVelocity" displayLabel="Full Flow Velocity"/>
+    <ECEnumerator value="3" name="SimpleAverageVelocity" displayLabel="Simple Average Velocity"/>
+    <ECEnumerator value="4" name="WeightedAverageVelocity" displayLabel="Weighted Average Velocity"/>
+  </ECEnumeration>
+  <ECEnumeration typeName="StructureLossMethod" backingTypeName="int" isStrict="true" description="">
+    <ECEnumerator value="0" name="HydraulicGrade" displayLabel="Hydraulic Grade"/>
+    <ECEnumerator value="1" name="EnergyGrade" displayLabel="Energy Grade"/>
+  </ECEnumeration>
+
+	<ECEnumeration typeName="MeasureCoverTo" backingTypeName="int" isStrict="true" description="">
+    <ECEnumerator value="0" name="PipeSoffit" displayLabel="Pipe Soffit"/>
+    <ECEnumerator value="1" name="PipeTop" displayLabel="Pipe Top"/>
+  </ECEnumeration>
+
+	  <ECEnumeration typeName="PipeMatching" backingTypeName="int" isStrict="true" >
+    <ECEnumerator value="0" name="Inverts" displayLabel="Inverts"/>
+    <ECEnumerator value="1" name="Crowns" displayLabel="Crowns"/>
+  </ECEnumeration>
+
+	<PropertyCategory typeName="HydraulicData" priority="1"/>
+	<PropertyCategory typeName="DesignData" priority="2"/>
+
+
+	<ECEntityClass typeName="SewerHydraulicAnalysisModel" modifier="Sealed" displayLabel="Sewer Hydraulics Analysis Model" description="Model containing all Sewer Hydraulic Analysis elements.">
+		<BaseClass>anlyt:AnalyticalModel</BaseClass>
+	</ECEntityClass>
+
+	<ECEntityClass typeName="SewerHydraulicAnalysisPartition" modifier="Sealed" displayLabel="Sewer Hydraulics Analysis Partition" description="Specializied Sewer Hydraulics perspective in the hierarchy">
+		<BaseClass>anlyt:AnalyticalPartition</BaseClass>
+	</ECEntityClass>
+
+	<ECEntityClass typeName="PipeDesignConstraintsAspect" modifier="Sealed" displayLabel="Pipe Design Constraints">
+    <BaseClass >bis:ElementUniqueAspect</BaseClass>
+    <ECProperty propertyName="MinVelocity" typeName="double" displayLabel="Velocity (Minimum)" category="DesignData" kindOfQuantity="rru:VELOCITY" description="The minimum velocity constraint used during constraint based design."/>
+    <ECProperty propertyName="MaxVelocity" typeName="double" displayLabel="Velocity (Maximum)" category="DesignData" kindOfQuantity="rru:VELOCITY" description="The maximum velocity constraint used during constraint based design."/>
+    <ECProperty propertyName="MinCover" typeName="double" displayLabel="Cover (Minimum)" category="DesignData" kindOfQuantity="rru:ELEVATION" description="The minimum allowable cover during the constraint based design."/>
+    <ECProperty propertyName="MaxCover" typeName="double" displayLabel="Cover (Maximum)" category="DesignData" kindOfQuantity="rru:ELEVATION" description="The maximum allowable cover during the constraint based design."/>
+    <ECProperty propertyName="MeasureCoverTo" typeName="MeasureCoverTo" displayLabel="Measure Cover To" category="DesignData" description="Specify how cover is measured during the design."/>
+    <ECProperty propertyName="MinSlope" typeName="double" displayLabel="Slope (Minimum)" category="DesignData" kindOfQuantity="rru:SLOPE" description="The minimum slope allowable during the constraint based design."/>
+    <ECProperty propertyName="MaxSlope" typeName="double" displayLabel="Slope (Maximum)" category="DesignData" kindOfQuantity="rru:SLOPE" description="The maximum slope allowable during the constraint based design."/>
+    <ECProperty propertyName="PartFullDesign" typeName="boolean" displayLabel="Part Full Design" category="DesignData" description="If true, design the pipe so the depth of flow is a percentage of the conduit's rise."/>
+    <ECProperty propertyName="PercentageFull" typeName="double" displayLabel="Percentage Full" category="DesignData" kindOfQuantity="rru:PERCENTAGE" description="Specify the percent of depth for calculating design capacity."/>
+    <ECProperty propertyName="AllowMultipleBarrels" typeName="boolean" displayLabel="Allow Multiple Barrels" category="DesignData" description="If true the design can add pipe capacity by adding additional pipes."/>
+    <ECProperty propertyName="MaxBarrels" typeName="int" displayLabel="Maximum Number of Barrels" category="DesignData" description="Will restrict the number of barrels to this value, if multiple barrels are allowed."/>
+    <ECProperty propertyName="LimitSectionSize" typeName="boolean" displayLabel="Limit Section Size" category="DesignData" description="If true, then the design will restrict the size of pipe to the 'Rise (Maximum)' attribute."/>
+    <ECProperty propertyName="MaximumRise" typeName="double" displayLabel="Rise (Maximum)" category="DesignData" kindOfQuantity="rru:LENGTH" description="The maximum allowable pipe size to be used during the constraint based design. "/>
+  </ECEntityClass>
+
+  <ECEntityClass typeName="NodeDesignConstraintsAspect" modifier="Sealed" displayLabel="Pipe Matching Design Constraints">
+    <BaseClass >bis:ElementUniqueAspect</BaseClass>
+    <ECProperty propertyName="MatchlineOffset" typeName="double" displayLabel="Matchline Offset" category="DesignData" kindOfQuantity="rru:ELEVATION" description="Set the offset distance between the upstream and downstream conduits."/>
+    <ECProperty propertyName="AllowDropStructure" typeName="boolean" displayLabel="Allow Drop Structure" category="DesignData" description="In some situations, drop structures can minimize pipe cover depths while maintaining adequate hydraulic performance. This can be done by setting this field to true and performing a constraint based design."/>
+    <ECProperty propertyName="UseDropStructureToMinimizeCover" typeName="boolean" displayLabel="Use Drop Structure to Minimize Cover" category="DesignData" description="When this field and Allow Drop Structure are set to true, node drop structure is designed even if the node upstream pipe slope is smaller than maximum slope in design constraints."/>
+    <ECProperty propertyName="MinimumDropDepth" typeName="double" displayLabel="Minimum Drop Depth" category="DesignData" kindOfQuantity="rru:LENGTH" description="Drop Depth is the difference between conduit invert when the drop structure is designed and the conduit invert when the drop structure is not designed. If the calculated drop depth is smaller than this value, the drop structure will not be designed."/>
+    <ECProperty propertyName="PipeMatching" typeName="PipeMatching" displayLabel="Pipe Matching" category="DesignData" description="Specify whether the matchline offset will be based on conduit inverts or conduit crowns."/>
+  </ECEntityClass>
+
+	<ECEntityClass typeName="InletDesignConstraintsAspect" modifier="Sealed" displayLabel="Inlet Design Constraints">
+    <BaseClass >bis:ElementUniqueAspect</BaseClass>
+    <ECProperty propertyName="MaximumSpread" typeName="double" displayLabel="Maximum Spread" category="DesignData" kindOfQuantity="rru:LENGTH" description="Maximum width of flow allowed at capture for an In Sag inlet, or width of bypass flow for an On Grade inlet."/>
+    <ECProperty propertyName="MaximumDepth" typeName="double" displayLabel="Maximum Gutter Depth" category="DesignData" kindOfQuantity="rru:LENGTH" description="Maximum depth of flow allowed at capture for an In Sag inlet, or depth of bypass flow for an On Grade inlet."/>
+    <ECProperty propertyName="MinimumEfficiencyOnGrade" typeName="double" displayLabel="Minimum Efficiency on Grade" category="DesignData" kindOfQuantity="rru:PERCENTAGE" description="Minimum allowable efficiency for an inlet on grade."/>
+  </ECEntityClass>
+
+ <ECEntityClass typeName="GlobalDesignConstraints" modifier="Sealed" displayLabel="Global Design Constraints">
+    <BaseClass >bis:DefinitionElement</BaseClass>
+  </ECEntityClass>
+  <ECRelationshipClass typeName="GlobalDesignConstraintsOwnsPipeDesignConstraintsAspect" strength="embedding" modifier="Sealed">
+    <BaseClass >bis:ElementOwnsUniqueAspect</BaseClass>
+    <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+      <Class class="GlobalDesignConstraints"/>
+    </Source>
+    <Target multiplicity="(1..1)" roleLabel="owned by" polymorphic="false">
+      <Class class="PipeDesignConstraintsAspect"/>
+    </Target>
+  </ECRelationshipClass>
+  <ECRelationshipClass typeName="GlobalDesignConstraintsOwnsNodeDesignConstraintsAspect" strength="embedding" modifier="Sealed">
+    <BaseClass >bis:ElementOwnsUniqueAspect</BaseClass>
+    <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+      <Class class="GlobalDesignConstraints"/>
+    </Source>
+    <Target multiplicity="(1..1)" roleLabel="owned by" polymorphic="false">
+      <Class class="NodeDesignConstraintsAspect"/>
+    </Target>
+  </ECRelationshipClass>
+  <ECRelationshipClass typeName="GlobalDesignConstraintsOwnsInletDesignConstraintsAspect" strength="embedding" modifier="Sealed">
+    <BaseClass >bis:ElementOwnsUniqueAspect</BaseClass>
+    <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+      <Class class="GlobalDesignConstraints"/>
+    </Source>
+    <Target multiplicity="(1..1)" roleLabel="owned by" polymorphic="false">
+      <Class class="InletDesignConstraintsAspect"/>
+    </Target>
+  </ECRelationshipClass>
+
+	<ECEntityClass typeName="BaseStructure" modifier="Abstract" displayLabel="Base Structure">
+		<BaseClass>anlyt:AnalyticalElement</BaseClass>
+		<BaseClass>net:INode</BaseClass>
+		<ECProperty propertyName="InvertElevation" typeName="double" displayLabel="Elevation (Invert)" category="HydraulicData" kindOfQuantity="rru:LENGTH"/>
+	</ECEntityClass>
+
+	<ECEntityClass typeName="GravityStructure" modifier="Abstract" displayLabel="Gravity Structure">
+		<BaseClass>BaseStructure</BaseClass>
+		<ECProperty propertyName="StructureShape" typeName="GravityStructureShape" displayLabel="Structure Shape" category="HydraulicData"/>
+		<ECProperty propertyName="RimElevation" typeName="double" displayLabel="Elevation (Rim)" category="HydraulicData" kindOfQuantity="rru:LENGTH"/>
+		<ECProperty propertyName="FixedLoad" typeName='double' category="HydraulicData" kindOfQuantity="AECU:FLOW"/>
+		<ECProperty propertyName="DesignStructure" typeName="boolean" displayLabel="Design Structure" category="DesignData" description="If true the subsurface structure will be designed to meet the active pipe matching constraints."/>
+    <ECProperty propertyName="NodeMinimumCover" typeName="double" displayLabel="Conduit Cover (Minimum)" category="DesignData" kindOfQuantity="rru:ELEVATION" description="The minimum allowable cover at the node during the constraint based design."/>
+    <ECProperty propertyName="NodeMaximumCover" typeName="double" displayLabel="Conduit Cover (Maximum)" category="DesignData" kindOfQuantity="rru:ELEVATION" description="The maximum allowable cover at the node during the constraint based design."/>
+    <ECProperty propertyName="DesiredSumpDepth" typeName="double" displayLabel="Sump Depth" category="DesignData" kindOfQuantity="rru:ELEVATION" description="Distance between lowest pipe invert or pipe bottom (depending on calculation option setting), and the invert of the structure."/>
+    <ECProperty propertyName="RequiredFreeboard" typeName="double" displayLabel="Freeboard (Required)" category="DesignData" kindOfQuantity="rru:ELEVATION" description="The depth below the rim elevation that is used to determine the lower limit of the overflow risk status during critical storm analysis."/>
+    <ECProperty propertyName="OverrideGlobalPipeMatchingConstraints" typeName="boolean" displayLabel="Override Global Pipe Matching Constraints" category="DesignData" />
+	</ECEntityClass>
+
+  <ECEntityClass typeName="Gutter" modifier="Sealed" displayLabel="Gutter">
+    <BaseClass>anlyt:AnalyticalElement</BaseClass>
+    <BaseClass>net:IEdge</BaseClass>
+  </ECEntityClass>
+
+	<ECEntityClass typeName="GravityStructureShapeAspect" modifier="Abstract" displayLabel="Structure Shape">
+		<BaseClass>bis:ElementUniqueAspect</BaseClass>
+	</ECEntityClass>
+
+	<ECRelationshipClass typeName="GravityStructureOwnsShapeAspect" strength="embedding" modifier="Sealed">
+		<BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+		<Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+			<Class class="GravityStructure"/>
+		</Source>
+		<Target multiplicity="(1..1)" roleLabel="is owned by" polymorphic="true">
+			<Class class="GravityStructureShapeAspect" />
+		</Target>
+	</ECRelationshipClass>
+
+	<ECEntityClass typeName="BoxGravityStructureShapeAspect" modifier="Sealed" displayLabel="Box Structure">
+		<BaseClass>GravityStructureShapeAspect</BaseClass>
+		<ECProperty propertyName="StructureLength" typeName="double" displayLabel="Length" category="HydraulicData" kindOfQuantity="rru:LENGTH"/>
+		<ECProperty propertyName="StructureWidth" typeName="double" displayLabel="Width" category="HydraulicData" kindOfQuantity="rru:LENGTH"/>
+	</ECEntityClass>
+
+
+	<ECRelationshipClass typeName="GravityStructureOwnsBoxShapeAspect" strength="embedding" strengthDirection="Forward" modifier="Sealed">
+		<BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+		<Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+			<Class class="GravityStructure" />
+		</Source>
+		<Target multiplicity="(0..1)" roleLabel="owned by" polymorphic="true">
+			<Class class="BoxGravityStructureShapeAspect" />
+		</Target>
+	</ECRelationshipClass>
+
+	<ECEntityClass typeName="CircularGravityStructureShapeAspect" modifier="Sealed" displayLabel="Circular Structure">
+		<BaseClass>GravityStructureShapeAspect</BaseClass>
+		<ECProperty propertyName="StructureDiameter" typeName="double" displayLabel="Diameter" category="HydraulicData" kindOfQuantity="AECU:LENGTH"/>
+	</ECEntityClass>
+
+	<ECRelationshipClass typeName="GravityStructureOwnsCircularShapeAspect" strength="embedding" strengthDirection="Forward" modifier="Sealed">
+		<BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+		<Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+			<Class class="GravityStructure" />
+		</Source>
+		<Target multiplicity="(0..1)" roleLabel="owned by" polymorphic="true">
+			<Class class="CircularGravityStructureShapeAspect" />
+		</Target>
+	</ECRelationshipClass>
+
+	  <ECRelationshipClass typeName="GravityStructureOwnsNodeDesignConstraintsAspect" strength="embedding" modifier="Sealed">
+    <BaseClass >bis:ElementOwnsUniqueAspect</BaseClass>
+    <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+      <Class class="GravityStructure"/>
+    </Source>
+    <Target multiplicity="(1..1)" roleLabel="owned by" polymorphic="false">
+      <Class class="NodeDesignConstraintsAspect"/>
+    </Target>
+	</ECRelationshipClass>
+	
+	<ECEntityClass typeName="Manhole" modifier="Sealed" displayLabel="Manhole">
+		<BaseClass>GravityStructure</BaseClass>
+		<ECProperty propertyName="TreatAsStorage" typeName="boolean" displayLabel="Treat As Storage" category="HydraulicData"/>
+		<ECProperty propertyName="ManholeIsBolted" typeName="boolean" displayLabel="Is Bolted" category="HydraulicData"/>
+	</ECEntityClass>
+
+  <ECEntityClass typeName="CatchBasin" modifier="Sealed" displayLabel="Catch Basin">
+    <BaseClass>GravityStructure</BaseClass>
+    <ECProperty propertyName="InletCaptureMethod" typeName="InletCaptureMethod" displayLabel="Inlet Capture Method" description="Method used to determine the rate of flow capture by the inlet." category="HydraulicData"/>
+     <ECProperty propertyName="DesignInlet" typeName="boolean" displayLabel="Design Inlet" category="DesignData" description="If true the length of the inlet will be designed to meet the active inlet design constraints."/>
+    <ECProperty propertyName="OverrideGlobalInletDesignConstraints" typeName="boolean" displayLabel="Override Global Inlet Design Constraints" category="DesignData" />
+	</ECEntityClass>
+  
+	<ECEntityClass typeName="InletCaptureMethodAspect" modifier="Abstract" displayLabel="InletCaptureMethodAspect">
+    <BaseClass>bis:ElementUniqueAspect</BaseClass>
+  </ECEntityClass>
+  
+	<ECRelationshipClass typeName="CatchBasinOwnsInletCaptureMethodAspect" strength="embedding" modifier="Sealed">
+	  <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+    <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+      <Class class="CatchBasin"/>
+    </Source>
+    <Target multiplicity="(1..1)" roleLabel="owned by" polymorphic="true">
+      <Class class="InletCaptureMethodAspect"/>
+    </Target>
+  </ECRelationshipClass>
+
+  <ECEntityClass typeName="PercentCaptureAspect" modifier="Sealed" displayLabel="Percent Capture">
+    <BaseClass>InletCaptureMethodAspect</BaseClass>
+    <ECProperty propertyName="CapturePercent" typeName="double" displayLabel="Capture Percent" description="Set the percent of incoming inflow to be captured by the inlet." category="HydraulicData" kindOfQuantity="rru:PERCENTAGE"/>
+  </ECEntityClass>
+
+  <ECEntityClass typeName="MaximumCapacityAspect" modifier="Sealed" displayLabel="Maximum Capacity">
+    <BaseClass>InletCaptureMethodAspect</BaseClass>
+    <ECProperty propertyName="InletFlowThreshold" typeName="double" displayLabel="Inlet Flow Threshold" description="The inlet will capture all incoming flow up the specified threshold, all excess flow will be bypassed." category="HydraulicData" kindOfQuantity="rru:FLOW"/>
+  </ECEntityClass>
+
+	<ECRelationshipClass typeName="CatchBasinOwnsInletDesignConstraintsAspect" strength="embedding" modifier="Sealed">
+    <BaseClass >bis:ElementOwnsUniqueAspect</BaseClass>
+    <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+      <Class class="CatchBasin"/>
+    </Source>
+    <Target multiplicity="(1..1)" roleLabel="owned by" polymorphic="true">
+      <Class class="InletDesignConstraintsAspect"/>
+    </Target>
+  </ECRelationshipClass>
+
+	<ECEntityClass typeName="Outfall" modifier="Sealed" displayLabel="Outfall">
+		<BaseClass>BaseStructure</BaseClass>
+	</ECEntityClass>
+
+	<ECEntityClass typeName="Pipe" modifier="Sealed" displayLabel="Pipe">
+		<BaseClass>anlyt:AnalyticalElement</BaseClass>
+		<BaseClass>net:IEdge</BaseClass>
+		<ECProperty propertyName="Shape" typeName="PipeShape" displayLabel="Shape" category="HydraulicData"/>
+		<ECProperty propertyName="StartInvert" typeName="double" displayLabel="Invert (Start)" category="HydraulicData" kindOfQuantity="rru:LENGTH"/>
+		<ECProperty propertyName="StopInvert" typeName="double" displayLabel="Invert (Stop)" category="HydraulicData" kindOfQuantity="rru:LENGTH"/>
+		<ECProperty propertyName="ManningsN" typeName="double" displayLabel="Mannings n" category="HydraulicData"/>
+		<ECProperty propertyName="PlanLength" typeName="double" displayLabel="Length" category="HydraulicData" kindOfQuantity="rru:LENGTH"/>
+	  <ECProperty propertyName="DesignPipe" typeName="boolean" displayLabel="Design Pipe" category="DesignData" />
+    <ECProperty propertyName="DesignStartInvert" typeName="boolean" displayLabel="Design Start Invert" category="DesignData" description="If true then the start invert will be adjusted during the design."/>
+    <ECProperty propertyName="DesignStopInvert" typeName="boolean" displayLabel="Design Stop Invert" category="DesignData" description="If true then the atop invert will be adjusted during the design."/>
+    <ECProperty propertyName="OverrideGlobalPipeConstraints" typeName="boolean" displayLabel="Override Global Pipe Constraints" category="DesignData" />
+	</ECEntityClass>
+
+	<ECEntityClass typeName="PipeShapeAspect" modifier="Abstract" displayLabel="Pipe Shape">
+		<BaseClass>bis:ElementUniqueAspect</BaseClass>
+	</ECEntityClass>
+
+	<ECRelationshipClass typeName="PipeOwnsShapeAspect" strength="embedding" modifier="Sealed">
+		<BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+		<Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+			<Class class="Pipe"/>
+		</Source>
+		<Target multiplicity="(1..1)" roleLabel="is owned by" polymorphic="true">
+			<Class class="PipeShapeAspect" />
+		</Target>
+	</ECRelationshipClass>
+
+	<ECEntityClass typeName="CircularPipeShapeAspect" modifier="Sealed" displayLabel="Circular">
+		<BaseClass>PipeShapeAspect</BaseClass>
+		<ECProperty propertyName="PipeDiameter" typeName="double" displayLabel="Diameter" category="HydraulicData" kindOfQuantity="AECU:LENGTH"/>
+	</ECEntityClass>
+
+	<ECRelationshipClass typeName="PipeOwnsCircularShapeAspect" strength="embedding" strengthDirection="Forward" modifier="Sealed">
+		<BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+		<Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+			<Class class="GravityStructure" />
+		</Source>
+		<Target multiplicity="(0..1)" roleLabel="owned by" polymorphic="true">
+			<Class class="CircularPipeShapeAspect" />
+		</Target>
+	</ECRelationshipClass>
+
+	<ECEntityClass typeName="BoxPipeShapeAspect" modifier="Sealed" displayLabel="Box">
+		<BaseClass>PipeShapeAspect</BaseClass>
+		<ECProperty propertyName="PipeRise" typeName="double" displayLabel="Rise" category="HydraulicData" kindOfQuantity="rru:LENGTH"/>
+		<ECProperty propertyName="PipeSpan" typeName="double" displayLabel="Span" category="HydraulicData" kindOfQuantity="rru:LENGTH"/>
+	</ECEntityClass>
+
+	<ECRelationshipClass typeName="PipeOwnsBoxShapeAspect" strength="embedding" strengthDirection="Forward" modifier="Sealed">
+		<BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+		<Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+			<Class class="Pipe" />
+		</Source>
+		<Target multiplicity="(0..1)" roleLabel="owned by" polymorphic="true">
+			<Class class="BoxPipeShapeAspect" />
+		</Target>
+	</ECRelationshipClass>
+
+	<ECRelationshipClass typeName="PipeOwnsPipeDesignConstraintsAspect" strength="embedding" modifier="Sealed">
+    <BaseClass >bis:ElementOwnsUniqueAspect</BaseClass>
+    <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+      <Class class="Pipe"/>
+    </Source>
+    <Target multiplicity="(0..1)" roleLabel="owned by" polymorphic="false">
+      <Class class="PipeDesignConstraintsAspect"/>
+    </Target>
+  </ECRelationshipClass>
+
+	<ECEntityClass typeName="Catchment" modifier="Sealed" displayLabel="Catchment">
+		<BaseClass>anlyt:AnalyticalElement</BaseClass>
+		<ECProperty propertyName="Area" typeName="double" displayLabel="Area" category="HydraulicData" kindOfQuantity="rru:AREA"/>
+		<ECProperty propertyName="Tc" typeName="double" displayLabel="Time of Concentration" category="HydraulicData" kindOfQuantity="AECU:TIME"/>
+		<ECProperty propertyName="RationalC" typeName="double" displayLabel="Rational C" category="HydraulicData"/>
+    <ECNavigationProperty propertyName="OutflowNode" relationshipName="CatchmentDischargesToOutflowNode" direction="Forward" />
+	</ECEntityClass>
+
+	<ECRelationshipClass typeName="CatchmentDischargesToOutflowNode" strength="referencing" modifier="Sealed">
+		<Source multiplicity="(0..*)" roleLabel="discharges from" polymorphic="false">
+			<Class class="Catchment"/>
+		</Source>
+		<Target multiplicity="(0..1)" roleLabel="discharges to" polymorphic="true">
+			<Class class="net:INode"/>
+		</Target>
+	</ECRelationshipClass>
+
+	<ECEntityClass typeName="Pond" modifier="Sealed" displayLabel="Pond">
+    <BaseClass >anlyt:AnalyticalElement</BaseClass>
+    <BaseClass >net:INode</BaseClass>
+    <ECProperty propertyName="StartingWaterSurfaceElevation" typeName="double" displayLabel="Starting Water Surface Elevation" category="HydraulicData" kindOfQuantity="rru:LENGTH"/>
+    <ECStructArrayProperty propertyName="StorageElevationAreaCurve" typeName="ElevationAreaPoint" displayLabel="Elevation-Area Curve" category="HydraulicData"  minOccurs="0" maxOccurs="unbounded"/>
+  </ECEntityClass>
+  
+	<ECStructClass typeName="ElevationAreaPoint" modifier="Sealed">
+    <ECProperty propertyName="Elevation" typeName="double" displayLabel="Elevation" category="HydraulicData" kindOfQuantity="rru:LENGTH"/>
+    <ECProperty propertyName="Area" typeName="double" displayLabel="Area" category="HydraulicData" kindOfQuantity="rru:AREA"/>
+  </ECStructClass>
+
+	<ECEntityClass typeName="RainfallSet" modifier="Sealed" displayLabel="Rainfall Set">
+		<BaseClass>bis:DefinitionElement</BaseClass>
+	</ECEntityClass>
+
+	<ECEntityClass typeName="RainfallEvent" modifier="Sealed" displayLabel="Rainfall Event">
+		<BaseClass>bis:DefinitionElement</BaseClass>
+		<ECProperty propertyName="ReturnEvent" typeName="double" displayLabel="Return Event" category="HydraulicData" kindOfQuantity="AECU:TIME"/>
+		<ECProperty propertyName="IncludeInAnalysis" typeName="boolean" displayLabel="Include In Analysis" category="HydraulicData"/>
+	</ECEntityClass>
+
+	<ECRelationshipClass typeName="RainfallSetOwnsRainfallEvents" strength="embedding" strengthDirection="Forward" modifier="Sealed">
+		<BaseClass>bis:ElementOwnsChildElements</BaseClass>
+		<Source multiplicity="(1..1)" roleLabel="owns child" polymorphic="false">
+			<Class class="RainfallSet" />
+		</Source>
+		<Target multiplicity="(0..*)" roleLabel="is owned by parent" polymorphic="true">
+			<Class class="RainfallEvent" />
+		</Target>
+	</ECRelationshipClass>
+
+	<ECEntityClass typeName="RainfallEventAspect" modifier="Abstract" displayLabel="Rainfall Event Aspect">
+		<BaseClass>bis:ElementUniqueAspect</BaseClass>
+	</ECEntityClass>
+
+	<ECRelationshipClass typeName="RainfallEventOwnsRainfallEventAspect" strength="embedding" modifier="Sealed">
+		<BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+		<Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+			<Class class="RainfallEvent"/>
+		</Source>
+		<Target multiplicity="(1..1)" roleLabel="is owned by" polymorphic="true">
+			<Class class="RainfallEventAspect" />
+		</Target>
+	</ECRelationshipClass>
+
+	<ECEntityClass typeName="TimeDepthRainfallEventAspect" modifier="Sealed" displayLabel="Time-Depth Rainfall">
+		<BaseClass>RainfallEventAspect</BaseClass>
+		<ECProperty propertyName="Duration" typeName="double" displayLabel="Storm Duration" category="HydraulicData" kindOfQuantity="AECU:TIME"/>
+		<ECProperty propertyName="TimeIncrement" typeName="double" displayLabel="Duration" category="HydraulicData" kindOfQuantity="AECU:TIME"/>
+		<ECProperty propertyName="DepthMethod" typeName="RainfallDepthMethod" displayLabel="Depth Method" category="HydraulicData"/>
+		<ECArrayProperty propertyName="Depths" typeName="double" displayLabel="Depths" category="HydraulicData" kindOfQuantity="AECU:LENGTH"/>
+	</ECEntityClass>
+
+	<ECRelationshipClass typeName="RainfallEventToTimeDepthsAspect" strength="embedding" strengthDirection="Forward" modifier="Sealed">
+		<BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+		<Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+			<Class class="RainfallEvent" />
+		</Source>
+		<Target multiplicity="(0..1)" roleLabel="owned by" polymorphic="true">
+			<Class class="TimeDepthRainfallEventAspect" />
+		</Target>
+	</ECRelationshipClass>
+
+	<ECStructClass typeName="IDFPoint" description="Point of IDF Curve" modifier="Sealed">
+		<ECProperty propertyName="Duration" typeName="double" description="Duration of storm" kindOfQuantity="AECU:TIME" />
+		<ECProperty propertyName="Intensity" typeName="double" description="Intensity at duration" />
+	</ECStructClass>
+
+	<ECEntityClass typeName="IDFRainfallEventAspect" modifier="Sealed" displayLabel="IDF Curve">
+		<BaseClass>RainfallEventAspect</BaseClass>
+		<ECStructArrayProperty propertyName="IDFPoints" typeName="IDFPoint" displayLabel="IDF Points" minOccurs="0" maxOccurs="unbounded" description="Array of Duration-Intensity Points" />
+	</ECEntityClass>
+
+	<ECRelationshipClass typeName="RainfallEventToIDFAspect" strength="embedding" strengthDirection="Forward" modifier="Sealed">
+		<BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+		<Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+			<Class class="RainfallEvent" />
+		</Source>
+		<Target multiplicity="(0..1)" roleLabel="owned by" polymorphic="true">
+			<Class class="IDFRainfallEventAspect" />
+		</Target>
+	</ECRelationshipClass>
+
+  <ECEntityClass typeName="GVFCalculationOptions" modifier="Sealed" displayLabel="Calc Options">
+    <BaseClass>bis:DefinitionElement</BaseClass>
+    <ECProperty propertyName="CalculationType" typeName="CalculationType" displayLabel="Calculation Type" category="HydraulicData"/>
+    <ECProperty propertyName="MinimumTc" typeName="double" displayLabel="Minimum Time of Concentration" category="HydraulicData"/>
+    <ECProperty propertyName="UseMinimumTcSystemTime" typeName="boolean" displayLabel="Use Minimum Tc System Time" category="HydraulicData"/>
+    <ECProperty propertyName="MaxNetworkTraversals" typeName="int" displayLabel="Maximum Network Traversals" category="HydraulicData"/>
+    <ECProperty propertyName="FlowConvergenceTest" typeName="double" displayLabel="Flow Convergence Test" category="HydraulicData"/>
+    <ECProperty propertyName="FlowProfileMethod" typeName="FlowProfileMethod" displayLabel="Flow Profile Method" category="HydraulicData"/>
+    <ECProperty propertyName="NumberOfProfileSteps" typeName="int" displayLabel="Number of Profile Steps" category="HydraulicData"/>
+    <ECProperty propertyName="HydraulicConvergenceTest" typeName="double" displayLabel="Hydraulic Convergence Test" category="HydraulicData"/>
+    <ECProperty propertyName="AverageVelocityMethod" typeName="AverageVelocityMethod" displayLabel="Average Velocity Method" category="HydraulicData"/>
+    <ECProperty propertyName="MinStructureHeadloss" typeName="double" displayLabel="Minimum Structure Headloss" category="HydraulicData"/>
+    <ECProperty propertyName="StructureLossMethod" typeName="StructureLossMethod" displayLabel="Structure Loss Method" category="HydraulicData"/>
+    <ECProperty propertyName="IgnorePipeTravelTimeInCarrierPipes" typeName="boolean" displayLabel="Ignore Pipe Travel Time in Carrier Pipes" category="HydraulicData"/>
+    <ECProperty propertyName="CorrectForPartialAreaEffects" typeName="boolean" displayLabel="Correct for Partial Area Effects" category="HydraulicData"/>
+  </ECEntityClass>
+
+	<ECEntityClass typeName="PipeSizeSet" modifier="Sealed" displayLabel="Pipe Sizes">
+    <BaseClass>bis:DefinitionElement</BaseClass>
+    <ECProperty propertyName="Shape" typeName="PipeShape" displayLabel="Shape"  category="HydraulicData"/>
+    <ECProperty propertyName="Material" typeName="string" displayLabel="Material"  category="HydraulicData"/>
+  </ECEntityClass>
+  
+  <ECRelationshipClass typeName="PipeSetOwnsPipeSetItem" strength="embedding" modifier="Sealed">
+    <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+    <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+      <Class class="PipeSizeSet"/>
+    </Source>
+    <Target multiplicity="(0..*)" roleLabel="owned by" polymorphic="false">
+      <Class class="PipeSize"/>
+    </Target>
+  </ECRelationshipClass>
+  
+  <ECEntityClass typeName="PipeSize" modifier="Sealed" displayLabel="Pipe Item">
+    <BaseClass>bis:DefinitionElement</BaseClass>
+    <ECProperty propertyName="Manningsn" typeName="double" displayLabel="Manning's n" category="HydraulicData"/>
+  </ECEntityClass>
+  
+  <ECRelationshipClass typeName="PipeSetItemOwnsPipeShapeAspect" strength="embedding" modifier="Sealed">
+    <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+    <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+      <Class class="PipeSize"/>
+    </Source>
+    <Target multiplicity="(1..1)" roleLabel="owned by" polymorphic="true">
+      <Class class="PipeShapeAspect"/>
+    </Target>
+  </ECRelationshipClass>
+</ECSchema>
