@@ -9,7 +9,10 @@
 
 const path = require("path");
 const readdirp = require("readdirp");
-const argv = require("yargs").argv;
+// 'version' is a keyword in this library, adding this workaround enables to use 'version' as user argument
+const argv = require("yargs")
+  .version(false)
+  .options({ version: { string: true} }).argv;
 const fs = require("fs");
 const chalk = require("chalk");
 const ValidationOptions = require("@bentley/schema-validator").ValidationOptions;
@@ -153,7 +156,15 @@ async function getAllSchemas() {
 }
 
 function shouldExcludeSchema(schema, excludeList) {
+
+  if (argv.name && argv.version)
+    return !(argv.name == schema.name && argv.version == schema.version);
+
   if (argv.name) {
+
+    if (argv.wip)
+      return !(argv.name == schema.name && !schema.released);
+
     return argv.name !== schema.name;
   } 
 
