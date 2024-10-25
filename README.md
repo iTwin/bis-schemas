@@ -134,7 +134,7 @@ To run the 'validateSchemas' script follow these steps:
     - To validate a group of same schemas (wip and all released versions) use this syntax: `npm run validateSchemas -- --name SCHEMA-NAME`
         - For example to validate BisCore: `npm run validateSchemas -- --name BisCore`
     - To validate a single released schema, use this syntax: `npm run validateSchemas -- --name SCHEMA-NAME --version SCHEMA-VERSION`
-        - For example to validate BisCore: `npm run validateSchemas -- --name BisCore --version 01.00.15`
+        - For example to validate BisCore.01.00.15.ecschema.xml: `npm run validateSchemas -- --name BisCore --version 01.00.15`
     - To validate a single work-in-progress (wip) schema, use this syntax: `npm run validateSchemas -- --name SCHEMA-NAME --wip`
         - For example to validate BisCore: `npm run validateSchemas -- --name BisCore --wip`
 
