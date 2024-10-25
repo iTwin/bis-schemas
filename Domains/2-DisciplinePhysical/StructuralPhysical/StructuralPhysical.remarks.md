@@ -37,7 +37,7 @@ Equivalent to [IfcStructuralMember](https://standards.buildingsmart.org/IFC/RELE
 
 ### StructuralMemberType
 
-The physical type `StructuralMemberType` specifies the shared properties and characteristics common to multiple instances of `StructuralMember`. `StructuralMemberType`s must be contained in `DefinitionModel`s.
+`StructuralMemberType`s must be contained in `DefinitionModel`s.
 
 Equivalent to [IfcMemberType](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcMemberType.htm).
 
@@ -51,7 +51,7 @@ Equivalent to [IfcSlab](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/H
 
 ### SlabType
 
-The physical type `SlabType` specifies the shared properties and characteristics common to multiple instances of `Slab`. `SlabType`s must be contained in `DefinitionModel`s.
+`SlabType`s must be contained in `DefinitionModel`s.
 
 Equivalent to [IfcSlabType](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcSlabType.htm).
 
@@ -65,7 +65,7 @@ Equivalent to [IfcWall](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/H
 
 ### WallType
 
-The physical type `WallType` specifies the shared properties and characteristics common to multiple instances of `Wall`. `WallType`s must be contained in `DefinitionModel`s.
+`WallType`s must be contained in `DefinitionModel`s.
 
 Equivalent to [IfcWallType](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcWallType.htm).
 
@@ -79,7 +79,7 @@ Equivalent to [IfcBeam](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/H
 
 ### BeamType
 
-The physical type `BeamType` specifies the shared properties and characteristics common to multiple instances of `Beam`. `BeamType`s must be contained in `DefinitionModel`s.
+`BeamType`s must be contained in `DefinitionModel`s.
 
 Equivalent to [IfcBeamType](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcBeamType.htm)
 
@@ -93,7 +93,7 @@ Equivalent to [IfcColumn](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3
 
 ### ColumnType
 
-The physical type `ColumnType` specifies the shared properties and characteristics common to multiple instances of `Column`. `ColumnType`s must be contained in `DefinitionModel`s.
+`ColumnType`s must be contained in `DefinitionModel`s.
 
 Equivalent to [IfcColumnType](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcColumnType.htm)
 
@@ -107,7 +107,7 @@ Equivalent to [IfcMember](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3
 
 ### BraceType
 
-The physical type `BraceType` specifies the shared properties and characteristics common to multiple instances of `Brace`. `BraceType`s must be contained in `DefinitionModel`s.
+`BraceType`s must be contained in `DefinitionModel`s.
 
 Equivalent to [IfcMemberType](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcMember.htm) with a PredefinedType equal to [IfcMemberTypeEnum](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcMemberTypeEnum.htm).BRACE.
 
@@ -125,7 +125,7 @@ Equivalent to [IfcFooting](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_
 
 ### StripFootingType
 
-The physical type `StripFootingType` specifies the shared properties and characteristics common to multiple instances of `StripFooting`. `StripFootingType`s must be contained in `DefinitionModel`s.
+`StripFootingType`s must be contained in `DefinitionModel`s.
 
 Equivalent to [IfcFootingType](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcFootingType.htm) with a PredefinedType equal to [IfcFootingTypeEnum](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcFootingTypeEnum.htm).STRIP_FOOTING.
 
@@ -139,7 +139,7 @@ Equivalent to [IfcFooting](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_
 
 ### SpreadFootingType
 
-The physical type `SpreadFootingType` specifies the shared properties and characteristics common to multiple instances of `SpreadFooting`. `SpreadFootingType`s must be contained in `DefinitionModel`s.
+`SpreadFootingType`s must be contained in `DefinitionModel`s.
 
 Equivalent to [IfcFootingType](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcFootingType.htm) with a PredefinedType equal to [IfcFootingTypeEnum](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcFootingTypeEnum.htm).PAD_FOOTING.
 
@@ -153,7 +153,7 @@ Equivalent to [IfcFooting](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_
 
 ### PileCapType
 
-The physical type `PileCapType` specifies the shared properties and characteristics common to multiple instances of `PileCap`. `PileCapType`s must be contained in `DefinitionModel`s.
+`PileCapType`s must be contained in `DefinitionModel`s.
 
 Equivalent to [IfcFooting](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcFootingType.htm) with a PredefinedType equal to [IfcFootingTypeEnum](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcFootingTypeEnum.htm).PILE_CAP.
 
@@ -167,6 +167,6 @@ Equivalent to [IfcPile](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/H
 
 ### PileType
 
-The physical type `PileType` specifies the shared properties and characteristics common to multiple instances of `Pile`. `PileType`s must be contained in `DefinitionModel`s.
+`PileType`s must be contained in `DefinitionModel`s.
 
 Equivalent to [IfcPileType](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcPileType.htm).
