@@ -68,7 +68,14 @@
     <ECEnumerator value="1" name="PipeTop" displayLabel="Pipe Top"/>
   </ECEnumeration>
 
+	  <ECEnumeration typeName="PipeMatching" backingTypeName="int" isStrict="true" >
+    <ECEnumerator value="0" name="Inverts" displayLabel="Inverts"/>
+    <ECEnumerator value="1" name="Crowns" displayLabel="Crowns"/>
+  </ECEnumeration>
+
 	<PropertyCategory typeName="HydraulicData" priority="1"/>
+	<PropertyCategory typeName="DesignData" priority="2"/>
+
 
 	<ECEntityClass typeName="SewerHydraulicAnalysisModel" modifier="Sealed" displayLabel="Sewer Hydraulics Analysis Model" description="Model containing all Sewer Hydraulic Analysis elements.">
 		<BaseClass>anlyt:AnalyticalModel</BaseClass>
@@ -77,6 +84,70 @@
 	<ECEntityClass typeName="SewerHydraulicAnalysisPartition" modifier="Sealed" displayLabel="Sewer Hydraulics Analysis Partition" description="Specializied Sewer Hydraulics perspective in the hierarchy">
 		<BaseClass>anlyt:AnalyticalPartition</BaseClass>
 	</ECEntityClass>
+
+	<ECEntityClass typeName="PipeDesignConstraintsAspect" modifier="Sealed" displayLabel="Pipe Design Constraints">
+    <BaseClass >bis:ElementUniqueAspect</BaseClass>
+    <ECProperty propertyName="MinVelocity" typeName="double" displayLabel="Velocity (Minimum)" category="DesignData" kindOfQuantity="rru:VELOCITY" description="The minimum velocity constraint used during constraint based design."/>
+    <ECProperty propertyName="MaxVelocity" typeName="double" displayLabel="Velocity (Maximum)" category="DesignData" kindOfQuantity="rru:VELOCITY" description="The maximum velocity constraint used during constraint based design."/>
+    <ECProperty propertyName="MinCover" typeName="double" displayLabel="Cover (Minimum)" category="DesignData" kindOfQuantity="rru:ELEVATION" description="The minimum allowable cover during the constraint based design."/>
+    <ECProperty propertyName="MaxCover" typeName="double" displayLabel="Cover (Maximum)" category="DesignData" kindOfQuantity="rru:ELEVATION" description="The maximum allowable cover during the constraint based design."/>
+    <ECProperty propertyName="MeasureCoverTo" typeName="MeasureCoverTo" displayLabel="Measure Cover To" category="DesignData" description="Specify how cover is measured during the design."/>
+    <ECProperty propertyName="MinSlope" typeName="double" displayLabel="Slope (Minimum)" category="DesignData" kindOfQuantity="rru:SLOPE" description="The minimum slope allowable during the constraint based design."/>
+    <ECProperty propertyName="MaxSlope" typeName="double" displayLabel="Slope (Maximum)" category="DesignData" kindOfQuantity="rru:SLOPE" description="The maximum slope allowable during the constraint based design."/>
+    <ECProperty propertyName="PartFullDesign" typeName="boolean" displayLabel="Part Full Design" category="DesignData" description="If true, design the pipe so the depth of flow is a percentage of the conduit's rise."/>
+    <ECProperty propertyName="PercentageFull" typeName="double" displayLabel="Percentage Full" category="DesignData" kindOfQuantity="rru:PERCENTAGE" description="Specify the percent of depth for calculating design capacity."/>
+    <ECProperty propertyName="AllowMultipleBarrels" typeName="boolean" displayLabel="Allow Multiple Barrels" category="DesignData" description="If true the design can add pipe capacity by adding additional pipes."/>
+    <ECProperty propertyName="MaxBarrels" typeName="int" displayLabel="Maximum Number of Barrels" category="DesignData" description="Will restrict the number of barrels to this value, if multiple barrels are allowed."/>
+    <ECProperty propertyName="LimitSectionSize" typeName="boolean" displayLabel="Limit Section Size" category="DesignData" description="If true, then the design will restrict the size of pipe to the 'Rise (Maximum)' attribute."/>
+    <ECProperty propertyName="MaximumRise" typeName="double" displayLabel="Rise (Maximum)" category="DesignData" kindOfQuantity="rru:LENGTH" description="The maximum allowable pipe size to be used during the constraint based design. "/>
+  </ECEntityClass>
+
+  <ECEntityClass typeName="NodeDesignConstraintsAspect" modifier="Sealed" displayLabel="Pipe Matching Design Constraints">
+    <BaseClass >bis:ElementUniqueAspect</BaseClass>
+    <ECProperty propertyName="MatchlineOffset" typeName="double" displayLabel="Matchline Offset" category="DesignData" kindOfQuantity="rru:ELEVATION" description="Set the offset distance between the upstream and downstream conduits."/>
+    <ECProperty propertyName="AllowDropStructure" typeName="boolean" displayLabel="Allow Drop Structure" category="DesignData" description="In some situations, drop structures can minimize pipe cover depths while maintaining adequate hydraulic performance. This can be done by setting this field to true and performing a constraint based design."/>
+    <ECProperty propertyName="UseDropStructureToMinimizeCover" typeName="boolean" displayLabel="Use Drop Structure to Minimize Cover" category="DesignData" description="When this field and Allow Drop Structure are set to true, node drop structure is designed even if the node upstream pipe slope is smaller than maximum slope in design constraints."/>
+    <ECProperty propertyName="MinimumDropDepth" typeName="double" displayLabel="Minimum Drop Depth" category="DesignData" kindOfQuantity="rru:LENGTH" description="Drop Depth is the difference between conduit invert when the drop structure is designed and the conduit invert when the drop structure is not designed. If the calculated drop depth is smaller than this value, the drop structure will not be designed."/>
+    <ECProperty propertyName="PipeMatching" typeName="PipeMatching" displayLabel="Pipe Matching" category="DesignData" description="Specify whether the matchline offset will be based on conduit inverts or conduit crowns."/>
+  </ECEntityClass>
+
+	<ECEntityClass typeName="InletDesignConstraintsAspect" modifier="Sealed" displayLabel="Inlet Design Constraints">
+    <BaseClass >bis:ElementUniqueAspect</BaseClass>
+    <ECProperty propertyName="MaximumSpread" typeName="double" displayLabel="Maximum Spread" category="DesignData" kindOfQuantity="rru:LENGTH" description="Maximum width of flow allowed at capture for an In Sag inlet, or width of bypass flow for an On Grade inlet."/>
+    <ECProperty propertyName="MaximumDepth" typeName="double" displayLabel="Maximum Gutter Depth" category="DesignData" kindOfQuantity="rru:LENGTH" description="Maximum depth of flow allowed at capture for an In Sag inlet, or depth of bypass flow for an On Grade inlet."/>
+    <ECProperty propertyName="MinimumEfficiencyOnGrade" typeName="double" displayLabel="Minimum Efficiency on Grade" category="DesignData" kindOfQuantity="rru:PERCENTAGE" description="Minimum allowable efficiency for an inlet on grade."/>
+  </ECEntityClass>
+
+ <ECEntityClass typeName="GlobalDesignConstraints" modifier="Sealed" displayLabel="Global Design Constraints">
+    <BaseClass >bis:DefinitionElement</BaseClass>
+  </ECEntityClass>
+  <ECRelationshipClass typeName="GlobalDesignConstraintsOwnsPipeDesignConstraintsAspect" strength="embedding" modifier="Sealed">
+    <BaseClass >bis:ElementOwnsUniqueAspect</BaseClass>
+    <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+      <Class class="GlobalDesignConstraints"/>
+    </Source>
+    <Target multiplicity="(1..1)" roleLabel="owned by" polymorphic="false">
+      <Class class="PipeDesignConstraintsAspect"/>
+    </Target>
+  </ECRelationshipClass>
+  <ECRelationshipClass typeName="GlobalDesignConstraintsOwnsNodeDesignConstraintsAspect" strength="embedding" modifier="Sealed">
+    <BaseClass >bis:ElementOwnsUniqueAspect</BaseClass>
+    <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+      <Class class="GlobalDesignConstraints"/>
+    </Source>
+    <Target multiplicity="(1..1)" roleLabel="owned by" polymorphic="false">
+      <Class class="NodeDesignConstraintsAspect"/>
+    </Target>
+  </ECRelationshipClass>
+  <ECRelationshipClass typeName="GlobalDesignConstraintsOwnsInletDesignConstraintsAspect" strength="embedding" modifier="Sealed">
+    <BaseClass >bis:ElementOwnsUniqueAspect</BaseClass>
+    <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+      <Class class="GlobalDesignConstraints"/>
+    </Source>
+    <Target multiplicity="(1..1)" roleLabel="owned by" polymorphic="false">
+      <Class class="InletDesignConstraintsAspect"/>
+    </Target>
+  </ECRelationshipClass>
 
 	<ECEntityClass typeName="BaseStructure" modifier="Abstract" displayLabel="Base Structure">
 		<BaseClass>anlyt:AnalyticalElement</BaseClass>
@@ -89,6 +160,12 @@
 		<ECProperty propertyName="StructureShape" typeName="GravityStructureShape" displayLabel="Structure Shape" category="HydraulicData"/>
 		<ECProperty propertyName="RimElevation" typeName="double" displayLabel="Elevation (Rim)" category="HydraulicData" kindOfQuantity="rru:LENGTH"/>
 		<ECProperty propertyName="FixedLoad" typeName='double' category="HydraulicData" kindOfQuantity="AECU:FLOW"/>
+		<ECProperty propertyName="DesignStructure" typeName="boolean" displayLabel="Design Structure" category="DesignData" description="If true the subsurface structure will be designed to meet the active pipe matching constraints."/>
+    <ECProperty propertyName="NodeMinimumCover" typeName="double" displayLabel="Conduit Cover (Minimum)" category="DesignData" kindOfQuantity="rru:ELEVATION" description="The minimum allowable cover at the node during the constraint based design."/>
+    <ECProperty propertyName="NodeMaximumCover" typeName="double" displayLabel="Conduit Cover (Maximum)" category="DesignData" kindOfQuantity="rru:ELEVATION" description="The maximum allowable cover at the node during the constraint based design."/>
+    <ECProperty propertyName="DesiredSumpDepth" typeName="double" displayLabel="Sump Depth" category="DesignData" kindOfQuantity="rru:ELEVATION" description="Distance between lowest pipe invert or pipe bottom (depending on calculation option setting), and the invert of the structure."/>
+    <ECProperty propertyName="RequiredFreeboard" typeName="double" displayLabel="Freeboard (Required)" category="DesignData" kindOfQuantity="rru:ELEVATION" description="The depth below the rim elevation that is used to determine the lower limit of the overflow risk status during critical storm analysis."/>
+    <ECProperty propertyName="OverrideGlobalPipeMatchingConstraints" typeName="boolean" displayLabel="Override Global Pipe Matching Constraints" category="DesignData" />
 	</ECEntityClass>
 
   <ECEntityClass typeName="Gutter" modifier="Sealed" displayLabel="Gutter">
@@ -142,6 +219,16 @@
 		</Target>
 	</ECRelationshipClass>
 
+	  <ECRelationshipClass typeName="GravityStructureOwnsNodeDesignConstraintsAspect" strength="embedding" modifier="Sealed">
+    <BaseClass >bis:ElementOwnsUniqueAspect</BaseClass>
+    <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+      <Class class="GravityStructure"/>
+    </Source>
+    <Target multiplicity="(1..1)" roleLabel="owned by" polymorphic="false">
+      <Class class="NodeDesignConstraintsAspect"/>
+    </Target>
+	</ECRelationshipClass>
+	
 	<ECEntityClass typeName="Manhole" modifier="Sealed" displayLabel="Manhole">
 		<BaseClass>GravityStructure</BaseClass>
 		<ECProperty propertyName="TreatAsStorage" typeName="boolean" displayLabel="Treat As Storage" category="HydraulicData"/>
@@ -151,7 +238,9 @@
   <ECEntityClass typeName="CatchBasin" modifier="Sealed" displayLabel="Catch Basin">
     <BaseClass>GravityStructure</BaseClass>
     <ECProperty propertyName="InletCaptureMethod" typeName="InletCaptureMethod" displayLabel="Inlet Capture Method" description="Method used to determine the rate of flow capture by the inlet." category="HydraulicData"/>
-  </ECEntityClass>
+     <ECProperty propertyName="DesignInlet" typeName="boolean" displayLabel="Design Inlet" category="DesignData" description="If true the length of the inlet will be designed to meet the active inlet design constraints."/>
+    <ECProperty propertyName="OverrideGlobalInletDesignConstraints" typeName="boolean" displayLabel="Override Global Inlet Design Constraints" category="DesignData" />
+	</ECEntityClass>
   
 	<ECEntityClass typeName="InletCaptureMethodAspect" modifier="Abstract" displayLabel="InletCaptureMethodAspect">
     <BaseClass>bis:ElementUniqueAspect</BaseClass>
@@ -177,6 +266,16 @@
     <ECProperty propertyName="InletFlowThreshold" typeName="double" displayLabel="Inlet Flow Threshold" description="The inlet will capture all incoming flow up the specified threshold, all excess flow will be bypassed." category="HydraulicData" kindOfQuantity="rru:FLOW"/>
   </ECEntityClass>
 
+	<ECRelationshipClass typeName="CatchBasinOwnsInletDesignConstraintsAspect" strength="embedding" modifier="Sealed">
+    <BaseClass >bis:ElementOwnsUniqueAspect</BaseClass>
+    <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+      <Class class="CatchBasin"/>
+    </Source>
+    <Target multiplicity="(1..1)" roleLabel="owned by" polymorphic="true">
+      <Class class="InletDesignConstraintsAspect"/>
+    </Target>
+  </ECRelationshipClass>
+
 	<ECEntityClass typeName="Outfall" modifier="Sealed" displayLabel="Outfall">
 		<BaseClass>BaseStructure</BaseClass>
 	</ECEntityClass>
@@ -189,6 +288,10 @@
 		<ECProperty propertyName="StopInvert" typeName="double" displayLabel="Invert (Stop)" category="HydraulicData" kindOfQuantity="rru:LENGTH"/>
 		<ECProperty propertyName="ManningsN" typeName="double" displayLabel="Mannings n" category="HydraulicData"/>
 		<ECProperty propertyName="PlanLength" typeName="double" displayLabel="Length" category="HydraulicData" kindOfQuantity="rru:LENGTH"/>
+	  <ECProperty propertyName="DesignPipe" typeName="boolean" displayLabel="Design Pipe" category="DesignData" />
+    <ECProperty propertyName="DesignStartInvert" typeName="boolean" displayLabel="Design Start Invert" category="DesignData" description="If true then the start invert will be adjusted during the design."/>
+    <ECProperty propertyName="DesignStopInvert" typeName="boolean" displayLabel="Design Stop Invert" category="DesignData" description="If true then the atop invert will be adjusted during the design."/>
+    <ECProperty propertyName="OverrideGlobalPipeConstraints" typeName="boolean" displayLabel="Override Global Pipe Constraints" category="DesignData" />
 	</ECEntityClass>
 
 	<ECEntityClass typeName="PipeShapeAspect" modifier="Abstract" displayLabel="Pipe Shape">
@@ -235,6 +338,16 @@
 			<Class class="BoxPipeShapeAspect" />
 		</Target>
 	</ECRelationshipClass>
+
+	<ECRelationshipClass typeName="PipeOwnsPipeDesignConstraintsAspect" strength="embedding" modifier="Sealed">
+    <BaseClass >bis:ElementOwnsUniqueAspect</BaseClass>
+    <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+      <Class class="Pipe"/>
+    </Source>
+    <Target multiplicity="(0..1)" roleLabel="owned by" polymorphic="false">
+      <Class class="PipeDesignConstraintsAspect"/>
+    </Target>
+  </ECRelationshipClass>
 
 	<ECEntityClass typeName="Catchment" modifier="Sealed" displayLabel="Catchment">
 		<BaseClass>anlyt:AnalyticalElement</BaseClass>
@@ -353,24 +466,8 @@
     <ECProperty propertyName="IgnorePipeTravelTimeInCarrierPipes" typeName="boolean" displayLabel="Ignore Pipe Travel Time in Carrier Pipes" category="HydraulicData"/>
     <ECProperty propertyName="CorrectForPartialAreaEffects" typeName="boolean" displayLabel="Correct for Partial Area Effects" category="HydraulicData"/>
   </ECEntityClass>
-  <ECEntityClass typeName="DesignSettings" modifier="Sealed" displayLabel="Design Settings">
-    <BaseClass>bis:DefinitionElement</BaseClass>
-    <ECProperty propertyName="MinVelocity" typeName="double" displayLabel="Velocity (Minimum)" category="HydraulicData"/>
-    <ECProperty propertyName="MaxVelocity" typeName="double" displayLabel="Velocity (Maximum)" category="HydraulicData"/>
-    <ECProperty propertyName="MinCover" typeName="double" displayLabel="Cover (Minimum)" category="HydraulicData"/>
-    <ECProperty propertyName="MaxCover" typeName="double" displayLabel="Cover (Maximum)" category="HydraulicData"/>
-    <ECProperty propertyName="MinSlope" typeName="double" displayLabel="Slope (Minimum)" category="HydraulicData"/>
-    <ECProperty propertyName="MaxSlope" typeName="double" displayLabel="Slope (Maximum)" category="HydraulicData"/>
-    <ECProperty propertyName="PercentageFull" typeName="double" displayLabel="Percentage Full" category="HydraulicData" kindOfQuantity="rru:PERCENTAGE"/>
-    <ECProperty propertyName="AllowMultipleBarrels" typeName="boolean" displayLabel="Allow Multiple Barrels" category="HydraulicData"/>
-    <ECProperty propertyName="MaxBarrels" typeName="int" displayLabel="Maximum Number of Barrels" category="HydraulicData"/>
-    <ECProperty propertyName="LimitSectionSize" typeName="boolean" displayLabel="Limit Section Size" category="HydraulicData"/>
-    <ECProperty propertyName="MaximumRise" typeName="double" displayLabel="Rise (Maximum)" category="HydraulicData"/>
-    <ECProperty propertyName="MeasureCoverTo" typeName="MeasureCoverTo" displayLabel="Measure Cover To" category="HydraulicData"/>
-		<ECProperty propertyName="IsPartFullDesign" typeName="boolean" displayLabel="Is Part Full Design" category="HydraulicData"/>
-	</ECEntityClass>
 
-	  <ECEntityClass typeName="PipeSizeSet" modifier="Sealed" displayLabel="Pipe Sizes">
+	<ECEntityClass typeName="PipeSizeSet" modifier="Sealed" displayLabel="Pipe Sizes">
     <BaseClass>bis:DefinitionElement</BaseClass>
     <ECProperty propertyName="Shape" typeName="PipeShape" displayLabel="Shape"  category="HydraulicData"/>
     <ECProperty propertyName="Material" typeName="string" displayLabel="Material"  category="HydraulicData"/>
