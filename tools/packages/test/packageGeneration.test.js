@@ -121,7 +121,7 @@ describe('Package Generation', function() {
       }
     });
 
-    it('Should attach remarks file to the wip schema package', function() {
+    it('Should attach the remarks file having no media references (WIP Schema Case)', function() {
       const schemaInfo = {
         name: 'SchemaA',
         path: 'tools\\packages\\test\\assets\\SchemaA.ecschema.xml',
@@ -130,11 +130,16 @@ describe('Package Generation', function() {
 
       pkgGen.addDocsToPackage(schemaInfo, packageDir);
       const remarksFile = path.join(packageDir, 'SchemaA.remarks.md');
-      const isExists = fs.existsSync(remarksFile)
+      let isExists = fs.existsSync(remarksFile)
       chai.expect(isExists).to.be.true;
+
+      // Only referenced media should be added
+      const media = path.join(packageDir, 'media');
+      isExists = fs.existsSync(media)
+      chai.expect(isExists).to.be.false;
     });
 
-    it('Should attach remarks file to the released schema package', function() {
+    it('Should attach the remarks file having no media references (Released Schema Case)', function() {
       const schemaInfo = {
         name: 'SchemaA',
         path: 'tools\\packages\\test\\assets\\Released\\SchemaA.ecschema.xml',
@@ -143,11 +148,16 @@ describe('Package Generation', function() {
 
       pkgGen.addDocsToPackage(schemaInfo, packageDir);
       const remarksFile = path.join(packageDir, 'SchemaA.remarks.md');
-      const isExists = fs.existsSync(remarksFile)
+      let isExists = fs.existsSync(remarksFile)
       chai.expect(isExists).to.be.true;
+
+      // Only referenced media should be added
+      const media = path.join(packageDir, 'media');
+      isExists = fs.existsSync(media)
+      chai.expect(isExists).to.be.false;
     });
 
-    it('Should attach remarks file and media to the schema package', function() {
+    it('Should only attach the referenced media from the remarks file', function() {
       const schemaInfo = {
         name: 'SchemaB',
         path: 'tools\\packages\\test\\assets\\SchemaB.ecschema.xml',
@@ -166,9 +176,14 @@ describe('Package Generation', function() {
       const image2 = path.join(packageDir, 'media', 'Shapes', 'image2.png');
       isExists = fs.existsSync(image2)
       chai.expect(isExists).to.be.true;
+
+      // image3 is not referenced in the remarks file
+      const image3 = path.join(packageDir, 'media', 'Shapes', 'image3.png');
+      isExists = fs.existsSync(image3)
+      chai.expect(isExists).to.be.false;
     });
 
-    it('Should not attach remarks file and media to the schema package', function() {
+    it('Should not attach docs, when remarks file is not present', function() {
       const schemaInfo = {
         name: 'SchemaC',
         path: 'tools\\packages\\test\\assets\\SchemaC.ecschema.xml',
