@@ -142,7 +142,7 @@ describe('Package Generation', function() {
     it('Should attach the remarks file having no media references (Released Schema Case)', function() {
       const schemaInfo = {
         name: 'SchemaA',
-        path: 'tools\\packages\\test\\assets\\Released\\SchemaA.ecschema.xml',
+        path: 'tools\\packages\\test\\assets\\Released\\SchemaA.01.01.01.ecschema.xml',
         released: true,
       };
 
