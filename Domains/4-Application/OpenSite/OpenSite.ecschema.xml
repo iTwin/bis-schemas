@@ -5,6 +5,7 @@
 ======================================================================================= -->
 <ECSchema schemaName="OpenSite" alias="opnsite" version="01.00.00" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" displayLabel="OpenSite" description="OpenSite+ application schema.">
     <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA" />
+    <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
     <ECSchemaReference name="BisCore" version="01.00.10" alias="bis" />
     <ECSchemaReference name="LinearReferencing" version="02.00.03" alias="lr" />
     <ECSchemaReference name="RoadRailUnits" version="01.00.01" alias="rru" />
@@ -524,11 +525,11 @@
         <BaseClass>ShapedArea</BaseClass>
     </ECEntityClass>
 
-    <ECEntityClass typeName="LayoutArea" modifier="Abstract" displayLabel="Area" description="Layout Area">
+    <ECEntityClass typeName="LayoutArea" modifier="Abstract" displayLabel="Layout Area" description="Layout Area">
         <BaseClass>Area</BaseClass>
     </ECEntityClass>
 
-    <ECEntityClass typeName="LayoutParkingArea" modifier="Sealed" displayLabel="Parking Area" description="Layout parking area.">
+    <ECEntityClass typeName="LayoutParkingArea" modifier="Sealed" displayLabel="Layout Parking Area" description="Layout parking area.">
         <BaseClass>LayoutArea</BaseClass>
 
         <ECProperty propertyName="ControlType" typeName="ControlType">
@@ -590,7 +591,7 @@
         <BaseClass>Wire</BaseClass>
     </ECEntityClass>
 
-    <ECEntityClass typeName="LayoutPath" modifier="Abstract" displayLabel="Path" description="Layout path.">
+    <ECEntityClass typeName="LayoutPath" modifier="Abstract" displayLabel="Layout Path" description="Layout path.">
         <BaseClass>Path</BaseClass>
     </ECEntityClass>
 
@@ -638,6 +639,16 @@
         <ECProperty propertyName="MinorStep" typeName="double" kindOfQuantity="rru:LENGTH" displayLabel="Minor Step" description="Minor steps interval size" />
         <ECProperty propertyName="MajorStepMultiple" typeName="int" displayLabel="Major Step Interval" description="Number of minor intervals between two major steps" />
     </ECEntityClass>
+
+    <ECRelationshipClass typeName="WireOwnsContourLinesAspect" modifier="Sealed" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="Wire" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="ContourLinesAspect" />
+        </Target>
+    </ECRelationshipClass>
 
     <ECEntityClass typeName="EdgeParkingAspect" modifier="Sealed" displayLabel="Parking" description="">
         <BaseClass>bis:ElementUniqueAspect</BaseClass>
