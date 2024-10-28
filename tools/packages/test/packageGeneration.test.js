@@ -183,10 +183,10 @@ describe('Package Generation', function() {
       chai.expect(isExists).to.be.false;
     });
 
-    it('Should not attach docs, when remarks file is not present', function() {
+    it('Should not attach docs, when remarks file is not present for the provided schema', function() {
       const schemaInfo = {
         name: 'SchemaC',
-        path: 'tools\\packages\\test\\assets\\SchemaC.ecschema.xml',
+        path: 'tools\\packages\\test\\assets\\SchemaC.ecschema.xml', // There is no remarks file for SchemaC
         released: false,
       };
 
