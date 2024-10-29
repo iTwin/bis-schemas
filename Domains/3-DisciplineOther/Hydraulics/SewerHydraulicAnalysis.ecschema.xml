@@ -207,15 +207,35 @@
 	<ECEntityClass typeName="FlowControlStructure" modifier="Abstract" displayLabel="Flow Control Structure">
     <BaseClass>BaseStructure</BaseClass>
     <ECProperty propertyName="FlowDirection" typeName="FlowDirection" displayLabel="Flow Direction" category="HydraulicData" description="Restricts the direction of flow to the specified direction."/>
-  </ECEntityClass>
+    <ECNavigationProperty propertyName="IntermediateNode" displayLabel="Intermediate Node" relationshipName="FlowControlStructureReferencesDrainageNode" direction="Forward" />
+    <ECNavigationProperty propertyName="IntermediateConduit" displayLabel="Intermediate Conduit" relationshipName="FlowControlStructureReferencesConduit" direction="Forward" />
+	</ECEntityClass>
+
+		<ECRelationshipClass typeName="FlowControlStructureReferencesDrainageNode" strength="referencing" modifier="Sealed">
+		<Source multiplicity="(0..*)" roleLabel="references" polymorphic="false">
+			<Class class="FlowControlStructure"/>
+		</Source>
+		<Target multiplicity="(1..1)" roleLabel="referenced" polymorphic="true">
+			<Class class="DrainageNode"/>
+		</Target>
+	</ECRelationshipClass>
+
+		<ECRelationshipClass typeName="FlowControlStructureReferencesConduit" strength="referencing" modifier="Sealed">
+		<Source multiplicity="(0..*)" roleLabel="references" polymorphic="false">
+			<Class class="FlowControlStructure"/>
+		</Source>
+		<Target multiplicity="(1..1)" roleLabel="referenced" polymorphic="true">
+			<Class class="Conduit"/>
+		</Target>
+	</ECRelationshipClass>
 
   <ECEntityClass typeName="PondRiser" modifier="Sealed" displayLabel="Riser">
-    <BaseClass >FlowControlStructure</BaseClass>
+    <BaseClass>FlowControlStructure</BaseClass>
     <ECProperty propertyName="WeirCoefficient" typeName="double" displayLabel="Weir Coefficient" category="HydraulicData" description="Set the coefficient of flow for the weir, which used to account for variables that are not otherwise directly accounted for in the weir equation (e.g., vena contracta)."/>
     <ECProperty propertyName="OrificeCoefficient" typeName="double" displayLabel="Orifice Coefficient" category="HydraulicData" description="Set the coefficient of flow for the orifice."/>
     <ECProperty propertyName="TopElevation" typeName="double" displayLabel="Top Elevation" category="HydraulicData" kindOfQuantity="rru:ELEVATION" description="The elevation of the top of the riser."/>
     <ECProperty propertyName="RiserType" typeName="RiserType" displayLabel="Riser Type"  />
-  </ECEntityClass>
+	</ECEntityClass>
 
 	<ECEntityClass typeName="RiserTypeAspect" modifier="Abstract" displayLabel="RiserTypeAspect">
     <BaseClass >bis:ElementUniqueAspect</BaseClass>
@@ -242,42 +262,8 @@
     <ECProperty propertyName="OrificeArea" typeName="double" displayLabel="Orifice Area" category="HydraulicData" kindOfQuantity="rru:AREA" description="Specify the active orifice area for the top opening when inlet box is submerged"/>
   </ECEntityClass>
 
-  <ECRelationshipClass typeName="PondRiserOwnsOrifices" strength="embedding" modifier="Sealed">
-    <BaseClass >bis:ElementOwnsChildElements</BaseClass>
-    <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
-      <Class class="PondRiser"/>
-    </Source>
-    <Target multiplicity="(0..*)" roleLabel="owned by" polymorphic="false">
-      <Class class="Orifice"/>
-    </Target>
-  </ECRelationshipClass>
-
-	<ECEntityClass typeName="IntermediateControlStructure" modifier="Abstract" displayLabel="Intermediate Control Structure">
-    <BaseClass>FlowControlStructure</BaseClass>
-    <ECNavigationProperty propertyName="IntermediateNode" displayLabel="Intermediate Node" relationshipName="IntermediateControlStructureReferencesDrainageNode" direction="Forward" />
-    <ECNavigationProperty propertyName="IntermediateConduit" displayLabel="Intermediate Conduit" relationshipName="IntermediateControlStructureReferencesDrainageNode" direction="Forward" />
-	</ECEntityClass>
-
-	<ECRelationshipClass typeName="IntermediateControlStructureReferencesDrainageNode" strength="referencing" modifier="Sealed">
-		<Source multiplicity="(0..*)" roleLabel="references" polymorphic="false">
-			<Class class="IntermediateControlStructure"/>
-		</Source>
-		<Target multiplicity="(1..1)" roleLabel="referenced" polymorphic="true">
-			<Class class="DrainageNode"/>
-		</Target>
-	</ECRelationshipClass>
-
-		<ECRelationshipClass typeName="IntermediateControlStructureReferencesDrainageConduit" strength="referencing" modifier="Sealed">
-		<Source multiplicity="(0..*)" roleLabel="references" polymorphic="false">
-			<Class class="IntermediateControlStructure"/>
-		</Source>
-		<Target multiplicity="(1..1)" roleLabel="referenced" polymorphic="true">
-			<Class class="Conduit"/>
-		</Target>
-	</ECRelationshipClass>
-
 	<ECEntityClass typeName="Orifice" modifier="Sealed" displayLabel="Orifice">
-    <BaseClass>IntermediateControlStructure</BaseClass>
+    <BaseClass>FlowControlStructure</BaseClass>
     <ECProperty propertyName="OrificeCoefficient" typeName="double" displayLabel="Orifice Coefficient" category="HydraulicData" description="Coefficient of flow for the orifice."/>
     <ECProperty propertyName="OrificeOrientation" typeName="OrificeOrientation" displayLabel="Orientation" category="HydraulicData" description="Specify if the orifice oriented perpendicular or parallel to flow."/>
     <ECProperty propertyName="OrificeShape" typeName="OrificeShape" displayLabel="Orifice Shape" category="HydraulicData" description="Specify the shape of the orifice"/>
@@ -324,7 +310,7 @@
   </ECEntityClass>
 
 	<ECEntityClass typeName="Weir" modifier="Sealed" displayLabel="Weir">
-    <BaseClass>IntermediateControlStructure</BaseClass>
+    <BaseClass>FlowControlStructure</BaseClass>
     <ECProperty propertyName="WeirShape" typeName="WeirShape" displayLabel="Weir Shape" category="HydraulicData" description="Specify the shape of weir"/>
   </ECEntityClass>
 
