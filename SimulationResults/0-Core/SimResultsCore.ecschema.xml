@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ==================================================================================
+|  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
+|  * See LICENSE.md in the project root for license terms and full copyright notice.
+======================================================================================= -->
+<ECSchema schemaName="SimResultsCore" alias="simrescore" version="01.00.00" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" displayLabel="Simulation Results Core" description="">
+    <ECSchemaReference name="ECDbMap" version="02.00.02" alias="ecdbmap"/>
+
+    <ECEntityClass typeName="ResultRecord" modifier="Abstract" displayLabel="Result Record" description="">
+        <DbIndexList xmlns="ECDbMap.02.00.02">
+            <Indexes>
+                <DbIndex>
+                    <Name>ix_simrescore_ResultRecord_ElementId</Name>
+                    <IsUnique>True</IsUnique>
+                    <Properties>
+                        <string>ElementId</string>
+                    </Properties>
+                </DbIndex>
+            </Indexes>
+        </DbIndexList>
+        <ECProperty propertyName="ElementId" typeName="long" description=""/>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="TimeStep" modifier="None" displayLabel="Time-Step" description="">
+        <ECProperty propertyName="TimeFromStart" typeName="double" description=""/>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="TimeVariantResultRecord" modifier="Abstract" displayLabel="Time-Variant Result Record" description="">
+        <BaseClass>ResultRecord</BaseClass>
+        <ECNavigationProperty propertyName="TimeStep" relationshipName="RecordRecordAtTimeStep" direction="Forward" displayLabel="Time-Step" description="">
+            <ECCustomAttributes>
+                <ForeignKeyConstraint xmlns="ECDbMap.02.00.02"/>
+            </ECCustomAttributes>
+        </ECNavigationProperty>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="RecordRecordAtTimeStep" strength="embedding" modifier="None" description="">
+        <!-- @see TimeVariantResultRecord.TimeStep ECNavigationProperty -->
+        <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="true">
+            <Class class="TimeVariantResultRecord"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is referenced by" polymorphic="true">
+            <Class class="TimeStep" />
+        </Target>
+    </ECRelationshipClass>
+</ECSchema>
