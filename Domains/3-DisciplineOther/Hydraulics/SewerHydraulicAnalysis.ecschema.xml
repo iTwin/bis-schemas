@@ -76,6 +76,38 @@
 	<PropertyCategory typeName="HydraulicData" priority="1"/>
 	<PropertyCategory typeName="DesignData" priority="2"/>
 
+  <ECEnumeration typeName="RiserType" backingTypeName="int" isStrict="true" >
+    <ECEnumerator value="0" name="RiserPipe" displayLabel="Riser Pipe"/>
+    <ECEnumerator value="1" name="InletBox" displayLabel="Inlet Box"/>
+  </ECEnumeration>
+
+	<ECEnumeration typeName="OrificeOrientation" backingTypeName="int" isStrict="true" >
+    <ECEnumerator value="0" name="Perpendicular" displayLabel="Perpendicular"/>
+    <ECEnumerator value="1" name="Parallel" displayLabel="Parallel"/>
+  </ECEnumeration>
+
+  <ECEnumeration typeName="OrificeShape" backingTypeName="int" isStrict="true" >
+    <ECEnumerator value="0" name="Circular" displayLabel="Circular"/>
+    <ECEnumerator value="1" name="Generic" displayLabel="Generic"/>
+  </ECEnumeration>
+
+	<ECEnumeration typeName="FlowDirection" backingTypeName="int" isStrict="true" >
+    <ECEnumerator value="0" name="ForwardOnly" displayLabel="Forward Only"/>
+    <ECEnumerator value="1" name="ReverseOnly" displayLabel="Reverse Only"/>
+    <ECEnumerator value="2" name="ForwardAndReverse" displayLabel="Forward and Reverse"/>
+  </ECEnumeration>
+
+  <ECEnumeration typeName="BoundaryConditionType" backingTypeName="int" isStrict="true" >
+    <ECEnumerator value="0" name="FreeOutfall" displayLabel="Free Outfall"/>
+    <ECEnumerator value="1" name="Crown" displayLabel="Crown"/>
+    <ECEnumerator value="2" name="UserDefinedTw" displayLabel="Elevation (User Defined Tailwater)"/>
+    <ECEnumerator value="3" name="BoundaryConnection" displayLabel="Boundary Connection"/>
+  </ECEnumeration>
+
+  <ECEnumeration typeName="WeirShape" backingTypeName="int" isStrict="true" >
+    <ECEnumerator value="0" name="Rectangular" displayLabel="Rectangular"/>
+    <ECEnumerator value="1" name="VNotch" displayLabel="V-Notch"/>
+  </ECEnumeration>
 
 	<ECEntityClass typeName="SewerHydraulicAnalysisModel" modifier="Sealed" displayLabel="Sewer Hydraulics Analysis Model" description="Model containing all Sewer Hydraulic Analysis elements.">
 		<BaseClass>anlyt:AnalyticalModel</BaseClass>
@@ -149,9 +181,13 @@
     </Target>
   </ECRelationshipClass>
 
-	<ECEntityClass typeName="BaseStructure" modifier="Abstract" displayLabel="Base Structure">
+	<ECEntityClass typeName="DrainageNode" modifier="Abstract" displayLabel="Drainage Node">
 		<BaseClass>anlyt:AnalyticalElement</BaseClass>
 		<BaseClass>net:INode</BaseClass>
+	</ECEntityClass>
+
+	<ECEntityClass typeName="BaseStructure" modifier="Abstract" displayLabel="Base Structure">
+		<BaseClass>DrainageNode</BaseClass>
 		<ECProperty propertyName="InvertElevation" typeName="double" displayLabel="Elevation (Invert)" category="HydraulicData" kindOfQuantity="rru:LENGTH"/>
 	</ECEntityClass>
 
@@ -167,6 +203,142 @@
     <ECProperty propertyName="RequiredFreeboard" typeName="double" displayLabel="Freeboard (Required)" category="DesignData" kindOfQuantity="rru:ELEVATION" description="The depth below the rim elevation that is used to determine the lower limit of the overflow risk status during critical storm analysis."/>
     <ECProperty propertyName="OverrideGlobalPipeMatchingConstraints" typeName="boolean" displayLabel="Override Global Pipe Matching Constraints" category="DesignData" />
 	</ECEntityClass>
+
+	<ECEntityClass typeName="FlowControlStructure" modifier="Abstract" displayLabel="Flow Control Structure">
+    <BaseClass>BaseStructure</BaseClass>
+    <ECProperty propertyName="FlowDirection" typeName="FlowDirection" displayLabel="Flow Direction" category="HydraulicData" description="Restricts the direction of flow to the specified direction."/>
+    <ECNavigationProperty propertyName="IntermediateNode" displayLabel="Intermediate Node" relationshipName="FlowControlStructureReferencesDrainageNode" direction="Forward" />
+    <ECNavigationProperty propertyName="IntermediateConduit" displayLabel="Intermediate Conduit" relationshipName="FlowControlStructureReferencesConduit" direction="Forward" />
+	</ECEntityClass>
+
+		<ECRelationshipClass typeName="FlowControlStructureReferencesDrainageNode" strength="referencing" modifier="Sealed">
+		<Source multiplicity="(0..*)" roleLabel="references" polymorphic="false">
+			<Class class="FlowControlStructure"/>
+		</Source>
+		<Target multiplicity="(1..1)" roleLabel="referenced" polymorphic="true">
+			<Class class="DrainageNode"/>
+		</Target>
+	</ECRelationshipClass>
+
+		<ECRelationshipClass typeName="FlowControlStructureReferencesConduit" strength="referencing" modifier="Sealed">
+		<Source multiplicity="(0..*)" roleLabel="references" polymorphic="false">
+			<Class class="FlowControlStructure"/>
+		</Source>
+		<Target multiplicity="(1..1)" roleLabel="referenced" polymorphic="true">
+			<Class class="Conduit"/>
+		</Target>
+	</ECRelationshipClass>
+
+  <ECEntityClass typeName="PondRiser" modifier="Sealed" displayLabel="Riser">
+    <BaseClass>FlowControlStructure</BaseClass>
+    <ECProperty propertyName="WeirCoefficient" typeName="double" displayLabel="Weir Coefficient" category="HydraulicData" description="Set the coefficient of flow for the weir, which used to account for variables that are not otherwise directly accounted for in the weir equation (e.g., vena contracta)."/>
+    <ECProperty propertyName="OrificeCoefficient" typeName="double" displayLabel="Orifice Coefficient" category="HydraulicData" description="Set the coefficient of flow for the orifice."/>
+    <ECProperty propertyName="TopElevation" typeName="double" displayLabel="Top Elevation" category="HydraulicData" kindOfQuantity="rru:ELEVATION" description="The elevation of the top of the riser."/>
+    <ECProperty propertyName="RiserType" typeName="RiserType" displayLabel="Riser Type"  />
+	</ECEntityClass>
+
+	<ECEntityClass typeName="RiserTypeAspect" modifier="Abstract" displayLabel="RiserTypeAspect">
+    <BaseClass >bis:ElementUniqueAspect</BaseClass>
+  </ECEntityClass>
+  
+	<ECRelationshipClass typeName="PondRiserOwnsRiserTypeAspect" strength="embedding" modifier="Sealed">
+    <BaseClass >bis:ElementOwnsUniqueAspect</BaseClass>
+    <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+      <Class class="PondRiser"/>
+    </Source>
+    <Target multiplicity="(1..1)" roleLabel="owned by" polymorphic="true">
+      <Class class="RiserTypeAspect"/>
+    </Target>
+  </ECRelationshipClass>
+ 
+  <ECEntityClass typeName="RiserPipeAspect" modifier="Sealed" displayLabel="Riser Pipe">
+    <BaseClass >RiserTypeAspect</BaseClass>
+    <ECProperty propertyName="OpeningDiameter" typeName="double" displayLabel="Diameter" category="HydraulicData" kindOfQuantity="rru:LENGTH" description="The diameter of the opening at the top of the riser structure."/>
+  </ECEntityClass>
+ 
+  <ECEntityClass typeName="InletBoxAspect" modifier="Sealed" displayLabel="Inlet Box">
+    <BaseClass >RiserTypeAspect</BaseClass>
+    <ECProperty propertyName="WeirLength" typeName="double" displayLabel="Weir Length" category="HydraulicData" kindOfQuantity="rru:LENGTH" description="Specify the active weir length for the opening at the top of the box."/>
+    <ECProperty propertyName="OrificeArea" typeName="double" displayLabel="Orifice Area" category="HydraulicData" kindOfQuantity="rru:AREA" description="Specify the active orifice area for the top opening when inlet box is submerged"/>
+  </ECEntityClass>
+
+	<ECEntityClass typeName="Orifice" modifier="Sealed" displayLabel="Orifice">
+    <BaseClass>FlowControlStructure</BaseClass>
+    <ECProperty propertyName="OrificeCoefficient" typeName="double" displayLabel="Orifice Coefficient" category="HydraulicData" description="Coefficient of flow for the orifice."/>
+    <ECProperty propertyName="OrificeOrientation" typeName="OrificeOrientation" displayLabel="Orientation" category="HydraulicData" description="Specify if the orifice oriented perpendicular or parallel to flow."/>
+    <ECProperty propertyName="OrificeShape" typeName="OrificeShape" displayLabel="Orifice Shape" category="HydraulicData" description="Specify the shape of the orifice"/>
+  </ECEntityClass>
+
+  <ECEntityClass typeName="OrificeShapeAspect" modifier="Abstract" displayLabel="OrificeShapeAspect">
+    <BaseClass >bis:ElementUniqueAspect</BaseClass>
+  </ECEntityClass>
+  
+	<ECRelationshipClass typeName="OrificeOwnsOrificeShapeAspect" strength="embedding" modifier="Sealed">
+    <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+    <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+      <Class class="Orifice"/>
+    </Source>
+    <Target multiplicity="(1..1)" roleLabel="owned by" polymorphic="true">
+      <Class class="OrificeShapeAspect"/>
+    </Target>
+  </ECRelationshipClass>
+  
+	<ECEntityClass typeName="CircularOrificeAspect" modifier="Sealed" displayLabel="Circular Orifice">
+    <BaseClass>OrificeShapeAspect</BaseClass>
+    <ECProperty propertyName="Diameter" typeName="double" displayLabel="Diameter" category="HydraulicData" kindOfQuantity="rru:LENGTH" description="The diameter of the orifice opening"/>
+  </ECEntityClass>
+  
+	<ECEntityClass typeName="GenericOrificeAspect" modifier="Sealed" displayLabel="Generic Orifice">
+    <BaseClass>OrificeShapeAspect</BaseClass>
+    <ECProperty propertyName="OrificeArea" typeName="double" displayLabel="Area" category="HydraulicData" kindOfQuantity="rru:AREA" description="The area of the orifice opening."/>
+  </ECEntityClass>
+	
+	<ECRelationshipClass typeName="OrificeOwnsPerpendicularGenericOrificeAspect" strength="embedding" modifier="Sealed">
+    <BaseClass >bis:ElementOwnsUniqueAspect</BaseClass>
+    <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+      <Class class="Orifice"/>
+    </Source>
+    <Target multiplicity="(1..1)" roleLabel="owned by" polymorphic="false">
+      <Class class="PerpendicularGenericOrificeAspect"/>
+    </Target>
+  </ECRelationshipClass>
+
+	<ECEntityClass typeName="PerpendicularGenericOrificeAspect" modifier="Sealed" displayLabel="Perpendicular Generic Orifice">
+    <BaseClass >bis:ElementUniqueAspect</BaseClass>
+    <ECProperty propertyName="TopElevation" typeName="double" displayLabel="Elevation (Top)" category="HydraulicData" kindOfQuantity="rru:ELEVATION" description="The top of the orifice opening."/>
+    <ECProperty propertyName="DatumElevation" typeName="double" displayLabel="Elevation (Datum)" category="HydraulicData" kindOfQuantity="rru:ELEVATION" description="Set the elevation from which to measure the orifice head (H) when a perpendicular orifice orientation is specified."/>
+  </ECEntityClass>
+
+	<ECEntityClass typeName="Weir" modifier="Sealed" displayLabel="Weir">
+    <BaseClass>FlowControlStructure</BaseClass>
+    <ECProperty propertyName="WeirShape" typeName="WeirShape" displayLabel="Weir Shape" category="HydraulicData" description="Specify the shape of weir"/>
+  </ECEntityClass>
+
+  <ECEntityClass typeName="WeirShapeAspect" modifier="Abstract" displayLabel="WeirShapeAspect">
+    <BaseClass >bis:ElementUniqueAspect</BaseClass>
+  </ECEntityClass>
+
+  <ECRelationshipClass typeName="WeirOwnsWeirShapeAspect" strength="embedding" modifier="Sealed">
+    <BaseClass >bis:ElementOwnsUniqueAspect</BaseClass>
+    <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+      <Class class="Weir"/>
+    </Source>
+    <Target multiplicity="(1..1)" roleLabel="owned by" polymorphic="true">
+      <Class class="WeirShapeAspect"/>
+    </Target>
+  </ECRelationshipClass>
+
+  <ECEntityClass typeName="RectangularAspect" modifier="Sealed" displayLabel="Rectangular">
+    <BaseClass >WeirShapeAspect</BaseClass>
+    <ECProperty propertyName="WeirLength" typeName="double" displayLabel="Weir Length" category="HydraulicData" kindOfQuantity="rru:LENGTH" />
+    <ECProperty propertyName="RectangularWeirCoefficient" typeName="double" displayLabel="Weir Coefficient" category="HydraulicData" description="Coefficient of flow for the rectangular weir."/>
+  </ECEntityClass>
+
+  <ECEntityClass typeName="VNotchAspect" modifier="Sealed" displayLabel="V-Notch">
+    <BaseClass >WeirShapeAspect</BaseClass>
+    <ECProperty propertyName="VNotchAngle" typeName="double" displayLabel="V-Notch Angle" category="HydraulicData" kindOfQuantity="rru:ANGLE" />
+    <ECProperty propertyName="VNotchDischargeCoefficient" typeName="double" displayLabel="Discharge Coefficient" category="HydraulicData" description="Coefficient of flow for the v-notch weir."/>
+  </ECEntityClass>
 
   <ECEntityClass typeName="Gutter" modifier="Sealed" displayLabel="Gutter">
     <BaseClass>anlyt:AnalyticalElement</BaseClass>
@@ -192,7 +364,6 @@
 		<ECProperty propertyName="StructureLength" typeName="double" displayLabel="Length" category="HydraulicData" kindOfQuantity="rru:LENGTH"/>
 		<ECProperty propertyName="StructureWidth" typeName="double" displayLabel="Width" category="HydraulicData" kindOfQuantity="rru:LENGTH"/>
 	</ECEntityClass>
-
 
 	<ECRelationshipClass typeName="GravityStructureOwnsBoxShapeAspect" strength="embedding" strengthDirection="Forward" modifier="Sealed">
 		<BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
@@ -278,15 +449,61 @@
 
 	<ECEntityClass typeName="Outfall" modifier="Sealed" displayLabel="Outfall">
 		<BaseClass>BaseStructure</BaseClass>
+    <ECProperty propertyName="BoundaryConditionType" typeName="BoundaryConditionType" displayLabel="Boundary Condition Type" category="HydraulicData" description="Select method to establish bounding tailwater for the network."/>
+	</ECEntityClass>
+	
+	<ECEntityClass typeName="BoundaryConditionTypeAspect" modifier="Abstract" displayLabel="BoundaryConditionTypeAspect">
+    <BaseClass >bis:ElementUniqueAspect</BaseClass>
+  </ECEntityClass>
+
+  <ECRelationshipClass typeName="OutfallOwnsBoundaryConditionTypeAspect" strength="embedding" modifier="Sealed">
+    <BaseClass >bis:ElementOwnsUniqueAspect</BaseClass>
+    <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+      <Class class="Outfall"/>
+    </Source>
+    <Target multiplicity="(1..1)" roleLabel="owned by" polymorphic="true">
+      <Class class="BoundaryConditionTypeAspect"/>
+    </Target>
+  </ECRelationshipClass>
+
+  <ECEntityClass typeName="FreeOutfall" modifier="Sealed" displayLabel="Free Outfall">
+    <BaseClass >BoundaryConditionTypeAspect</BaseClass>
+  </ECEntityClass>
+
+	<ECEntityClass typeName="Crown" modifier="Sealed" displayLabel="Crown">
+    <BaseClass >BoundaryConditionTypeAspect</BaseClass>
+  </ECEntityClass>
+
+  <ECEntityClass typeName="UserDefinedTwAspect" modifier="Sealed" displayLabel="Elevation (User Defined Tailwater)">
+    <BaseClass >BoundaryConditionTypeAspect</BaseClass>
+    <ECProperty propertyName="TailwaterElevation" typeName="double" displayLabel="Elevation (Tailwater)" category="HydraulicData" kindOfQuantity="rru:LENGTH" />
+  </ECEntityClass>
+
+  <ECEntityClass typeName="BoundaryConnectionAspect" modifier="Sealed" displayLabel="Boundary Connection">
+    <BaseClass>BoundaryConditionTypeAspect</BaseClass>
+    <ECNavigationProperty propertyName="BoundingElement" displayLabel="Bounding Element" relationshipName="OutflowBoundaryEstablishedBy" direction="Forward" />
+	</ECEntityClass>
+
+	<ECRelationshipClass typeName="OutflowBoundaryEstablishedBy" strength="referencing" modifier="Sealed">
+		<Source multiplicity="(0..*)" roleLabel="bounded by" polymorphic="false">
+			<Class class="BoundaryConnectionAspect"/>
+		</Source>
+		<Target multiplicity="(0..1)" roleLabel="bounds" polymorphic="true">
+			<Class class="DrainageNode"/>
+		</Target>
+	</ECRelationshipClass>
+
+	<ECEntityClass typeName="Conduit" modifier="Abstract" displayLabel="Conduit">
+		<BaseClass>anlyt:AnalyticalElement</BaseClass>
+		<BaseClass>net:IEdge</BaseClass>
 	</ECEntityClass>
 
 	<ECEntityClass typeName="Pipe" modifier="Sealed" displayLabel="Pipe">
-		<BaseClass>anlyt:AnalyticalElement</BaseClass>
-		<BaseClass>net:IEdge</BaseClass>
+		<BaseClass>Conduit</BaseClass>
 		<ECProperty propertyName="Shape" typeName="PipeShape" displayLabel="Shape" category="HydraulicData"/>
 		<ECProperty propertyName="StartInvert" typeName="double" displayLabel="Invert (Start)" category="HydraulicData" kindOfQuantity="rru:LENGTH"/>
 		<ECProperty propertyName="StopInvert" typeName="double" displayLabel="Invert (Stop)" category="HydraulicData" kindOfQuantity="rru:LENGTH"/>
-		<ECProperty propertyName="ManningsN" typeName="double" displayLabel="Mannings n" category="HydraulicData"/>
+		<ECProperty propertyName="ManningsN" typeName="double" displayLabel="Manning's n" category="HydraulicData"/>
 		<ECProperty propertyName="PlanLength" typeName="double" displayLabel="Length" category="HydraulicData" kindOfQuantity="rru:LENGTH"/>
 	  <ECProperty propertyName="DesignPipe" typeName="boolean" displayLabel="Design Pipe" category="DesignData" />
     <ECProperty propertyName="DesignStartInvert" typeName="boolean" displayLabel="Design Start Invert" category="DesignData" description="If true then the start invert will be adjusted during the design."/>
@@ -362,13 +579,12 @@
 			<Class class="Catchment"/>
 		</Source>
 		<Target multiplicity="(0..1)" roleLabel="discharges to" polymorphic="true">
-			<Class class="net:INode"/>
+			<Class class="DrainageNode"/>
 		</Target>
 	</ECRelationshipClass>
 
 	<ECEntityClass typeName="Pond" modifier="Sealed" displayLabel="Pond">
-    <BaseClass >anlyt:AnalyticalElement</BaseClass>
-    <BaseClass >net:INode</BaseClass>
+		<BaseClass>DrainageNode</BaseClass>
     <ECProperty propertyName="StartingWaterSurfaceElevation" typeName="double" displayLabel="Starting Water Surface Elevation" category="HydraulicData" kindOfQuantity="rru:LENGTH"/>
     <ECStructArrayProperty propertyName="StorageElevationAreaCurve" typeName="ElevationAreaPoint" displayLabel="Elevation-Area Curve" category="HydraulicData"  minOccurs="0" maxOccurs="unbounded"/>
   </ECEntityClass>
