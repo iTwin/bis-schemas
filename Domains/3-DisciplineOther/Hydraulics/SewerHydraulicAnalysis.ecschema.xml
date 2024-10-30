@@ -144,6 +144,11 @@
     <ECEnumerator value="1" name="SWMM" displayLabel="SWMM"/>
   </ECEnumeration>
 
+ <ECEnumeration typeName="RainfallSetDefinition" backingTypeName="int" isStrict="true" >
+    <ECEnumerator value="0" name="IDFTable" displayLabel="IDF Table"/>
+    <ECEnumerator value="1" name="Depth" displayLabel="Depth"/>
+  </ECEnumeration>
+
 	<ECEntityClass typeName="SewerHydraulicAnalysisModel" modifier="Sealed" displayLabel="Sewer Hydraulics Analysis Model" description="Model containing all Sewer Hydraulic Analysis elements.">
 		<BaseClass>anlyt:AnalyticalModel</BaseClass>
 	</ECEntityClass>
@@ -244,7 +249,7 @@
 		<BaseClass>BaseStructure</BaseClass>
 		<ECProperty propertyName="StructureShape" typeName="GravityStructureShape" displayLabel="Structure Shape" category="HydraulicData"/>
 		<ECProperty propertyName="RimElevation" typeName="double" displayLabel="Elevation (Rim)" category="HydraulicData" kindOfQuantity="rru:LENGTH"/>
-		<ECProperty propertyName="FixedLoad" typeName='double' category="HydraulicData" kindOfQuantity="AECU:FLOW"/>
+		<ECProperty propertyName="FixedLoad" typeName='double' category="HydraulicData" kindOfQuantity="rru:FLOW"/>
 		<ECProperty propertyName="DesignStructure" typeName="boolean" displayLabel="Design Structure" category="DesignData" description="If true the subsurface structure will be designed to meet the active pipe matching constraints."/>
     <ECProperty propertyName="NodeMinimumCover" typeName="double" displayLabel="Conduit Cover (Minimum)" category="DesignData" kindOfQuantity="rru:ELEVATION" description="The minimum allowable cover at the node during the constraint based design."/>
     <ECProperty propertyName="NodeMaximumCover" typeName="double" displayLabel="Conduit Cover (Maximum)" category="DesignData" kindOfQuantity="rru:ELEVATION" description="The maximum allowable cover at the node during the constraint based design."/>
@@ -645,6 +650,7 @@
 
 	<ECEntityClass typeName="RainfallSet" modifier="Sealed" displayLabel="Rainfall Set">
 		<BaseClass>bis:DefinitionElement</BaseClass>
+		<ECProperty propertyName="RainDataDefinition" typeName="RainfallSetDefinition" displayLabel="Rain Data Definition" category="HydraulicData" description="Specify how to define the rainfall data for this rainfall set."/>
 	</ECEntityClass>
 
 	<ECEntityClass typeName="RainfallEvent" modifier="Sealed" displayLabel="Rainfall Event">
@@ -739,7 +745,7 @@
     <ECProperty propertyName="MinimumTc" typeName="double" displayLabel="Minimum Time of Concentration" category="HydraulicData" kindOfQuantity="AECU:TIME" description="The minimum allowed time of concentration on on a catchment."/>
     <ECProperty propertyName="UseMinimumTcSystemTime" typeName="boolean" displayLabel="Use Minimum Tc System Time" category="HydraulicData" description="If True, the system travel time in the pipe will be the Minimum for Time of Concentration or greater."/>
     <ECProperty propertyName="MaxNetworkTraversals" typeName="int" displayLabel="Maximum Network Traversals" category="HydraulicData" description="Maximum number of iterations that will be performed to achieve the closest approximation of the desired network results."/>
-    <ECProperty propertyName="FlowConvergenceTest" typeName="double" displayLabel="Flow Convergence Test" category="HydraulicData" kindOfQuantity="Value is taken as the maximum relative change in discharge occurring at the system outlet between two successive network solutions." />
+    <ECProperty propertyName="FlowConvergenceTest" typeName="double" displayLabel="Flow Convergence Test" category="HydraulicData" kindOfQuantity="rru:ELEVATION" description="Value is taken as the maximum relative change in discharge occurring at the system outlet between two successive network solutions." />
     <ECProperty propertyName="FlowProfileMethod" typeName="FlowProfileMethod" displayLabel="Flow Profile Method" category="HydraulicData" description="Select how the engine performs flow routing."/>
     <ECProperty propertyName="NumberOfProfileSteps" typeName="int" displayLabel="Number of Profile Steps" category="HydraulicData" description="The gradually varied flow profile divides each pipe into internal segments (profile steps) prior to calculation of the hydraulic grade."/>
     <ECProperty propertyName="HydraulicConvergenceTest" typeName="double" displayLabel="Hydraulic Convergence Test" category="HydraulicData" kindOfQuantity="rru:ELEVATION" description="In full network calculation this value is taken as the maximum absolute change between two successive solves of hydraulic grade at any junction or inlet in the system."/>
@@ -759,12 +765,12 @@
     <ECProperty propertyName="OutputIncrement" typeName="double" displayLabel="Output Increment" category="HydraulicData" kindOfQuantity="AECU:TIME" description="The time interval for reporting of computed results."/>
     <ECProperty propertyName="MinConduitSlope" typeName="double" displayLabel="Minimum Conduit Slope" category="HydraulicData" kindOfQuantity="rru:SLOPE" description="The minimum value allowed for a conduit's slope. If zero (the default) then no minimum is imposed (although SWMM uses a lower limit on elevation drop of 0.001 ft (0.00035 m) when computing a conduit slope)."/>
     <ECProperty propertyName="MinSurfaceArea" typeName="double" displayLabel="Minimum Surface Area" category="HydraulicData" kindOfQuantity="rru:AREA" description="The minimum surface area to be used at nodes when computing changes in water depth. If you enter 0, then the default value of 12.566 square feet is used."/>
-    <ECProperty propertyName="ConduitLengthTimeStep" typeName="double" displayLabel="Minimum Surface Area" category="HydraulicData" kindOfQuantity="AECU:TIME" description="The time step artificially lengthen conduits so that they meet the Courant stability criterion under full-flow conditions (i.e., the travel time of a wave will not be smaller than the specified conduit lengthening time step). As this value is decreased, fewer conduits will require lengthening. A value of 0 means that no conduits will be lengthened."/>
+    <ECProperty propertyName="ConduitLengthTimeStep" typeName="double" displayLabel="Time Step For Conduit Lengthening" category="HydraulicData" kindOfQuantity="AECU:TIME" description="The time step artificially lengthen conduits so that they meet the Courant stability criterion under full-flow conditions (i.e., the travel time of a wave will not be smaller than the specified conduit lengthening time step). As this value is decreased, fewer conduits will require lengthening. A value of 0 means that no conduits will be lengthened."/>
     <ECProperty propertyName="HeadTolerance" typeName="double" displayLabel="Head Convergence Tolerance" category="HydraulicData" kindOfQuantity="rru:ELEVATION" description="When the difference in computed head at each node between successive trials is below this value the flow solution for the current time step is assumed to have converged."/>
     <ECProperty propertyName="MaxTrials" typeName="int" displayLabel="Max Trials per Time Step" category="HydraulicData" description="The maximum allowable number of trials performed each time step to reach convergence when updating hydraulic heads at the conveyance system's nodes."/>
     <ECProperty propertyName="UseVariableTimeSteps" typeName="boolean" displayLabel="Use Minimum Variable Time Step" category="HydraulicData" description="Select whether or not to use a variable time step, which is computed for each time period to prevent an excessive change in water depth at each node."/>
-    <ECProperty propertyName="MinVariableTimeSteps" typeName="double" displayLabel="Minimum Variable Time Step" category="HydraulicData" kindOfQuantity="rru:TIME" description="When the difference in computed head at each node between successive trials is below this value the flow solution for the current time step is assumed to have converged."/>
-    <ECProperty propertyName="TimeStepMultiplier" typeName="double" displayLabel="Time Step Multiplier" category="HydraulicData" kindOfQuantity="rru:PERCENT" description="Lets you enter a safety factor (between 10 and 200%) to be applied against the variable time step as automatically derived to preserve the Courant stability criterion."/>
+    <ECProperty propertyName="MinVariableTimeSteps" typeName="double" displayLabel="Minimum Variable Time Step" category="HydraulicData" kindOfQuantity="AECU:TIME" description="When the difference in computed head at each node between successive trials is below this value the flow solution for the current time step is assumed to have converged."/>
+    <ECProperty propertyName="TimeStepMultiplier" typeName="double" displayLabel="Time Step Multiplier" category="HydraulicData" kindOfQuantity="rru:PERCENTAGE" description="Lets you enter a safety factor (between 10 and 200%) to be applied against the variable time step as automatically derived to preserve the Courant stability criterion."/>
     <ECProperty propertyName="IntegrationMethod" typeName="IntegrationMethod" displayLabel="Integration Method" category="HydraulicData" description="Specify the integration method to use: Modified Euler or Picard Iterations (a method of successive approximations)."/>
     <ECProperty propertyName="InertialTerms" typeName="InertialTerms" displayLabel="Inertial Terms" category="HydraulicData" description="Defines how the inertial terms in the St. Venant momentum equation will be handled."/>
     <ECProperty propertyName="DefineSuperCriticalFlow" typeName="DefineSuperCriticalFlow" displayLabel="Define Super Critical Flow" category="HydraulicData" description="Selects the basis used to determine when supercritical flow occurs in a conduit."/>
