@@ -47,6 +47,7 @@
     <ECEnumerator value="1" name="Design" displayLabel="Design"/>
     <ECEnumerator value="2" name="DesignInvertsOnly" displayLabel="Design Inverts Only"/>
   </ECEnumeration>
+
   <ECEnumeration typeName="FlowProfileMethod" backingTypeName="int" isStrict="true" description="">
     <ECEnumerator value="0" name="BackwaterAnalysis" displayLabel="Backwater Analysis"/>
     <ECEnumerator value="1" name="CapacityAnalysis" displayLabel="Capacity Analysis"/>
@@ -58,6 +59,7 @@
     <ECEnumerator value="3" name="SimpleAverageVelocity" displayLabel="Simple Average Velocity"/>
     <ECEnumerator value="4" name="WeightedAverageVelocity" displayLabel="Weighted Average Velocity"/>
   </ECEnumeration>
+
   <ECEnumeration typeName="StructureLossMethod" backingTypeName="int" isStrict="true" description="">
     <ECEnumerator value="0" name="HydraulicGrade" displayLabel="Hydraulic Grade"/>
     <ECEnumerator value="1" name="EnergyGrade" displayLabel="Energy Grade"/>
@@ -68,7 +70,7 @@
     <ECEnumerator value="1" name="PipeTop" displayLabel="Pipe Top"/>
   </ECEnumeration>
 
-	  <ECEnumeration typeName="PipeMatching" backingTypeName="int" isStrict="true" >
+	<ECEnumeration typeName="PipeMatching" backingTypeName="int" isStrict="true" >
     <ECEnumerator value="0" name="Inverts" displayLabel="Inverts"/>
     <ECEnumerator value="1" name="Crowns" displayLabel="Crowns"/>
   </ECEnumeration>
@@ -117,6 +119,17 @@
 		<BaseClass>anlyt:AnalyticalPartition</BaseClass>
 	</ECEntityClass>
 
+  <ECRelationshipClass typeName="SewerHydraulicAnalysisModelBreaksDownPartition" displayLabel="SewerHydraulicAnalysisModel Sub-Models SewerHydraulicAnalysisPartition" strength="embedding" strengthDirection="backward" modifier="None" description="Relates a SewerHydraulicAnalysisModel to the SewerHydraulicAnalysisPartition that it sub-models.">
+    <!-- @see Model.ModeledElement ECNavigationProperty -->
+    <BaseClass>bis:ModelModelsElement</BaseClass>
+    <Source multiplicity="(0..1)" roleLabel="models" polymorphic="false">
+        <Class class="SewerHydraulicAnalysisModel"/>
+    </Source>
+    <Target multiplicity="(0..1)" roleLabel="is modeled by" polymorphic="false">
+        <Class class="SewerHydraulicAnalysisPartition" />
+    </Target>
+  </ECRelationshipClass>
+
 	<ECEntityClass typeName="PipeDesignConstraintsAspect" modifier="Sealed" displayLabel="Pipe Design Constraints">
     <BaseClass >bis:ElementUniqueAspect</BaseClass>
     <ECProperty propertyName="MinVelocity" typeName="double" displayLabel="Velocity (Minimum)" category="DesignData" kindOfQuantity="rru:VELOCITY" description="The minimum velocity constraint used during constraint based design."/>
@@ -153,6 +166,7 @@
  <ECEntityClass typeName="GlobalDesignConstraints" modifier="Sealed" displayLabel="Global Design Constraints">
     <BaseClass >bis:DefinitionElement</BaseClass>
   </ECEntityClass>
+
   <ECRelationshipClass typeName="GlobalDesignConstraintsOwnsPipeDesignConstraintsAspect" strength="embedding" modifier="Sealed">
     <BaseClass >bis:ElementOwnsUniqueAspect</BaseClass>
     <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
@@ -162,6 +176,7 @@
       <Class class="PipeDesignConstraintsAspect"/>
     </Target>
   </ECRelationshipClass>
+
   <ECRelationshipClass typeName="GlobalDesignConstraintsOwnsNodeDesignConstraintsAspect" strength="embedding" modifier="Sealed">
     <BaseClass >bis:ElementOwnsUniqueAspect</BaseClass>
     <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
@@ -171,6 +186,7 @@
       <Class class="NodeDesignConstraintsAspect"/>
     </Target>
   </ECRelationshipClass>
+
   <ECRelationshipClass typeName="GlobalDesignConstraintsOwnsInletDesignConstraintsAspect" strength="embedding" modifier="Sealed">
     <BaseClass >bis:ElementOwnsUniqueAspect</BaseClass>
     <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
@@ -390,7 +406,7 @@
 		</Target>
 	</ECRelationshipClass>
 
-	  <ECRelationshipClass typeName="GravityStructureOwnsNodeDesignConstraintsAspect" strength="embedding" modifier="Sealed">
+	<ECRelationshipClass typeName="GravityStructureOwnsNodeDesignConstraintsAspect" strength="embedding" modifier="Sealed">
     <BaseClass >bis:ElementOwnsUniqueAspect</BaseClass>
     <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
       <Class class="GravityStructure"/>
