@@ -111,6 +111,44 @@
     <ECEnumerator value="1" name="VNotch" displayLabel="V-Notch"/>
   </ECEnumeration>
 
+	<ECEnumeration typeName="SwmmRoutingMethod" backingTypeName="int" isStrict="true" >
+    <ECEnumerator value="0" name="UniformFlow" displayLabel="Uniform Flow"/>
+    <ECEnumerator value="1" name="KinematicWave" displayLabel="Kinematic Wave"/>
+    <ECEnumerator value="2" name="DynamicWave" displayLabel="Dynamic Wave"/>
+  </ECEnumeration>
+  
+	<ECEnumeration typeName="IntegrationMethod" backingTypeName="int" isStrict="true" >
+    <ECEnumerator value="0" name="ModifiedEuler" displayLabel="Modified Euler"/>
+    <ECEnumerator value="1" name="PicardIterations" displayLabel="Picard Iterations"/>
+  </ECEnumeration>
+  
+	<ECEnumeration typeName="InertialTerms" backingTypeName="int" isStrict="true" >
+    <ECEnumerator value="0" name="Keep" displayLabel="Keep"/>
+    <ECEnumerator value="1" name="Dampen" displayLabel="Dampen"/>
+    <ECEnumerator value="2" name="Ignore" displayLabel="Ignore"/>
+  </ECEnumeration>
+  
+	<ECEnumeration typeName="DefineSuperCriticalFlow" backingTypeName="int" isStrict="true" >
+    <ECEnumerator value="0" name="FroudeAndSlope" displayLabel="Froude And Slope"/>
+    <ECEnumerator value="1" name="Slope" displayLabel="Slope"/>
+    <ECEnumerator value="2" name="Froude" displayLabel="Froude"/>
+  </ECEnumeration>
+  
+	<ECEnumeration typeName="SurchargeMethod" backingTypeName="int" isStrict="true" >
+    <ECEnumerator value="0" name="Extran" displayLabel="Extran"/>
+    <ECEnumerator value="1" name="Slot" displayLabel="Slot"/>
+  </ECEnumeration>
+
+  <ECEnumeration typeName="CalculationEngine" backingTypeName="int" isStrict="true" >
+    <ECEnumerator value="0" name="GVF" displayLabel="GVF"/>
+    <ECEnumerator value="1" name="SWMM" displayLabel="SWMM"/>
+  </ECEnumeration>
+
+ <ECEnumeration typeName="RainfallSetDefinition" backingTypeName="int" isStrict="true" >
+    <ECEnumerator value="0" name="IDFTable" displayLabel="IDF Table"/>
+    <ECEnumerator value="1" name="Depth" displayLabel="Depth"/>
+  </ECEnumeration>
+
 	<ECEntityClass typeName="SewerHydraulicAnalysisModel" modifier="Sealed" displayLabel="Sewer Hydraulics Analysis Model" description="Model containing all Sewer Hydraulic Analysis elements.">
 		<BaseClass>anlyt:AnalyticalModel</BaseClass>
 	</ECEntityClass>
@@ -211,7 +249,7 @@
 		<BaseClass>BaseStructure</BaseClass>
 		<ECProperty propertyName="StructureShape" typeName="GravityStructureShape" displayLabel="Structure Shape" category="HydraulicData"/>
 		<ECProperty propertyName="RimElevation" typeName="double" displayLabel="Elevation (Rim)" category="HydraulicData" kindOfQuantity="rru:LENGTH"/>
-		<ECProperty propertyName="FixedLoad" typeName='double' category="HydraulicData" kindOfQuantity="AECU:FLOW"/>
+		<ECProperty propertyName="FixedLoad" typeName='double' category="HydraulicData" kindOfQuantity="rru:FLOW"/>
 		<ECProperty propertyName="DesignStructure" typeName="boolean" displayLabel="Design Structure" category="DesignData" description="If true the subsurface structure will be designed to meet the active pipe matching constraints."/>
     <ECProperty propertyName="NodeMinimumCover" typeName="double" displayLabel="Conduit Cover (Minimum)" category="DesignData" kindOfQuantity="rru:ELEVATION" description="The minimum allowable cover at the node during the constraint based design."/>
     <ECProperty propertyName="NodeMaximumCover" typeName="double" displayLabel="Conduit Cover (Maximum)" category="DesignData" kindOfQuantity="rru:ELEVATION" description="The maximum allowable cover at the node during the constraint based design."/>
@@ -269,7 +307,7 @@
  
   <ECEntityClass typeName="RiserPipeAspect" modifier="Sealed" displayLabel="Riser Pipe">
     <BaseClass >RiserTypeAspect</BaseClass>
-    <ECProperty propertyName="OpeningDiameter" typeName="double" displayLabel="Diameter" category="HydraulicData" kindOfQuantity="rru:LENGTH" description="The diameter of the opening at the top of the riser structure."/>
+    <ECProperty propertyName="OpeningDiameter" typeName="double" displayLabel="Diameter" category="HydraulicData" kindOfQuantity="rru:LENGTH_SHORT" description="The diameter of the opening at the top of the riser structure."/>
   </ECEntityClass>
  
   <ECEntityClass typeName="InletBoxAspect" modifier="Sealed" displayLabel="Inlet Box">
@@ -301,7 +339,7 @@
   
 	<ECEntityClass typeName="CircularOrificeAspect" modifier="Sealed" displayLabel="Circular Orifice">
     <BaseClass>OrificeShapeAspect</BaseClass>
-    <ECProperty propertyName="Diameter" typeName="double" displayLabel="Diameter" category="HydraulicData" kindOfQuantity="rru:LENGTH" description="The diameter of the orifice opening"/>
+    <ECProperty propertyName="Diameter" typeName="double" displayLabel="Diameter" category="HydraulicData" kindOfQuantity="rru:LENGTH_SHORT" description="The diameter of the orifice opening"/>
   </ECEntityClass>
   
 	<ECEntityClass typeName="GenericOrificeAspect" modifier="Sealed" displayLabel="Generic Orifice">
@@ -393,7 +431,7 @@
 
 	<ECEntityClass typeName="CircularGravityStructureShapeAspect" modifier="Sealed" displayLabel="Circular Structure">
 		<BaseClass>GravityStructureShapeAspect</BaseClass>
-		<ECProperty propertyName="StructureDiameter" typeName="double" displayLabel="Diameter" category="HydraulicData" kindOfQuantity="AECU:LENGTH"/>
+		<ECProperty propertyName="StructureDiameter" typeName="double" displayLabel="Diameter" category="HydraulicData" kindOfQuantity="rru:LENGTH"/>
 	</ECEntityClass>
 
 	<ECRelationshipClass typeName="GravityStructureOwnsCircularShapeAspect" strength="embedding" strengthDirection="Forward" modifier="Sealed">
@@ -517,8 +555,8 @@
 	<ECEntityClass typeName="Pipe" modifier="Sealed" displayLabel="Pipe">
 		<BaseClass>Conduit</BaseClass>
 		<ECProperty propertyName="Shape" typeName="PipeShape" displayLabel="Shape" category="HydraulicData"/>
-		<ECProperty propertyName="StartInvert" typeName="double" displayLabel="Invert (Start)" category="HydraulicData" kindOfQuantity="rru:LENGTH"/>
-		<ECProperty propertyName="StopInvert" typeName="double" displayLabel="Invert (Stop)" category="HydraulicData" kindOfQuantity="rru:LENGTH"/>
+		<ECProperty propertyName="StartInvert" typeName="double" displayLabel="Invert (Start)" category="HydraulicData" kindOfQuantity="rru:ELEVATION"/>
+		<ECProperty propertyName="StopInvert" typeName="double" displayLabel="Invert (Stop)" category="HydraulicData" kindOfQuantity="rru:ELEVATION"/>
 		<ECProperty propertyName="ManningsN" typeName="double" displayLabel="Manning's n" category="HydraulicData"/>
 		<ECProperty propertyName="PlanLength" typeName="double" displayLabel="Length" category="HydraulicData" kindOfQuantity="rru:LENGTH"/>
 	  <ECProperty propertyName="DesignPipe" typeName="boolean" displayLabel="Design Pipe" category="DesignData" />
@@ -543,7 +581,7 @@
 
 	<ECEntityClass typeName="CircularPipeShapeAspect" modifier="Sealed" displayLabel="Circular">
 		<BaseClass>PipeShapeAspect</BaseClass>
-		<ECProperty propertyName="PipeDiameter" typeName="double" displayLabel="Diameter" category="HydraulicData" kindOfQuantity="AECU:LENGTH"/>
+		<ECProperty propertyName="PipeDiameter" typeName="double" displayLabel="Diameter" category="HydraulicData" kindOfQuantity="rru:LENGTH_SHORT"/>
 	</ECEntityClass>
 
 	<ECRelationshipClass typeName="PipeOwnsCircularShapeAspect" strength="embedding" strengthDirection="Forward" modifier="Sealed">
@@ -558,8 +596,8 @@
 
 	<ECEntityClass typeName="BoxPipeShapeAspect" modifier="Sealed" displayLabel="Box">
 		<BaseClass>PipeShapeAspect</BaseClass>
-		<ECProperty propertyName="PipeRise" typeName="double" displayLabel="Rise" category="HydraulicData" kindOfQuantity="rru:LENGTH"/>
-		<ECProperty propertyName="PipeSpan" typeName="double" displayLabel="Span" category="HydraulicData" kindOfQuantity="rru:LENGTH"/>
+		<ECProperty propertyName="PipeRise" typeName="double" displayLabel="Rise" category="HydraulicData" kindOfQuantity="rru:LENGTH_SHORT"/>
+		<ECProperty propertyName="PipeSpan" typeName="double" displayLabel="Span" category="HydraulicData" kindOfQuantity="rru:LENGTH_SHORT"/>
 	</ECEntityClass>
 
 	<ECRelationshipClass typeName="PipeOwnsBoxShapeAspect" strength="embedding" strengthDirection="Forward" modifier="Sealed">
@@ -612,6 +650,7 @@
 
 	<ECEntityClass typeName="RainfallSet" modifier="Sealed" displayLabel="Rainfall Set">
 		<BaseClass>bis:DefinitionElement</BaseClass>
+		<ECProperty propertyName="RainDataDefinition" typeName="RainfallSetDefinition" displayLabel="Rain Data Definition" category="HydraulicData" description="Specify how to define the rainfall data for this rainfall set."/>
 	</ECEntityClass>
 
 	<ECEntityClass typeName="RainfallEvent" modifier="Sealed" displayLabel="Rainfall Event">
@@ -649,7 +688,7 @@
 		<ECProperty propertyName="Duration" typeName="double" displayLabel="Storm Duration" category="HydraulicData" kindOfQuantity="AECU:TIME"/>
 		<ECProperty propertyName="TimeIncrement" typeName="double" displayLabel="Duration" category="HydraulicData" kindOfQuantity="AECU:TIME"/>
 		<ECProperty propertyName="DepthMethod" typeName="RainfallDepthMethod" displayLabel="Depth Method" category="HydraulicData"/>
-		<ECArrayProperty propertyName="Depths" typeName="double" displayLabel="Depths" category="HydraulicData" kindOfQuantity="AECU:LENGTH"/>
+		<ECArrayProperty propertyName="Depths" typeName="double" displayLabel="Depths" category="HydraulicData" kindOfQuantity="rru:LENGTH_SHORT"/>
 	</ECEntityClass>
 
 	<ECRelationshipClass typeName="RainfallEventToTimeDepthsAspect" strength="embedding" strengthDirection="Forward" modifier="Sealed">
@@ -682,21 +721,60 @@
 		</Target>
 	</ECRelationshipClass>
 
-  <ECEntityClass typeName="GVFCalculationOptions" modifier="Sealed" displayLabel="Calc Options">
-    <BaseClass>bis:DefinitionElement</BaseClass>
-    <ECProperty propertyName="CalculationType" typeName="CalculationType" displayLabel="Calculation Type" category="HydraulicData"/>
-    <ECProperty propertyName="MinimumTc" typeName="double" displayLabel="Minimum Time of Concentration" category="HydraulicData"/>
-    <ECProperty propertyName="UseMinimumTcSystemTime" typeName="boolean" displayLabel="Use Minimum Tc System Time" category="HydraulicData"/>
-    <ECProperty propertyName="MaxNetworkTraversals" typeName="int" displayLabel="Maximum Network Traversals" category="HydraulicData"/>
-    <ECProperty propertyName="FlowConvergenceTest" typeName="double" displayLabel="Flow Convergence Test" category="HydraulicData"/>
-    <ECProperty propertyName="FlowProfileMethod" typeName="FlowProfileMethod" displayLabel="Flow Profile Method" category="HydraulicData"/>
-    <ECProperty propertyName="NumberOfProfileSteps" typeName="int" displayLabel="Number of Profile Steps" category="HydraulicData"/>
-    <ECProperty propertyName="HydraulicConvergenceTest" typeName="double" displayLabel="Hydraulic Convergence Test" category="HydraulicData"/>
-    <ECProperty propertyName="AverageVelocityMethod" typeName="AverageVelocityMethod" displayLabel="Average Velocity Method" category="HydraulicData"/>
-    <ECProperty propertyName="MinStructureHeadloss" typeName="double" displayLabel="Minimum Structure Headloss" category="HydraulicData"/>
-    <ECProperty propertyName="StructureLossMethod" typeName="StructureLossMethod" displayLabel="Structure Loss Method" category="HydraulicData"/>
-    <ECProperty propertyName="IgnorePipeTravelTimeInCarrierPipes" typeName="boolean" displayLabel="Ignore Pipe Travel Time in Carrier Pipes" category="HydraulicData"/>
-    <ECProperty propertyName="CorrectForPartialAreaEffects" typeName="boolean" displayLabel="Correct for Partial Area Effects" category="HydraulicData"/>
+  <ECEntityClass typeName="CalculationOptions" modifier="Sealed" displayLabel="Calculation Options">
+    <BaseClass >bis:DefinitionElement</BaseClass>
+    <ECProperty propertyName="CalculationEngine" typeName="CalculationEngine" displayLabel="Engine" category="HydraulicData" description="Choose the hydraulics engine to calculate the current site."/>
+  </ECEntityClass>
+
+  <ECEntityClass typeName="CalculationEngineAspect" modifier="Abstract" displayLabel="CalculationEngineAspect">
+    <BaseClass >bis:ElementUniqueAspect</BaseClass>
+  </ECEntityClass>
+  <ECRelationshipClass typeName="CalculationOptionsOwnsCalculationEngineAspect" strength="embedding" modifier="Sealed">
+    <BaseClass >bis:ElementOwnsUniqueAspect</BaseClass>
+    <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+      <Class class="CalculationOptions"/>
+    </Source>
+    <Target multiplicity="(1..1)" roleLabel="owned by" polymorphic="true">
+      <Class class="CalculationEngineAspect"/>
+    </Target>
+  </ECRelationshipClass>
+
+  <ECEntityClass typeName="GVFAspect" modifier="Sealed" displayLabel="GVF">
+    <BaseClass >CalculationEngineAspect</BaseClass>
+    <ECProperty propertyName="CalculationType" typeName="CalculationType" displayLabel="Calculation Type" category="HydraulicData" description="Select the type of calculation to perform"/>
+    <ECProperty propertyName="MinimumTc" typeName="double" displayLabel="Minimum Time of Concentration" category="HydraulicData" kindOfQuantity="AECU:TIME" description="The minimum allowed time of concentration on on a catchment."/>
+    <ECProperty propertyName="UseMinimumTcSystemTime" typeName="boolean" displayLabel="Use Minimum Tc System Time" category="HydraulicData" description="If True, the system travel time in the pipe will be the Minimum for Time of Concentration or greater."/>
+    <ECProperty propertyName="MaxNetworkTraversals" typeName="int" displayLabel="Maximum Network Traversals" category="HydraulicData" description="Maximum number of iterations that will be performed to achieve the closest approximation of the desired network results."/>
+    <ECProperty propertyName="FlowConvergenceTest" typeName="double" displayLabel="Flow Convergence Test" category="HydraulicData" kindOfQuantity="rru:ELEVATION" description="Value is taken as the maximum relative change in discharge occurring at the system outlet between two successive network solutions." />
+    <ECProperty propertyName="FlowProfileMethod" typeName="FlowProfileMethod" displayLabel="Flow Profile Method" category="HydraulicData" description="Select how the engine performs flow routing."/>
+    <ECProperty propertyName="NumberOfProfileSteps" typeName="int" displayLabel="Number of Profile Steps" category="HydraulicData" description="The gradually varied flow profile divides each pipe into internal segments (profile steps) prior to calculation of the hydraulic grade."/>
+    <ECProperty propertyName="HydraulicConvergenceTest" typeName="double" displayLabel="Hydraulic Convergence Test" category="HydraulicData" kindOfQuantity="rru:ELEVATION" description="In full network calculation this value is taken as the maximum absolute change between two successive solves of hydraulic grade at any junction or inlet in the system."/>
+    <ECProperty propertyName="AverageVelocityMethod" typeName="AverageVelocityMethod" displayLabel="Average Velocity Method" category="HydraulicData" description="The method used to calculate the average travel time velocity."/>
+    <ECProperty propertyName="MinStructureHeadloss" typeName="double" displayLabel="Minimum Structure Headloss" category="HydraulicData" kindOfQuantity="rru:ELEVATION" description="If the system calculates a structure headloss that is lower then this value, the value specified will be used."/>
+    <ECProperty propertyName="StructureLossMethod" typeName="StructureLossMethod" displayLabel="Structure Loss Method" category="HydraulicData" description="Specify the basis for the hydraulic calculations."/>
+    <ECProperty propertyName="IgnorePipeTravelTimeInCarrierPipes" typeName="boolean" displayLabel="Ignore Pipe Travel Time in Carrier Pipes" category="HydraulicData" description="Ignore the travel time in carrier pipes (pipes with no subcatchment connected to their upstream node) when computing system time at the node immediately downstream of the carrier pipe."/>
+    <ECProperty propertyName="CorrectForPartialAreaEffects" typeName="boolean" displayLabel="Correct for Partial Area Effects" category="HydraulicData" description="If false, the simulation will always adopt the largest system time from all incoming flows. Otherwise, when two or more rational flows enter a single node, StormCAD will adopt the system time that produces the largest rational flow. A larger 'partial area' flow will be carried downstream until the 'total area' flows exceeds it."/>
+  </ECEntityClass>
+
+  <ECEntityClass typeName="SWMMAspect" modifier="Sealed" displayLabel="SWMM">
+    <BaseClass >CalculationEngineAspect</BaseClass>
+    <ECProperty propertyName="SwmmRoutingMethod" typeName="SwmmRoutingMethod" displayLabel="Routing Method" category="HydraulicData" description="The method to use to route flows through the conveyance system: Uniform Flow, Kinematic Wave, or Dynamic Wave."/>
+    <ECProperty propertyName="AllowPondingAtJunctions" typeName="boolean" displayLabel="Allow Ponding at Gravity Structures" category="HydraulicData" description="Lets you select whether or not to allow excess water to collect at gravity structures and be re-introduced into the system as conditions permit.  In order for ponding to actually occur at a particular node, you must enter a non-zero value for the node's Ponded Area attribute."/>
+    <ECProperty propertyName="RoutingTimeStep" typeName="double" displayLabel="Routing Time Step" category="HydraulicData" kindOfQuantity="AECU:TIME" description="The time step used for routing flows and water quality constituents through the conveyance system. Note that Dynamic Wave routing requires a much smaller time step than the other methods of flow routing."/>
+    <ECProperty propertyName="HydrologicTimeStep" typeName="double" displayLabel="Hydrologic Time Step" category="HydraulicData" kindOfQuantity="AECU:TIME" description="The time step used to calculate runoff hydrographs."/>
+    <ECProperty propertyName="OutputIncrement" typeName="double" displayLabel="Output Increment" category="HydraulicData" kindOfQuantity="AECU:TIME" description="The time interval for reporting of computed results."/>
+    <ECProperty propertyName="MinConduitSlope" typeName="double" displayLabel="Minimum Conduit Slope" category="HydraulicData" kindOfQuantity="rru:SLOPE" description="The minimum value allowed for a conduit's slope. If zero (the default) then no minimum is imposed (although SWMM uses a lower limit on elevation drop of 0.001 ft (0.00035 m) when computing a conduit slope)."/>
+    <ECProperty propertyName="MinSurfaceArea" typeName="double" displayLabel="Minimum Surface Area" category="HydraulicData" kindOfQuantity="rru:AREA" description="The minimum surface area to be used at nodes when computing changes in water depth. If you enter 0, then the default value of 12.566 square feet is used."/>
+    <ECProperty propertyName="ConduitLengthTimeStep" typeName="double" displayLabel="Time Step For Conduit Lengthening" category="HydraulicData" kindOfQuantity="AECU:TIME" description="The time step artificially lengthen conduits so that they meet the Courant stability criterion under full-flow conditions (i.e., the travel time of a wave will not be smaller than the specified conduit lengthening time step). As this value is decreased, fewer conduits will require lengthening. A value of 0 means that no conduits will be lengthened."/>
+    <ECProperty propertyName="HeadTolerance" typeName="double" displayLabel="Head Convergence Tolerance" category="HydraulicData" kindOfQuantity="rru:ELEVATION" description="When the difference in computed head at each node between successive trials is below this value the flow solution for the current time step is assumed to have converged."/>
+    <ECProperty propertyName="MaxTrials" typeName="int" displayLabel="Max Trials per Time Step" category="HydraulicData" description="The maximum allowable number of trials performed each time step to reach convergence when updating hydraulic heads at the conveyance system's nodes."/>
+    <ECProperty propertyName="UseVariableTimeSteps" typeName="boolean" displayLabel="Use Minimum Variable Time Step" category="HydraulicData" description="Select whether or not to use a variable time step, which is computed for each time period to prevent an excessive change in water depth at each node."/>
+    <ECProperty propertyName="MinVariableTimeSteps" typeName="double" displayLabel="Minimum Variable Time Step" category="HydraulicData" kindOfQuantity="AECU:TIME" description="When the difference in computed head at each node between successive trials is below this value the flow solution for the current time step is assumed to have converged."/>
+    <ECProperty propertyName="TimeStepMultiplier" typeName="double" displayLabel="Time Step Multiplier" category="HydraulicData" kindOfQuantity="rru:PERCENTAGE" description="Lets you enter a safety factor (between 10 and 200%) to be applied against the variable time step as automatically derived to preserve the Courant stability criterion."/>
+    <ECProperty propertyName="IntegrationMethod" typeName="IntegrationMethod" displayLabel="Integration Method" category="HydraulicData" description="Specify the integration method to use: Modified Euler or Picard Iterations (a method of successive approximations)."/>
+    <ECProperty propertyName="InertialTerms" typeName="InertialTerms" displayLabel="Inertial Terms" category="HydraulicData" description="Defines how the inertial terms in the St. Venant momentum equation will be handled."/>
+    <ECProperty propertyName="DefineSuperCriticalFlow" typeName="DefineSuperCriticalFlow" displayLabel="Define Super Critical Flow" category="HydraulicData" description="Selects the basis used to determine when supercritical flow occurs in a conduit."/>
+    <ECProperty propertyName="SurchargeMethod" typeName="SurchargeMethod" displayLabel="Surcharge Method" category="HydraulicData" description="Select which method to be used to handle surcharge conditions. Extran is based on the original SWMM methods, whereas Slot uses a Preissmann slot methodology."/>
   </ECEntityClass>
 
 	<ECEntityClass typeName="PipeSizeSet" modifier="Sealed" displayLabel="Pipe Sizes">
