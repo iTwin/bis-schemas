@@ -1,8 +1,8 @@
 ---
 noEditThisPage: true
-remarksTarget: SewerHydraulicAnalysis.ecschema.md
+remarksTarget: PipeNetworkHydraulicAnalysis.ecschema.md
 ---
 
-# SewerHydraulicAnalysis
+# PipeNetworkHydraulicAnalysis
 
-This schema defines classes that represent data for Hydraulic modeling of Stormwater and Sanitary networks.
+This schema defines classes that represent data for Hydraulic modeling of Pipe Networks
