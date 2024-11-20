@@ -5,28 +5,64 @@
 ======================================================================================= -->
 <ECSchema schemaName="SimResultsCore" alias="simrescore" version="01.00.00" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" displayLabel="Simulation Results Core" description="">
     <ECSchemaReference name="ECDbMap" version="02.00.02" alias="ecdbmap"/>
+    <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
+    <ECSchemaReference name="Analytical" version="01.00.00" alias="anlyt"/> <!-- TODO: Signal that this schema reference is metadata-only. -->
+
+    <ECCustomAttributes>
+        <!-- TODO: Signal that this is not a BIS schema, but a "SimulationResults" one -->
+    </ECCustomAttributes>
 
     <ECEntityClass typeName="ResultRecord" modifier="Abstract" displayLabel="Result Record" description="">
-        <DbIndexList xmlns="ECDbMap.02.00.02">
-            <Indexes>
-                <DbIndex>
-                    <Name>ix_simrescore_ResultRecord_ElementId</Name>
-                    <IsUnique>True</IsUnique>
-                    <Properties>
-                        <string>ElementId</string>
-                    </Properties>
-                </DbIndex>
-            </Indexes>
-        </DbIndexList>
-        <ECProperty propertyName="ElementId" typeName="long" description=""/>
+        <ECCustomAttributes>
+            <DbIndexList xmlns="ECDbMap.02.00.02">
+                <Indexes>
+                    <DbIndex>
+                        <Name>ix_NodeResultRecord_Element</Name>
+                        <IsUnique>False</IsUnique>
+                        <Properties>
+                            <string>Element</string>
+                        </Properties>
+                    </DbIndex>
+                </Indexes>
+            </DbIndexList>
+        </ECCustomAttributes>
+        <ECNavigationProperty propertyName="Element" relationshipName="AnalyticalElementHasResultRecord" direction="backward" description=""/>
     </ECEntityClass>
 
+    <ECRelationshipClass typeName="AnalyticalElementHasResultRecord" strength="referencing" modifier="Abstract">
+        <!-- @see RecordRecord.Element ECNavigationProperty -->
+        <Source multiplicity="(1..1)" roleLabel="has" polymorphic="true">
+            <Class class="anlyt:AnalyticalElement"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="true">
+            <Class class="ResultRecord"/>
+        </Target>
+    </ECRelationshipClass>
+
     <ECEntityClass typeName="TimeStep" modifier="None" displayLabel="Time-Step" description="">
+        <ECCustomAttributes>
+            <ClassMap xmlns="ECDbMap.02.00.02">
+                <MapStrategy>TablePerHierarchy</MapStrategy>
+            </ClassMap>
+        </ECCustomAttributes>
         <ECProperty propertyName="TimeFromStart" typeName="double" description=""/>
     </ECEntityClass>
 
     <ECEntityClass typeName="TimeVariantResultRecord" modifier="Abstract" displayLabel="Time-Variant Result Record" description="">
         <BaseClass>ResultRecord</BaseClass>
+        <ECCustomAttributes>
+            <DbIndexList xmlns="ECDbMap.02.00.02">
+                <Indexes>
+                    <DbIndex>
+                        <Name>ix_simrescore_TimeVariantResultRecord_TimeStep</Name>
+                        <IsUnique>False</IsUnique>
+                        <Properties>
+                            <string>TimeStep</string>
+                        </Properties>
+                    </DbIndex>
+                </Indexes>
+            </DbIndexList>
+        </ECCustomAttributes>
         <ECNavigationProperty propertyName="TimeStep" relationshipName="RecordRecordAtTimeStep" direction="Forward" displayLabel="Time-Step" description="">
             <ECCustomAttributes>
                 <ForeignKeyConstraint xmlns="ECDbMap.02.00.02"/>
