@@ -519,9 +519,9 @@
 
   <ECEntityClass typeName="CatchBasin" modifier="Sealed" displayLabel="Catch Basin">
     <BaseClass>GravityStructure</BaseClass>
-    <ECProperty propertyName="InletCaptureMethod" typeName="InletCaptureMethod" displayLabel="Inlet Capture Method" description="Method used to determine the rate of flow capture by the inlet." category="HydraulicData"/>
-     <ECProperty propertyName="DesignInlet" typeName="boolean" displayLabel="Design Inlet" category="DesignData" description="If true the length of the inlet will be designed to meet the active inlet design constraints."/>
-    <ECProperty propertyName="OverrideGlobalInletDesignConstraints" typeName="boolean" displayLabel="Override Global Inlet Design Constraints" category="DesignData" />
+    <ECProperty propertyName="InletCaptureMethod" typeName="InletCaptureMethod" displayLabel="Inlet Capture Method" category="HydraulicData" description="Method used to determine the rate of flow capture by the inlet." />
+    <ECProperty propertyName="DesignInlet" typeName="boolean" displayLabel="Design Inlet" category="DesignData" description="If true then the length of the inlet will be designed to meet the active inlet design constraints."/>
+    <ECProperty propertyName="OverrideGlobalInletDesignConstraints" typeName="boolean" displayLabel="Override Global Inlet Design Constraints" category="DesignData" description="If true then the user can override the system wide design constraints for the current inlet."/>
 	</ECEntityClass>
   
 	<ECEntityClass typeName="InletCaptureMethodAspect" modifier="Abstract" displayLabel="InletCaptureMethodAspect">
@@ -611,15 +611,16 @@
 
 	<ECEntityClass typeName="Pipe" modifier="Sealed" displayLabel="Pipe">
 		<BaseClass>Conduit</BaseClass>
-		<ECProperty propertyName="Shape" typeName="PipeShape" displayLabel="Shape" category="HydraulicData"/>
-		<ECProperty propertyName="StartInvert" typeName="double" displayLabel="Invert (Start)" category="HydraulicData" kindOfQuantity="rru:ELEVATION"/>
-		<ECProperty propertyName="StopInvert" typeName="double" displayLabel="Invert (Stop)" category="HydraulicData" kindOfQuantity="rru:ELEVATION"/>
-		<ECProperty propertyName="ManningsN" typeName="double" displayLabel="Manning's n" category="HydraulicData"/>
-		<ECProperty propertyName="PlanLength" typeName="double" displayLabel="Length" category="HydraulicData" kindOfQuantity="rru:LENGTH"/>
-	  <ECProperty propertyName="DesignPipe" typeName="boolean" displayLabel="Design Pipe" category="DesignData" />
+		<ECProperty propertyName="Shape" typeName="PipeShape" displayLabel="Shape" category="HydraulicData" description="Select the shape of the pipe."/>
+		<ECProperty propertyName="StartInvert" typeName="double" displayLabel="Invert (Start)" category="HydraulicData" kindOfQuantity="rru:ELEVATION" description="Set the invert of pipe adjacent to the start node."/>
+		<ECProperty propertyName="StopInvert" typeName="double" displayLabel="Invert (Stop)" category="HydraulicData" kindOfQuantity="rru:ELEVATION" description="Set the invert of the pipe adjacent to the stop node."/>
+		<ECProperty propertyName="ManningsN" typeName="double" displayLabel="Manning's n" category="HydraulicData" description="The roughness value for the pipe."/>
+		<ECProperty propertyName="PlanLength" typeName="double" displayLabel="Length" category="HydraulicData" kindOfQuantity="rru:LENGTH" description="The horizontal length of the pipe."/>
+    <ECProperty propertyName="NumberOfBarrels" typeName="int" display="Number of Barrels" category="HydraulicData" description="Select the number of equal sized barrels of the pipe."/>
+	  <ECProperty propertyName="DesignPipe" typeName="boolean" displayLabel="Design Pipe" category="DesignData" description="If true then the pipe will be designed during a design run."/>
     <ECProperty propertyName="DesignStartInvert" typeName="boolean" displayLabel="Design Start Invert" category="DesignData" description="If true then the start invert will be adjusted during the design."/>
-    <ECProperty propertyName="DesignStopInvert" typeName="boolean" displayLabel="Design Stop Invert" category="DesignData" description="If true then the atop invert will be adjusted during the design."/>
-    <ECProperty propertyName="OverrideGlobalPipeConstraints" typeName="boolean" displayLabel="Override Global Pipe Constraints" category="DesignData" />
+    <ECProperty propertyName="DesignStopInvert" typeName="boolean" displayLabel="Design Stop Invert" category="DesignData" description="If true then the stop invert will be adjusted during the design."/>
+    <ECProperty propertyName="OverrideGlobalPipeConstraints" typeName="boolean" displayLabel="Override Global Pipe Constraints" category="DesignData" description="If true then you can override the design constraints for the current pipe." />
 	</ECEntityClass>
 
 	<ECEntityClass typeName="PipeShapeAspect" modifier="Abstract" displayLabel="Pipe Shape">
@@ -679,7 +680,7 @@
 
 	<ECEntityClass typeName="Catchment" modifier="Sealed" displayLabel="Catchment">
 		<BaseClass>anlyt:AnalyticalElement</BaseClass>
-  <ECNavigationProperty propertyName="OutflowNode" relationshipName="CatchmentDischargesToOutflowNode" direction="Forward" />
+  <ECNavigationProperty propertyName="OutflowNode" displayLabel="Outflow Element" relationshipName="CatchmentDischargesToOutflowNode" direction="Forward" description="Specify the element which the catchment outflows." />
 	</ECEntityClass>
 
 	<ECRelationshipClass typeName="CatchmentDischargesToOutflowNode" strength="referencing" modifier="Sealed">
@@ -742,7 +743,7 @@
 
   <ECEntityClass typeName="CatchmentRationalSimpleAreaAspect" modifier="Sealed" displayLabel="CatchmentRationalSimpleAreaAspect">
     <BaseClass >CatchmentSimpleAreaDefinitionAspect</BaseClass>
-    <ECProperty propertyName="RationalC" typeName="double" displayLabel="Rational C" category="HydraulicData" />
+    <ECProperty propertyName="RationalC" typeName="double" displayLabel="Rational C" category="HydraulicData" kindOfQuantity="rru:PERCENTAGE" description="The runoff coefficient used with the Rational Method. C in Q=CiA."/>
   </ECEntityClass>
 
    <ECEntityClass typeName="CatchmentRationalComplexAreaDefinitionAspect" modifier="Sealed" displayLabel="CatchmentRationalComplexAreaAspect">
@@ -751,8 +752,8 @@
   </ECEntityClass>
 
   <ECStructClass typeName="RationalSubarea" modifier="Sealed" description="The list of subareas that comprise the total area of the catchment. The weighted average of the rational c value will be used to compute the runoff.">
-    <ECProperty propertyName="RationalSubareaArea" typeName="double" displayLabel="Area" category="HydraulicData" kindOfQuantity="rru:AREA" />
-    <ECProperty propertyName="RationalSubareaC" typeName="double" displayLabel="Rational C" category="HydraulicData" />
+    <ECProperty propertyName="RationalSubareaArea" typeName="double" displayLabel="Area" category="HydraulicData" kindOfQuantity="rru:AREA" description="The size of the subarea."/>
+    <ECProperty propertyName="RationalSubareaC" typeName="double" displayLabel="Rational C" category="HydraulicData" description="The Rational C coefficient to be applied to the current subarea."/>
   </ECStructClass>
 
   <ECEntityClass typeName="EpaSWMMRunoffMethodAreaAspect" modifier="Sealed" displayLabel="EPA SWMM Runoff Method">
@@ -821,8 +822,8 @@
 
 	<ECEntityClass typeName="Pond" modifier="Sealed" displayLabel="Pond">
 		<BaseClass>DrainageNode</BaseClass>
-    <ECProperty propertyName="StartingWaterSurfaceElevation" typeName="double" displayLabel="Starting Water Surface Elevation" category="HydraulicData" kindOfQuantity="rru:LENGTH"/>
-    <ECStructArrayProperty propertyName="StorageElevationAreaCurve" typeName="ElevationAreaPoint" displayLabel="Elevation-Area Curve" category="HydraulicData"  minOccurs="0" maxOccurs="unbounded"/>
+    <ECProperty propertyName="StartingWaterSurfaceElevation" typeName="double" displayLabel="Starting Water Surface Elevation" category="HydraulicData" kindOfQuantity="rru:ELEVATION" description="Set water surface elevation in the pond at the beginning of the simulation."/>
+    <ECStructArrayProperty propertyName="StorageElevationAreaCurve" typeName="ElevationAreaPoint" displayLabel="Elevation-Area Curve" category="HydraulicData"  minOccurs="0" maxOccurs="unbounded" description="Define the volume of the pond using a stage-area curve."/>
   </ECEntityClass>
   
 	<ECStructClass typeName="ElevationAreaPoint" modifier="Sealed">
