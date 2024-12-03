@@ -83,13 +83,12 @@ Equivalent to [IfcDistributionPort](https://standards.buildingsmart.org/IFC/RELE
 
 A `PortConnection` instance objectifies a physical connection between 2 or more DistributionPorts when needed. That is typically the case when the level of granularity being modeled includes any physical element(s) that realize a connection. In that case, the realizing element(s) could be found using the `PortConnectionIsRealizedByPhysicalElements` relationship.
 
-A `PortConnection` generally connects two distribution ports via the `PortConnectionConnectsTwoPorts`. However, its base `PortConnectionConnectsPorts` relationship class can be used when modeling port-connections at a higher level of detail.
-
-
 ## Relationships
 
 ### PortConnectsToPort
 
 The connection between two or more DistributionPorts can be objectified by associating a `PortConnection` instance via the `PortConnectionObjectifiesConnection` relationship. Objectifying a connection is needed when there is data (identity or business-related) to be captured about a connection, or when the level of granularity being modeled includes any physical element(s) that realize it.
+
+BIS domains extending the rules and patterns in the DistributionSystems schema are expected to subclass the `PortConnectsToPort` relationship in order to provide specific semantics and multiplicity applicable to how DistributionPort instances connect in such domain.
 
 Equivalent to [IfcRelConnectsPorts](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcRelConnectsPorts.htm).
