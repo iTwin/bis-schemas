@@ -7,6 +7,7 @@
     <ECSchemaReference name="BisCore" version="01.00.14" alias="bis" />
     <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
     <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
+    <ECSchemaReference name="ECDbMap" version="02.00.02" alias="ecdbmap"/>
 
     <ECCustomAttributes>
         <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
@@ -119,26 +120,30 @@
         <BaseClass>bis:InformationRecordElement</BaseClass>
     </ECEntityClass>
 
-    <ECRelationshipClass typeName="PortConnectionConnectsPorts" strength="referencing" modifier="Abstract" description="Indicates that the DistributionPort is connected to some other Distribution ports via PortConnection.">
+    <ECRelationshipClass typeName="PortConnectsToPorts" strength="referencing" modifier="None" description="Indicates that the DistributionPort is connected to other DistributionPorts.">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
-        <Source multiplicity="(0..1)" roleLabel="connects" polymorphic="true">
+        <Source multiplicity="(0..*)" roleLabel="connects to" polymorphic="true">
+            <Class class="DistributionPort"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is connected by" polymorphic="true">
+            <Class class="DistributionPort"/>
+        </Target>
+        <ECNavigationProperty propertyName="PortConnection" relationshipName="PortConnectionObjectifiesConnection" direction="backward" description="The bis:Element that owns this bis:ElementUniqueAspect">
+            <ECCustomAttributes>
+                <ForeignKeyConstraint xmlns="ECDbMap.02.00.00"/>
+            </ECCustomAttributes>
+        </ECNavigationProperty>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="PortConnectionObjectifiesConnection" strength="referencing" modifier="None" description="Indicates that the Port Connection is realized by some Physical Element(s).">
+        <Source multiplicity="(0..1)" roleLabel="objectifies" polymorphic="true">
             <Class class="PortConnection"/>
         </Source>
-        <Target multiplicity="(2..*)" roleLabel="is connected by" polymorphic="true">
-            <Class class="DistributionPort"/>
+        <Target multiplicity="(0..*)" roleLabel="is objectified by" polymorphic="true">
+            <Class class="PortConnectsToPorts"/>
         </Target>
     </ECRelationshipClass>
 
-    <ECRelationshipClass typeName="PortConnectionConnectsTwoPorts" strength="referencing" modifier="Abstract" description="Indicates that the DistributionPort is connected to one other Distribution port via PortConnection.">
-        <BaseClass>PortConnectionConnectsPorts</BaseClass>
-        <Source multiplicity="(0..1)" roleLabel="connects" polymorphic="true">
-            <Class class="PortConnection"/>
-        </Source>
-        <Target multiplicity="(2..2)" roleLabel="is connected by" polymorphic="true">
-            <Class class="DistributionPort"/>
-        </Target>
-    </ECRelationshipClass>
-    
     <ECRelationshipClass typeName="PortConnectionIsRealizedByPhysicalElements" strength="referencing" modifier="None" description="Indicates that the Port Connection is realized by some Physical Element(s).">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <Source multiplicity="(0..1)" roleLabel="is realized by" polymorphic="true">
@@ -148,5 +153,4 @@
             <Class class="bis:PhysicalElement"/>
         </Target>
     </ECRelationshipClass>
-
 </ECSchema>

@@ -11,9 +11,11 @@ A BIS [DistributionSystem](#distributionsystem) consists of [IDistributionElemen
 
 A given bis:PhysicalElement can implement more that one of [IDistributionFlowElement](#idistributionflowelement), [IDistributionControlElement](#idistributioncontrolelement), and [IDistributionFlowElement](#idistributionflowelement).
 
-Connection point information will be added in subsequent versions of the schema.
+The following class-diagrams depict the main classes and relationships in the DistributionSystems schema:
 
-![Class and Instance Diagrams](./media/DistributionSystems.png)
+![DistributionSystems](./media/DistributionSystems.png)
+
+![DistributionPorts](./media/DistributionPorts.png)
 
 ## Entity Classes
 
@@ -79,8 +81,15 @@ Equivalent to [IfcDistributionPort](https://standards.buildingsmart.org/IFC/RELE
 
 ### PortConnection
 
-A `PortConnection` defines a physical connection between 2 DistributionPorts. In the case where a connection is realized by some other physical element, the realizing element could be found using `PortConnectionIsRealizedByPhysicalElements` relationship.
+A `PortConnection` instance objectifies a physical connection between 2 or more DistributionPorts when needed. That is typically the case when the level of granularity being modeled includes any physical element(s) that realize a connection. In that case, the realizing element(s) could be found using the `PortConnectionIsRealizedByPhysicalElements` relationship.
 
 A `PortConnection` generally connects two distribution ports via the `PortConnectionConnectsTwoPorts`. However, its base `PortConnectionConnectsPorts` relationship class can be used when modeling port-connections at a higher level of detail.
+
+
+## Relationships
+
+### PortConnectsToPort
+
+The connection between two or more DistributionPorts can be objectified by associating a `PortConnection` instance via the `PortConnectionObjectifiesConnection` relationship. Objectifying a connection is needed when there is data (identity or business-related) to be captured about a connection, or when the level of granularity being modeled includes any physical element(s) that realize it.
 
 Equivalent to [IfcRelConnectsPorts](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcRelConnectsPorts.htm).
