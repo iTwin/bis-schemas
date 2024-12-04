@@ -4,17 +4,25 @@ remarksTarget: RoadRailAlignment.ecschema.md
 
 # RoadRailAlignment
 
-Contains the main classes to capture Alignment information primarily used in Road & Rail disciplines.
+This schema contains the main classes to capture Alignment information primarily used in Road & Rail disciplines.
+
+The following class-diagram depicts the main classes and relationships in the RoadRailAlignment schema:
 
 ![RoadRailAlignment](./media/RoadRailAlignment-classes.png)
+
+The following instance-diagram depicts an example of a typical usage of the classes from the RoadRailAlignment schema:
+
+![RoadRailAlignment](./media/RoadRailAlignment-instances.png)
 
 ## Entity Classes
 
 ### Alignment
 
-When an `Alignment` drives the design of a linear asset, it is referred to as a *Design Alignment*. `Alignment`s used for design purposes shall be contained in a `SpatialLocationModel`, submodel of a `DesignAlignments` instance, and by default, shall use the Domain-ranked `Alignment` category.
+`Alignment` instances shall be contained in a `SpatialLocationModel` or a `PhysicalModel`, that typically submodel a `SpatialLocationPartition` or a `PhysicalPartition` respectively. 
 
-On the other hand, when an `Alignment` describes a secondary entity of a linear asset, it is referred to as a *Linear*. `Alignment`s created for the purpose of a *Linear* shall be contained in any `SpatialModel`, and by default, shall use the Domain-ranked `Linear` category.
+If there is any need to organize `Alignment` instances that drive the design of a linear asset (i.e. *Design Alignments*) into a separate model further down the model-hierarchy of a BIS repository, it can be done by using a `SpatialLocationModel` model that submodels a `DesignAlignments` instance at a higher level.
+
+If there is a need to standardize the categories associated with `Alignment` instances in an organization, the RoadRailAlignment BIS domain suggests the usage of the Domain-ranked `Alignment` and `Linear` categories for *Design* and *Secondary* Alignments respectively.
 
 An `Alignment` shall always have an associated `HorizontalAlignment`, but `VerticalAlignment`s are optional. When an `Alignment` has one or more associated `VerticalAlignment`s, it refers to the one used to describe its profile as being the *Main Vertical*.
 
@@ -32,19 +40,21 @@ Equivalent to [IfcAlignmentTypeEnum](https://standards.buildingsmart.org/IFC/REL
 
 ### DesignAlignments
 
+A `DesignAlignments` instance shall be used when there is a need to organize `Alignment` instances that drive the design of a linear asset (i.e. *Design Alignments*) into a separate model further down the model-hierarchy of a BIS repository. In that case, `Alignment`s are organized into a `SpatialLocationModel` model that submodels a `DesignAlignments` instance at a higher level.
+
 A `DesignAlignments` instance, by default, shall use the Domain-ranked `Alignment` category.
 
 ### HorizontalAlignments
 
-Every set of `Alignment`s, contained in a `SpatialModel`, shall have one and only one instance of `HorizontalAlignments` leading to a *Plan-projection* `SpatialLocationModel` containing one `HorizontalAlignment` instance for each `Alignment` in the parent model. 
+A `HorizontalAlignments` instance shall be used when there is a need to organize `HorizontalAlignment` instances into a separate model further down the model-hierarchy of a BIS repository. In that case, `HorizontalAlignment` instances can be contained in a `SpatialLocationModel` model that submodels a `HorizontalAlignments` instance at a higher level.
 
-Each `HorizontalAlignments` instance shall set its `CodeValue` property to "Horizontal Alignments", and by default, shall use the Domain-ranked `Alignment` category in the case of *Design Alignments* or the `Linear` category in the case of *Linears*.
+Each `HorizontalAlignments` instance shall set its `CodeValue` property to "Horizontal Alignments", and by default, shall use the Domain-ranked `Alignment` category.
 
 ### HorizontalAlignment
 
-A `HorizontalAlignment` instance shall be contained in a *Plan-projection* `SpatialLocationModel` submodel of a `HorizontalAlignments` instance, and shall be associated with one `Alignment` on such parent model via the `AlignmentRefersToHorizontal` relationship.
+A `HorizontalAlignment` instance shall be contained in a *Plan-projection* `SpatialLocationModel` submodel of either a `SpatialLocationPartition` or a `HorizontalAlignments` instance. It shall be associated with one `Alignment` instance via the `AlignmentRefersToHorizontal` relationship.
 
-A `HorizontalAlignment` typically has the same `CodeValue` and Category as its associated `Alignment`.
+A `HorizontalAlignment` typically has the same `CodeValue` and Category as its associated `Alignment` instance.
 
 A `HorizontalAlignment` stores its visual geometry separately from geometry used for linear-referencing and design purposes, although the two could be identical. The former shall be stored in its `GeometryStream` whereas the latter shall be stored in the `HorizontalGeometry` property, encoded as a [Path](https://www.itwinjs.org/reference/geometry-core/curve/path/). Each curve primitive in such *Path* describes a segment along the `HorizontalAlignment` as follows:
 
