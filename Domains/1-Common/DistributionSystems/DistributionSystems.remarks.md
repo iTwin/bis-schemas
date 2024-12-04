@@ -92,3 +92,13 @@ The connection between two or more DistributionPorts can be objectified by assoc
 BIS domains extending the rules and patterns in the DistributionSystems schema are expected to subclass the `PortConnectsToPort` relationship in order to provide specific semantics and multiplicity applicable to how DistributionPort instances connect in such domain.
 
 Equivalent to [IfcRelConnectsPorts](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcRelConnectsPorts.htm).
+
+### PhysicalElementsRealizeConnection
+
+When the Connection between DistributionPorts needs to be objectified, a `PortConnection` instance could be introduced, referenced by the `PortConnectsToPort` relationship via its _PortConnection_ navigation property. The `PhysicalElementsRealizeConnection` relationship can then be used to associate Physical Elements with such `PortConnection` instance.
+
+Note that Physical Elements realizing a Connection are not directly enabling the flow of matter in a DistributionSystem. Thus, they are typically not `IDistributionElement`s themselves. 
+
+Examples include bolts, rings or cement used on Connections between Pipes.
+
+Equivalent to the _RealizingElement_ property of [IfcRelConnectsPorts](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcRelConnectsPorts.htm).
