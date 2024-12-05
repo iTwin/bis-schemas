@@ -93,9 +93,9 @@ BIS domains extending the rules and patterns in the DistributionSystems schema a
 
 Equivalent to [IfcRelConnectsPorts](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcRelConnectsPorts.htm).
 
-### PhysicalElementsRealizeConnection
+### PhysicalElementRealizesConnection
 
-When the Connection between DistributionPorts needs to be objectified, a `PortConnection` instance could be introduced, referenced by the `PortConnectsToPort` relationship via its _PortConnection_ navigation property. The `PhysicalElementsRealizeConnection` relationship can then be used to associate Physical Elements with such `PortConnection` instance.
+When the Connection between DistributionPorts needs to be objectified, a `PortConnection` instance could be introduced, referenced by the `PortConnectsToPort` relationship via its _PortConnection_ navigation property. The `PhysicalElementRealizesConnection` relationship can then be used to associate Physical Elements with such `PortConnection` instance.
 
 Note that Physical Elements realizing a Connection are not directly enabling the flow of matter in a DistributionSystem. Thus, they are typically not `IDistributionElement`s themselves. 
 
