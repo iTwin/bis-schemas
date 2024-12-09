@@ -12,6 +12,7 @@
 	<ECSchemaReference name="AecUnits" version="01.00.03" alias="AECU"/>
 	<ECSchemaReference name="RoadRailUnits" version="01.00.01" alias="rru"/>
 	<ECSchemaReference name="NetworkTopology" version="01.00.00" alias="net"/>
+  <ECSchemaReference name="StormSewerPhysical" version="01.00.00" alias="stmswrphys"/>
 
 	<ECCustomAttributes>
 		<ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
@@ -21,11 +22,18 @@
 			<Value>DisciplineOther</Value>
 		</SchemaLayerInfo>
 	</ECCustomAttributes>
+  
+	<PropertyCategory typeName="HydraulicData" priority="1"/>
+  <PropertyCategory typeName="GutterData" priority="5"/>
+  <PropertyCategory typeName="InletData" priority="7"/>
+	<PropertyCategory typeName="DesignData" priority="10"/>
+
 
   <ECEnumeration typeName="InletCaptureMethod" backingTypeName="int" isStrict="true" >
     <ECEnumerator value="0" name="FullCapture" displayLabel="Full Capture"/>
     <ECEnumerator value="1" name="PercentCapture" displayLabel="Percent Capture"/>
     <ECEnumerator value="2" name="MaximumCapacity" displayLabel="Maximum Capacity"/>
+    <ECEnumerator value="3" name="HEC22" displayLabel="HEC-22"/>
   </ECEnumeration>
 
 	<ECEnumeration typeName="GravityStructureShape" backingTypeName="int" isStrict="true" description="Set the shape of a gravity structure.">
@@ -74,9 +82,6 @@
     <ECEnumerator value="0" name="Inverts" displayLabel="Inverts"/>
     <ECEnumerator value="1" name="Crowns" displayLabel="Crowns"/>
   </ECEnumeration>
-
-	<PropertyCategory typeName="HydraulicData" priority="1"/>
-	<PropertyCategory typeName="DesignData" priority="2"/>
 
   <ECEnumeration typeName="RiserType" backingTypeName="int" isStrict="true" >
     <ECEnumerator value="0" name="RiserPipe" displayLabel="Riser Pipe"/>
@@ -178,6 +183,28 @@
     <ECEnumerator value="2" name="ImperviousToPervious" displayLabel="Impervious to Pervious"/>
   </ECEnumeration>
 
+  <ECEnumeration typeName="InletLocation" backingTypeName="int" isStrict="true">
+    <ECEnumerator value="0" name="OnGrade" displayLabel="On Grade"/>
+    <ECEnumerator value="1" name="InSag" displayLabel="In Sag"/>
+  </ECEnumeration>
+
+  <ECEnumeration typeName="HEC22GrateType" backingTypeName="int" isStrict="true" >
+    <ECEnumerator value="0" name="P50mm" displayLabel="P-50 mm"/>
+    <ECEnumerator value="1" name="P30mm" displayLabel="P-30 mm"/>
+    <ECEnumerator value="2" name="CurvedVein" displayLabel="Curved Vein"/>
+    <ECEnumerator value="3" name="Degree45TiltBar" displayLabel="45° Tilt Bar"/>
+    <ECEnumerator value="4" name="Degree30TiltBar" displayLabel="30° Tilt Bar"/>
+    <ECEnumerator value="5" name="P50mmBy100mm" displayLabel="P-50 mm x 100mm"/>
+    <ECEnumerator value="6" name="Reticuline" displayLabel="Reticuline"/>
+  </ECEnumeration>
+
+  <ECEnumeration typeName="HEC22InletStructure" backingTypeName="int" isStrict="true">
+    <ECEnumerator value="0" name="Combination" displayLabel="Combination Inlet"/>
+    <ECEnumerator value="1" name="Curb" displayLabel="Curb Inlet"/>
+    <ECEnumerator value="2" name="Grate" displayLabel="Grate Inlet"/>
+    <ECEnumerator value="3" name="Slot" displayLabel="Slot Inlet"/>
+  </ECEnumeration>
+
 	<ECEntityClass typeName="SewerHydraulicAnalysisModel" modifier="Sealed" displayLabel="Sewer Hydraulics Analysis Model" description="Model containing all Sewer Hydraulic Analysis elements.">
 		<BaseClass>anlyt:AnalyticalModel</BaseClass>
 	</ECEntityClass>
@@ -201,7 +228,27 @@
     <BaseClass >bis:DefinitionElement</BaseClass>
     <ECProperty propertyName="RunoffMethod" typeName="RunoffMethod" displayLabel="Runoff Method" category="HydraulicData" description="Specify the runoff method to be used by all catchments"/>
     <ECProperty propertyName="InfiltrationMethod" typeName="InfiltrationMethod" displayLabel="Infiltration Method" category="HydraulicData" description="Specify the infiltration method to calculate runoff when not using the Rational Method."/>
-  </ECEntityClass>
+    <ECNavigationProperty propertyName="ActiveCalcOptions" displayLabel="Active Calc Options" relationshipName="GlobalSettingsOwnsCalcOptions" direction="Forward" />
+    <ECNavigationProperty propertyName="ActiveRainfallEvent" displayLabel="Active Rainfall Event" relationshipName="GlobalSettingsOwnsRainfallEvent" direction="Forward" />
+	 </ECEntityClass>
+
+	<ECRelationshipClass typeName="GlobalSettingsOwnsCalcOptions" strength="referencing" modifier="Sealed">
+		<Source multiplicity="(0..*)" roleLabel="bounded by" polymorphic="false">
+			<Class class="GlobalHydraulicModelSettings"/>
+		</Source>
+		<Target multiplicity="(0..1)" roleLabel="bounds" polymorphic="true">
+			<Class class="CalculationOptions"/>
+		</Target>
+  </ECRelationshipClass>
+
+  <ECRelationshipClass typeName="GlobalSettingsOwnsRainfallEvent" strength="referencing" modifier="Sealed">
+		<Source multiplicity="(0..*)" roleLabel="bounded by" polymorphic="false">
+			<Class class="GlobalHydraulicModelSettings"/>
+		</Source>
+		<Target multiplicity="(0..1)" roleLabel="bounds" polymorphic="true">
+			<Class class="RainfallEvent"/>
+		</Target>
+  </ECRelationshipClass>
 
 	<ECEntityClass typeName="PipeDesignConstraintsAspect" modifier="Sealed" displayLabel="Pipe Design Constraints">
     <BaseClass >bis:ElementUniqueAspect</BaseClass>
@@ -513,17 +560,41 @@
 	
 	<ECEntityClass typeName="Manhole" modifier="Sealed" displayLabel="Manhole">
 		<BaseClass>GravityStructure</BaseClass>
-		<ECProperty propertyName="TreatAsStorage" typeName="boolean" displayLabel="Treat As Storage" category="HydraulicData"/>
-		<ECProperty propertyName="ManholeIsBolted" typeName="boolean" displayLabel="Is Bolted" category="HydraulicData"/>
+		<ECProperty propertyName="TreatAsStorage" typeName="boolean" displayLabel="Treat As Storage" category="HydraulicData" description="If true then the SWMM engine will treat the manhole as a storage unit."/>
+		<ECProperty propertyName="ManholeIsBolted" typeName="boolean" displayLabel="Is Bolted" category="HydraulicData" description="If true then the manhole can go under pressure."/>
 	</ECEntityClass>
 
   <ECEntityClass typeName="CatchBasin" modifier="Sealed" displayLabel="Catch Basin">
     <BaseClass>GravityStructure</BaseClass>
-    <ECProperty propertyName="InletCaptureMethod" typeName="InletCaptureMethod" displayLabel="Inlet Capture Method" description="Method used to determine the rate of flow capture by the inlet." category="HydraulicData"/>
-     <ECProperty propertyName="DesignInlet" typeName="boolean" displayLabel="Design Inlet" category="DesignData" description="If true the length of the inlet will be designed to meet the active inlet design constraints."/>
-    <ECProperty propertyName="OverrideGlobalInletDesignConstraints" typeName="boolean" displayLabel="Override Global Inlet Design Constraints" category="DesignData" />
+    <ECProperty propertyName="InletCaptureMethod" typeName="InletCaptureMethod" displayLabel="Inlet Capture Method" category="HydraulicData" description="Method used to determine the rate of flow capture by the inlet." />
+    <ECProperty propertyName="DesignInlet" typeName="boolean" displayLabel="Design Inlet" category="DesignData" description="If true then the length of the inlet will be designed to meet the active inlet design constraints."/>
+    <ECProperty propertyName="OverrideGlobalInletDesignConstraints" typeName="boolean" displayLabel="Override Global Inlet Design Constraints" category="DesignData" description="If true then the user can override the system wide design constraints for the current inlet."/>
 	</ECEntityClass>
-  
+
+  <ECEntityClass typeName="GutterShapeAspect" modifier="Abstract" displayLabel="GutterShapeAspect">
+    <BaseClass>bis:ElementUniqueAspect</BaseClass>
+		<ECProperty propertyName="GutterHeight" typeName="double" displayLabel="Diameter" category="HydraulicData" kindOfQuantity="rru:LENGTH_SHORT" description="The height of the gutter, over which overflow will occur."/>
+  </ECEntityClass>
+
+  <!-- Currently only one gutter shape supported but more will come in the future -->
+  <ECEntityClass typeName="ConventionalGutterShapeAspect" displayLabel="ConventionalGutterShapeAspect">
+    <BaseClass>GutterShapeAspect</BaseClass>
+    <ECProperty propertyName="RoadCrossSlope" typeName="double" displayLabel="Road Cross Slope" category="GutterData" kindOfQuantity="rru:SLOPE" description="The transverse slope of the road."/>
+    <ECProperty propertyName="IsDepressedGutter" typeName="boolean" displayLabel="Is Depressed Gutter" category="GutterData" description="If true the gutter slope differs from the road cross slope."/>
+    <ECProperty propertyName="GutterWidth" typeName="double" displayLabel="Gutter Width" category="GutterData" kindOfQuantity="rru:LENGTH" description="Enter the horizontal width of the gutter. This is equal to the distance from the curb face to the point at which the gutter cross slope begins."/>
+    <ECProperty propertyName="GutterCrossSlope" typeName="double" displayLabel="Gutter Cross Slope" category="GutterData" kindOfQuantity="rru:SLOPE" description="Enter the transverse slope of the gutter. This value is typically equal to or greater than the road cross slope."/>
+  </ECEntityClass>
+
+	<ECRelationshipClass typeName="CatchBasinOwnsGutterShapeAspect" strength="embedding" modifier="Sealed">
+	  <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+    <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+      <Class class="CatchBasin"/>
+    </Source>
+    <Target multiplicity="(1..1)" roleLabel="owned by" polymorphic="true">
+      <Class class="GutterShapeAspect"/>
+    </Target>
+  </ECRelationshipClass>
+
 	<ECEntityClass typeName="InletCaptureMethodAspect" modifier="Abstract" displayLabel="InletCaptureMethodAspect">
     <BaseClass>bis:ElementUniqueAspect</BaseClass>
   </ECEntityClass>
@@ -540,12 +611,51 @@
 
   <ECEntityClass typeName="PercentCaptureAspect" modifier="Sealed" displayLabel="Percent Capture">
     <BaseClass>InletCaptureMethodAspect</BaseClass>
-    <ECProperty propertyName="CapturePercent" typeName="double" displayLabel="Capture Percent" description="Set the percent of incoming inflow to be captured by the inlet." category="HydraulicData" kindOfQuantity="rru:PERCENTAGE"/>
+    <ECProperty propertyName="CapturePercent" typeName="double" displayLabel="Capture Percent" description="Set the percent of incoming inflow to be captured by the inlet." category="InletData" kindOfQuantity="rru:PERCENTAGE"/>
   </ECEntityClass>
 
   <ECEntityClass typeName="MaximumCapacityAspect" modifier="Sealed" displayLabel="Maximum Capacity">
     <BaseClass>InletCaptureMethodAspect</BaseClass>
-    <ECProperty propertyName="InletFlowThreshold" typeName="double" displayLabel="Inlet Flow Threshold" description="The inlet will capture all incoming flow up the specified threshold, all excess flow will be bypassed." category="HydraulicData" kindOfQuantity="rru:FLOW"/>
+    <ECProperty propertyName="InletFlowThreshold" typeName="double" displayLabel="Inlet Flow Threshold" description="The inlet will capture all incoming flow up the specified threshold, all excess flow will be bypassed." category="InletData" kindOfQuantity="rru:FLOW"/>
+  </ECEntityClass>
+
+  <ECEntityClass typeName="HEC22InletAspect" modifier="Sealed" displayLabel="HEC-22 Inlet">
+    <BaseClass>InletCaptureMethodAspect</BaseClass>
+    <ECProperty propertyName="InletLocation" typeName="InletLocation" displayLabel="Inlet Location" category="InletData" description="Choose if the inlet is on grade or in sag."/>
+    <ECProperty propertyName="HEC22InletStructure" typeName="HEC22InletStructure" displayLabel="Inlet Structure" category="InletData" description="Choose the type of inlet structure."/>
+  </ECEntityClass>
+
+  <ECEntityClass typeName="CatchBasinTypeHydraulicAspect" displayLabel="CatchBasinTypeHydraulicAspect">
+  	  <BaseClass>bis:ElementMultiAspect</BaseClass>
+  </ECEntityClass>
+
+  <ECRelationshipClass typeName="CatchBasinTypeOwnsHydraulicAspect" strength="embedding" modifier="Sealed">
+    <BaseClass>bis:ElementOwnsMultiAspects</BaseClass>
+    <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+      <Class class="stmswrphys:CatchbasinType"/>
+    </Source>
+    <Target multiplicity="(1..2)" roleLabel="owned by" polymorphic="true">
+      <Class class="CatchBasinTypeHydraulicAspect"/>
+    </Target>
+  </ECRelationshipClass>
+
+  <ECEntityClass typeName="CatchBasinTypeGrateInletHydraulicAspect" displayLabel="CatchBasinTypeGrateInletHydraulicAspect">
+  	<BaseClass>CatchBasinTypeHydraulicAspect</BaseClass>
+      <ECProperty propertyName="GrateLength" typeName="double" displayLabel="Grate Length" category="InletData" kindOfQuantity="rru:LENGTH" description="Length of grate parallel to the gutter."/>
+      <ECProperty propertyName="GrateWidth" typeName="double" displayLabel="Grate Width" category="InletData" kindOfQuantity="rru:LENGTH" description="Length of grate perpendicular to the gutter."/>
+      <ECProperty propertyName="GrateType" typeName="HEC22GrateType" displayLabel="Grate Type" category="InletData" description="Specify the type of grate to be used during the calculation."/>
+  </ECEntityClass>
+
+  <ECEntityClass typeName="CatchBasinTypeCurbInletHydraulicAspect" displayLabel="CatchBasinTypeCurbInletHydraulicAspect">
+  	  <BaseClass>CatchBasinTypeHydraulicAspect</BaseClass>
+          <ECProperty propertyName="SlotWidth" typeName="double" displayLabel="Slot Width" category="HydraulicData" kindOfQuantity="rru:LENGTH" />
+    <ECProperty propertyName="SlotLength" typeName="double" displayLabel="Slot Length" category="HydraulicData" kindOfQuantity="rru:LENGTH" />
+  </ECEntityClass>
+  
+  <ECEntityClass typeName="CatchBasinTypeSlotInletHydraulicAspect" displayLabel="CatchBasinTypeSlotInletHydraulicAspect">
+  	  <BaseClass>CatchBasinTypeHydraulicAspect</BaseClass>
+      <ECProperty propertyName="SlotWidth" typeName="double" displayLabel="Slot Width" category="HydraulicData" kindOfQuantity="rru:LENGTH" />
+      <ECProperty propertyName="SlotLength" typeName="double" displayLabel="Slot Length" category="HydraulicData" kindOfQuantity="rru:LENGTH" />
   </ECEntityClass>
 
 	<ECRelationshipClass typeName="CatchBasinOwnsInletDesignConstraintsAspect" strength="embedding" modifier="Sealed">
@@ -607,19 +717,20 @@
 	<ECEntityClass typeName="Conduit" modifier="Abstract" displayLabel="Conduit">
 		<BaseClass>anlyt:AnalyticalElement</BaseClass>
 		<BaseClass>net:IEdge</BaseClass>
+   	<ECProperty propertyName="StartInvert" typeName="double" displayLabel="Invert (Start)" category="HydraulicData" kindOfQuantity="rru:ELEVATION" description="Set the invert of pipe adjacent to the start node."/>
+		<ECProperty propertyName="StopInvert" typeName="double" displayLabel="Invert (Stop)" category="HydraulicData" kindOfQuantity="rru:ELEVATION" description="Set the invert of the pipe adjacent to the stop node."/>
+		<ECProperty propertyName="ManningsN" typeName="double" displayLabel="Manning's n" category="HydraulicData" description="The roughness value for the pipe."/>
+		<ECProperty propertyName="PlanLength" typeName="double" displayLabel="Length" category="HydraulicData" kindOfQuantity="rru:LENGTH" description="The horizontal length of the pipe."/> 
 	</ECEntityClass>
 
 	<ECEntityClass typeName="Pipe" modifier="Sealed" displayLabel="Pipe">
 		<BaseClass>Conduit</BaseClass>
-		<ECProperty propertyName="Shape" typeName="PipeShape" displayLabel="Shape" category="HydraulicData"/>
-		<ECProperty propertyName="StartInvert" typeName="double" displayLabel="Invert (Start)" category="HydraulicData" kindOfQuantity="rru:ELEVATION"/>
-		<ECProperty propertyName="StopInvert" typeName="double" displayLabel="Invert (Stop)" category="HydraulicData" kindOfQuantity="rru:ELEVATION"/>
-		<ECProperty propertyName="ManningsN" typeName="double" displayLabel="Manning's n" category="HydraulicData"/>
-		<ECProperty propertyName="PlanLength" typeName="double" displayLabel="Length" category="HydraulicData" kindOfQuantity="rru:LENGTH"/>
-	  <ECProperty propertyName="DesignPipe" typeName="boolean" displayLabel="Design Pipe" category="DesignData" />
+		<ECProperty propertyName="Shape" typeName="PipeShape" displayLabel="Shape" category="HydraulicData" description="Select the shape of the pipe."/>
+	  <ECProperty propertyName="NumberOfBarrels" typeName="int" display="Number of Barrels" category="HydraulicData" description="Select the number of equal sized barrels of the pipe."/>
+	  <ECProperty propertyName="DesignPipe" typeName="boolean" displayLabel="Design Pipe" category="DesignData" description="If true then the pipe will be designed during a design run."/>
     <ECProperty propertyName="DesignStartInvert" typeName="boolean" displayLabel="Design Start Invert" category="DesignData" description="If true then the start invert will be adjusted during the design."/>
-    <ECProperty propertyName="DesignStopInvert" typeName="boolean" displayLabel="Design Stop Invert" category="DesignData" description="If true then the atop invert will be adjusted during the design."/>
-    <ECProperty propertyName="OverrideGlobalPipeConstraints" typeName="boolean" displayLabel="Override Global Pipe Constraints" category="DesignData" />
+    <ECProperty propertyName="DesignStopInvert" typeName="boolean" displayLabel="Design Stop Invert" category="DesignData" description="If true then the stop invert will be adjusted during the design."/>
+    <ECProperty propertyName="OverrideGlobalPipeConstraints" typeName="boolean" displayLabel="Override Global Pipe Constraints" category="DesignData" description="If true then you can override the design constraints for the current pipe." />
 	</ECEntityClass>
 
 	<ECEntityClass typeName="PipeShapeAspect" modifier="Abstract" displayLabel="Pipe Shape">
@@ -679,7 +790,7 @@
 
 	<ECEntityClass typeName="Catchment" modifier="Sealed" displayLabel="Catchment">
 		<BaseClass>anlyt:AnalyticalElement</BaseClass>
-  <ECNavigationProperty propertyName="OutflowNode" relationshipName="CatchmentDischargesToOutflowNode" direction="Forward" />
+  <ECNavigationProperty propertyName="OutflowNode" displayLabel="Outflow Element" relationshipName="CatchmentDischargesToOutflowNode" direction="Forward" description="Specify the element which the catchment outflows." />
 	</ECEntityClass>
 
 	<ECRelationshipClass typeName="CatchmentDischargesToOutflowNode" strength="referencing" modifier="Sealed">
@@ -742,7 +853,7 @@
 
   <ECEntityClass typeName="CatchmentRationalSimpleAreaAspect" modifier="Sealed" displayLabel="CatchmentRationalSimpleAreaAspect">
     <BaseClass >CatchmentSimpleAreaDefinitionAspect</BaseClass>
-    <ECProperty propertyName="RationalC" typeName="double" displayLabel="Rational C" category="HydraulicData" />
+    <ECProperty propertyName="RationalC" typeName="double" displayLabel="Rational C" category="HydraulicData" kindOfQuantity="rru:PERCENTAGE" description="The runoff coefficient used with the Rational Method. C in Q=CiA."/>
   </ECEntityClass>
 
    <ECEntityClass typeName="CatchmentRationalComplexAreaDefinitionAspect" modifier="Sealed" displayLabel="CatchmentRationalComplexAreaAspect">
@@ -751,8 +862,8 @@
   </ECEntityClass>
 
   <ECStructClass typeName="RationalSubarea" modifier="Sealed" description="The list of subareas that comprise the total area of the catchment. The weighted average of the rational c value will be used to compute the runoff.">
-    <ECProperty propertyName="RationalSubareaArea" typeName="double" displayLabel="Area" category="HydraulicData" kindOfQuantity="rru:AREA" />
-    <ECProperty propertyName="RationalSubareaC" typeName="double" displayLabel="Rational C" category="HydraulicData" />
+    <ECProperty propertyName="RationalSubareaArea" typeName="double" displayLabel="Area" category="HydraulicData" kindOfQuantity="rru:AREA" description="The size of the subarea."/>
+    <ECProperty propertyName="RationalSubareaC" typeName="double" displayLabel="Rational C" category="HydraulicData" description="The Rational C coefficient to be applied to the current subarea."/>
   </ECStructClass>
 
   <ECEntityClass typeName="EpaSWMMRunoffMethodAreaAspect" modifier="Sealed" displayLabel="EPA SWMM Runoff Method">
@@ -821,8 +932,8 @@
 
 	<ECEntityClass typeName="Pond" modifier="Sealed" displayLabel="Pond">
 		<BaseClass>DrainageNode</BaseClass>
-    <ECProperty propertyName="StartingWaterSurfaceElevation" typeName="double" displayLabel="Starting Water Surface Elevation" category="HydraulicData" kindOfQuantity="rru:LENGTH"/>
-    <ECStructArrayProperty propertyName="StorageElevationAreaCurve" typeName="ElevationAreaPoint" displayLabel="Elevation-Area Curve" category="HydraulicData"  minOccurs="0" maxOccurs="unbounded"/>
+    <ECProperty propertyName="StartingWaterSurfaceElevation" typeName="double" displayLabel="Starting Water Surface Elevation" category="HydraulicData" kindOfQuantity="rru:ELEVATION" description="Set water surface elevation in the pond at the beginning of the simulation."/>
+    <ECStructArrayProperty propertyName="StorageElevationAreaCurve" typeName="ElevationAreaPoint" displayLabel="Elevation-Area Curve" category="HydraulicData"  minOccurs="0" maxOccurs="unbounded" description="Define the volume of the pond using a stage-area curve."/>
   </ECEntityClass>
   
 	<ECStructClass typeName="ElevationAreaPoint" modifier="Sealed">
@@ -838,7 +949,6 @@
 	<ECEntityClass typeName="RainfallEvent" modifier="Sealed" displayLabel="Rainfall Event">
 		<BaseClass>bis:DefinitionElement</BaseClass>
 		<ECProperty propertyName="ReturnEvent" typeName="double" displayLabel="Return Event" category="HydraulicData" kindOfQuantity="AECU:TIME"/>
-		<ECProperty propertyName="IncludeInAnalysis" typeName="boolean" displayLabel="Include In Analysis" category="HydraulicData"/>
 	</ECEntityClass>
 
 	<ECRelationshipClass typeName="RainfallSetOwnsRainfallEvents" strength="embedding" strengthDirection="Forward" modifier="Sealed">
