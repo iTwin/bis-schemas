@@ -673,6 +673,17 @@
     <ECProperty propertyName="BoundaryConditionType" typeName="BoundaryConditionType" displayLabel="Boundary Condition Type" category="HydraulicData" description="Select method to establish bounding tailwater for the network."/>
 	</ECEntityClass>
 	
+
+	<ECRelationshipClass typeName="OutfallOwnsNodeDesignConstraintsAspect" strength="embedding" modifier="Sealed">
+    <BaseClass >bis:ElementOwnsUniqueAspect</BaseClass>
+    <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+      <Class class="Outfall"/>
+    </Source>
+    <Target multiplicity="(1..1)" roleLabel="owned by" polymorphic="false">
+      <Class class="NodeDesignConstraintsAspect"/>
+    </Target>
+	</ECRelationshipClass>
+
 	<ECEntityClass typeName="BoundaryConditionTypeAspect" modifier="Abstract" displayLabel="BoundaryConditionTypeAspect">
     <BaseClass >bis:ElementUniqueAspect</BaseClass>
   </ECEntityClass>
@@ -1068,35 +1079,4 @@
     <ECProperty propertyName="DefineSuperCriticalFlow" typeName="DefineSuperCriticalFlow" displayLabel="Define Super Critical Flow" category="HydraulicData" description="Selects the basis used to determine when supercritical flow occurs in a conduit."/>
     <ECProperty propertyName="SurchargeMethod" typeName="SurchargeMethod" displayLabel="Surcharge Method" category="HydraulicData" description="Select which method to be used to handle surcharge conditions. Extran is based on the original SWMM methods, whereas Slot uses a Preissmann slot methodology."/>
   </ECEntityClass>
-
-	<ECEntityClass typeName="PipeSizeSet" modifier="Sealed" displayLabel="Pipe Sizes">
-    <BaseClass>bis:DefinitionElement</BaseClass>
-    <ECProperty propertyName="Shape" typeName="PipeShape" displayLabel="Shape"  category="HydraulicData"/>
-    <ECProperty propertyName="Material" typeName="string" displayLabel="Material"  category="HydraulicData"/>
-  </ECEntityClass>
-  
-  <ECRelationshipClass typeName="PipeSetOwnsPipeSetItem" strength="embedding" modifier="Sealed">
-    <BaseClass>bis:ElementOwnsChildElements</BaseClass>
-    <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
-      <Class class="PipeSizeSet"/>
-    </Source>
-    <Target multiplicity="(0..*)" roleLabel="owned by" polymorphic="false">
-      <Class class="PipeSize"/>
-    </Target>
-  </ECRelationshipClass>
-  
-  <ECEntityClass typeName="PipeSize" modifier="Sealed" displayLabel="Pipe Item">
-    <BaseClass>bis:DefinitionElement</BaseClass>
-    <ECProperty propertyName="Manningsn" typeName="double" displayLabel="Manning's n" category="HydraulicData"/>
-  </ECEntityClass>
-  
-  <ECRelationshipClass typeName="PipeSetItemOwnsPipeShapeAspect" strength="embedding" modifier="Sealed">
-    <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
-    <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
-      <Class class="PipeSize"/>
-    </Source>
-    <Target multiplicity="(1..1)" roleLabel="owned by" polymorphic="true">
-      <Class class="PipeShapeAspect"/>
-    </Target>
-  </ECRelationshipClass>
 </ECSchema>
