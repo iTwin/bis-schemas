@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ==================================================================================
+|  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
+|  * See LICENSE.md in the project root for license terms and full copyright notice.
+======================================================================================= -->
+<ECSchema schemaName="CivilSpatial" alias="cvsp" version="01.00.00" description="Schema modeling the spatial breakdown of concepts common across Civil domains such as Road, Rail or Site." xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
+    <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
+    <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
+    <ECSchemaReference name="BisCore" version="01.00.13" alias="bis"/>
+    <ECSchemaReference name="SpatialComposition" version="01.00.01" alias="spcomp"/>
+    <ECSchemaReference name="RoadRailUnits" version="01.00.02" alias="rru"/>
+
+    <ECCustomAttributes>
+        <ProductionStatus xmlns="CoreCustomAttributes.01.00.00">
+            <SupportedUse>NotForProduction</SupportedUse>
+        </ProductionStatus>
+        <SchemaLayerInfo xmlns="BisCustomAttributes.01.00.00">
+            <Value>DisciplinePhysical</Value>
+        </SchemaLayerInfo>
+    </ECCustomAttributes>
+
+    <ECEntityClass typeName="Space" displayLabel="Space" modifier="Abstract" description="A spcomp:Space modeling an Area bounded either physically or virtually that provides for some function within a Site, Road or Rail.">
+        <BaseClass>spcomp:Space</BaseClass>
+        <ECProperty propertyName="FootprintArea" displayLabel="Footprint Area" typeName="double" readOnly="true" kindOfQuantity="rru:AREA" />
+        <ECProperty propertyName="SlopedTopArea" displayLabel="Sloped Top Area" typeName="double" readOnly="true" kindOfQuantity="rru:AREA" />
+    </ECEntityClass>
+    <ECEntityClass typeName="ParkingArea" modifier="None" description="A cvsp:Space whose are is dedicated for use as a parking spot for vehicles, including access, such as a parking aisle.">
+        <BaseClass>Space</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="ParkingAreaType" displayLabel="Parking Area Type" description="Defines a shared set of properties whose values vary per-type of cvsp:ParkingArea rather than per-instance.">
+        <BaseClass>spcomp:SpaceType</BaseClass>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ParkingAreaIsOfType" strength="referencing" modifier="None" description="A type-instance relation; one that indicates that the specific cvsp:ParkingArea is an instance of the defined cvsp:ParkingAreaType.">
+        <BaseClass>spcomp:SpaceIsOfType</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="is of" polymorphic="true">
+            <Class class="ParkingArea" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is type of" polymorphic="true">
+            <Class class="ParkingAreaType"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="ParkingIsland" modifier="None" displayLabel="Parking Island" description="A cvsp:Space modeling a subsidiary area raised or marked on a cvsp:ParkingArea, shaped and placed so as to direct traffic movement and/or provide refuge for pedestrians.">
+        <BaseClass>Space</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="ParkingIslandType" displayLabel="Parking Island Type" description="Defines a shared set of properties whose values vary per-type of cvsp:ParkingIsland rather than per-instance.">
+        <BaseClass>spcomp:SpaceType</BaseClass>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="IslandAreaIsOfType" strength="referencing" modifier="None" description="A type-instance relation; one that indicates that the specific cvsp:ParkingIsland is an instance of the defined cvsp:ParkingIslandType.">
+        <BaseClass>spcomp:SpaceIsOfType</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="is of" polymorphic="true">
+            <Class class="ParkingIsland" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is type of" polymorphic="true">
+            <Class class="ParkingIslandType"/>
+        </Target>
+    </ECRelationshipClass>
+</ECSchema>
