@@ -175,7 +175,7 @@ async function validateWipSchemas(ignoreList, singleSchemaName, output) {
   }
 
   if (results.length > 0)
-    console.log(chalk.default.red("\nWIP Schema validation failed.  Please see logs for more details"));
+    throw new Error("\nWIP Schema validation failed.  Please see logs for more details");
   else
     console.log(chalk.default.green("\nWIP Schema validation Succeeded"));
 }
