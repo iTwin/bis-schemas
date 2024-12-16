@@ -46,6 +46,12 @@
         <ECEnumerator value="1" name="Box" displayLabel="Box" />
     </ECEnumeration>
 
+    <ECEnumeration typeName="ChannelShape" backingTypeName="int" isStrict="true" description="Available shapes for channel elements.">
+        <ECEnumerator value="0" name="Trapezoidal" displayLabel="Trapezoidal" />
+        <ECEnumerator value="1" name="Triangular" displayLabel="Triangular" />
+        <ECEnumerator value="2" name="Rectangular" displayLabel="Rectangular" />
+    </ECEnumeration>
+
     <ECEnumeration typeName="RainfallDepthMethod" backingTypeName="int" isStrict="true">
         <ECEnumerator value="0" name="Cumulative" displayLabel="Cumulative"/>
         <ECEnumerator value="1" name="Incremental" displayLabel="Incremental"/>
@@ -486,7 +492,7 @@
         </Target>
     </ECRelationshipClass>
 
-    <ECEntityClass typeName="RectangularAspect" modifier="Sealed" displayLabel="Rectangular">
+    <ECEntityClass typeName="RectangularWeirAspect" modifier="Sealed" displayLabel="Rectangular">
         <BaseClass >WeirShapeAspect</BaseClass>
         <ECProperty propertyName="WeirLength" typeName="double" displayLabel="Weir Length" category="HydraulicData" kindOfQuantity="rru:LENGTH" />
         <ECProperty propertyName="RectangularWeirCoefficient" typeName="double" displayLabel="Weir Coefficient" category="HydraulicData" description="Coefficient of flow for the rectangular weir."/>
@@ -732,6 +738,40 @@
         <ECProperty propertyName="StopInvert" typeName="double" displayLabel="Invert (Stop)" category="HydraulicData" kindOfQuantity="rru:ELEVATION" description="Set the invert of the pipe adjacent to the stop node."/>
         <ECProperty propertyName="ManningsN" typeName="double" displayLabel="Manning's n" category="HydraulicData" description="The roughness value for the pipe."/>
         <ECProperty propertyName="PlanLength" typeName="double" displayLabel="Length" category="HydraulicData" kindOfQuantity="rru:LENGTH" description="The horizontal length of the pipe."/>
+    </ECEntityClass>  
+    
+    <ECEntityClass typeName="Channel" modifier="Sealed" displayLabel="Channel">
+        <BaseClass>Conduit</BaseClass>
+        <ECProperty propertyName="Shape", typeName="ChannelShape" displayLabel="Shape" category="HydraulicData"/>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="ChannelOwnsShapeAspect" strength="embedding" modifier="Sealed">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <ECProperty propertyName="ChannelHeight" typeName="double" displayLabel="Height" category="HydraulicData" kindOfQuantity="rru:LENGTH"/>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="Channel"/>
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="is owned by" polymorphic="true">
+            <Class class="ChannelShapeAspect" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="StandardChannelShapeAspect" modifier="Abstract" displayLabel="Standard Channel">
+        <BaseClass>ChannelShapeAspect</BaseClass>
+        <ECProperty propertyName="ChannelSpan" typeName="double" displayLabel="Span" category="HydraulicData" kindOfQuantity="rru:LENGTH"/>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="RectangularChannelShapeAspect" modifier="Sealed" displayLabel="Rectangular">
+      <BaseClass>StandardChannelShapeAspect</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="TriangularChannelShapeAspect" modifier="Sealed" displayLabel="Triangular">
+      <BaseClass>StandardChannelShapeAspect</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="TrapezoidalShapeAspect" modifier="Sealed" displayLabel="Trapezoidal">
+        <BaseClass>ChannelShapeAspect</BaseClass>
+        <ECProperty propertyName="BottomWidth" typeName="double" displayLabel="Bottom Width" category="HydraulicData" kindOfQuantity="rru:LENGTH"/>
     </ECEntityClass>
 
     <ECEntityClass typeName="Pipe" modifier="Sealed" displayLabel="Pipe">
