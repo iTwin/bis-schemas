@@ -8,6 +8,7 @@
     <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
     <ECSchemaReference name="BisCore" version="01.00.14" alias="bis"/>
     <ECSchemaReference name="DistributionSystems" version="01.00.02" alias="dsys"/>
+    <ECSchemaReference name="StructuralPhysicalInterop" version="01.00.00" alias="spi"/>
 
     <ECCustomAttributes>
         <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
@@ -33,8 +34,28 @@
 
     <ECEntityClass typeName="CableAssembly" modifier="None" displayLabel="Cable Assembly" description="">
         <BaseClass>bis:PhysicalElement</BaseClass>
+        <BaseClass>dsys:IDistributionFlowElement</BaseClass>
+        <BaseClass>spi:IStructuralAssembly</BaseClass>
         <BaseClass>bis:IParentElement</BaseClass>
     </ECEntityClass>
+    <ECRelationshipClass typeName="CableAssemblyOwnsPorts" strength="embedding" modifier="None" description="">
+        <BaseClass>dsys:DistributionElementOwnsDistributionPorts</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="CableAssembly"/>
+        </Source>
+        <Target multiplicity="(1..*)" roleLabel="is owned by" polymorphic="true">
+            <Class class="ElectricalPort"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="CableAssemblyOwnsConnectors" modifier="None" strength="embedding">
+        <BaseClass>spi:StructuralAssemblyOwnsStructuralComponents</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="owns" polymorphic="true">
+            <Class class="CableAssembly"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="true">
+            <Class class="CableConnector"/>
+        </Target>
+    </ECRelationshipClass>
     <ECEntityClass typeName="CableAssemblyType" modifier="None" displayLabel="Cable Assembly Type" description="">
         <BaseClass>bis:PhysicalType</BaseClass>
     </ECEntityClass>
@@ -50,6 +71,7 @@
 
     <ECEntityClass typeName="CableConnector" modifier="None" displayLabel="Cable Connector" description="">
         <BaseClass>bis:PhysicalElement</BaseClass>
+        <BaseClass>spi:IStructuralComponent</BaseClass>
     </ECEntityClass>
     <ECEntityClass typeName="CableConnectorType" modifier="None" displayLabel="Cable Connector Type" description="">
         <BaseClass>bis:PhysicalType</BaseClass>
@@ -66,8 +88,19 @@
 
     <ECEntityClass typeName="Transformer" modifier="None" displayLabel="Transformer" description="">
         <BaseClass>bis:PhysicalElement</BaseClass>
+        <BaseClass>dsys:IDistributionFlowElement</BaseClass>
+        <BaseClass>spi:IStructuralAssembly</BaseClass>
         <BaseClass>bis:IParentElement</BaseClass>
     </ECEntityClass>
+    <ECRelationshipClass typeName="TransformerOwnsPorts" strength="embedding" modifier="None" description="">
+        <BaseClass>dsys:DistributionElementOwnsDistributionPorts</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="Transformer"/>
+        </Source>
+        <Target multiplicity="(1..*)" roleLabel="is owned by" polymorphic="true">
+            <Class class="ElectricalPort"/>
+        </Target>
+    </ECRelationshipClass>
     <ECEntityClass typeName="TransformerType" modifier="None" displayLabel="Transformer Type" description="">
         <BaseClass>bis:PhysicalType</BaseClass>
     </ECEntityClass>
@@ -80,9 +113,19 @@
             <Class class="TransformerType"/>
         </Target>
     </ECRelationshipClass>
+    <ECRelationshipClass typeName="TransformerOwnsInsulators" modifier="None" strength="embedding">
+        <BaseClass>spi:StructuralAssemblyOwnsStructuralComponents</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="owns" polymorphic="true">
+            <Class class="Transformer"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="true">
+            <Class class="Insulator"/>
+        </Target>
+    </ECRelationshipClass>
 
     <ECEntityClass typeName="Insulator" modifier="None" displayLabel="Insulator" description="">
         <BaseClass>bis:PhysicalElement</BaseClass>
+        <BaseClass>spi:IStructuralComponent</BaseClass>
     </ECEntityClass>
     <ECEntityClass typeName="InsulatorType" modifier="None" displayLabel="Insulator Type" description="">
         <BaseClass>bis:PhysicalType</BaseClass>
@@ -99,6 +142,7 @@
 
     <ECEntityClass typeName="Structure" modifier="None" displayLabel="Structure" description="">
         <BaseClass>bis:PhysicalElement</BaseClass>
+        <BaseClass>spi:IStructuralAssembly</BaseClass>
         <BaseClass>bis:IParentElement</BaseClass>
     </ECEntityClass>
     <ECEntityClass typeName="StructureType" modifier="None" displayLabel="Structure Type" description="">
