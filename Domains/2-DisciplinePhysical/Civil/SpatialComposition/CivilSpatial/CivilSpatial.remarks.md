@@ -5,9 +5,15 @@ remarksTarget: CivilSpatial.ecschema.md
 
 # CivilSpatial
 
+This schema contains the main classes to capture the Spatial Structure of Site projects.
+
 NOTE: Currently under development. This schema should not be used for production workflows. Data created using this schema is not supported and may not be upgradable.
 
 ## Entity Classes
+
+### Site
+
+`Site`s must be contained in `SpatialLocationModel`s or `PhysicalModel`s.
 
 ### ParkingArea
 
@@ -21,6 +27,24 @@ Instances of `ParkingIsland` are typically aggregated by instances of `ParkingAr
 
 `ParkingIsland`s must be contained in `SpatialLocationModel`s or `PhysicalModel`s.
 
+### Sidewalk
+
+A `Sidewalk` instance may be aggregated by a `RoadwayPlateau` when defined as part of a `rdsp:Road`, or may be defined parallel to other `spcomp:Facility` instances.
+
+When defined as part of a `rdsp:Road`, a sidewalk may accommodate moderate changes in grade (elevation) and is normally separated from the vehicular section by a curb. There may be a central reserve between the sidewalk and traffic lanes.
+
+`Sidewalk`s must be contained in `SpatialLocationModel`s or `PhysicalModel`s and can be linearly located, typically along an *Alignment*. An instance of `Sidewalk` typically holds the `bis:PhysicalElement`s (e.g. *Course*s) comprising its *pavement* structure.
+
+Equivalent to [IfcFacilityPart](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcFacilityPart.htm) with its PredefinedType attribute set to [IfcRoadPartTypeEnum.SIDEWALK](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcRoadPartTypeEnum.htm).
+
+### GenericArea
+
+`GenericArea`s must be contained in `SpatialLocationModel`s or `PhysicalModel`s.
+
+### SiteType
+
+Instances of `SiteType` provide an additional classification that can be applied to `Site`s.
+
 ### ParkingAreaType
 
 Instances of `ParkingAreaType` provide an additional classification that can be applied to `ParkingArea`s.
@@ -28,3 +52,11 @@ Instances of `ParkingAreaType` provide an additional classification that can be 
 ### ParkingIslandType
 
 Instances of `ParkingIslandType` provide an additional classification that can be applied to `ParkingIsland`s.
+
+### SidewalkType
+
+Instances of `SidewalkType` provide an additional classification that can be applied to `Sidewalk`s.
+
+### GenericAreaType
+
+Instances of `GenericAreaType` provide an additional classification that can be applied to `GenericArea`s.
