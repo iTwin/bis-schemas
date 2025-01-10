@@ -27,6 +27,20 @@ Instances of `ParkingIsland` are typically aggregated by instances of `ParkingAr
 
 `ParkingIsland`s must be contained in `SpatialLocationModel`s or `PhysicalModel`s.
 
+### ParkingRow
+
+The number of Parking-spaces modeled in a single instance of `ParkingRow` is captured by its `ParkingSpaceCount` property.
+
+`ParkingRow`s must be contained in `SpatialLocationModel`s or `PhysicalModel`s.
+
+### PondArea
+
+Uses of permanent `PondArea`s include: to manage stormwater runoff, for protection against flooding, for erosion control, and to serve as an artificial wetland and improve the water quality in adjacent bodies of water.
+
+When needed, a `PondArea` may aggregate smaller areas within their boundary, modeled as instances of `GenericArea`.
+
+`PondArea`s must be contained in `SpatialLocationModel`s or `PhysicalModel`s.
+
 ### Sidewalk
 
 A `Sidewalk` instance may be aggregated by a `RoadwayPlateau` when defined as part of a `rdsp:Road`, or may be defined parallel to other `spcomp:Facility` instances.
@@ -52,6 +66,14 @@ Instances of `ParkingAreaType` provide an additional classification that can be 
 ### ParkingIslandType
 
 Instances of `ParkingIslandType` provide an additional classification that can be applied to `ParkingIsland`s.
+
+### ParkingRowType
+
+Instances of `ParkingRowType` provide an additional classification that can be applied to `ParkingRow`s.
+
+### PondAreaType
+
+Instances of `PondAreaType` provide an additional classification that can be applied to `PondArea`s.
 
 ### SidewalkType
 
