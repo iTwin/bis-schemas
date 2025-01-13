@@ -5,6 +5,10 @@
     <ECSchemaReference name="BisCore" version="01.00.14" alias="bis" />
     <ECSchemaReference name="Analytical" version="01.00.00" alias="anlyt" />
     <ECSchemaReference name="AecUnits" version="01.00.03" alias="AECU" />
+    <ECSchemaReference name="Units" version="01.00.04" alias="u" />
+    <ECSchemaReference name="Formats" version="01.00.00" alias="f" />
+
+    <PropertyCategory typeName="Calculated_category" displayLabel="Calculated" priority="0" />
 
     <ECEntityClass typeName="IsmPartition" modifier="Sealed" displayLabel="Ism Partition" description="">
         <BaseClass>anlyt:AnalyticalPartition</BaseClass>
@@ -13,6 +17,37 @@
     <ECEntityClass typeName="IsmModel" modifier="Sealed" displayLabel="Ism Model" description="">
         <BaseClass>anlyt:AnalyticalModel</BaseClass>
     </ECEntityClass>
+
+    <ECEnumeration typeName="IsmGeometryType" backingTypeName="string" isStrict="true" description="Geometry Type.">
+        <ECEnumerator value="ismLineSegment2d" name="IsmLineSegment2d" displayLabel="Ism Line Segment 2d" />
+        <ECEnumerator value="ismLineSegment3d" name="IsmLineSegment3d" displayLabel="Ism LineSegment 3d" />
+        <ECEnumerator value="ismCircularArc2d" name="IsmCircularArc2d" displayLabel="Ism Circular Arc 2d" />
+        <ECEnumerator value="ismCircularArc3d" name="IsmCircularArc3d" displayLabel="Ism Circular Arc 3d" />
+        <ECEnumerator value="ismEllipticalArc3d" name="IsmEllipticalArc3d" displayLabel="Ism Elliptical Arc 3d" />
+        <ECEnumerator value="ismCylinder3d" name="IsmCylinder3d" displayLabel="Ism Cylinder 3d" />
+        <ECEnumerator value="ismBsplineCurve3d" name="IsmBsplineCurve3d" displayLabel="Ism Bspline Curve 3d" />
+        <ECEnumerator value="ismVolumeExtrusion3d" name="IsmVolumeExtrusion3d" displayLabel="Ism Volume Extrusion 3d" />
+        <ECEnumerator value="ismEllipticalCylinder3d" name="IsmEllipticalCylinder3d" displayLabel="Ism Elliptical Cylinder 3d" />
+        <ECEnumerator value="ismSolidExtrusion3d" name="IsmSolidExtrusion3d" displayLabel="Ism Solid Extrusion 3d" />
+        <ECEnumerator value="ismPolyline2d" name="IsmPolyline2d" displayLabel="Ism Polyline 2d" />
+        <ECEnumerator value="ismPolyline3d" name="IsmPolyline3d" displayLabel="Ism Polyline 3d" />
+        <ECEnumerator value="ismCurveChain3d" name="IsmCurveChain3d" displayLabel="Ism CurveChain 3d" />
+        <ECEnumerator value="ismCurveChain2d" name="IsmCurveChain2d" displayLabel="Ism CurveChain 2d" />
+        <ECEnumerator value="ismPerimeterSurface2d" name="IsmPerimeterSurface2d" displayLabel="Ism PerimeterSurface 2d" />
+        <ECEnumerator value="ismPoint3dArray" name="IsmPoint3dArray" displayLabel="Ism Point 3d Array" />
+        <ECEnumerator value="ismMultiSurface2d" name="IsmMultiSurface2d" displayLabel="Ism Multi Surface 2d" />
+        <ECEnumerator value="ismTrimmedSurface3d" name="IsmTrimmedSurface3d" displayLabel="Ism Trimmed Surface 3d" />
+    </ECEnumeration>
+
+    <ECStructClass typeName="IsmPrimitiveGeometry" description="Primitive Geometry" modifier="Sealed">
+        <ECProperty propertyName="type" typeName="IsmGeometryType" description="Type of Geoemetry." />
+        <ECProperty propertyName="geometry" typeName="Bentley.Geometry.Common.IGeometry" displayLabel="Geometry" kindOfQuantity="AECU:LENGTH" />
+    </ECStructClass>
+
+    <ECStructClass typeName="IsmArrayGeometry" description="Array Geometry" modifier="Sealed">
+        <ECProperty propertyName="type" typeName="IsmGeometryType" description="Type of Geoemetry." />
+        <ECArrayProperty propertyName="geometry" typeName="Bentley.Geometry.Common.IGeometry" displayLabel="Geometry" kindOfQuantity="AECU:LENGTH" />
+    </ECStructClass>
 
     <ECCustomAttributes>
         <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
@@ -41,6 +76,7 @@
         </ECCustomAttributes>
     </ECEntityClass>
 
+    <PropertyCategory typeName="IIsmObject_category" displayLabel="Object" priority="200" />
     <ECEntityClass typeName="IIsmObject" displayLabel="IIsm Object" modifier="Abstract">
         <BaseClass>IIsmPropertyHolder</BaseClass>
         <ECCustomAttributes>
@@ -48,11 +84,11 @@
                 <AppliesToEntityClass>bis:Element</AppliesToEntityClass>
             </IsMixin>
         </ECCustomAttributes>
-        <ECProperty propertyName="CustomProperties" typeName="string" displayLabel="Custom Property Values" />
-        <ECProperty propertyName="AutoNavigatorTransparency" typeName="double" />
-        <ECProperty propertyName="ShortId" typeName="string" displayLabel="Short ID" />
-        <ECProperty propertyName="Name" typeName="string"/>
-        <ECProperty propertyName="IsmId" typeName="string"/>
+        <ECProperty propertyName="CustomProperties" typeName="string" displayLabel="Custom Property Values" category="IIsmObject_category" />
+        <ECProperty propertyName="AutoNavigatorTransparency" typeName="double" category="IIsmObject_category" />
+        <ECProperty propertyName="ShortId" typeName="string" displayLabel="Short Id" category="IIsmObject_category" />
+        <ECProperty propertyName="Name" typeName="string" category="IIsmObject_category" />
+        <ECProperty propertyName="IsmId" typeName="string" category="IIsmObject_category" />
     </ECEntityClass>
 
     <ECEntityClass typeName="IsmAnalysisDesign" displayLabel="Analysis Design" modifier="None">
@@ -101,8 +137,8 @@
 
     <ECEntityClass typeName="IsmAnalysisResults" modifier="None" displayLabel="Analysis Results">
         <BaseClass>IsmResults</BaseClass>
-        <ECProperty propertyName="MaxDisplacedLocation" typeName="point3d" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="MaxDisplacement" typeName="point3d" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="MaxDisplacedLocation" typeName="Point3d" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="MaxDisplacement" typeName="Point3d" kindOfQuantity="AECU:LENGTH" />
     </ECEntityClass>
 
     <ECRelationshipClass typeName="IsmAnalysisResults_MaxDisplacementLoadContainer" modifier="None" strength="referencing" strengthDirection="forward">
@@ -142,7 +178,7 @@
 
     <ECEntityClass typeName="IsmCurveMemberAnalysisResults" modifier="None" displayLabel="Curve Member Analysis Results">
         <BaseClass>IsmMemberAnalysisResults</BaseClass>
-        <ECProperty propertyName="MaxDisplacement" typeName="point3d" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="MaxDisplacement" typeName="Point3d" kindOfQuantity="AECU:LENGTH" />
         <ECProperty propertyName="MaxDisplacedLinearDistance" typeName="double" displayLabel="Max Displacement Location Ratio" kindOfQuantity="AECU:LENGTH" />
     </ECEntityClass>
 
@@ -333,7 +369,7 @@
 
     <ECEntityClass typeName="IsmConstantSection" displayLabel="Ism Constant Section" modifier="Abstract">
         <BaseClass>IsmSection</BaseClass>
-        <ECProperty propertyName="Shape" typeName="Bentley.Geometry.Common.IGeometry" />
+        <ECStructProperty propertyName="Shape" typeName="IsmPrimitiveGeometry" />
     </ECEntityClass>
 
     <ECEntityClass typeName="IsmVaryingSection" displayLabel="Varying Section" modifier="Sealed">
@@ -404,7 +440,7 @@
     <ECEntityClass typeName="IsmBuiltUpSectionComponent" displayLabel="Built-Up Section Component" modifier="Sealed">
         <BaseClass>bis:DefinitionElement</BaseClass>
         <BaseClass>IIsmSubObject</BaseClass>
-        <ECProperty propertyName="Offset" typeName="Bentley.Geometry.Common.IGeometry" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="Offset" typeName="Point2d" kindOfQuantity="AECU:LENGTH_SHORT" />
         <ECProperty propertyName="Index" typeName="int" />
         <ECProperty propertyName="MirrorShapeAboutYAxis" typeName="boolean" displayLabel="Mirror Shape About Y-Axis" />
         <ECProperty propertyName="PlacementPoint" typeName="int" displayLabel="Placement Point" />
@@ -539,17 +575,18 @@
         <ECEnumerator value="30" name="Tie" displayLabel="Tie" description="This is a stirrup, tie, link, ligature or fitment bar." />
     </ECEnumeration>
 
+    <PropertyCategory typeName="IsmRebar_category" displayLabel="Rebar" priority="190" />
     <ECEntityClass typeName="IsmRebar" modifier="None" displayLabel="Rebar">
         <BaseClass>anlyt:AnalyticalElement</BaseClass>
         <BaseClass>IIsmSubObject</BaseClass>
-        <ECArrayProperty propertyName="CustomBendRadii" typeName="double" displayLabel="Custom Bend Radii" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="CustomEndHookExtension" typeName="double" displayLabel="Custom End Hook Extension" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="CustomEndHookRadius" typeName="double" displayLabel="Custom End Hook Radius" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="CustomStartHookExtension" typeName="double" displayLabel="Custom Start Hook Extension" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="CustomStartHookRadius" typeName="double" displayLabel="Custom Start Hook Radius" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="EndHook" typeName="HookType" displayLabel="End Hook" />
-        <ECProperty propertyName="StartHook" typeName="HookType" displayLabel="Start Hook" />
-        <ECProperty propertyName="Use" typeName="RebarUseType" />
+        <ECArrayProperty propertyName="CustomBendRadii" typeName="double" displayLabel="Custom Bend Radii" category="IsmRebar_Category" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="CustomEndHookExtension" typeName="double" displayLabel="Custom End Hook Extension" category="IsmRebar_Category" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="CustomEndHookRadius" typeName="double" displayLabel="Custom End Hook Radius" category="IsmRebar_Category" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="CustomStartHookExtension" typeName="double" displayLabel="Custom Start Hook Extension" category="IsmRebar_Category" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="CustomStartHookRadius" typeName="double" displayLabel="Custom Start Hook Radius" category="IsmRebar_Category" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="EndHook" typeName="HookType" displayLabel="End Hook" category="IsmRebar_Category" />
+        <ECProperty propertyName="StartHook" typeName="HookType" displayLabel="Start Hook" category="IsmRebar_Category" />
+        <ECProperty propertyName="Use" typeName="RebarUseType" category="IsmRebar_Category" />
     </ECEntityClass>
 
     <ECEnumeration typeName="LayoutPlacementType" backingTypeName="int" isStrict="true" description="Defines placement surface on the host.">
@@ -567,13 +604,14 @@
         <ECEnumerator value="120" name="WallFace2MinorDirection" displayLabel="Wall Face2 Minor Direction" description="Rebar is placed at the Face2 of a wall along Minor direction." />
     </ECEnumeration>
 
+    <PropertyCategory typeName="IsmSurfaceRebar_category" displayLabel="Surface Rebar" priority="180" />
     <ECEntityClass typeName="IsmSurfaceRebar" modifier="None" displayLabel="Surface Rebar">
         <BaseClass>IsmRebar</BaseClass>
-        <ECProperty propertyName="LayoutPlacement" typeName="LayoutPlacementType" displayLabel="Layout Placement" />
-        <ECProperty propertyName="BarDirection" typeName="point3d" displayLabel="Bar Direction" />
-        <ECProperty propertyName="BarSpacing" typeName="double" displayLabel="Bar Spacing" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="EndHookDirection" typeName="double" displayLabel="End Hook Direction" kindOfQuantity="AECU:ANGLE" />
-        <ECProperty propertyName="StartHookDirection" typeName="double" displayLabel="Start Hook Direction" kindOfQuantity="AECU:ANGLE" />
+        <ECProperty propertyName="LayoutPlacement" typeName="LayoutPlacementType" displayLabel="Layout Placement" category="IsmSurfaceRebar_category" />
+        <ECProperty propertyName="BarDirection" typeName="Point3d" displayLabel="Bar Direction" category="IsmSurfaceRebar_category" />
+        <ECProperty propertyName="BarSpacing" typeName="double" displayLabel="Bar Spacing" category="IsmSurfaceRebar_category" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="EndHookDirection" typeName="double" displayLabel="End Hook Direction" category="IsmSurfaceRebar_category" kindOfQuantity="AECU:ANGLE" />
+        <ECProperty propertyName="StartHookDirection" typeName="double" displayLabel="Start Hook Direction" category="IsmSurfaceRebar_category" kindOfQuantity="AECU:ANGLE" />
     </ECEntityClass>
 
     <ECEnumeration typeName="ConstrainedDimensionType" backingTypeName="int" isStrict="true" description="This enumeration defines which property is auto-calculated.">
@@ -582,101 +620,113 @@
         <ECEnumerator value="30" name="LayoutWidth" displayLabel="Layout width" description="LayoutWidth is auto-calculated." />
     </ECEnumeration>
 
+    <PropertyCategory typeName="IsmConcentratedSurfaceRebar_category" displayLabel="Concentrated Surface Rebar" priority="170" />
     <ECEntityClass typeName="IsmConcentratedSurfaceRebar" modifier="Sealed" displayLabel="Concentrated Surface Rebar">
         <BaseClass>IsmSurfaceRebar</BaseClass>
-        <ECProperty propertyName="LayoutPoint" typeName="point3d" displayLabel="Layout Point" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="LayoutDirection" typeName="point3d" displayLabel="Layout Direction" />
-        <ECProperty propertyName="BarLength" typeName="double" displayLabel="Bar Length" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="AutoDetailedLength" typeName="double" displayLabel="Detailed Length" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="AutoGroupBarWeight" typeName="double" displayLabel="Group Bar Weight" kindOfQuantity="AECU:WEIGHT" />
-        <ECProperty propertyName="BarCount" typeName="int" displayLabel="Bar Count" />
-        <ECProperty propertyName="LayoutWidth" typeName="double" displayLabel="Layout Width" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="ConstrainedDimension" typeName="ConstrainedDimensionType" displayLabel="Constrained Dimension" />
-        <ECProperty propertyName="StaggerLength" typeName="double" displayLabel="Stagger Length" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="LayoutPoint" typeName="Point3d" displayLabel="Layout Point" category="IsmConcentratedSurfaceRebar_category" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="LayoutDirection" typeName="Point3d" displayLabel="Layout Direction" category="IsmConcentratedSurfaceRebar_category" />
+        <ECProperty propertyName="BarLength" typeName="double" displayLabel="Bar Length" category="IsmConcentratedSurfaceRebar_category" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="AutoDetailedLength" typeName="double" displayLabel="Detailed Length" category="Calculated_category" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="AutoGroupBarWeight" typeName="double" displayLabel="Group Bar Weight" category="Calculated_category" kindOfQuantity="AECU:WEIGHT" />
+        <ECProperty propertyName="BarCount" typeName="int" displayLabel="Bar Count" category="IsmConcentratedSurfaceRebar_category" />
+        <ECProperty propertyName="LayoutWidth" typeName="double" displayLabel="Layout Width" category="IsmConcentratedSurfaceRebar_category" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="ConstrainedDimension" typeName="ConstrainedDimensionType" category="IsmConcentratedSurfaceRebar_category" displayLabel="Constrained Dimension" />
+        <ECProperty propertyName="StaggerLength" typeName="double" displayLabel="Stagger Length" category="IsmConcentratedSurfaceRebar_category" kindOfQuantity="AECU:LENGTH" />
     </ECEntityClass>
 
+    <PropertyCategory typeName="IsmAreaSurfaceRebar_category" displayLabel="Area Surface Rebar" priority="170" />
     <ECEntityClass typeName="IsmAreaSurfaceRebar" modifier="Sealed" displayLabel="Area Surface Rebar">
         <BaseClass>IsmSurfaceRebar</BaseClass>
-        <ECProperty propertyName="LayoutBoundary" typeName="Bentley.Geometry.Common.IGeometry" displayLabel="Layout Boundary" />
-        <ECProperty propertyName="ConsiderMemberOpenings" typeName="boolean" displayLabel="Consider Member Openings" />
-        <ECProperty propertyName="EndAndSideCover" typeName="double" displayLabel="End and Side Cover" />
+        <ECStructProperty propertyName="LayoutBoundary" typeName="IsmPrimitiveGeometry" displayLabel="Layout Boundary" category="IsmAreaSurfaceRebar_category" />
+        <ECProperty propertyName="ConsiderMemberOpenings" typeName="boolean" displayLabel="Consider Member Openings" category="IsmAreaSurfaceRebar_category" />
+        <ECProperty propertyName="EndAndSideCover" typeName="double" displayLabel="End and Side Cover" category="IsmAreaSurfaceRebar_category" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="AutoBarCount" typeName="int" displayLabel="Bar Count" category="Calculated_category" />
+        <ECProperty propertyName="AutoGroupBarWeight" typeName="double" displayLabel="Group Bar Weight" category="Calculated_category" kindOfQuantity="AECU:WEIGHT" />
     </ECEntityClass>
 
+    <PropertyCategory typeName="IsmGrid_category" displayLabel="Grid" priority="190" />
     <ECEntityClass typeName="IsmGrid" modifier="Abstract" displayLabel="Grid" >
         <BaseClass>anlyt:AnalyticalElement</BaseClass>
         <BaseClass>IIsmObject</BaseClass>
-        <ECProperty propertyName="RAxis" typeName="point3d" displayLabel="R Axis" />
-        <ECProperty propertyName="SAxis" typeName="point3d" displayLabel="S Axis" />
-        <ECProperty propertyName="Location" typeName="point3d" displayLabel="Origin" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="RAxis" typeName="Point3d" displayLabel="R Axis" category="IsmGrid_category" />
+        <ECProperty propertyName="SAxis" typeName="Point3d" displayLabel="S Axis" category="IsmGrid_category" />
+        <ECProperty propertyName="Location" typeName="Point3d" displayLabel="Origin" category="IsmGrid_category" kindOfQuantity="AECU:LENGTH" />
     </ECEntityClass>
 
     <ECEntityClass typeName="IsmCartesianGrid" modifier="Sealed" displayLabel="Cartesian Grid">
         <BaseClass>IsmGrid</BaseClass>
     </ECEntityClass>
 
+    <PropertyCategory typeName="IsmGridLine_category" displayLabel="Grid Line" priority="190" />
     <ECEntityClass typeName="IsmGridLine" modifier="Abstract" displayLabel="Grid Line" >
         <BaseClass>anlyt:AnalyticalElement</BaseClass>
         <BaseClass>IIsmSubObject</BaseClass>
-        <ECProperty propertyName="IsMajor" typeName="boolean" displayLabel="Is Major" />
-        <ECProperty propertyName="StartBubble" typeName="boolean" displayLabel="Start Bubble" />
-        <ECProperty propertyName="StartBubbleOffset" typeName="double" displayLabel="Start Bubble Offset" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="EndBubble" typeName="boolean" displayLabel="End Bubble" />
-        <ECProperty propertyName="EndBubbleOffset" typeName="double" displayLabel="End Bubble Offset" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="IsMajor" typeName="boolean" displayLabel="Is Major" category="IsmGridLine_category" />
+        <ECProperty propertyName="StartBubble" typeName="boolean" displayLabel="Start Bubble" category="IsmGridLine_category" />
+        <ECProperty propertyName="StartBubbleOffset" typeName="double" displayLabel="Start Bubble Offset" category="IsmGridLine_category" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="EndBubble" typeName="boolean" displayLabel="End Bubble" category="IsmGridLine_category" />
+        <ECProperty propertyName="EndBubbleOffset" typeName="double" displayLabel="End Bubble Offset" category="IsmGridLine_category" kindOfQuantity="AECU:LENGTH" />
     </ECEntityClass>
 
+    <PropertyCategory typeName="IsmCartesianGridLine_category" displayLabel="Cartesian Grid Line" priority="180" />
     <ECEntityClass typeName="IsmCartesianGridLine" modifier="Sealed" displayLabel="Cartesian Grid Line">
         <BaseClass>IsmGridLine</BaseClass>
-        <ECProperty propertyName="Coordinate" typeName="double" displayLabel="Coordinate" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="GridLineKind" typeName="IsmCartesianGridLineKind" displayLabel="Grid Line Kind" />
-        <ECProperty propertyName="MaximumExtent" typeName="double" displayLabel="Maximum Extent" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="MinimumExtent" typeName="double" displayLabel="Minimum Extent" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="Coordinate" typeName="double" displayLabel="Coordinate" category="IsmCartesianGridLine_category" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="GridLineKind" typeName="IsmCartesianGridLineKind" displayLabel="Grid Line Kind" category="IsmCartesianGridLine_category" />
+        <ECProperty propertyName="MaximumExtent" typeName="double" displayLabel="Maximum Extent" category="IsmCartesianGridLine_category" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="MinimumExtent" typeName="double" displayLabel="Minimum Extent" category="IsmCartesianGridLine_category" kindOfQuantity="AECU:LENGTH" />
     </ECEntityClass>
 
-    <ECEntityClass typeName="IsmParallelRebar" modified="Abstract" displayLabel="Parallel Rebar">
+    <PropertyCategory typeName="IsmParallelRebar_category" displayLabel="Parallel Rebar" priority="180" />
+    <ECEntityClass typeName="IsmParallelRebar" modifier="Abstract" displayLabel="Parallel Rebar">
         <BaseClass>IsmRebar</BaseClass>
-        <ECProperty propertyName="LayoutPath" typeName="Bentley.Geometry.Common.IGeometry" displayLabel="Layout Path" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="TAxis" typeName="point3d" displayLabel="T Axis" />
-        <ECProperty propertyName="AutoBarCount" typeName="double" displayLabel="Auto Bar Count" />
-        <ECProperty propertyName="AutoLayoutLength" typeName="double" displayLabel="Auto Layout Length" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="AutoDetailedLength" typeName="double" displayLabel="Auto Detailed Length" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="AutoGroupBarWeight" typeName="double" displayLabel="Auto Group Bar Weight" kindOfQuantity="AECU:WEIGHT" />
-        <ECArrayProperty propertyName="StartHookDirections" typeName="double" displayLabel="Start Hook Directions" kindOfQuantity="AECU:ANGLE" />
-        <ECArrayProperty propertyName="EndHookDirections" typeName="double" displayLabel="End Hook Directions" kindOfQuantity="AECU:ANGLE" />
+        <ECStructProperty propertyName="LayoutPath" typeName="IsmPrimitiveGeometry" displayLabel="Layout Path" category="IsmParallelRebar_category" />
+        <ECProperty propertyName="TAxis" typeName="Point3d" displayLabel="T Axis" category="IsmParallelRebar_category" />
+        <ECProperty propertyName="AutoBarCount" typeName="int" displayLabel="Bar Count" category="Calculated_category" />
+        <ECProperty propertyName="AutoLayoutLength" typeName="double" displayLabel="Layout Length" category="Calculated_category" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="AutoDetailedLength" typeName="double" displayLabel="Detailed Length" category="Calculated_category" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="AutoGroupBarWeight" typeName="double" displayLabel="Group Bar Weight" category="Calculated_category" kindOfQuantity="AECU:WEIGHT" />
+        <ECArrayProperty propertyName="StartHookDirections" typeName="double" displayLabel="Start Hook Directions" category="IsmParallelRebar_category" kindOfQuantity="AECU:ANGLE" />
+        <ECArrayProperty propertyName="EndHookDirections" typeName="double" displayLabel="End Hook Directions" category="IsmParallelRebar_category" kindOfQuantity="AECU:ANGLE" />
     </ECEntityClass>
 
-    <ECEntityClass typeName="IsmCircleParallelRebar" modified="Sealed" displayLabel="Circle Parallel Rebar">
+    <PropertyCategory typeName="IsmCircleParallelRebar_category" displayLabel="Circle Parallel Rebar" priority="170" />
+    <ECEntityClass typeName="IsmCircleParallelRebar" modifier="Sealed" displayLabel="Circle Parallel Rebar">
         <BaseClass>IsmParallelRebar</BaseClass>
-        <ECProperty propertyName="BarCount" typeName="int" displayLabel="Bar Count" />
-        <ECProperty propertyName="Diameter" typeName="double" displayLabel="Diameter" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="BarCount" typeName="int" displayLabel="Bar Count" category="IsmCircleParallelRebar_category" />
+        <ECProperty propertyName="Diameter" typeName="double" displayLabel="Diameter" category="IsmCircleParallelRebar_category" kindOfQuantity="AECU:LENGTH_SHORT" />
     </ECEntityClass>
 
-    <ECEntityClass typeName="IsmPerpendicularRebar" modified="Abstract" displayLabel="Perpendicular Rebar">
+    <PropertyCategory typeName="IsmPerpendicularRebar_category" displayLabel="Perpendicular Rebar" priority="180" />
+    <ECEntityClass typeName="IsmPerpendicularRebar" modifier="Abstract" displayLabel="Perpendicular Rebar">
         <BaseClass>IsmRebar</BaseClass>
-        <ECProperty propertyName="SAxis" typeName="Point3d" displayLabel="S Axis" />
-        <ECProperty propertyName="TAxis" typeName="Point3d" displayLabel="T Axis" />
-        <ECProperty propertyName="LayoutPath" typeName="Bentley.Geometry.Common.IGeometry" displayLabel="Layout Path" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="AutoBarCount" typeName="double" displayLabel="Auto Bar Count" />
-        <ECProperty propertyName="AutoLayoutLength" typeName="double" displayLabel="Auto Layout Length" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="AutoDetailedLength" typeName="double" displayLabel="Auto Detailed Length" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="AutoGroupBarWeight" typeName="double" displayLabel="Auto Group Bar Weight" kindOfQuantity="AECU:WEIGHT" />
-        <ECProperty propertyName="StartHookDirection" typeName="double" displayLabel="Start Hook Direction" />
-        <ECProperty propertyName="Spacing" typeName="double" displayLabel="Spacing" kindOfQuantity="AECU:LENGTH_SHORT" />
-        <ECProperty propertyName="EndHookDirection" typeName="double" displayLabel="End Hook Direction" />
+        <ECProperty propertyName="SAxis" typeName="Point3d" displayLabel="S Axis" category="IsmPerpendicularRebar_category" />
+        <ECProperty propertyName="TAxis" typeName="Point3d" displayLabel="T Axis" category="IsmPerpendicularRebar_category" />
+        <ECStructProperty propertyName="LayoutPath" typeName="IsmPrimitiveGeometry" displayLabel="Layout Path" category="IsmPerpendicularRebar_category" />
+        <ECProperty propertyName="AutoBarCount" typeName="int" displayLabel="Bar Count" category="Calculated_category" />
+        <ECProperty propertyName="AutoLayoutLength" typeName="double" displayLabel="Layout Length" category="Calculated_category" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="AutoDetailedLength" typeName="double" displayLabel="Detailed Length" category="Calculated_category" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="AutoGroupBarWeight" typeName="double" displayLabel="Group Bar Weight" category="Calculated_category" kindOfQuantity="AECU:WEIGHT" />
+        <ECProperty propertyName="StartHookDirection" typeName="double" displayLabel="Start Hook Direction" category="IsmPerpendicularRebar_category" kindOfQuantity="AECU:ANGLE" />
+        <ECProperty propertyName="Spacing" typeName="double" displayLabel="Spacing" category="IsmPerpendicularRebar_category" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="EndHookDirection" typeName="double" displayLabel="End Hook Direction" category="IsmPerpendicularRebar_category" kindOfQuantity="AECU:ANGLE" />
     </ECEntityClass>
 
-    <ECEntityClass typeName="IsmCircleTieRebar" modified="Abstract" displayLabel="Circle Tie Rebar">
+    <PropertyCategory typeName="IsmCircleTieRebar_category" displayLabel="Circle Tie Rebar" priority="170" />
+    <ECEntityClass typeName="IsmCircleTieRebar" modifier="None" displayLabel="Circle Tie Rebar">
         <BaseClass>IsmPerpendicularRebar</BaseClass>
-        <ECProperty propertyName="Diameter" typeName="double" displayLabel="Diameter" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="Diameter" typeName="double" displayLabel="Diameter" category="IsmCircleTieRebar_category" kindOfQuantity="AECU:LENGTH_SHORT" />
     </ECEntityClass>
 
-    <ECEntityClass typeName="IsmCircularGridLine" modified="Abstract" displayLabel="Circular Grid Line">
+    <PropertyCategory typeName="IsmCircularGridLine_category" displayLabel="Circular Grid Line" priority="180" />
+    <ECEntityClass typeName="IsmCircularGridLine" modifier="None" displayLabel="Circular Grid Line">
         <BaseClass>IsmGridLine</BaseClass>
-        <ECProperty propertyName="Radius" typeName="double" displayLabel="Radius" kindOfQuantity="AECU:LENGTH_SHORT" />
-        <ECProperty propertyName="MinimumAngle" typeName="double" displayLabel="Minimum Angle" kindOfQuantity="AECU:ANGLE" />
-        <ECProperty propertyName="MaximumAngle" typeName="double" displayLabel="Maximum Angle" kindOfQuantity="AECU:ANGLE" />
+        <ECProperty propertyName="Radius" typeName="double" displayLabel="Radius" category="IsmCircularGridLine_category" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="MinimumAngle" typeName="double" displayLabel="Minimum Angle" category="IsmCircularGridLine_category" kindOfQuantity="AECU:ANGLE" />
+        <ECProperty propertyName="MaximumAngle" typeName="double" displayLabel="Maximum Angle" category="IsmCircularGridLine_category" kindOfQuantity="AECU:ANGLE" />
     </ECEntityClass>
 
-    <ECEntityClass typeName="IsmCompositeDeck" modified="Abstract" displayLabel="Composite Deck">
+    <ECEntityClass typeName="IsmCompositeDeck" modifier="None" displayLabel="Composite Deck">
         <BaseClass>IsmMaterial</BaseClass>
     </ECEntityClass>
 
@@ -732,28 +782,31 @@
         </Target>
     </ECRelationshipClass>
 
+    <PropertyCategory typeName="IsmLoad_category" displayLabel="Load" priority="190" />
     <ECEntityClass typeName="IsmLoad" modifier="Abstract" displayLabel="Load">
         <BaseClass>anlyt:AnalyticalElement</BaseClass>
         <BaseClass>IIsmObject</BaseClass>
-        <ECProperty propertyName="IsReaction" typeName="boolean" displayLabel="Is Reaction" />
+        <ECProperty propertyName="IsReaction" typeName="boolean" displayLabel="Is Reaction" category="IsmLoad_category" />
     </ECEntityClass>
 
     <ECEntityClass typeName="IsmMemberLoad" modifier="Abstract" displayLabel="Member Load">
         <BaseClass>IsmLoad</BaseClass>
     </ECEntityClass>
 
+    <PropertyCategory typeName="IsmForceMemberLoad_category" displayLabel="Force Member Load" priority="180" />
     <ECEntityClass typeName="IsmForceMemberLoad" modifier="Abstract" displayLabel="Force Member Load">
         <BaseClass>IsmLoad</BaseClass>
-        <ECProperty propertyName="UseProjectedScale" typeName="boolean" displayLabel="Use Projected Scale" />
+        <ECProperty propertyName="UseProjectedScale" typeName="boolean" displayLabel="Use Projected Scale" category="IsmForceMemberLoad_category" />
     </ECEntityClass>
 
+    <PropertyCategory typeName="IsmCurveForceMemberLoad_category" displayLabel="Curve Force Member Load" priority="170" />
     <ECEntityClass typeName="IsmCurveForceMemberLoad" modifier="Sealed" displayLabel="Curve Force Member Load">
-        <BaseClass>IsmLoad</BaseClass>
-        <ECProperty propertyName="Force0" typeName="point3d" displayLabel="Force #0" kindOfQuantity="AECU:LINEAR_FORCE" />
-        <ECProperty propertyName="Force1" typeName="point3d" displayLabel="Force #1" kindOfQuantity="AECU:LINEAR_FORCE" />
-        <ECProperty propertyName="Moment0" typeName="point3d" displayLabel="Moment #0" kindOfQuantity="AECU:LINEAR_MOMENT" />
-        <ECProperty propertyName="Moment1" typeName="point3d" displayLabel="Moment #1" kindOfQuantity="AECU:LINEAR_MOMENT" />
-        <ECProperty propertyName="Location" typeName="Bentley.Geometry.Common.IGeometry" displayLabel="Location" kindOfQuantity="AECU:LENGTH" />
+        <BaseClass>IsmForceMemberLoad</BaseClass>
+        <ECProperty propertyName="Force0" typeName="Point3d" displayLabel="Force #0" category="IsmCurveForceMemberLoad_category" kindOfQuantity="AECU:LINEAR_FORCE" />
+        <ECProperty propertyName="Force1" typeName="Point3d" displayLabel="Force #1" category="IsmCurveForceMemberLoad_category" kindOfQuantity="AECU:LINEAR_FORCE" />
+        <ECProperty propertyName="Moment0" typeName="Point3d" displayLabel="Moment #0" category="IsmCurveForceMemberLoad_category" kindOfQuantity="AECU:LINEAR_MOMENT" />
+        <ECProperty propertyName="Moment1" typeName="Point3d" displayLabel="Moment #1" category="IsmCurveForceMemberLoad_category" kindOfQuantity="AECU:LINEAR_MOMENT" />
+        <ECStructProperty propertyName="Location" typeName="IsmPrimitiveGeometry" displayLabel="Location" category="IsmCurveForceMemberLoad_category" />
     </ECEntityClass>
 
     <ECEnumeration typeName="IsmCurveMemberPlacementPoint" backingTypeName="int" isStrict="true" description="Placement Point.">
@@ -823,10 +876,11 @@
         <ECEnumerator value="40" name="S" displayLabel="S" description="S." />
     </ECEnumeration>
 
+    <PropertyCategory typeName="IsmMember_category" displayLabel="Member" priority="190" />
     <ECEntityClass typeName="IsmMember" displayLabel="Ism Member" modifier="Abstract" >
         <BaseClass>anlyt:AnalyticalElement</BaseClass>
         <BaseClass>IIsmObject</BaseClass>
-        <ECProperty propertyName="LoadResistance" typeName="IsmMemberLoadResistance" displayLabel="Load Resistance" />
+        <ECProperty propertyName="LoadResistance" typeName="IsmMemberLoadResistance" displayLabel="Load Resistance" category="IsmMember_category" />
     </ECEntityClass>
 
     <ECEntityClass typeName="IsmSpanningMember" displayLabel="Ism Spanning Member" modifier="Abstract">
@@ -838,18 +892,20 @@
         <ECEnumerator value="20" name="Ultimate" displayLabel="Ultimate" description="Ultimate." />
     </ECEnumeration>
 
+    <PropertyCategory typeName="IsmCurveMember_category" displayLabel="Curve Member" priority="180" />
+    <PropertyCategory typeName="IsmCurveMember_Reactions_category" displayLabel="Curve Member Reactions" priority="150" />
     <ECEntityClass typeName="IsmCurveMember" displayLabel="Curve Member" modifier="Sealed">
         <BaseClass>IsmSpanningMember</BaseClass>
-        <ECProperty propertyName="Location" typeName="Bentley.Geometry.Common.IGeometry" displayLabel="Location (ICurve)" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="AxialBehavior" typeName="AxialBehavior" displayLabel="Axial Behavior" />
-        <ECProperty propertyName="Camber" typeName="double" displayLabel="Camber" kindOfQuantity="AECU:LENGTH_SHORT" />
-        <ECProperty propertyName="MirrorShapeAboutYAxis" typeName="boolean" displayLabel="Mirror Shape about Y-Axis" />
-        <ECProperty propertyName="Orientation" typeName="Point3d" displayLabel="Orientation" />
-        <ECProperty propertyName="PlacementPoint" typeName="IsmCurveMemberPlacementPoint" displayLabel="Placement Point" />
-        <ECProperty propertyName="SystemKind" typeName="IsmCurveMemberSystemKind" displayLabel="System Kind" />
-        <ECArrayProperty propertyName="SteelConnectionTagAtStart" typeName="string" displayLabel="Steel Connection Tag at Start" minOccurs="0" maxOccurs="unbounded" />
-        <ECArrayProperty propertyName="SteelConnectionTagAtEnd" typeName="string" displayLabel="Steel Connection Tag at End" minOccurs="0" maxOccurs="unbounded" />
-        <ECProperty propertyName="Use" typeName="IsmCurveMemberUse" displayLabel="Use" />
+        <ECStructProperty propertyName="Location" typeName="IsmPrimitiveGeometry" displayLabel="Location (ICurve)" category="IsmCurveMember_category" />
+        <ECProperty propertyName="AxialBehavior" typeName="AxialBehavior" displayLabel="Axial Behavior" category="IsmCurveMember_category" />
+        <ECProperty propertyName="Camber" typeName="double" displayLabel="Camber" kindOfQuantity="AECU:LENGTH_SHORT" category="IsmCurveMember_category" />
+        <ECProperty propertyName="MirrorShapeAboutYAxis" typeName="boolean" displayLabel="Mirror Shape about Y-Axis" category="IsmCurveMember_category" />
+        <ECProperty propertyName="Orientation" typeName="Point3d" displayLabel="Orientation" category="IsmCurveMember_category" />
+        <ECProperty propertyName="PlacementPoint" typeName="IsmCurveMemberPlacementPoint" displayLabel="Placement Point" category="IsmCurveMember_category" />
+        <ECProperty propertyName="SystemKind" typeName="IsmCurveMemberSystemKind" displayLabel="System Kind" category="IsmCurveMember_category" />
+        <ECArrayProperty propertyName="SteelConnectionTagAtStart" typeName="string" displayLabel="Steel Connection Tag at Start" category="IsmCurveMember_category" />
+        <ECArrayProperty propertyName="SteelConnectionTagAtEnd" typeName="string" displayLabel="Steel Connection Tag at End" category="IsmCurveMember_category" />
+        <ECProperty propertyName="Use" typeName="IsmCurveMemberUse" displayLabel="Use" category="IsmCurveMember_category" />
         <ECProperty propertyName="RAxisTranslationFixity1" typeName="boolean" displayLabel="R-Axis Translation Fixity #1" />
         <ECProperty propertyName="SAxisTranslationFixity1" typeName="boolean" displayLabel="S-Axis Translation Fixity #1" />
         <ECProperty propertyName="TAxisTranslationFixity1" typeName="boolean" displayLabel="T-Axis Translation Fixity #1" />
@@ -862,14 +918,14 @@
         <ECProperty propertyName="RAxisRotationFixity2" typeName="boolean" displayLabel="R-Axis Rotation Fixity #2" />
         <ECProperty propertyName="SAxisRotationFixity2" typeName="boolean" displayLabel="S-Axis Rotation Fixity #2" />
         <ECProperty propertyName="TAxisRotationFixity2" typeName="boolean" displayLabel="T-Axis Rotation Fixity #2" />
-        <ECProperty propertyName="ReactionForceAtStart" typeName="double" displayLabel="Reaction Force at Start" kindOfQuantity="AECU:FORCE" />
-        <ECProperty propertyName="ReactionForceAtEnd" typeName="double" displayLabel="Reaction Force at End" kindOfQuantity="AECU:FORCE" />
-        <ECProperty propertyName="ReactionMomentAtStart" typeName="double" displayLabel="Reaction Moment at Start" kindOfQuantity="AECU:MOMENT" />
-        <ECProperty propertyName="ReactionMomentAtEnd" typeName="double" displayLabel="Reaction Moment at End" kindOfQuantity="AECU:MOMENT" />
-        <ECProperty propertyName="ReactionLimitState" typeName="ReactionLimitState" displayLabel="Reaction Limit State" />
-        <ECProperty propertyName="AutoLength" typeName="double" displayLabel="Length" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="AutoVolume" typeName="double" displayLabel="Volume" kindOfQuantity="AECU:VOLUME" />
-        <ECProperty propertyName="AutoWeight" typeName="double" displayLabel="Weight" kindOfQuantity="AECU:WEIGHT" />
+        <ECProperty propertyName="ReactionForceAtStart" typeName="double" displayLabel="Reaction Force at Start" category="IsmCurveMember_Reactions_category" kindOfQuantity="AECU:FORCE" />
+        <ECProperty propertyName="ReactionForceAtEnd" typeName="double" displayLabel="Reaction Force at End" category="IsmCurveMember_Reactions_category" kindOfQuantity="AECU:FORCE" />
+        <ECProperty propertyName="ReactionMomentAtStart" typeName="double" displayLabel="Reaction Moment at Start" category="IsmCurveMember_Reactions_category" kindOfQuantity="AECU:MOMENT" />
+        <ECProperty propertyName="ReactionMomentAtEnd" typeName="double" displayLabel="Reaction Moment at End" category="IsmCurveMember_Reactions_category" kindOfQuantity="AECU:MOMENT" />
+        <ECProperty propertyName="ReactionLimitState" typeName="ReactionLimitState" displayLabel="Reaction Limit State" category="IsmCurveMember_Reactions_category" />
+        <ECProperty propertyName="AutoLength" typeName="double" displayLabel="Length" category="Calculated_category" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="AutoVolume" typeName="double" displayLabel="Volume" category="Calculated_category" kindOfQuantity="AECU:VOLUME" />
+        <ECProperty propertyName="AutoWeight" typeName="double" displayLabel="Weight" category="Calculated_category" kindOfQuantity="AECU:WEIGHT" />
     </ECEntityClass>
 
     <ECRelationshipClass typeName="IsmCurveMember_Material" strength="referencing" strengthDirection="forward" modifier="Sealed">
@@ -896,20 +952,21 @@
         <BaseClass>IsmMember</BaseClass>
     </ECEntityClass>
 
+    <PropertyCategory typeName="IsmCurveSupport_category" displayLabel="Curve Support" priority="180" />
     <ECEntityClass typeName="IsmCurveSupport" displayLabel="Curve Support" modifier="Sealed">
         <BaseClass>IsmSupportMember</BaseClass>
-        <ECProperty propertyName="Location" typeName="Bentley.Geometry.Common.IGeometry" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="TAxis" typeName="Point3d" displayLabel="T-Axis" />
-        <ECProperty propertyName="TAxisTranslationStiffness" typeName="double" displayLabel="T-Axis Translation Stiffness" kindOfQuantity="AECU:SPRING_CONSTANT" />
-        <ECProperty propertyName="RAxisRotationStiffness" typeName="double" displayLabel="R-Axis Rotation Stiffness" kindOfQuantity="AECU:SPRING_CONSTANT" />
-        <ECProperty propertyName="RAxisTranslationDirection" typeName="int" displayLabel="R-Axis Translation Direction" />
-        <ECProperty propertyName="RAxisTranslationStiffness" typeName="double" displayLabel="R-Axis Translation Stiffness" kindOfQuantity="AECU:SPRING_CONSTANT" />
-        <ECProperty propertyName="SAxisTranslationDirection" typeName="int" displayLabel="S-Axis Translation Direction" />
-        <ECProperty propertyName="SAxisTranslationStiffness" typeName="double" displayLabel="S-Axis Translation Stiffness" kindOfQuantity="AECU:SPRING_CONSTANT" />
-        <ECProperty propertyName="TAxisTranslationDirection" typeName="int" displayLabel="T-Axis Translation Direction" />
+        <ECStructProperty propertyName="Location" typeName="IsmPrimitiveGeometry" displayLabel="Location" category="IsmCurveSupport_category" />
+        <ECProperty propertyName="TAxis" typeName="Point3d" displayLabel="T-Axis" category="IsmCurveSupport_category" />
+        <ECProperty propertyName="TAxisTranslationStiffness" typeName="double" displayLabel="T-Axis Translation Stiffness" category="IsmCurveSupport_category" kindOfQuantity="AECU:LINEAR_SPRING_CONSTANT" />
+        <ECProperty propertyName="RAxisRotationStiffness" typeName="double" displayLabel="R-Axis Rotation Stiffness" category="IsmCurveSupport_category" kindOfQuantity="AECU:ROTATIONAL_SPRING_CONSTANT" />
+        <ECProperty propertyName="RAxisTranslationDirection" typeName="IsmFixityDirection" displayLabel="R-Axis Translation Direction" category="IsmCurveSupport_category" />
+        <ECProperty propertyName="RAxisTranslationStiffness" typeName="double" displayLabel="R-Axis Translation Stiffness" category="IsmCurveSupport_category" kindOfQuantity="AECU:LINEAR_SPRING_CONSTANT" />
+        <ECProperty propertyName="SAxisTranslationDirection" typeName="IsmFixityDirection" displayLabel="S-Axis Translation Direction" category="IsmCurveSupport_category" />
+        <ECProperty propertyName="SAxisTranslationStiffness" typeName="double" displayLabel="S-Axis Translation Stiffness" category="IsmCurveSupport_category" kindOfQuantity="AECU:LINEAR_SPRING_CONSTANT" />
+        <ECProperty propertyName="TAxisTranslationDirection" typeName="IsmFixityDirection" displayLabel="T-Axis Translation Direction" category="IsmCurveSupport_category" />
     </ECEntityClass>
 
-    <ECEntityClass typeName="IsmCustomData" modified="Sealed" displayLabel="Custom Data">
+    <ECEntityClass typeName="IsmCustomData" modifier="Sealed" displayLabel="Custom Data">
         <BaseClass>bis:DefinitionElement</BaseClass>
         <BaseClass>IIsmObject</BaseClass>
         <ECProperty propertyName="ApplicationId" typeName="string" displayLabel="Application Id" />
@@ -919,25 +976,29 @@
         <ECProperty propertyName="Data" typeName="string" displayLabel="Data" />
     </ECEntityClass>
 
-    <ECEntityClass typeName="IsmCustomGrid" modified="Sealed" displayLabel="Custom Grid">
+    <PropertyCategory typeName="IsmCustomGrid_category" displayLabel="Custom Grid" priority="180" />
+    <ECEntityClass typeName="IsmCustomGrid" modifier="Sealed" displayLabel="Custom Grid">
         <BaseClass>IsmGrid</BaseClass>
-        <ECArrayProperty propertyName="AxisGroups" typeName="string" displayLabel="Axis Groups" />
+        <ECArrayProperty propertyName="AxisGroups" typeName="string" displayLabel="Axis Groups" category="IsmCustomGrid_category" />
     </ECEntityClass>
 
-    <ECEntityClass typeName="IsmCustomGridLine" modified="Sealed" displayLabel="Custom Grid Line">
+    <PropertyCategory typeName="IsmCustomGridLine_category" displayLabel="Custom Grid Line" priority="180" />
+    <ECEntityClass typeName="IsmCustomGridLine" modifier="Sealed" displayLabel="Custom Grid Line">
         <BaseClass>IsmGridLine</BaseClass>
-        <ECArrayProperty propertyName="Location" typeName="Bentley.Geometry.Common.IGeometry" displayLabel="Location" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="AxisGroup" typeName="string" displayLabel="Axis Group" />
+        <ECStructProperty propertyName="Location" typeName="IsmPrimitiveGeometry" displayLabel="Location" category="IsmCustomGridLine_category" />
+        <ECProperty propertyName="AxisGroup" typeName="string" displayLabel="Axis Group" category="IsmCustomGridLine_category" />
     </ECEntityClass>
 
-    <ECEntityClass typeName="IsmCustomParallelRebar" modified="Sealed" displayLabel="Custom Parallel Rebar">
+    <PropertyCategory typeName="IsmCustomParallelRebar_category" displayLabel="Custom Parallel Rebar" priority="170" />
+    <ECEntityClass typeName="IsmCustomParallelRebar" modifier="Sealed" displayLabel="Custom Parallel Rebar">
         <BaseClass>IsmParallelRebar</BaseClass>
-        <ECArrayProperty propertyName="BarPositions" typeName="point2d" displayLabel="Bar Positions" kindOfQuantity="AECU:LENGTH" />
+        <ECArrayProperty propertyName="BarPositions" typeName="Point2d" displayLabel="Bar Positions" category="IsmCustomParallelRebar_category" kindOfQuantity="AECU:LENGTH" />
     </ECEntityClass>
 
-    <ECEntityClass typeName="IsmCustomPerpendicularRebar" modified="Sealed" displayLabel="Custom Perpendicular Rebar">
+    <PropertyCategory typeName="IsmCustomPerpendicularRebar_category" displayLabel="Custom Perpendicular Rebar" priority="170" />
+    <ECEntityClass typeName="IsmCustomPerpendicularRebar" modifier="Sealed" displayLabel="Custom Perpendicular Rebar">
         <BaseClass>IsmPerpendicularRebar</BaseClass>
-        <ECArrayProperty propertyName="BarShape" typeName="Bentley.Geometry.Common.IGeometry" displayLabel="Bar Shape" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECStructProperty propertyName="BarShape" typeName="IsmPrimitiveGeometry" displayLabel="Bar Shape" category="IsmCustomPerpendicularRebar_category" kindOfQuantity="AECU:LENGTH_SHORT" />
     </ECEntityClass>
 
     <ECEntityClass typeName="IsmCustomSection" modifier="Sealed" displayLabel="Custom Section" >
@@ -946,14 +1007,15 @@
 
     <ECEntityClass typeName="IsmCustomSteelDeck" modifier="Sealed" displayLabel="Custom Steel Deck">
         <BaseClass>IsmSteelDeck</BaseClass>
-        <ECProperty propertyName="Profile" typeName="Bentley.Geometry.Common.IGeometry" displayLabel="Bar Shape" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECStructProperty propertyName="Profile" typeName="IsmPrimitiveGeometry" displayLabel="Bar Shape" kindOfQuantity="AECU:LENGTH_SHORT" />
         <ECProperty propertyName="OverlapWidth" typeName="double" displayLabel="Overlap Width" kindOfQuantity="AECU:LENGTH_SHORT" />
     </ECEntityClass>
 
+    <PropertyCategory typeName="IsmDiamondTieRebar_category" displayLabel="Diamond Tie Rebar" priority="170" />
     <ECEntityClass typeName="IsmDiamondTieRebar" modifier="Sealed" displayLabel="Diamond Tie Rebar" >
         <BaseClass>IsmPerpendicularRebar</BaseClass>
-        <ECProperty propertyName="Depth" typeName="double" displayLabel="Depth" kindOfQuantity="AECU:LENGTH_SHORT" />
-        <ECProperty propertyName="Width" typeName="double" displayLabel="Width" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="Depth" typeName="double" displayLabel="Depth" category="IsmDiamondTieRebar_category" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="Width" typeName="double" displayLabel="Width" category="IsmDiamondTieRebar_category" kindOfQuantity="AECU:LENGTH_SHORT" />
     </ECEntityClass>
 
     <ECEntityClass typeName="IsmModelRule" modifier="Abstract" displayLabel="Model Rule" >
@@ -998,10 +1060,11 @@
         <ECProperty propertyName="SpacingDecimalPlace" typeName="int" displayLabel="Spacing Decimal Place" />
     </ECEntityClass>
 
+    <PropertyCategory typeName="IsmFeature_category" displayLabel="Feature" priority="190" />
     <ECEntityClass typeName="IsmFeature" modifier="Abstract" displayLabel="Feature">
         <BaseClass>anlyt:AnalyticalElement</BaseClass>
         <BaseClass>IIsmSubObject</BaseClass>
-        <ECProperty propertyName="Priority" typeName="int" displayLabel="Priority" />
+        <ECProperty propertyName="Priority" typeName="int" displayLabel="Priority" category="IsmFeature_category" />
     </ECEntityClass>
 
     <ECRelationshipClass typeName="IsmFeature_Member" strength="referencing" strengthDirection="forward" modifier="Sealed">
@@ -1029,10 +1092,11 @@
         <ECEnumerator value="10000" name="Other" displayLabel="Other" description="Other." />
     </ECEnumeration>
 
+    <PropertyCategory typeName="IsmFeatureAddition_category" displayLabel="Feature Addition" priority="180" />
     <ECEntityClass typeName="IsmFeatureAddition" modifier="Sealed" displayLabel="Feature Addition">
         <BaseClass>IsmFeature</BaseClass>
-        <ECArrayProperty propertyName="Location" typeName="Bentley.Geometry.Common.IGeometry" displayLabel="Location" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="Use" typeName="FeatureUse" displayLabel="Use" />
+        <ECStructProperty propertyName="Location" typeName="IsmArrayGeometry" displayLabel="Location" category="IsmFeatureAddition_category"  />
+        <ECProperty propertyName="Use" typeName="FeatureUse" displayLabel="Use" category="IsmFeatureAddition_category" />
     </ECEntityClass>
 
     <ECRelationshipClass typeName="IsmFeatureAddition_Material" strength="referencing" strengthDirection="forward" modifier="Sealed">
@@ -1055,10 +1119,11 @@
         <ECEnumerator value="1000" name="Other" displayLabel="Other" description="Other." />
     </ECEnumeration>
 
+    <PropertyCategory typeName="IsmFeatureSubtraction_category" displayLabel="Feature Sutraction" priority="180" />
     <ECEntityClass typeName="IsmFeatureSubtraction" modifier="Sealed" displayLabel="Feature Subtraction">
         <BaseClass>IsmFeature</BaseClass>
-        <ECProperty propertyName="Location" typeName="Bentley.Geometry.Common.IGeometry" displayLabel="Location" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="Use" typeName="SubstractionUse" displayLabel="Use" />
+        <ECStructProperty propertyName="Location" typeName="IsmArrayGeometry" displayLabel="Location" category="IsmFeatureSubtraction_category" />
+        <ECProperty propertyName="Use" typeName="SubstractionUse" displayLabel="Use" category="IsmFeatureSubtraction_category" />
     </ECEntityClass>            
 
     <ECRelationshipClass typeName="IsmGridLine_Grid" strength="referencing" strengthDirection="forward" modifier="Sealed">
@@ -1071,24 +1136,27 @@
         </Target>
     </ECRelationshipClass>
 
+    <PropertyCategory typeName="IsmGridParallelRebar_category" displayLabel="Grid Parallel Rebar" priority="170" />
     <ECEntityClass typeName="IsmGridParallelRebar" modifier="Sealed" displayLabel="Grid Parallel Rebar">
         <BaseClass>IsmParallelRebar</BaseClass>
-        <ECProperty propertyName="LayerCount" typeName="int" displayLabel="Layer Count" />
-        <ECProperty propertyName="BarsPerLayer" typeName="int" displayLabel="Bars Per Layer" />
-        <ECProperty propertyName="Depth" typeName="double" displayLabel="Depth" kindOfQuantity="AECU:LENGTH_SHORT" />
-        <ECProperty propertyName="Width" typeName="double" displayLabel="Width" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="LayerCount" typeName="int" displayLabel="Layer Count" category="IsmGridParallelRebar_category" />
+        <ECProperty propertyName="BarsPerLayer" typeName="int" displayLabel="Bars Per Layer" category="IsmGridParallelRebar_category" />
+        <ECProperty propertyName="Depth" typeName="double" displayLabel="Depth" category="IsmGridParallelRebar_category" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="Width" typeName="double" displayLabel="Width" category="IsmGridParallelRebar_category" kindOfQuantity="AECU:LENGTH_SHORT" />
     </ECEntityClass>
 
+    <PropertyCategory typeName="IsmLappedTopRectangleTieRebar_category" displayLabel="Lapped Top Rectangle Tie Rebar" priority="170" />
     <ECEntityClass typeName="IsmLappedTopRectangleTieRebar" modifier="Sealed" displayLabel="Lapped Top Rectangle Tie Rebar">
         <BaseClass>IsmPerpendicularRebar</BaseClass>
-        <ECProperty propertyName="Depth" typeName="double" displayLabel="Depth" kindOfQuantity="AECU:LENGTH_SHORT" />
-        <ECProperty propertyName="Width" typeName="double" displayLabel="Width" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="Depth" typeName="double" displayLabel="Depth" category="IsmLappedTopRectangleTieRebar_category" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="Width" typeName="double" displayLabel="Width" category="IsmLappedTopRectangleTieRebar_category" kindOfQuantity="AECU:LENGTH_SHORT" />
     </ECEntityClass>
 
+    <PropertyCategory typeName="IsmLayerParallelRebar_category" displayLabel="Layer Parallel Rebar" priority="170" />
     <ECEntityClass typeName="IsmLayerParallelRebar" modifier="Sealed" displayLabel="Layer Parallel Rebar">
         <BaseClass>IsmParallelRebar</BaseClass>
-        <ECProperty propertyName="Width" typeName="double" displayLabel="Width" kindOfQuantity="AECU:LENGTH_SHORT" />
-        <ECProperty propertyName="BarCount" typeName="int" displayLabel="Bar Count" />
+        <ECProperty propertyName="Width" typeName="double" displayLabel="Width" category="IsmLayerParallelRebar_category" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="BarCount" typeName="int" displayLabel="Bar Count" category="IsmLayerParallelRebar_category" />
     </ECEntityClass>
 
     <ECEnumeration typeName="LoadAdditionMethod" backingTypeName="int" isStrict="true" description="Load Addition Method.">
@@ -1097,24 +1165,26 @@
         <ECEnumerator value="300" name="SRSS" displayLabel="SRSS" description="SRSS." />
     </ECEnumeration>
 
+    <PropertyCategory typeName="IsmLoadCombination_category" displayLabel="Load Combination" priority="190" />
     <ECEntityClass typeName="IsmLoadCombination" modifier="Sealed" displayLabel="Load Combination">
         <BaseClass>IsmLoadContainer</BaseClass>
-        <ECProperty propertyName="SRSSFactor" typeName="double" displayLabel="SRSS Factor" />
-        <ECProperty propertyName="Type" typeName="LoadAdditionMethod" displayLabel="Type" />
+        <ECProperty propertyName="SRSSFactor" typeName="double" displayLabel="SRSS Factor" category="IsmLoadCombination_category" />
     </ECEntityClass>
 
+    <PropertyCategory typeName="IsmFactoredLoadCase_category" displayLabel="Factored Load Case" priority="190" />
     <ECEntityClass typeName="IsmFactoredLoadCase" modifier="Sealed" displayLabel="Factored Load Case">
         <BaseClass>anlyt:AnalyticalElement</BaseClass>
         <BaseClass>IIsmSubObject</BaseClass>
-        <ECProperty propertyName="Factor" typeName="double" displayLabel="Factor" />
-        <ECProperty propertyName="Type" typeName="LoadAdditionMethod" displayLabel="Type" />
+        <ECProperty propertyName="Factor" typeName="double" displayLabel="Factor" category="IsmFactoredLoadCase_category" />
+        <ECProperty propertyName="Type" typeName="LoadAdditionMethod" displayLabel="Type" category="IsmFactoredLoadCase_category" />
     </ECEntityClass>
 
+    <PropertyCategory typeName="IsmFactoredLoadCombination_category" displayLabel="Factored Load Combination" priority="190" />
     <ECEntityClass typeName="IsmFactoredLoadCombination" modifier="Sealed" displayLabel="Factored Load Combination">
         <BaseClass>anlyt:AnalyticalElement</BaseClass>
         <BaseClass>IIsmSubObject</BaseClass>
-        <ECProperty propertyName="Factor" typeName="double" displayLabel="Factor" />
-        <ECProperty propertyName="Type" typeName="LoadAdditionMethod" displayLabel="Type" />
+        <ECProperty propertyName="Factor" typeName="double" displayLabel="Factor" category="IsmFactoredLoadCombination_category" />
+        <ECProperty propertyName="Type" typeName="LoadAdditionMethod" displayLabel="Type" category="IsmFactoredLoadCombination_category" />
     </ECEntityClass>
 
     <ECRelationshipClass typeName="IsmLoadCombination_FactoredLoadCases" strength="referencing" strengthDirection="forward" modifier="Sealed">
@@ -1211,12 +1281,13 @@
         <ECEnumerator value="10000" name="Other" displayLabel="Other" description="Other." />
     </ECEnumeration>
 
+    <PropertyCategory typeName="IsmLoadCase_category" displayLabel="Load Case" priority="190" />
     <ECEntityClass typeName="IsmLoadCase" modifier="Sealed" displayLabel="Load Case">
         <BaseClass>IsmLoadContainer</BaseClass>
-        <ECProperty propertyName="Description" typeName="string" displayLabel="Description" />
-        <ECProperty propertyName="AnalysisKind" typeName="LoadAnalysisCase" displayLabel="Analysis Kind" />
-        <ECProperty propertyName="IncludesSelfWeightLoads" typeName="boolean" displayLabel="Includes Self Weight Loads" />
-        <ECProperty propertyName="LoadCause" typeName="LoadCause" displayLabel="Load Cause" />
+        <ECProperty propertyName="Description" typeName="string" displayLabel="Description" category="IsmLoadCase_category" />
+        <ECProperty propertyName="AnalysisKind" typeName="LoadAnalysisCase" displayLabel="Analysis Kind" category="IsmLoadCase_category" />
+        <ECProperty propertyName="IncludesSelfWeightLoads" typeName="boolean" displayLabel="Includes Self Weight Loads" category="IsmLoadCase_category" />
+        <ECProperty propertyName="LoadCause" typeName="LoadCause" displayLabel="Load Cause" category="IsmLoadCase_category" />
     </ECEntityClass>
 
     <ECRelationshipClass typeName="IsmLoad_LoadCase" strength="referencing" strengthDirection="forward" modifier="Sealed">
@@ -1238,10 +1309,11 @@
         <BaseClass>IsmMaterial</BaseClass>
     </ECEntityClass>
 
+    <PropertyCategory typeName="IsmStory_category" displayLabel="Story" priority="190" />
     <ECEntityClass typeName="IsmStory" modifier="Sealed" displayLabel="Story">
         <BaseClass>anlyt:AnalyticalElement</BaseClass>
         <BaseClass>IIsmObject</BaseClass>
-        <ECProperty propertyName="ReferenceElevation" typeName="double" displayLabel="Reference Elevation" />
+        <ECProperty propertyName="ReferenceElevation" typeName="double" displayLabel="Reference Elevation" category="IsmStory_category" kindOfQuantity="AECU:LENGTH" />
     </ECEntityClass>
 
     <ECRelationshipClass typeName="IsmMember_Story" strength="referencing" strengthDirection="forward" modifier="Sealed">
@@ -1264,26 +1336,34 @@
         </Target>
     </ECRelationshipClass>
 
+    <ECEnumeration typeName="IsmFixityDirection" backingTypeName="int" isStrict="true" description="Fixity Direction.">
+        <ECEnumerator value="1" name="CompressionOnly" displayLabel="Compression Only" description="Compression Only." />
+        <ECEnumerator value="2" name="TensionOnly" displayLabel="Tension Only" description="Tension Only." />
+        <ECEnumerator value="3" name="CompressionAndTension" displayLabel="Compression And Tension" description="Compression And Tension." />
+    </ECEnumeration>
+
+    <PropertyCategory typeName="IsmPointSupport_category" displayLabel="Point Support" priority="180" />
     <ECEntityClass typeName="IsmPointSupport" displayLabel="Point Support" modifier="Sealed">
         <BaseClass>IsmSupportMember</BaseClass>
-        <ECProperty propertyName="RAxis" typeName="Point3d" />
-        <ECProperty propertyName="SAxis" typeName="Point3d" />
-        <ECProperty propertyName="Location" typeName="Point3d" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="RAxisRotationStiffness" typeName="double" displayLabel="R-Axis Rotation Stiffness" kindOfQuantity="AECU:ROTATIONAL_SPRING_CONSTANT" />
-        <ECProperty propertyName="RAxisTranslationDirection" typeName="int" displayLabel="R-Axis Translation Direction" />
-        <ECProperty propertyName="RAxisTranslationStiffness" typeName="double" displayLabel="R-Axis Translation Stiffness" kindOfQuantity="AECU:SPRING_CONSTANT" />
-        <ECProperty propertyName="SAxisRotationStiffness" typeName="double" displayLabel="S-Axis Rotation Stiffness" kindOfQuantity="AECU:ROTATIONAL_SPRING_CONSTANT" />
-        <ECProperty propertyName="SAxisTranslationDirection" typeName="int" displayLabel="S-Axis Translation Direction" />
-        <ECProperty propertyName="SAxisTranslationStiffness" typeName="double" displayLabel="S-Axis Translation Stiffness" kindOfQuantity="AECU:SPRING_CONSTANT" />
-        <ECProperty propertyName="TAxisRotationStiffness" typeName="double" displayLabel="T-Axis Rotation Stiffness" kindOfQuantity="AECU:ROTATIONAL_SPRING_CONSTANT" />
-        <ECProperty propertyName="TAxisTranslationDirection" typeName="int" displayLabel="T-Axis Translation Direction" />
-        <ECProperty propertyName="TAxisTranslationStiffness" typeName="double" displayLabel="T-Axis Translation Stiffness" kindOfQuantity="AECU:SPRING_CONSTANT" />
+        <ECProperty propertyName="RAxis" typeName="Point3d" category="IsmPointSupport_category" />
+        <ECProperty propertyName="SAxis" typeName="Point3d" category="IsmPointSupport_category" />
+        <ECProperty propertyName="Location" typeName="Point3d" category="IsmPointSupport_category" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="RAxisRotationStiffness" typeName="double" displayLabel="R-Axis Rotation Stiffness" category="IsmPointSupport_category" kindOfQuantity="AECU:ROTATIONAL_SPRING_CONSTANT" />
+        <ECProperty propertyName="RAxisTranslationDirection" typeName="IsmFixityDirection" displayLabel="R-Axis Translation Direction" category="IsmPointSupport_category" />
+        <ECProperty propertyName="RAxisTranslationStiffness" typeName="double" displayLabel="R-Axis Translation Stiffness" category="IsmPointSupport_category" kindOfQuantity="AECU:SPRING_CONSTANT" />
+        <ECProperty propertyName="SAxisRotationStiffness" typeName="double" displayLabel="S-Axis Rotation Stiffness" category="IsmPointSupport_category" kindOfQuantity="AECU:ROTATIONAL_SPRING_CONSTANT" />
+        <ECProperty propertyName="SAxisTranslationDirection" typeName="IsmFixityDirection" displayLabel="S-Axis Translation Direction" category="IsmPointSupport_category" />
+        <ECProperty propertyName="SAxisTranslationStiffness" typeName="double" displayLabel="S-Axis Translation Stiffness" category="IsmPointSupport_category" kindOfQuantity="AECU:SPRING_CONSTANT" />
+        <ECProperty propertyName="TAxisRotationStiffness" typeName="double" displayLabel="T-Axis Rotation Stiffness" category="IsmPointSupport_category" kindOfQuantity="AECU:ROTATIONAL_SPRING_CONSTANT" />
+        <ECProperty propertyName="TAxisTranslationDirection" typeName="IsmFixityDirection" displayLabel="T-Axis Translation Direction" category="IsmPointSupport_category" />
+        <ECProperty propertyName="TAxisTranslationStiffness" typeName="double" displayLabel="T-Axis Translation Stiffness" category="IsmPointSupport_category" kindOfQuantity="AECU:SPRING_CONSTANT" />
     </ECEntityClass>
 
+    <PropertyCategory typeName="IsmNode_category" displayLabel="Node" priority="190" />
     <ECEntityClass typeName="IsmNode" displayLabel="Node" modifier="None" >
         <BaseClass>anlyt:AnalyticalElement</BaseClass>
         <BaseClass>IIsmObject</BaseClass>
-        <ECProperty propertyName="Location" typeName="Point3d" displayLabel="Location" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="Location" typeName="Point3d" displayLabel="Location" category="IsmNode_category" kindOfQuantity="AECU:LENGTH" />
     </ECEntityClass>
 
     <ECRelationshipClass typeName="IsmNode_Members" strength="referencing" strengthDirection="forward" modifier="Sealed">
@@ -1296,10 +1376,11 @@
         </Target>
     </ECRelationshipClass>
 
+    <PropertyCategory typeName="IsmOpenUTieRebar_category" displayLabel="Open-U Tie Rebar" priority="170" />
     <ECEntityClass typeName="IsmOpenUTieRebar" displayLabel="Open-U Tie Rebar" modifier="Sealed">
         <BaseClass>IsmPerpendicularRebar</BaseClass>
-        <ECProperty propertyName="Depth" typeName="double" displayLabel="Depth" kindOfQuantity="AECU:LENGTH_SHORT" />
-        <ECProperty propertyName="Width" typeName="double" displayLabel="Width" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="Depth" typeName="double" displayLabel="Depth" category="IsmOpenUTieRebar_category" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="Width" typeName="double" displayLabel="Width" category="IsmOpenUTieRebar_category" kindOfQuantity="AECU:LENGTH_SHORT" />
     </ECEntityClass>
 
     <ECEntityClass typeName="IsmOtherMaterial" modifier="Sealed" displayLabel="Other Material">
@@ -1310,24 +1391,25 @@
         <BaseClass>IsmSteelDeck</BaseClass>
     </ECEntityClass>
 
+    <PropertyCategory typeName="IsmPipingLine_category" displayLabel="Piping Line" priority="190" />
     <ECEntityClass typeName="IsmPipingLine" modifier="Sealed" displayLabel="Piping Line">
         <BaseClass>anlyt:AnalyticalElement</BaseClass>
         <BaseClass>IIsmObject</BaseClass>
-        <ECProperty propertyName="Tag" typeName="string" displayLabel="Tag" />
+        <ECProperty propertyName="Tag" typeName="string" displayLabel="Tag" category="IsmPipingLine_category" />
     </ECEntityClass>
 
     <ECEntityClass typeName="IsmPipingMember" modifier="Abstract" displayLabel="Piping Member">
         <BaseClass>IsmMember</BaseClass>
     </ECEntityClass>
 
+    <PropertyCategory typeName="IsmPipingComponent_category" displayLabel="Piping Component" priority="180" />
     <ECEntityClass typeName="IsmPipingComponent" modifier="Abstract" displayLabel="Piping Component">
         <BaseClass>IsmPipingMember</BaseClass>
-        <ECProperty propertyName="IsRigid" typeName="boolean" displayLabel="Is Rigid" />
-        <ECProperty propertyName="Location" typeName="Bentley.Geometry.Common.IGeometry" displayLabel="Location" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="Diameter" typeName="double" displayLabel="Diameter" kindOfQuantity="AECU:LENGTH_SHORT" />
-        <ECProperty propertyName="NominalDiameter" typeName="double" displayLabel="Nominal Diameter" kindOfQuantity="AECU:LENGTH_SHORT" />
-        <ECProperty propertyName="WallThickness" typeName="double" displayLabel="Wall Thickness" kindOfQuantity="AECU:LENGTH_SHORT" />
-        <ECProperty propertyName="Orientation" typeName="point3d" displayLabel="Orientation" />
+        <ECProperty propertyName="IsRigid" typeName="boolean" displayLabel="Is Rigid" category="IsmPipingComponent_category" />
+        <ECProperty propertyName="Diameter" typeName="double" displayLabel="Diameter" category="IsmPipingComponent_category" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="NominalDiameter" typeName="double" displayLabel="Nominal Diameter" category="IsmPipingComponent_category" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="WallThickness" typeName="double" displayLabel="Wall Thickness" category="IsmPipingComponent_category" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="Orientation" typeName="Point3d" displayLabel="Orientation" category="IsmPipingComponent_category" />
     </ECEntityClass>
 
     <ECEnumeration typeName="PipingBranchingType" backingTypeName="int" isStrict="true" description="Piping Branching Type.">
@@ -1340,10 +1422,12 @@
         <ECEnumerator value="70" name="Other" displayLabel="Other" description="Other." />
     </ECEnumeration>
 
+    <PropertyCategory typeName="IsmPipingRunComponent_category" displayLabel="Piping Run Component" priority="170" />
     <ECEntityClass typeName="IsmPipingRunComponent" modifier="Sealed" displayLabel="Piping Run Component">
         <BaseClass>IsmPipingComponent</BaseClass>
-        <ECProperty propertyName="StartBranchingType" typeName="PipingBranchingType" displayLabel="Start Branching Type" />
-        <ECProperty propertyName="EndBranchingType" typeName="PipingBranchingType" displayLabel="End Branching Type" />
+        <ECStructProperty propertyName="Location" typeName="IsmPrimitiveGeometry" displayLabel="Location" category="IsmPipingComponent_category" />
+        <ECProperty propertyName="StartBranchingType" typeName="PipingBranchingType" displayLabel="Start Branching Type" category="IsmPipingRunComponent_category" />
+        <ECProperty propertyName="EndBranchingType" typeName="PipingBranchingType" displayLabel="End Branching Type" category="IsmPipingRunComponent_category" />
     </ECEntityClass>
 
     <ECEnumeration typeName="PipingFlangeType" backingTypeName="int" isStrict="true" description="Piping Flange Type.">
@@ -1386,44 +1470,49 @@
         <ECEnumerator value="220" name="HdpeButtFusion" displayLabel="Hdpe Butt Fusion" description="Hdpe Butt Fusion." />
     </ECEnumeration>
 
+    <PropertyCategory typeName="IsmPipingFlangeComponent_category" displayLabel="Piping Flange Component" priority="170" />
     <ECEntityClass typeName="IsmPipingFlangeComponent" modifier="Sealed" displayLabel="Piping Flange Component">
         <BaseClass>IsmPipingComponent</BaseClass>
-        <ECProperty propertyName="BoltNutWeight" typeName="double" displayLabel="Bolt Nut Weight" kindOfQuantity="AECU:WEIGHT" />
-        <ECProperty propertyName="Weight" typeName="double" displayLabel="Weight" kindOfQuantity="AECU:WEIGHT" />
-        <ECProperty propertyName="FlangeType" typeName="PipingFlangeType" displayLabel="Flange Type" />
-        <ECProperty propertyName="Tag" typeName="string" displayLabel="Tag" />
-        <ECProperty propertyName="PressureRating" typeName="string" displayLabel="Pressure Rating" />
-        <ECProperty propertyName="FlangePlacement" typeName="PipingFlangeComponentPlacement" displayLabel="Placement" />
-        <ECProperty propertyName="Direction" typeName="point3d" displayLabel="Direction" />
-        <ECProperty propertyName="Series" typeName="string" displayLabel="Series" />
-        <ECProperty propertyName="OffsetJoint" typeName="double" displayLabel="Offset Joint" kindOfQuantity="AECU:LENGTH_SHORT" />
-        <ECProperty propertyName="OffsetAverage" typeName="double" displayLabel="Offset Average" kindOfQuantity="AECU:LENGTH_SHORT" />
-        <ECProperty propertyName="OffsetMaximum" typeName="double" displayLabel="Offset Maximum" kindOfQuantity="AECU:LENGTH_SHORT" />
-        <ECProperty propertyName="JointStressIntensificationFactor" typeName="double" displayLabel="Joint Stress Intensification Factor" />
-        <ECProperty propertyName="JointType" typeName="PipingJoint" displayLabel="Joint Type" />
+        <ECProperty propertyName="Location" typeName="Point3d" displayLabel="Location" category="IsmPipingComponent_category" />
+        <ECProperty propertyName="BoltNutWeight" typeName="double" displayLabel="Bolt Nut Weight" category="IsmPipingFlangeComponent_category" kindOfQuantity="AECU:WEIGHT" />
+        <ECProperty propertyName="Weight" typeName="double" displayLabel="Weight" category="IsmPipingFlangeComponent_category" kindOfQuantity="AECU:WEIGHT" />
+        <ECProperty propertyName="FlangeType" typeName="PipingFlangeType" displayLabel="Flange Type" category="IsmPipingFlangeComponent_category" />
+        <ECProperty propertyName="Tag" typeName="string" displayLabel="Tag" category="IsmPipingFlangeComponent_category" />
+        <ECProperty propertyName="PressureRating" typeName="string" displayLabel="Pressure Rating" category="IsmPipingFlangeComponent_category" />
+        <ECProperty propertyName="FlangePlacement" typeName="PipingFlangeComponentPlacement" displayLabel="Placement" category="IsmPipingFlangeComponent_category" />
+        <ECProperty propertyName="Direction" typeName="Point3d" displayLabel="Direction" category="IsmPipingFlangeComponent_category" />
+        <ECProperty propertyName="Series" typeName="string" displayLabel="Series" category="IsmPipingFlangeComponent_category" />
+        <ECProperty propertyName="OffsetJoint" typeName="double" displayLabel="Offset Joint" category="IsmPipingFlangeComponent_category" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="OffsetAverage" typeName="double" displayLabel="Offset Average" category="IsmPipingFlangeComponent_category" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="OffsetMaximum" typeName="double" displayLabel="Offset Maximum" category="IsmPipingFlangeComponent_category" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="JointStressIntensificationFactor" typeName="double" displayLabel="Joint Stress Intensification Factor" category="IsmPipingFlangeComponent_category" />
+        <ECProperty propertyName="JointType" typeName="PipingJoint" displayLabel="Joint End Type" category="IsmPipingFlangeComponent_category" />
     </ECEntityClass>
 
-    <ECEnumeration typeName="PippingBendComponentType" backingTypeName="int" isStrict="true" description="Piping Flange Component Joint.">
+    <ECEnumeration typeName="PipingBendComponentType" backingTypeName="int" isStrict="true" description="Piping Flange Component Joint.">
         <ECEnumerator value="10" name="Elbow" displayLabel="Elbow" description="Elbow." />
         <ECEnumerator value="20" name="Close" displayLabel="Close" description="Close." />
         <ECEnumerator value="30" name="Wide" displayLabel="Wide" description="Wide." />
     </ECEnumeration>
 
+    <PropertyCategory typeName="IsmPipingBendComponent_category" displayLabel="Piping Bend Component" priority="170" />
     <ECEntityClass typeName="IsmPipingBendComponent" modifier="Sealed" displayLabel="Piping Bend Component">
         <BaseClass>IsmPipingComponent</BaseClass>
-        <ECProperty propertyName="Type" typeName="PippingBendComponentType" displayLabel="Type" />
+        <ECStructProperty propertyName="Location" typeName="IsmPrimitiveGeometry" displayLabel="Location" category="IsmPipingComponent_category" />
+        <ECProperty propertyName="BendType" typeName="PipingBendComponentType" displayLabel="Type" category="IsmPipingBendComponent_category" />
     </ECEntityClass>
 
+    <PropertyCategory typeName="IsmPipingNode_category" displayLabel="Piping Node" priority="170" />
     <ECEntityClass typeName="IsmPipingNode" modifier="Sealed" displayLabel="Piping Node">
         <BaseClass>IsmNode</BaseClass>
-        <ECProperty propertyName="JointType" typeName="PipingJoint" displayLabel="Type" />
-        <ECProperty propertyName="WeldSize" typeName="double" displayLabel="Weld Size" kindOfQuantity="AECU:LENGTH_SHORT" />
-        <ECProperty propertyName="OffsetJoint" typeName="double" displayLabel="Offset Joint" kindOfQuantity="AECU:LENGTH_SHORT" />
-        <ECProperty propertyName="OffsetAverage" typeName="double" displayLabel="Offset Average" kindOfQuantity="AECU:LENGTH_SHORT" />
-        <ECProperty propertyName="OffsetMaximum" typeName="double" displayLabel="Offset Maximum" kindOfQuantity="AECU:LENGTH_SHORT" />
-        <ECProperty propertyName="StressIntensificationFactor" typeName="double" displayLabel="Stress Intensification Factor" />
-        <ECProperty propertyName="InPlaneStressIntensificationFactor" typeName="double" displayLabel="In Plane Stress Intensification Factor" />
-        <ECProperty propertyName="OutPlaneStressOuttensificationFactor" typeName="double" displayLabel="Out Plane Stress Intensification Factor" />
+        <ECProperty propertyName="JointType" typeName="PipingJoint" displayLabel="Joint End Type" category="IsmPipingNode_category" />
+        <ECProperty propertyName="WeldSize" typeName="double" displayLabel="Weld Size" category="IsmPipingNode_category" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="OffsetJoint" typeName="double" displayLabel="Offset Joint" category="IsmPipingNode_category" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="OffsetAverage" typeName="double" displayLabel="Offset Average" category="IsmPipingNode_category" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="OffsetMaximum" typeName="double" displayLabel="Offset Maximum" category="IsmPipingNode_category" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="StressIntensificationFactor" typeName="double" displayLabel="Stress Intensification Factor" category="IsmPipingNode_category" />
+        <ECProperty propertyName="InPlaneStressIntensificationFactor" typeName="double" displayLabel="In Plane Stress Intensification Factor" category="IsmPipingNode_category" />
+        <ECProperty propertyName="OutPlaneStressIntensificationFactor" typeName="double" displayLabel="Out Plane Stress Intensification Factor" category="IsmPipingNode_category" />
     </ECEntityClass>
 
     <ECEnumeration typeName="ValveType" backingTypeName="int" isStrict="true" description="Valve Type.">
@@ -1439,24 +1528,29 @@
         <ECEnumerator value="2000" name="NonStandard" displayLabel="Non-Standard" description="Non-Standard." />
     </ECEnumeration>
 
+    <PropertyCategory typeName="IsmPipingValveComponent_category" displayLabel="Piping Valve Component" priority="170" />
     <ECEntityClass typeName="IsmPipingValveComponent" modifier="Sealed" displayLabel="Piping Valve Component">
         <BaseClass>IsmPipingComponent</BaseClass>
-        <ECProperty propertyName="Tag" typeName="string" displayLabel="Tag" />
-        <ECProperty propertyName="ValveType" typeName="ValveType" displayLabel="Valve Type" />
-        <ECProperty propertyName="ValveWeight" typeName="double" displayLabel="Valve Weight" kindOfQuantity="AECU:WEIGHT" />
-        <ECProperty propertyName="HasActuator" typeName="boolean" displayLabel="Has Actuator" />
-        <ECProperty propertyName="ActuatorWeight" typeName="double" displayLabel="Actuator Weight" kindOfQuantity="AECU:WEIGHT" />
-        <ECProperty propertyName="ActuatorLength" typeName="double" displayLabel="Actuator Length" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="PressureRating" typeName="string" displayLabel="Pressure Rating" kindOfQuantity="AECU:PRESSURE" />
+        <ECStructProperty propertyName="Location" typeName="IsmPrimitiveGeometry" displayLabel="Location" category="IsmPipingComponent_category" />
+        <ECProperty propertyName="Tag" typeName="string" displayLabel="Tag" category="IsmPipingValveComponent_category" />
+        <ECProperty propertyName="ValveType" typeName="ValveType" displayLabel="Valve Type" category="IsmPipingValveComponent_category" />
+        <ECProperty propertyName="ValveWeight" typeName="double" displayLabel="Valve Weight" category="IsmPipingValveComponent_category" kindOfQuantity="AECU:WEIGHT" />
+        <ECProperty propertyName="HasActuator" typeName="boolean" displayLabel="Has Actuator" category="IsmPipingValveComponent_category" />
+        <ECProperty propertyName="ActuatorWeight" typeName="double" displayLabel="Actuator Weight" category="IsmPipingValveComponent_category" kindOfQuantity="AECU:WEIGHT" />
+        <ECProperty propertyName="ActuatorLength" typeName="double" displayLabel="Actuator Length" category="IsmPipingValveComponent_category" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="PressureRating" typeName="string" displayLabel="Pressure Rating" category="IsmPipingValveComponent_category" kindOfQuantity="AECU:PRESSURE" />
     </ECEntityClass>
 
+    <PropertyCategory typeName="IsmPipingReducerComponent_category" displayLabel="Piping Reducer Component" priority="170" />
     <ECEntityClass typeName="IsmPipingReducerComponent" modifier="Sealed" displayLabel="Piping Reducer Component">
         <BaseClass>IsmPipingComponent</BaseClass>
-        <ECProperty propertyName="EndDiameter" typeName="double" displayLabel="End Diameter" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="EndNominalDiameter" typeName="double" displayLabel="End Nominal Diameter" />
+        <ECStructProperty propertyName="Location" typeName="IsmPrimitiveGeometry" displayLabel="Location" category="IsmPipingComponent_category" />
+        <ECProperty propertyName="EndDiameter" typeName="double" displayLabel="End Diameter" category="IsmPipingReducerComponent_category" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="EndNominalDiameter" typeName="double" displayLabel="End Nominal Diameter" category="IsmPipingReducerComponent_category" kindOfQuantity="AECU:LENGTH_SHORT" />
     </ECEntityClass>
 
     <ECEntityClass typeName="IsmPipingFlexibleJointComponent" modifier="Sealed" displayLabel="Piping Flexible Joint Component">
+        <ECStructProperty propertyName="Location" typeName="IsmPrimitiveGeometry" displayLabel="Location" category="IsmPipingComponent_category" />
         <BaseClass>IsmPipingComponent</BaseClass>
     </ECEntityClass>
 
@@ -1469,27 +1563,30 @@
         <ECEnumerator value="120" name="User" displayLabel="User" description="User." />
     </ECEnumeration>
 
+    <PropertyCategory typeName="IsmPipingNozzleComponent_category" displayLabel="Piping Nozzle Component" priority="170" />
     <ECEntityClass typeName="IsmPipingNozzleComponent" modifier="Sealed" displayLabel="Piping Nozzle Component">
         <BaseClass>IsmPipingComponent</BaseClass>
-        <ECProperty propertyName="VesselDiameter" typeName="double" displayLabel="Vessel Diameter" kindOfQuantity="AECU:LENGTH_SHORT" />
-        <ECProperty propertyName="VesselDirection" typeName="point3d" displayLabel="Vessel Direction" />
-        <ECProperty propertyName="FlexibilityMethod" typeName="FlexibilityMethod" displayLabel="Flexibility Method" />
-        <ECProperty propertyName="RadialStiffness" typeName="double" displayLabel="Radial Stiffness" kindOfQuantity="AECU:ROTATIONAL_SPRING_CONSTANT" />
-        <ECProperty propertyName="CircularStiffness" typeName="double" displayLabel="Circular Stiffness" kindOfQuantity="AECU:ROTATIONAL_SPRING_CONSTANT" />
-        <ECProperty propertyName="LongitudinalStiffness" typeName="double" displayLabel="Longitudinal Stiffness" kindOfQuantity="AECU:ROTATIONAL_SPRING_CONSTANT" />
+        <ECStructProperty propertyName="Location" typeName="IsmPrimitiveGeometry" displayLabel="Location" category="IsmPipingComponent_category" />
+        <ECProperty propertyName="VesselDiameter" typeName="double" displayLabel="Vessel Diameter" category="IsmPipingNozzleComponent_category" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="VesselDirection" typeName="Point3d" displayLabel="Vessel Direction" category="IsmPipingNozzleComponent_category" />
+        <ECProperty propertyName="FlexibilityMethod" typeName="FlexibilityMethod" displayLabel="Flexibility Method" category="IsmPipingNozzleComponent_category" />
+        <ECProperty propertyName="RadialStiffness" typeName="double" displayLabel="Radial Stiffness" category="IsmPipingNozzleComponent_category" kindOfQuantity="AECU:ROTATIONAL_SPRING_CONSTANT" />
+        <ECProperty propertyName="CircularStiffness" typeName="double" displayLabel="Circular Stiffness" category="IsmPipingNozzleComponent_category" kindOfQuantity="AECU:ROTATIONAL_SPRING_CONSTANT" />
+        <ECProperty propertyName="LongitudinalStiffness" typeName="double" displayLabel="Longitudinal Stiffness" category="IsmPipingNozzleComponent_category" kindOfQuantity="AECU:ROTATIONAL_SPRING_CONSTANT" />
     </ECEntityClass>
 
+    <PropertyCategory typeName="IsmPipingSupport_category" displayLabel="Piping Support" priority="180" />
     <ECEntityClass typeName="IsmPipingSupport" modifier="Abstract" displayLabel="Piping Support">
         <BaseClass>IsmPipingMember</BaseClass>
-        <ECProperty propertyName="Tag" typeName="string" displayLabel="Tag" />
-        <ECProperty propertyName="AttachmentId" typeName="string" displayLabel="Attachment Id" />
-        <ECProperty propertyName="ComponentWeight" typeName="string" displayLabel="Component Weight" />
-        <ECProperty propertyName="IsConnectedToGround" typeName="boolean" displayLabel="Is Connected To Ground" />
-        <ECProperty propertyName="StartPoint" typeName="point3d" displayLabel="Start Point" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="EndPoint" typeName="point3d" displayLabel="End Point" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="PipeDiameter" typeName="double" displayLabel="PipeDiameter" kindOfQuantity="AECU:LENGTH_SHORT" />
-        <ECProperty propertyName="RAxis" typeName="point3d" displayLabel="R Axis" />
-        <ECProperty propertyName="SAxis" typeName="point3d" displayLabel="S Axis" />
+        <ECProperty propertyName="Tag" typeName="string" displayLabel="Tag" category="IsmPipingSupport_category" />
+        <ECProperty propertyName="AttachmentId" typeName="string" displayLabel="Attachment Id" category="IsmPipingSupport_category" />
+        <ECProperty propertyName="ComponentWeight" typeName="double" displayLabel="Component Weight" category="IsmPipingSupport_category" kindOfQuantity="AECU:WEIGHT" />
+        <ECProperty propertyName="IsConnectedToGround" typeName="boolean" displayLabel="Is Connected To Ground" category="IsmPipingSupport_category" />
+        <ECProperty propertyName="StartPoint" typeName="Point3d" displayLabel="Start Point" category="IsmPipingSupport_category" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="EndPoint" typeName="Point3d" displayLabel="End Point" category="IsmPipingSupport_category" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="PipeDiameter" typeName="double" displayLabel="PipeDiameter" category="IsmPipingSupport_category" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="RAxis" typeName="Point3d" displayLabel="R Axis" category="IsmPipingSupport_category" />
+        <ECProperty propertyName="SAxis" typeName="Point3d" displayLabel="S Axis" category="IsmPipingSupport_category" />
     </ECEntityClass>
 
     <ECEnumeration typeName="PipingSupportDesignMethod" backingTypeName="int" isStrict="true" description="Piping Spring Support Design Method.">
@@ -1502,32 +1599,34 @@
         <ECEnumerator value="20" name="Can" displayLabel="Can" description="Can." />
     </ECEnumeration>
 
+    <PropertyCategory typeName="IsmPipingSpringSupport_category" displayLabel="Piping Spring Support" priority="170" />
     <ECEntityClass typeName="IsmPipingSpringSupport" modifier="Sealed" displayLabel="Piping Spring Support">
         <BaseClass>IsmPipingSupport</BaseClass>
-        <ECProperty propertyName="DesignMethod" typeName="PipingSupportDesignMethod" displayLabel="Design Method" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="MaximumVerticalTravelRange" typeName="double" displayLabel="Maximum Vertical Travel Range" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="MovementDistance" typeName="double" displayLabel="Movement Distance" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="Load" typeName="double" displayLabel="Load" kindOfQuantity="AECU:FORCE" />
-        <ECProperty propertyName="LoadVariationRatio" typeName="double" displayLabel="Load Variation Ratio" />
-        <ECProperty propertyName="Stiffness" typeName="double" displayLabel="Stiffness" kindOfQuantity="AECU:SPRING_CONSTANT" />
-        <ECProperty propertyName="CatalogName" typeName="string" displayLabel="Catalog Name" />
-        <ECProperty propertyName="SpringType" typeName="PipingSpringType" displayLabel="Spring Type" />
-        <ECProperty propertyName="IsDesigned" typeName="boolean" displayLabel="Is Designed" />
-        <ECProperty propertyName="HangerCount" typeName="int" displayLabel="Hanger Count" />
-        <ECProperty propertyName="SpringSize" typeName="string" displayLabel="Spring Size" />
-        <ECProperty propertyName="SpringFigure" typeName="string" displayLabel="Spring Figure" />
+        <ECProperty propertyName="DesignMethod" typeName="PipingSupportDesignMethod" displayLabel="Design Method" category="IsmPipingSpringSupport_category" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="MaximumVerticalTravelRange" typeName="double" displayLabel="Maximum Vertical Travel Range" category="IsmPipingSpringSupport_category" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="MovementDistance" typeName="double" displayLabel="Movement Distance" category="IsmPipingSpringSupport_category" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="Load" typeName="double" displayLabel="Load" category="IsmPipingSpringSupport_category" kindOfQuantity="AECU:FORCE" />
+        <ECProperty propertyName="LoadVariationRatio" typeName="double" displayLabel="Load Variation Ratio" category="IsmPipingSpringSupport_category" />
+        <ECProperty propertyName="Stiffness" typeName="double" displayLabel="Stiffness" category="IsmPipingSpringSupport_category" kindOfQuantity="AECU:SPRING_CONSTANT" />
+        <ECProperty propertyName="CatalogName" typeName="string" displayLabel="Catalog Name" category="IsmPipingSpringSupport_category" />
+        <ECProperty propertyName="SpringType" typeName="PipingSpringType" displayLabel="Spring Type" category="IsmPipingSpringSupport_category" />
+        <ECProperty propertyName="IsDesigned" typeName="boolean" displayLabel="Is Designed" category="IsmPipingSpringSupport_category" />
+        <ECProperty propertyName="HangerCount" typeName="int" displayLabel="Hanger Count" category="IsmPipingSpringSupport_category" />
+        <ECProperty propertyName="SpringSize" typeName="string" displayLabel="Spring Size" category="IsmPipingSpringSupport_category" />
+        <ECProperty propertyName="SpringFigure" typeName="string" displayLabel="Spring Figure" category="IsmPipingSpringSupport_category" />
     </ECEntityClass>
 
+    <PropertyCategory typeName="IsmPipingConstantSupport_category" displayLabel="Piping Constant Support" priority="170" />
     <ECEntityClass typeName="IsmPipingConstantSupport" modifier="Sealed" displayLabel="Piping Constant Support">
         <BaseClass>IsmPipingSupport</BaseClass>
-        <ECProperty propertyName="DesignMethod" typeName="PipingSupportDesignMethod" displayLabel="Design Method" />
-        <ECProperty propertyName="MaximumVerticalTravelRange" typeName="double" displayLabel="Maximum Vertical Travel Range" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="MovementDistance" typeName="double" displayLabel="Movement Distance" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="Load" typeName="double" displayLabel="Load" kindOfQuantity="AECU:FORCE" />
-        <ECProperty propertyName="CatalogName" typeName="string" displayLabel="Catalog Name" />
-        <ECProperty propertyName="SpringType" typeName="PipingSpringType" displayLabel="Spring Type" />
-        <ECProperty propertyName="IsDesigned" typeName="boolean" displayLabel="Is Designed" />
-        <ECProperty propertyName="HangerCount" typeName="int" displayLabel="Hanger Count" />
+        <ECProperty propertyName="DesignMethod" typeName="PipingSupportDesignMethod" displayLabel="Design Method" category="IsmPipingConstantSupport_category" />
+        <ECProperty propertyName="MaximumVerticalTravelRange" typeName="double" displayLabel="Maximum Vertical Travel Range" category="IsmPipingConstantSupport_category" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="MovementDistance" typeName="double" displayLabel="Movement Distance" category="IsmPipingConstantSupport_category" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="Load" typeName="double" displayLabel="Load" category="IsmPipingConstantSupport_category" kindOfQuantity="AECU:FORCE" />
+        <ECProperty propertyName="CatalogName" typeName="string" displayLabel="Catalog Name" category="IsmPipingConstantSupport_category" />
+        <ECProperty propertyName="SpringType" typeName="PipingSpringType" displayLabel="Spring Type" category="IsmPipingConstantSupport_category" />
+        <ECProperty propertyName="IsDesigned" typeName="boolean" displayLabel="Is Designed" category="IsmPipingConstantSupport_category" />
+        <ECProperty propertyName="HangerCount" typeName="int" displayLabel="Hanger Count" category="IsmPipingConstantSupport_category" />
     </ECEntityClass>
 
     <ECEnumeration typeName="PipingVStopSupportType" backingTypeName="int" isStrict="true" description="V-Stop Type.">
@@ -1542,13 +1641,14 @@
         <ECEnumerator value="30" name="Shoe" displayLabel="Shoe" description="Shoe." />
     </ECEnumeration>
 
+    <PropertyCategory typeName="IsmPipingVStopSupport_category" displayLabel="Piping V-Stop Support" priority="170" />
     <ECEntityClass typeName="IsmPipingVStopSupport" modifier="Sealed" displayLabel="Piping V-Stop Support">
         <BaseClass>IsmPipingSupport</BaseClass>
-        <ECProperty propertyName="VStopType" typeName="PipingVStopSupportType" displayLabel="V-Stop Type" />
-        <ECProperty propertyName="GapDown" typeName="double" displayLabel="Gap Down" />
-        <ECProperty propertyName="GapUp" typeName="double" displayLabel="Gap Up" />
-        <ECProperty propertyName="GapType" typeName="PipingVStopSupportGap" displayLabel="Gap Type" />
-        <ECProperty propertyName="FrictionCoefficient" typeName="double" displayLabel="Friction Coefficient" />
+        <ECProperty propertyName="VStopType" typeName="PipingVStopSupportType" displayLabel="V-Stop Type" category="IsmPipingVStopSupport_category" />
+        <ECProperty propertyName="GapDown" typeName="double" displayLabel="Gap Down" category="IsmPipingVStopSupport_category" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="GapUp" typeName="double" displayLabel="Gap Up" category="IsmPipingVStopSupport_category" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="GapType" typeName="PipingVStopSupportGap" category="IsmPipingVStopSupport_category" displayLabel="Gap Type" />
+        <ECProperty propertyName="FrictionCoefficient" typeName="double" displayLabel="Friction Coefficient" category="IsmPipingVStopSupport_category" kindOfQuantity="Coefficient3DP" />
     </ECEntityClass>
 
     <ECEnumeration typeName="PipingSupportGapType" backingTypeName="int" isStrict="true" description="Piping Support Weight Gap.">
@@ -1556,54 +1656,64 @@
         <ECEnumerator value="20" name="AsBuilt" displayLabel="As Built" description="As Built." />
     </ECEnumeration>
 
+    <KindOfQuantity typeName='Coefficient3DP' description='Coefficient 3DP'
+        displayLabel='Coefficient 3DP' persistenceUnit='u:COEFFICIENT' relativeError='.0005'
+        presentationUnits='f:DefaultRealU(3)[u:COEFFICIENT|]' />
+
+    <PropertyCategory typeName="IsmPipingInclineSupport_category" displayLabel="Piping Incline Support" priority="170" />
     <ECEntityClass typeName="IsmPipingInclineSupport" modifier="Sealed" displayLabel="Piping Incline Support">
         <BaseClass>IsmPipingSupport</BaseClass>
-        <ECProperty propertyName="Direction" typeName="point3d" displayLabel="Direction" />
-        <ECProperty propertyName="Stiffness" typeName="double" displayLabel="Stiffness" kindOfQuantity="AECU:SPRING_CONSTANT" />
-        <ECProperty propertyName="GapForward" typeName="double" displayLabel="Gap Forward" kindOfQuantity="AECU:LENGTH_SHORT" />
-        <ECProperty propertyName="GapBackward" typeName="double" displayLabel="Gap Backward" kindOfQuantity="AECU:LENGTH_SHORT" />
-        <ECProperty propertyName="GapType" typeName="PipingSupportGapType" displayLabel="Gap Type" />
-        <ECProperty propertyName="FrictionCoefficient" typeName="double" displayLabel="Friction Coefficient" />
+        <ECProperty propertyName="Direction" typeName="Point3d" displayLabel="Direction" category="IsmPipingInclineSupport_category" />
+        <ECProperty propertyName="Stiffness" typeName="double" displayLabel="Stiffness" category="IsmPipingInclineSupport_category" kindOfQuantity="AECU:SPRING_CONSTANT" />
+        <ECProperty propertyName="GapForward" typeName="double" displayLabel="Gap Forward" category="IsmPipingInclineSupport_category" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="GapBackward" typeName="double" displayLabel="Gap Backward" category="IsmPipingInclineSupport_category" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="GapType" typeName="PipingSupportGapType" displayLabel="Gap Type" category="IsmPipingInclineSupport_category" />
+        <ECProperty propertyName="FrictionCoefficient" typeName="double" displayLabel="Friction Coefficient" category="IsmPipingInclineSupport_category" kindOfQuantity="Coefficient3DP" />
     </ECEntityClass>
 
+    <PropertyCategory typeName="IsmPipingLineStopSupport_category" displayLabel="Piping Line Stop Support" priority="170" />
     <ECEntityClass typeName="IsmPipingLineStopSupport" modifier="Sealed" displayLabel="Piping Line Stop Support">
         <BaseClass>IsmPipingSupport</BaseClass>
-        <ECProperty propertyName="Stiffness" typeName="double" displayLabel="Stiffness" kindOfQuantity="AECU:SPRING_CONSTANT" />
-        <ECProperty propertyName="GapForward" typeName="double" displayLabel="Gap Forward" kindOfQuantity="AECU:LENGTH_SHORT" />
-        <ECProperty propertyName="GapBackward" typeName="double" displayLabel="Gap Backward" kindOfQuantity="AECU:LENGTH_SHORT" />
-        <ECProperty propertyName="GapType" typeName="PipingSupportGapType" displayLabel="Gap Type" />
+        <ECProperty propertyName="Stiffness" typeName="double" displayLabel="Stiffness" category="IsmPipingLineStopSupport_category" kindOfQuantity="AECU:SPRING_CONSTANT" />
+        <ECProperty propertyName="GapForward" typeName="double" displayLabel="Gap Forward" category="IsmPipingLineStopSupport_category" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="GapBackward" typeName="double" displayLabel="Gap Backward" category="IsmPipingLineStopSupport_category" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="GapType" typeName="PipingSupportGapType" displayLabel="Gap Type" category="IsmPipingLineStopSupport_category" />
     </ECEntityClass>
 
+    <PropertyCategory typeName="IsmPipingGuideSupport_category" displayLabel="Piping Guide Support" priority="170" />
     <ECEntityClass typeName="IsmPipingGuideSupport" modifier="Sealed" displayLabel="Piping Guide Support">
         <BaseClass>IsmPipingSupport</BaseClass>
-        <ECProperty propertyName="Stiffness" typeName="double" displayLabel="Stiffness" kindOfQuantity="AECU:SPRING_CONSTANT" />
-        <ECProperty propertyName="GapDown" typeName="double" displayLabel="Gap Down" kindOfQuantity="AECU:LENGTH_SHORT" />
-        <ECProperty propertyName="GapUp" typeName="double" displayLabel="Gap Up" kindOfQuantity="AECU:LENGTH_SHORT" />
-        <ECProperty propertyName="GapLeft" typeName="double" displayLabel="Gap Left" kindOfQuantity="AECU:LENGTH_SHORT" />
-        <ECProperty propertyName="GapRight" typeName="double" displayLabel="Gap Right" kindOfQuantity="AECU:LENGTH_SHORT" />
-        <ECProperty propertyName="FrictionCoefficient" typeName="double" displayLabel="Friction Coefficient" />
-        <ECProperty propertyName="GapType" typeName="PipingSupportGapType" displayLabel="Gap Type" />
+        <ECProperty propertyName="Stiffness" typeName="double" displayLabel="Stiffness" category="IsmPipingGuideSupport_category" kindOfQuantity="AECU:SPRING_CONSTANT" />
+        <ECProperty propertyName="GapDown" typeName="double" displayLabel="Gap Down" category="IsmPipingGuideSupport_category" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="GapUp" typeName="double" displayLabel="Gap Up" category="IsmPipingGuideSupport_category" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="GapLeft" typeName="double" displayLabel="Gap Left" category="IsmPipingGuideSupport_category" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="GapRight" typeName="double" displayLabel="Gap Right" category="IsmPipingGuideSupport_category" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="FrictionCoefficient" typeName="double" displayLabel="Friction Coefficient" category="IsmPipingGuideSupport_category" kindOfQuantity="Coefficient3DP" />
+        <ECProperty propertyName="GapType" typeName="PipingSupportGapType" displayLabel="Gap Type" category="IsmPipingGuideSupport_category" />
     </ECEntityClass>
 
+    <PropertyCategory typeName="IsmPipingRotationSupport_category" displayLabel="Piping Rotation Support" priority="170" />
     <ECEntityClass typeName="IsmPipingRotationSupport" modifier="Sealed" displayLabel="Piping Rotation Support">
         <BaseClass>IsmPipingSupport</BaseClass>
-        <ECProperty propertyName="Direction" typeName="point3d" displayLabel="Direction" />
-        <ECProperty propertyName="Stiffness" typeName="double" displayLabel="Stiffness" kindOfQuantity="AECU:SPRING_CONSTANT" />
+        <ECProperty propertyName="Direction" typeName="Point3d" displayLabel="Direction" category="IsmPipingRotationSupport_category" />
+        <ECProperty propertyName="Stiffness" typeName="double" displayLabel="Stiffness" category="IsmPipingRotationSupport_category" kindOfQuantity="AECU:SPRING_CONSTANT" />
     </ECEntityClass>
 
+    <PropertyCategory typeName="IsmPipingDamperSupport_category" displayLabel="Piping Damper Support" priority="170" />
     <ECEntityClass typeName="IsmPipingDamperSupport" modifier="Sealed" displayLabel="Piping Damper Support">
         <BaseClass>IsmPipingSupport</BaseClass>
-        <ECProperty propertyName="Direction" typeName="point3d" displayLabel="Direction" />
-        <ECProperty propertyName="Stiffness" typeName="double" displayLabel="Stiffness" kindOfQuantity="AECU:SPRING_CONSTANT" />
+        <ECProperty propertyName="Direction" typeName="Point3d" displayLabel="Direction" category="IsmPipingDamperSupport_category" />
+        <ECProperty propertyName="Stiffness" typeName="double" displayLabel="Stiffness" category="IsmPipingDamperSupport_category" kindOfQuantity="AECU:SPRING_CONSTANT" />
     </ECEntityClass>
 
-    <ECEntityClass typeName="IsmPipingTieLinkSupport" modifier="Sealed" displayLabel="Piping Tie Link Support">
+    <PropertyCategory typeName="IsmPipingTieLinkSupport_category" displayLabel="Piping Tie/Link Support" priority="170" />
+    <ECEntityClass typeName="IsmPipingTieLinkSupport" modifier="Sealed" displayLabel="Piping Tie/Link Support">
         <BaseClass>IsmPipingSupport</BaseClass>
-        <ECProperty propertyName="Stiffness" typeName="double" displayLabel="Stiffness" kindOfQuantity="AECU:SPRING_CONSTANT" />
-        <ECProperty propertyName="GapForward" typeName="double" displayLabel="Gap Forward" kindOfQuantity="AECU:LENGTH_SHORT" />
-        <ECProperty propertyName="GapBackward" typeName="double" displayLabel="Gap Backward" kindOfQuantity="AECU:LENGTH_SHORT" />
-        <ECProperty propertyName="GapType" typeName="PipingSupportGapType" displayLabel="Gap Type" />
-        <ECProperty propertyName="FrictionCoefficient" typeName="double" displayLabel="Friction Coefficient" />
+        <ECProperty propertyName="Stiffness" typeName="double" displayLabel="Stiffness" category="IsmPipingTieLinkSupport_category" kindOfQuantity="AECU:SPRING_CONSTANT" />
+        <ECProperty propertyName="GapForward" typeName="double" displayLabel="Gap Forward" category="IsmPipingTieLinkSupport_category" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="GapBackward" typeName="double" displayLabel="Gap Backward" category="IsmPipingTieLinkSupport_category" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="GapType" typeName="PipingSupportGapType" displayLabel="Gap Type" category="IsmPipingTieLinkSupport_category" />
+        <ECProperty propertyName="FrictionCoefficient" typeName="double" displayLabel="Friction Coefficient" category="IsmPipingTieLinkSupport_category" kindOfQuantity="Coefficient3DP" />
     </ECEntityClass>
 
     <ECEnumeration typeName="AxialBehavior" backingTypeName="int" isStrict="true" description="Axial Behavior.">
@@ -1612,17 +1722,18 @@
         <ECEnumerator value="3" name="CompressionAndTension" displayLabel="Compression And Tension" description="Compression And Tension." />
     </ECEnumeration>
 
+    <PropertyCategory typeName="IsmPipingAnchorSupport_category" displayLabel="Piping Anchor Support" priority="170" />
     <ECEntityClass typeName="IsmPipingAnchorSupport" modifier="Sealed" displayLabel="Piping Anchor Support">
         <BaseClass>IsmPipingSupport</BaseClass>
-        <ECProperty propertyName="RAxisRotationStiffness" typeName="double" displayLabel="R-Axis Rotation Stiffness" />
-        <ECProperty propertyName="RAxisTranslationDirection" typeName="AxialBehavior" displayLabel="R-Axis Translation Direction" />
-        <ECProperty propertyName="RAxisTranslationStiffness" typeName="double" displayLabel="R-Axis Translation Stiffness" />
-        <ECProperty propertyName="SAxisRotationStiffness" typeName="double" displayLabel="S-Axis Rotation Stiffness" />
-        <ECProperty propertyName="SAxisTranslationDirection" typeName="AxialBehavior" displayLabel="S-Axis Translation Direction" />
-        <ECProperty propertyName="SAxisTranslationStiffness" typeName="double" displayLabel="S-Axis Translation Stiffness" />
-        <ECProperty propertyName="TAxisRotationStiffness" typeName="double" displayLabel="T-Axis Rotation Stiffness" />
-        <ECProperty propertyName="TAxisTranslationDirection" typeName="AxialBehavior" displayLabel="T-Axis Translation Direction" />
-        <ECProperty propertyName="TAxisTranslationStiffness" typeName="double" displayLabel="T-Axis Translation Stiffness" />
+        <ECProperty propertyName="RAxisRotationStiffness" typeName="double" displayLabel="R-Axis Rotation Stiffness" category="IsmPipingAnchorSupport_category" kindOfQuantity="AECU:ROTATIONAL_SPRING_CONSTANT" />
+        <ECProperty propertyName="RAxisTranslationDirection" typeName="AxialBehavior" displayLabel="R-Axis Translation Direction" category="IsmPipingAnchorSupport_category" />
+        <ECProperty propertyName="RAxisTranslationStiffness" typeName="double" displayLabel="R-Axis Translation Stiffness" category="IsmPipingAnchorSupport_category" kindOfQuantity="AECU:SPRING_CONSTANT" />
+        <ECProperty propertyName="SAxisRotationStiffness" typeName="double" displayLabel="S-Axis Rotation Stiffness" category="IsmPipingAnchorSupport_category" kindOfQuantity="AECU:ROTATIONAL_SPRING_CONSTANT" />
+        <ECProperty propertyName="SAxisTranslationDirection" typeName="AxialBehavior" displayLabel="S-Axis Translation Direction" category="IsmPipingAnchorSupport_category" />
+        <ECProperty propertyName="SAxisTranslationStiffness" typeName="double" displayLabel="S-Axis Translation Stiffness" category="IsmPipingAnchorSupport_category" kindOfQuantity="AECU:SPRING_CONSTANT" />
+        <ECProperty propertyName="TAxisRotationStiffness" typeName="double" displayLabel="T-Axis Rotation Stiffness" category="IsmPipingAnchorSupport_category" kindOfQuantity="AECU:ROTATIONAL_SPRING_CONSTANT" />
+        <ECProperty propertyName="TAxisTranslationDirection" typeName="AxialBehavior" displayLabel="T-Axis Translation Direction" category="IsmPipingAnchorSupport_category" />
+        <ECProperty propertyName="TAxisTranslationStiffness" typeName="double" displayLabel="T-Axis Translation Stiffness" category="IsmPipingAnchorSupport_category" kindOfQuantity="AECU:SPRING_CONSTANT" />
     </ECEntityClass>
 
     <ECRelationshipClass typeName="IsmPipingMember_PipingLine" modifier="None" strength="referencing" strengthDirection="forward">
@@ -1706,10 +1817,11 @@
         </Target>
     </ECRelationshipClass>
 
+    <PropertyCategory typeName="IsmTendonNode_category" displayLabel="Tendon Node" priority="190" />
     <ECEntityClass typeName="IsmTendonNode" modifier="None" displayLabel="Tendon Node">
         <BaseClass>anlyt:AnalyticalElement</BaseClass>
         <BaseClass>IIsmSubObject</BaseClass>
-        <ECProperty propertyName="Location" typeName="point3d" displayLabel="Location" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="Location" typeName="Point3d" displayLabel="Location" category="IsmTendonNode_category" kindOfQuantity="AECU:LENGTH" />
     </ECEntityClass>
 
     <ECRelationshipClass typeName="IsmTendonSet_Nodes" modifier="None" strength="referencing" strengthDirection="forward">
@@ -1722,10 +1834,11 @@
         </Target>
     </ECRelationshipClass>
 
+    <PropertyCategory typeName="IsmTendon_category" displayLabel="Tendon" priority="190" />
     <ECEntityClass typeName="IsmTendon" modifier="None" displayLabel="Tendon">
         <BaseClass>anlyt:AnalyticalElement</BaseClass>
         <BaseClass>IIsmSubObject</BaseClass>
-        <ECProperty propertyName="StrandCount" typeName="double" displayLabel="Strand Count" />
+        <ECProperty propertyName="StrandCount" typeName="double" displayLabel="Strand Count" category="IsmTendon_category" />
     </ECEntityClass>
 
     <ECRelationshipClass typeName="IsmTendonSet_Tendon" modifier="None" strength="referencing" strengthDirection="forward">
@@ -1756,14 +1869,7 @@
 
     <ECEntityClass typeName="IsmTendonDuctedSystem" modifier="None" displayLabel="Tendon Ducted System">
         <BaseClass>IsmTendonSystem</BaseClass>
-        <ECProperty propertyName="DuctShape" typeName="TendonDuctShapeType" displayLabel="Duct Shape">
-            <ECCustomAttributes>
-                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03"/>
-                <Deprecated xmlns="CoreCustomAttributes.01.00.03">
-                    <Description>Deprecated renamed property. Use 'DuctProfile' instead.</Description>
-                </Deprecated>
-            </ECCustomAttributes>
-        </ECProperty>
+        <ECProperty propertyName="DuctShape" typeName="TendonDuctShapeType" displayLabel="Duct Shape" />
         <ECProperty propertyName="DuctProfile" typeName="TendonDuctProfile" displayLabel="Duct Profile" />
         <ECProperty propertyName="DuctWidth" typeName="double" displayLabel="Duct Width" kindOfQuantity="AECU:LENGTH_SHORT" />
         <ECProperty propertyName="DuctHeight" typeName="double" displayLabel="Duct Height" kindOfQuantity="AECU:LENGTH_SHORT" />
@@ -1796,10 +1902,11 @@
         </Target>
     </ECRelationshipClass>
 
+    <PropertyCategory typeName="IsmTendonPart_category" displayLabel="Tendon Part" priority="190" />
     <ECEntityClass typeName="IsmTendonPart" modifier="Abstract" displayLabel="Tendon Part">
         <BaseClass>anlyt:AnalyticalElement</BaseClass>
         <BaseClass>IIsmSubObject</BaseClass>
-        <ECProperty propertyName="Orientation" typeName="point3d" displayLabel="Orientation" />
+        <ECProperty propertyName="Orientation" typeName="Point3d" displayLabel="Orientation" category="IsmTendonPart_category" />
     </ECEntityClass>
 
     <ECRelationshipClass typeName="IsmTendon_TendonPart" modifier="None" strength="referencing" strengthDirection="forward">
@@ -1812,14 +1919,15 @@
         </Target>
     </ECRelationshipClass>
 
+    <PropertyCategory typeName="IsmTendonSegment_category" displayLabel="Tendon Segment" priority="180" />
     <ECEntityClass typeName="IsmTendonSegment" modifier="None" displayLabel="Tendon Segment">
         <BaseClass>IsmTendonPart</BaseClass>
-        <ECProperty propertyName="Harped" typeName="boolean" displayLabel="Harped" />
-        <ECProperty propertyName="InflectionRatio" typeName="double" displayLabel="Inflection Ratio" />
-        <ECProperty propertyName="Location" typeName="Bentley.Geometry.Common.IGeometry" displayLabel="Location" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="DuctLocation" typeName="Bentley.Geometry.Common.IGeometry" displayLabel="Duct Location" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="StartStress" typeName="double" displayLabel="Start Stress" kindOfQuantity="AECU:PRESSURE" />
-        <ECProperty propertyName="EndStress" typeName="double" displayLabel="End Stress" kindOfQuantity="AECU:PRESSURE" />
+        <ECProperty propertyName="Harped" typeName="boolean" displayLabel="Harped" category="IsmTendonSegment_category" />
+        <ECProperty propertyName="InflectionRatio" typeName="double" displayLabel="Inflection Ratio" category="IsmTendonSegment_category" />
+        <ECStructProperty propertyName="Location" typeName="IsmPrimitiveGeometry" displayLabel="Location" category="IsmTendonSegment_category" />
+        <ECStructProperty propertyName="DuctLocation" typeName="IsmPrimitiveGeometry" displayLabel="Duct Location" category="IsmTendonSegment_category" />
+        <ECProperty propertyName="StartStress" typeName="double" displayLabel="Start Stress" category="IsmTendonSegment_category" kindOfQuantity="AECU:AREA_FORCE_LARGE" />
+        <ECProperty propertyName="EndStress" typeName="double" displayLabel="End Stress" category="IsmTendonSegment_category" kindOfQuantity="AECU:AREA_FORCE_LARGE" />
     </ECEntityClass>
 
     <ECRelationshipClass typeName="IsmTendonSegment_StartNode" modifier="None" strength="referencing" strengthDirection="forward">
@@ -1842,11 +1950,12 @@
         </Target>
     </ECRelationshipClass>
 
+    <PropertyCategory typeName="IsmTendonAnchor_category" displayLabel="Tendon Anchor" priority="180" />
     <ECEntityClass typeName="IsmTendonAnchor" modifier="Abstract" displayLabel="Tendon Anchor">
         <BaseClass>IsmTendonPart</BaseClass>
-        <ECProperty propertyName="AnchorFriction" typeName="double" displayLabel="Anchor Friction" />
-        <ECProperty propertyName="AnchorType" typeName="AnchorType" displayLabel="Anchor Type" />
-        <ECProperty propertyName="Direction" typeName="point3d" displayLabel="Direction" />
+        <ECProperty propertyName="AnchorFriction" typeName="double" displayLabel="Anchor Friction" category="IsmTendonAnchor_category" />
+        <ECProperty propertyName="AnchorType" typeName="AnchorType" displayLabel="Anchor Type" category="IsmTendonAnchor_category" />
+        <ECProperty propertyName="Direction" typeName="Point3d" displayLabel="Direction" category="IsmTendonAnchor_category" />
     </ECEntityClass>
 
     <ECRelationshipClass typeName="IsmTendonAnchor_Node" modifier="None" strength="referencing" strengthDirection="forward">
@@ -1859,11 +1968,12 @@
         </Target>
     </ECRelationshipClass>
 
+    <PropertyCategory typeName="IsmTendonTensioningEndAnchor_category" displayLabel="Tendon Tensioning End Anchor" priority="170" />
     <ECEntityClass typeName="IsmTendonTensioningEndAnchor" modifier="None" displayLabel="Tendon Tensioning-End Anchor">
         <BaseClass>IsmTendonAnchor</BaseClass>
-        <ECProperty propertyName="JackStress" typeName="double" displayLabel="Jack Stress" kindOfQuantity="AECU:PRESSURE" />
-        <ECProperty propertyName="SeatingDistance" typeName="double" displayLabel="Seating Distance" kindOfQuantity="AECU:LENGTH_SHORT" />
-        <ECProperty propertyName="Elongation" typeName="double" displayLabel="Elongation" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="JackStress" typeName="double" displayLabel="Jack Stress" category="IsmTendonTensioningEndAnchor_category" kindOfQuantity="AECU:AREA_FORCE_LARGE" />
+        <ECProperty propertyName="SeatingDistance" typeName="double" displayLabel="Seating Distance" category="IsmTendonTensioningEndAnchor_category" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="Elongation" typeName="double" displayLabel="Elongation" category="IsmTendonTensioningEndAnchor_category" kindOfQuantity="AECU:LENGTH" />
     </ECEntityClass>
 
     <ECEntityClass typeName="IsmTendonFixedEndAnchor" modifier="None" displayLabel="Tendon Fixed-End Anchor">
@@ -1917,30 +2027,33 @@
         <ECEnumerator value="1300" name="Other" displayLabel="Other" />
     </ECEnumeration>
 
+    <PropertyCategory typeName="IsmPointForceMemberLoad_category" displayLabel="Point Force Member Load" priority="180" />
     <ECEntityClass typeName="IsmPointForceMemberLoad" modifier="None" displayLabel="Point Force Member Load">
         <BaseClass>IsmForceMemberLoad</BaseClass>
-        <ECProperty propertyName="Force" typeName="point3d" displayLabel="Force" kindOfQuantity="AECU:FORCE" />
-        <ECProperty propertyName="Moment" typeName="point3d" displayLabel="Moment" kindOfQuantity="AECU:MOMENT" />
-        <ECProperty propertyName="Location" typeName="point3d" displayLabel="Location" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="IsNodalLoad" typeName="boolean" displayLabel="Is Nodal Load" />
+        <ECProperty propertyName="Force" typeName="Point3d" displayLabel="Force" category="IsmPointForceMemberLoad_category" kindOfQuantity="AECU:FORCE" />
+        <ECProperty propertyName="Moment" typeName="Point3d" displayLabel="Moment" category="IsmPointForceMemberLoad_category" kindOfQuantity="AECU:MOMENT" />
+        <ECProperty propertyName="Location" typeName="Point3d" displayLabel="Location" category="IsmPointForceMemberLoad_category" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="IsNodalLoad" typeName="boolean" displayLabel="Is Nodal Load" category="IsmPointForceMemberLoad_category" />
     </ECEntityClass>
 
+    <PropertyCategory typeName="IsmProxy_category" displayLabel="Proxy" priority="190" />
     <ECEntityClass typeName="IsmProxy" modifier="None" displayLabel="Proxy">
         <BaseClass>anlyt:AnalyticalElement</BaseClass>
         <BaseClass>IIsmObject</BaseClass>
-        <ECProperty propertyName="Location" typeName="binary" displayLabel="Location" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="ProxyType" typeName="string" displayLabel="Proxy Type" />
+        <ECProperty propertyName="Location" typeName="binary" displayLabel="Location" category="IsmProxy_category" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="ProxyType" typeName="string" displayLabel="Proxy Type" category="IsmProxy_category" />
     </ECEntityClass>
 
     <ECEntityClass typeName="IsmRadialGrid" modifier="None" displayLabel="Radial Grid">
         <BaseClass>IsmGrid</BaseClass>
     </ECEntityClass>
 
+    <PropertyCategory typeName="IsmRadialGridLine_category" displayLabel="Radial Grid Line" priority="180" />
     <ECEntityClass typeName="IsmRadialGridLine" modifier="None" displayLabel="Radial Grid Line">
         <BaseClass>IsmGridLine</BaseClass>
-        <ECProperty propertyName="Angle" typeName="double" displayLabel="Angle" kindOfQuantity="AECU:ANGLE" />
-        <ECProperty propertyName="MinimumRadius" typeName="double" displayLabel="Minimum Radius" kindOfQuantity="AECU:ANGLE" />
-        <ECProperty propertyName="MaximumRadius" typeName="double" displayLabel="Maximum Radius" kindOfQuantity="AECU:ANGLE" />
+        <ECProperty propertyName="Angle" typeName="double" displayLabel="Angle" category="IsmRadialGridLine_category" kindOfQuantity="AECU:ANGLE" />
+        <ECProperty propertyName="MinimumRadius" typeName="double" displayLabel="Minimum Radius" category="IsmRadialGridLine_category" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="MaximumRadius" typeName="double" displayLabel="Maximum Radius" category="IsmRadialGridLine_category" kindOfQuantity="AECU:LENGTH" />
     </ECEntityClass>
 
 
@@ -2018,32 +2131,35 @@
         </Target>
     </ECRelationshipClass>
 
+    <PropertyCategory typeName="IsmRectangleParallelRebar_category" displayLabel="Rectangle Parallel Rebar" priority="170" />
     <ECEntityClass typeName="IsmRectangleParallelRebar" modifier="None" displayLabel="Rectangle Parallel Rebar" >
         <BaseClass>IsmParallelRebar</BaseClass>
-        <ECProperty propertyName="BottomBarCount" typeName="int" displayLabel="Bottom Bar Count" />
-        <ECProperty propertyName="CornerBarCount" typeName="int" displayLabel="Corner Bar Count" />
-        <ECProperty propertyName="Depth" typeName="double" displayLabel="Depth" kindOfQuantity="AECU:LENGTH_SHORT" />
-        <ECProperty propertyName="LeftBarCount" typeName="int" displayLabel="Left Bar Count" />
-        <ECProperty propertyName="RightBarCount" typeName="int" displayLabel="Right Bar Count" />
-        <ECProperty propertyName="TopBarCount" typeName="int" displayLabel="Top Bar Count" />
-        <ECProperty propertyName="Width" typeName="double" displayLabel="Width" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="BottomBarCount" typeName="int" displayLabel="Bottom Bar Count" category="IsmRectangleParallelRebar_category" />
+        <ECProperty propertyName="CornerBarCount" typeName="int" displayLabel="Corner Bar Count" category="IsmRectangleParallelRebar_category" />
+        <ECProperty propertyName="Depth" typeName="double" displayLabel="Depth" category="IsmRectangleParallelRebar_category" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="LeftBarCount" typeName="int" displayLabel="Left Bar Count" category="IsmRectangleParallelRebar_category" />
+        <ECProperty propertyName="RightBarCount" typeName="int" displayLabel="Right Bar Count" category="IsmRectangleParallelRebar_category" />
+        <ECProperty propertyName="TopBarCount" typeName="int" displayLabel="Top Bar Count" category="IsmRectangleParallelRebar_category" />
+        <ECProperty propertyName="Width" typeName="double" displayLabel="Width" category="IsmRectangleParallelRebar_category" kindOfQuantity="AECU:LENGTH_SHORT" />
     </ECEntityClass>
 
+    <PropertyCategory typeName="IsmRectangleTieRebar_category" displayLabel="Rectangle Tie Rebar" priority="170" />
     <ECEntityClass typeName="IsmRectangleTieRebar" modifier="None" displayLabel="Rectangle Tie Rebar" >
         <BaseClass>IsmPerpendicularRebar</BaseClass>
-        <ECProperty propertyName="Depth" typeName="double" displayLabel="Depth" kindOfQuantity="AECU:LENGTH_SHORT" />
-        <ECProperty propertyName="Width" typeName="double" displayLabel="Width" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="Depth" typeName="double" displayLabel="Depth" category="IsmRectangleTieRebar_category" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="Width" typeName="double" displayLabel="Width" category="IsmRectangleTieRebar_category" kindOfQuantity="AECU:LENGTH_SHORT" />
     </ECEntityClass>
 
+    <PropertyCategory typeName="IsmShearStudZone_category" displayLabel="Rectangle Tie Rebar" priority="190" />
     <ECEntityClass typeName="IsmShearStudZone" modifier="None" displayLabel="Shear Stud Zone" >
         <BaseClass>anlyt:AnalyticalElement</BaseClass>
         <BaseClass>IIsmSubObject</BaseClass>
-        <ECProperty propertyName="ZoneLength" typeName="double" displayLabel="Zone Length" kindOfQuantity="AECU:LENGTH_SHORT" />
-        <ECProperty propertyName="Index" typeName="int" displayLabel="Index" />
-        <ECProperty propertyName="StudCount" typeName="int" displayLabel="Stud Count" />
-        <ECProperty propertyName="StudDiameter" typeName="double" displayLabel="Stud Diameter" kindOfQuantity="AECU:LENGTH_SHORT" />
-        <ECProperty propertyName="StudLength" typeName="double" displayLabel="Stud Length" kindOfQuantity="AECU:LENGTH_SHORT" />
-        <ECProperty propertyName="StudTensileStrength" typeName="double" displayLabel="Stud Tensile Length" kindOfQuantity="AECU:PRESSURE" />
+        <ECProperty propertyName="ZoneLength" typeName="double" displayLabel="Zone Length" category="IsmShearStudZone_category" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="Index" typeName="int" displayLabel="Index" category="IsmShearStudZone_category" />
+        <ECProperty propertyName="StudCount" typeName="int" displayLabel="Stud Count" category="IsmShearStudZone_category" />
+        <ECProperty propertyName="StudDiameter" typeName="double" displayLabel="Stud Diameter" category="IsmShearStudZone_category" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="StudLength" typeName="double" displayLabel="Stud Length" category="IsmShearStudZone_category" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="StudTensileStrength" typeName="double" displayLabel="Stud Tensile Length" category="IsmShearStudZone_category" kindOfQuantity="AECU:AREA_FORCE_LARGE" />
     </ECEntityClass>
 
     <ECRelationshipClass typeName="IsmShearStudZone_Member" modifier="None" strength="referencing" strengthDirection="forward">
@@ -2079,9 +2195,10 @@
         <ECProperty propertyName="Spaces" typeName="int" displayLabel="Spaces" />
     </ECEntityClass>
 
+    <PropertyCategory typeName="IsmSpiralTieRebar_category" displayLabel="Spiral Tie Rebar" priority="170" />
     <ECEntityClass typeName="IsmSpiralTieRebar" modifier="None" displayLabel="Spiral Tie Rebar" >
         <BaseClass>IsmPerpendicularRebar</BaseClass>
-        <ECProperty propertyName="Diameter" typeName="double" displayLabel="Diameter" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="Diameter" typeName="double" displayLabel="Diameter" category="IsmSpiralTieRebar_category" kindOfQuantity="AECU:LENGTH_SHORT" />
     </ECEntityClass>
 
     <ECEntityClass typeName="IsmStandardSteelDeck" modifier="None" displayLabel="Standard Steel Deck" >
@@ -2102,9 +2219,10 @@
         </Target>
     </ECRelationshipClass>
 
+    <PropertyCategory typeName="IsmStraightPerpendicularRebar_category" displayLabel="Straight Perpendicular Rebar" priority="170" />
     <ECEntityClass typeName="IsmStraightPerpendicularRebar" modifier="None" displayLabel="Straight Perpendicular Rebar" >
         <BaseClass>IsmPerpendicularRebar</BaseClass>
-        <ECProperty propertyName="Length" typeName="double" displayLabel="Length" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="Length" typeName="double" displayLabel="Length" category="IsmStraightPerpendicularRebar_category" kindOfQuantity="AECU:LENGTH_SHORT" />
     </ECEntityClass>
 
     <ECEntityClass typeName="IsmSubStructure" modifier="None" displayLabel="Sub Structure" >
@@ -2132,18 +2250,20 @@
         </Target>
     </ECRelationshipClass>
 
+
+    <PropertyCategory typeName="IsmSurfaceForceMemberLoad_category" displayLabel="Surface Force Member Load" priority="170" />
     <ECEntityClass typeName="IsmSurfaceForceMemberLoad" modifier="Sealed" displayLabel="Surface Force Member Load" >
         <BaseClass>IsmForceMemberLoad</BaseClass>
-        <ECProperty propertyName="Force0" typeName="point3d" displayLabel="Force0" kindOfQuantity="AECU:AREA_FORCE" />
-        <ECProperty propertyName="Force1" typeName="point3d" displayLabel="Force1" kindOfQuantity="AECU:AREA_FORCE" />
-        <ECProperty propertyName="Force2" typeName="point3d" displayLabel="Force2" kindOfQuantity="AECU:AREA_FORCE" />
-        <ECProperty propertyName="Moment0" typeName="point3d" displayLabel="Moment0" kindOfQuantity="AECU:AREA_MOMENT" />
-        <ECProperty propertyName="Moment1" typeName="point3d" displayLabel="Moment1" kindOfQuantity="AECU:AREA_MOMENT" />
-        <ECProperty propertyName="Moment2" typeName="point3d" displayLabel="Moment2" kindOfQuantity="AECU:AREA_MOMENT" />
-        <ECProperty propertyName="Location" typeName="Bentley.Geometry.Common.IGeometry" displayLabel="Location" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="ReferencePoint0" typeName="point3d" displayLabel="ReferencePoint0" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="ReferencePoint1" typeName="point3d" displayLabel="ReferencePoint1" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="ReferencePoint2" typeName="point3d" displayLabel="ReferencePoint2" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="Force0" typeName="Point3d" displayLabel="Force #0" kindOfQuantity="AECU:AREA_FORCE" category="IsmSurfaceForceMemberLoad_category" />
+        <ECProperty propertyName="Force1" typeName="Point3d" displayLabel="Force #1" kindOfQuantity="AECU:AREA_FORCE" category="IsmSurfaceForceMemberLoad_category" />
+        <ECProperty propertyName="Force2" typeName="Point3d" displayLabel="Force #2" kindOfQuantity="AECU:AREA_FORCE" category="IsmSurfaceForceMemberLoad_category" />
+        <ECProperty propertyName="Moment0" typeName="Point3d" displayLabel="Moment #0" kindOfQuantity="AECU:AREA_MOMENT" category="IsmSurfaceForceMemberLoad_category" />
+        <ECProperty propertyName="Moment1" typeName="Point3d" displayLabel="Moment #1" kindOfQuantity="AECU:AREA_MOMENT" category="IsmSurfaceForceMemberLoad_category" />
+        <ECProperty propertyName="Moment2" typeName="Point3d" displayLabel="Moment #2" kindOfQuantity="AECU:AREA_MOMENT" category="IsmSurfaceForceMemberLoad_category" />
+        <ECStructProperty propertyName="Location" typeName="IsmPrimitiveGeometry" displayLabel="Location" category="IsmSurfaceForceMemberLoad_category" />
+        <ECProperty propertyName="ReferencePoint0" typeName="Point3d" displayLabel="Reference Point #0" kindOfQuantity="AECU:LENGTH" category="IsmSurfaceForceMemberLoad_category" />
+        <ECProperty propertyName="ReferencePoint1" typeName="Point3d" displayLabel="Reference Point #1" kindOfQuantity="AECU:LENGTH" category="IsmSurfaceForceMemberLoad_category" />
+        <ECProperty propertyName="ReferencePoint2" typeName="Point3d" displayLabel="Reference Point #2" kindOfQuantity="AECU:LENGTH" category="IsmSurfaceForceMemberLoad_category" />
     </ECEntityClass>
 
     <ECEnumeration typeName="SurfaceMemberBendingBehavior" backingTypeName="int" isStrict="true">
@@ -2177,25 +2297,26 @@
         <ECEnumerator value="500" name="TimberUnspecified" displayLabel="Timber Unspecified" />
     </ECEnumeration>
 
+    <PropertyCategory typeName="IsmSurfaceMember_category" displayLabel="Surface Member" priority="180" />
     <ECEntityClass typeName="IsmSurfaceMember" modifier="Sealed" displayLabel="Surface Member" >
         <BaseClass>IsmSpanningMember</BaseClass>
-        <ECArrayProperty propertyName="Location" typeName="Bentley.Geometry.Common.IGeometry" displayLabel="Location" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="BendingBehavior" typeName="SurfaceMemberBendingBehavior" displayLabel="Bending Behavior" />
-        <ECProperty propertyName="SurfaceOffset" typeName="double" displayLabel="Surface Offset" kindOfQuantity="AECU:LENGTH_SHORT" />
-        <ECProperty propertyName="PlacementSurface" typeName="PlacementSurface" displayLabel="Placement Surface" />
-        <ECProperty propertyName="RAxisOrientation" typeName="point3d" displayLabel="R-Axis Orientation" />
-        <ECProperty propertyName="SystemKind" typeName="SurfaceMemberSystemKind" displayLabel="System Kind" />
-        <ECProperty propertyName="Thickness" typeName="double" displayLabel="Thickness" kindOfQuantity="AECU:LENGTH_SHORT" />
-        <ECProperty propertyName="Thickness1" typeName="double" displayLabel="Thickness 1" kindOfQuantity="AECU:LENGTH_SHORT" />
-        <ECProperty propertyName="Thickness2" typeName="double" displayLabel="Thickness 2" kindOfQuantity="AECU:LENGTH_SHORT" />
-        <ECProperty propertyName="Thickness3" typeName="double" displayLabel="Thickness 3" kindOfQuantity="AECU:LENGTH_SHORT" />
-        <ECProperty propertyName="Location1" typeName="point3d" displayLabel="Location 1" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="Location2" typeName="point3d" displayLabel="Location 2" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="Location3" typeName="point3d" displayLabel="Location 3" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="Use" typeName="SurfaceMemberUse" displayLabel="Use" />
-        <ECProperty propertyName="AutoArea" typeName="double" displayLabel="Auto Area"  kindOfQuantity="AECU:AREA" />
-        <ECProperty propertyName="AutoVolume" typeName="double" displayLabel="Auto Volume" kindOfQuantity="AECU:VOLUME" />
-        <ECProperty propertyName="AutoWeight" typeName="double" displayLabel="Auto Weight" kindOfQuantity="AECU:WEIGHT" />
+        <ECStructProperty propertyName="Location" typeName="IsmArrayGeometry" displayLabel="Location" category="IsmSurfaceMember_category" />
+        <ECProperty propertyName="BendingBehavior" typeName="SurfaceMemberBendingBehavior" displayLabel="Bending Behavior" category="IsmSurfaceMember_category" />
+        <ECProperty propertyName="SurfaceOffset" typeName="double" displayLabel="Surface Offset" kindOfQuantity="AECU:LENGTH_SHORT" category="IsmSurfaceMember_category" />
+        <ECProperty propertyName="PlacementSurface" typeName="PlacementSurface" displayLabel="Placement Surface" category="IsmSurfaceMember_category" />
+        <ECProperty propertyName="RAxisOrientation" typeName="Point3d" displayLabel="R-Axis Orientation" category="IsmSurfaceMember_category" />
+        <ECProperty propertyName="SystemKind" typeName="SurfaceMemberSystemKind" displayLabel="System Kind" category="IsmSurfaceMember_category" />
+        <ECProperty propertyName="Thickness" typeName="double" displayLabel="Thickness" kindOfQuantity="AECU:LENGTH_SHORT" category="IsmSurfaceMember_category" />
+        <ECProperty propertyName="Thickness1" typeName="double" displayLabel="Thickness 1" kindOfQuantity="AECU:LENGTH_SHORT" category="IsmSurfaceMember_category" />
+        <ECProperty propertyName="Thickness2" typeName="double" displayLabel="Thickness 2" kindOfQuantity="AECU:LENGTH_SHORT" category="IsmSurfaceMember_category" />
+        <ECProperty propertyName="Thickness3" typeName="double" displayLabel="Thickness 3" kindOfQuantity="AECU:LENGTH_SHORT" category="IsmSurfaceMember_category" />
+        <ECProperty propertyName="Location1" typeName="Point3d" displayLabel="Location 1" kindOfQuantity="AECU:LENGTH" category="IsmSurfaceMember_category" />
+        <ECProperty propertyName="Location2" typeName="Point3d" displayLabel="Location 2" kindOfQuantity="AECU:LENGTH" category="IsmSurfaceMember_category" />
+        <ECProperty propertyName="Location3" typeName="Point3d" displayLabel="Location 3" kindOfQuantity="AECU:LENGTH" category="IsmSurfaceMember_category" />
+        <ECProperty propertyName="Use" typeName="SurfaceMemberUse" displayLabel="Use" category="IsmSurfaceMember_category" />
+        <ECProperty propertyName="AutoArea" typeName="double" displayLabel="Auto Area"  kindOfQuantity="AECU:AREA" category="Calculated_category" />
+        <ECProperty propertyName="AutoVolume" typeName="double" displayLabel="Auto Volume" kindOfQuantity="AECU:VOLUME" category="Calculated_category" />
+        <ECProperty propertyName="AutoWeight" typeName="double" displayLabel="Auto Weight" kindOfQuantity="AECU:WEIGHT" category="Calculated_category" />
     </ECEntityClass>
 
     <ECRelationshipClass typeName="IsmSurfaceMember_Material" modifier="None" strength="referencing" strengthDirection="forward">
@@ -2212,23 +2333,24 @@
         <ECEnumerator value="100" name="ColumnCapital" displayLabel="Column Capital" />
     </ECEnumeration>
 
+    <PropertyCategory typeName="IsmSurfaceMemberModifier_category" displayLabel="Surface Member Modifier" priority="190" />
     <ECEntityClass typeName="IsmSurfaceMemberModifier" modifier="Sealed" displayLabel="Surface Member Modifier" >
         <BaseClass>anlyt:AnalyticalElement</BaseClass>
         <BaseClass>IIsmSubObject</BaseClass>
-        <ECProperty propertyName="RAxisOrientation" typeName="point3d" displayLabel="R-Axis Orientation" />
-        <ECProperty propertyName="Use" typeName="SurfaceMemberUse" displayLabel="Use" />
-        <ECProperty propertyName="Thickness" typeName="double" displayLabel="Thickness" kindOfQuantity="AECU:LENGTH_SHORT" />
-        <ECArrayProperty propertyName="Location" typeName="Bentley.Geometry.Common.IGeometry" displayLabel="Location" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="Thickness1" typeName="double" displayLabel="Thickness 1" kindOfQuantity="AECU:LENGTH_SHORT" />
-        <ECProperty propertyName="Thickness2" typeName="double" displayLabel="Thickness 2" kindOfQuantity="AECU:LENGTH_SHORT" />
-        <ECProperty propertyName="Thickness3" typeName="double" displayLabel="Thickness 3" kindOfQuantity="AECU:LENGTH_SHORT" />
-        <ECProperty propertyName="Location1" typeName="point3d" displayLabel="Location 1" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="Location2" typeName="point3d" displayLabel="Location 2" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="Location3" typeName="point3d" displayLabel="Location 3" kindOfQuantity="AECU:LENGTH" />
-        <ECProperty propertyName="BendingBehavior" typeName="SurfaceMemberBendingBehavior" displayLabel="Bending Behavior" />
-        <ECProperty propertyName="ModificationPriority" typeName="int" displayLabel="Modification Priority" />
-        <ECProperty propertyName="SurfaceOffset" typeName="double" displayLabel="Surface Offset" kindOfQuantity="AECU:LENGTH_SHORT" />
-        <ECProperty propertyName="PlacementSurface" typeName="PlacementSurface" displayLabel="Placement Surface" />
+        <ECProperty propertyName="RAxisOrientation" typeName="Point3d" displayLabel="R-Axis Orientation" category="IsmSurfaceMemberModifier_category" />
+        <ECProperty propertyName="Use" typeName="SurfaceMemberModifierUse" displayLabel="Use" category="IsmSurfaceMemberModifier_category" />
+        <ECProperty propertyName="Thickness" typeName="double" displayLabel="Thickness" category="IsmSurfaceMemberModifier_category" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECStructProperty propertyName="Location" typeName="IsmArrayGeometry" displayLabel="Location" category="IsmSurfaceMemberModifier_category" />
+        <ECProperty propertyName="Thickness1" typeName="double" displayLabel="Thickness 1" category="IsmSurfaceMemberModifier_category" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="Thickness2" typeName="double" displayLabel="Thickness 2" category="IsmSurfaceMemberModifier_category" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="Thickness3" typeName="double" displayLabel="Thickness 3" category="IsmSurfaceMemberModifier_category" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="Location1" typeName="Point3d" displayLabel="Location 1" category="IsmSurfaceMemberModifier_category" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="Location2" typeName="Point3d" displayLabel="Location 2" category="IsmSurfaceMemberModifier_category" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="Location3" typeName="Point3d" displayLabel="Location 3" category="IsmSurfaceMemberModifier_category" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="BendingBehavior" typeName="SurfaceMemberBendingBehavior" displayLabel="Bending Behavior" category="IsmSurfaceMemberModifier_category" />
+        <ECProperty propertyName="ModificationPriority" typeName="int" displayLabel="Modification Priority" category="IsmSurfaceMemberModifier_category" />
+        <ECProperty propertyName="SurfaceOffset" typeName="double" displayLabel="Surface Offset" category="IsmSurfaceMemberModifier_category" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="PlacementSurface" typeName="PlacementSurface" displayLabel="Placement Surface" category="IsmSurfaceMemberModifier_category" />
     </ECEntityClass>
 
     <ECRelationshipClass typeName="IsmSurfaceMemberModifier_Material" modifier="None" strength="referencing" strengthDirection="forward">
@@ -2251,10 +2373,11 @@
         </Target>
     </ECRelationshipClass>
 
+    <PropertyCategory typeName="IsmSurfaceMemberOpening_category" displayLabel="Surface Member Opening" priority="190" />
     <ECEntityClass typeName="IsmSurfaceMemberOpening" modifier="Sealed" displayLabel="Surface Member Opening" >
         <BaseClass>anlyt:AnalyticalElement</BaseClass>
         <BaseClass>IIsmSubObject</BaseClass>
-        <ECArrayProperty propertyName="Location" typeName="Bentley.Geometry.Common.IGeometry" displayLabel="Location" kindOfQuantity="AECU:LENGTH" />
+        <ECStructProperty propertyName="Location" typeName="IsmArrayGeometry" displayLabel="Location" category="IsmSurfaceMemberOpening_category" />
     </ECEntityClass>
 
     <ECRelationshipClass typeName="IsmSurfaceMemberOpening_SurfaceMember" modifier="None" strength="referencing" strengthDirection="forward">
