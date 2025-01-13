@@ -25,7 +25,7 @@ Applications that don't have access to catalogs will still be able to render the
 
 The following instance-diagram presents a simple example of the Structural Components Hierarchy explained next.
 
-![Structural Components Hierarchy](./media/Decks%20&%20Classification%20Systems.png)
+![Structural Components Hierarchy](./media/DeckClassificationSystems.png)
 
 <u>Profiles Definition Catalog</u>
 

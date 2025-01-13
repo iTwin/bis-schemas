@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ==================================================================================
+|  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
+|  * See LICENSE.md in the project root for license terms and full copyright notice.
+======================================================================================= -->
+<ECSchema schemaName="StormSewerPhysicalViews" alias="stmswrphysViews" version="01.00.00" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" displayLabel="BIS Core Views" description="Views that introduce derived concepts based on the StormSewerPhysical schema.">
+    <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
+    <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
+    <ECSchemaReference name="ECDbMap" version="02.00.04" alias="ecdbmap"/>
+    <ECSchemaReference name="BisCore" version="01.00.11" alias="bis"/>
+    <ECSchemaReference name="DistributionSystems" version="01.00.02" alias="dsys"/>
+    <ECSchemaReference name="PipeworkPhysical" version="01.00.00" alias="pipphys"/>
+    <ECSchemaReference name="RoadRailUnits" version="01.00.02" alias="rru"/>
+
+    <ECCustomAttributes>
+        <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
+            <SupportedUse>FieldTesting</SupportedUse>
+        </ProductionStatus>
+        <SchemaLayerInfo xmlns="BisCustomAttributes.01.00.00">
+            <Value>DisciplinePhysical</Value>
+        </SchemaLayerInfo>
+    </ECCustomAttributes>
+
+    <ECEntityClass typeName="PipeView" modifier="Abstract" displayLabel="Pipe View" description="View that adds derived properties to the definition of a Pipe.">
+        <ECCustomAttributes>
+            <QueryView xmlns="ECDbMap.02.00.04">
+                <Query>
+                    SELECT
+                        [pg].[ECInstanceId],
+                        [pg].[ECClassId],
+                        pow(pow([pg].[MaxX] - [pg].[MinX], 2) + 
+                            pow([pg].[MaxY] - [pg].[MinY], 2) +
+                            pow([pg].[MaxZ] - [pg].[MinZ], 2), 0.5)         [Length],
+                        abs([pg].[MaxZ] - [pg].[MinZ]) / 
+                            (pow(pow([pg].[MaxX] - [pg].[MinX], 2) + 
+                                pow([pg].[MaxY] - [pg].[MinY], 2) +
+                                pow([pg].[MaxZ] - [pg].[MinZ], 2), 0.5))    [Slope]
+                    FROM
+                        (SELECT 
+                            [p].[ECInstanceId], 
+                            [p].[ECClassId],
+                            MIN([pp].[Origin].[X]) [MinX],
+                            MIN([pp].[Origin].[Y]) [MinY],
+                            MIN([pp].[Origin].[Z]) [MinZ],
+                            MAX([pp].[Origin].[X]) [MaxX],
+                            MAX([pp].[Origin].[Y]) [MaxY],
+                            MAX([pp].[Origin].[Z]) [MaxZ]
+                        FROM [pipphys].[Pipe] [p]
+                        INNER JOIN [pipphys].[PipingPort] [pp] ON [pp].[Parent].[Id] = [p].[ECInstanceId]
+                        GROUP BY [p].[ECInstanceId]
+                        HAVING COUNT(*) = 2) [pg]
+                </Query>
+            </QueryView>
+        </ECCustomAttributes>
+        <ECProperty propertyName="Length" typeName="double" kindOfQuantity="rru:LENGTH" description="Length of the Pipe"/>
+        <ECProperty propertyName="Slope" typeName="double" kindOfQuantity="rru:SLOPE" description="Slope of the Pipe"/>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="PipingPortView" modifier="Abstract" displayLabel="PipingPort View" description="View that adds derived properties to the definition of a PipingPort.">
+        <ECCustomAttributes>
+            <QueryView xmlns="ECDbMap.02.00.04">
+                <Query>
+                    SELECT 
+                        [pp].[ECInstanceId], 
+                        [pp].[ECClassId],
+                        CASE 
+                            WHEN ([cpt].[ECInstanceId] IS NOT NULL)
+                                THEN ([pp].[Origin].[Z] + (([cpt].[InnerDiameter] / 2) * cos([pp].[Pitch]))) 
+                            WHEN ([rpt].[ECInstanceId] IS NOT NULL)
+                                THEN ([pp].[Origin].[Z] + (([rpt].[SmallerDimension] / 2) * cos([pp].[Pitch])))
+                            ELSE NULL
+                        END [CrownElevation],
+                        CASE 
+                            WHEN ([cpt].[ECInstanceId] IS NOT NULL)
+                                THEN ([pp].[Origin].[Z] - (([cpt].[InnerDiameter] / 2) * cos([pp].[Pitch]))) 
+                            WHEN ([rpt].[ECInstanceId] IS NOT NULL)
+                                THEN ([pp].[Origin].[Z] - (([rpt].[SmallerDimension] / 2) * cos([pp].[Pitch])))
+                            ELSE NULL
+                        END [InvertElevation],
+                        NAVIGATION_VALUE(stmswrphysViews.PipingPortView.Parent, [pp].[Parent].[Id]),
+                        NAVIGATION_VALUE(stmswrphysViews.PipingPortView.TypeDefinition, [pp].[TypeDefinition].[Id])
+                    FROM [pipphys].[PipingPort] [pp] 
+                    INNER JOIN [pipphys].[PipingPortType] [ppt] ON [pp].[TypeDefinition].[Id] = [ppt].[ECInstanceId]
+                    LEFT JOIN [pipphys].[CircularPortType] [cpt] ON [ppt].[ECInstanceId] = [cpt].[ECInstanceId]
+                    LEFT JOIN [pipphys].[RectangularPortType] [rpt] ON [ppt].[ECInstanceId] = [rpt].[ECInstanceId]
+                </Query>
+            </QueryView>
+        </ECCustomAttributes>
+        <ECProperty propertyName="CrownElevation" typeName="double" kindOfQuantity="rru:LENGTH" description="Elevation of the inside top of the PipingPort"/>
+        <ECProperty propertyName="InvertElevation" typeName="double" kindOfQuantity="rru:LENGTH" description="Elevation of the inside bottom of the PipingPort"/>
+        <ECNavigationProperty propertyName="Parent" relationshipName="PipingElementOwnsPorts" direction="backward" description="The parent bis:Element that owns this PipingPort."/>
+        <ECNavigationProperty propertyName="TypeDefinition" relationshipName="PipingPortIsOfType" direction="forward" />
+    </ECEntityClass>
+    <ECRelationshipClass typeName="PipingElementOwnsPorts" strength="embedding" modifier="None" description="Relationship between an IPipingElement and its Ports.">
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="pipphys:IPipingElement"/>
+        </Source>
+        <Target multiplicity="(1..*)" roleLabel="is owned by" polymorphic="true">
+            <Class class="PipingPortView"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="PipingPortIsOfType" strength="referencing" modifier="None" description="A type-instance relation; one that indicates that the specific PipingPort is an instance of the defined PipingPortType">
+        <Source multiplicity="(0..*)" roleLabel="is of" polymorphic="true">
+            <Class class="PipingPortView" />
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="is type of" polymorphic="true">
+            <Class class="pipphys:PipingPortType"/>
+        </Target>
+    </ECRelationshipClass>
+ </ECSchema>

@@ -21,44 +21,164 @@
         <BaseClass>bis:PhysicalModel</BaseClass>
         <ECCustomAttributes>
             <Deprecated xmlns="CoreCustomAttributes.01.00.03">
-                <Description>PhysicalModel should be used in place of this class.</Description>
+                <Description>bis:PhysicalModel should be used in place of this class.</Description>
             </Deprecated>
         </ECCustomAttributes>
     </ECEntityClass>
-    <ECEntityClass typeName="StructuralElement" displayLabel="Structural Element" modifier="Abstract">
+    <ECEntityClass typeName="StructuralElement" displayLabel="Structural Element" modifier="Abstract" description="A bis:PhysicalElement that is used to provide structural support, serving as a framework for more specific structural elements.">
         <BaseClass>bis:PhysicalElement</BaseClass>
     </ECEntityClass>
-    <ECEntityClass typeName="StructuralMember" displayLabel="Structural Member">
+    <ECEntityClass typeName="StructuralMember" displayLabel="Structural Member" description="A generically-classified sp:StructuralElement, unless a subclass is used for further classification.">
         <BaseClass>StructuralElement</BaseClass>
     </ECEntityClass>
-    <ECEntityClass typeName="Slab" displayLabel="Slab">
+    <ECEntityClass typeName="StructuralMemberType" displayLabel="Structural Member Type" description="Defines a shared set of properties whose values vary per-type of StructuralMember rather than per-instance">
+        <BaseClass>bis:PhysicalType</BaseClass>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="StructuralMemberIsOfType" strength="referencing" modifier="None" description="A type-instance relation; one that indicates that the specific sp:StructuralMember is an instance of the defined sp:StructuralMemberType.">
+        <BaseClass>bis:PhysicalElementIsOfType</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="is of type" polymorphic="true">
+            <Class class="StructuralMember" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is type of" polymorphic="true">
+            <Class class="StructuralMemberType"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="Slab" displayLabel="Slab" description="A horizontal sp:StructuralMember with two dimensions much longer than the third one used in building construction to support and transfer loads to beams, columns, or walls.">
         <BaseClass>StructuralMember</BaseClass>
     </ECEntityClass>
-    <ECEntityClass typeName="Wall" displayLabel="Wall">
+    <ECEntityClass typeName="SlabType" displayLabel="Slab Type" description="Defines a shared set of properties whose values vary per-type of Slab rather than per-instance">
+        <BaseClass>StructuralMemberType</BaseClass>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="SlabIsOfType" strength="referencing" modifier="None" description="A type-instance relation; one that indicates that the specific sp:Slab is an instance of the defined sp:SlabType.">
+        <BaseClass>StructuralMemberIsOfType</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="is of type" polymorphic="true">
+            <Class class="Slab" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is type of" polymorphic="true">
+            <Class class="SlabType"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="Wall" displayLabel="Wall" description="A vertical sp:StructuralMember with two dimensions much longer than the third one used in building construction to support loads and enclose or divide spaces.">
         <BaseClass>StructuralMember</BaseClass>
     </ECEntityClass>
-    <ECEntityClass typeName="Beam" displayLabel="Beam">
+    <ECEntityClass typeName="WallType" displayLabel="Wall Type" description="Defines a shared set of properties whose values vary per-type of Wall rather than per-instance">
+        <BaseClass>StructuralMemberType</BaseClass>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="WallIsOfType" strength="referencing" modifier="None" description="A type-instance relation; one that indicates that the specific sp:Wall is an instance of the defined sp:WallType.">
+        <BaseClass>StructuralMemberIsOfType</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="is of type" polymorphic="true">
+            <Class class="Wall" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is type of" polymorphic="true">
+            <Class class="WallType"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="Beam" displayLabel="Beam" description="A horizontal sp:StructuralMember with one dimension much longer than other two used in building construction to support and transfer loads to columns or walls.">
         <BaseClass>StructuralMember</BaseClass>
     </ECEntityClass>
-    <ECEntityClass typeName="Column" displayLabel="Column">
+    <ECEntityClass typeName="BeamType" displayLabel="Beam Type" description="Defines a shared set of properties whose values vary per-type of Beam rather than per-instance">
+        <BaseClass>StructuralMemberType</BaseClass>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="BeamIsOfType" strength="referencing" modifier="None" description="A type-instance relation; one that indicates that the specific sp:Beam is an instance of the defined sp:BeamType.">
+        <BaseClass>StructuralMemberIsOfType</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="is of type" polymorphic="true">
+            <Class class="Beam" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is type of" polymorphic="true">
+            <Class class="BeamType"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="Column" displayLabel="Column" description="A vertical sp:StructuralMember with one dimension much longer than other two used in building construction to support and transfer loads from beams or slabs to the foundation.">
         <BaseClass>StructuralMember</BaseClass>
     </ECEntityClass>
-    <ECEntityClass typeName="Brace" displayLabel="Brace">
+    <ECEntityClass typeName="ColumnType" displayLabel="Column Type" description="Defines a shared set of properties whose values vary per-type of Column rather than per-instance">
+        <BaseClass>StructuralMemberType</BaseClass>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ColumnIsOfType" strength="referencing" modifier="None" description="A type-instance relation; one that indicates that the specific sp:Column is an instance of the defined sp:ColumnType.">
+        <BaseClass>StructuralMemberIsOfType</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="is of type" polymorphic="true">
+            <Class class="Column" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is type of" polymorphic="true">
+            <Class class="ColumnType"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="Brace" displayLabel="Brace" description="A diagonal sp:StructuralMember with one dimension much longer than other two used in building construction to provide stability by resisting lateral forces and transferring loads to other sp:StructuralMember.">
         <BaseClass>StructuralMember</BaseClass>
     </ECEntityClass>
-    <ECEntityClass typeName="FoundationMember" displayLabel="Foundation Member">
+    <ECEntityClass typeName="BraceType" displayLabel="Brace Type" description="Defines a shared set of properties whose values vary per-type of Brace rather than per-instance">
+        <BaseClass>StructuralMemberType</BaseClass>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="BraceIsOfType" strength="referencing" modifier="None" description="A type-instance relation; one that indicates that the specific sp:Brace is an instance of the defined sp:BraceType.">
+        <BaseClass>StructuralMemberIsOfType</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="is of type" polymorphic="true">
+            <Class class="Brace" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is type of" polymorphic="true">
+            <Class class="BraceType"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="FoundationMember" displayLabel="Foundation Member" description="A sp:StructuralMember general structural element in building construction that serves as a base class for specific foundation types, responsible for transferring loads from the structure to the ground.">
         <BaseClass>StructuralMember</BaseClass>
     </ECEntityClass>
-    <ECEntityClass typeName="StripFooting" displayLabel="Strip Footing">
+    <ECEntityClass typeName="StripFooting" displayLabel="Strip Footing" description="A line sp:FoundationMember used to distribute the load of a structure along a continuous strip, typically under walls.">
         <BaseClass>FoundationMember</BaseClass>
     </ECEntityClass>
-    <ECEntityClass typeName="SpreadFooting" displayLabel="Spread Footing">
+    <ECEntityClass typeName="StripFootingType" displayLabel="Strip Footing Type" description="Defines a shared set of properties whose values vary per-type of StripFooting rather than per-instance">
+        <BaseClass>StructuralMemberType</BaseClass>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="StripFootingIsOfType" strength="referencing" modifier="None" description="A type-instance relation; one that indicates that the specific sp:StripFooting is an instance of the defined sp:StripFootingType.">
+        <BaseClass>StructuralMemberIsOfType</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="is of type" polymorphic="true">
+            <Class class="StripFooting" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is type of" polymorphic="true">
+            <Class class="StripFootingType"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="SpreadFooting" displayLabel="Spread Footing" description="An isolated sp:FoundationMember used to spread the load of a structure over a larger area, typically supporting columns or piers.">
         <BaseClass>FoundationMember</BaseClass>
     </ECEntityClass>
-    <ECEntityClass typeName="PileCap" displayLabel="Pile Cap">
+    <ECEntityClass typeName="SpreadFootingType" displayLabel="Spread Footing Type" description="Defines a shared set of properties whose values vary per-type of SpreadFooting rather than per-instance">
+        <BaseClass>StructuralMemberType</BaseClass>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="SpreadFootingIsOfType" strength="referencing" modifier="None" description="A type-instance relation; one that indicates that the specific sp:SpreadFooting is an instance of the defined sp:SpreadFootingType.">
+        <BaseClass>StructuralMemberIsOfType</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="is of type" polymorphic="true">
+            <Class class="SpreadFooting" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is type of" polymorphic="true">
+            <Class class="SpreadFootingType"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="PileCap" displayLabel="Pile Cap" description="A thick concrete mat sp:FoundationMember placed over a group of piles to distribute the load of the structure evenly across them.">
         <BaseClass>FoundationMember</BaseClass>
     </ECEntityClass>
-    <ECEntityClass typeName="Pile" displayLabel="Pile">
+    <ECEntityClass typeName="PileCapType" displayLabel="Pile Cap Type" description="Defines a shared set of properties whose values vary per-type of PileCap rather than per-instance">
+        <BaseClass>StructuralMemberType</BaseClass>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="PileCapIsOfType" strength="referencing" modifier="None" description="A type-instance relation; one that indicates that the specific sp:PileCap is an instance of the defined sp:PileCapType.">
+        <BaseClass>StructuralMemberIsOfType</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="is of type" polymorphic="true">
+            <Class class="PileCap" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is type of" polymorphic="true">
+            <Class class="PileCapType"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="Pile" displayLabel="Pile" description="A long and slender sp:FoundationMember driven into the ground to transfer loads from a structure to deeper, more stable soil or rock layers.">
         <BaseClass>FoundationMember</BaseClass>
     </ECEntityClass>
+    <ECEntityClass typeName="PileType" displayLabel="Pile Type" description="Defines a shared set of properties whose values vary per-type of Pile rather than per-instance">
+        <BaseClass>StructuralMemberType</BaseClass>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="PileIsOfType" strength="referencing" modifier="None" description="A type-instance relation; one that indicates that the specific sp:Pile is an instance of the defined sp:PileType.">
+        <BaseClass>StructuralMemberIsOfType</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="is of type" polymorphic="true">
+            <Class class="Pile" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is type of" polymorphic="true">
+            <Class class="PileType"/>
+        </Target>
+    </ECRelationshipClass>
 </ECSchema>

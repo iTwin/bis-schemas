@@ -3,7 +3,7 @@
 |  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
 |  * See LICENSE.md in the project root for license terms and full copyright notice.
 ======================================================================================= -->
-<ECSchema schemaName="CifCommon" alias="cifcmn" version="01.00.10" description="iModel Connector schema containing aspect classes with common properties from Civil Infrastructure Framework (CIF) applications." xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
+<ECSchema schemaName="CifCommon" alias="cifcmn" version="01.00.12" description="iModel Connector schema containing aspect classes with common properties from Civil Infrastructure Framework (CIF) applications." xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
     <ECSchemaReference name="BisCore" version="01.00.16" alias="bis"/>
     <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
     <ECSchemaReference name="CifUnits" version="01.00.08" alias="cifu"/>
@@ -780,8 +780,24 @@
         <ECProperty propertyName="MeshSurfaceEntity_PlanarArea" typeName="double" displayLabel="Planar Area" category="MeshQuantities_Civil_Quantities" priority="299910" kindOfQuantity="cifu:AREA"/>
         <ECProperty propertyName="MeshSurfaceEntity_CivilVolume" typeName="double" displayLabel="Volume" category="MeshQuantities_Civil_Quantities" priority="299900" kindOfQuantity="cifu:VOLUME"/>
         <ECProperty propertyName="VolumeOption" typeName="MeshSurfaceEntityAspect_VolumeOption_Enum" displayLabel="Volume Option" category="MeshSurfaceEntity_Component_Layer" priority="299925"/>
-        <ECProperty propertyName="MeshSurfaceEntity_StartStationNumeric" typeName="double" displayLabel="Start Station" category="MeshSurfaceEntity_Component_Layer" priority="299950" kindOfQuantity="cifu:LENGTH"/>
-        <ECProperty propertyName="MeshSurfaceEntity_EndStationNumeric" typeName="double" displayLabel="End Station" category="MeshSurfaceEntity_Component_Layer" priority="299940" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="MeshSurfaceEntity_StartStationNumeric" typeName="double" displayLabel="Start Station [Deprecated 2024]" category="MeshSurfaceEntity_Component_Layer" priority="299950" kindOfQuantity="cifu:LENGTH">
+            <ECCustomAttributes>
+                <Deprecated xmlns="CoreCustomAttributes.01.00.04">
+                    <Description>Replaced by the new MeshSurfaceEntity_StartStationFormatted property.</Description>
+                </Deprecated>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.04"/>
+            </ECCustomAttributes>
+        </ECProperty>
+        <ECProperty propertyName="MeshSurfaceEntity_EndStationNumeric" typeName="double" displayLabel="End Station [Deprecated 2024]" category="MeshSurfaceEntity_Component_Layer" priority="299940" kindOfQuantity="cifu:LENGTH">
+            <ECCustomAttributes>
+                <Deprecated xmlns="CoreCustomAttributes.01.00.04">
+                    <Description>Replaced by the new MeshSurfaceEntity_EndStationFormatted property.</Description>
+                </Deprecated>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.04"/>
+            </ECCustomAttributes>
+        </ECProperty>
+        <ECProperty propertyName="MeshSurfaceEntity_EndStationFormatted" typeName="string" displayLabel="End Station" category="MeshSurfaceEntity_Component_Layer" priority="299940" kindOfQuantity="cifu:STATION"/>
+        <ECProperty propertyName="MeshSurfaceEntity_StartStationFormatted" typeName="string" displayLabel="Start Station" category="MeshSurfaceEntity_Component_Layer" priority="299940" kindOfQuantity="cifu:STATION"/>
     </ECEntityClass>
     <ECRelationshipClass typeName="ElementOwnsMeshSurfaceEntityAspect" modifier="None" strength="embedding">
         <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
@@ -1400,6 +1416,36 @@
             <Class class="ReadOnlySpiralAspect"/>
         </Target>
     </ECRelationshipClass>
+    <ECEntityClass typeName="SpeedSectionAspectClass" displayLabel="Speed Section" modifier="Sealed">
+        <BaseClass>bis:ElementMultiAspect</BaseClass>
+        <ECProperty propertyName="StartStation" typeName="double" displayLabel="Start Station" category="SpeedSection_Speed_Section" kindOfQuantity="cifu:STATION"/>
+        <ECProperty propertyName="EndStation" typeName="double" displayLabel="End Station" category="SpeedSection_Speed_Section" kindOfQuantity="cifu:STATION"/>
+        <ECProperty propertyName="SpeedScheme1Name" typeName="string" displayLabel="Speed Scheme 1 Name" category="SpeedSection_Speed_Section"/>
+        <ECProperty propertyName="SpeedScheme1StartSpeed" typeName="double" displayLabel="Speed Scheme 1 Start Speed" category="SpeedSection_Speed_Section" kindOfQuantity="cifu:VELOCITY"/>
+        <ECProperty propertyName="SpeedScheme1EndSpeed" typeName="double" displayLabel="Speed Scheme 1 End Speed" category="SpeedSection_Speed_Section" kindOfQuantity="cifu:VELOCITY"/>
+        <ECProperty propertyName="SpeedScheme2Name" typeName="string" displayLabel="Speed Scheme 2 Name" category="SpeedSection_Speed_Section"/>
+        <ECProperty propertyName="SpeedScheme2StartSpeed" typeName="double" displayLabel="Speed Scheme 2 Start Speed" category="SpeedSection_Speed_Section" kindOfQuantity="cifu:VELOCITY"/>
+        <ECProperty propertyName="SpeedScheme2EndSpeed" typeName="double" displayLabel="Speed Scheme 2 End Speed" category="SpeedSection_Speed_Section" kindOfQuantity="cifu:VELOCITY"/>
+        <ECProperty propertyName="SpeedScheme3Name" typeName="string" displayLabel="Speed Scheme 3 Name" category="SpeedSection_Speed_Section"/>
+        <ECProperty propertyName="SpeedScheme3StartSpeed" typeName="double" displayLabel="Speed Scheme 3 Start Speed" category="SpeedSection_Speed_Section" kindOfQuantity="cifu:VELOCITY"/>
+        <ECProperty propertyName="SpeedScheme3EndSpeed" typeName="double" displayLabel="Speed Scheme 3 End Speed" category="SpeedSection_Speed_Section" kindOfQuantity="cifu:VELOCITY"/>
+        <ECProperty propertyName="SpeedScheme4Name" typeName="string" displayLabel="Speed Scheme 4 Name" category="SpeedSection_Speed_Section"/>
+        <ECProperty propertyName="SpeedScheme4StartSpeed" typeName="double" displayLabel="Speed Scheme 4 Start Speed" category="SpeedSection_Speed_Section" kindOfQuantity="cifu:VELOCITY"/>
+        <ECProperty propertyName="SpeedScheme4EndSpeed" typeName="double" displayLabel="Speed Scheme 4 End Speed" category="SpeedSection_Speed_Section" kindOfQuantity="cifu:VELOCITY"/>
+        <ECProperty propertyName="SpeedScheme5Name" typeName="string" displayLabel="Speed Scheme 5 Name" category="SpeedSection_Speed_Section"/>
+        <ECProperty propertyName="SpeedScheme5StartSpeed" typeName="double" displayLabel="Speed Scheme 5 Start Speed" category="SpeedSection_Speed_Section" kindOfQuantity="cifu:VELOCITY"/>
+        <ECProperty propertyName="SpeedScheme5EndSpeed" typeName="double" displayLabel="Speed Scheme 5 End Speed" category="SpeedSection_Speed_Section" kindOfQuantity="cifu:VELOCITY"/>
+        <ECProperty propertyName="Description" typeName="string" displayLabel="Description" category="SpeedSection_Speed_Section"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsSpeedSectionAspectClass" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsMultiAspects</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="false">
+            <Class class="SpeedSectionAspectClass"/>
+        </Target>
+    </ECRelationshipClass>
     <ECEntityClass typeName="SecondaryAlignmentAspect">
         <BaseClass>CivilPresentation</BaseClass>
         <ECProperty propertyName="SecondaryAlignmentName" typeName="string" displayLabel="Name" category="SecondaryAlignment_Secondary_Alignment" priority="299999"/>
@@ -1636,6 +1682,7 @@
     <PropertyCategory typeName="ProjectionProperties_Geographical_Coordinate_Systems" description="ProjectionProperties" displayLabel="Geographical Coordinate Systems" priority="299980"/>
     <PropertyCategory typeName="Radius_Transition_Setting_Attributes_Radius_Transition_Settings" description="Radius Transition Setting Attributes" displayLabel="Radius Transition Settings" priority="299999"/>
     <PropertyCategory typeName="SecondaryAlignment_Secondary_Alignment" description="SecondaryAlignment" displayLabel="Secondary Alignment" priority="199800"/>
+    <PropertyCategory typeName="SpeedSection_Speed_Section" description="SpeedSection" displayLabel="Speed Section" priority="0"/>
     <PropertyCategory typeName="StationingProperties_Stationing" description="StationingProperties" displayLabel="Stationing" priority="0"/>
     <PropertyCategory typeName="StrokingDefinition_Stroking_Definition" description="StrokingDefinition" displayLabel="Stroking Definition" priority="0"/>
     <PropertyCategory typeName="TargetAlias_Target_Alias" description="TargetAlias" displayLabel="Target Alias" priority="199800"/>
