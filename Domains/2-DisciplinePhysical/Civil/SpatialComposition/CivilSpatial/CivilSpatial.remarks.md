@@ -9,6 +9,18 @@ This schema contains the main classes to capture the Spatial Structure of Site p
 
 NOTE: Currently under development. This schema should not be used for production workflows. Data created using this schema is not supported and may not be upgradable.
 
+The following class diagram depicts the main classes in the CivilSpatial schema that extend the _Site_-related concepts from the `SpatialComposition` schema.
+
+![Site classes](./media/Site-classes.png)
+
+The following class diagram depicts the main classes in the CivilSpatial schema that extend the _Space_-related concepts from the `SpatialComposition` schema.
+
+![Space classes](./media/Space-classes.png)
+
+The following instance diagram depicts a simplified spatial hierarchy of a sample of a "Shopping Plaza", involving not only concepts defined in the `CivilSpatial` schema, but also the `BuildingSpatial` and `RoadSpatial` schemas - all of which are based on common rules and patterns defined in the `SpatialComposition` schema.
+
+![Shopping Plaza](./media/CivilSpatial-instances.png)
+
 ## Entity Classes
 
 ### Site
