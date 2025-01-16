@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ==================================================================================
+|  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
+|  * See LICENSE.md in the project root for license terms and full copyright notice.
+======================================================================================= -->
+<ECSchema schemaName="CSPhysical" alias="csp" version="01.00.02" description="iModel Connector schema capturing application data from ConceptStation." xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
+
+    <ECSchemaReference name="BisCore" version="01.00.14" alias="bis"/>
+    <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
+    <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
+    <ECSchemaReference name="AecUnits" version="01.00.03" alias="AECU"/>
+    <ECSchemaReference name="CSUnits" version="01.00.00" alias="csu"/>
+
+    <ECCustomAttributes>
+        <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
+            <SupportedUse>Production</SupportedUse>
+        </ProductionStatus>
+        <SchemaLayerInfo xmlns="BisCustomAttributes.01.00.00">
+            <Value>Application</Value>
+        </SchemaLayerInfo>
+    </ECCustomAttributes>
+    <ECEntityClass typeName="ConceptStationPhysicalElement" modifier="Abstract" displayLabel="ConceptStation Physical Element" description="Base class for ConceptStation elements.">
+        <BaseClass>bis:PhysicalElement</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="SegmentAssembly" modifier="Abstract" displayLabel="Segment Assembly" description="Base class for groups of components, such as road segments, transition segments, intersections, etc.">
+        <BaseClass>ConceptStationPhysicalElement</BaseClass>
+        <BaseClass>bis:IParentElement</BaseClass>
+        <ECCustomAttributes>
+            <HiddenClass xmlns="CoreCustomAttributes.01.00.00"/>
+        </ECCustomAttributes>
+        <ECProperty propertyName="StartStation" displayLabel="Start Station" typeName="double" kindOfQuantity="csu:STATION" description="The starting station of the assembly along the associated alignment."/>
+        <ECProperty propertyName="EndStation" displayLabel="End Station" typeName="double" kindOfQuantity="csu:STATION" description="The ending station of the assembly along the associated alignment."/>
+    </ECEntityClass>
+    <ECEntityClass typeName="RoadSegment" modifier="Sealed" displayLabel="Road Segment" description="A physical stretch of roadway that groups all components across its width.">
+        <BaseClass>SegmentAssembly</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="TransitionSegment" modifier="Sealed" displayLabel="Transition Segment" description="A physical stretch of roadway whose composition of components changes from one end to the other.">
+        <BaseClass>SegmentAssembly</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="Intersection" modifier="Sealed" displayLabel="Intersection" description="A physical stretch of roadway where two or more legs intersect.">
+        <BaseClass>SegmentAssembly</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="BridgeSegment" modifier="Sealed" displayLabel="Bridge Segment" description="A physical stretch of bridge that groups all components across its width.">
+        <BaseClass>SegmentAssembly</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="TunnelSegment" modifier="Sealed" displayLabel="Tunnel Segment" description="A physical stretch of tunnel that groups all components across its width.">
+        <BaseClass>SegmentAssembly</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="HyperloopSegment" modifier="Sealed" displayLabel="Hyperloop Segment" description="A physical stretch of hyperloop that groups all components across its width.">
+        <BaseClass>SegmentAssembly</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="Furniture" modifier="Sealed" displayLabel="Furniture" description="A physical piece of furniture.">
+        <BaseClass>ConceptStationPhysicalElement</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="Culvert" modifier="Sealed" displayLabel="Culvert" description="A physical culvert structure.">
+        <BaseClass>ConceptStationPhysicalElement</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="SurfaceArea" modifier="Sealed" displayLabel="Surface Area" description="A physical structure covering an area.">
+        <BaseClass>ConceptStationPhysicalElement</BaseClass>
+    </ECEntityClass>
+
+    <!-- Rail schema definintions -->
+    <ECEntityClass typeName="OLECantilever" modifier="Sealed" displayLabel="OLE Cantilever" description="A physical OLE Cantilever structure.">
+        <BaseClass>ConceptStationPhysicalElement</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="OLEStructure" modifier="Sealed" displayLabel="OLE Structure" description="A physical OLE Structure.">
+       <BaseClass>ConceptStationPhysicalElement</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="WireSpan" modifier="Sealed" displayLabel="Wire Span" description="A physical WireSpan structure.">
+       <BaseClass>ConceptStationPhysicalElement</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="CorridorSegment" modifier="Sealed" displayLabel="Corridor Segment" description="A physical stretch of railway that groups all components across its width.">
+        <BaseClass>SegmentAssembly</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="TrackSegment" modifier="Sealed" displayLabel="Track Segment" description="A physical stretch of railway that groups all components across its width.">
+        <BaseClass>SegmentAssembly</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="TurnoutIntersection" modifier="Sealed" displayLabel="Turnout" description="A physical stretch of railway where two or more legs intersect.">
+       <BaseClass>SegmentAssembly</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="PayItemQuantityAspect" displayLabel="Pay Item Quantity Aspect" description="A bis:ElementMultiAspect that stores common pay item data for ConceptStation elements.">
+        <BaseClass>bis:ElementMultiAspect</BaseClass>
+        <ECProperty propertyName="UnitCodeGroupLabel" displayLabel="Category" typeName="string" description="The label of the unit cost group."/>
+        <ECProperty propertyName="QuantityCode" displayLabel="Code" typeName="string" description="The code of the quantity."/>
+        <ECProperty propertyName="QuantityLabel" displayLabel="Item" typeName="string" description="The label of the quantity."/>
+        <ECProperty propertyName="QuantityValue" displayLabel="Quantity" typeName="double" description="The value of the quantity."/>
+        <ECProperty propertyName="Rate" displayLabel="Rate" typeName="double" description="The rate per unit."/>
+        <ECProperty propertyName="Cost" displayLabel="Cost" typeName="double" kindOfQuantity="csu:CURRENCY" description="The cost of the quantity."/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ConceptStationPhysicalElementOwnsPayItemQuantityAspects" strength="embedding" modifier="None">
+        <BaseClass>bis:ElementOwnsMultiAspects</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="ConceptStationPhysicalElement"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="true">
+            <Class class="PayItemQuantityAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="PayItemLengthAspect" displayLabel="Pay Item Length Aspect" description="A bis:ElementMultiAspect that stores common pay item data in terms of lengths of segments.">
+        <BaseClass>PayItemQuantityAspect</BaseClass>
+        <ECProperty propertyName="QuantityValue" displayLabel="Quantity" typeName="double" kindOfQuantity="AECU:LENGTH" description="The length of the segment."/>
+        <ECProperty propertyName="Rate" displayLabel="Rate" typeName="double" description="The rate per unit length."/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ConceptStationPhysicalElementOwnsPayItemLengthAspects" strength="embedding" modifier="None">
+        <BaseClass>bis:ElementOwnsMultiAspects</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="ConceptStationPhysicalElement"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="true">
+            <Class class="PayItemLengthAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="PayItemAreaAspect" displayLabel="Pay Item Area Aspect" description="A bis:ElementMultiAspect that stores common pay item data in terms of areas of segments.">
+        <BaseClass>PayItemQuantityAspect</BaseClass>
+        <ECProperty propertyName="QuantityValue" displayLabel="Quantity" typeName="double" kindOfQuantity="AECU:AREA" description="The area of the segment."/>
+        <ECProperty propertyName="Rate" displayLabel="Rate" typeName="double" description="The rate per unit area."/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ConceptStationPhysicalElementOwnsPayItemAreaAspects" strength="embedding" modifier="None">
+        <BaseClass>bis:ElementOwnsMultiAspects</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="ConceptStationPhysicalElement"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="true">
+            <Class class="PayItemAreaAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="PayItemVolumeAspect" displayLabel="Pay Item Volume Aspect" description="A bis:ElementMultiAspect that stores common pay item data in terms of volumes of segments.">
+        <BaseClass>PayItemQuantityAspect</BaseClass>
+        <ECProperty propertyName="QuantityValue" displayLabel="Quantity" typeName="double" kindOfQuantity="AECU:VOLUME" description="The volume of the segment."/>
+        <ECProperty propertyName="Rate" displayLabel="Rate" typeName="double" description="The rate per unit volume."/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ConceptStationPhysicalElementOwnsPayItemVolumeAspects" strength="embedding" modifier="None">
+        <BaseClass>bis:ElementOwnsMultiAspects</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="ConceptStationPhysicalElement"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="true">
+            <Class class="PayItemVolumeAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="PayItemCountAspect" displayLabel="Pay Item Count Aspect" description="A bis:ElementMultiAspect that stores common pay item data in terms of counts for segments.">
+        <BaseClass>PayItemQuantityAspect</BaseClass>
+        <ECProperty propertyName="QuantityValue" displayLabel="Quantity" typeName="double" description="The count of the segment."/>
+        <ECProperty propertyName="Rate" displayLabel="Rate" typeName="double" description="The rate per unit count."/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ConceptStationPhysicalElementOwnsPayItemCountAspects" strength="embedding" modifier="None">
+        <BaseClass>bis:ElementOwnsMultiAspects</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="ConceptStationPhysicalElement"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="true">
+            <Class class="PayItemCountAspect"/>
+        </Target>
+    </ECRelationshipClass>
+
+</ECSchema>
