@@ -46,11 +46,11 @@ A `HorizontalAlignment` instance shall be contained in a *Plan-projection* `Spat
 
 A `HorizontalAlignment` typically has the same `CodeValue` and Category as its associated `Alignment`.
 
-A `HorizontalAlignment` stores its visual geometry separately from geometry used for linear-referencing and design purposes, although the two could be identical. The former shall be stored in its `GeometryStream` whereas the latter shall be stored in the `HorizontalGeometry` property, encoded as a [Path](https://www.itwinjs.org/reference/geometry-core/curve/path/). Each curve primitive in such *Path* describes a segment along the `HorizontalAlignment` as follows:
+A `HorizontalAlignment` stores its visual geometry separately from geometry used for linear-referencing and design purposes, although the two could be identical. The former shall be stored in its `GeometryStream` whereas the latter shall be stored in the `HorizontalGeometry` property, encoded as a [Path](https://www.itwinjs.org/reference/core-geometry/curve/path/). Each curve primitive in such *Path* describes a segment along the `HorizontalAlignment` as follows:
 
-- Linear segments shall be encoded as [LineSegment3d](https://www.itwinjs.org/reference/geometry-core/curve/linesegment3d/)s.
-- Circular arc segments shall be encoded as [Arc3d](https://www.itwinjs.org/reference/geometry-core/curve/arc3d/)s.
-- Transition segments (spirals) shall be encoded as [TransitionSpiral3d](https://www.itwinjs.org/reference/geometry-core/curve/transitionspiral3d/)s.
+- Linear segments shall be encoded as [LineSegment3d](https://www.itwinjs.org/reference/core-geometry/curve/linesegment3d/)s.
+- Circular arc segments shall be encoded as [Arc3d](https://www.itwinjs.org/reference/core-geometry/curve/arc3d/)s.
+- Transition segments (spirals) shall be encoded as [TransitionSpiral3d](https://www.itwinjs.org/reference/core-geometry/curve/transitionspiral3d/)s.
 
 The Z-coordinate of all of these primitives shall be zero.
 
@@ -78,11 +78,11 @@ A `VerticalAlignment` instance shall be contained in a `VerticalAlignmentModel` 
 
 A `VerticalAlignment` by default use the Domain-ranked `Vertical Alignment` Category.
 
-A `VerticalAlignment` stores its visual geometry separately from geometry used for linear-referencing and design purposes, although the two could be identical. The former shall be stored in its `GeometryStream` whereas the latter shall be stored in the `VerticalGeometry` property, encoded as a [Path](https://www.itwinjs.org/reference/geometry-core/curve/path/). Each curve primitive in such *Path* describes a segment along the `VerticalAlignment` as follows:
+A `VerticalAlignment` stores its visual geometry separately from geometry used for linear-referencing and design purposes, although the two could be identical. The former shall be stored in its `GeometryStream` whereas the latter shall be stored in the `VerticalGeometry` property, encoded as a [Path](https://www.itwinjs.org/reference/core-geometry/curve/path/). Each curve primitive in such *Path* describes a segment along the `VerticalAlignment` as follows:
 
-- Linear segments shall be encoded as [LineSegment3d](https://www.itwinjs.org/reference/geometry-core/curve/linesegment3d/)s.
-- Circular arc segments shall be encoded as [Arc3d](https://www.itwinjs.org/reference/geometry-core/curve/arc3d/)s.
-- Transition segments (parabolic) shall be encoded as [BSplineCurve3d](https://www.itwinjs.org/reference/geometry-core/bspline/bsplinecurve3d/)s.
+- Linear segments shall be encoded as [LineSegment3d](https://www.itwinjs.org/reference/core-geometry/curve/linesegment3d/)s.
+- Circular arc segments shall be encoded as [Arc3d](https://www.itwinjs.org/reference/core-geometry/curve/arc3d/)s.
+- Transition segments (parabolic) shall be encoded as [BSplineCurve3d](https://www.itwinjs.org/reference/core-geometry/bspline/bsplinecurve3d/)s.
 
 The X-coordinate of all of these primitives shall indicate *distance along* measurements in terms of the corresponding `HorizontalAlignment`. That is, an X-coordinate = 0.0 corresponds to the start location of its `HorizontalAlignment`. Y-coordinates shall indicate *elevation* at such location. Z-coordinate of all of these primitives shall be zero. 
 
