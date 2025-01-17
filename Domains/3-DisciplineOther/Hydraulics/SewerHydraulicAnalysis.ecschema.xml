@@ -13,6 +13,7 @@
     <ECSchemaReference name="RoadRailUnits" version="01.00.03" alias="rru"/>
     <ECSchemaReference name="NetworkTopology" version="01.00.01" alias="net"/>
     <ECSchemaReference name="StormSewerPhysical" version="01.00.01" alias="stmswrphys"/>
+    <ECSchemaReference name="SchemaUpgradeCustomAttributes" version="01.00.00" alias="SchemaUpgradeCA"/>
 
     <ECCustomAttributes>
         <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
@@ -845,7 +846,7 @@
         <BaseClass>net:IEdge</BaseClass>
         <ECProperty propertyName="StartInvert" typeName="double" displayLabel="Invert (Start)" category="HydraulicData" kindOfQuantity="rru:ELEVATION" description="Set the invert of pipe adjacent to the start node."/>
         <ECProperty propertyName="StopInvert" typeName="double" displayLabel="Invert (Stop)" category="HydraulicData" kindOfQuantity="rru:ELEVATION" description="Set the invert of the pipe adjacent to the stop node."/>
-        <ECProperty propertyName="ManningsN" typeName="double" displayLabel="Manning's n" category="HydraulicData" description="The roughness value for the pipe."/>
+        <ECProperty propertyName="ManningsN" typeName="double" displayLabel="Manning's n" kindOfQuantity="rru:MANNINGS_N" category="HydraulicData" description="The roughness value for the pipe."/>
         <ECProperty propertyName="PlanLength" typeName="double" displayLabel="Length" category="HydraulicData" kindOfQuantity="rru:LENGTH" description="The horizontal length of the pipe."/>
     </ECEntityClass>  
     
@@ -1019,7 +1020,14 @@
 
     <ECEntityClass typeName="CatchmentRationalSimpleAreaAspect" modifier="Sealed" displayLabel="CatchmentRationalSimpleAreaAspect">
         <BaseClass >CatchmentSimpleAreaDefinitionAspect</BaseClass>
-        <ECProperty propertyName="RationalC" typeName="double" displayLabel="Rational C" category="HydraulicData" kindOfQuantity="rru:PERCENTAGE" description="The runoff coefficient used with the Rational Method. C in Q=CiA."/>
+        <ECProperty propertyName="RationalC" typeName="double" displayLabel="Rational C" category="HydraulicData" kindOfQuantity="rru:RATIONAL_COEFFICIENT" description="The runoff coefficient used with the Rational Method. C in Q=CiA.">
+            <ECCustomAttributes>
+                <AllowUnitChange xmlns="SchemaUpgradeCustomAttributes.01.00.00">
+                    <From>u:DECIMAL_PERCENT</From>
+                    <To>u:COEFFICIENT</To>
+                </AllowUnitChange>
+            </ECCustomAttributes>
+            </ECProperty>
     </ECEntityClass>
 
     <ECEntityClass typeName="CatchmentRationalComplexAreaDefinitionAspect" modifier="Sealed" displayLabel="CatchmentRationalComplexAreaAspect">
@@ -1029,16 +1037,16 @@
 
     <ECStructClass typeName="RationalSubarea" modifier="Sealed" description="The list of subareas that comprise the total area of the catchment. The weighted average of the rational c value will be used to compute the runoff.">
         <ECProperty propertyName="RationalSubareaArea" typeName="double" displayLabel="Area" category="HydraulicData" kindOfQuantity="rru:AREA" description="The size of the subarea."/>
-        <ECProperty propertyName="RationalSubareaC" typeName="double" displayLabel="Rational C" category="HydraulicData" description="The Rational C coefficient to be applied to the current subarea."/>
+        <ECProperty propertyName="RationalSubareaC" typeName="double" displayLabel="Rational C" category="HydraulicData" kindOfQuantity="rru:RATIONAL_COEFFICIENT" description="The Rational C coefficient to be applied to the current subarea."/>
     </ECStructClass>
 
     <ECEntityClass typeName="EpaSWMMRunoffMethodAreaAspect" modifier="Sealed" displayLabel="EPA SWMM Runoff Method">
         <BaseClass >CatchmentSimpleAreaDefinitionAspect</BaseClass>
         <ECProperty propertyName="CharacteristicWidth" typeName="double" displayLabel="Characteristic Width" category="HydraulicData" description="The width of the overland flow path for sheet flow runoff (note: the catchment area occupied by Low Impact Development Controls (if any) should not be considered when determining characteristic width)." kindOfQuantity="rru:LENGTH" />
         <ECProperty propertyName="CatchmentSlope" typeName="double" displayLabel="Slope (Catchment)" category="HydraulicData" kindOfQuantity="rru:SLOPE" description="Average slope of the catchment."/>
-        <ECProperty propertyName="ManningsNImpervious" typeName="double" displayLabel="Manning's n (Impervious)" category="HydraulicData" description="Manning's n for overland flow over the impervious portion of the catchment."/>
-        <ECProperty propertyName="ManningsNPervious" typeName="double" displayLabel="Manning's n (Pervious)" category="HydraulicData" description="Manning's n for overland flow over the pervious portion of the catchment."/>
-        <ECProperty propertyName="DepressionStorageImpervious" typeName="double" displayLabel="Storage (Impervious Depression)" category="HydraulicData" kindOfQuantity="rru:LENGTH_SHORT" description="Manning's n for overland flow over the pervious portion of the catchment."/>
+        <ECProperty propertyName="ManningsNImpervious" typeName="double" displayLabel="Manning's n (Impervious)" category="HydraulicData" kindOfQuantity="rru:MANNINGS_N" description="Manning's n for overland flow over the impervious portion of the catchment."/>
+        <ECProperty propertyName="ManningsNPervious" typeName="double" displayLabel="Manning's n (Pervious)" category="HydraulicData" kindOfQuantity="rru:MANNINGS_N" description="Manning's n for overland flow over the pervious portion of the catchment."/>
+        <ECProperty propertyName="DepressionStorageImpervious" typeName="double" displayLabel="Storage (Impervious Depression)" category="HydraulicData" kindOfQuantity="rru:LENGTH_SHORT" description="Depth of depression storage on the impervious portion of the catchment."/>
         <ECProperty propertyName="DepressionStoragePervious" typeName="double" displayLabel="Storage (Pervious Depression)" category="HydraulicData" kindOfQuantity="rru:LENGTH_SHORT" description="Depth of depression storage on the pervious portion of the catchment."/>
         <ECProperty propertyName="PercentImpervious" typeName="double" displayLabel="Percent Impervious" category="HydraulicData" kindOfQuantity="rru:PERCENTAGE" description="Percent of land area (not including any land in this catchment associated with a Low Impact Development Control) that is impervious."/>
         <ECProperty propertyName="PercentZeroStorageImpervious" typeName="double" displayLabel="Percent Zero Storage on Impervious" category="HydraulicData" kindOfQuantity="rru:PERCENTAGE" description="Percent of the impervious area with no depression storage."/>
