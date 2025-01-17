@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!-- ==================================================================================
+|  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
+|  * See LICENSE.md in the project root for license terms and full copyright notice.
+======================================================================================= -->
+<ECSchema schemaName="StructuralConnections" alias="sc" version="01.00.00" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
+    <ECSchemaReference name="BisCore" version="01.00.14" alias="bis" />
+    <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
+    <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
+    <ECSchemaReference name="StructuralPhysicalInterop" version="01.00.00" alias="spi"/>
+
+    <ECCustomAttributes>
+        <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
+            <SupportedUse>NotForProduction</SupportedUse>
+        </ProductionStatus>
+        <SchemaLayerInfo xmlns="BisCustomAttributes.01.00.00">
+            <Value>DisciplinePhysical</Value>
+        </SchemaLayerInfo>
+    </ECCustomAttributes>
+
+    <ECEntityClass typeName="Joint" displayLabel="Joint" description="A Joint is an area where two or more ends, surfaces or edges of individual members are attached.">
+        <BaseClass>bis:SpatialLocationElement</BaseClass>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="JointConnectsStructuralElements" strength="referencing" modifier="None" description="A relationship that connects IStructuralElements to a Joint.">
+        <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="connects to" polymorphic="true">
+            <Class class="Joint"/>
+        </Source>
+        <Target multiplicity="(2..*)" roleLabel="is connected by" polymorphic="true">
+            <Class class="spi:IStructuralElement"/>
+        </Target>        
+    </ECRelationshipClass>
+</ECSchema>
