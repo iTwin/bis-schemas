@@ -85,16 +85,6 @@ Instances of `Shoulder` are typically aggregated by an instance of `RoadwayPlate
 
 Equivalent to [IfcFacilityPart](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcFacilityPart.htm) with its PredefinedType attribute set to [IfcRoadPartTypeEnum.SHOULDER](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcRoadPartTypeEnum.htm).
 
-### Sidewalk
-
-A sidewalk may accommodate moderate changes in grade (elevation) and is normally separated from the vehicular section by a curb. There may be a central reserve between the sidewalk and traffic lanes.
-
-A `RoadwayPlateau` instance typically aggregates zero or more instances of `Sidewalk`.
-
-`Sidewalk`s must be contained in `SpatialLocationModel`s or `PhysicalModel`s and can be linearly located, typically along an *Alignment*. An instance of `Sidewalk` typically holds the `bis:PhysicalElement`s (e.g. *Course*s) comprising its *pavement* structure.
-
-Equivalent to [IfcFacilityPart](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcFacilityPart.htm) with its PredefinedType attribute set to [IfcRoadPartTypeEnum.SIDEWALK](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcRoadPartTypeEnum.htm).
-
 ### JunctionElement
 
 Only one instance of `Road` can aggregate an instance of `JunctionElement`. Other `Road`s meeting or crossing the same `JunctionElement` shall use the `RoadIncludesJunctions` relationship to indicate association with it.
