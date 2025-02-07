@@ -3,13 +3,14 @@
 |  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
 |  * See LICENSE.md in the project root for license terms and full copyright notice.
 ======================================================================================= -->
-<ECSchema schemaName="OpenSite" alias="opnsite" version="01.00.04" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" displayLabel="OpenSite" description="OpenSite+ application schema.">
+<ECSchema schemaName="OpenSite" alias="opnsite" version="01.00.05" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" displayLabel="OpenSite" description="OpenSite+ application schema.">
     <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA" />
     <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
     <ECSchemaReference name="BisCore" version="01.00.10" alias="bis" />
     <ECSchemaReference name="LinearReferencing" version="02.00.03" alias="lr" />
     <ECSchemaReference name="RoadRailUnits" version="01.00.02" alias="rru" />
     <ECSchemaReference name="SpatialComposition" version="01.00.01" alias="spcomp" />
+    <ECSchemaReference name="StormSewerPhysical" version="01.00.01" alias="ssphys" />
 
     <ECCustomAttributes>
         <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
@@ -936,6 +937,35 @@
         </Source>
         <Target multiplicity="(0..*)" roleLabel="is created by" polymorphic="true">
             <Class class="spcomp:Space"/>
+        </Target>
+    </ECRelationshipClass>
+	
+	<ECStructClass typeName="DistanceAlongLinearPath" description="Describes a distance along a linear path, as either an absolute distance or a percent along" modifier="Sealed">
+        <ECProperty propertyName="AbsoluteAlong" typeName="double" kindOfQuantity="rru:LENGTH_SHORT" displayLabel="Applicable when IsDistanceAbsolute is true. It is the distance along the linear path in meters"/>
+        <ECProperty propertyName="PercentAlong" typeName="double" kindOfQuantity="rru:PERCENTAGE" displayLabel="Applicable when IsDistanceAbsolute is false. It is the percent along the linear path"/>
+        <ECProperty propertyName="IsDistanceAbsolute" typeName="boolean" displayLabel="True if DistanceAlong property should be used, false if PercentAlong describes the distance. Undefined implies an absolute distance"/>
+    </ECStructClass>
+
+	<ECRelationshipClass typeName="ElementDrivesElementLinearly" modifier="Abstract" strength="referencing" strengthDirection="forward" description="">
+        <BaseClass>bis:ElementDrivesElement</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="drives" polymorphic="true">
+            <Class class="bis:GeometricElement"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is driven by" polymorphic="true">
+            <Class class="bis:GeometricElement"/>
+        </Target>
+        <ECStructProperty propertyName="DistanceAlong" typeName="DistanceAlongLinearPath" displayLabel="Distance along linear, in meters or percent"/>
+        <ECProperty propertyName="Offset" typeName="double" kindOfQuantity="rru:LENGTH_SHORT" displayLabel="Perpendicular offset from linear. Positive is to the right, negative to the left, relative to the linear path direction"/>
+        <ECProperty propertyName="IsDistanceFromStart" typeName="boolean" displayLabel="True if distance is from the start of the linear path, false if it is from the end. Undefined implies it is from the start"/>
+    </ECRelationshipClass>
+
+	<ECRelationshipClass typeName="ElementDrivesDistributionStructureLinearly" modifier="None" strength="referencing" strengthDirection="forward" description="">
+        <BaseClass>ElementDrivesElementLinearly</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="drives" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is driven by" polymorphic="true">
+            <Class class="ssphys:DistributionStructure"/>
         </Target>
     </ECRelationshipClass>
 </ECSchema>
