@@ -5,7 +5,7 @@
 ======================================================================================= -->
 <ECSchema schemaName="SewerHydraulicAnalysis" alias="swrhyd" version="01.00.01"
     xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" displayLabel="Gravity Sewer Analysis" description="Sewer Hydraulic Analysis Schema.">
-    <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA" />
+    <ECSchemaReference name="CoreCustomAttributes" version="01.00.04" alias="CoreCA" />
     <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
     <ECSchemaReference name="BisCore" version="01.00.10" alias="bis" />
     <ECSchemaReference name="Analytical" version="01.00.01" alias="anlyt" />
@@ -16,7 +16,7 @@
     <ECSchemaReference name="SchemaUpgradeCustomAttributes" version="01.00.00" alias="SchemaUpgradeCA"/>
 
     <ECCustomAttributes>
-        <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
+        <ProductionStatus xmlns="CoreCustomAttributes.01.00.04">
             <SupportedUse>NotForProduction</SupportedUse>
         </ProductionStatus>
         <SchemaLayerInfo xmlns="BisCustomAttributes.01.00.00">
@@ -266,6 +266,11 @@
         <ECEnumerator value="3" name="AsOutfall" displayLabel="Outfall" description="Headwall acts as boundary outfall to a network."/>
     </ECEnumeration>
 
+    <ECEnumeration typeName="TcDefinition" backingTypeName="int" isStrict="true">
+        <ECEnumerator value="0" name="Simple" displayLabel="Simple" description="The user enters in a single value for the Tc."/>
+        <ECEnumerator value="1" name="FlowPath" displayLabel="Flow Path" description="The time of concentration is calculated along the flow path."/>
+    </ECEnumeration>
+
     <ECEnumeration typeName="DesignStorms" backingTypeName="int" isStrict="true">
         <ECEnumeration value="0" name="SCSTypeI24Hr" displayLabel="SCS Type I 24 hr"/>
         <ECEnumeration value="1" name="SCSTypeIA24Hr" displayLabel="SCS Type IA 24 hr"/>
@@ -478,7 +483,7 @@
     </ECRelationshipClass>
 
     <ECEntityClass typeName="RiserPipeAspect" modifier="Sealed" displayLabel="Riser Pipe">
-        <BaseClass >RiserTypeAspect</BaseClass>
+        <BaseClass>RiserTypeAspect</BaseClass>
         <ECProperty propertyName="OpeningDiameter" typeName="double" displayLabel="Diameter" category="HydraulicData" kindOfQuantity="rru:LENGTH_SHORT" description="The diameter of the opening at the top of the riser structure."/>
     </ECEntityClass>
 
@@ -716,8 +721,22 @@
 
     <ECEntityClass typeName="CatchBasinTypeCurbInletHydraulicAspect" displayLabel="CatchBasinTypeCurbInletHydraulicAspect">
         <BaseClass>CatchBasinTypeHydraulicAspect</BaseClass>
-        <ECProperty propertyName="SlotWidth" typeName="double" displayLabel="Slot Width" category="HydraulicData" kindOfQuantity="rru:LENGTH" />
-        <ECProperty propertyName="SlotLength" typeName="double" displayLabel="Slot Length" category="HydraulicData" kindOfQuantity="rru:LENGTH" />
+        <ECProperty propertyName="SlotWidth" typeName="double" displayLabel="Slot Width" category="HydraulicData" kindOfQuantity="rru:LENGTH">
+               <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.04"/>
+                <Deprecated xmlns="CoreCustomAttribute.01.00.04">
+                    <Description>Is in the CatchBasinTypeSlotInletHydraulicAspect</Description>
+                </Deprecated>
+            </ECCustomAttributes>
+        </ECProperty>
+        <ECProperty propertyName="SlotLength" typeName="double" displayLabel="Slot Length" category="HydraulicData" kindOfQuantity="rru:LENGTH">
+              <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.04"/>
+                <Deprecated xmlns="CoreCustomAttribute.01.00.04">
+                    <Description>Is in the CatchBasinTypeSlotInletHydraulicAspect</Description>
+                </Deprecated>
+            </ECCustomAttributes>
+        </ECProperty>
         <ECProperty propertyName="CurbLength" typeName="double" displayLabel="Curb Length" category="HydraulicData" kindOfQuantity="rru:LENGTH" description="Length of curb opening."/>
         <ECProperty propertyName="CurbHeight" typeName="double" displayLabel="Curb Height" category="HydraulicData" kindOfQuantity="rru:LENGTH" description="Size of the vertical opening of curb inlet."/>
         <ECProperty propertyName="InclineAngle" typeName="double" displayLabel="Incline Angle" category="HydraulicData" kindOfQuantity="rru:ANGLE" description="Angle throat of the curb inlet relative to the horizontal. Is used when the throat type is inclined."/>
@@ -979,6 +998,14 @@
 
     <ECEntityClass typeName="CatchmentTimeOfConcentrationAspect" modifier="Abstract" displayLabel="CatchmentTimeOfConcentrationAspect">
         <BaseClass >bis:ElementUniqueAspect</BaseClass>
+        <ECProperty propertyName="Tc" typeName="double" displayLabel="Tc" category="HydraulicData" kindOfQuantity="AECU:TIME">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.04"/>
+                <Deprecated xmlns="CoreCustomAttribute.01.00.04">
+                    <Description>Refactoring moved this attribute to its own aspect. See "CatchmentSimpleTimeOfConcentrationAspect"</Description>
+                </Deprecated>
+            </ECCustomAttributes>
+        </ECProperty>
     </ECEntityClass>
 
     <ECRelationshipClass typeName="CatchmentOwnsTcAspect" strength="embedding" modifier="Sealed">
@@ -993,7 +1020,7 @@
 
     <ECEntityClass typeName="CatchmentSimpleTimeOfConcentrationAspect" modifier="Abstract" displayLabel="CatchmentSimpleTimeOfConcentrationAspect">
         <BaseClass>CatchmentTimeOfConcentrationAspect</BaseClass>
-        <ECProperty propertyName="Tc" typeName="double" displayLabel="Tc" category="HydraulicData" kindOfQuantity="AECU:TIME" />
+        <ECProperty propertyName="SimpleTc" typeName="double" displayLabel="Tc" category="HydraulicData" kindOfQuantity="AECU:TIME" />
     </ECEntityClass>
 
     <ECEntityClass typeName="CatchmentFlowPathTimeOfConcentrationAspect" modifier="Sealed" displayLabel="CatchmentFlowPathTimeOfConcentrationAspect">
