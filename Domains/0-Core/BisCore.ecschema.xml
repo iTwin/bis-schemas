@@ -3,7 +3,7 @@
 |  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
 |  * See LICENSE.md in the project root for license terms and full copyright notice.
 ======================================================================================= -->
-<ECSchema schemaName="BisCore" alias="bis" version="01.00.17" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" displayLabel="BIS Core" description="The BIS core schema contains classes that all other domain schemas extend.">
+<ECSchema schemaName="BisCore" alias="bis" version="01.00.18" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" displayLabel="BIS Core" description="The BIS core schema contains classes that all other domain schemas extend.">
 
     <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
     <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
@@ -1524,7 +1524,7 @@
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.01.00.00"/>
             <Deprecated xmlns="CoreCustomAttributes.01.00.03">
-                <Description>Settings are now stored in the `JsonProperties` attribute of TextAnnotation2d and TextAnnotation3d classes.</Description>
+                <Description>`TextAnnotationData` is deprecated and replaced by the `TextAnnotationData` property of TextAnnotation2d and TextAnnotation3d classes.</Description>
             </Deprecated>
         </ECCustomAttributes>
         <ECProperty propertyName="TextAnnotation" typeName="binary" displayLabel="Text Annotation" description="Text in Annotations.fb.h flat buffer format">
@@ -1539,6 +1539,11 @@
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.01.00.00"/>
         </ECCustomAttributes>
+        <ECProperty propertyName="TextAnnotationData" typeName="string" extendedTypeName="Json" description="Data used to generate the visual representation of a TextAnnotation2d element.">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03"/>
+            </ECCustomAttributes>
+        </ECProperty>
     </ECEntityClass>
     <ECRelationshipClass typeName="TextAnnotation2dOwnsTextAnnotationData" strength="embedding" modifier="None">
         <BaseClass>ElementOwnsUniqueAspect</BaseClass>
@@ -1560,6 +1565,11 @@
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.01.00.00"/>
         </ECCustomAttributes>
+        <ECProperty propertyName="TextAnnotationData" typeName="string" extendedTypeName="Json" description="Data used to generate the visual representation of a TextAnnotation3d element.">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03"/>
+            </ECCustomAttributes>
+        </ECProperty>
     </ECEntityClass>
     <ECRelationshipClass typeName="TextAnnotation3dOwnsTextAnnotationData" strength="embedding" modifier="None">
         <BaseClass>ElementOwnsUniqueAspect</BaseClass>
@@ -2182,19 +2192,24 @@
         <BaseClass>DefinitionElement</BaseClass>
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.01.00.00"/>
-            <Deprecated xmlns="CoreCustomAttributes.01.00.03">
-                <Description>Not modeled with BIS anymore.</Description>
-            </Deprecated>
         </ECCustomAttributes>
         <ECProperty propertyName="Description" typeName="string" description="Description of the style">
             <ECCustomAttributes>
                 <CustomHandledProperty xmlns="BisCore.01.00.16"/>
             </ECCustomAttributes>
         </ECProperty>
+        <ECProperty propertyName="Settings" typeName="string" extendedTypeName="Json" description="Settings of the style">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03"/>
+            </ECCustomAttributes>
+        </ECProperty>
         <ECProperty propertyName="Data" typeName="binary" description="Encoded style properties">
             <ECCustomAttributes>
                 <CustomHandledProperty xmlns="BisCore.01.00.16"/>
                 <HiddenProperty xmlns="CoreCustomAttributes.01.00.03"/>
+                <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                    <Description>The `Data` property is deprecated and replaced by the `Settings` property.</Description>
+                </Deprecated>
             </ECCustomAttributes>
         </ECProperty>
     </ECEntityClass>
