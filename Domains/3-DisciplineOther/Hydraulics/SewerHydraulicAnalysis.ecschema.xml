@@ -998,14 +998,8 @@
 
     <ECEntityClass typeName="CatchmentTimeOfConcentrationAspect" displayLabel="CatchmentTimeOfConcentrationAspect">
         <BaseClass >bis:ElementUniqueAspect</BaseClass>
-        <ECProperty propertyName="Tc" typeName="double" displayLabel="Tc" category="HydraulicData" kindOfQuantity="AECU:TIME">
-            <ECCustomAttributes>
-                <HiddenProperty xmlns="CoreCustomAttributes.01.00.04"/>
-                <Deprecated xmlns="CoreCustomAttributes.01.00.04">
-                    <Description>Refactoring moved this attribute to its own aspect. See CatchmentSimpleTimeOfConcentrationAspect.</Description>
-                </Deprecated>
-            </ECCustomAttributes>
-        </ECProperty>
+        <ECProperty propertyName="Tc" typeName="double" displayLabel="Tc" category="HydraulicData" kindOfQuantity="AECU:TIME" description="Specify the longest time it takes for flow to traverse the longest flow path on the catchment."/>
+        <ECProperty propertyName="TcDefinition" typeName="TcDefinition" displayLabel="Tc Method" description="Choose how to generate the Time of Concentration for the catchment"/>
     </ECEntityClass>
 
     <ECRelationshipClass typeName="CatchmentOwnsTcAspect" strength="embedding" modifier="Sealed">
@@ -1018,21 +1012,12 @@
         </Target>
     </ECRelationshipClass>
 
-    <ECEntityClass typeName="CatchmentSimpleTimeOfConcentrationAspect" modifier="Abstract" displayLabel="CatchmentSimpleTimeOfConcentrationAspect">
-        <BaseClass>CatchmentTimeOfConcentrationAspect</BaseClass>
-        <ECProperty propertyName="SimpleTc" typeName="double" displayLabel="Tc" category="HydraulicData" kindOfQuantity="AECU:TIME" />
-    </ECEntityClass>
-
-    <ECEntityClass typeName="CatchmentFlowPathTimeOfConcentrationAspect" modifier="Sealed" displayLabel="CatchmentFlowPathTimeOfConcentrationAspect">
-        <BaseClass>CatchmentTimeOfConcentrationAspect</BaseClass>
-        <ECNavigationProperty propertyName="FlowPath" displayLabel="Flow Path" relationshipName="CatchmentOwnsTcFlowPath" direction="Forward" description="The Tc flow path associated with the catchment." />
-    </ECEntityClass>
-
-    <ECRelationshipClass typeName="CatchmentOwnsTcFlowPath" strength="embedding" modifier="Sealed">
-        <Source multiplicity="(1..1)" roleLabel="discharges from" polymorphic="false">
-            <Class class="CatchmentFlowPathTimeOfConcentrationAspect"/>
+    <ECRelationshipClass typeName="CatchmentOwnsFlowPath" strength="embedding" modifier="Sealed">
+        <BaseClass >bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="Catchment"/>
         </Source>
-        <Target multiplicity="(1..1)" roleLabel="discharges to" polymorphic="false">
+        <Target multiplicity="(1..1)" roleLabel="owned by" polymorphic="false">
             <Class class="TimeOfConcentrationFlowPath"/>
         </Target>
     </ECRelationshipClass>
