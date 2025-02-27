@@ -3,7 +3,7 @@
 |  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
 |  * See LICENSE.md in the project root for license terms and full copyright notice.
 ======================================================================================= -->
-<ECSchema schemaName="BisCore" alias="bis" version="01.00.17" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" displayLabel="BIS Core" description="The BIS core schema contains classes that all other domain schemas extend.">
+<ECSchema schemaName="BisCore" alias="bis" version="01.00.18" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" displayLabel="BIS Core" description="The BIS core schema contains classes that all other domain schemas extend.">
 
     <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
     <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
@@ -1034,6 +1034,19 @@
         </ECProperty>
         <ECProperty propertyName="Format" typeName="string" displayLabel="Format" description="The format of the external repository."/>
     </ECEntityClass>
+    <ECEntityClass typeName="RepositoryInfoAspect" displayLabel="Repository Info Aspect" modifier="None" description="A bis:ElementUniqueAspect that identifies a bis:Element as one of the roots of a *channel*, specified by its *channel-key*, which is a subset of the overall model-hierarchy and associated data, that is independently maintained.">
+        <BaseClass>ElementUniqueAspect</BaseClass>
+        <ECProperty propertyName="OriginatingSystem" typeName="string" displayLabel="Originating System" description="Name and optionally version of the software application or tool that created data in the External DataSource referenced through the owning RepositoryLink"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="RepositoryLinkOwnsInfoAspect" strength="embedding" modifier="None">
+        <BaseClass>ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="RepositoryLink"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="true">
+            <Class class="RepositoryInfoAspect"/>
+        </Target>
+    </ECRelationshipClass>
 
     <ECEntityClass typeName="EmbeddedFileLink" displayLabel="Embedded File Link" description="A bis:EmbeddedFileLink is a bis:LinkElement that links to a file embedded within the iModel.">
         <BaseClass>LinkElement</BaseClass>
@@ -1510,6 +1523,9 @@
         <BaseClass>ElementUniqueAspect</BaseClass>
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.01.00.00"/>
+            <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                <Description>`TextAnnotationData` is deprecated and replaced by the `TextAnnotationData` property of TextAnnotation2d and TextAnnotation3d classes.</Description>
+            </Deprecated>
         </ECCustomAttributes>
         <ECProperty propertyName="TextAnnotation" typeName="binary" displayLabel="Text Annotation" description="Text in Annotations.fb.h flat buffer format">
             <ECCustomAttributes>
@@ -1523,9 +1539,19 @@
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.01.00.00"/>
         </ECCustomAttributes>
+        <ECProperty propertyName="TextAnnotationData" typeName="string" extendedTypeName="Json" description="Data used to generate the visual representation of a TextAnnotation2d element.">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03"/>
+            </ECCustomAttributes>
+        </ECProperty>
     </ECEntityClass>
     <ECRelationshipClass typeName="TextAnnotation2dOwnsTextAnnotationData" strength="embedding" modifier="None">
         <BaseClass>ElementOwnsUniqueAspect</BaseClass>
+        <ECCustomAttributes>
+            <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                <Description>See deprecation description for TextAnnotationData class.</Description>
+            </Deprecated>
+        </ECCustomAttributes>
         <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
             <Class class="TextAnnotation2d"/>
         </Source>
@@ -1539,9 +1565,19 @@
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.01.00.00"/>
         </ECCustomAttributes>
+        <ECProperty propertyName="TextAnnotationData" typeName="string" extendedTypeName="Json" description="Data used to generate the visual representation of a TextAnnotation3d element.">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03"/>
+            </ECCustomAttributes>
+        </ECProperty>
     </ECEntityClass>
     <ECRelationshipClass typeName="TextAnnotation3dOwnsTextAnnotationData" strength="embedding" modifier="None">
         <BaseClass>ElementOwnsUniqueAspect</BaseClass>
+        <ECCustomAttributes>
+            <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                <Description>See deprecation description for TextAnnotationData class.</Description>
+            </Deprecated>
+        </ECCustomAttributes>
         <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
             <Class class="TextAnnotation3d"/>
         </Source>
@@ -1860,6 +1896,7 @@
     <ECEntityClass typeName="ChannelRootAspect" displayLabel="Channel Root Aspect" modifier="Sealed" description="A bis:ElementUniqueAspect that identifies a bis:Element as one of the roots of a *channel*, specified by its *channel-key*, which is a subset of the overall model-hierarchy and associated data, that is independently maintained.">
         <BaseClass>ElementUniqueAspect</BaseClass>
         <ECProperty propertyName="Owner" typeName="string" description="Channel-key of the channel"/>
+        <ECProperty propertyName="Version" typeName="string" description="Semantic version of the data-organization and default content in the channel, set by the Owner that last edited it."/>
     </ECEntityClass>
     <ECRelationshipClass typeName="ElementOwnsChannelRootAspect" strength="embedding" modifier="None">
         <BaseClass>ElementOwnsUniqueAspect</BaseClass>
@@ -2161,10 +2198,18 @@
                 <CustomHandledProperty xmlns="BisCore.01.00.16"/>
             </ECCustomAttributes>
         </ECProperty>
+        <ECProperty propertyName="Settings" typeName="string" extendedTypeName="Json" description="Settings of the style">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03"/>
+            </ECCustomAttributes>
+        </ECProperty>
         <ECProperty propertyName="Data" typeName="binary" description="Encoded style properties">
             <ECCustomAttributes>
                 <CustomHandledProperty xmlns="BisCore.01.00.16"/>
                 <HiddenProperty xmlns="CoreCustomAttributes.01.00.03"/>
+                <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                    <Description>The `Data` property is deprecated and replaced by the `Settings` property.</Description>
+                </Deprecated>
             </ECCustomAttributes>
         </ECProperty>
     </ECEntityClass>

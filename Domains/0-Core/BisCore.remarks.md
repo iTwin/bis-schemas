@@ -396,7 +396,12 @@ Applications create channels to define portions of the model-hierarchy that they
 
 Each Element (typically a `Subject` or `InformationPartitionElement`) that owns a `ChannelRootAspect` defines a root of the model-hierarchy that is included in a particular *channel*. It recursively descends down through `ElementOwnsChildElements` and `ModelModelsElement` relationships to include all of the child elements and sub-models into the specified *channel*. A *channel* is conceptually identified by its _Channel Key_ value of the `Owner` property of a `ChannelRootAspect`. 
 
-There may be more than one root `Subject`s or `InformationPartitionElement`s in a model-hierarchy that are included in the same *channel*. In that case, each `Subject` or `InformationPartitionElement` instance specifies the same _Channel Key_ value in their `ChannelRootAspect`. 
+Applications can optionally use the `ChannelRootAspect.Version` property in order to assign a _semantic version_ number to the data-organization in a *channel*. _Semantic versioning_ aims at efficiently advertising read and write backwards-compatibility with respect to previous versions of the owning Application of a *channel*. 
+
+_Semantic versioning_ of *channels* follows the "[read-version].[write-version].[minor-version]" format.
+- [read-version] is incremented when the data-organization of a *channel* is changed in ways that older versions of an Application cannot safely understand it for reading purposes.
+- [write-version] is incremented when the data-organization of a *channel* is changed in ways that it is not safe for older versions of an Application to add, modify or delete data in it.
+- [minor-version] is incremented when the data-organization of a *channel* is changed in ways that older versions of an Application can still safely read it or write to it.
 
 Note that *Channels* do not nest. That is, once a `Subject` or `InformationPartitionElement` instance defines a root to be included in a particular *channel*, no descendant Element of such root in the subject-hierarchy can be used to define a root for a different *channel*.
 
