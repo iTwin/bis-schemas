@@ -5,7 +5,7 @@
 ======================================================================================= -->
 <ECSchema schemaName="SewerHydraulicAnalysis" alias="swrhyd" version="01.00.02"
     xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" displayLabel="Gravity Sewer Analysis" description="Sewer Hydraulic Analysis Schema.">
-    <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA" />
+    <ECSchemaReference name="CoreCustomAttributes" version="01.00.04" alias="CoreCA" />
     <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
     <ECSchemaReference name="BisCore" version="01.00.10" alias="bis" />
     <ECSchemaReference name="Analytical" version="01.00.01" alias="anlyt" />
@@ -16,7 +16,7 @@
     <ECSchemaReference name="SchemaUpgradeCustomAttributes" version="01.00.00" alias="SchemaUpgradeCA"/>
 
     <ECCustomAttributes>
-        <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
+        <ProductionStatus xmlns="CoreCustomAttributes.01.00.04">
             <SupportedUse>NotForProduction</SupportedUse>
         </ProductionStatus>
         <SchemaLayerInfo xmlns="BisCustomAttributes.01.00.00">
@@ -159,6 +159,7 @@
     <ECEnumeration typeName="RainfallSetDefinition" backingTypeName="int" isStrict="true">
         <ECEnumerator value="0" name="IDFTable" displayLabel="IDF Table"/>
         <ECEnumerator value="1" name="Depth" displayLabel="Depth"/>
+        <ECEnumerator value="2" name="DesignStorms" displayLabel="Design Storm"/>
     </ECEnumeration>
 
     <ECEnumeration typeName="AreaDefinition" backingTypeName="int" isStrict="true">
@@ -264,7 +265,19 @@
         <ECEnumerator value="2" name="PondOutflow" displayLabel="Pond Outflow" description="Headwall works as a pond drain."/>
         <ECEnumerator value="3" name="AsOutfall" displayLabel="Outfall" description="Headwall acts as boundary outfall to a network."/>
     </ECEnumeration>
-    
+
+    <ECEnumeration typeName="TcDefinition" backingTypeName="int" isStrict="true">
+        <ECEnumerator value="0" name="Simple" displayLabel="Simple" description="The user enters in a single value for the Tc."/>
+        <ECEnumerator value="1" name="FlowPath" displayLabel="Flow Path" description="The time of concentration is calculated along the flow path."/>
+    </ECEnumeration>
+
+    <ECEnumeration typeName="DesignStorms" backingTypeName="int" isStrict="true">
+        <ECEnumerator value="0" name="SCSTypeI24Hr" displayLabel="SCS Type I 24 hr"/>
+        <ECEnumerator value="1" name="SCSTypeIA24Hr" displayLabel="SCS Type IA 24 hr"/>
+        <ECEnumerator value="2" name="SCSTypeII24Hr" displayLabel="SCS Type II 24 hr"/>
+        <ECEnumerator value="3" name="SCSTypeIII24Hr" displayLabel="SCS Type III 24 hr"/>
+    </ECEnumeration>
+
     <ECEntityClass typeName="SewerHydraulicAnalysisModel" modifier="Sealed" displayLabel="Sewer Hydraulics Analysis Model" description="Model containing all Sewer Hydraulic Analysis elements.">
         <BaseClass>anlyt:AnalyticalModel</BaseClass>
     </ECEntityClass>
@@ -470,7 +483,7 @@
     </ECRelationshipClass>
 
     <ECEntityClass typeName="RiserPipeAspect" modifier="Sealed" displayLabel="Riser Pipe">
-        <BaseClass >RiserTypeAspect</BaseClass>
+        <BaseClass>RiserTypeAspect</BaseClass>
         <ECProperty propertyName="OpeningDiameter" typeName="double" displayLabel="Diameter" category="HydraulicData" kindOfQuantity="rru:LENGTH_SHORT" description="The diameter of the opening at the top of the riser structure."/>
     </ECEntityClass>
 
@@ -708,8 +721,22 @@
 
     <ECEntityClass typeName="CatchBasinTypeCurbInletHydraulicAspect" displayLabel="CatchBasinTypeCurbInletHydraulicAspect">
         <BaseClass>CatchBasinTypeHydraulicAspect</BaseClass>
-        <ECProperty propertyName="SlotWidth" typeName="double" displayLabel="Slot Width" category="HydraulicData" kindOfQuantity="rru:LENGTH" />
-        <ECProperty propertyName="SlotLength" typeName="double" displayLabel="Slot Length" category="HydraulicData" kindOfQuantity="rru:LENGTH" />
+        <ECProperty propertyName="SlotWidth" typeName="double" displayLabel="Slot Width" category="HydraulicData" kindOfQuantity="rru:LENGTH">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.04"/>
+                <Deprecated xmlns="CoreCustomAttributes.01.00.04">
+                    <Description>Is in the CatchBasinTypeSlotInletHydraulicAspect</Description>
+                </Deprecated>
+            </ECCustomAttributes>
+        </ECProperty>
+        <ECProperty propertyName="SlotLength" typeName="double" displayLabel="Slot Length" category="HydraulicData" kindOfQuantity="rru:LENGTH">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.04"/>
+                <Deprecated xmlns="CoreCustomAttributes.01.00.04">
+                    <Description>Is in the CatchBasinTypeSlotInletHydraulicAspect</Description>
+                </Deprecated>
+            </ECCustomAttributes>
+        </ECProperty>
         <ECProperty propertyName="CurbLength" typeName="double" displayLabel="Curb Length" category="HydraulicData" kindOfQuantity="rru:LENGTH" description="Length of curb opening."/>
         <ECProperty propertyName="CurbHeight" typeName="double" displayLabel="Curb Height" category="HydraulicData" kindOfQuantity="rru:LENGTH" description="Size of the vertical opening of curb inlet."/>
         <ECProperty propertyName="InclineAngle" typeName="double" displayLabel="Incline Angle" category="HydraulicData" kindOfQuantity="rru:ANGLE" description="Angle throat of the curb inlet relative to the horizontal. Is used when the throat type is inclined."/>
@@ -969,9 +996,10 @@
         </Target>
     </ECRelationshipClass>
 
-    <ECEntityClass typeName="CatchmentTimeOfConcentrationAspect" modifier="Sealed" displayLabel="CatchmentTimeOfConcentrationAspect">
+    <ECEntityClass typeName="CatchmentTimeOfConcentrationAspect" displayLabel="CatchmentTimeOfConcentrationAspect">
         <BaseClass >bis:ElementUniqueAspect</BaseClass>
-        <ECProperty propertyName="Tc" typeName="double" displayLabel="Tc" category="HydraulicData" kindOfQuantity="AECU:TIME" />
+        <ECProperty propertyName="Tc" typeName="double" displayLabel="Tc" category="HydraulicData" kindOfQuantity="AECU:TIME" description="Specify the longest time it takes for flow to traverse the longest flow path on the catchment."/>
+        <ECProperty propertyName="TcDefinition" typeName="TcDefinition" displayLabel="Tc Method" description="Choose how to generate the Time of Concentration for the catchment"/>
     </ECEntityClass>
 
     <ECRelationshipClass typeName="CatchmentOwnsTcAspect" strength="embedding" modifier="Sealed">
@@ -979,11 +1007,62 @@
         <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
             <Class class="Catchment"/>
         </Source>
-        <Target multiplicity="(0..1)" roleLabel="owned by" polymorphic="false">
+        <Target multiplicity="(0..1)" roleLabel="owned by" polymorphic="true">
             <Class class="CatchmentTimeOfConcentrationAspect"/>
         </Target>
     </ECRelationshipClass>
 
+    <ECRelationshipClass typeName="CatchmentOwnsFlowPath" strength="embedding" modifier="Sealed">
+        <BaseClass >bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="Catchment"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="owned by" polymorphic="false">
+            <Class class="TimeOfConcentrationFlowPath"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="TimeOfConcentrationFlowPath" modifier="Sealed" displayLabel="Tc Flow Path">
+        <BaseClass>anlyt:AnalyticalElement</BaseClass>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="FlowPathOwnsTcMethods" strength="embedding" modifier="Sealed">
+        <BaseClass >bis:ElementOwnsMultiAspects</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="TimeOfConcentrationFlowPath"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="owned by" polymorphic="true">
+            <Class class="TimeOfConcentrationMethodAspect"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="TimeOfConcentrationMethodAspect" modifier="Abstract" displayLabel="TimeOfConcentrationMethodAspect">
+        <BaseClass>bis:ElementMultiAspect</BaseClass>
+        <ECProperty propertyName="HydraulicLength" typeName="double" displayLabel="Hydraulic Length" category="HydraulicData" kindOfQuantity="rru:LENGTH" description="The length of the flow travel path to use when calculating the Tc."/>
+        <ECProperty propertyName="Slope" typeName="double" displayLabel="Slope" category="HydraulicData" kindOfQuantity="rru:SLOPE" description="The average slope of the flow path to use when calculating the Tc."/>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="ConveyanceTimeOfConcentrationMethodAspect" modifier="Abstract" displayLabel="ConveyanceTimeOfConcentrationMethodAspect">
+        <BaseClass>TimeOfConcentrationMethodAspect</BaseClass>
+        <ECProperty propertyName="ManningsN" typeName="double" displayLabel="Manning's n" category="HydraulicData" kindOfQuantity="rru:LENGTH" description="The Manning's n of the flow travel path to use when calculating the Tc."/>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="TR55SheetFlowTcMethodAspect" modifier="Sealed" displayLabel="TR55SheetFlowTcMethodAspect">
+        <BaseClass>ConveyanceTimeOfConcentrationMethodAspect</BaseClass>
+        <ECProperty propertyName="TwoYearTwentyFourHourDepth" typeName="double" displayLabel="2 year 24 Hour Depth" category="HydraulicData" kindOfQuantity="rru:LENGTH_SHORT" description="The depth 2 year 24 hour storm at the location."/>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="Tr55ShallowConcentratedFlowTcMethodAspect" modifier="Sealed" displayLabel="Tr55ShallowConcentratedFlowTcMethodAspect">
+        <BaseClass>TimeOfConcentrationMethodAspect</BaseClass>
+        <ECProperty propertyName="TreatAsPaved" typeName="boolean" displayLabel="Treat as Paved" category="HydraulicData" description="If true will use the paved form of the TR-55 Shallow Concentrated Flow Tc formula."/>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="Tr55ChannelFlowTcMethodAspect" modifier="Sealed" displayLabel="Tr55ChannelFlowTcMethodAspect">
+        <BaseClass>ConveyanceTimeOfConcentrationMethodAspect</BaseClass>
+        <ECProperty propertyName="WettedPerimeter" typeName="double" displayLabel="Wetted Perimeter" category="HydraulicData" kindOfQuantity="rru:LENGTH" description="Wetted Perimeter of flow in channel to be used in TR-55 Channel Flow Formula for Tc."/>
+        <ECProperty propertyName="FlowArea" typeName="double" displayLabel="Flow Area" category="HydraulicData" kindOfQuantity="rru:AREA" description="Area of flow in channel to be used in TR-55 Channel Flow Formula for Tc."/>
+    </ECEntityClass>
+    
     <ECEntityClass typeName="CatchmentAreaDefinitionSelectorAspect" modifier="Sealed" displayLabel="CatchmentAreaDefinitionSelectorAspect">
         <BaseClass >bis:ElementUniqueAspect</BaseClass>
         <ECProperty propertyName="AreaDefinition" typeName="AreaDefinition" displayLabel="Area Definition" category="HydraulicData" description="Specify how to define the area for the catchment"/>
@@ -1120,6 +1199,25 @@
         <ECProperty propertyName="RainDataDefinition" typeName="RainfallSetDefinition" displayLabel="Rain Data Definition" category="HydraulicData" description="Specify how to define the rainfall data for this rainfall set."/>
     </ECEntityClass>
 
+    <ECEntityClass typeName="RainfallSetAspect" modifier="Abstract" displayLabel="RainfallSetAspect">
+        <BaseClass>bis:ElementUniqueAspect</BaseClass>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="RainfallSetOwnsRainfallSetAspect" strength="embedding" modifier="Sealed">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="RainfallSet"/>
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="is owned by" polymorphic="true">
+            <Class class="RainfallSetAspect" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="DesignStormRainfallSetAspect" displayLabel="DesignStormRainfallSetAspect">
+        <BaseClass>RainfallSetAspect</BaseClass>
+        <ECProperty propertyName="DesignStorm" typeName="DesignStorms" displayLabel="Design Storm" category="HydraulicData" description="Choose the design storm to apply to this rainfall set."/>       
+    </ECEntityClass>    
+
     <ECEntityClass typeName="RainfallEvent" modifier="Sealed" displayLabel="Rainfall Event">
         <BaseClass>bis:DefinitionElement</BaseClass>
         <ECProperty propertyName="ReturnEvent" typeName="double" displayLabel="Return Event" category="HydraulicData" kindOfQuantity="AECU:TIME"/>
@@ -1148,7 +1246,7 @@
             <Class class="RainfallEventAspect" />
         </Target>
     </ECRelationshipClass>
-
+    
     <ECEntityClass typeName="TimeDepthRainfallEventAspect" modifier="Sealed" displayLabel="Time-Depth Rainfall">
         <BaseClass>RainfallEventAspect</BaseClass>
         <ECProperty propertyName="Duration" typeName="double" displayLabel="Storm Duration" category="HydraulicData" kindOfQuantity="AECU:TIME"/>
@@ -1186,6 +1284,12 @@
             <Class class="IDFRainfallEventAspect" />
         </Target>
     </ECRelationshipClass>
+
+    <ECEntityClass typeName="DesignStormRainfallEventAspect" modifier="Sealed" displayLabel="DesignStormRainfallEventAspect">
+        <BaseClass>RainfallEventAspect</BaseClass>
+        <ECProperty propertyName="Duration" typeName="double" displayLabel="Storm Duration" category="HydraulicData" kindOfQuantity="AECU:TIME"/>
+        <ECProperty propertyName="Depth" typeName="double" displayLabel="Depth" category="HydraulicData" kindOfQuantity="rru:LENGTH_SHORT"/>
+    </ECEntityClass>
 
     <ECEntityClass typeName="CalculationOptions" modifier="Sealed" displayLabel="Calculation Options">
         <BaseClass >bis:DefinitionElement</BaseClass>
