@@ -135,7 +135,7 @@ async function validateReleasedSchemas(ignoreList, singleSchemaName, output) {
     results.push(result);
   }
 
-  getResults(results, bisSchemaRepo, outputLogs);
+  await getResults(results, bisSchemaRepo, outputLogs);
 }
 
 async function validateWipSchemas(ignoreList, singleSchemaName, output) {
