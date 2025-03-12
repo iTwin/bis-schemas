@@ -1309,6 +1309,35 @@
         </Target>
     </ECRelationshipClass>
 
+    <ECEntityClass typeName="StorageChamber" modifier="Sealed" displayLabel="Storage Chamber">
+        <ECProperty propertyName="StorageChamberDefinition" typeName="StorageChamberDefinition"  category="HydraulicData" description="Choose how to define the shape of the storage chamber"/>
+        <ECProperty propertyName="EffectiveLength" typeName="double" displayLabel="Effective Length" kindOfQuantity="rru:LENGTH"  category="HydraulicData" description="The length of the storage chamber when it is interlocked in a storage chamber row.  If the Section Length Varies, then the effective length represent the length of the middle sections."/>
+        <ECProperty propertyName="StorageMultiplier" typeName="double" displayLabel="Storage Multiplier" kindOfQuantity="rru:PERCENTAGE"  category="HydraulicData" description="Adjusts the internal storage volume of the storage chamber."/>
+        <ECProperty propertyName="DefaultSpacing" typeName="double" displayLabel="Default Spacing" kindOfQuantity="rru:LENGTH_SHORT"  category="HydraulicData" description="Set the default edge to edge spacing for the storage chamber when organized into rows on the Pond Element."/>
+        <ECProperty propertyName="SectionLengthVaries" typeName="boolean" displayLabel="Section Length Varies"  category="HydraulicData" description="If true then the user can specify the effective lengths of the start and stop sections of a Storage Chamber row."/>    
+        <ECProperty propertyName="StartSectionLength" typeName="double" displayLabel="Start Section Length" kindOfQuantity="rru:LENGTH" category="HydraulicData" description="Specify the length of the storage chamber at the start of the Storage Chamber row."/> 
+        <ECProperty propertyName="EndSectionLength" typeName="double" displayLabel="End Section Length" kindOfQuantity="rru:LENGTH" category="HydraulicData" description="Specify the length of the storage chamber at the end of the Storage Chamber row."/> 
+    </ECEntityClass>
+
+    <ECEntityClass typeName="StorageChamberDefinitionAspect" modifier="Abstract" displayLabel="StorageChamberDefinitionAspect">
+        <BaseClass >bis:ElementUniqueAspect</BaseClass>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="StorageChamberOwnsStorageChamberDefinitionAspect" strength="embedding" modifier="Sealed">
+        <BaseClass >bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="StorageChamber"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="owned by" polymorphic="true">
+            <Class class="StorageChamberDefinitionAspect"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="CircularStorageChamberDefinitionAspect" modifier="Sealed" displayLabel="CircularStorageChamberDefinitionAspect">
+        <BaseClass>StorageChamberOwnsStorageChamberDefinitionAspect</BaseClass>
+        <ECProperty propertyName="Diameter" typeName="double" displayLabel="Diameter" kindOfQuantity="rru:LENGTH" category="HydraulicData" description="The internal diameter of the circular structure."/>
+    </ECEntityClass>
+
     <ECEntityClass typeName="GVFAspect" modifier="Sealed" displayLabel="GVF">
         <BaseClass >CalculationEngineAspect</BaseClass>
         <ECProperty propertyName="CalculationType" typeName="CalculationType" displayLabel="Calculation Type" category="HydraulicData" description="Select the type of calculation to perform"/>
