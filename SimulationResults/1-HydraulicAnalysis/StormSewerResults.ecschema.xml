@@ -4,8 +4,8 @@
 |  * See LICENSE.md in the project root for license terms and full copyright notice.
 ======================================================================================= -->
 <ECSchema schemaName="StormSewerResults" alias="stmswrres" version="01.00.00" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" displayLabel="Simulation Results Core" description="">
+    <ECSchemaReference name="ECDbMap" version="02.00.02" alias="ecdbmap"/>
     <ECSchemaReference name="SimResultsCore" version="01.00.00" alias="simrescore"/>
-    <ECSchemaReference name="SewerHydraulicAnalysis" version="01.00.00" alias="swrhyd"/>
 
     <ECEntityClass typeName="NodeResultRecord" modifier="Abstract" displayLabel="" description="">
         <BaseClass>simrescore:ResultRecord</BaseClass>
@@ -13,7 +13,22 @@
             <ClassMap xmlns="ECDbMap.02.00.00">
                 <MapStrategy>TablePerHierarchy</MapStrategy>
             </ClassMap>
-        <ECCustomAttributes>
+            <DbIndexList xmlns="ECDbMap.02.00.02">
+                <Indexes>
+                    <DbIndex>
+                        <Name>ix_NodeResultRecord_Element</Name>
+                        <IsUnique>False</IsUnique>
+                        <Properties>
+                            <string>ElementId</string>
+                        </Properties>
+                    </DbIndex>
+                </Indexes>
+            </DbIndexList>
+            <ShareColumns xmlns="ECDbMap.02.00.00">
+                <MaxSharedColumnsBeforeOverflow>32</MaxSharedColumnsBeforeOverflow>
+                <ApplyToSubclassesOnly>True</ApplyToSubclassesOnly>
+            </ShareColumns>
+        </ECCustomAttributes>
     </ECEntityClass>
 
     <ECEntityClass typeName="NodeTimeVariantResultRecord" modifier="Abstract" displayLabel="" description="">
@@ -25,15 +40,19 @@
             <DbIndexList xmlns="ECDbMap.02.00.02">
                 <Indexes>
                     <DbIndex>
-                        <Name>ix_NodeTimeVariantResultRecord_ElementId</Name>
+                        <Name>ix_NodeTimeVariantResultRecord_Element</Name>
                         <IsUnique>False</IsUnique>
                         <Properties>
-                            <string>Element</string>
+                            <string>ElementId</string>
                         </Properties>
                     </DbIndex>
                 </Indexes>
             </DbIndexList>
-        <ECCustomAttributes>
+            <ShareColumns xmlns="ECDbMap.02.00.00">
+                <MaxSharedColumnsBeforeOverflow>32</MaxSharedColumnsBeforeOverflow>
+                <ApplyToSubclassesOnly>True</ApplyToSubclassesOnly>
+            </ShareColumns>
+        </ECCustomAttributes>
     </ECEntityClass>
 
     <ECEntityClass typeName="LinkResultRecord" modifier="Abstract" displayLabel="" description="">
@@ -45,15 +64,19 @@
             <DbIndexList xmlns="ECDbMap.02.00.02">
                 <Indexes>
                     <DbIndex>
-                        <Name>ix_LinkResultRecord_ElementId</Name>
+                        <Name>ix_LinkResultRecord_Element</Name>
                         <IsUnique>False</IsUnique>
                         <Properties>
-                            <string>Element</string>
+                            <string>ElementId</string>
                         </Properties>
                     </DbIndex>
                 </Indexes>
             </DbIndexList>
-        <ECCustomAttributes>
+            <ShareColumns xmlns="ECDbMap.02.00.00">
+                <MaxSharedColumnsBeforeOverflow>32</MaxSharedColumnsBeforeOverflow>
+                <ApplyToSubclassesOnly>True</ApplyToSubclassesOnly>
+            </ShareColumns>
+        </ECCustomAttributes>
     </ECEntityClass>
 
     <ECEntityClass typeName="LinkTimeVariantResultRecord" modifier="Abstract" displayLabel="" description="">
@@ -65,74 +88,66 @@
             <DbIndexList xmlns="ECDbMap.02.00.02">
                 <Indexes>
                     <DbIndex>
-                        <Name>ix_LinkTimeVariantResultRecord_ElementId</Name>
+                        <Name>ix_LinkTimeVariantResultRecord_Element</Name>
                         <IsUnique>False</IsUnique>
                         <Properties>
-                            <string>Element</string>
+                            <string>ElementId</string>
                         </Properties>
                     </DbIndex>
                 </Indexes>
             </DbIndexList>
-        <ECCustomAttributes>
+            <ShareColumns xmlns="ECDbMap.02.00.00">
+                <MaxSharedColumnsBeforeOverflow>32</MaxSharedColumnsBeforeOverflow>
+                <ApplyToSubclassesOnly>True</ApplyToSubclassesOnly>
+            </ShareColumns>
+        </ECCustomAttributes>
     </ECEntityClass>
 
     <ECEntityClass typeName="BasicVolumeResultRecord" modifier="None" displayLabel="" description="">
         <BaseClass>NodeTimeVariantResultRecord</BaseClass>
+        <ECCustomAttributes>
+            <ResultRecordOwners xmlns="SimResultsCore.01.00.00">
+                <ClassNames>
+                    <string>swrhyd:GravityStructure</string>
+                </ClassNames>
+            </ResultRecordOwners>
+        </ECCustomAttributes>
         <ECProperty propertyName="Volume" typeName="double" description=""/>
     </ECEntityClass>
 
-    <ECRelationshipClass typeName="GravityStructureHasBasicVolumeResultRecord" strength="referencing" modifier="None">
-        <!-- @see RecordRecord.Element ECNavigationProperty -->
-        <Source multiplicity="(1..1)" roleLabel="has" polymorphic="true">
-            <Class class="swrhyd:GravityStructure"/>
-        </Source>
-        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="true">
-            <Class class="BasicVolumeResultRecord"/>
-        </Target>
-    </ECRelationshipClass>
-
     <ECEntityClass typeName="BasicFlowResultRecord" modifier="None" displayLabel="" description="">
         <BaseClass>LinkTimeVariantResultRecord</BaseClass>
+        <ECCustomAttributes>
+            <ResultRecordOwners xmlns="SimResultsCore.01.00.00">
+                <ClassNames>
+                    <string>swrhyd:Conduit</string>
+                </ClassNames>
+            </ResultRecordOwners>
+        </ECCustomAttributes>
         <ECProperty propertyName="Flow" typeName="double" description=""/>
     </ECEntityClass>
 
-    <ECRelationshipClass typeName="ConduitHasBasicFlowResultRecord" strength="referencing" modifier="None">
-        <!-- @see RecordRecord.Element ECNavigationProperty -->
-        <Source multiplicity="(1..1)" roleLabel="has" polymorphic="true">
-            <Class class="swrhyd:Conduit"/>
-        </Source>
-        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="true">
-            <Class class="BasicFlowResultRecord"/>
-        </Target>
-    </ECRelationshipClass>
-
     <ECEntityClass typeName="BasicOverflowingResultRecord" modifier="Sealed" displayLabel="" description="">
         <BaseClass>NodeResultRecord</BaseClass>
+        <ECCustomAttributes>
+            <ResultRecordOwners xmlns="SimResultsCore.01.00.00">
+                <ClassNames>
+                    <string>swrhyd:GravityStructure</string>
+                </ClassNames>
+            </ResultRecordOwners>
+        </ECCustomAttributes>
         <ECProperty propertyName="EverOverflowing" typeName="boolean" description=""/>
     </ECEntityClass>
 
-    <ECRelationshipClass typeName="GravityStructureHasBasicOverflowingResultRecord" strength="referencing" modifier="None">
-        <!-- @see RecordRecord.Element ECNavigationProperty -->
-        <Source multiplicity="(1..1)" roleLabel="has" polymorphic="true">
-            <Class class="swrhyd:GravityStructure"/>
-        </Source>
-        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="true">
-            <Class class="BasicOverflowingResultRecord"/>
-        </Target>
-    </ECRelationshipClass>
-
     <ECEntityClass typeName="BasicOverflowingTimeVariantResultRecord" modifier="Sealed" displayLabel="" description="">
         <BaseClass>NodeTimeVariantResultRecord</BaseClass>
+        <ECCustomAttributes>
+            <ResultRecordOwners xmlns="SimResultsCore.01.00.00">
+                <ClassNames>
+                    <string>swrhyd:GravityStructure</string>
+                </ClassNames>
+            </ResultRecordOwners>
+        </ECCustomAttributes>
         <ECProperty propertyName="IsOverflowing" typeName="boolean" description=""/>
     </ECEntityClass>
-
-    <ECRelationshipClass typeName="GravityStructureHasBasicOverflowingTimeVariantResultRecord" strength="referencing" modifier="None">
-        <!-- @see RecordRecord.Element ECNavigationProperty -->
-        <Source multiplicity="(1..1)" roleLabel="has" polymorphic="true">
-            <Class class="swrhyd:GravityStructure"/>
-        </Source>
-        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="true">
-            <Class class="BasicOverflowingTimeVariantResultRecord"/>
-        </Target>
-    </ECRelationshipClass>
 </ECSchema>

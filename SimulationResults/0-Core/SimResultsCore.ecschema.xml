@@ -5,39 +5,18 @@
 ======================================================================================= -->
 <ECSchema schemaName="SimResultsCore" alias="simrescore" version="01.00.00" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" displayLabel="Simulation Results Core" description="">
     <ECSchemaReference name="ECDbMap" version="02.00.02" alias="ecdbmap"/>
-    <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
-    <ECSchemaReference name="Analytical" version="01.00.00" alias="anlyt"/> <!-- TODO: Signal that this schema reference is metadata-only. -->
 
     <ECCustomAttributes>
         <!-- TODO: Signal that this is not a BIS schema, but a "SimulationResults" one -->
     </ECCustomAttributes>
 
-    <ECEntityClass typeName="ResultRecord" modifier="Abstract" displayLabel="Result Record" description="">
-        <ECCustomAttributes>
-            <DbIndexList xmlns="ECDbMap.02.00.02">
-                <Indexes>
-                    <DbIndex>
-                        <Name>ix_NodeResultRecord_Element</Name>
-                        <IsUnique>False</IsUnique>
-                        <Properties>
-                            <string>Element</string>
-                        </Properties>
-                    </DbIndex>
-                </Indexes>
-            </DbIndexList>
-        </ECCustomAttributes>
-        <ECNavigationProperty propertyName="Element" relationshipName="AnalyticalElementHasResultRecord" direction="backward" description=""/>
-    </ECEntityClass>
+    <ECCustomAttributeClass typeName="ResultRecordOwners" appliesTo="AnyClass" modifier="Sealed" description="Identifies a class which is designed to be hidden from teh user interface.  Hides the class it is applied to and all derived classes">
+        <ECArrayProperty propertyName="ClassNames" typeName="string" minOccurs="0" maxOccurs="unbounded" description="An array of names of properties that should not be used. Case-insensitive comparison will be used."/>
+    </ECCustomAttributeClass>
 
-    <ECRelationshipClass typeName="AnalyticalElementHasResultRecord" strength="referencing" modifier="Abstract">
-        <!-- @see RecordRecord.Element ECNavigationProperty -->
-        <Source multiplicity="(1..1)" roleLabel="has" polymorphic="true">
-            <Class class="anlyt:AnalyticalElement"/>
-        </Source>
-        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="true">
-            <Class class="ResultRecord"/>
-        </Target>
-    </ECRelationshipClass>
+    <ECEntityClass typeName="ResultRecord" modifier="Abstract" displayLabel="Result Record" description="">
+        <ECProperty propertyName="ElementId" typeName="long" displayLabel="" description=""/>
+    </ECEntityClass>
 
     <ECEntityClass typeName="TimeStep" modifier="None" displayLabel="Time-Step" description="">
         <ECCustomAttributes>
@@ -50,27 +29,14 @@
 
     <ECEntityClass typeName="TimeVariantResultRecord" modifier="Abstract" displayLabel="Time-Variant Result Record" description="">
         <BaseClass>ResultRecord</BaseClass>
-        <ECCustomAttributes>
-            <DbIndexList xmlns="ECDbMap.02.00.02">
-                <Indexes>
-                    <DbIndex>
-                        <Name>ix_simrescore_TimeVariantResultRecord_TimeStep</Name>
-                        <IsUnique>False</IsUnique>
-                        <Properties>
-                            <string>TimeStep</string>
-                        </Properties>
-                    </DbIndex>
-                </Indexes>
-            </DbIndexList>
-        </ECCustomAttributes>
-        <ECNavigationProperty propertyName="TimeStep" relationshipName="RecordRecordAtTimeStep" direction="Forward" displayLabel="Time-Step" description="">
+        <ECNavigationProperty propertyName="TimeStep" relationshipName="ResultRecordAtTimeStep" direction="Forward" displayLabel="Time-Step" description="">
             <ECCustomAttributes>
                 <ForeignKeyConstraint xmlns="ECDbMap.02.00.02"/>
             </ECCustomAttributes>
         </ECNavigationProperty>
     </ECEntityClass>
 
-    <ECRelationshipClass typeName="RecordRecordAtTimeStep" strength="embedding" modifier="None" description="">
+    <ECRelationshipClass typeName="ResultRecordAtTimeStep" strength="referencing" direction="Forward" modifier="None" description="">
         <!-- @see TimeVariantResultRecord.TimeStep ECNavigationProperty -->
         <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="true">
             <Class class="TimeVariantResultRecord"/>

@@ -4,10 +4,18 @@
 |  * See LICENSE.md in the project root for license terms and full copyright notice.
 ======================================================================================= -->
 <ECSchema schemaName="GvfRationalResults" alias="gvfrational" version="01.00.00" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" displayLabel="Simulation Results Core" description="">
+    <ECSchemaReference name="SimResultsCore" version="01.00.00" alias="simrescore"/>
     <ECSchemaReference name="StormSewerResults" version="01.00.00" alias="stmswrres"/>
 
     <ECEntityClass typeName="TotalInletFlowResultRecord" modifier="Sealed" displayLabel="" description="">
         <BaseClass>stmswrres:NodeResultRecord</BaseClass>
+        <ECCustomAttributes>
+            <ResultRecordOwners xmlns="SimResultsCore.01.00.00">
+                <ClassNames>
+                    <string>swrhyd:Catchbasin</string>
+                </ClassNames>
+            </ResultRecordOwners>
+        </ECCustomAttributes>
         <ECProperty propertyName="TotalInletCA" typeName="double" description=""/>
         <ECProperty propertyName="TotalInletTimeOfConcentration" typeName="double" description=""/>
         <ECProperty propertyName="TotalInletIntensity" typeName="double" description=""/>
@@ -15,14 +23,4 @@
         <ECProperty propertyName="TotalInletAdditionalFlow" typeName="double" description=""/>
         <ECProperty propertyName="TotalInletFixedFlow" typeName="double" description=""/>
     </ECEntityClass>
-
-    <ECRelationshipClass typeName="CatchbasinHasTotalInletFlowResultRecord" strength="referencing" modifier="Sealed">
-        <!-- @see RecordRecord.Element ECNavigationProperty -->
-        <Source multiplicity="(1..1)" roleLabel="has" polymorphic="true">
-            <Class class="swrhyd:Catchbasin"/>
-        </Source>
-        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="false">
-            <Class class="TotalInletFlowResultRecord"/>
-        </Target>
-    </ECRelationshipClass>
 </ECSchema>

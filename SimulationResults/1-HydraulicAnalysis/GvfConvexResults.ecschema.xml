@@ -4,29 +4,28 @@
 |  * See LICENSE.md in the project root for license terms and full copyright notice.
 ======================================================================================= -->
 <ECSchema schemaName="GvfConvexResults" alias="gvfconvex" version="01.00.00" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" displayLabel="Simulation Results Core" description="">
+    <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
+    <ECSchemaReference name="SimResultsCore" version="01.00.00" alias="simrescore"/>
     <ECSchemaReference name="StormSewerResults" version="01.00.00" alias="stmswrres"/>
 
    <ECEntityClass typeName="GravityNodeTimeVariantResultRecord" modifier="Sealed" displayLabel="" description="">
         <BaseClass>stmswrres:NodeTimeVariantResultRecord</BaseClass>
+        <ECCustomAttributes>
+            <ResultRecordOwners xmlns="SimResultsCore.01.00.00">
+                <ClassNames>
+                    <string>swrhyd:GravityStructure</string>
+                </ClassNames>
+            </ResultRecordOwners>
+        </ECCustomAttributes>
         <ECProperty propertyName="TotalVolumeIn" typeName="double" description=""/>
     </ECEntityClass>
-
-    <ECRelationshipClass typeName="GravityStructureHasBasicVolumeResultRecord" strength="referencing" modifier="Sealed">
-        <!-- @see RecordRecord.Element ECNavigationProperty -->
-        <Source multiplicity="(1..1)" roleLabel="has" polymorphic="true">
-            <Class class="swrhyd:GravityStructure"/>
-        </Source>
-        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="false">
-            <Class class="GravityNodeTimeVariantResultRecord"/>
-        </Target>
-    </ECRelationshipClass>
 
     <ECEntityClass typeName="ISystemFlowResultRecord" modifier="Abstract" displayLabel="" description="">
         <ECCustomAttributes>
             <IsMixIn xmlns="CoreCustomAttributes.01.00.03">
                 <AppliesToEntityClass>simrescore:ResultRecord</AppliesToEntityClass>
             </IsMixIn>
-        <ECCustomAttributes>
+        </ECCustomAttributes>
         <ECProperty propertyName="SystemInfiltration" typeName="double" description=""/>
         <ECProperty propertyName="SystemTotalInfiltration" typeName="double" description=""/>
         <ECProperty propertyName="SystemInflow" typeName="double" description=""/>
@@ -40,35 +39,36 @@
     <ECEntityClass typeName="GravityNodeSystemFlowResultRecord" modifier="Sealed" displayLabel="" description="">
         <BaseClass>stmswrres:NodeResultRecord</BaseClass>
         <BaseClass>ISystemFlowResultRecord</BaseClass>
+        <ECCustomAttributes>
+            <ResultRecordOwners xmlns="SimResultsCore.01.00.00">
+                <ClassNames>
+                    <string>swrhyd:GravityStructure</string>
+                </ClassNames>
+            </ResultRecordOwners>
+        </ECCustomAttributes>
     </ECEntityClass>
-
-    <ECRelationshipClass typeName="GravityStructureHasSystemFlowResultRecord" strength="referencing" modifier="Sealed">
-        <!-- @see RecordRecord.Element ECNavigationProperty -->
-        <Source multiplicity="(1..1)" roleLabel="has" polymorphic="true">
-            <Class class="swrhyd:GravityStructure"/>
-        </Source>
-        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="false">
-            <Class class="GravityNodeSystemFlowResultRecord"/>
-        </Target>
-    </ECRelationshipClass>
 
     <ECEntityClass typeName="ConduitSystemFlowResultRecord" modifier="Sealed" displayLabel="" description="">
         <BaseClass>stmswrres:LinkResultRecord</BaseClass>
         <BaseClass>ISystemFlowResultRecord</BaseClass>
+        <ECCustomAttributes>
+            <ResultRecordOwners xmlns="SimResultsCore.01.00.00">
+                <ClassNames>
+                    <string>swrhyd:Conduit</string>
+                </ClassNames>
+            </ResultRecordOwners>
+        </ECCustomAttributes>
     </ECEntityClass>
 
-    <ECRelationshipClass typeName="GravityStructureHasSystemFlowResultRecord" strength="referencing" modifier="Sealed">
-        <!-- @see RecordRecord.Element ECNavigationProperty -->
-        <Source multiplicity="(1..1)" roleLabel="has" polymorphic="true">
-            <Class class="swrhyd:Conduit"/>
-        </Source>
-        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="false">
-            <Class class="ConduitSystemFlowResultRecord"/>
-        </Target>
-    </ECRelationshipClass>
-
-    <ECEntityClass typeName="StandardStatsResultRecord" modifier="Sealed" displayLabel="Manhole Time-Variant Result Record" description="">
-        <BaseClass>simrescore:LinkResultRecord</BaseClass>
+    <ECEntityClass typeName="StandardStatsResultRecord" modifier="Sealed" displayLabel="" description="">
+        <BaseClass>stmswrres:LinkResultRecord</BaseClass>
+        <ECCustomAttributes>
+            <ResultRecordOwners xmlns="SimResultsCore.01.00.00">
+                <ClassNames>
+                    <string>swrhyd:Conduit</string>
+                </ClassNames>
+            </ResultRecordOwners>
+        </ECCustomAttributes>
         <ECProperty propertyName="MaxHGL" typeName="double" description=""/>
         <ECNavigationProperty propertyName="TimeStepToMaxHGL" relationshipName="TimeStepToMaxHGL" direction="Forward" displayLabel="Time-Step for Max HGL" description="" />
     </ECEntityClass>
@@ -80,16 +80,6 @@
         </Source>
         <Target multiplicity="(0..1)" roleLabel="is referenced by" polymorphic="true">
             <Class class="simrescore:TimeStep" />
-        </Target>
-    </ECRelationshipClass>
-
-    <ECRelationshipClass typeName="ConduitHasStandardStatsResultRecord" strength="referencing" modifier="Sealed">
-        <!-- @see RecordRecord.Element ECNavigationProperty -->
-        <Source multiplicity="(1..1)" roleLabel="has" polymorphic="true">
-            <Class class="swrhyd:Conduit"/>
-        </Source>
-        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="false">
-            <Class class="StandardStatsResultRecord"/>
         </Target>
     </ECRelationshipClass>
 </ECSchema>
