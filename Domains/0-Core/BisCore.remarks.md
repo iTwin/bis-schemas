@@ -470,6 +470,10 @@ The system handler also requires a valid *placement* if `GeometryStream` is not 
 
 See [GeometryStream](../../learning/common/geometrystream/) for a more in-depth explanation about that property.
 
+### Drawing
+
+A `Drawing` instance with a NULL _ScaleFactor_ implies no scaling is applied to any Text contained in the GeometryStream of elements in its submodel. That is effectively the same as _ScaleFactor_ = 1.0.
+
 ### DrawingModel
 
 > Behavior: The system handler (C++) for `DrawingModel` ensures that the *modeled element* for a `DrawingModel` is a `Drawing` or a `TemplateRecipe2d`.
