@@ -278,6 +278,12 @@
         <ECEnumerator value="3" name="SCSTypeIII24Hr" displayLabel="SCS Type III 24 hr"/>
     </ECEnumeration>
 
+    <ECEnumeration typeName="StorageChamberDefinition" backingTypeName="int" isStrict="true">
+        <ECEnumerator value="0" name="CircularChamber" displayLabel="Circular"/>
+        <ECEnumerator value="1" name="BoxChamber" displayLabel="Box"/>
+        <ECEnumerator value="2" name="PipeArchChamber" displayLabel="Pipe-Arch"/> 
+    </ECEnumeration>
+
     <ECEntityClass typeName="SewerHydraulicAnalysisModel" modifier="Sealed" displayLabel="Sewer Hydraulics Analysis Model" description="Model containing all Sewer Hydraulic Analysis elements.">
         <BaseClass>anlyt:AnalyticalModel</BaseClass>
     </ECEntityClass>
@@ -1299,6 +1305,7 @@
     <ECEntityClass typeName="CalculationEngineAspect" modifier="Abstract" displayLabel="CalculationEngineAspect">
         <BaseClass >bis:ElementUniqueAspect</BaseClass>
     </ECEntityClass>
+
     <ECRelationshipClass typeName="CalculationOptionsOwnsCalculationEngineAspect" strength="embedding" modifier="Sealed">
         <BaseClass >bis:ElementOwnsUniqueAspect</BaseClass>
         <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
@@ -1309,8 +1316,33 @@
         </Target>
     </ECRelationshipClass>
 
+    <ECEntityClass typeName="UndergroundStorageChamberSystem" modifier="Sealed" displayLabel="Underground Storage Chamber System">
+        <BaseClass>DrainageNode</BaseClass>
+        <ECProperty propertyName="StorageSystemInvert" typeName="double" displayLabel="Chamber System Invert" category="HydraulicData" kindOfQuantity="rru:ELEVATION" description="The overall invert elevation of the storage chamber system (i.e. the bottom of the base fill)."/>
+        <ECProperty propertyName="ChamberSystemRows" typeName="int" displayLabel="Chamber System Rows" category="HydraulicData" description="The number of rows of the selected storage chamber."/>
+        <ECProperty propertyName="ChambersPerRow" typeName="int" displayLabel="Chambers Per Row" category="HydraulicData" description="The number of storae chambers per row."/>
+        <ECProperty propertyName="FillVoidSpace" typeName="double" displayLabel="Fill Void Space" category="HydraulicData" kindOfQuantity="rru:PERCENTAGE" description="The void space of fill/stone that surround the storage chambers."/>
+        <ECProperty propertyName="RowSpacing" typeName="double" displayLabel="Row Spacing" category="HydraulicData" kindOfQuantity="rru:LENGTH_SHORT" description="The edge to edge spacing between the rows of storage chambers."/>
+        <ECProperty propertyName="SideFill" typeName="double" displayLabel="Side Fill" category="HydraulicData" kindOfQuantity="rru:LENGTH_SHORT" description="The distance between edges of the storage chambers and the side of the surrounding fill."/>
+        <ECProperty propertyName="FillCoverDepth" typeName="double" displayLabel="Fill Cover Depth" category="HydraulicData" kindOfQuantity="rru:LENGTH" description="The distance between the top of the fill and the top of the storage chambers."/>
+        <ECProperty propertyName="FillBaseDepth" typeName="double" displayLabel="Fill Base Depth" category="HydraulicData" kindOfQuantity="rru:LENGTH" description="The distance from the bottom of the fill to the bottom of the storage chambers."/>
+        <ECProperty propertyName="FillSideSlope" typeName="double" displayLabel="Fill Side Slope" category="HydraulicData" kindOfQuantity="rru:SIDE_SLOPE" description="The side slope of the fill on all four sides."/>
+        <ECProperty propertyName="EndFill" typeName="double" displayLabel="End Fill" category="HydraulicData" kindOfQuantity="rru:LENGTH" description="The distance between ends of the storage chambers and the end of the surrounding fill."/>
+        <ECNavigationProperty propertyName="StorageChamber" displayLabel="Storage Chamber" relationshipName="UnderGroundStorageChamberSystemUsesAStorageChamber" direction="Forward" />
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="UnderGroundStorageChamberSystemUsesAStorageChamber" strength="referencing" modifier="Sealed">
+        <Source multiplicity="(0..*)" roleLabel="bounded by" polymorphic="false">
+            <Class class="UndergroundStorageChamberSystem"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="bounds" polymorphic="true">
+            <Class class="StorageChamber"/>
+        </Target>
+    </ECRelationshipClass>
+
     <ECEntityClass typeName="StorageChamber" modifier="Sealed" displayLabel="Storage Chamber">
-        <ECProperty propertyName="StorageChamberDefinition" typeName="StorageChamberDefinition"  category="HydraulicData" description="Choose how to define the shape of the storage chamber"/>
+        <BaseClass>bis:DefinitionElement</BaseClass>
+        <ECProperty propertyName="StorageChamberDefinition" typeName="StorageChamberDefinition" displayLabel="Storage Chamber Shape" category="HydraulicData" description="Choose how to define the shape of the storage chamber"/>
         <ECProperty propertyName="EffectiveLength" typeName="double" displayLabel="Effective Length" kindOfQuantity="rru:LENGTH"  category="HydraulicData" description="The length of the storage chamber when it is interlocked in a storage chamber row.  If the Section Length Varies, then the effective length represent the length of the middle sections."/>
         <ECProperty propertyName="StorageMultiplier" typeName="double" displayLabel="Storage Multiplier" kindOfQuantity="rru:PERCENTAGE"  category="HydraulicData" description="Adjusts the internal storage volume of the storage chamber."/>
         <ECProperty propertyName="DefaultSpacing" typeName="double" displayLabel="Default Spacing" kindOfQuantity="rru:LENGTH_SHORT"  category="HydraulicData" description="Set the default edge to edge spacing for the storage chamber when organized into rows on the Pond Element."/>
@@ -1320,8 +1352,8 @@
     </ECEntityClass>
 
     <ECEntityClass typeName="StorageChamberDefinitionAspect" modifier="Abstract" displayLabel="StorageChamberDefinitionAspect">
-        <BaseClass >bis:ElementUniqueAspect</BaseClass>
-    </ECEntityClass>
+        <BaseClass>bis:ElementUniqueAspect</BaseClass>
+    </ECEntityClass>   
 
     <ECRelationshipClass typeName="StorageChamberOwnsStorageChamberDefinitionAspect" strength="embedding" modifier="Sealed">
         <BaseClass >bis:ElementOwnsUniqueAspect</BaseClass>
@@ -1333,9 +1365,33 @@
         </Target>
     </ECRelationshipClass>
 
+    <ECEntityClass typeName="WalledStorageChamberDefinitionAspect" modifier="Abstract" displayLabel="WalledStorageChamberDefinitionAspect">
+        <BaseClass>StorageChamberDefinitionAspect</BaseClass>
+        <ECProperty propertyName="Thickness" typeName="double" displayLabel="Thickness" kindOfQuantity="rru:LENGTH_SHORT" category="HydraulicData" description="Average wall thickness of the storage chamber."/>
+    </ECEntityClass>
+
     <ECEntityClass typeName="CircularStorageChamberDefinitionAspect" modifier="Sealed" displayLabel="CircularStorageChamberDefinitionAspect">
-        <BaseClass>StorageChamberOwnsStorageChamberDefinitionAspect</BaseClass>
+        <BaseClass>WalledStorageChamberDefinitionAspect</BaseClass>
         <ECProperty propertyName="Diameter" typeName="double" displayLabel="Diameter" kindOfQuantity="rru:LENGTH" category="HydraulicData" description="The internal diameter of the circular structure."/>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="StandardShapeStorageChamberDefinitionAspect" modifier="Abstract" displayLabel="StandardShapeStorageChamberDefinitionAspect">
+        <BaseClass>WalledStorageChamberDefinitionAspect</BaseClass>
+        <ECProperty propertyName="Rise" typeName="double" displayLabel="Rise" kindOfQuantity="rru:LENGTH" category="HydraulicData" description="The vertical internal opening height of the storage chamber."/>
+        <ECProperty propertyName="Span" typeName="double" displayLabel="Span" kindOfQuantity="rru:LENGTH" category="HydraulicData" description="The horizontal internal opening height of the storage chamber."/>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="BoxStorageChamberDefinitionAspect" modifier="Sealed" displayLabel="BoxStorageChamberDefinitionAspect">
+        <BaseClass>StandardShapeStorageChamberDefinitionAspect</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="PipeArchStorageChamberDefinitionAspect" modifier="Sealed" displayLabel="PipeArchStorageChamberDefinitionAspect">
+        <BaseClass>StandardShapeStorageChamberDefinitionAspect</BaseClass>
+        <ECProperty propertyName="FullArea" typeName="double" displayLabel="Full Area" kindOfQuantity="rru:AREA" category="HydraulicData" description="The internal full area of the structure."/>
+        <ECProperty propertyName="BottomRadius" typeName="double" displayLabel="Bottom Radius" kindOfQuantity="rru:LENGTH" category="HydraulicData" description="The internal bottom radius of the Pipe Arch Structure."/>
+        <ECProperty propertyName="CornerRadius" typeName="double" displayLabel="Corner Radius" kindOfQuantity="rru:LENGTH" category="HydraulicData" description="The internal Corner Radius of the structure."/>
+        <ECProperty propertyName="BottomDistance" typeName="double" displayLabel="Bottom Distance" kindOfQuantity="rru:LENGTH" category="HydraulicData" description="The internal Bottom Distance of the Pipe Arch."/>
+        <ECProperty propertyName="TopRadius" typeName="double" displayLabel="Top Radius" kindOfQuantity="rru:LENGTH" category="HydraulicData" description="The internal Top Radius of the Pipe Arch."/>
     </ECEntityClass>
 
     <ECEntityClass typeName="GVFAspect" modifier="Sealed" displayLabel="GVF">
@@ -1356,7 +1412,7 @@
     </ECEntityClass>
 
     <ECEntityClass typeName="SWMMAspect" modifier="Sealed" displayLabel="SWMM">
-        <BaseClass >CalculationEngineAspect</BaseClass>
+        <BaseClass>CalculationEngineAspect</BaseClass>
         <ECProperty propertyName="SwmmRoutingMethod" typeName="SwmmRoutingMethod" displayLabel="Routing Method" category="HydraulicData" description="The method to use to route flows through the conveyance system: Uniform Flow, Kinematic Wave, or Dynamic Wave."/>
         <ECProperty propertyName="AllowPondingAtJunctions" typeName="boolean" displayLabel="Allow Ponding at Gravity Structures" category="HydraulicData" description="Lets you select whether or not to allow excess water to collect at gravity structures and be re-introduced into the system as conditions permit.  In order for ponding to actually occur at a particular node, you must enter a non-zero value for the node's Ponded Area attribute."/>
         <ECProperty propertyName="RoutingTimeStep" typeName="double" displayLabel="Routing Time Step" category="HydraulicData" kindOfQuantity="AECU:TIME" description="The time step used for routing flows and water quality constituents through the conveyance system. Note that Dynamic Wave routing requires a much smaller time step than the other methods of flow routing."/>
