@@ -185,7 +185,7 @@
         <ECProperty propertyName="IslandWidth" typeName="double" category="ParkingIslandVertex_Island" kindOfQuantity="rru:LENGTH" displayLabel="Island Width" description="Defines the island override for it's width." />
     </ECEntityClass>
 
-    <ECEntityClass typeName="Edge" modifier="Abstract">
+    <ECEntityClass typeName="Edge" modifier="Abstract" displayLabel="Edge">
         <BaseClass>bis:SpatialLocationElement</BaseClass>
 
         <ECProperty propertyName="Order" typeName="int">
@@ -209,14 +209,28 @@
         <ECProperty propertyName="UseWallInCost" typeName="boolean" category="ShapedEdge_LinkHeight" displayLabel="Use Wall in Cost" description="Treat as a wall for cost optimization." />
     </ECEntityClass>
 
-    <ECEntityClass typeName="PropertyEdge" modifier="Sealed" displayLabel="Property Edge">
+    <ECEntityClass typeName="PropertyEdge" modifier="Sealed" displayLabel="Grading Limit Edge">
         <BaseClass>ShapedEdge</BaseClass>
 
-        <ECProperty propertyName="ParkingSetback" typeName="double" kindOfQuantity="rru:LENGTH" category="PropertyEdge_Setbacks" displayLabel="Parking Setback" />
-        <ECProperty propertyName="BuildingSetback" typeName="double" kindOfQuantity="rru:LENGTH" category="PropertyEdge_Setbacks" displayLabel="Building Setback" />
+        <ECProperty propertyName="ParkingSetback" typeName="double" kindOfQuantity="rru:LENGTH" category="PropertyEdge_Setbacks" displayLabel="Parking Setback">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03" />
+                <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                    <Description>PropertyArea and by extension PropertyEdge is no longer used for controlling parking setbacks. PropertyArea now serves the purpose of representing grading limits only.</Description>
+                </Deprecated>
+            </ECCustomAttributes>
+        </ECProperty>
+        <ECProperty propertyName="BuildingSetback" typeName="double" kindOfQuantity="rru:LENGTH" category="PropertyEdge_Setbacks" displayLabel="Building Setback">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03" />
+                <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                    <Description>PropertyArea and by extension PropertyEdge is no longer used for controlling building setbacks. PropertyArea now serves the purpose of representing 'grading limits' only.</Description>
+                </Deprecated>
+            </ECCustomAttributes>
+        </ECProperty>
     </ECEntityClass>
 
-    <ECEntityClass typeName="BuildingEdge" modifier="Sealed" displayLabel="Building Edge">
+    <ECEntityClass typeName="BuildingEdge" modifier="Sealed" displayLabel="Building Pad Edge">
         <BaseClass>ShapedEdge</BaseClass>
 
         <ECProperty propertyName="SlopeAway" typeName="double" kindOfQuantity="rru:SLOPE" category="BuildingEdge_SlopeAway" displayLabel="Slope Away" description="Slope away from edge for grading." />
@@ -231,7 +245,7 @@
         <BaseClass>ShapedEdge</BaseClass>
     </ECEntityClass>
 
-    <ECEntityClass typeName="SidewalkEdge" modifier="Sealed" displayLabel="Sidewalk Edge">
+    <ECEntityClass typeName="SidewalkEdge" modifier="Sealed" displayLabel="Sidewalk Area Edge">
         <BaseClass>ShapedEdge</BaseClass>
     </ECEntityClass>
 
@@ -247,7 +261,7 @@
         <BaseClass>ShapedEdge</BaseClass>
     </ECEntityClass>
 
-    <ECEntityClass typeName="LayoutParkingEdge" modifier="Sealed" displayLabel="Parking Lot Edge" description="Parking lot">
+    <ECEntityClass typeName="LayoutParkingEdge" modifier="Sealed" displayLabel="Layout Parking Edge" description="Parking lot">
         <BaseClass>AreaEdge</BaseClass>
     </ECEntityClass>
 
@@ -302,11 +316,11 @@
         <ECProperty propertyName="DitchSlope" typeName="double" kindOfQuantity="rru:SLOPE" category="DrivewayPathFin_Shoulder" displayLabel="Ditch Slope" description="Ditch slope for this side of driveway." />
     </ECEntityClass>
 
-    <ECEntityClass typeName="SidewalkPathEdge" modifier="Sealed" displayLabel="Sidewalk Path Edge" description="Sidewalk path edge.">
+    <ECEntityClass typeName="SidewalkPathEdge" modifier="Sealed" displayLabel="Sidewalk Edge" description="Sidewalk path edge.">
         <BaseClass>CenterlinePathEdge</BaseClass>
     </ECEntityClass>
 
-    <ECEntityClass typeName="ParkingDirectionPathEdge" modifier="Sealed" displayLabel="Parking Direction Path Edge" description="Parking direction path edge.">
+    <ECEntityClass typeName="ParkingDirectionPathEdge" modifier="Sealed" displayLabel="Parking Direction Edge" description="Parking direction path edge.">
         <BaseClass>PathEdge</BaseClass>
     </ECEntityClass>
 
@@ -328,7 +342,7 @@
         </Target>
     </ECRelationshipClass>
 
-    <ECEntityClass typeName="Wire" modifier="Abstract">
+    <ECEntityClass typeName="Wire" modifier="Abstract" displayLabel="Wire">
         <BaseClass>bis:SpatialLocationElement</BaseClass>
         <BaseClass>bis:IParentElement</BaseClass>
     </ECEntityClass>
@@ -493,11 +507,11 @@
         <ECProperty propertyName="MaxZ" typeName="double" category="ShapedArea_Constraints" kindOfQuantity="rru:LENGTH" displayLabel="Max. Elevation" description="Maximum design elevation for area." />
     </ECEntityClass>
 
-    <ECEntityClass typeName="PropertyArea" modifier="Sealed" displayLabel="Property Area" description="Property Area">
+    <ECEntityClass typeName="PropertyArea" modifier="Sealed" displayLabel="Grading Limits" description="Grading Limits">
         <BaseClass>ShapedArea</BaseClass>
     </ECEntityClass>
 
-    <ECEntityClass typeName="BuildingArea" modifier="Sealed" displayLabel="Building Area" description="Building Area">
+    <ECEntityClass typeName="BuildingArea" modifier="Sealed" displayLabel="Building Pad" description="Building Pad">
         <BaseClass>ShapedArea</BaseClass>
 
         <ECProperty propertyName="ControlType" typeName="ControlType">
@@ -563,7 +577,7 @@
         <ECProperty propertyName="SurfaceDepthParkingSpaces" typeName="double" category="LayoutParkingArea_ParkingGrading" kindOfQuantity="rru:LENGTH_SHORT" displayLabel="Space Surface Depth" description="Surface or material depth for specific parking spaces." />
     </ECEntityClass>
 
-    <ECEntityClass typeName="LayoutPondArea" modifier="Sealed" displayLabel="Pond Area" description="Layout pond area.">
+    <ECEntityClass typeName="LayoutPondArea" modifier="Sealed" displayLabel="Pond" description="Layout pond area.">
         <BaseClass>LayoutArea</BaseClass>
 
         <ECProperty propertyName="Height" typeName="double" category="LayoutPondArea_Pond" kindOfQuantity="rru:LENGTH" displayLabel="Riser Top Elevation" description="Riser Top Elevation." />
@@ -591,7 +605,7 @@
         <ECProperty propertyName="MaxZ" typeName="double" category="GradingArea_Constraints" kindOfQuantity="rru:LENGTH" displayLabel="Max. Elevation" description="Maximum elevation change constraint on grading area." />
     </ECEntityClass>
 
-    <ECEntityClass typeName="GradingLimitArea" modifier="Sealed" displayLabel="Grading Limit Area" description="Grading limit area.">
+    <ECEntityClass typeName="GradingLimitArea" modifier="Sealed" displayLabel="Grading Constraints" description="Grading constraints area.">
         <BaseClass>GradingArea</BaseClass>
     </ECEntityClass>
 
@@ -617,15 +631,15 @@
         <ECProperty propertyName="DriveOnRight" typeName="boolean" category="DrivewayPath_Direction" displayLabel="Drive On Right" description="Sets the primary drive side, true to drive on the right-hand side." />
     </ECEntityClass>
 
-    <ECEntityClass typeName="ParkingDirectionPath" modifier="Sealed" displayLabel="Parking Direction Path" description="Parking direction path.">
+    <ECEntityClass typeName="ParkingDirectionPath" modifier="Sealed" displayLabel="Parking Direction" description="Parking direction path.">
         <BaseClass>LayoutPath</BaseClass>
     </ECEntityClass>
 
-    <ECEntityClass typeName="SidewalkPath" modifier="Sealed" displayLabel="Sidewalk Path" description="Sidewalk path.">
+    <ECEntityClass typeName="SidewalkPath" modifier="Sealed" displayLabel="Sidewalk" description="Sidewalk path.">
         <BaseClass>LayoutPath</BaseClass>
     </ECEntityClass>
 
-    <ECEntityClass typeName="ParkingRowPath" modifier="Sealed" displayLabel="Parking Row Path" description="Parking row path.">
+    <ECEntityClass typeName="ParkingRowPath" modifier="Sealed" displayLabel="Parking Row" description="Parking row path.">
         <BaseClass>LayoutPath</BaseClass>
 
         <ECProperty propertyName="ParkingWidth" typeName="double" kindOfQuantity="rru:LENGTH" category="ParkingRowPath_Parking" displayLabel="Width" description="Parking width for row." />
@@ -747,7 +761,7 @@
         </Target>
     </ECRelationshipClass>
 
-    <ECEntityClass typeName="EdgeSidewalkAspect" modifier="Sealed" displayLabel="Sidewalk">
+    <ECEntityClass typeName="EdgeSidewalkAspect" modifier="Sealed" displayLabel="Sidewalk Aspect">
         <BaseClass>bis:ElementUniqueAspect</BaseClass>
 
         <ECProperty propertyName="SidewalkType" typeName="SurfaceType" category="EdgeSidewalkAspect_Sidewalk" displayLabel="Type" description="Defines the type of sidewalk or material." />
