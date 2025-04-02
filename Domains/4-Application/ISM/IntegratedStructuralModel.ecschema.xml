@@ -7,6 +7,7 @@
     <ECSchemaReference name="AecUnits" version="01.00.03" alias="AECU" />
     <ECSchemaReference name="Units" version="01.00.04" alias="u" />
     <ECSchemaReference name="Formats" version="01.00.00" alias="f" />
+    <ECSchemaReference name="ECDbMeta" version="04.00.03" alias="meta" />
 
     <PropertyCategory typeName="Calculated_category" displayLabel="Calculated" priority="0" />
 
@@ -17,6 +18,11 @@
     <ECEntityClass typeName="IsmModel" modifier="Sealed" displayLabel="Ism Model" description="">
         <BaseClass>anlyt:AnalyticalModel</BaseClass>
     </ECEntityClass>
+
+    <ECCustomAttributeClass typeName="RelationshipHasLabels" appliesTo="RelationshipClass" description="Applied to relationships to indicate displayable labels for source and target objects of a relationship.">
+        <ECProperty propertyName="SourceDisplayLabel" typeName="string" description="Displayable relationship source label."/>
+        <ECProperty propertyName="TargetDisplayLabel" typeName="string" description="Displayable relationship target label."/>
+    </ECCustomAttributeClass>
 
     <ECEnumeration typeName="IsmGeometryType" backingTypeName="string" isStrict="true" description="Geometry Type.">
         <ECEnumerator value="ismLineSegment2d" name="IsmLineSegment2d" displayLabel="Ism Line Segment 2d" />
@@ -104,6 +110,12 @@
         <Target multiplicity="(0..1)" roleLabel="owns results" polymorphic="false">
             <Class class="IsmAnalysisDesign" />
         </Target>
+	<ECCustomAttributes>
+            <RelationshipHasLabels>
+                <SourceDisplayLabel>Analysis results</SourceDisplayLabel>
+                <TargetDisplayLabel>Analysis design</TargetDisplayLabel>
+            </RelationshipHasLabels>
+        </ECCustomAttributes>
     </ECRelationshipClass>
 
     <ECRelationshipClass typeName="IsmDesignResults_AnalysisDesign" modifier="None" strength="referencing" strengthDirection="forward">
@@ -114,6 +126,12 @@
         <Target multiplicity="(0..1)" roleLabel="owns" polymorphic="false">
             <Class class="IsmAnalysisDesign" />
         </Target>
+	<ECCustomAttributes>
+            <RelationshipHasLabels>
+                <SourceDisplayLabel>Design results</SourceDisplayLabel>
+                <TargetDisplayLabel>Analysis design</TargetDisplayLabel>
+            </RelationshipHasLabels>
+        </ECCustomAttributes>
     </ECRelationshipClass>
 
     <ECRelationshipClass typeName="IsmMemberDesignCriteria_AnalysisDesign" modifier="None" strength="referencing" strengthDirection="forward">
@@ -124,6 +142,12 @@
         <Target multiplicity="(0..*)" roleLabel="owns criteria" polymorphic="true">
             <Class class="IsmAnalysisDesign" />
         </Target>
+	<ECCustomAttributes>
+            <RelationshipHasLabels>
+                <SourceDisplayLabel>Member design criteria</SourceDisplayLabel>
+                <TargetDisplayLabel>Analysis design</TargetDisplayLabel>
+            </RelationshipHasLabels>
+        </ECCustomAttributes>
     </ECRelationshipClass>
 
     <ECEntityClass typeName="IsmResults" modifier="Abstract" displayLabel="Results">
@@ -149,6 +173,12 @@
         <Target multiplicity="(0..1)" roleLabel="is referred by" polymorphic="true">
             <Class class="IsmLoadContainer" />
         </Target>
+	<ECCustomAttributes>
+            <RelationshipHasLabels>
+                <SourceDisplayLabel>Analysis results</SourceDisplayLabel>
+                <TargetDisplayLabel>Load container</TargetDisplayLabel>
+            </RelationshipHasLabels>
+        </ECCustomAttributes>
     </ECRelationshipClass>
 
     <ECEntityClass typeName="IsmMemberAnalysisResults" modifier="Abstract" displayLabel="Member Analysis Results">
@@ -164,6 +194,12 @@
         <Target multiplicity="(0..1)" roleLabel="has member results" polymorphic="false">
             <Class class="IsmAnalysisResults" />
         </Target>
+	<ECCustomAttributes>
+            <RelationshipHasLabels>
+                <SourceDisplayLabel>Member analysis results</SourceDisplayLabel>
+                <TargetDisplayLabel>Analysis results</TargetDisplayLabel>
+            </RelationshipHasLabels>
+        </ECCustomAttributes>
     </ECRelationshipClass>
 
     <ECRelationshipClass typeName="IsmMemberAnalysisResults_Member" modifier="None" strength="referencing" strengthDirection="forward">
@@ -174,6 +210,12 @@
         <Target multiplicity="(0..1)" roleLabel="is referred by results" polymorphic="true">
             <Class class="IsmSpanningMember" />
         </Target>
+	<ECCustomAttributes>
+            <RelationshipHasLabels>
+                <SourceDisplayLabel>Member analysis results</SourceDisplayLabel>
+                <TargetDisplayLabel>Spanning member</TargetDisplayLabel>
+            </RelationshipHasLabels>
+        </ECCustomAttributes>
     </ECRelationshipClass>
 
     <ECEntityClass typeName="IsmCurveMemberAnalysisResults" modifier="None" displayLabel="Curve Member Analysis Results">
@@ -190,6 +232,12 @@
         <Target multiplicity="(0..1)" roleLabel="is referred by" polymorphic="true">
             <Class class="IsmLoadContainer" />
         </Target>
+	<ECCustomAttributes>
+            <RelationshipHasLabels>
+                <SourceDisplayLabel>Curve member analysis results</SourceDisplayLabel>
+                <TargetDisplayLabel>Load container</TargetDisplayLabel>
+            </RelationshipHasLabels>
+        </ECCustomAttributes>
     </ECRelationshipClass>
 
     <ECEntityClass typeName="IsmDesignResults" displayLabel="Design Results" modifier="None">
@@ -204,6 +252,12 @@
         <Target multiplicity="(0..1)" roleLabel="is referred by" polymorphic="true">
             <Class class="IsmMemberDesignResults" />
         </Target>
+	<ECCustomAttributes>
+            <RelationshipHasLabels>
+                <SourceDisplayLabel>Design results</SourceDisplayLabel>
+                <TargetDisplayLabel>Member Design results</TargetDisplayLabel>
+            </RelationshipHasLabels>
+        </ECCustomAttributes>
     </ECRelationshipClass>
 
     <ECRelationshipClass typeName="IsmMemberDesignResults_DesignResults" modifier="None" strength="referencing" strengthDirection="forward">
@@ -214,6 +268,12 @@
         <Target multiplicity="(0..*)" roleLabel="refers to" polymorphic="false">
             <Class class="IsmDesignResults" />
         </Target>
+	<ECCustomAttributes>
+            <RelationshipHasLabels>
+                <SourceDisplayLabel>Member design results</SourceDisplayLabel>
+                <TargetDisplayLabel>Design results</TargetDisplayLabel>
+            </RelationshipHasLabels>
+        </ECCustomAttributes>
     </ECRelationshipClass>
 
     <ECRelationshipClass typeName="IsmMemberDesignResults_ConsideredLoadContainers" modifier="None" strength="referencing" strengthDirection="forward">
@@ -224,6 +284,12 @@
         <Target multiplicity="(0..*)" roleLabel="refers to" polymorphic="true">
             <Class class="IsmLoadContainer" />
         </Target>
+	<ECCustomAttributes>
+            <RelationshipHasLabels>
+                <SourceDisplayLabel>Member design results</SourceDisplayLabel>
+                <TargetDisplayLabel>Load containers</TargetDisplayLabel>
+            </RelationshipHasLabels>
+        </ECCustomAttributes>
     </ECRelationshipClass>
 
     <ECEntityClass typeName="IsmMemberDesignResults" modifier="Abstract" displayLabel="Member Design Results">
@@ -240,6 +306,12 @@
         <Target multiplicity="(0..1)" roleLabel="is referred by results" polymorphic="true">
             <Class class="IsmSpanningMember" />
         </Target>
+	<ECCustomAttributes>
+            <RelationshipHasLabels>
+                <SourceDisplayLabel>Member design results</SourceDisplayLabel>
+                <TargetDisplayLabel>Spanning member</TargetDisplayLabel>
+            </RelationshipHasLabels>
+        </ECCustomAttributes>
     </ECRelationshipClass>
 
     <ECRelationshipClass typeName="IsmMemberDesignResults_MemberDesignCriteria" modifier="None" strength="referencing" strengthDirection="forward">
@@ -250,6 +322,12 @@
         <Target multiplicity="(0..1)" roleLabel="is referred by results" polymorphic="true">
             <Class class="IsmMemberDesignCriteria" />
         </Target>
+	<ECCustomAttributes>
+            <RelationshipHasLabels>
+                <SourceDisplayLabel>Member design results</SourceDisplayLabel>
+                <TargetDisplayLabel>Member design criteria</TargetDisplayLabel>
+            </RelationshipHasLabels>
+        </ECCustomAttributes>
     </ECRelationshipClass>
 
     <ECRelationshipClass typeName="IsmMemberCheck_MemberDesignResults" modifier="None" strength="referencing" strengthDirection="forward">
@@ -260,6 +338,12 @@
         <Target multiplicity="(0..*)" roleLabel="owns checks" polymorphic="true">
             <Class class="IsmMemberDesignResults" />
         </Target>
+	<ECCustomAttributes>
+            <RelationshipHasLabels>
+                <SourceDisplayLabel>Member check</SourceDisplayLabel>
+                <TargetDisplayLabel>Member design results</TargetDisplayLabel>
+            </RelationshipHasLabels>
+        </ECCustomAttributes>
     </ECRelationshipClass>
 
     <ECEntityClass typeName="IsmCurveMemberDesignResults" modifier="Abstract" displayLabel="Curve Member Design Results">
@@ -299,6 +383,12 @@
         <Target multiplicity="(0..1)" roleLabel="is referred by" polymorphic="true">
             <Class class="IsmLoadContainer" />
         </Target>
+	<ECCustomAttributes>
+            <RelationshipHasLabels>
+                <SourceDisplayLabel>Member checks</SourceDisplayLabel>
+                <TargetDisplayLabel>Load container</TargetDisplayLabel>
+            </RelationshipHasLabels>
+        </ECCustomAttributes>
     </ECRelationshipClass>
 
     <ECEntityClass typeName="IsmMemberDesignCriteria" modifier="Abstract" displayLabel="Member Design Criteria">
@@ -320,6 +410,12 @@
         <Target multiplicity="(0..*)" roleLabel="owns" polymorphic="true">
             <Class class="IsmMemberDesignCriteria" />
         </Target>
+	<ECCustomAttributes>
+            <RelationshipHasLabels>
+                <SourceDisplayLabel>Design parameter</SourceDisplayLabel>
+                <TargetDisplayLabel>Member design criterion</TargetDisplayLabel>
+            </RelationshipHasLabels>
+        </ECCustomAttributes>
     </ECRelationshipClass>
 
     <ECEntityClass typeName="IsmDesignParameter" modifier="None" displayLabel="Design Parameter">
@@ -391,6 +487,12 @@
         <Target multiplicity="(0..1)" roleLabel="has segments" polymorphic="false">
             <Class class="IsmVaryingSection" />
         </Target>
+	<ECCustomAttributes>
+            <RelationshipHasLabels>
+                <SourceDisplayLabel>Varying section segments</SourceDisplayLabel>
+                <TargetDisplayLabel>Varying section</TargetDisplayLabel>
+            </RelationshipHasLabels>
+        </ECCustomAttributes>
     </ECRelationshipClass>
 
     <ECRelationshipClass typeName="IsmVaryingSectionSegment_StartSection" strength="referencing" strengthDirection="forward" modifier="Sealed">
@@ -401,6 +503,12 @@
         <Target multiplicity="(0..1)" roleLabel="is used by VaryingSectionSegment at start" polymorphic="true">
             <Class class="IsmConstantSection" />
         </Target>
+	<ECCustomAttributes>
+            <RelationshipHasLabels>
+                <SourceDisplayLabel>Varying section segments</SourceDisplayLabel>
+                <TargetDisplayLabel>Constant section</TargetDisplayLabel>
+            </RelationshipHasLabels>
+        </ECCustomAttributes>
     </ECRelationshipClass>
 
     <ECRelationshipClass typeName="IsmVaryingSectionSegment_EndSection" strength="referencing" strengthDirection="forward" modifier="Sealed">
@@ -411,6 +519,12 @@
         <Target multiplicity="(0..1)" roleLabel="is used by VaryingSectionSegment at end" polymorphic="true">
             <Class class="IsmConstantSection" />
         </Target>
+	<ECCustomAttributes>
+            <RelationshipHasLabels>
+                <SourceDisplayLabel>Varying section segment</SourceDisplayLabel>
+                <TargetDisplayLabel>Constant section</TargetDisplayLabel>
+            </RelationshipHasLabels>
+        </ECCustomAttributes>
     </ECRelationshipClass>
 
     <ECEntityClass typeName="IsmFixedParametricSection" displayLabel="Ism Fixed Parametric Section" modifier="Abstract">
@@ -455,6 +569,12 @@
         <Target multiplicity="(0..1)" roleLabel="has components" polymorphic="false">
             <Class class="IsmBuiltUpSection" />
         </Target>
+	<ECCustomAttributes>
+            <RelationshipHasLabels>
+                <SourceDisplayLabel>Built up section components</SourceDisplayLabel>
+                <TargetDisplayLabel>Built up section</TargetDisplayLabel>
+            </RelationshipHasLabels>
+        </ECCustomAttributes>
     </ECRelationshipClass>
 
     <ECRelationshipClass typeName="IsmBuiltUpSectionComponent_Section" strength="referencing" strengthDirection="forward" modifier="Sealed">
@@ -465,6 +585,12 @@
         <Target multiplicity="(0..1)" roleLabel="is part of built up section" polymorphic="true">
             <Class class="IsmConstantSection" />
         </Target>
+	<ECCustomAttributes>
+            <RelationshipHasLabels>
+                <SourceDisplayLabel>Built up section components</SourceDisplayLabel>
+                <TargetDisplayLabel>Constant section</TargetDisplayLabel>
+            </RelationshipHasLabels>
+        </ECCustomAttributes>
     </ECRelationshipClass>
 
     <ECEntityClass typeName="IsmTableSection" displayLabel="Table Section" modifier="Sealed">
@@ -544,6 +670,12 @@
         <Target multiplicity="(0..1)" roleLabel="is refered by" polymorphic="true">
             <Class class="IsmNode" />
         </Target>
+	<ECCustomAttributes>
+            <RelationshipHasLabels>
+                <SourceDisplayLabel>Node links</SourceDisplayLabel>
+                <TargetDisplayLabel>Node</TargetDisplayLabel>
+            </RelationshipHasLabels>
+        </ECCustomAttributes>
     </ECRelationshipClass>
 
     <ECRelationshipClass typeName="IsmNodeLink_EndNode" strength="referencing" strengthDirection="forward" modifier="Sealed">
@@ -554,6 +686,12 @@
         <Target multiplicity="(0..1)" roleLabel="is refered by" polymorphic="true">
             <Class class="IsmNode" />
         </Target>
+	<ECCustomAttributes>
+            <RelationshipHasLabels>
+                <SourceDisplayLabel>Node links</SourceDisplayLabel>
+                <TargetDisplayLabel>Node</TargetDisplayLabel>
+            </RelationshipHasLabels>
+        </ECCustomAttributes>
     </ECRelationshipClass>
 
     <ECEnumeration typeName="HookType" backingTypeName="int" isStrict="true" description="Describes one end of bar.">
@@ -765,6 +903,12 @@
         <Target multiplicity="(0..1)" roleLabel="is refered by" polymorphic="true">
             <Class class="IsmConcrete" />
         </Target>
+	<ECCustomAttributes>
+            <RelationshipHasLabels>
+                <SourceDisplayLabel>Composite decks</SourceDisplayLabel>
+                <TargetDisplayLabel>Concrete</TargetDisplayLabel>
+            </RelationshipHasLabels>
+        </ECCustomAttributes>
     </ECRelationshipClass>
 
     <ECEntityClass typeName="IsmSteelDeck" modifier="Abstract" displayLabel="Steel Deck">
@@ -780,6 +924,12 @@
         <Target multiplicity="(0..1)" roleLabel="is refered by" polymorphic="true">
             <Class class="IsmSteelDeck" />
         </Target>
+	<ECCustomAttributes>
+            <RelationshipHasLabels>
+                <SourceDisplayLabel>Composite decks</SourceDisplayLabel>
+                <TargetDisplayLabel>Steel deck</TargetDisplayLabel>
+            </RelationshipHasLabels>
+        </ECCustomAttributes>
     </ECRelationshipClass>
 
     <PropertyCategory typeName="IsmLoad_category" displayLabel="Load" priority="190" />
@@ -936,6 +1086,12 @@
         <Target multiplicity="(0..1)" roleLabel="is used by curve member" polymorphic="true">
             <Class class="IsmMaterial" />
         </Target>
+	<ECCustomAttributes>
+            <RelationshipHasLabels>
+                <SourceDisplayLabel>Curve members</SourceDisplayLabel>
+                <TargetDisplayLabel>Material</TargetDisplayLabel>
+            </RelationshipHasLabels>
+        </ECCustomAttributes>
     </ECRelationshipClass>
 
     <ECRelationshipClass typeName="IsmCurveMember_Section" strength="referencing" strengthDirection="forward" modifier="Sealed">
@@ -946,6 +1102,12 @@
         <Target multiplicity="(0..1)" roleLabel="is used by" polymorphic="true">
             <Class class="IsmSection" />
         </Target>
+	<ECCustomAttributes>
+            <RelationshipHasLabels>
+                <SourceDisplayLabel>Curve members</SourceDisplayLabel>
+                <TargetDisplayLabel>Section</TargetDisplayLabel>
+            </RelationshipHasLabels>
+        </ECCustomAttributes>
     </ECRelationshipClass>
 
     <ECEntityClass typeName="IsmSupportMember" modifier="Abstract">
@@ -1081,6 +1243,12 @@
         <Target multiplicity="(0..1)" roleLabel="is refered by" polymorphic="true">
             <Class class="IsmSpanningMember" />
         </Target>
+	<ECCustomAttributes>
+            <RelationshipHasLabels>
+                <SourceDisplayLabel>Features</SourceDisplayLabel>
+                <TargetDisplayLabel>Spanning member</TargetDisplayLabel>
+            </RelationshipHasLabels>
+        </ECCustomAttributes>
     </ECRelationshipClass>
 
     <ECEnumeration typeName="FeatureUse" backingTypeName="int" isStrict="true" description="Feature Use.">
@@ -1113,6 +1281,12 @@
         <Target multiplicity="(0..1)" roleLabel="is refered by" polymorphic="true">
             <Class class="IsmMaterial" />
         </Target>
+	<ECCustomAttributes>
+            <RelationshipHasLabels>
+                <SourceDisplayLabel>Feature additions</SourceDisplayLabel>
+                <TargetDisplayLabel>Material</TargetDisplayLabel>
+            </RelationshipHasLabels>
+        </ECCustomAttributes>
     </ECRelationshipClass>
 
     <ECEnumeration typeName="SubstractionUse" backingTypeName="int" isStrict="true" description="Feature Use.">
@@ -1140,6 +1314,12 @@
         <Target multiplicity="(0..1)" roleLabel="is refered by" polymorphic="true">
             <Class class="IsmGrid" />
         </Target>
+	<ECCustomAttributes>
+            <RelationshipHasLabels>
+                <SourceDisplayLabel>Grid lines</SourceDisplayLabel>
+                <TargetDisplayLabel>Grid</TargetDisplayLabel>
+            </RelationshipHasLabels>
+        </ECCustomAttributes>
     </ECRelationshipClass>
 
     <PropertyCategory typeName="IsmGridParallelRebar_category" displayLabel="Grid Parallel Rebar" priority="170" />
@@ -1201,6 +1381,12 @@
         <Target multiplicity="(0..*)" roleLabel="is refered by" polymorphic="true">
             <Class class="IsmFactoredLoadCase" />
         </Target>
+	<ECCustomAttributes>
+            <RelationshipHasLabels>
+                <SourceDisplayLabel>Load combination</SourceDisplayLabel>
+                <TargetDisplayLabel>Factored load cases</TargetDisplayLabel>
+            </RelationshipHasLabels>
+        </ECCustomAttributes>
     </ECRelationshipClass>
 
     <ECRelationshipClass typeName="IsmLoadCombination_FactoredLoadCombinations" strength="referencing" strengthDirection="forward" modifier="Sealed">
@@ -1211,6 +1397,12 @@
         <Target multiplicity="(0..*)" roleLabel="is refered by" polymorphic="true">
             <Class class="IsmFactoredLoadCombination" />
         </Target>
+	<ECCustomAttributes>
+            <RelationshipHasLabels>
+                <SourceDisplayLabel>Load combination</SourceDisplayLabel>
+                <TargetDisplayLabel>Factored load combinations</TargetDisplayLabel>
+            </RelationshipHasLabels>
+        </ECCustomAttributes>
     </ECRelationshipClass>
 
     <ECRelationshipClass typeName="IsmFactoredLoadCase_LoadCase" strength="referencing" strengthDirection="forward" modifier="Sealed">
@@ -1221,6 +1413,12 @@
         <Target multiplicity="(0..*)" roleLabel="is refered by" polymorphic="true">
             <Class class="IsmLoadCase" />
         </Target>
+	<ECCustomAttributes>
+            <RelationshipHasLabels>
+                <SourceDisplayLabel>Factored load case</SourceDisplayLabel>
+                <TargetDisplayLabel>Load cases</TargetDisplayLabel>
+            </RelationshipHasLabels>
+        </ECCustomAttributes>
     </ECRelationshipClass>
 
     <ECRelationshipClass typeName="IsmFactoredLoadCombination_LoadCombination" strength="referencing" strengthDirection="forward" modifier="Sealed">
@@ -1231,6 +1429,12 @@
         <Target multiplicity="(0..*)" roleLabel="is refered by" polymorphic="true">
             <Class class="IsmLoadCombination" />
         </Target>
+	<ECCustomAttributes>
+            <RelationshipHasLabels>
+                <SourceDisplayLabel>Factored load combination</SourceDisplayLabel>
+                <TargetDisplayLabel>Load combinations</TargetDisplayLabel>
+            </RelationshipHasLabels>
+        </ECCustomAttributes>
     </ECRelationshipClass>
 
     <ECEnumeration typeName="LoadAnalysisCase" backingTypeName="int" isStrict="true" description="Load Analysis Case.">
@@ -1304,6 +1508,12 @@
         <Target multiplicity="(0..1)" roleLabel="is refered by" polymorphic="true">
             <Class class="IsmLoadCase" />
         </Target>
+	<ECCustomAttributes>
+            <RelationshipHasLabels>
+                <SourceDisplayLabel>Loads</SourceDisplayLabel>
+                <TargetDisplayLabel>Load case</TargetDisplayLabel>
+            </RelationshipHasLabels>
+        </ECCustomAttributes>
     </ECRelationshipClass>
 
     <ECEntityClass typeName="IsmLoadContainer" modifier="Abstract" displayLabel="Load Container">
@@ -1330,6 +1540,12 @@
         <Target multiplicity="(0..1)" roleLabel="is refered by" polymorphic="true">
             <Class class="IsmStory" />
         </Target>
+	<ECCustomAttributes>
+            <RelationshipHasLabels>
+                <SourceDisplayLabel>Members</SourceDisplayLabel>
+                <TargetDisplayLabel>Story</TargetDisplayLabel>
+            </RelationshipHasLabels>
+        </ECCustomAttributes>
     </ECRelationshipClass>
 
     <ECRelationshipClass typeName="IsmMemberLoad_Member" strength="referencing" strengthDirection="forward" modifier="Sealed">
@@ -1340,6 +1556,12 @@
         <Target multiplicity="(0..1)" roleLabel="is refered by" polymorphic="true">
             <Class class="IsmMember" />
         </Target>
+	<ECCustomAttributes>
+            <RelationshipHasLabels>
+                <SourceDisplayLabel>Member loads</SourceDisplayLabel>
+                <TargetDisplayLabel>Member</TargetDisplayLabel>
+            </RelationshipHasLabels>
+        </ECCustomAttributes>
     </ECRelationshipClass>
 
     <ECEnumeration typeName="IsmFixityDirection" backingTypeName="int" isStrict="true" description="Fixity Direction.">
@@ -1380,6 +1602,12 @@
         <Target multiplicity="(0..*)" roleLabel="Is connected through" polymorphic="true">
             <Class class="IsmMember" />
         </Target>
+	<ECCustomAttributes>
+            <RelationshipHasLabels>
+                <SourceDisplayLabel>Nodes</SourceDisplayLabel>
+                <TargetDisplayLabel>Members</TargetDisplayLabel>
+            </RelationshipHasLabels>
+        </ECCustomAttributes>
     </ECRelationshipClass>
 
     <PropertyCategory typeName="IsmOpenUTieRebar_category" displayLabel="Open-U Tie Rebar" priority="170" />
@@ -1750,6 +1978,12 @@
         <Target multiplicity="(0..1)" roleLabel="is referred by" polymorphic="false">
             <Class class="IsmPipingLine" />
         </Target>
+	<ECCustomAttributes>
+            <RelationshipHasLabels>
+                <SourceDisplayLabel>Piping members</SourceDisplayLabel>
+                <TargetDisplayLabel>Piping line</TargetDisplayLabel>
+            </RelationshipHasLabels>
+        </ECCustomAttributes>
     </ECRelationshipClass>
 
     <ECRelationshipClass typeName="IsmPipingMember_Material" modifier="None" strength="referencing" strengthDirection="forward">
@@ -1760,6 +1994,12 @@
         <Target multiplicity="(0..1)" roleLabel="is referred by" polymorphic="false">
             <Class class="IsmMaterial" />
         </Target>
+	<ECCustomAttributes>
+            <RelationshipHasLabels>
+                <SourceDisplayLabel>Piping members</SourceDisplayLabel>
+                <TargetDisplayLabel>Material</TargetDisplayLabel>
+            </RelationshipHasLabels>
+        </ECCustomAttributes>
     </ECRelationshipClass>
 
 
@@ -1821,6 +2061,12 @@
         <Target multiplicity="(0..*)" roleLabel="has tendon sets" polymorphic="true">
             <Class class="IsmSpanningMember" />
         </Target>
+	<ECCustomAttributes>
+            <RelationshipHasLabels>
+                <SourceDisplayLabel>Tendon sets</SourceDisplayLabel>
+                <TargetDisplayLabel>Spanning members</TargetDisplayLabel>
+            </RelationshipHasLabels>
+        </ECCustomAttributes>
     </ECRelationshipClass>
 
     <PropertyCategory typeName="IsmTendonNode_category" displayLabel="Tendon Node" priority="190" />
@@ -1838,6 +2084,12 @@
         <Target multiplicity="(0..*)" roleLabel="is owned by set" polymorphic="false">
             <Class class="IsmTendonNode" />
         </Target>
+	<ECCustomAttributes>
+            <RelationshipHasLabels>
+                <SourceDisplayLabel>Tendon set</SourceDisplayLabel>
+                <TargetDisplayLabel>Tendon nodes</TargetDisplayLabel>
+            </RelationshipHasLabels>
+        </ECCustomAttributes>
     </ECRelationshipClass>
 
     <PropertyCategory typeName="IsmTendon_category" displayLabel="Tendon" priority="190" />
@@ -1855,6 +2107,12 @@
         <Target multiplicity="(0..*)" roleLabel="is part of a set" polymorphic="false">
             <Class class="IsmTendon" />
         </Target>
+	<ECCustomAttributes>
+            <RelationshipHasLabels>
+                <SourceDisplayLabel>Tendon set</SourceDisplayLabel>
+                <TargetDisplayLabel>Tendons</TargetDisplayLabel>
+            </RelationshipHasLabels>
+        </ECCustomAttributes>
     </ECRelationshipClass>
 
     <ECEntityClass typeName="IsmTendonSystem" modifier="Abstract" displayLabel="Tendon System">
@@ -1906,6 +2164,12 @@
         <Target multiplicity="(0..1)" roleLabel="is system for" polymorphic="true">
             <Class class="IsmTendonSystem" />
         </Target>
+	<ECCustomAttributes>
+            <RelationshipHasLabels>
+                <SourceDisplayLabel>Tendons</SourceDisplayLabel>
+                <TargetDisplayLabel>Tendon system</TargetDisplayLabel>
+            </RelationshipHasLabels>
+        </ECCustomAttributes>
     </ECRelationshipClass>
 
     <PropertyCategory typeName="IsmTendonPart_category" displayLabel="Tendon Part" priority="190" />
@@ -1923,6 +2187,12 @@
         <Target multiplicity="(0..*)" roleLabel="is part of tendon" polymorphic="true">
             <Class class="IsmTendonPart" />
         </Target>
+	<ECCustomAttributes>
+            <RelationshipHasLabels>
+                <SourceDisplayLabel>Tendon</SourceDisplayLabel>
+                <TargetDisplayLabel>Tendon parts</TargetDisplayLabel>
+            </RelationshipHasLabels>
+        </ECCustomAttributes>
     </ECRelationshipClass>
 
     <PropertyCategory typeName="IsmTendonSegment_category" displayLabel="Tendon Segment" priority="180" />
@@ -1944,6 +2214,12 @@
         <Target multiplicity="(0..1)" roleLabel="is start node for segment" polymorphic="false">
             <Class class="IsmTendonNode" />
         </Target>
+	<ECCustomAttributes>
+            <RelationshipHasLabels>
+                <SourceDisplayLabel>Tendon segments</SourceDisplayLabel>
+                <TargetDisplayLabel>Tendon node</TargetDisplayLabel>
+            </RelationshipHasLabels>
+        </ECCustomAttributes>
     </ECRelationshipClass>
 
     <ECRelationshipClass typeName="IsmTendonSegment_EndNode" modifier="None" strength="referencing" strengthDirection="forward">
@@ -1954,6 +2230,12 @@
         <Target multiplicity="(0..1)" roleLabel="is end node for segment" polymorphic="false">
             <Class class="IsmTendonNode" />
         </Target>
+	<ECCustomAttributes>
+            <RelationshipHasLabels>
+                <SourceDisplayLabel>Tendon segments</SourceDisplayLabel>
+                <TargetDisplayLabel>Tendon node</TargetDisplayLabel>
+            </RelationshipHasLabels>
+        </ECCustomAttributes>
     </ECRelationshipClass>
 
     <PropertyCategory typeName="IsmTendonAnchor_category" displayLabel="Tendon Anchor" priority="180" />
@@ -1972,6 +2254,12 @@
         <Target multiplicity="(0..1)" roleLabel="is location node for anchor" polymorphic="false">
             <Class class="IsmTendonNode" />
         </Target>
+	<ECCustomAttributes>
+            <RelationshipHasLabels>
+                <SourceDisplayLabel>Tendon anchor</SourceDisplayLabel>
+                <TargetDisplayLabel>Tendon node</TargetDisplayLabel>
+            </RelationshipHasLabels>
+        </ECCustomAttributes>
     </ECRelationshipClass>
 
     <PropertyCategory typeName="IsmTendonTensioningEndAnchor_category" displayLabel="Tendon Tensioning End Anchor" priority="170" />
@@ -2076,6 +2364,12 @@
         <Target multiplicity="(0..1)" roleLabel="contains bars" polymorphic="false">
             <Class class="IsmRebarCage" />
         </Target>
+	<ECCustomAttributes>
+            <RelationshipHasLabels>
+                <SourceDisplayLabel>Rebars</SourceDisplayLabel>
+                <TargetDisplayLabel>Rebar cage</TargetDisplayLabel>
+            </RelationshipHasLabels>
+        </ECCustomAttributes>
     </ECRelationshipClass>
 
     <ECEnumeration typeName="RebarMaterialCoatingType" backingTypeName="int" isStrict="true">
@@ -2125,6 +2419,12 @@
         <Target multiplicity="(0..1)" roleLabel="is used by bars" polymorphic="true">
             <Class class="IsmRebarMaterial" />
         </Target>
+	<ECCustomAttributes>
+            <RelationshipHasLabels>
+                <SourceDisplayLabel>Rebars</SourceDisplayLabel>
+                <TargetDisplayLabel>Rebar material</TargetDisplayLabel>
+            </RelationshipHasLabels>
+        </ECCustomAttributes>
     </ECRelationshipClass>
 
     <ECRelationshipClass typeName="IsmRebar_Members" modifier="None" strength="referencing" strengthDirection="forward">
@@ -2135,6 +2435,12 @@
         <Target multiplicity="(0..*)" roleLabel="has rebar" polymorphic="true">
             <Class class="IsmSpanningMember" />
         </Target>
+	<ECCustomAttributes>
+            <RelationshipHasLabels>
+                <SourceDisplayLabel>Rebars</SourceDisplayLabel>
+                <TargetDisplayLabel>Spanning members</TargetDisplayLabel>
+            </RelationshipHasLabels>
+        </ECCustomAttributes>
     </ECRelationshipClass>
 
     <PropertyCategory typeName="IsmRectangleParallelRebar_category" displayLabel="Rectangle Parallel Rebar" priority="170" />
@@ -2176,6 +2482,12 @@
         <Target multiplicity="(0..*)" roleLabel="is used by bars" polymorphic="true">
             <Class class="IsmCurveMember" />
         </Target>
+	<ECCustomAttributes>
+            <RelationshipHasLabels>
+                <SourceDisplayLabel>Shear stud zones</SourceDisplayLabel>
+                <TargetDisplayLabel>Curve members</TargetDisplayLabel>
+            </RelationshipHasLabels>
+        </ECCustomAttributes>
     </ECRelationshipClass>
 
     <ECEntityClass typeName="IsmSineWaveSteelDeck" modifier="None" displayLabel="Sine Wave Steel Deck" >
@@ -2223,6 +2535,12 @@
         <Target multiplicity="(0..*)" roleLabel="is used by bars" polymorphic="true">
             <Class class="IsmGrid" />
         </Target>
+	<ECCustomAttributes>
+            <RelationshipHasLabels>
+                <SourceDisplayLabel>Stories</SourceDisplayLabel>
+                <TargetDisplayLabel>Grids</TargetDisplayLabel>
+            </RelationshipHasLabels>
+        </ECCustomAttributes>
     </ECRelationshipClass>
 
     <PropertyCategory typeName="IsmStraightPerpendicularRebar_category" displayLabel="Straight Perpendicular Rebar" priority="170" />
@@ -2244,6 +2562,12 @@
         <Target multiplicity="(0..*)" roleLabel="is used by bars" polymorphic="true">
             <Class class="IIsmObject" />
         </Target>
+	<ECCustomAttributes>
+            <RelationshipHasLabels>
+                <SourceDisplayLabel>Sub structures</SourceDisplayLabel>
+                <TargetDisplayLabel>Objects</TargetDisplayLabel>
+            </RelationshipHasLabels>
+        </ECCustomAttributes>
     </ECRelationshipClass>
 
     <ECRelationshipClass typeName="IsmSupportMember_RepresentedMembers" modifier="None" strength="referencing" strengthDirection="forward">
@@ -2254,6 +2578,12 @@
         <Target multiplicity="(0..*)" roleLabel="is used by bars" polymorphic="true">
             <Class class="IsmSpanningMember" />
         </Target>
+	<ECCustomAttributes>
+            <RelationshipHasLabels>
+                <SourceDisplayLabel>Support members</SourceDisplayLabel>
+                <TargetDisplayLabel>Spanning members</TargetDisplayLabel>
+            </RelationshipHasLabels>
+        </ECCustomAttributes>
     </ECRelationshipClass>
 
 
@@ -2333,6 +2663,12 @@
         <Target multiplicity="(0..1)" roleLabel="is used by bars" polymorphic="true">
             <Class class="IsmMaterial" />
         </Target>
+	<ECCustomAttributes>
+            <RelationshipHasLabels>
+                <SourceDisplayLabel>Surface members</SourceDisplayLabel>
+                <TargetDisplayLabel>Material</TargetDisplayLabel>
+            </RelationshipHasLabels>
+        </ECCustomAttributes>
     </ECRelationshipClass>
 
     <ECEnumeration typeName="SurfaceMemberModifierUse" backingTypeName="int" isStrict="true">
@@ -2367,6 +2703,12 @@
         <Target multiplicity="(0..1)" roleLabel="is refered by" polymorphic="true">
             <Class class="IsmMaterial" />
         </Target>
+	<ECCustomAttributes>
+            <RelationshipHasLabels>
+                <SourceDisplayLabel>Surface member modifiers</SourceDisplayLabel>
+                <TargetDisplayLabel>Material</TargetDisplayLabel>
+            </RelationshipHasLabels>
+        </ECCustomAttributes>
     </ECRelationshipClass>
 
     <ECRelationshipClass typeName="IsmSurfaceMemberModifier_SurfaceMember" modifier="None" strength="referencing" strengthDirection="forward">
@@ -2377,6 +2719,12 @@
         <Target multiplicity="(0..1)" roleLabel="is refered by" polymorphic="true">
             <Class class="IsmSurfaceMember" />
         </Target>
+	<ECCustomAttributes>
+            <RelationshipHasLabels>
+                <SourceDisplayLabel>Surface member modifiers</SourceDisplayLabel>
+                <TargetDisplayLabel>Surface member</TargetDisplayLabel>
+            </RelationshipHasLabels>
+        </ECCustomAttributes>
     </ECRelationshipClass>
 
     <PropertyCategory typeName="IsmSurfaceMemberOpening_category" displayLabel="Surface Member Opening" priority="190" />
@@ -2394,6 +2742,12 @@
         <Target multiplicity="(0..1)" roleLabel="is refered by" polymorphic="true">
             <Class class="IsmSurfaceMember" />
         </Target>
+	<ECCustomAttributes>
+            <RelationshipHasLabels>
+                <SourceDisplayLabel>Surface member openings</SourceDisplayLabel>
+                <TargetDisplayLabel>Surface member</TargetDisplayLabel>
+            </RelationshipHasLabels>
+        </ECCustomAttributes>
     </ECRelationshipClass>
 
     <ECEntityClass typeName="IsmTableSteelDeck" modifier="Sealed" displayLabel="Table Steel Deck" >
