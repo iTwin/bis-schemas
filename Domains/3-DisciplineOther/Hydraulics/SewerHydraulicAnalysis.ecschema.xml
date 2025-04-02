@@ -278,7 +278,7 @@
         <ECEnumerator value="3" name="SCSTypeIII24Hr" displayLabel="SCS Type III 24 hr"/>
     </ECEnumeration>
 
-    <ECEnumeration typeName="StorageChamberDefinition" backingTypeName="int" isStrict="true">
+    <ECEnumeration typeName="StorageChamberShape" backingTypeName="int" isStrict="true">
         <ECEnumerator value="0" name="CircularChamber" displayLabel="Circular"/>
         <ECEnumerator value="1" name="BoxChamber" displayLabel="Box"/>
         <ECEnumerator value="2" name="PipeArchChamber" displayLabel="Pipe-Arch"/> 
@@ -1316,7 +1316,7 @@
         </Target>
     </ECRelationshipClass>
 
-    <ECEntityClass typeName="UndergroundStorageChamberSystem" modifier="Sealed" displayLabel="Underground Storage Chamber System">
+    <ECEntityClass typeName="UndergroundStorage" modifier="Sealed" displayLabel="Underground Storage Chamber System">
         <BaseClass>DrainageNode</BaseClass>
         <ECProperty propertyName="StorageSystemInvert" typeName="double" displayLabel="Chamber System Invert" category="HydraulicData" kindOfQuantity="rru:ELEVATION" description="The overall invert elevation of the storage chamber system (i.e. the bottom of the base fill)."/>
         <ECProperty propertyName="ChamberSystemRows" typeName="int" displayLabel="Chamber System Rows" category="HydraulicData" description="The number of rows of the selected storage chamber."/>
@@ -1328,12 +1328,12 @@
         <ECProperty propertyName="FillBaseDepth" typeName="double" displayLabel="Fill Base Depth" category="HydraulicData" kindOfQuantity="rru:LENGTH" description="The distance from the bottom of the fill to the bottom of the storage chambers."/>
         <ECProperty propertyName="FillSideSlope" typeName="double" displayLabel="Fill Side Slope" category="HydraulicData" kindOfQuantity="rru:SIDE_SLOPE" description="The side slope of the fill on all four sides."/>
         <ECProperty propertyName="EndFill" typeName="double" displayLabel="End Fill" category="HydraulicData" kindOfQuantity="rru:LENGTH" description="The distance between ends of the storage chambers and the end of the surrounding fill."/>
-        <ECNavigationProperty propertyName="StorageChamber" displayLabel="Storage Chamber" relationshipName="UnderGroundStorageChamberSystemUsesAStorageChamber" direction="Forward" />
+        <ECNavigationProperty propertyName="StorageChamber" displayLabel="Storage Chamber" relationshipName="UndergroundStorageUsesAStorageChamber" direction="Forward" />
     </ECEntityClass>
 
-    <ECRelationshipClass typeName="UnderGroundStorageChamberSystemUsesAStorageChamber" strength="referencing" modifier="Sealed">
+    <ECRelationshipClass typeName="UndergroundStorageUsesAStorageChamber" strength="referencing" modifier="Sealed">
         <Source multiplicity="(0..*)" roleLabel="bounded by" polymorphic="false">
-            <Class class="UndergroundStorageChamberSystem"/>
+            <Class class="UndergroundStorage"/>
         </Source>
         <Target multiplicity="(0..1)" roleLabel="bounds" polymorphic="true">
             <Class class="StorageChamber"/>
@@ -1342,7 +1342,7 @@
 
     <ECEntityClass typeName="StorageChamber" modifier="Sealed" displayLabel="Storage Chamber">
         <BaseClass>bis:DefinitionElement</BaseClass>
-        <ECProperty propertyName="StorageChamberDefinition" typeName="StorageChamberDefinition" displayLabel="Storage Chamber Shape" category="HydraulicData" description="Choose how to define the shape of the storage chamber"/>
+        <ECProperty propertyName="StorageChamberShape" typeName="StorageChamberShape" displayLabel="Storage Chamber Shape" category="HydraulicData" description="Choose how to define the shape of the storage chamber"/>
         <ECProperty propertyName="EffectiveLength" typeName="double" displayLabel="Effective Length" kindOfQuantity="rru:LENGTH"  category="HydraulicData" description="The length of the storage chamber when it is interlocked in a storage chamber row.  If the Section Length Varies, then the effective length represent the length of the middle sections."/>
         <ECProperty propertyName="StorageMultiplier" typeName="double" displayLabel="Storage Multiplier" kindOfQuantity="rru:PERCENTAGE"  category="HydraulicData" description="Adjusts the internal storage volume of the storage chamber."/>
         <ECProperty propertyName="DefaultSpacing" typeName="double" displayLabel="Default Spacing" kindOfQuantity="rru:LENGTH_SHORT"  category="HydraulicData" description="Set the default edge to edge spacing for the storage chamber when organized into rows on the Pond Element."/>
