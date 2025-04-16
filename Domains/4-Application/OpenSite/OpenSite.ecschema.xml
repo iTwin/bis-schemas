@@ -146,9 +146,30 @@
     <ECEntityClass typeName="DrivewayMidVertex" modifier="Sealed" displayLabel="Driveway Mid Vertex" description="Vertex of a DrivewayPath that is attached to two DrivewayPathEdge instances.">
         <BaseClass>PathMidVertex</BaseClass>
 
-        <ECProperty propertyName="SideTransitionOffset" typeName="double" kindOfQuantity="rru:LENGTH" category="DrivewayMidVertex_Transition" displayLabel="Transition Offset" description="The transition offset distance." />
-        <ECProperty propertyName="SideTransitionRadius1" typeName="double" kindOfQuantity="rru:LENGTH" category="DrivewayMidVertex_Transition" displayLabel="Transition Inner Radius" description="The inner radius of the transition." />
-        <ECProperty propertyName="SideTransitionRadius2" typeName="double" kindOfQuantity="rru:LENGTH" category="DrivewayMidVertex_Transition" displayLabel="Transition Outer Radius" description="The outer radius of the transition." />
+        <ECProperty propertyName="SideTransitionOffset" typeName="double" kindOfQuantity="rru:LENGTH" category="DrivewayMidVertex_Transition" displayLabel="Transition Offset" description="The transition offset distance." >
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03" />
+                <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                    <Description>Transition data to be stored in DrivewayTransitions instead. </Description>
+                </Deprecated>
+            </ECCustomAttributes>
+        </ECProperty>
+        <ECProperty propertyName="SideTransitionRadius1" typeName="double" kindOfQuantity="rru:LENGTH" category="DrivewayMidVertex_Transition" displayLabel="Transition Inner Radius" description="The inner radius of the transition." >
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03" />
+                <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                    <Description>Transition data to be stored in DrivewayTransitions instead. </Description>
+                </Deprecated>
+            </ECCustomAttributes>
+        </ECProperty>
+        <ECProperty propertyName="SideTransitionRadius2" typeName="double" kindOfQuantity="rru:LENGTH" category="DrivewayMidVertex_Transition" displayLabel="Transition Outer Radius" description="The outer radius of the transition." >
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03" />
+                <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                    <Description>Transition data to be stored in DrivewayTransitions instead. </Description>
+                </Deprecated>
+            </ECCustomAttributes>
+        </ECProperty>
     </ECEntityClass>
 
     <ECEntityClass typeName="ParkingVertex" modifier="Abstract" displayLabel="Parking Vertex">
@@ -318,6 +339,20 @@
         <ECProperty propertyName="DitchSlope" typeName="double" kindOfQuantity="rru:SLOPE" category="DrivewayPathFin_Shoulder" displayLabel="Ditch Slope" description="Ditch slope for this side of driveway." />
     </ECEntityClass>
 
+    <ECEntityClass typeName="DrivewayTransition" modifier="Sealed" displayLabel="Transition">
+        <BaseClass>bis:SpatialLocationElement</BaseClass>
+
+        <ECProperty propertyName="IsPrimary" typeName="boolean">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03" />
+            </ECCustomAttributes>
+        </ECProperty>
+
+        <ECProperty propertyName="sideTransitionOffset" typeName="double" kindOfQuantity="rru:LENGTH" displayLabel="Transition Offset"/>
+        <ECProperty propertyName="sideTransitionRadius1" typeName="double" kindOfQuantity="rru:LENGTH" displayLabel="Transition Inner Radius"/>
+        <ECProperty propertyName="sideTransitionRadius2" typeName="double" kindOfQuantity="rru:LENGTH" displayLabel="Transition Outer Radius"/>
+    </ECEntityClass>
+
     <ECEntityClass typeName="SidewalkPathEdge" modifier="Sealed" displayLabel="Sidewalk Edge" description="Sidewalk path edge.">
         <BaseClass>CenterlinePathEdge</BaseClass>
     </ECEntityClass>
@@ -446,6 +481,16 @@
         </Source>
         <Target multiplicity="(2..2)" roleLabel="is owned by" polymorphic="false">
             <Class class="DrivewayPathFin" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="DrivewayMidVertexOwnsTransitions" strength="embedding" strengthDirection="Forward" modifier="Sealed">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="DrivewayMidVertex" />
+        </Source>
+        <Target multiplicity="(2..2)" roleLabel="is owned by" polymorphic="false">
+            <Class class="DrivewayTransition" />
         </Target>
     </ECRelationshipClass>
 
@@ -657,6 +702,24 @@
 
     <ECEntityClass typeName="BreaklinePath" modifier="Sealed" displayLabel="Breakline Path" description="Breakline path.">
         <BaseClass>GradingPath</BaseClass>
+    </ECEntityClass>
+    
+    <ECEntityClass typeName="CachedLinear" modifier="Sealed" displayLabel="Cached Linear" description="Cached 3D Linear geometry.">
+        <BaseClass>bis:SpatialLocationElement</BaseClass>
+        <ECCustomAttributes>
+            <HiddenClass xmlns="CoreCustomAttributes.01.00.03" />
+        </ECCustomAttributes>
+
+        <ECProperty propertyName="Geometry" typeName="Bentley.Geometry.Common.IGeometry" displayLabel="Linear Geometry" />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="CachedTopSurface" modifier="Sealed" displayLabel="Cached Top Surface" description="Cached Top Surface geometry.">
+        <BaseClass>bis:SpatialLocationElement</BaseClass>
+        <ECCustomAttributes>
+            <HiddenClass xmlns="CoreCustomAttributes.01.00.03" />
+        </ECCustomAttributes>
+
+        <ECProperty propertyName="Surface" typeName="Bentley.Geometry.Common.IGeometry" displayLabel="Top Surface Geometry" />
     </ECEntityClass>
 
     <ECEntityClass typeName="ContourLinesAspect" modifier="Sealed" displayLabel="Contour Lines" description="Terrain contour lines" >
@@ -987,7 +1050,16 @@
         </Target>
     </ECRelationshipClass>
 
-    
+    <ECRelationshipClass typeName="SpatialLocationExtractedFromPhysicalElement" modifier="None" strength="referencing" strengthDirection="forward" description="A relationship that describes how a bis:SpatialLocationElement can be extracted from a bis:PhysicalElement">
+        <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="is extracted from" polymorphic="true">
+            <Class class="bis:SpatialLocationElement"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="extracts" polymorphic="true">
+            <Class class="bis:PhysicalElement"/>
+        </Target>
+    </ECRelationshipClass>
+
     <ECEntityClass typeName="ISurfaceControl" modifier="Abstract" displayLabel="Surface Control" description="An interface that can be mixed-into a shaped area or layout area to indicate that it can be a surface control area.">
         <ECCustomAttributes>
         <IsMixin xmlns="CoreCustomAttributes.01.00.03">
