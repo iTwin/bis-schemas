@@ -282,6 +282,9 @@
         <ECEnumerator value="0" name="CircularChamber" displayLabel="Circular"/>
         <ECEnumerator value="1" name="BoxChamber" displayLabel="Box"/>
         <ECEnumerator value="2" name="PipeArchChamber" displayLabel="Pipe-Arch"/> 
+        <ECEnumerator value="3" name="DepthWidthCurve" displayLabel="Depth-Width Curve"/>
+
+        <ECEnumerator value="4" name="VolumePerUnitLength" displayLabel="Volume Per Unit Length"/>     
     </ECEnumeration>
 
     <ECEntityClass typeName="SewerHydraulicAnalysisModel" modifier="Sealed" displayLabel="Sewer Hydraulics Analysis Model" description="Model containing all Sewer Hydraulic Analysis elements.">
@@ -1384,6 +1387,28 @@
     <ECEntityClass typeName="BoxStorageChamberDefinitionAspect" modifier="Sealed" displayLabel="BoxStorageChamberDefinitionAspect">
         <BaseClass>StandardShapeStorageChamberDefinitionAspect</BaseClass>
     </ECEntityClass>
+
+    <ECEntityClass typeName="DepthWidthStorageChamberDefinitionAspect" modifier="Sealed" displayLabel="DepthWidthStorageChamberDefinitionAspect">
+        <BaseClass>StorageChamberDefinitionAspect</BaseClass>
+        <ECStructArrayProperty propertyName="StorageChamberDepthWidthCurve" typeName="StorageChamberDepthWidthCurvePoint" displayLabel="Depth-Width Curve" minOccurs="0" maxOccurs="unbounded" description="Define how the width of the storage varies as the depths change." />
+    </ECEntityClass>
+
+    <ECStructClass typeName="StorageChamberDepthWidthCurvePoint" description="The Depth-Width Curve point for a storage chamber" modifier="Sealed">
+        <ECProperty propertyName="Depth" displayLabel="Depth" typeName="double" description="Depth measured from the bottom of the storage chamber." kindOfQuantity="rru:LENGTH" />
+        <ECProperty propertyName="InnerWidth" displayLabel="Inner-Width" typeName="double" description="Width of the inner chamber opening." kindOfQuantity="rru:LENGTH" />
+        <ECProperty propertyName="OuterWidth" displayLabel="Outer-Width" typeName="double" description="Total width of the chamber including the wall thickiness" kindOfQuantity="rru:LENGTH" />
+    </ECStructClass>
+
+    <ECEntityClass typeName="VolumePerLengthStorageChamberDefinitionAspect" modifier="Sealed" displayLabel="VolumePerLengthStorageChamberDefinitionAspect">
+        <BaseClass>StorageChamberDefinitionAspect</BaseClass>
+        <ECProperty propertyName="MaximumWidth" displayLabel="Maximum Width" typeName="double" kindOfQuantity="rru:LENGTH" description="The maximum span that occurs in the structure. This is used for setting the spacing in the Storage Chamber System." />
+        <ECStructArrayProperty propertyName="StorageChamberDepthUnitVolumeCurve" typeName="StorageChamberDepthUnitVolumeCurvePoint" displayLabel="Depth-Incremental Volume Per Unit Length Curve" minOccurs="0" maxOccurs="unbounded" description="Define how the incremental unit volume varies as the depths change." />
+    </ECEntityClass>
+
+    <ECStructClass typeName="StorageChamberDepthUnitVolumeCurvePoint" description="Depth-Unit Volume Curve Point" modifier="Sealed">
+        <ECProperty propertyName="Depth" displayLabel="Depth" typeName="double"  kindOfQuantity="rru:LENGTH" description="Depth measured from the bottom of the storage chamber."/>
+        <ECProperty propertyName="VolumePerUnitLength" displayLabel="Incremental Volume Per Unit Length" typeName="double" description="The incremental volume per length at the current depth." />
+     </ECStructClass>
 
     <ECEntityClass typeName="PipeArchStorageChamberDefinitionAspect" modifier="Sealed" displayLabel="PipeArchStorageChamberDefinitionAspect">
         <BaseClass>StandardShapeStorageChamberDefinitionAspect</BaseClass>
