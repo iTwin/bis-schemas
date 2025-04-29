@@ -62,6 +62,8 @@
     <PropertyCategory typeName="EdgeOnSideParkingAspect_Parking" displayLabel="OnSide Parking" priority="0" />
     <PropertyCategory typeName="EdgeOnSideParkingAspect_Grading" displayLabel="OnSide Parking Grading" priority="0" />
 
+    <PropertyCategory typeName="SurfaceControl_Vertex" displayLabel="Surface Control" priority="0" />
+
     <ECEnumeration typeName="IslandType" backingTypeName="int" isStrict="true" displayLabel="Island Type" description="Describes the parking island construction type.">
         <ECEnumerator value="0" name="UNSET" displayLabel="Not Set" />
         <ECEnumerator value="1" name="LANDSCAPED" displayLabel="Landscaped" />
@@ -538,6 +540,7 @@
 
     <ECEntityClass typeName="ShapedArea" modifier="Abstract" displayLabel="Shaped Area" description="Shaped area">
         <BaseClass>Area</BaseClass>
+        <BaseClass>ISurfaceControl</BaseClass>
 
         <ECProperty propertyName="DoGrade" typeName="boolean" category="ShapedArea_Optimizer" displayLabel="Grading" description="Add area grading data to grading optimizer." />
 
@@ -588,6 +591,7 @@
 
     <ECEntityClass typeName="LayoutArea" modifier="Abstract" displayLabel="Layout Area" description="Layout Area">
         <BaseClass>Area</BaseClass>
+        <BaseClass>ISurfaceControl</BaseClass>
     </ECEntityClass>
 
     <ECEntityClass typeName="LayoutParkingArea" modifier="Sealed" displayLabel="Layout Parking Area" description="Layout parking area.">
@@ -1055,4 +1059,53 @@
             <Class class="bis:PhysicalElement"/>
         </Target>
     </ECRelationshipClass>
+
+    <ECEntityClass typeName="ISurfaceControl" modifier="Abstract" displayLabel="Surface Control" description="An interface that can be mixed-into a shaped area or layout area to indicate that it can be a surface control area.">
+        <ECCustomAttributes>
+        <IsMixin xmlns="CoreCustomAttributes.01.00.03">
+            <AppliesToEntityClass>Area</AppliesToEntityClass>
+        </IsMixin>
+        </ECCustomAttributes>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="SurfaceControlVertex" modifier="Sealed" displayLabel="Control Vertex" description="Defines a location point which controls control object.">
+        <BaseClass>Vertex</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="SurfaceControlVertexRule" modifier="Abstract">
+        <BaseClass>bis:SpatialLocationElement</BaseClass>
+
+        <ECNavigationProperty propertyName="StartVertex" relationshipName="SurfaceControlVertexRuleStartsAtVertex" direction="Forward" />
+        <ECNavigationProperty propertyName="EndVertex" relationshipName="SurfaceControlVertexRuleEndsAtVertex" direction="Forward" />
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="SurfaceControlVertexRuleStartsAtVertex" strength="referencing" modifier="Sealed">
+        <Source multiplicity="(0..2)" roleLabel="starts at" polymorphic="true">
+        <Class class="SurfaceControlVertexRule" />
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="connects to" polymorphic="true">
+        <Class class="SurfaceControlVertex" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="SurfaceControlVertexRuleEndsAtVertex" strength="referencing" modifier="Sealed">
+        <Source multiplicity="(0..2)" roleLabel="ends at" polymorphic="true">
+        <Class class="SurfaceControlVertexRule" />
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="connects to" polymorphic="true">
+        <Class class="SurfaceControlVertex" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="SurfaceControlVertexDeltaRule" modifier="Sealed" displayLabel="Surface Control Vertex Delta Rule" description="Surface control vertex delta rule.">
+        <BaseClass>SurfaceControlVertexRule</BaseClass>
+
+        <ECProperty propertyName="ControlVertexDelta" typeName="double" category="SurfaceControl_Vertex" kindOfQuantity="rru:LENGTH" displayLabel="Delta" description="Delta defined by a control vertex override." />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="SurfaceControlVertexSlopeRule" modifier="Sealed" displayLabel="Surface Control Vertex Slope Rule" description="Surface control vertex slope rule.">
+        <BaseClass>SurfaceControlVertexRule</BaseClass>
+
+        <ECProperty propertyName="ControlVertexSlope" typeName="double" category="SurfaceControl_Vertex" kindOfQuantity="rru:SLOPE" displayLabel="Slope" description="Slope defined by a control vertex override." />
+    </ECEntityClass>
 </ECSchema>
