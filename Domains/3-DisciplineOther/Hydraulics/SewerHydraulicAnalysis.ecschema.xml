@@ -312,6 +312,7 @@
         <ECProperty propertyName="InfiltrationMethod" typeName="InfiltrationMethod" displayLabel="Infiltration Method" category="HydraulicData" description="Specify the infiltration method to calculate runoff when not using the Rational Method."/>
         <ECNavigationProperty propertyName="ActiveCalcOptions" displayLabel="Active Calc Options" relationshipName="GlobalSettingsOwnsCalcOptions" direction="Forward" />
         <ECNavigationProperty propertyName="ActiveRainfallEvent" displayLabel="Active Rainfall Event" relationshipName="GlobalSettingsOwnsRainfallEvent" direction="Forward" />
+        <ECProperty propertyName="IDFDuration" typeName="double" displayLabel="Duration (Modified Rational)" category="HydraulicData" kindOfQuantity="AECU:TIME" description="Specify the duration of an IDF storm when analyzing catchments with modified rational method."/> 
     </ECEntityClass>
 
     <ECRelationshipClass typeName="GlobalSettingsOwnsCalcOptions" strength="referencing" modifier="Sealed">
@@ -991,6 +992,12 @@
         </Target>
     </ECRelationshipClass>
 
+    <ECEntityClass typeName="SurfaceDefinition" displayLabel="Surface Definition">
+        <BaseClass>bis:DefinitionElement</BaseClass>
+        <ECProperty propertyName="RationalC" typeName="double" displayLabel="Rational C" category="HydraulicData" kindOfQuantity="rru:RATIONAL_COEFFICIENT" description="The runoff coefficient used with the Rational Method. C in Q=CiA."/>
+        <ECProperty propertyName="ScsCn" typeName="int" displayLabel="SCS CN" category="HydraulicData" description="Curve Number value to use by the SCS Infiltration method to define the characteristics of land surface of the catchment."/>
+    </ECEntityClass>
+
     <ECEntityClass typeName="Catchment" modifier="Sealed" displayLabel="Catchment">
         <BaseClass>anlyt:AnalyticalElement</BaseClass>
         <ECNavigationProperty propertyName="OutflowNode" displayLabel="Outflow Element" relationshipName="CatchmentDischargesToOutflowNode" direction="Forward" description="Specify the element which the catchment outflows." />
@@ -1127,6 +1134,15 @@
         <ECProperty propertyName="RationalSubareaArea" typeName="double" displayLabel="Area" category="HydraulicData" kindOfQuantity="rru:AREA" description="The size of the subarea."/>
         <ECProperty propertyName="RationalSubareaC" typeName="double" displayLabel="Rational C" category="HydraulicData" kindOfQuantity="rru:RATIONAL_COEFFICIENT" description="The Rational C coefficient to be applied to the current subarea."/>
     </ECStructClass>
+
+    <ECRelationshipClass typeName="RationalSubareaReferencesSurfaceDefinition" strength="referencing" modifier="Sealed">
+        <Source multiplicity="(0..*)" roleLabel="referenced by" polymorphic="false">
+            <Class class="RationalSubarea"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="references" polymorphic="true">
+            <Class class="SurfaceDefinition"/>
+        </Target>
+    </ECRelationshipClass>
 
     <ECEntityClass typeName="EpaSWMMRunoffMethodAreaAspect" modifier="Sealed" displayLabel="EPA SWMM Runoff Method">
         <BaseClass >CatchmentSimpleAreaDefinitionAspect</BaseClass>
@@ -1332,13 +1348,27 @@
         <ECProperty propertyName="FillSideSlope" typeName="double" displayLabel="Fill Side Slope" category="HydraulicData" kindOfQuantity="rru:SIDE_SLOPE" description="The side slope of the fill on all four sides."/>
         <ECProperty propertyName="EndFill" typeName="double" displayLabel="End Fill" category="HydraulicData" kindOfQuantity="rru:LENGTH" description="The distance between ends of the storage chambers and the end of the surrounding fill."/>
         <ECNavigationProperty propertyName="StorageChamber" displayLabel="Storage Chamber" relationshipName="UndergroundStorageUsesAStorageChamber" direction="Forward" />
+        <ECProperty propertyName="IncludesHeader" typeName="boolean" displayLabel="Includes Header" category="HydraulicData" description="A header storage row can applied to the storage chamber system."/>   
+        <ECProperty propertyName="ChambersInHeader" typeName="int" displayLabel="Chambers in Header" category="HydraulicData" description="TThe number of chambers in header to the storage system."/>
+        <ECProperty propertyName="HeaderDistance" typeName="double" displayLabel="Header Distance" category="HydraulicData" kindOfQuantity="rru:LENGTH_SHORT" description="Distance between the header pipe and the main storage system."/>
+        <ECNavigationProperty propertyName="HeaderStorageChamber" displayLabel="Header Storage Chamber" relationshipName="UndergroundStorageHasHeaderStorageChamber" direction="Forward" />
+    
     </ECEntityClass>
 
     <ECRelationshipClass typeName="UndergroundStorageUsesAStorageChamber" strength="referencing" modifier="Sealed">
-        <Source multiplicity="(0..*)" roleLabel="bounded by" polymorphic="false">
+        <Source multiplicity="(0..*)" roleLabel="references" polymorphic="false">
             <Class class="UndergroundStorage"/>
         </Source>
-        <Target multiplicity="(0..1)" roleLabel="bounds" polymorphic="true">
+        <Target multiplicity="(0..1)" roleLabel="referenced" polymorphic="false">
+            <Class class="StorageChamberDefinition"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="UndergroundStorageHasHeaderStorageChamber" strength="referencing" modifier="Sealed">
+        <Source multiplicity="(0..*)" roleLabel="references" polymorphic="false">
+            <Class class="UndergroundStorage"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="referenced" polymorphic="false">
             <Class class="StorageChamberDefinition"/>
         </Target>
     </ECRelationshipClass>
