@@ -1127,8 +1127,40 @@
 
     <ECEntityClass typeName="CatchmentRationalComplexAreaDefinitionAspect" modifier="Sealed" displayLabel="CatchmentRationalComplexAreaAspect">
         <BaseClass >CatchmentAreaDefinitionAspect</BaseClass>
-        <ECStructArrayProperty propertyName="RationalSubareas" typeName="RationalSubarea" displayLabel="Subareas (Rational)" minOccurs="0" maxOccurs="unbounded" description="The list of subareas that comprise the total area of the catchment. The weighted average of the rational c value will be used to compute the runoff."/>
+        <ECStructArrayProperty propertyName="RationalSubareas" typeName="RationalSubarea" displayLabel="Subareas (Rational)" minOccurs="0" maxOccurs="unbounded" description="The list of subareas that comprise the total area of the catchment. The weighted average of the rational c value will be used to compute the runoff.">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.04"/>
+                <Deprecated xmlns="CoreCustomAttributes.01.00.04">
+                    <Description>Refactor required so child elements could reference surface definition.</Description>
+                </Deprecated>
+            </ECCustomAttributes>
+        </ECStructArrayProperty>
     </ECEntityClass>
+
+    <ECRelationshipClass typeName="CatchmentRationalComplexAreaDefinitionAspectOwnsChild" strength="embedding" modifier="Sealed">
+        <Source multiplicity="(0..1)" roleLabel="owned by" polymorphic="false">
+            <Class class="CatchmentRationalComplexAreaDefinitionAspect"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="owns" polymorphic="false">
+            <Class class="RationalChildArea"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="RationalChildArea" modifier="Sealed" description="The list of subareas that comprise the total area of the catchment. The weighted average of the rational c value will be used to compute the runoff.">
+        <BaseClass>bis:Element</BaseClass>
+        <ECProperty propertyName="RationalSubareaArea" typeName="double" displayLabel="Area" category="HydraulicData" kindOfQuantity="rru:AREA" description="The size of the subarea."/>
+        <ECProperty propertyName="RationalSubareaC" typeName="double" displayLabel="Rational C" category="HydraulicData" kindOfQuantity="rru:RATIONAL_COEFFICIENT" description="The Rational C coefficient to be applied to the current subarea."/>
+        <ECNavigationProperty propertyName="SurfaceDefinition" displayLabel="Surface Definition" category="HydraulicData" relationshipName="RationalChildAreaReferencesSurfaceDefinition" direction="Forward" />
+    </ECEntityClass>
+
+     <ECRelationshipClass typeName="RationalChildAreaReferencesSurfaceDefinition" strength="referencing" modifier="Sealed">
+        <Source multiplicity="(0..*)" roleLabel="referenced by" polymorphic="false">
+            <Class class="RationalChildArea"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="references" polymorphic="true">
+            <Class class="SurfaceDefinition"/>
+        </Target>
+    </ECRelationshipClass>
 
     <ECStructClass typeName="RationalSubarea" modifier="Sealed" description="The list of subareas that comprise the total area of the catchment. The weighted average of the rational c value will be used to compute the runoff.">
         <ECProperty propertyName="RationalSubareaArea" typeName="double" displayLabel="Area" category="HydraulicData" kindOfQuantity="rru:AREA" description="The size of the subarea."/>
