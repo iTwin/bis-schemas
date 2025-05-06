@@ -556,6 +556,10 @@ This behavior applies to all `RoleElement` subclasses.
 
 ## Relationship Classes
 
+### PhysicalTypeHasAdditionalRecipes
+
+The `RecipeDefinitionElement` already associated to a `TypeDefinition` via its _Recipe_ navigation-property shall not be also included in the associations captured by `PhysicalTypeHasAdditionalRecipes` instances.
+
 ### SpatialLocationModelBreaksDownTemplateRecipe3dInPlan
 
 The _IsPlanProjection_ property of the `SpatialLocationModel` breaking down a `TemplateRecipe3dInPlan` instance is expected to be set to true.
