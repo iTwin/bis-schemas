@@ -312,6 +312,7 @@
         <ECProperty propertyName="InfiltrationMethod" typeName="InfiltrationMethod" displayLabel="Infiltration Method" category="HydraulicData" description="Specify the infiltration method to calculate runoff when not using the Rational Method."/>
         <ECNavigationProperty propertyName="ActiveCalcOptions" displayLabel="Active Calc Options" relationshipName="GlobalSettingsOwnsCalcOptions" direction="Forward" />
         <ECNavigationProperty propertyName="ActiveRainfallEvent" displayLabel="Active Rainfall Event" relationshipName="GlobalSettingsOwnsRainfallEvent" direction="Forward" />
+        <ECProperty propertyName="IDFDuration" typeName="double" displayLabel="Duration (Modified Rational)" category="HydraulicData" kindOfQuantity="AECU:TIME" description="Specify the duration of an IDF storm when analyzing catchments with modified rational method."/> 
     </ECEntityClass>
 
     <ECRelationshipClass typeName="GlobalSettingsOwnsCalcOptions" strength="referencing" modifier="Sealed">
@@ -991,6 +992,12 @@
         </Target>
     </ECRelationshipClass>
 
+    <ECEntityClass typeName="SurfaceDefinition" displayLabel="Surface Definition">
+        <BaseClass>bis:DefinitionElement</BaseClass>
+        <ECProperty propertyName="RationalC" typeName="double" displayLabel="Rational C" category="HydraulicData" kindOfQuantity="rru:RATIONAL_COEFFICIENT" description="The runoff coefficient used with the Rational Method. C in Q=CiA."/>
+        <ECProperty propertyName="ScsCn" typeName="int" displayLabel="SCS CN" category="HydraulicData" description="Curve Number value to use by the SCS Infiltration method to define the characteristics of land surface of the catchment."/>
+    </ECEntityClass>
+
     <ECEntityClass typeName="Catchment" modifier="Sealed" displayLabel="Catchment">
         <BaseClass>anlyt:AnalyticalElement</BaseClass>
         <ECNavigationProperty propertyName="OutflowNode" displayLabel="Outflow Element" relationshipName="CatchmentDischargesToOutflowNode" direction="Forward" description="Specify the element which the catchment outflows." />
@@ -1120,10 +1127,53 @@
 
     <ECEntityClass typeName="CatchmentRationalComplexAreaDefinitionAspect" modifier="Sealed" displayLabel="CatchmentRationalComplexAreaAspect">
         <BaseClass >CatchmentAreaDefinitionAspect</BaseClass>
-        <ECStructArrayProperty propertyName="RationalSubareas" typeName="RationalSubarea" displayLabel="Subareas (Rational)" minOccurs="0" maxOccurs="unbounded" description="The list of subareas that comprise the total area of the catchment. The weighted average of the rational c value will be used to compute the runoff."/>
+        <ECStructArrayProperty propertyName="RationalSubareas" typeName="RationalSubarea" displayLabel="Subareas (Rational)" minOccurs="0" maxOccurs="unbounded" description="The list of subareas that comprise the total area of the catchment. The weighted average of the rational c value will be used to compute the runoff.">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.04"/>
+                <Deprecated xmlns="CoreCustomAttributes.01.00.04">
+                    <Description>Refactor required so child elements could reference surface definition.</Description>
+                </Deprecated>
+            </ECCustomAttributes>
+        </ECStructArrayProperty>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="CatchmentOwnsSubareas" strength="embedding" modifier="Sealed">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="owned by" polymorphic="false">
+            <Class class="Catchment"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="owns" polymorphic="true">
+            <Class class="Subarea"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="Subarea" modifier="abstract" description="Smaller area of the catchment which has consistent properties.">
+        <BaseClass>bis:InformationRecordElement</BaseClass>
+        <ECProperty propertyName="SubareaArea" typeName="double" displayLabel="Area" category="HydraulicData" kindOfQuantity="rru:AREA" description="The size of the subarea."/>
+        <ECNavigationProperty propertyName="SurfaceDefinition" displayLabel="Surface Definition" category="HydraulicData" relationshipName="SubareaReferencesSurfaceDefinition" direction="Forward" />
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="SubareaReferencesSurfaceDefinition" strength="referencing" modifier="Sealed">
+        <Source multiplicity="(0..*)" roleLabel="referenced by" polymorphic="true">
+            <Class class="Subarea"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="references" polymorphic="false">
+            <Class class="SurfaceDefinition"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="RationalMethodSubarea" modifier="Sealed" description="Rational Method version of a catchment subarea.">
+        <BaseClass>Subarea</BaseClass>
+        <ECProperty propertyName="RationalSubareaC" typeName="double" displayLabel="Rational C" category="HydraulicData" kindOfQuantity="rru:RATIONAL_COEFFICIENT" description="The Rational C coefficient to be applied to the current subarea."/>
     </ECEntityClass>
 
     <ECStructClass typeName="RationalSubarea" modifier="Sealed" description="The list of subareas that comprise the total area of the catchment. The weighted average of the rational c value will be used to compute the runoff.">
+        <ECCustomAttributes>
+            <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                <Description>Replaced with ECEntityClass RationalMethodSubarea.</Description>
+            </Deprecated>
+        </ECCustomAttributes>
+        
         <ECProperty propertyName="RationalSubareaArea" typeName="double" displayLabel="Area" category="HydraulicData" kindOfQuantity="rru:AREA" description="The size of the subarea."/>
         <ECProperty propertyName="RationalSubareaC" typeName="double" displayLabel="Rational C" category="HydraulicData" kindOfQuantity="rru:RATIONAL_COEFFICIENT" description="The Rational C coefficient to be applied to the current subarea."/>
     </ECStructClass>
@@ -1147,10 +1197,29 @@
 
     <ECEntityClass typeName="CatchmentScsUhComplexAreaDefinitionAspect" modifier="Sealed" displayLabel="CatchmentScsUhComplexAreaAspect">
         <BaseClass>CatchmentAreaDefinitionAspect</BaseClass>
-        <ECStructArrayProperty propertyName="ScsUhSubareas" typeName="ScsUhSubarea" displayLabel="Subareas (SCS UH)" minOccurs="0" maxOccurs="unbounded" description="The list of subareas that comprise the total area of the catchment. The weighted average of the CN value will be used to compute the runoff."/>
+        <ECStructArrayProperty propertyName="ScsUhSubareas" typeName="ScsUhSubarea" displayLabel="Subareas (SCS UH)" minOccurs="0" maxOccurs="unbounded" description="The list of subareas that comprise the total area of the catchment. The weighted average of the CN value will be used to compute the runoff.">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.04"/>
+                <Deprecated xmlns="CoreCustomAttributes.01.00.04">
+                    <Description>Refactor required so child elements could reference surface definition.</Description>
+                </Deprecated>
+            </ECCustomAttributes>
+         </ECStructArrayProperty>  
+    </ECEntityClass>
+
+    <ECEntityClass typeName="ScsUhMethodSubarea" modifier="Sealed" description="The list of subareas that comprise the total area of the catchment. The weighted average of the CN value will be used to compute the runoff.">
+        <BaseClass>Subarea</BaseClass>
+        <ECProperty propertyName="ScsUhSubareaCN" typeName="int" displayLabel="SCS CN" category="HydraulicData" />
+        <ECProperty propertyName="PercentConnectedImperviousArea" typeName="double" displayLabel="Percent Connected Impervious Area" category="HydraulicData" kindOfQuantity="rru:PERCENTAGE" />
+        <ECProperty propertyName="PercentUnconnectedImperviousArea" typeName="double" displayLabel="Percent Unconnected Impervious Area" category="HydraulicData" kindOfQuantity="rru:PERCENTAGE" />
     </ECEntityClass>
 
     <ECStructClass typeName="ScsUhSubarea" modifier="Sealed" description="The list of subareas that comprise the total area of the catchment. The weighted average of the CN value will be used to compute the runoff.">
+        <ECCustomAttributes>
+            <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                <Description>Replaced with ECEntityClass ScsUhMethodSubarea.</Description>
+            </Deprecated>
+        </ECCustomAttributes>
         <ECProperty propertyName="ScsUhSubareaArea" typeName="double" displayLabel="Area" category="HydraulicData" kindOfQuantity="rru:AREA" />
         <ECProperty propertyName="ScsUhSubareaCN" typeName="int" displayLabel="SCS CN" category="HydraulicData" />
         <ECProperty propertyName="PercentConnectedImperviousArea" typeName="double" displayLabel="Percent Connected Impervious Area" category="HydraulicData" kindOfQuantity="rru:PERCENTAGE" />
@@ -1332,13 +1401,27 @@
         <ECProperty propertyName="FillSideSlope" typeName="double" displayLabel="Fill Side Slope" category="HydraulicData" kindOfQuantity="rru:SIDE_SLOPE" description="The side slope of the fill on all four sides."/>
         <ECProperty propertyName="EndFill" typeName="double" displayLabel="End Fill" category="HydraulicData" kindOfQuantity="rru:LENGTH" description="The distance between ends of the storage chambers and the end of the surrounding fill."/>
         <ECNavigationProperty propertyName="StorageChamber" displayLabel="Storage Chamber" relationshipName="UndergroundStorageUsesAStorageChamber" direction="Forward" />
+        <ECProperty propertyName="IncludesHeader" typeName="boolean" displayLabel="Includes Header" category="HydraulicData" description="A header storage row can applied to the storage chamber system."/>   
+        <ECProperty propertyName="ChambersInHeader" typeName="int" displayLabel="Chambers in Header" category="HydraulicData" description="TThe number of chambers in header to the storage system."/>
+        <ECProperty propertyName="HeaderDistance" typeName="double" displayLabel="Header Distance" category="HydraulicData" kindOfQuantity="rru:LENGTH_SHORT" description="Distance between the header pipe and the main storage system."/>
+        <ECNavigationProperty propertyName="HeaderStorageChamber" displayLabel="Header Storage Chamber" relationshipName="UndergroundStorageHasHeaderStorageChamber" direction="Forward" />
+    
     </ECEntityClass>
 
     <ECRelationshipClass typeName="UndergroundStorageUsesAStorageChamber" strength="referencing" modifier="Sealed">
-        <Source multiplicity="(0..*)" roleLabel="bounded by" polymorphic="false">
+        <Source multiplicity="(0..*)" roleLabel="references" polymorphic="false">
             <Class class="UndergroundStorage"/>
         </Source>
-        <Target multiplicity="(0..1)" roleLabel="bounds" polymorphic="true">
+        <Target multiplicity="(0..1)" roleLabel="referenced" polymorphic="false">
+            <Class class="StorageChamberDefinition"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="UndergroundStorageHasHeaderStorageChamber" strength="referencing" modifier="Sealed">
+        <Source multiplicity="(0..*)" roleLabel="references" polymorphic="false">
+            <Class class="UndergroundStorage"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="referenced" polymorphic="false">
             <Class class="StorageChamberDefinition"/>
         </Target>
     </ECRelationshipClass>
