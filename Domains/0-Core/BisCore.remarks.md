@@ -553,3 +553,9 @@ An Entity is modeled as a `bis:RoleElement` when a set of external circumstances
 > Behavior: The system handler (C++) for `RoleElement` will only permit instances to be inserted into a `RoleModel`.
 This behavior applies to all `RoleElement` subclasses.
 `FunctionalElement` (from the `Functional` schema) is the most widely known subclass of `RoleElement`.
+
+## Relationship Classes
+
+### SpatialLocationModelBreaksDownTemplateRecipe3dInPlan
+
+The _IsPlanProjection_ property of the `SpatialLocationModel` breaking down a `TemplateRecipe3dInPlan` instance is expected to be set to true.
