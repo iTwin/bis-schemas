@@ -563,3 +563,15 @@ Concrete implementations of the `PhysicalTypeComposesSubTypes` relationship can 
 ### SpatialLocationModelBreaksDownTemplateRecipe3dInPlan
 
 The _IsPlanProjection_ property of the `SpatialLocationModel` breaking down a `TemplateRecipe3dInPlan` instance is expected to be set to true.
+
+### SpatialLocationTypeRepresentsTypeDefinition
+
+The `SpatialLocationTypeRepresentsTypeDefinition` relationship is the equivalent of the `SpatialLocationElementRepresentsElement` relationship but between `TypeDefinition`s. That is, it enables association of `TypeDefinitions` across modeling-perspectives.
+
+Consider the following example. A particular application has the need to manage `ManholeType` instances (subclass of `PhysicalType`) that need to capture semantics and _Template geometry_ applicable to different _Plan-Projection_ representations, each expected to use a different graphics for the same `ManholeType`. An example of such case involves the need to symbolize a Manhole participating in a Sewer system differently than a Manhole in a Storm system.
+
+The scenario presented in such example is addressed by introducing a `SpatialLocationType` instance for each different representation of a Physical `ManholeType` needed. In that case, the `SpatialLocationTypeRepresentsTypeDefinition` relationship is used to associate those `TypeDefinitions`. The following class-diagram and instance diagram depict this solution:
+
+![Class diagram](media/SpatialLocationTypeRepresents-classes.png)
+
+![Instance diagram](media/SpatialLocationTypeRepresents-instances.png)
