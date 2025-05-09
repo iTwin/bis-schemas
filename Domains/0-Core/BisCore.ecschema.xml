@@ -785,21 +785,21 @@
             <Class class="PhysicalMaterial"/>
         </Target>
     </ECRelationshipClass>
-    <ECRelationshipClass typeName="PhysicalTypeHasAdditionalRecipes" strength="referencing" modifier="None" description="A relationship associating one or more instances of bis:RecipeDefinitionElement with a particular bis:PhysicalType.">
-        <BaseClass>ElementRefersToElements</BaseClass>
-        <Source multiplicity="(0..*)" roleLabel="has" polymorphic="true">
-            <Class class="PhysicalType"/>
-        </Source>
-        <Target multiplicity="(0..*)" roleLabel="is associated to" polymorphic="true">
-            <Class class="RecipeDefinitionElement"/>
-        </Target>
-    </ECRelationshipClass>
     <ECEntityClass typeName="SpatialLocationType" modifier="Abstract" displayLabel="Spatial Location Type" description="Defines a shared set of properties whose values vary per-type of a bis:SpatialLocationElement rather than per-instance.">
         <BaseClass>TypeDefinitionElement</BaseClass>
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.01.00.00"/>
         </ECCustomAttributes>
     </ECEntityClass>
+    <ECRelationshipClass typeName="SpatialLocationTypeRepresentsTypeDefinition" strength="referencing" modifier="None" description="Relates a bis:SpatialLocationType to the bis:TypeDefinitionElement that it represents.">
+        <BaseClass>ElementRefersToElements</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="represents" polymorphic="true">
+            <Class class="SpatialLocationType"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is represented by" polymorphic="true">
+            <Class class="TypeDefinitionElement"/>
+        </Target>
+    </ECRelationshipClass>
 
     <ECRelationshipClass typeName="TypeDefinitionHasRecipe" strength="referencing" modifier="Abstract">
         <!-- @see TypeDefinitionElement.Recipe ECNavigationProperty -->
@@ -901,6 +901,11 @@
         <BaseClass>ISubModeledElement</BaseClass>
     </ECEntityClass>
 
+    <ECEnumeration typeName="ThumbnailImageFormat" backingTypeName="string" isStrict="true" description="Supported MIME-type formats for Thumbnail images.">
+        <ECEnumerator value="image/jpeg" name="Jpeg" displayLabel="Jpeg"/>
+        <ECEnumerator value="image/png" name="Png" displayLabel="Png"/>
+    </ECEnumeration>
+
     <ECEntityClass typeName="DefinitionThumbnail" modifier="None" displayLabel="Thumbnail" description="A bis:DefinitionElement that captures the Thumbnail of one or more bis:DefinitionElement instances.">
         <BaseClass>DefinitionElement</BaseClass>
         <ECProperty propertyName="Image" typeName="binary" displayLabel="Image" description="Image of the Thumbnail.">
@@ -908,7 +913,7 @@
                 <HiddenProperty xmlns="CoreCustomAttributes.01.00.03"/>
             </ECCustomAttributes>
         </ECProperty>
-        <ECProperty propertyName="ImageFormat" typeName="string" displayLabel="Image Format" description="Format of the Image captured as MIME-type.">
+        <ECProperty propertyName="ImageFormat" typeName="ThumbnailImageFormat" displayLabel="Image Format" description="Format of the Image captured as MIME-type.">
             <ECCustomAttributes>
                 <HiddenProperty xmlns="CoreCustomAttributes.01.00.03"/>
             </ECCustomAttributes>
@@ -2333,6 +2338,11 @@
         <ECProperty propertyName="Data" typeName="string" extendedTypeName="Json" description="Encoded style properties" />
     </ECEntityClass>
 
+    <ECEnumeration typeName="TextureFormat" backingTypeName="int" isStrict="true" description="Supported Formats for texture data.">
+        <ECEnumerator value="0" name="Jpeg" displayLabel="Jpeg"/>
+        <ECEnumerator value="2" name="Png" displayLabel="Png"/>
+    </ECEnumeration>
+
     <ECEntityClass typeName="Texture" modifier="Sealed" description="A bis:Texture represents a named texture used for rendering purposes. The texture data is stored as a binary blob interpreted according to the specified texture format.">
         <BaseClass>DefinitionElement</BaseClass>
         <ECCustomAttributes>
@@ -2350,7 +2360,7 @@
                 <HiddenProperty xmlns="CoreCustomAttributes.01.00.03"/>
             </ECCustomAttributes>
         </ECProperty>
-        <ECProperty propertyName="Format" typeName="int" description="Format of the encoded texture data. See the ImageSourceFormat enum in the API.">
+        <ECProperty propertyName="Format" typeName="TextureFormat" description="Format of the encoded texture data.">
             <ECCustomAttributes>
                 <!-- IsNullable=False -->
                 <CustomHandledProperty xmlns="BisCore.01.00.16"/>

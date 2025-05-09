@@ -556,10 +556,6 @@ This behavior applies to all `RoleElement` subclasses.
 
 ## Relationship Classes
 
-### PhysicalTypeHasAdditionalRecipes
-
-The `RecipeDefinitionElement` already associated to a `TypeDefinition` via its _Recipe_ navigation-property shall not be also included in the associations captured by `PhysicalTypeHasAdditionalRecipes` instances.
-
 ### PhysicalTypeComposesSubTypes
 
 Concrete implementations of the `PhysicalTypeComposesSubTypes` relationship can use the inherited _PriorityMember_ property to introduce ordering among the composed PhysicalType instances, when needed. In that case, the numeric values assigned to such property shall be the result of a convention adopted in a given domain or application.
