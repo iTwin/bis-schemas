@@ -30,7 +30,7 @@
     <PropertyCategory typeName="ParkingBayVertex_Bay" displayLabel="Bay" priority="0" />
     <PropertyCategory typeName="ParkingAisleVertex_Aisle" displayLabel="Aisle" priority="0" />
 
-    <PropertyCategory typeName="ShapedEdge_LinkHeight" displayLabel="Grading Link Height" priority="0" />
+    <PropertyCategory typeName="ShapedEdge_LinkHeight" displayLabel="Grading Edge Height" priority="0" />
     <PropertyCategory typeName="BuildingEdge_SlopeAway" displayLabel="Grading Slope Away" priority="0" />
     <PropertyCategory typeName="PropertyEdge_Setbacks" displayLabel="Setbacks" priority="0" />
     <PropertyCategory typeName="CenterlinePathEdge_Grading" displayLabel="Grading" priority="0" />
@@ -229,7 +229,15 @@
     <ECEntityClass typeName="ShapedEdge" modifier="Abstract" displayLabel="Shaped Edge" description="Edge class for physical objects such as buildings.">
         <BaseClass>AreaEdge</BaseClass>
 
-        <ECProperty propertyName="LinkHeight" typeName="double" kindOfQuantity="rru:LENGTH" category="ShapedEdge_LinkHeight" displayLabel="Link Height" description="Height of an edge." />
+        <ECProperty propertyName="LinkHeight" typeName="double" kindOfQuantity="rru:LENGTH" category="ShapedEdge_LinkHeight" displayLabel="Link Height" description="Height of an edge." >
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03" />
+                <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                    <Description>Link Height has been moved to BuildingEdge and PadEdge and renamed to Fixed Height Difference.</Description>
+                </Deprecated>
+            </ECCustomAttributes>
+        </ECProperty>
+
         <ECProperty propertyName="UseWallInCost" typeName="boolean" category="ShapedEdge_LinkHeight" displayLabel="Use Wall in Cost" description="Treat as a wall for cost optimization." />
     </ECEntityClass>
 
@@ -259,6 +267,7 @@
 
         <ECProperty propertyName="SlopeAway" typeName="double" kindOfQuantity="rru:SLOPE" category="BuildingEdge_SlopeAway" displayLabel="Slope Away" description="Slope away from edge for grading." />
         <ECProperty propertyName="SlopeAwayDistance" typeName="double" kindOfQuantity="rru:LENGTH" category="BuildingEdge_SlopeAway" displayLabel="Slope Away Distance" description="Distance of the slope away from edge for grading." />
+        <ECProperty propertyName="FixedHeightDifference" typeName="double" kindOfQuantity="rru:LENGTH" category="ShapedEdge_LinkHeight" displayLabel="Fixed Height Difference" description="Height of an edge." />
     </ECEntityClass>
 
     <ECEntityClass typeName="ParkingEdge" modifier="Sealed" displayLabel="Parking Edge">
@@ -283,6 +292,7 @@
 
     <ECEntityClass typeName="PadEdge" modifier="Sealed" displayLabel="Pad Edge">
         <BaseClass>ShapedEdge</BaseClass>
+        <ECProperty propertyName="FixedHeightDifference" typeName="double" kindOfQuantity="rru:LENGTH" category="ShapedEdge_LinkHeight" displayLabel="Fixed Height Difference" description="Height of an edge." />
     </ECEntityClass>
 
     <ECEntityClass typeName="LayoutParkingEdge" modifier="Sealed" displayLabel="Layout Parking Edge" description="Parking lot">
@@ -711,7 +721,7 @@
     <ECEntityClass typeName="BreaklinePath" modifier="Sealed" displayLabel="Breakline Path" description="Breakline path.">
         <BaseClass>GradingPath</BaseClass>
     </ECEntityClass>
-    
+
     <ECEntityClass typeName="CachedLinear" modifier="Sealed" displayLabel="Cached Linear" description="Cached 3D Linear geometry.">
         <BaseClass>bis:SpatialLocationElement</BaseClass>
         <ECCustomAttributes>
