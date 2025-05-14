@@ -3,7 +3,7 @@
 |  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
 |  * See LICENSE.md in the project root for license terms and full copyright notice.
 ======================================================================================= -->
-<ECSchema schemaName="CifCommon" alias="cifcmn" version="01.00.11" description="iModel Connector schema containing aspect classes with common properties from Civil Infrastructure Framework (CIF) applications." xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
+<ECSchema schemaName="CifCommon" alias="cifcmn" version="01.00.13" description="iModel Connector schema containing aspect classes with common properties from Civil Infrastructure Framework (CIF) applications." xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
     <ECSchemaReference name="BisCore" version="01.00.16" alias="bis"/>
     <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
     <ECSchemaReference name="CifUnits" version="01.00.08" alias="cifu"/>
@@ -780,8 +780,24 @@
         <ECProperty propertyName="MeshSurfaceEntity_PlanarArea" typeName="double" displayLabel="Planar Area" category="MeshQuantities_Civil_Quantities" priority="299910" kindOfQuantity="cifu:AREA"/>
         <ECProperty propertyName="MeshSurfaceEntity_CivilVolume" typeName="double" displayLabel="Volume" category="MeshQuantities_Civil_Quantities" priority="299900" kindOfQuantity="cifu:VOLUME"/>
         <ECProperty propertyName="VolumeOption" typeName="MeshSurfaceEntityAspect_VolumeOption_Enum" displayLabel="Volume Option" category="MeshSurfaceEntity_Component_Layer" priority="299925"/>
-        <ECProperty propertyName="MeshSurfaceEntity_StartStationNumeric" typeName="double" displayLabel="Start Station" category="MeshSurfaceEntity_Component_Layer" priority="299950" kindOfQuantity="cifu:LENGTH"/>
-        <ECProperty propertyName="MeshSurfaceEntity_EndStationNumeric" typeName="double" displayLabel="End Station" category="MeshSurfaceEntity_Component_Layer" priority="299940" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="MeshSurfaceEntity_StartStationNumeric" typeName="double" displayLabel="Start Station [Deprecated 2024]" category="MeshSurfaceEntity_Component_Layer" priority="299950" kindOfQuantity="cifu:LENGTH">
+            <ECCustomAttributes>
+                <Deprecated xmlns="CoreCustomAttributes.01.00.04">
+                    <Description>Replaced by the new MeshSurfaceEntity_StartStationFormatted property.</Description>
+                </Deprecated>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.04"/>
+            </ECCustomAttributes>
+        </ECProperty>
+        <ECProperty propertyName="MeshSurfaceEntity_EndStationNumeric" typeName="double" displayLabel="End Station [Deprecated 2024]" category="MeshSurfaceEntity_Component_Layer" priority="299940" kindOfQuantity="cifu:LENGTH">
+            <ECCustomAttributes>
+                <Deprecated xmlns="CoreCustomAttributes.01.00.04">
+                    <Description>Replaced by the new MeshSurfaceEntity_EndStationFormatted property.</Description>
+                </Deprecated>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.04"/>
+            </ECCustomAttributes>
+        </ECProperty>
+        <ECProperty propertyName="MeshSurfaceEntity_EndStationFormatted" typeName="string" displayLabel="End Station" category="MeshSurfaceEntity_Component_Layer" priority="299940" kindOfQuantity="cifu:STATION"/>
+        <ECProperty propertyName="MeshSurfaceEntity_StartStationFormatted" typeName="string" displayLabel="Start Station" category="MeshSurfaceEntity_Component_Layer" priority="299940" kindOfQuantity="cifu:STATION"/>
     </ECEntityClass>
     <ECRelationshipClass typeName="ElementOwnsMeshSurfaceEntityAspect" modifier="None" strength="embedding">
         <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
@@ -790,6 +806,20 @@
         </Source>
         <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
             <Class class="MeshSurfaceEntityAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="NamedBoundaryAspect">
+        <BaseClass>CivilPresentation</BaseClass>
+        <ECProperty propertyName="Name" typeName="string" displayLabel="Name" category="NamedBoundary_Category" priority="299994" />
+        <ECProperty propertyName="ViewType" typeName="string" displayLabel="View Type" category="NamedBoundary_Category" priority="299994"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsNamedBoundaryAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="NamedBoundaryAspect"/>
         </Target>
     </ECRelationshipClass>
     <ECEntityClass typeName="ObjectStatusAspect">
@@ -1657,6 +1687,7 @@
     <PropertyCategory typeName="Miscellaneous_Station_Equation" description="Miscellaneous" displayLabel="Station Equation" priority="0"/>
     <PropertyCategory typeName="Miscellaneous_StationEquation_Presentation" description="Miscellaneous" displayLabel="StationEquation_Presentation" priority="0"/>
     <PropertyCategory typeName="Name_General_Category" description="Name" displayLabel="General Category" priority="300000"/>
+    <PropertyCategory typeName="NamedBoundary_Category" description="Named Boundary properties" displayLabel="Named Boundary" priority="299999"/>
     <PropertyCategory typeName="ParametricConstraint_Parametric_Constraint" description="ParametricConstraint" displayLabel="Parametric Constraint" priority="199800"/>
     <PropertyCategory typeName="PointControl_PointControl" description="PointControl" displayLabel="PointControl" priority="199800"/>
     <PropertyCategory typeName="PointGroupCategoryAttributes_Point_Group" description="PointGroupCategoryAttributes" displayLabel="Point Group" priority="4294966996"/>

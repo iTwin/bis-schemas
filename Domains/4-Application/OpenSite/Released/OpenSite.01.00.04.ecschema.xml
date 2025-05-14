@@ -1,0 +1,971 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ==================================================================================
+|  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
+|  * See LICENSE.md in the project root for license terms and full copyright notice.
+======================================================================================= -->
+<ECSchema schemaName="OpenSite" alias="opnsite" version="01.00.04" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" displayLabel="OpenSite" description="OpenSite+ application schema.">
+    <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA" />
+    <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
+    <ECSchemaReference name="BisCore" version="01.00.10" alias="bis" />
+    <ECSchemaReference name="LinearReferencing" version="02.00.03" alias="lr" />
+    <ECSchemaReference name="RoadRailUnits" version="01.00.02" alias="rru" />
+    <ECSchemaReference name="SpatialComposition" version="01.00.01" alias="spcomp" />
+    <ECSchemaReference name="StormSewerPhysical" version="01.00.00" alias="stmswrphys" />
+
+    <ECCustomAttributes>
+        <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
+            <SupportedUse>FieldTesting</SupportedUse>
+        </ProductionStatus>
+        <SchemaLayerInfo xmlns="BisCustomAttributes.01.00.00">
+            <Value>Application</Value>
+        </SchemaLayerInfo>
+    </ECCustomAttributes>
+
+    <PropertyCategory typeName="DrivewayEndVertex_CulDeSac" displayLabel="Cul-de-sac" priority="0" />
+    <PropertyCategory typeName="DrivewayEndVertex_Flares" displayLabel="Flares" priority="0" />
+    <PropertyCategory typeName="DrivewayMidVertex_Transition" displayLabel="Transition" priority="0" />
+    <PropertyCategory typeName="ParkingSpaceVertex_Parking" displayLabel="Parking" priority="0" />
+    <PropertyCategory typeName="ParkingIslandVertex_Island" displayLabel="Island" priority="0" />
+    <PropertyCategory typeName="ParkingBayVertex_Bay" displayLabel="Bay" priority="0" />
+    <PropertyCategory typeName="ParkingAisleVertex_Aisle" displayLabel="Aisle" priority="0" />
+
+    <PropertyCategory typeName="ShapedEdge_LinkHeight" displayLabel="Grading Link Height" priority="0" />
+    <PropertyCategory typeName="BuildingEdge_SlopeAway" displayLabel="Grading Slope Away" priority="0" />
+    <PropertyCategory typeName="PropertyEdge_Setbacks" displayLabel="Setbacks" priority="0" />
+    <PropertyCategory typeName="CenterlinePathEdge_Grading" displayLabel="Grading" priority="0" />
+    <PropertyCategory typeName="CenterlinePathEdge_Drainage" displayLabel="Drainage" priority="0" />
+    <PropertyCategory typeName="DrivewayPathEdge_Median" displayLabel="Median" priority="0" />
+    <PropertyCategory typeName="DrivewayPathEdge_Crowning" displayLabel="Crowning" priority="0" />
+    <PropertyCategory typeName="DrivewayPathFin_Road" displayLabel="Road" priority="0" />
+    <PropertyCategory typeName="DrivewayPathFin_Shoulder" displayLabel="Shoulder" priority="0" />
+
+    <PropertyCategory typeName="ShapedArea_Optimizer" displayLabel="Optimizer" priority="0" />
+    <PropertyCategory typeName="ShapedArea_Constraints" displayLabel="Constraints" priority="0" />
+    <PropertyCategory typeName="ShapedArea_Surface" displayLabel="Surface" priority="0" />
+    <PropertyCategory typeName="LayoutParkingArea_Parking" displayLabel="Parking" priority="0" />
+    <PropertyCategory typeName="LayoutParkingArea_ParkingAisle" displayLabel="Parking Aisle" priority="0" />
+    <PropertyCategory typeName="LayoutParkingArea_ParkingIsland" displayLabel="Parking Island" priority="0" />
+    <PropertyCategory typeName="LayoutParkingArea_ParkingBay" displayLabel="Parking Bay" priority="0" />
+    <PropertyCategory typeName="LayoutParkingArea_ParkingGrading" displayLabel="Parking Grading" priority="0" />
+    <PropertyCategory typeName="GradingArea_Optimizer" displayLabel="Optimizer" priority="0" />
+    <PropertyCategory typeName="GradingArea_Surface" displayLabel="Surface" priority="0" />
+    <PropertyCategory typeName="GradingArea_Constraints" displayLabel="Constraints" priority="0" />
+    <PropertyCategory typeName="LayoutPondArea_Pond" displayLabel="Pond" priority="0" />
+
+    <PropertyCategory typeName="DrivewayPath_Direction" displayLabel="Direction" priority="0" />
+    <PropertyCategory typeName="ParkingRowPath_Parking" displayLabel="Parking" priority="0" />
+
+    <PropertyCategory typeName="EdgeAisleAspect_Aisle" displayLabel="Aisle" priority="0" />
+    <PropertyCategory typeName="EdgeParkingAspect_Parking" displayLabel="Parking" priority="0" />
+    <PropertyCategory typeName="EdgeSidewalkAspect_Sidewalk" displayLabel="Sidewalk" priority="0" />
+    <PropertyCategory typeName="EdgeCurbAspect_Curb" displayLabel="Curb" priority="0" />
+    <PropertyCategory typeName="EdgeOnSideParkingAspect_Parking" displayLabel="OnSide Parking" priority="0" />
+    <PropertyCategory typeName="EdgeOnSideParkingAspect_Grading" displayLabel="OnSide Parking Grading" priority="0" />
+
+    <ECEnumeration typeName="IslandType" backingTypeName="int" isStrict="true" displayLabel="Island Type" description="Describes the parking island construction type.">
+        <ECEnumerator value="0" name="UNSET" displayLabel="Not Set" />
+        <ECEnumerator value="1" name="LANDSCAPED" displayLabel="Landscaped" />
+        <ECEnumerator value="2" name="RAISED_CONCRETE" displayLabel="Raised Concrete" />
+        <ECEnumerator value="3" name="RAISED_ASPHALT" displayLabel="Raised Asphalt" />
+        <ECEnumerator value="4" name="PAINTED_LINES" displayLabel="Painted Lines" />
+    </ECEnumeration>
+
+    <ECEnumeration typeName="ControlType" backingTypeName="int" isStrict="true" displayLabel="Control Type">
+        <ECEnumerator value="1" name="USER_CONTROL" displayLabel="User Controlled" />
+        <ECEnumerator value="2" name="COMPUTER_CONTROL" displayLabel="Computer Controlled" />
+    </ECEnumeration>
+
+    <ECEnumeration typeName="SurfaceType" backingTypeName="int" isStrict="true" displayLabel="Surface Type" description="Describes a design surface usage and/or material.">
+        <ECEnumerator value="-1" name="UNSET" displayLabel="Not Set" />
+        <ECEnumerator value="0" name="NONE" displayLabel="None" />
+        <ECEnumerator value="1" name="LIGHT_PAVING" displayLabel=" Light Paving" />
+        <ECEnumerator value="2" name="HEAVY_PAVING" displayLabel="Heavy Paving" />
+        <ECEnumerator value="3" name="LIGHT_CONCRETE" displayLabel="Light Concrete" />
+        <ECEnumerator value="4" name="HEAVY_CONCRETE" displayLabel="Heavy Concrete" />
+        <ECEnumerator value="5" name="PEDESTRIAN_CONCRETE" displayLabel="Pedestrian Concrete" />
+        <ECEnumerator value="6" name="LIGHT_PAVING_STREET" displayLabel="Light Paving Street" />
+        <ECEnumerator value="7" name="HEAVY_PAVING_STREET" displayLabel="Heavy Paving Street" />
+        <ECEnumerator value="8" name="LIGHT_CONCRETE_STREET" displayLabel="Light Concrete Street" />
+        <ECEnumerator value="9" name="HEAVY_CONCRETE_STREET" displayLabel="Heavy Concrete Street" />
+        <ECEnumerator value="10" name="PEDESTRIAN_ASPHALT" displayLabel="Pedestrian Asphalt" />
+        <ECEnumerator value="12" name="GRAVEL" displayLabel="Gravel" />
+        <ECEnumerator value="20" name="ALT1" displayLabel="Alternative One" />
+        <ECEnumerator value="21" name="ALT2" displayLabel="Alternative Two" />
+        <ECEnumerator value="22" name="ALT3" displayLabel="Alternative Three" />
+    </ECEnumeration>
+
+    <ECEnumeration typeName="CrownType" backingTypeName="int" isStrict="true" displayLabel="Crown Type" description="Describes how a road or driveway design is crowned.">
+        <ECEnumerator value="1" name="CROWN" displayLabel="Crown" />
+        <ECEnumerator value="2" name="SHED" displayLabel="Shed" />
+        <ECEnumerator value="3" name="INVERT_CROWN" displayLabel="Inverted Crown" />
+        <ECEnumerator value="4" name="FLEXIBLE" displayLabel="Flexible" />
+    </ECEnumeration>
+
+    <ECEntityClass typeName="Vertex" modifier="Abstract" displayLabel="Vertex">
+        <BaseClass>bis:SpatialLocationElement</BaseClass>
+
+        <ECProperty propertyName="Location" typeName="Point3d" />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="AreaVertex" modifier="Sealed" displayLabel="Area Vertex">
+        <BaseClass>Vertex</BaseClass>
+
+        <ECProperty propertyName="Radius" typeName="double" kindOfQuantity="rru:LENGTH" />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="PathVertex" modifier="Abstract" displayLabel="Path Vertex">
+        <BaseClass>Vertex</BaseClass>
+
+        <ECProperty propertyName="Radius" typeName="double" kindOfQuantity="rru:LENGTH" />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="PathEndVertex" modifier="None" displayLabel="Path End Vertex" description="Path Vertex that is located at the start or end of a Path, in other words, it only has a single PathEdge attached to it">
+        <BaseClass>Vertex</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="PathMidVertex" modifier="None" displayLabel="Path Mid Vertex" description="Path Vertex that has two PathEdge instances attached to it, in other words.">
+        <BaseClass>Vertex</BaseClass>
+
+        <ECProperty propertyName="Radius" typeName="double" kindOfQuantity="rru:LENGTH" />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="DrivewayEndVertex" modifier="Sealed" displayLabel="Driveway End Vertex" description="The first and last Vertex of a DrivewayPath.">
+        <BaseClass>PathEndVertex</BaseClass>
+
+        <ECProperty propertyName="CuldesacRadius" typeName="double" kindOfQuantity="rru:LENGTH" category="DrivewayEndVertex_CulDeSac" displayLabel="Radius" description="Radius of cul-de-sac." />
+        <ECProperty propertyName="CuldesacOffset" typeName="double" kindOfQuantity="rru:LENGTH" category="DrivewayEndVertex_CulDeSac" displayLabel="Offset" description="Offset of cul-de-sac, negative for left." />
+        <ECProperty propertyName="CuldesacROWRadius" typeName="double" kindOfQuantity="rru:LENGTH" category="DrivewayEndVertex_CulDeSac" displayLabel="ROW Radius" description="Cul-de-sac right of way entrance radius." />
+        <ECProperty propertyName="CuldesacROWReturnRadius" typeName="double" kindOfQuantity="rru:LENGTH" category="DrivewayEndVertex_CulDeSac" displayLabel="ROW Return Radius" description="Cul-de-sac right of way exit radius." />
+
+        <ECProperty propertyName="EntranceFlareRadius" typeName="double" kindOfQuantity="rru:LENGTH" category="DrivewayEndVertex_Flares" displayLabel="Entrance Radius" description="Sets the size of the flared entrance radius. Exit will be defined by the drive side of the road." />
+        <ECProperty propertyName="ExitFlareRadius" typeName="double" kindOfQuantity="rru:LENGTH" category="DrivewayEndVertex_Flares" displayLabel="Exit Radius" description="Sets the size of the flared exit radius.  Entrance will be defined by the drive side of the road." />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="DrivewayMidVertex" modifier="Sealed" displayLabel="Driveway Mid Vertex" description="Vertex of a DrivewayPath that is attached to two DrivewayPathEdge instances.">
+        <BaseClass>PathMidVertex</BaseClass>
+
+        <ECProperty propertyName="SideTransitionOffset" typeName="double" kindOfQuantity="rru:LENGTH" category="DrivewayMidVertex_Transition" displayLabel="Transition Offset" description="The transition offset distance." />
+        <ECProperty propertyName="SideTransitionRadius1" typeName="double" kindOfQuantity="rru:LENGTH" category="DrivewayMidVertex_Transition" displayLabel="Transition Inner Radius" description="The inner radius of the transition." />
+        <ECProperty propertyName="SideTransitionRadius2" typeName="double" kindOfQuantity="rru:LENGTH" category="DrivewayMidVertex_Transition" displayLabel="Transition Outer Radius" description="The outer radius of the transition." />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="ParkingVertex" modifier="Abstract" displayLabel="Parking Vertex">
+        <BaseClass>Vertex</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="ParkingSpaceVertex" modifier="Sealed" displayLabel="Parking Space Vertex" description="Defines a location point which overrides parking space settings.">
+        <BaseClass>ParkingVertex</BaseClass>
+
+        <ECProperty propertyName="ParkingNumber" typeName="int" category="ParkingSpaceVertex_Parking" displayLabel="Number of Spaces" description="Number of spaces to be overridden by a parking vertex." />
+        <ECProperty propertyName="ParkingWidth" typeName="double" category="ParkingSpaceVertex_Parking" kindOfQuantity="rru:LENGTH" displayLabel="Space Width" description="Width to be used for a parking vertex override." />
+        <ECProperty propertyName="ParkingSurfaceType" typeName="SurfaceType" category="ParkingSpaceVertex_Parking" displayLabel="Surface Type" description="Surface type defined by a parking vertex override." />
+        <ECProperty propertyName="ParkingMinSlope" typeName="double" category="ParkingSpaceVertex_Parking" kindOfQuantity="rru:SLOPE" displayLabel="Min. Slope" description="Minimum slope defined by a parking vertex override." />
+        <ECProperty propertyName="ParkingMaxSlope" typeName="double" category="ParkingSpaceVertex_Parking" kindOfQuantity="rru:SLOPE" displayLabel="Max. Slope" description="Maximum slope defined by a parking vertex override." />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="ParkingBayVertex" modifier="Sealed" displayLabel="Parking Bay Vertex" description="Defines a location point to override an entire parking bay settings.">
+        <BaseClass>ParkingVertex</BaseClass>
+
+        <ECProperty propertyName="BayMedianWidth" typeName="double" category="ParkingBayVertex_Bay" kindOfQuantity="rru:LENGTH" displayLabel="Median Width" description="Median width defined by a bay override." />
+        <ECProperty propertyName="ParkingDepth" typeName="double" category="ParkingBayVertex_Bay" kindOfQuantity="rru:LENGTH" displayLabel="Parking Depth Primary" description="Defines the bay override parking depth for primary side." />
+        <ECProperty propertyName="ParkingDepthOther" typeName="double" category="ParkingBayVertex_Bay" kindOfQuantity="rru:LENGTH" displayLabel="Parking Depth Secondary" description="Defines the bay override parking depth for secondary side." />
+        <ECProperty propertyName="ParkingAngle" typeName="double" category="ParkingBayVertex_Bay" kindOfQuantity="rru:ANGLE" displayLabel="Parking Angle Primary" description="Defines the bay override parking angle for primary side." />
+        <ECProperty propertyName="ParkingAngleOther" typeName="double" category="ParkingBayVertex_Bay" kindOfQuantity="rru:ANGLE" displayLabel="Parking Angle Secondary" description="Defines the bay override parking angle for secondary side." />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="ParkingAisleVertex" modifier="Sealed" displayLabel="Parking Aisle Vertex" description="Defines a location point to override a parking aisle settings.">
+        <BaseClass>ParkingVertex</BaseClass>
+
+        <ECProperty propertyName="AisleWidth" typeName="double" category="ParkingAisleVertex_Aisle" kindOfQuantity="rru:LENGTH" displayLabel="Aisle Width" description="Defines the aisle override width." />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="ParkingIslandVertex" modifier="Sealed" displayLabel="Parking Island Vertex" description="Defines a location point to override a parking island settings.">
+        <BaseClass>ParkingVertex</BaseClass>
+
+        <ECProperty propertyName="IslandWidth" typeName="double" category="ParkingIslandVertex_Island" kindOfQuantity="rru:LENGTH" displayLabel="Island Width" description="Defines the island override for it's width." />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="Edge" modifier="Abstract">
+        <BaseClass>bis:SpatialLocationElement</BaseClass>
+
+        <ECProperty propertyName="Order" typeName="int">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03" />
+            </ECCustomAttributes>
+        </ECProperty>
+
+        <ECNavigationProperty propertyName="StartVertex" relationshipName="EdgeStartsAtVertex" direction="Forward" />
+        <ECNavigationProperty propertyName="EndVertex" relationshipName="EdgeEndsAtVertex" direction="Forward" />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="AreaEdge" modifier="Abstract" displayLabel="Area Edge">
+        <BaseClass>Edge</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="ShapedEdge" modifier="Abstract" displayLabel="Shaped Edge" description="Edge class for physical objects such as buildings.">
+        <BaseClass>AreaEdge</BaseClass>
+
+        <ECProperty propertyName="LinkHeight" typeName="double" kindOfQuantity="rru:LENGTH" category="ShapedEdge_LinkHeight" displayLabel="Link Height" description="Height of an edge." />
+        <ECProperty propertyName="UseWallInCost" typeName="boolean" category="ShapedEdge_LinkHeight" displayLabel="Use Wall in Cost" description="Treat as a wall for cost optimization." />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="PropertyEdge" modifier="Sealed" displayLabel="Property Edge">
+        <BaseClass>ShapedEdge</BaseClass>
+
+        <ECProperty propertyName="ParkingSetback" typeName="double" kindOfQuantity="rru:LENGTH" category="PropertyEdge_Setbacks" displayLabel="Parking Setback" />
+        <ECProperty propertyName="BuildingSetback" typeName="double" kindOfQuantity="rru:LENGTH" category="PropertyEdge_Setbacks" displayLabel="Building Setback" />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="BuildingEdge" modifier="Sealed" displayLabel="Building Edge">
+        <BaseClass>ShapedEdge</BaseClass>
+
+        <ECProperty propertyName="SlopeAway" typeName="double" kindOfQuantity="rru:SLOPE" category="BuildingEdge_SlopeAway" displayLabel="Slope Away" description="Slope away from edge for grading." />
+        <ECProperty propertyName="SlopeAwayDistance" typeName="double" kindOfQuantity="rru:LENGTH" category="BuildingEdge_SlopeAway" displayLabel="Slope Away Distance" description="Distance of the slope away from edge for grading." />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="ParkingEdge" modifier="Sealed" displayLabel="Parking Edge">
+        <BaseClass>ShapedEdge</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="IslandEdge" modifier="Sealed" displayLabel="Island Edge">
+        <BaseClass>ShapedEdge</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="SidewalkEdge" modifier="Sealed" displayLabel="Sidewalk Edge">
+        <BaseClass>ShapedEdge</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="DrivewayAreaEdge" modifier="Sealed" displayLabel="Driveway Area Edge">
+        <BaseClass>ShapedEdge</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="PondEdge" modifier="Sealed" displayLabel="Pond Edge">
+        <BaseClass>ShapedEdge</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="PadEdge" modifier="Sealed" displayLabel="Pad Edge">
+        <BaseClass>ShapedEdge</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="LayoutParkingEdge" modifier="Sealed" displayLabel="Parking Lot Edge" description="Parking lot">
+        <BaseClass>AreaEdge</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="PathEdge" modifier="None" displayLabel="Path Edge">
+        <BaseClass>Edge</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="CenterlinePathEdge" modifier="None" displayLabel="Centerline Path Edge" description="Centerline of a path.">
+        <BaseClass>PathEdge</BaseClass>
+
+        <ECProperty propertyName="MinDriveSlope" typeName="double" kindOfQuantity="rru:SLOPE" category="CenterlinePathEdge_Grading" displayLabel="Min. Slope" description="Minimum path slope for design." />
+        <ECProperty propertyName="MaxDriveSlope" typeName="double" kindOfQuantity="rru:SLOPE" category="CenterlinePathEdge_Grading" displayLabel="Max. Slope" description="Maximum path slope for design." />
+        <ECProperty propertyName="SurfaceType" typeName="SurfaceType" category="CenterlinePathEdge_Grading" displayLabel="Surface Type" description="Surface material type for path." />
+        <ECProperty propertyName="SurfaceDepth" typeName="double" kindOfQuantity="rru:LENGTH_SHORT" category="CenterlinePathEdge_Grading" displayLabel="Surface Depth" description="Surface material depth for path." />
+        <ECProperty propertyName="MinZ" typeName="double" kindOfQuantity="rru:LENGTH" category="CenterlinePathEdge_Grading" displayLabel="Min. Elevation" description="Minimum design elevation for path." />
+        <ECProperty propertyName="MaxZ" typeName="double" kindOfQuantity="rru:LENGTH" category="CenterlinePathEdge_Grading" displayLabel="Max. Elevation" description="Maximum design elevation for path." />
+
+        <ECProperty propertyName="RunoffC" typeName="double" category="CenterlinePathEdge_Drainage" displayLabel="Runoff Coefficient" description="Runoff coefficient for path." />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="DrivewayPathEdge" modifier="Sealed" displayLabel="Driveway Edge" description="Centerline of a driveway.">
+        <BaseClass>CenterlinePathEdge</BaseClass>
+        <BaseClass>bis:IParentElement</BaseClass>
+
+        <ECProperty propertyName="MedianType" typeName="SurfaceType" category="DrivewayPathEdge_Median" displayLabel="Type" description="Median type along path." />
+        <ECProperty propertyName="MedianWidth" typeName="double" kindOfQuantity="rru:LENGTH"  category="DrivewayPathEdge_Median" displayLabel="Width" description="Median width for path." />
+
+        <ECProperty propertyName="CrowningType" typeName="CrownType" category="DrivewayPathEdge_Crowning" displayLabel="Crown Type" description="Type of crown design for path." />
+        <ECProperty propertyName="KValueSag" typeName="double" category="DrivewayPathEdge_Crowning" displayLabel="Sag K Value" description="Design K-Value for sag vertical curves." />
+        <ECProperty propertyName="KValueSummit" typeName="double" category="DrivewayPathEdge_Crowning" displayLabel="Crest K Value" description="Design K-Value for crest vertical curves." />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="DrivewayPathFin" modifier="Sealed" displayLabel="Driveway Fin" description="One of two sides to a Driveway Path Edge.">
+        <BaseClass>bis:SpatialLocationElement</BaseClass>
+
+        <!--
+            In SITEOPS, (almost) all the properties on this element are duplicated with the '-Other' post-fix and live on a single Side object.
+            Here, we have two separate elements, with this single property to determine if it is the 'Primary' DrivewayPathFin or the 'Other' DrivewayPathFin
+        -->
+        <ECProperty propertyName="IsPrimary" typeName="boolean">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03" />
+            </ECCustomAttributes>
+        </ECProperty>
+
+        <ECProperty propertyName="CrossSlope" typeName="double" kindOfQuantity="rru:SLOPE" category="DrivewayPathFin_Road" displayLabel="Cross Slope" description="Cross slope for this side of driveway." />
+        <ECProperty propertyName="DrivewayWidth" typeName="double" kindOfQuantity="rru:LENGTH" category="DrivewayPathFin_Road" displayLabel="Driveway Width" description="Driveway width on this side." />
+
+        <ECProperty propertyName="ShoulderWidth" typeName="double" kindOfQuantity="rru:LENGTH" category="DrivewayPathFin_Shoulder" displayLabel="Shoulder Width" description="Width of shoulder on this side of driveway." />
+        <ECProperty propertyName="ShoulderSlope" typeName="double" kindOfQuantity="rru:SLOPE" category="DrivewayPathFin_Shoulder" displayLabel="Shoulder Slope" description="Slope of shoulder on this side of driveway." />
+        <ECProperty propertyName="DitchOffset" typeName="double" kindOfQuantity="rru:LENGTH" category="DrivewayPathFin_Shoulder" displayLabel="Ditch Offset" description="Offset to ditch on this side of driveway." />
+        <ECProperty propertyName="DitchSlope" typeName="double" kindOfQuantity="rru:SLOPE" category="DrivewayPathFin_Shoulder" displayLabel="Ditch Slope" description="Ditch slope for this side of driveway." />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="SidewalkPathEdge" modifier="Sealed" displayLabel="Sidewalk Path Edge" description="Sidewalk path edge.">
+        <BaseClass>CenterlinePathEdge</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="ParkingDirectionPathEdge" modifier="Sealed" displayLabel="Parking Direction Path Edge" description="Parking direction path edge.">
+        <BaseClass>PathEdge</BaseClass>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="EdgeStartsAtVertex" strength="referencing" modifier="Sealed">
+        <Source multiplicity="(0..2)" roleLabel="starts at" polymorphic="true">
+            <Class class="Edge" />
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="connects to" polymorphic="true">
+            <Class class="Vertex" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="EdgeEndsAtVertex" strength="referencing" modifier="Sealed">
+        <Source multiplicity="(0..2)" roleLabel="ends at" polymorphic="true">
+            <Class class="Edge" />
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="connects to" polymorphic="true">
+            <Class class="Vertex" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="Wire" modifier="Abstract">
+        <BaseClass>bis:SpatialLocationElement</BaseClass>
+        <BaseClass>bis:IParentElement</BaseClass>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="LayoutParkingAreaOwnsIslandAreas" strength="embedding" strengthDirection="Forward" modifier="Sealed">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="LayoutParkingArea" />
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="false">
+            <Class class="IslandArea" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="LayoutParkingAreaOwnsParkingRows" strength="embedding" strengthDirection="Forward" modifier="Sealed">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="LayoutParkingArea" />
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="false">
+            <Class class="ParkingRowPath" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="LayoutParkingAreaOwnsParkingArea" strength="embedding" strengthDirection="Forward" modifier="Sealed">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="LayoutParkingArea" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="ParkingArea" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="BuildingAreaOwnsSidewalks" strength="embedding" strengthDirection="Forward" modifier="Sealed">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="BuildingArea" />
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="false">
+            <Class class="SidewalkArea" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="DrivewayPathOwnsDrivewayAreas" strength="embedding" strengthDirection="Forward" modifier="Sealed">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="DrivewayPath" />
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="false">
+            <Class class="DrivewayArea" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="DrivewayPathOwnsSidewalks" strength="embedding" strengthDirection="Forward" modifier="Sealed">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="DrivewayPath" />
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="false">
+            <Class class="SidewalkArea" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="DrivewayPathOwnsParkingAreas" strength="embedding" strengthDirection="Forward" modifier="Sealed">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="DrivewayPath" />
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="false">
+            <Class class="ParkingArea" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="DrivewayPathOwnsParkingRows" strength="embedding" strengthDirection="Forward" modifier="Sealed">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="DrivewayPath" />
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="false">
+            <Class class="ParkingRowPath" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="DrivewayPathOwnsBreaklines" strength="embedding" strengthDirection="Forward" modifier="Sealed">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="DrivewayPath" />
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="false">
+            <Class class="BreaklinePath" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="DrivewayPathEdgeOwnsFins" strength="embedding" strengthDirection="Forward" modifier="Sealed">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="DrivewayPathEdge" />
+        </Source>
+        <Target multiplicity="(2..2)" roleLabel="is owned by" polymorphic="false">
+            <Class class="DrivewayPathFin" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="WireOwnsVertices" strength="embedding" strengthDirection="Forward" modifier="Sealed">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="Wire" />
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="true">
+            <Class class="Vertex" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="WireOwnsEdges" strength="embedding" strengthDirection="Forward" modifier="Sealed">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="Wire" />
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="true">
+            <Class class="Edge" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="LayoutParkingAreaOwnsParkingDirectionPath" strength="embedding" strengthDirection="Forward" modifier="Sealed">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="LayoutParkingArea" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="ParkingDirectionPath" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="LayoutParkingAreaOwnsParkingVertex" strength="embedding" strengthDirection="Forward" modifier="Sealed">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="LayoutParkingArea" />
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="false">
+            <Class class="ParkingVertex" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="Area" modifier="Abstract" displayLabel="Area" description="Area">
+        <BaseClass>Wire</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="ShapedArea" modifier="Abstract" displayLabel="Shaped Area" description="Shaped area">
+        <BaseClass>Area</BaseClass>
+
+        <ECProperty propertyName="DoGrade" typeName="boolean" category="ShapedArea_Optimizer" displayLabel="Grading" description="Add area grading data to grading optimizer." />
+
+        <ECProperty propertyName="Topsoil" typeName="double" category="ShapedArea_Surface" kindOfQuantity="rru:LENGTH_SHORT" displayLabel="Topsoil" description="Depth of topsoil." />
+        <ECProperty propertyName="SurfaceType" typeName="SurfaceType" category="ShapedArea_Surface" displayLabel="Surface Type" description="Type definition of area." />
+        <ECProperty propertyName="SurfaceDepth" typeName="double" category="ShapedArea_Surface" kindOfQuantity="rru:LENGTH_SHORT" displayLabel="Surface Depth" description="Material depth of area." />
+        <ECProperty propertyName="RunoffCoefficient" typeName="double" category="ShapedArea_Surface" displayLabel="Runoff Coefficient" description="Runoff coefficient for area." />
+
+        <ECProperty propertyName="MinSlope" typeName="double" category="ShapedArea_Constraints" kindOfQuantity="rru:SLOPE" displayLabel="Min. Slope" description="Minimum design slope for area." />
+        <ECProperty propertyName="MaxSlope" typeName="double" category="ShapedArea_Constraints" kindOfQuantity="rru:SLOPE" displayLabel="Max. Slope" description="Maximum design slope for area." />
+        <ECProperty propertyName="MinZ" typeName="double" category="ShapedArea_Constraints" kindOfQuantity="rru:LENGTH" displayLabel="Min. Elevation" description="Minimum design elevation for area." />
+        <ECProperty propertyName="MaxZ" typeName="double" category="ShapedArea_Constraints" kindOfQuantity="rru:LENGTH" displayLabel="Max. Elevation" description="Maximum design elevation for area." />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="PropertyArea" modifier="Sealed" displayLabel="Property Area" description="Property Area">
+        <BaseClass>ShapedArea</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="BuildingArea" modifier="Sealed" displayLabel="Building Area" description="Building Area">
+        <BaseClass>ShapedArea</BaseClass>
+
+        <ECProperty propertyName="ControlType" typeName="ControlType">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03" />
+            </ECCustomAttributes>
+        </ECProperty>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="PadArea" modifier="Sealed" displayLabel="Pad Area" description="Pad Area">
+        <BaseClass>ShapedArea</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="ParkingArea" modifier="Sealed" displayLabel="Parking Area" description="Parking Area">
+        <BaseClass>ShapedArea</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="DrivewayArea" modifier="Sealed" displayLabel="Driveway Area" description="Driveway Area">
+        <BaseClass>ShapedArea</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="SidewalkArea" modifier="Sealed" displayLabel="Sidewalk Area" description="Sidewalk Area">
+        <BaseClass>ShapedArea</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="IslandArea" modifier="Sealed" displayLabel="Island Area" description="Island Area">
+        <BaseClass>ShapedArea</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="LayoutArea" modifier="Abstract" displayLabel="Layout Area" description="Layout Area">
+        <BaseClass>Area</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="LayoutParkingArea" modifier="Sealed" displayLabel="Layout Parking Area" description="Layout parking area.">
+        <BaseClass>LayoutArea</BaseClass>
+
+        <ECProperty propertyName="ControlType" typeName="ControlType">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03" />
+            </ECCustomAttributes>
+        </ECProperty>
+
+        <ECProperty propertyName="ParkingWidth" typeName="double" category="LayoutParkingArea_Parking" kindOfQuantity="rru:LENGTH"  displayLabel="Width" description="Parking space width." />
+        <ECProperty propertyName="ParkingDepth" typeName="double" category="LayoutParkingArea_Parking" kindOfQuantity="rru:LENGTH"  displayLabel="Depth" description="Parking space depth." />
+        <ECProperty propertyName="ParkingAngle" typeName="double" category="LayoutParkingArea_Parking" kindOfQuantity="rru:ANGLE"  displayLabel="Angle" description="Parking space angle." />
+        <ECProperty propertyName="ParkingSpaces" typeName="int" category="LayoutParkingArea_Parking" displayLabel="Parking Spaces" description="Number of spaces." />
+        <ECProperty propertyName="ProblemSpaces" typeName="int" category="LayoutParkingArea_Parking" displayLabel="Problem Spaces" description="Number of problematic spaces." />
+
+        <ECProperty propertyName="AisleWidth" typeName="double" kindOfQuantity="rru:LENGTH" category="LayoutParkingArea_ParkingAisle" displayLabel="Width" description="Parking aisle width." />
+
+        <ECProperty propertyName="ParkingPerIsland" typeName="int" category="LayoutParkingArea_ParkingIsland" displayLabel="Count Per Island" description="Number of parking spaces between islands." />
+        <ECProperty propertyName="MinIslandWidth" typeName="double" category="LayoutParkingArea_ParkingIsland" kindOfQuantity="rru:LENGTH"  displayLabel="Minimum Width" description="Minimum parking island width." />
+        <ECProperty propertyName="IslandType" typeName="IslandType" category="LayoutParkingArea_ParkingIsland" displayLabel="Type" description="Island type or material." />
+        <ECProperty propertyName="IslandCurbRadius" typeName="double" category="LayoutParkingArea_ParkingIsland" kindOfQuantity="rru:LENGTH" displayLabel="Curb Radius" description="Island curb radius." />
+
+        <ECProperty propertyName="BayCurbRadius" typeName="double" category="LayoutParkingArea_ParkingBay" kindOfQuantity="rru:LENGTH" displayLabel="Curb Radius" description="Parking bay curb radius." />
+
+        <ECProperty propertyName="MinSlopeParkingLot" typeName="double" category="LayoutParkingArea_ParkingGrading" kindOfQuantity="rru:SLOPE" displayLabel="Min. Design Slope" description="Minimum design slope for parking lot." />
+        <ECProperty propertyName="MaxSlopeParkingLot" typeName="double" category="LayoutParkingArea_ParkingGrading" kindOfQuantity="rru:SLOPE" displayLabel="Max. Design Slope" description="Maximum design slope for parking lot." />
+        <ECProperty propertyName="SurfaceTypeParkingLot" typeName="SurfaceType" category="LayoutParkingArea_ParkingGrading" displayLabel="Surface Type" description="Surface type or material for parking lot." />
+        <ECProperty propertyName="SurfaceDepthParkingLot" typeName="double" category="LayoutParkingArea_ParkingGrading" kindOfQuantity="rru:LENGTH_SHORT" displayLabel="Surface Depth" description="Surface or material depth." />
+        <ECProperty propertyName="SurfaceTypeParkingSpaces" typeName="SurfaceType" category="LayoutParkingArea_ParkingGrading" displayLabel="Space Surface Type" description="Surface type or material for specific parking spaces." />
+        <ECProperty propertyName="SurfaceDepthParkingSpaces" typeName="double" category="LayoutParkingArea_ParkingGrading" kindOfQuantity="rru:LENGTH_SHORT" displayLabel="Space Surface Depth" description="Surface or material depth for specific parking spaces." />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="LayoutPondArea" modifier="Sealed" displayLabel="Pond Area" description="Layout pond area.">
+        <BaseClass>LayoutArea</BaseClass>
+
+        <ECProperty propertyName="Height" typeName="double" category="LayoutPondArea_Pond" kindOfQuantity="rru:LENGTH" displayLabel="Riser Top Elevation" description="Riser Top Elevation." />
+        <ECProperty propertyName="TopHeight" typeName="double" category="LayoutPondArea_Pond" kindOfQuantity="rru:LENGTH" displayLabel="Dry Storage Height" description="Dry Storage Height." />
+		<ECProperty propertyName="WallSlope" typeName="double" category="LayoutPondArea_Pond" kindOfQuantity="rru:SLOPE" displayLabel="Side Slope" description=" Side Slope." />
+        <ECProperty propertyName="WallWidth" typeName="double" category="LayoutPondArea_Pond" kindOfQuantity="rru:LENGTH" displayLabel="Berm Width" description="Depth of the pond." />
+		<ECProperty propertyName="Depth" typeName="double" category="LayoutPondArea_Pond" kindOfQuantity="rru:LENGTH" displayLabel="Riser Height" description="Riser Height." />
+		<ECProperty propertyName="SizePond" typeName="boolean" category="LayoutPondArea_Pond" displayLabel="Size Pond" description="Size the pond using the target surface or volume." />
+		<ECProperty propertyName="TargetSurface" typeName="double" category="LayoutPondArea_Pond" kindOfQuantity="rru:AREA" displayLabel="Target Surface" description="Target surface." />
+		<ECProperty propertyName="TargetVolume" typeName="double" category="LayoutPondArea_Pond" kindOfQuantity="rru:VOLUME" displayLabel="Target Volume" description="Target volume." />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="GradingArea" modifier="Abstract" displayLabel="Grading Area" description="Grading area.">
+        <BaseClass>Area</BaseClass>
+
+        <ECProperty propertyName="DoGrade" typeName="boolean" category="GradingArea_Optimizer" displayLabel="Grading" />
+
+        <ECProperty propertyName="Topsoil" typeName="double" category="GradingArea_Surface" kindOfQuantity="rru:LENGTH_SHORT" displayLabel="Topsoil" description="Topsoil depth for grading area." />
+        <ECProperty propertyName="SurfaceType" typeName="SurfaceType" category="GradingArea_Surface" displayLabel="Surface Type" description="Surface type or material for grading area." />
+        <ECProperty propertyName="SurfaceDepth" typeName="double" category="GradingArea_Surface" kindOfQuantity="rru:LENGTH_SHORT" displayLabel="Surface Depth" description="Surface or material depth for grading area." />
+
+        <ECProperty propertyName="MinSlope" typeName="double" category="GradingArea_Constraints" kindOfQuantity="rru:SLOPE" displayLabel="Min. Slope" description="Minimum slope constraint on grading area." />
+        <ECProperty propertyName="MaxSlope" typeName="double" category="GradingArea_Constraints" kindOfQuantity="rru:SLOPE" displayLabel="Max. Slope" description="Maximum slope constraint on grading area." />
+        <ECProperty propertyName="MinZ" typeName="double" category="GradingArea_Constraints" kindOfQuantity="rru:LENGTH" displayLabel="Min. Elevation" description="Minimum elevation change constraint on grading area." />
+        <ECProperty propertyName="MaxZ" typeName="double" category="GradingArea_Constraints" kindOfQuantity="rru:LENGTH" displayLabel="Max. Elevation" description="Maximum elevation change constraint on grading area." />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="GradingLimitArea" modifier="Sealed" displayLabel="Grading Limit Area" description="Grading limit area.">
+        <BaseClass>GradingArea</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="Path" modifier="Abstract" displayLabel="Path">
+        <BaseClass>Wire</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="LayoutPath" modifier="Abstract" displayLabel="Layout Path" description="Layout path.">
+        <BaseClass>Path</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="DrivewayPath" modifier="Sealed" displayLabel="Driveway" description="Driveway path.">
+        <BaseClass>LayoutPath</BaseClass>
+        <BaseClass>lr:ILinearElementSource</BaseClass>
+        <BaseClass>bis:IParentElement</BaseClass>
+
+        <ECProperty propertyName="ControlType" typeName="ControlType">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03" />
+            </ECCustomAttributes>
+        </ECProperty>
+
+        <ECProperty propertyName="DriveOnRight" typeName="boolean" category="DrivewayPath_Direction" displayLabel="Drive On Right" description="Sets the primary drive side, true to drive on the right-hand side." />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="ParkingDirectionPath" modifier="Sealed" displayLabel="Parking Direction Path" description="Parking direction path.">
+        <BaseClass>LayoutPath</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="SidewalkPath" modifier="Sealed" displayLabel="Sidewalk Path" description="Sidewalk path.">
+        <BaseClass>LayoutPath</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="ParkingRowPath" modifier="Sealed" displayLabel="Parking Row Path" description="Parking row path.">
+        <BaseClass>LayoutPath</BaseClass>
+
+        <ECProperty propertyName="ParkingWidth" typeName="double" kindOfQuantity="rru:LENGTH" category="ParkingRowPath_Parking" displayLabel="Width" description="Parking width for row." />
+        <ECProperty propertyName="ParkingDepth" typeName="double" kindOfQuantity="rru:LENGTH" category="ParkingRowPath_Parking" displayLabel="Depth" description="Parking depth for row." />
+        <ECProperty propertyName="ParkingAngle" typeName="double" kindOfQuantity="rru:ANGLE" category="ParkingRowPath_Parking" displayLabel="Angle" description="Parking angle for row." />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="GradingPath" modifier="Abstract" displayLabel="Grading Path" description="Grading path.">
+        <BaseClass>Path</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="BreaklinePath" modifier="Sealed" displayLabel="Breakline Path" description="Breakline path.">
+        <BaseClass>GradingPath</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="ContourLinesAspect" modifier="Sealed" displayLabel="Contour Lines" description="Terrain contour lines" >
+        <BaseClass>bis:ElementUniqueAspect</BaseClass>
+
+        <ECProperty propertyName="MinorStep" typeName="double" kindOfQuantity="rru:LENGTH" displayLabel="Minor Step" description="Minor steps interval size" />
+        <ECProperty propertyName="MajorStepMultiple" typeName="int" displayLabel="Major Step Interval" description="Number of minor intervals between two major steps" />
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="WireOwnsContourLinesAspect" modifier="Sealed" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="Wire" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="ContourLinesAspect" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="EdgeParkingAspect" modifier="Sealed" displayLabel="Parking">
+        <BaseClass>bis:ElementUniqueAspect</BaseClass>
+
+        <ECProperty propertyName="ParkingWidth" typeName="double" kindOfQuantity="rru:LENGTH" category="EdgeParkingAspect_Parking" displayLabel="Parking Width" description="Parking space width." />
+        <ECProperty propertyName="ParkingDepth" typeName="double" kindOfQuantity="rru:LENGTH" category="EdgeParkingAspect_Parking" displayLabel="Parking Depth" description="Parking space depth." />
+        <ECProperty propertyName="ParkingAngle" typeName="double" kindOfQuantity="rru:ANGLE" category="EdgeParkingAspect_Parking" displayLabel="Parking Angle" description="Parking space angle." />
+        <ECProperty propertyName="MaxParkingOffset" typeName="double" kindOfQuantity="rru:LENGTH" category="EdgeParkingAspect_Parking" displayLabel="Max. Parking Offset" />
+        <ECProperty propertyName="IgnoreProblems" typeName="boolean" category="EdgeParkingAspect_Parking" displayLabel="Ignore Problems" />
+        <ECProperty propertyName="ParksPerIsland" typeName="int" category="EdgeParkingAspect_Parking" displayLabel="Count Per Island" description="Parking space count between islands." />
+        <ECProperty propertyName="IslandWidth" typeName="double" kindOfQuantity="rru:LENGTH" category="EdgeParkingAspect_Parking" displayLabel="Island Width" description="Width of parking islands." />
+        <ECProperty propertyName="IslandCurbRadius" typeName="double" kindOfQuantity="rru:LENGTH" category="EdgeParkingAspect_Parking" displayLabel="Island Curb Radius" description="Curb radius for parking islands." />
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="PropertyEdgeOwnsParkingAspect" modifier="Sealed" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="PropertyEdge" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="EdgeParkingAspect" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="BuildingEdgeOwnsParkingAspect" modifier="Sealed" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="BuildingEdge" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="EdgeParkingAspect" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="IslandEdgeOwnsParkingAspect" modifier="Sealed" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="IslandEdge" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="EdgeParkingAspect" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="PadEdgeOwnsParkingAspect" modifier="Sealed" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="PadEdge" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="EdgeParkingAspect" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="LayoutParkingEdgeOwnsParkingAspect" modifier="Sealed" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="LayoutParkingEdge" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="EdgeParkingAspect" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="EdgeOnSideParkingAspect" modifier="Sealed" displayLabel="Onside Parking">
+        <BaseClass>bis:ElementUniqueAspect</BaseClass>
+
+        <ECProperty propertyName="OnSideParkingWidth" typeName="double" kindOfQuantity="rru:LENGTH" category="EdgeOnSideParkingAspect_Parking" displayLabel="Onside Parking Width" description="Onside parking space width for this side of driveway." />
+        <ECProperty propertyName="OnSideParkingDepth" typeName="double" kindOfQuantity="rru:LENGTH" category="EdgeOnSideParkingAspect_Parking" displayLabel="Onside Parking Depth" description="Onside parking space depth for this side of driveway." />
+        <ECProperty propertyName="OnSideParkingAngle" typeName="double" kindOfQuantity="rru:ANGLE" category="EdgeOnSideParkingAspect_Parking" displayLabel="Onside Parking Angle" description="Onside parking space angle for this side of driveway." />
+        <ECProperty propertyName="OnSideParksPerIsland" typeName="int" category="EdgeOnSideParkingAspect_Parking" displayLabel="Onside Parks Per Island" description="Onside parking space count per island on this side of driveway." />
+        <ECProperty propertyName="OnSideIslandWidth" typeName="double" kindOfQuantity="rru:LENGTH" category="EdgeOnSideParkingAspect_Parking" displayLabel="Onside Island Width" description="Onside parking island width for this side of driveway." />
+        <ECProperty propertyName="OnSideIslandCurbRadius" typeName="double" kindOfQuantity="rru:LENGTH" category="EdgeOnSideParkingAspect_Parking" displayLabel="Onside Curb Radius" description="Onside parking island curb radius for this side of driveway." />
+
+        <ECProperty propertyName="OnSideParkingSurfaceType" typeName="SurfaceType" category="EdgeOnSideParkingAspect_Grading" displayLabel="Onside Surface Type" description="Onside parking surface type for this side of driveway." />
+        <ECProperty propertyName="OnSideParkingSurfaceDepth" typeName="double" kindOfQuantity="rru:LENGTH_SHORT" category="EdgeOnSideParkingAspect_Grading" displayLabel="Onside Surface Depth" description="Onside parking material depth for this side of driveway." />
+        <ECProperty propertyName="OnSideParkingMinSlope" typeName="double" kindOfQuantity="rru:SLOPE" category="EdgeOnSideParkingAspect_Grading" displayLabel="Onside Parking Min. Slope" description="Onside parking minimum design slope for this side of driveway." />
+        <ECProperty propertyName="OnSideParkingMaxSlope" typeName="double" kindOfQuantity="rru:SLOPE" category="EdgeOnSideParkingAspect_Grading" displayLabel="Onside Parking Max. Slope" description="Onside parking maximum design slope for this side of driveway." />
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="DrivewayPathFinOwnsOnSideParkingAspect" modifier="Sealed" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="DrivewayPathFin" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="EdgeOnSideParkingAspect" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="EdgeSidewalkAspect" modifier="Sealed" displayLabel="Sidewalk">
+        <BaseClass>bis:ElementUniqueAspect</BaseClass>
+
+        <ECProperty propertyName="SidewalkType" typeName="SurfaceType" category="EdgeSidewalkAspect_Sidewalk" displayLabel="Type" description="Defines the type of sidewalk or material." />
+        <ECProperty propertyName="SidewalkWidth" typeName="double" kindOfQuantity="rru:LENGTH" category="EdgeSidewalkAspect_Sidewalk" displayLabel="Width" description="Width of sidewalk." />
+        <ECProperty propertyName="SidewalkOffset" typeName="double" kindOfQuantity="rru:LENGTH" category="EdgeSidewalkAspect_Sidewalk" displayLabel="Offset" description="Offset distance for sidewalk." />
+        <ECProperty propertyName="SidewalkDepth" typeName="double" kindOfQuantity="rru:LENGTH" category="EdgeSidewalkAspect_Sidewalk" displayLabel="Depth" description="Depth of sidewalk material." />
+        <ECProperty propertyName="MinSidewalkSlope" typeName="double" kindOfQuantity="rru:SLOPE" category="EdgeSidewalkAspect_Sidewalk" displayLabel="Min. Slope" description="Minimum allowable sidewalk slope." />
+        <ECProperty propertyName="MaxSidewalkSlope" typeName="double" kindOfQuantity="rru:SLOPE" category="EdgeSidewalkAspect_Sidewalk" displayLabel="Max. Slope" description="Maximum allowable sidewalk slope." />
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="BuildingEdgeOwnsSidewalkAspect" modifier="Sealed" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="BuildingEdge" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="EdgeSidewalkAspect" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="LayoutParkingEdgeOwnsSidewalkAspect" modifier="Sealed" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="LayoutParkingEdge" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="EdgeSidewalkAspect" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="DrivewayPathFinOwnsSidewalkAspect" modifier="Sealed" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="DrivewayPathFin" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="EdgeSidewalkAspect" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="EdgeCurbAspect" modifier="Sealed" displayLabel="Curb">
+        <BaseClass>bis:ElementUniqueAspect</BaseClass>
+
+        <ECProperty propertyName="CurbHeight" typeName="double" kindOfQuantity="rru:LENGTH" category="EdgeCurbAspect_Curb" displayLabel="Curb Height" description="Height of the curb." />
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="BuildingEdgeOwnsCurbAspect" modifier="Sealed" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="BuildingEdge" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="EdgeCurbAspect" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="ParkingEdgeOwnsCurbAspect" modifier="Sealed" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="ParkingEdge" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="EdgeCurbAspect" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="IslandEdgeOwnsCurbAspect" modifier="Sealed" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="IslandEdge" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="EdgeCurbAspect" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="SidewalkEdgeOwnsCurbAspect" modifier="Sealed" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="SidewalkEdge" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="EdgeCurbAspect" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="DrivewayAreaEdgeOwnsCurbAspect" modifier="Sealed" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="DrivewayAreaEdge" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="EdgeCurbAspect" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="PadEdgeOwnsCurbAspect" modifier="Sealed" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="PadEdge" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="EdgeCurbAspect" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="LayoutParkingEdgeOwnsCurbAspect" modifier="Sealed" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="LayoutParkingEdge" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="EdgeCurbAspect" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="DrivewayPathFinOwnsCurbAspect" modifier="Sealed" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="DrivewayPathFin" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="EdgeCurbAspect" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="EdgeAisleAspect" modifier="Sealed" displayLabel="Aisle">
+        <BaseClass>bis:ElementUniqueAspect</BaseClass>
+
+        <ECProperty propertyName="AisleWidth" typeName="double" kindOfQuantity="rru:LENGTH" category="EdgeAisleAspect_Aisle" displayLabel="Aisle Width" description="Aisle width for parking." />
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="PropertyEdgeOwnsAisleAspect" modifier="Sealed" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="PropertyEdge" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="EdgeAisleAspect" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="BuildingEdgeOwnsAisleAspect" modifier="Sealed" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="BuildingEdge" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="EdgeAisleAspect" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="IslandEdgeOwnsAisleAspect" modifier="Sealed" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="IslandEdge" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="EdgeAisleAspect" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="PadEdgeOwnsAisleAspect" modifier="Sealed" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="PadEdge" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="EdgeAisleAspect" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="LayoutParkingEdgeOwnsAisleAspect" modifier="Sealed" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="LayoutParkingEdge" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="EdgeAisleAspect" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="AuthoringElementDrivesPlanElements" modifier="None" strength="referencing">
+        <BaseClass>bis:ElementDrivesElement</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="creates" polymorphic="true">
+            <Class class="bis:SpatialLocationElement"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is created by" polymorphic="true">
+            <Class class="spcomp:Space"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECStructClass typeName="DistanceAlongLinearPath" description="Describes a distance along a linear path, as either an absolute distance or a percent along" modifier="Sealed">
+        <ECProperty propertyName="AbsoluteAlong" typeName="double" kindOfQuantity="rru:LENGTH_SHORT" displayLabel="Applicable when IsDistanceAbsolute is true. It is the distance along the linear path in meters"/>
+        <ECProperty propertyName="PercentAlong" typeName="double" kindOfQuantity="rru:PERCENTAGE" displayLabel="Applicable when IsDistanceAbsolute is false. It is the percent along the linear path"/>
+        <ECProperty propertyName="IsDistanceAbsolute" typeName="boolean" displayLabel="True if DistanceAlong property should be used, false if PercentAlong describes the distance. Undefined implies an absolute distance"/>
+    </ECStructClass>
+
+    <ECRelationshipClass typeName="ElementDrivesElementsLinearly" modifier="Abstract" strength="referencing" strengthDirection="forward" description="A relationship that defines a target element's location relative to the linear path defined by the source element. When the source element is changed the target element's location should be updated based on the relationship properties">
+        <BaseClass>bis:ElementDrivesElement</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="drives" polymorphic="true">
+            <Class class="bis:GeometricElement"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is driven by" polymorphic="true">
+            <Class class="bis:GeometricElement"/>
+        </Target>
+        <ECStructProperty propertyName="DistanceAlong" typeName="DistanceAlongLinearPath" displayLabel="Distance along linear, in meters or percent"/>
+        <ECProperty propertyName="Offset" typeName="double" kindOfQuantity="rru:LENGTH_SHORT" displayLabel="Perpendicular offset from linear. Positive is to the right, negative to the left, relative to the linear path direction"/>
+        <ECProperty propertyName="IsDistanceFromStart" typeName="boolean" displayLabel="True if distance is from the start of the linear path, false if it is from the end. Undefined implies it is from the start"/>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="ElementDrivesDistributionStructuresLinearly" modifier="None" strength="referencing" strengthDirection="forward" description="A relationship that defines a drainage node's location relative to the linear path defined by the source element. When the source element is changed the target element's location should be updated based on the relationship properties">
+        <BaseClass>ElementDrivesElementsLinearly</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="drives" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is driven by" polymorphic="true">
+            <Class class="stmswrphys:DistributionStructure"/>
+        </Target>
+    </ECRelationshipClass>
+</ECSchema>
