@@ -56,7 +56,7 @@ A `HorizontalAlignment` instance shall be contained in a *Plan-projection* `Spat
 
 A `HorizontalAlignment` typically has the same `CodeValue` and Category as its associated `Alignment` instance.
 
-A `HorizontalAlignment` stores its visual geometry separately from geometry used for linear-referencing and design purposes, although the two could be identical. The former shall be stored in its `GeometryStream` whereas the latter shall be stored in the `HorizontalGeometry` property, encoded as a [Path](https://www.itwinjs.org/reference/core-geometry/curve/path/). Each curve primitive in such *Path* describes a segment along the `HorizontalAlignment` as follows:
+A `HorizontalAlignment` stores its visual geometry separately from geometry used for linear-referencing and design purposes, although the two could be identical. The former shall be stored either in its `GeometryStream` or via child `GraphicalElement3d` instances, whereas the latter shall be stored in the `HorizontalGeometry` property, encoded as a [Path](https://www.itwinjs.org/reference/core-geometry/curve/path/). Each curve primitive in such *Path* describes a segment along the `HorizontalAlignment` as follows:
 
 - Linear segments shall be encoded as [LineSegment3d](https://www.itwinjs.org/reference/core-geometry/curve/linesegment3d/)s.
 - Circular arc segments shall be encoded as [Arc3d](https://www.itwinjs.org/reference/core-geometry/curve/arc3d/)s.
@@ -88,7 +88,7 @@ A `VerticalAlignment` instance shall be contained in a `VerticalAlignmentModel` 
 
 A `VerticalAlignment` by default use the Domain-ranked `Vertical Alignment` Category.
 
-A `VerticalAlignment` stores its visual geometry separately from geometry used for linear-referencing and design purposes, although the two could be identical. The former shall be stored in its `GeometryStream` whereas the latter shall be stored in the `VerticalGeometry` property, encoded as a [Path](https://www.itwinjs.org/reference/core-geometry/curve/path/). Each curve primitive in such *Path* describes a segment along the `VerticalAlignment` as follows:
+A `VerticalAlignment` stores its visual geometry separately from geometry used for linear-referencing and design purposes, although the two could be identical. The former shall be stored either in its `GeometryStream` or via child `GraphicalElement2d` instances, whereas the latter shall be stored in the `VerticalGeometry` property, encoded as a [Path](https://www.itwinjs.org/reference/core-geometry/curve/path/). Each curve primitive in such *Path* describes a segment along the `VerticalAlignment` as follows:
 
 - Linear segments shall be encoded as [LineSegment3d](https://www.itwinjs.org/reference/core-geometry/curve/linesegment3d/)s.
 - Circular arc segments shall be encoded as [Arc3d](https://www.itwinjs.org/reference/core-geometry/curve/arc3d/)s.
@@ -109,3 +109,13 @@ Individual segments along the `VerticalAlignment` encoded as a *Path* are equiva
 `AlignmentStation`s are linearly-located elements along an `Alignment`. They shall carry the *distance along* measurement in a `LinearlyReferencedAtLocation` aspect whereas the mapped *station value* shall be stored in their `Station` property. `Alignment`s shall define its initial *station value* in their `StartStation` property.
 
 Equivalent to [IfcReferent](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcReferent.htm) with a non-zero `StartDistance` attribute and relative measurements used by linear-locations referencing it.
+
+## Relationship Classes
+
+### HorizontalAlignmentOwnsSegmentGraphics
+
+The `HorizontalAlignmentOwnsSegmentGraphics` relationship is used when the visual geometry (also referred to as symbology) of a `HorizontalAlignment` is captured via child `bis:GraphicalElement3d` instances. That strategy enables control over symbology settings via the default `SubCategory` of the associated `SpatialCategory` for each graphical segment.
+
+### VerticalAlignmentOwnsSegmentGraphics
+
+The `VerticalAlignmentOwnsSegmentGraphics` relationship is used when the visual geometry (also referred to as symbology) of a `VerticalAlignment` is captured via child `bis:GraphicalElement2d` instances. That strategy enables control over symbology settings via the default `SubCategory` of the associated `DrawingCategory` for each graphical segment.
