@@ -808,6 +808,87 @@
             <Class class="MeshSurfaceEntityAspect"/>
         </Target>
     </ECRelationshipClass>
+    <!-- Base class for mesh -->
+    <ECEntityClass typeName="MeshSurfaceEntityBaseAspect" modifier="Abstract">
+        <BaseClass>CivilPresentation</BaseClass>
+        <ECProperty propertyName="MeshSurfaceEntity_SlopedArea" typeName="double" displayLabel="Top Sloped Area" category="MeshQuantities_Civil_Quantities" priority="299920" kindOfQuantity="cifu:AREA"/>
+        <ECProperty propertyName="MeshSurfaceEntity_PlanarArea" typeName="double" displayLabel="Planar Area" category="MeshQuantities_Civil_Quantities" priority="299910" kindOfQuantity="cifu:AREA"/>
+        <ECProperty propertyName="MeshSurfaceEntity_Description" typeName="string" displayLabel="Description" category="MeshSurfaceEntity_Component_Layer" priority="299980"/>
+        <ECProperty propertyName="VolumeOption" typeName="MeshSurfaceEntityAspect_VolumeOption_Enum" displayLabel="Volume Option" category="MeshSurfaceEntity_Component_Layer" priority="299925"/>
+    </ECEntityClass>
+    <!-- Basic mesh e.g. RailMesh -->
+    <ECEntityClass typeName="BasicMeshSurfaceEntityAspect">
+        <BaseClass>MeshSurfaceEntityBaseAspect</BaseClass>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsBasicMeshSurfaceEntityAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="BasicMeshSurfaceEntityAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <!-- Volume mesh e.g. Sleeper, Coach and Swept Coach -->
+    <ECEntityClass typeName="VolumeMeshSurfaceEntityAspect">
+        <BaseClass>MeshSurfaceEntityBaseAspect</BaseClass>
+        <ECProperty propertyName="MeshSurfaceEntity_CivilVolume" typeName="double" displayLabel="Volume" category="MeshQuantities_Civil_Quantities" priority="299900" kindOfQuantity="cifu:VOLUME"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsVolumeMeshSurfaceEntityAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="VolumeMeshSurfaceEntityAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <!-- Aggregate mesh e.g. Ballast, Subballast -->
+    <ECEntityClass typeName="AggregateMeshSurfaceEntityAspect">
+        <BaseClass>MeshSurfaceEntityBaseAspect</BaseClass>
+        <ECProperty propertyName="MeshSurfaceEntity_CivilVolume" typeName="double" displayLabel="Volume" category="MeshQuantities_Civil_Quantities" priority="299900" kindOfQuantity="cifu:VOLUME"/>
+        <ECProperty propertyName="MeshSurfaceEntity_StartStationFormatted" typeName="string" displayLabel="Start Station" category="MeshSurfaceEntity_Component_Layer" priority="299940" kindOfQuantity="cifu:STATION"/>
+        <ECProperty propertyName="MeshSurfaceEntity_EndStationFormatted" typeName="string" displayLabel="End Station" category="MeshSurfaceEntity_Component_Layer" priority="299940" kindOfQuantity="cifu:STATION"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsAggregateMeshSurfaceEntityAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="AggregateMeshSurfaceEntityAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <!-- Earthwork mesh e.g. CutSlope, FillSlope, Ditch and Trench -->
+    <ECEntityClass typeName="EarthworkMeshSurfaceEntityAspect">
+        <BaseClass>MeshSurfaceEntityBaseAspect</BaseClass>
+        <ECProperty propertyName="MeshSurfaceEntity_StartStationFormatted" typeName="string" displayLabel="Start Station" category="MeshSurfaceEntity_Component_Layer" priority="299940" kindOfQuantity="cifu:STATION"/>
+        <ECProperty propertyName="MeshSurfaceEntity_EndStationFormatted" typeName="string" displayLabel="End Station" category="MeshSurfaceEntity_Component_Layer" priority="299940" kindOfQuantity="cifu:STATION"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsEarthworkMeshSurfaceEntityAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="EarthworkMeshSurfaceEntityAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <!-- Other mesh which has properties of Depth and Material Subtype -->
+    <ECEntityClass typeName="OtherMeshSurfaceEntityAspect">
+        <BaseClass>MeshSurfaceEntityBaseAspect</BaseClass>
+        <ECProperty propertyName="MeshSurfaceEntity_Depth" typeName="double" displayLabel="Depth" category="MeshSurfaceEntity_Component_Layer" priority="299990" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="MeshSurfaceEntity_MaterialSubtype" typeName="string" displayLabel="Material Subtype" category="MeshSurfaceEntity_Component_Layer" priority="299930"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsOtherMeshSurfaceEntityAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="OtherMeshSurfaceEntityAspect"/>
+        </Target>
+    </ECRelationshipClass>
     <ECEntityClass typeName="NamedBoundaryAspect">
         <BaseClass>CivilPresentation</BaseClass>
         <ECProperty propertyName="Name" typeName="string" displayLabel="Name" category="NamedBoundary_Category" priority="299994" />
