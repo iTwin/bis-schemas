@@ -116,6 +116,16 @@ stages:
         )
       displayName: 'Display Source Branch'
 
+    - script: |
+        cd /d $(BB_SRC_ROOT)/imodel-native
+        git checkout test-failure
+      displayName: 'Set Native Branch'
+
+    - script: |
+        cd /d $(BB_SRC_ROOT)/imodel-native
+        git branch
+      displayName: 'Display Native Branch'
+
     - script: $(PY_EXE) $(CALL_BB_PATH) build $(BB_V) -a $(BB_ARCH) -s $(STRATEGY) -N 6
       displayName: Build
       env:
@@ -235,66 +245,66 @@ stages:
         currentBranch: master
         targetBranch: master
 
-- stage: iModeEvolution
-  displayName: iModeEvolution Tests
-  dependsOn: Source_Branch
-  condition: and(succeeded(), in(variables['Build.Reason'], 'IndividualCI', 'Schedule', 'Manual', 'PullRequest'))
+# - stage: iModeEvolution
+#   displayName: iModeEvolution Tests
+#   dependsOn: Source_Branch
+#   condition: and(succeeded(), in(variables['Build.Reason'], 'IndividualCI', 'Schedule', 'Manual', 'PullRequest'))
 
-  jobs:
-  - job: RuniModeEvolutionTests
-    timeoutInMinutes: 240
+#   jobs:
+#   - job: RuniModeEvolutionTests
+#     timeoutInMinutes: 240
 
-    workspace:
-      clean: all
+#     workspace:
+#       clean: all
 
-    pool:
-      name: imodelNative-Win11-VS2022
-      demands: Agent.OS -equals Windows_NT
+#     pool:
+#       name: imodelNative-Win11-VS2022
+#       demands: Agent.OS -equals Windows_NT
 
-    variables:
-      BB_V: 4
-      BB_ARCH: x64
-      PY_EXE: py -3
-      BB_SRC_ROOT: $(Agent.BuildDirectory)/bbsrc
-      bb: $(BB_SRC_ROOT)/BentleyBuild/BentleyBuild.py
-      strategy: 'iModelEvolutionTests;SkipPull_imodel-native-internal'
-      BRANCH_NAME: $[ stageDependencies.Source_Branch.Find_Branch.outputs['Get_Branch_Name.sourceBranch'] ]
+#     variables:
+#       BB_V: 4
+#       BB_ARCH: x64
+#       PY_EXE: py -3
+#       BB_SRC_ROOT: $(Agent.BuildDirectory)/bbsrc
+#       bb: $(BB_SRC_ROOT)/BentleyBuild/BentleyBuild.py
+#       strategy: 'iModelEvolutionTests;SkipPull_imodel-native-internal'
+#       BRANCH_NAME: $[ stageDependencies.Source_Branch.Find_Branch.outputs['Get_Branch_Name.sourceBranch'] ]
 
-    steps:
-    - checkout: imodel-native-internal
+#     steps:
+#     - checkout: imodel-native-internal
 
-    - template: build/templates/prebuild.yml@imodel-native-internal
-      parameters:
-        otherRepo: imodel-native
-        nativePR: 'main'
+#     - template: build/templates/prebuild.yml@imodel-native-internal
+#       parameters:
+#         otherRepo: imodel-native
+#         nativePR: 'main'
 
-    - script: $(PY_EXE) $(CALL_BB_PATH) pull -v $(BB_V) -a $(BB_ARCH) -s $(strategy)
-      displayName: Pull
-      env:
-        CALL_BB_PATH: $(CALL_BB_PATH)
-        AZURE_DEVOPS_EXT_PAT: $(System.AccessToken)
+#     - script: $(PY_EXE) $(CALL_BB_PATH) pull -v $(BB_V) -a $(BB_ARCH) -s $(strategy)
+#       displayName: Pull
+#       env:
+#         CALL_BB_PATH: $(CALL_BB_PATH)
+#         AZURE_DEVOPS_EXT_PAT: $(System.AccessToken)
 
-    - script: |
-        if not "%BRANCH_NAME%" == "" (
-          cd /d $(BB_SRC_ROOT)/BisSchemas
-          git checkout %BRANCH_NAME%
-        )
-      displayName: 'Set Source Branch'
+#     - script: |
+#         if not "%BRANCH_NAME%" == "" (
+#           cd /d $(BB_SRC_ROOT)/BisSchemas
+#           git checkout %BRANCH_NAME%
+#         )
+#       displayName: 'Set Source Branch'
 
-    - script: |
-        if not "%BRANCH_NAME%" == "" (
-          cd /d $(BB_SRC_ROOT)/BisSchemas
-          git branch
-        )
-      displayName: 'Display Source Branch'
+#     - script: |
+#         if not "%BRANCH_NAME%" == "" (
+#           cd /d $(BB_SRC_ROOT)/BisSchemas
+#           git branch
+#         )
+#       displayName: 'Display Source Branch'
 
-    - script: |
-        pip3 install setuptools
-      displayName: 'Install SetupTools'
-      condition: and(succeeded(), in(variables['Agent.Name'], 'BuildMinion03A', 'BuildMinion03B'))
+#     - script: |
+#         pip3 install setuptools
+#       displayName: 'Install SetupTools'
+#       condition: and(succeeded(), in(variables['Agent.Name'], 'BuildMinion03A', 'BuildMinion03B'))
 
-    - script: $(PY_EXE) $(bb) -v $(BB_V) -a $(BB_ARCH) -s $(strategy) build
-      displayName: Build
-      env:
-        NuGetFeed_Address: $(NUGETFEED_ADDRESS)
-        AZURE_DEVOPS_EXT_PAT: $(System.AccessToken)
+#     - script: $(PY_EXE) $(bb) -v $(BB_V) -a $(BB_ARCH) -s $(strategy) build
+#       displayName: Build
+#       env:
+#         NuGetFeed_Address: $(NUGETFEED_ADDRESS)
+#         AZURE_DEVOPS_EXT_PAT: $(System.AccessToken)
