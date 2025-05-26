@@ -39,6 +39,7 @@
     <PropertyCategory typeName="DrivewayPathEdge_Crowning" displayLabel="Crowning" priority="0" />
     <PropertyCategory typeName="DrivewayPathFin_Road" displayLabel="Road" priority="0" />
     <PropertyCategory typeName="DrivewayPathFin_Shoulder" displayLabel="Shoulder" priority="0" />
+    <PropertyCategory typeName="SidewalkPathFin_Road" displayLabel="Road" priority="0" />
 
     <PropertyCategory typeName="ShapedArea_Optimizer" displayLabel="Optimizer" priority="0" />
     <PropertyCategory typeName="ShapedArea_Constraints" displayLabel="Constraints" priority="0" />
@@ -366,6 +367,24 @@
 
     <ECEntityClass typeName="SidewalkPathEdge" modifier="Sealed" displayLabel="Sidewalk Edge" description="Sidewalk path edge.">
         <BaseClass>CenterlinePathEdge</BaseClass>
+        <ECProperty propertyName="CrowningType" typeName="CrownType" category="CenterlinePathEdge_Grading" displayLabel="Crown Type" description="Type of crown design for path." />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="SidewalkPathFin" modifier="Sealed" displayLabel="Sidewalk Fin" description="One of two sides to a Sidewalk Path Edge.">
+        <BaseClass>bis:SpatialLocationElement</BaseClass>
+
+        <!--
+            In SITEOPS, (almost) all the properties on this element are duplicated with the '-Other' post-fix and live on a single Side object.
+            Here, we have two separate elements, with this single property to determine if it is the 'Primary' SidewalkPathFin or the 'Other' SidewalkPathFin
+        -->
+        <ECProperty propertyName="IsPrimary" typeName="boolean">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03" />
+            </ECCustomAttributes>
+        </ECProperty>
+
+        <ECProperty propertyName="SidewalkWidth" typeName="double" kindOfQuantity="rru:LENGTH" category="SidewalkPathFin_Road" displayLabel="Sidewalk Width" description="Sidewalk width for this side of the sidewalk." />        
+        <ECProperty propertyName="CrossSlope" typeName="double" kindOfQuantity="rru:SLOPE" category="SidewalkPathFin_Road" displayLabel="Cross Slope" description="Cross slope for this side of the sidewalk." />
     </ECEntityClass>
 
     <ECEntityClass typeName="ParkingDirectionPathEdge" modifier="Sealed" displayLabel="Parking Direction Edge" description="Parking direction path edge.">
@@ -546,6 +565,16 @@
         </Source>
         <Target multiplicity="(2..2)" roleLabel="is owned by" polymorphic="false">
             <Class class="DrivewayPathFin" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="SidewalkPathEdgeOwnsFins" strength="embedding" strengthDirection="Forward" modifier="Sealed">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="SidewalkPathEdge" />
+        </Source>
+        <Target multiplicity="(2..2)" roleLabel="is owned by" polymorphic="false">
+            <Class class="SidewalkPathFin" />
         </Target>
     </ECRelationshipClass>
 
