@@ -3,7 +3,7 @@
 |  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
 |  * See LICENSE.md in the project root for license terms and full copyright notice.
 ======================================================================================= -->
-<ECSchema schemaName="OpenSite" alias="opnsite" version="01.00.08" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" displayLabel="OpenSite" description="OpenSite+ application schema.">
+<ECSchema schemaName="OpenSite" alias="opnsite" version="01.00.06" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" displayLabel="OpenSite" description="OpenSite+ application schema.">
     <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA" />
     <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
     <ECSchemaReference name="BisCore" version="01.00.10" alias="bis" />
@@ -15,7 +15,7 @@
 
     <ECCustomAttributes>
         <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
-            <SupportedUse>NotForProduction</SupportedUse>
+            <SupportedUse>FieldTesting</SupportedUse>
         </ProductionStatus>
         <SchemaLayerInfo xmlns="BisCustomAttributes.01.00.00">
             <Value>Application</Value>
@@ -30,7 +30,7 @@
     <PropertyCategory typeName="ParkingBayVertex_Bay" displayLabel="Bay" priority="0" />
     <PropertyCategory typeName="ParkingAisleVertex_Aisle" displayLabel="Aisle" priority="0" />
 
-    <PropertyCategory typeName="ShapedEdge_LinkHeight" displayLabel="Grading Edge Height" priority="0" />
+    <PropertyCategory typeName="ShapedEdge_LinkHeight" displayLabel="Grading Link Height" priority="0" />
     <PropertyCategory typeName="BuildingEdge_SlopeAway" displayLabel="Grading Slope Away" priority="0" />
     <PropertyCategory typeName="PropertyEdge_Setbacks" displayLabel="Setbacks" priority="0" />
     <PropertyCategory typeName="CenterlinePathEdge_Grading" displayLabel="Grading" priority="0" />
@@ -39,7 +39,6 @@
     <PropertyCategory typeName="DrivewayPathEdge_Crowning" displayLabel="Crowning" priority="0" />
     <PropertyCategory typeName="DrivewayPathFin_Road" displayLabel="Road" priority="0" />
     <PropertyCategory typeName="DrivewayPathFin_Shoulder" displayLabel="Shoulder" priority="0" />
-    <PropertyCategory typeName="SidewalkPathFin_Road" displayLabel="Road" priority="0" />
 
     <PropertyCategory typeName="ShapedArea_Optimizer" displayLabel="Optimizer" priority="0" />
     <PropertyCategory typeName="ShapedArea_Constraints" displayLabel="Constraints" priority="0" />
@@ -230,15 +229,7 @@
     <ECEntityClass typeName="ShapedEdge" modifier="Abstract" displayLabel="Shaped Edge" description="Edge class for physical objects such as buildings.">
         <BaseClass>AreaEdge</BaseClass>
 
-        <ECProperty propertyName="LinkHeight" typeName="double" kindOfQuantity="rru:LENGTH" category="ShapedEdge_LinkHeight" displayLabel="Link Height" description="Height of an edge." >
-            <ECCustomAttributes>
-                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03" />
-                <Deprecated xmlns="CoreCustomAttributes.01.00.03">
-                    <Description>Link Height has been moved to BuildingEdge and PadEdge and renamed to Fixed Height Difference.</Description>
-                </Deprecated>
-            </ECCustomAttributes>
-        </ECProperty>
-
+        <ECProperty propertyName="LinkHeight" typeName="double" kindOfQuantity="rru:LENGTH" category="ShapedEdge_LinkHeight" displayLabel="Link Height" description="Height of an edge." />
         <ECProperty propertyName="UseWallInCost" typeName="boolean" category="ShapedEdge_LinkHeight" displayLabel="Use Wall in Cost" description="Treat as a wall for cost optimization." />
     </ECEntityClass>
 
@@ -268,7 +259,6 @@
 
         <ECProperty propertyName="SlopeAway" typeName="double" kindOfQuantity="rru:SLOPE" category="BuildingEdge_SlopeAway" displayLabel="Slope Away" description="Slope away from edge for grading." />
         <ECProperty propertyName="SlopeAwayDistance" typeName="double" kindOfQuantity="rru:LENGTH" category="BuildingEdge_SlopeAway" displayLabel="Slope Away Distance" description="Distance of the slope away from edge for grading." />
-        <ECProperty propertyName="FixedHeightDifference" typeName="double" kindOfQuantity="rru:LENGTH" category="ShapedEdge_LinkHeight" displayLabel="Fixed Height Difference" description="Height of an edge." />
     </ECEntityClass>
 
     <ECEntityClass typeName="ParkingEdge" modifier="Sealed" displayLabel="Parking Edge">
@@ -293,7 +283,6 @@
 
     <ECEntityClass typeName="PadEdge" modifier="Sealed" displayLabel="Pad Edge">
         <BaseClass>ShapedEdge</BaseClass>
-        <ECProperty propertyName="FixedHeightDifference" typeName="double" kindOfQuantity="rru:LENGTH" category="ShapedEdge_LinkHeight" displayLabel="Fixed Height Difference" description="Height of an edge." />
     </ECEntityClass>
 
     <ECEntityClass typeName="LayoutParkingEdge" modifier="Sealed" displayLabel="Layout Parking Edge" description="Parking lot">
@@ -367,83 +356,11 @@
 
     <ECEntityClass typeName="SidewalkPathEdge" modifier="Sealed" displayLabel="Sidewalk Edge" description="Sidewalk path edge.">
         <BaseClass>CenterlinePathEdge</BaseClass>
-        <ECProperty propertyName="CrowningType" typeName="CrownType" category="CenterlinePathEdge_Grading" displayLabel="Crown Type" description="Type of crown design for path." />
-    </ECEntityClass>
-
-    <ECEntityClass typeName="SidewalkPathFin" modifier="Sealed" displayLabel="Sidewalk Fin" description="One of two sides to a Sidewalk Path Edge.">
-        <BaseClass>bis:SpatialLocationElement</BaseClass>
-
-        <!--
-            In SITEOPS, (almost) all the properties on this element are duplicated with the '-Other' post-fix and live on a single Side object.
-            Here, we have two separate elements, with this single property to determine if it is the 'Primary' SidewalkPathFin or the 'Other' SidewalkPathFin
-        -->
-        <ECProperty propertyName="IsPrimary" typeName="boolean">
-            <ECCustomAttributes>
-                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03" />
-            </ECCustomAttributes>
-        </ECProperty>
-
-        <ECProperty propertyName="SidewalkWidth" typeName="double" kindOfQuantity="rru:LENGTH" category="SidewalkPathFin_Road" displayLabel="Sidewalk Width" description="Sidewalk width for this side of the sidewalk." />        
-        <ECProperty propertyName="CrossSlope" typeName="double" kindOfQuantity="rru:SLOPE" category="SidewalkPathFin_Road" displayLabel="Cross Slope" description="Cross slope for this side of the sidewalk." />
     </ECEntityClass>
 
     <ECEntityClass typeName="ParkingDirectionPathEdge" modifier="Sealed" displayLabel="Parking Direction Edge" description="Parking direction path edge.">
         <BaseClass>PathEdge</BaseClass>
     </ECEntityClass>
-
-    <ECRelationshipClass typeName="DrivewayPathUsesCurbType" strength="referencing" modifier="Sealed">
-        <Source multiplicity="(0..*)" roleLabel="uses" polymorphic="false">
-            <Class class="DrivewayPath" />
-        </Source>
-        <Target multiplicity="(0..1)" roleLabel="is used by" polymorphic="true">
-            <Class class="CurbType" />
-        </Target>
-    </ECRelationshipClass>
-
-    <ECRelationshipClass typeName="DrivewayAreaUsesCurbType" strength="referencing" modifier="Sealed">
-        <Source multiplicity="(0..*)" roleLabel="uses" polymorphic="false">
-            <Class class="DrivewayArea" />
-        </Source>
-        <Target multiplicity="(0..1)" roleLabel="is used by" polymorphic="true">
-            <Class class="CurbType" />
-        </Target>
-    </ECRelationshipClass>
-
-    <ECRelationshipClass typeName="IslandAreaUsesCurbType" strength="referencing" modifier="Sealed">
-        <Source multiplicity="(0..*)" roleLabel="uses" polymorphic="false">
-            <Class class="IslandArea" />
-        </Source>
-        <Target multiplicity="(0..1)" roleLabel="is used by" polymorphic="true">
-            <Class class="CurbType" />
-        </Target>
-    </ECRelationshipClass>
-
-    <ECRelationshipClass typeName="ParkingAreaUsesCurbType" strength="referencing" modifier="Sealed">
-        <Source multiplicity="(0..*)" roleLabel="uses" polymorphic="false">
-            <Class class="ParkingArea" />
-        </Source>
-        <Target multiplicity="(0..1)" roleLabel="is used by" polymorphic="true">
-            <Class class="CurbType" />
-        </Target>
-    </ECRelationshipClass>
-
-    <ECRelationshipClass typeName="LayoutParkingAreaUsesCurbType" strength="referencing" modifier="Sealed">
-        <Source multiplicity="(0..*)" roleLabel="uses" polymorphic="false">
-            <Class class="LayoutParkingArea" />
-        </Source>
-        <Target multiplicity="(0..1)" roleLabel="is used by" polymorphic="true">
-            <Class class="CurbType" />
-        </Target>
-    </ECRelationshipClass>
-
-    <ECRelationshipClass typeName="LayoutParkingAreaUsesIslandCurbType" strength="referencing" modifier="Sealed">
-        <Source multiplicity="(0..*)" roleLabel="uses" polymorphic="false">
-            <Class class="LayoutParkingArea" />
-        </Source>
-        <Target multiplicity="(0..1)" roleLabel="is used by" polymorphic="true">
-            <Class class="CurbType" />
-        </Target>
-    </ECRelationshipClass>
 
     <ECRelationshipClass typeName="EdgeStartsAtVertex" strength="referencing" modifier="Sealed">
         <Source multiplicity="(0..2)" roleLabel="starts at" polymorphic="true">
@@ -568,16 +485,6 @@
         </Target>
     </ECRelationshipClass>
 
-    <ECRelationshipClass typeName="SidewalkPathEdgeOwnsFins" strength="embedding" strengthDirection="Forward" modifier="Sealed">
-        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
-        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
-            <Class class="SidewalkPathEdge" />
-        </Source>
-        <Target multiplicity="(2..2)" roleLabel="is owned by" polymorphic="false">
-            <Class class="SidewalkPathFin" />
-        </Target>
-    </ECRelationshipClass>
-
     <ECRelationshipClass typeName="DrivewayMidVertexOwnsTransitions" strength="embedding" strengthDirection="Forward" modifier="Sealed">
         <BaseClass>bis:ElementOwnsChildElements</BaseClass>
         <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
@@ -643,7 +550,6 @@
         <ECProperty propertyName="SurfaceDepth" typeName="double" category="ShapedArea_Surface" kindOfQuantity="rru:LENGTH_SHORT" displayLabel="Surface Depth" description="Material depth of area." />
         <ECProperty propertyName="RunoffCoefficient" typeName="double" category="ShapedArea_Surface" displayLabel="Runoff Coefficient" description="Runoff coefficient for area." />
 
-        <ECProperty propertyName="FixedSlope" typeName="double" category="ShapedArea_Constraints" kindOfQuantity="rru:SLOPE" displayLabel="Fixed Slope" description="Fixed design slope for area." />
         <ECProperty propertyName="MinSlope" typeName="double" category="ShapedArea_Constraints" kindOfQuantity="rru:SLOPE" displayLabel="Min. Slope" description="Minimum design slope for area." />
         <ECProperty propertyName="MaxSlope" typeName="double" category="ShapedArea_Constraints" kindOfQuantity="rru:SLOPE" displayLabel="Max. Slope" description="Maximum design slope for area." />
         <ECProperty propertyName="MinZ" typeName="double" category="ShapedArea_Constraints" kindOfQuantity="rru:LENGTH" displayLabel="Min. Elevation" description="Minimum design elevation for area." />
@@ -670,14 +576,10 @@
 
     <ECEntityClass typeName="ParkingArea" modifier="Sealed" displayLabel="Parking Area" description="Parking Area">
         <BaseClass>ShapedArea</BaseClass>
-
-        <ECNavigationProperty propertyName="CurbType" relationshipName="ParkingAreaUsesCurbType" direction="Forward" displayLabel="Curb Type" />
     </ECEntityClass>
 
     <ECEntityClass typeName="DrivewayArea" modifier="Sealed" displayLabel="Driveway Area" description="Driveway Area">
         <BaseClass>ShapedArea</BaseClass>
-
-        <ECNavigationProperty propertyName="CurbType" relationshipName="DrivewayAreaUsesCurbType" direction="Forward" displayLabel="Curb Type" />
     </ECEntityClass>
 
     <ECEntityClass typeName="SidewalkArea" modifier="Sealed" displayLabel="Sidewalk Area" description="Sidewalk Area">
@@ -686,8 +588,6 @@
 
     <ECEntityClass typeName="IslandArea" modifier="Sealed" displayLabel="Island Area" description="Island Area">
         <BaseClass>ShapedArea</BaseClass>
-
-        <ECNavigationProperty propertyName="CurbType" relationshipName="IslandAreaUsesCurbType" direction="Forward" displayLabel="Curb Type" />
     </ECEntityClass>
 
     <ECEntityClass typeName="LayoutArea" modifier="Abstract" displayLabel="Layout Area" description="Layout Area">
@@ -725,9 +625,6 @@
         <ECProperty propertyName="SurfaceDepthParkingLot" typeName="double" category="LayoutParkingArea_ParkingGrading" kindOfQuantity="rru:LENGTH_SHORT" displayLabel="Surface Depth" description="Surface or material depth." />
         <ECProperty propertyName="SurfaceTypeParkingSpaces" typeName="SurfaceType" category="LayoutParkingArea_ParkingGrading" displayLabel="Space Surface Type" description="Surface type or material for specific parking spaces." />
         <ECProperty propertyName="SurfaceDepthParkingSpaces" typeName="double" category="LayoutParkingArea_ParkingGrading" kindOfQuantity="rru:LENGTH_SHORT" displayLabel="Space Surface Depth" description="Surface or material depth for specific parking spaces." />
-
-        <ECNavigationProperty propertyName="IslandCurbType" relationshipName="LayoutParkingAreaUsesIslandCurbType" direction="Forward" displayLabel="Island Curb Type" />
-        <ECNavigationProperty propertyName="ParkingCurbType" relationshipName="LayoutParkingAreaUsesCurbType" direction="Forward" displayLabel="Curb Type" />
     </ECEntityClass>
 
     <ECEntityClass typeName="LayoutPondArea" modifier="Sealed" displayLabel="Pond" description="Layout pond area.">
@@ -746,20 +643,12 @@
     <ECEntityClass typeName="GradingArea" modifier="Abstract" displayLabel="Grading Area" description="Grading area.">
         <BaseClass>Area</BaseClass>
 
-        <ECProperty propertyName="DoGrade" typeName="boolean" category="GradingArea_Optimizer" displayLabel="Grading">
-            <ECCustomAttributes>
-                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03" />
-                <Deprecated xmlns="CoreCustomAttributes.01.00.03">
-                    <Description>DoGrade is deprecated for Grading Area. </Description>
-                </Deprecated>
-            </ECCustomAttributes>
-        </ECProperty>
+        <ECProperty propertyName="DoGrade" typeName="boolean" category="GradingArea_Optimizer" displayLabel="Grading" />
 
         <ECProperty propertyName="Topsoil" typeName="double" category="GradingArea_Surface" kindOfQuantity="rru:LENGTH_SHORT" displayLabel="Topsoil" description="Topsoil depth for grading area." />
         <ECProperty propertyName="SurfaceType" typeName="SurfaceType" category="GradingArea_Surface" displayLabel="Surface Type" description="Surface type or material for grading area." />
         <ECProperty propertyName="SurfaceDepth" typeName="double" category="GradingArea_Surface" kindOfQuantity="rru:LENGTH_SHORT" displayLabel="Surface Depth" description="Surface or material depth for grading area." />
 
-        <ECProperty propertyName="FixedSlope" typeName="double" category="GradingArea_Constraints" kindOfQuantity="rru:SLOPE" displayLabel="Fixed Slope" description="Fixed slope constraint on grading area." />
         <ECProperty propertyName="MinSlope" typeName="double" category="GradingArea_Constraints" kindOfQuantity="rru:SLOPE" displayLabel="Min. Slope" description="Minimum slope constraint on grading area." />
         <ECProperty propertyName="MaxSlope" typeName="double" category="GradingArea_Constraints" kindOfQuantity="rru:SLOPE" displayLabel="Max. Slope" description="Maximum slope constraint on grading area." />
         <ECProperty propertyName="MinZ" typeName="double" category="GradingArea_Constraints" kindOfQuantity="rru:LENGTH" displayLabel="Min. Elevation" description="Minimum elevation change constraint on grading area." />
@@ -790,7 +679,6 @@
         </ECProperty>
 
         <ECProperty propertyName="DriveOnRight" typeName="boolean" category="DrivewayPath_Direction" displayLabel="Drive On Right" description="Sets the primary drive side, true to drive on the right-hand side." />
-        <ECNavigationProperty propertyName="CurbType" relationshipName="DrivewayPathUsesCurbType" direction="Forward" displayLabel="Curb Type" />
     </ECEntityClass>
 
     <ECEntityClass typeName="ParkingDirectionPath" modifier="Sealed" displayLabel="Parking Direction" description="Parking direction path.">
@@ -816,7 +704,7 @@
     <ECEntityClass typeName="BreaklinePath" modifier="Sealed" displayLabel="Breakline Path" description="Breakline path.">
         <BaseClass>GradingPath</BaseClass>
     </ECEntityClass>
-
+    
     <ECEntityClass typeName="CachedLinear" modifier="Sealed" displayLabel="Cached Linear" description="Cached 3D Linear geometry.">
         <BaseClass>bis:SpatialLocationElement</BaseClass>
         <ECCustomAttributes>

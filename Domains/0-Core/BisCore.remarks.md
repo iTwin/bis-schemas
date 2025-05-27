@@ -470,6 +470,10 @@ The system handler also requires a valid *placement* if `GeometryStream` is not 
 
 See [GeometryStream](../../learning/common/geometrystream/) for a more in-depth explanation about that property.
 
+### Drawing
+
+A `Drawing` instance with a NULL _ScaleFactor_ implies no scaling is applied to any Text contained in the GeometryStream of elements in its submodel. That is effectively the same as _ScaleFactor_ = 1.0.
+
 ### DrawingModel
 
 > Behavior: The system handler (C++) for `DrawingModel` ensures that the *modeled element* for a `DrawingModel` is a `Drawing` or a `TemplateRecipe2d`.
@@ -549,3 +553,25 @@ An Entity is modeled as a `bis:RoleElement` when a set of external circumstances
 > Behavior: The system handler (C++) for `RoleElement` will only permit instances to be inserted into a `RoleModel`.
 This behavior applies to all `RoleElement` subclasses.
 `FunctionalElement` (from the `Functional` schema) is the most widely known subclass of `RoleElement`.
+
+## Relationship Classes
+
+### PhysicalTypeComposesSubTypes
+
+Concrete implementations of the `PhysicalTypeComposesSubTypes` relationship can use the inherited _PriorityMember_ property to introduce ordering among the composed PhysicalType instances, when needed. In that case, the numeric values assigned to such property shall be the result of a convention adopted in a given domain or application.
+
+### SpatialLocationModelBreaksDownTemplateRecipe3dInPlan
+
+The _IsPlanProjection_ property of the `SpatialLocationModel` breaking down a `TemplateRecipe3dInPlan` instance is expected to be set to true.
+
+### SpatialLocationTypeRepresentsTypeDefinition
+
+The `SpatialLocationTypeRepresentsTypeDefinition` relationship is the equivalent of the `SpatialLocationElementRepresentsElement` relationship but between `TypeDefinition`s. That is, it enables association of `TypeDefinitions` across modeling-perspectives.
+
+Consider the following example. A particular application has the need to manage `ManholeType` instances (subclass of `PhysicalType`) that need to capture semantics and _Template geometry_ applicable to different _Plan-Projection_ representations, each expected to use a different graphics for the same `ManholeType`. An example of such case involves the need to symbolize a Manhole participating in a Sewer system differently than a Manhole in a Storm system.
+
+The scenario presented in such example is addressed by introducing a `SpatialLocationType` instance for each different representation of a Physical `ManholeType` needed. In that case, the `SpatialLocationTypeRepresentsTypeDefinition` relationship is used to associate those `TypeDefinitions`. The following class-diagram and instance diagram depict this solution:
+
+![Class diagram](media/SpatialLocationTypeRepresents-classes.png)
+
+![Instance diagram](media/SpatialLocationTypeRepresents-instances.png)

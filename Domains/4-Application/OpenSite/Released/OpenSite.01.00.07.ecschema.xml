@@ -3,7 +3,7 @@
 |  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
 |  * See LICENSE.md in the project root for license terms and full copyright notice.
 ======================================================================================= -->
-<ECSchema schemaName="OpenSite" alias="opnsite" version="01.00.08" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" displayLabel="OpenSite" description="OpenSite+ application schema.">
+<ECSchema schemaName="OpenSite" alias="opnsite" version="01.00.07" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" displayLabel="OpenSite" description="OpenSite+ application schema.">
     <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA" />
     <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
     <ECSchemaReference name="BisCore" version="01.00.10" alias="bis" />
@@ -15,7 +15,7 @@
 
     <ECCustomAttributes>
         <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
-            <SupportedUse>NotForProduction</SupportedUse>
+            <SupportedUse>FieldTesting</SupportedUse>
         </ProductionStatus>
         <SchemaLayerInfo xmlns="BisCustomAttributes.01.00.00">
             <Value>Application</Value>
@@ -39,7 +39,6 @@
     <PropertyCategory typeName="DrivewayPathEdge_Crowning" displayLabel="Crowning" priority="0" />
     <PropertyCategory typeName="DrivewayPathFin_Road" displayLabel="Road" priority="0" />
     <PropertyCategory typeName="DrivewayPathFin_Shoulder" displayLabel="Shoulder" priority="0" />
-    <PropertyCategory typeName="SidewalkPathFin_Road" displayLabel="Road" priority="0" />
 
     <PropertyCategory typeName="ShapedArea_Optimizer" displayLabel="Optimizer" priority="0" />
     <PropertyCategory typeName="ShapedArea_Constraints" displayLabel="Constraints" priority="0" />
@@ -367,83 +366,11 @@
 
     <ECEntityClass typeName="SidewalkPathEdge" modifier="Sealed" displayLabel="Sidewalk Edge" description="Sidewalk path edge.">
         <BaseClass>CenterlinePathEdge</BaseClass>
-        <ECProperty propertyName="CrowningType" typeName="CrownType" category="CenterlinePathEdge_Grading" displayLabel="Crown Type" description="Type of crown design for path." />
-    </ECEntityClass>
-
-    <ECEntityClass typeName="SidewalkPathFin" modifier="Sealed" displayLabel="Sidewalk Fin" description="One of two sides to a Sidewalk Path Edge.">
-        <BaseClass>bis:SpatialLocationElement</BaseClass>
-
-        <!--
-            In SITEOPS, (almost) all the properties on this element are duplicated with the '-Other' post-fix and live on a single Side object.
-            Here, we have two separate elements, with this single property to determine if it is the 'Primary' SidewalkPathFin or the 'Other' SidewalkPathFin
-        -->
-        <ECProperty propertyName="IsPrimary" typeName="boolean">
-            <ECCustomAttributes>
-                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03" />
-            </ECCustomAttributes>
-        </ECProperty>
-
-        <ECProperty propertyName="SidewalkWidth" typeName="double" kindOfQuantity="rru:LENGTH" category="SidewalkPathFin_Road" displayLabel="Sidewalk Width" description="Sidewalk width for this side of the sidewalk." />        
-        <ECProperty propertyName="CrossSlope" typeName="double" kindOfQuantity="rru:SLOPE" category="SidewalkPathFin_Road" displayLabel="Cross Slope" description="Cross slope for this side of the sidewalk." />
     </ECEntityClass>
 
     <ECEntityClass typeName="ParkingDirectionPathEdge" modifier="Sealed" displayLabel="Parking Direction Edge" description="Parking direction path edge.">
         <BaseClass>PathEdge</BaseClass>
     </ECEntityClass>
-
-    <ECRelationshipClass typeName="DrivewayPathUsesCurbType" strength="referencing" modifier="Sealed">
-        <Source multiplicity="(0..*)" roleLabel="uses" polymorphic="false">
-            <Class class="DrivewayPath" />
-        </Source>
-        <Target multiplicity="(0..1)" roleLabel="is used by" polymorphic="true">
-            <Class class="CurbType" />
-        </Target>
-    </ECRelationshipClass>
-
-    <ECRelationshipClass typeName="DrivewayAreaUsesCurbType" strength="referencing" modifier="Sealed">
-        <Source multiplicity="(0..*)" roleLabel="uses" polymorphic="false">
-            <Class class="DrivewayArea" />
-        </Source>
-        <Target multiplicity="(0..1)" roleLabel="is used by" polymorphic="true">
-            <Class class="CurbType" />
-        </Target>
-    </ECRelationshipClass>
-
-    <ECRelationshipClass typeName="IslandAreaUsesCurbType" strength="referencing" modifier="Sealed">
-        <Source multiplicity="(0..*)" roleLabel="uses" polymorphic="false">
-            <Class class="IslandArea" />
-        </Source>
-        <Target multiplicity="(0..1)" roleLabel="is used by" polymorphic="true">
-            <Class class="CurbType" />
-        </Target>
-    </ECRelationshipClass>
-
-    <ECRelationshipClass typeName="ParkingAreaUsesCurbType" strength="referencing" modifier="Sealed">
-        <Source multiplicity="(0..*)" roleLabel="uses" polymorphic="false">
-            <Class class="ParkingArea" />
-        </Source>
-        <Target multiplicity="(0..1)" roleLabel="is used by" polymorphic="true">
-            <Class class="CurbType" />
-        </Target>
-    </ECRelationshipClass>
-
-    <ECRelationshipClass typeName="LayoutParkingAreaUsesCurbType" strength="referencing" modifier="Sealed">
-        <Source multiplicity="(0..*)" roleLabel="uses" polymorphic="false">
-            <Class class="LayoutParkingArea" />
-        </Source>
-        <Target multiplicity="(0..1)" roleLabel="is used by" polymorphic="true">
-            <Class class="CurbType" />
-        </Target>
-    </ECRelationshipClass>
-
-    <ECRelationshipClass typeName="LayoutParkingAreaUsesIslandCurbType" strength="referencing" modifier="Sealed">
-        <Source multiplicity="(0..*)" roleLabel="uses" polymorphic="false">
-            <Class class="LayoutParkingArea" />
-        </Source>
-        <Target multiplicity="(0..1)" roleLabel="is used by" polymorphic="true">
-            <Class class="CurbType" />
-        </Target>
-    </ECRelationshipClass>
 
     <ECRelationshipClass typeName="EdgeStartsAtVertex" strength="referencing" modifier="Sealed">
         <Source multiplicity="(0..2)" roleLabel="starts at" polymorphic="true">
@@ -568,16 +495,6 @@
         </Target>
     </ECRelationshipClass>
 
-    <ECRelationshipClass typeName="SidewalkPathEdgeOwnsFins" strength="embedding" strengthDirection="Forward" modifier="Sealed">
-        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
-        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
-            <Class class="SidewalkPathEdge" />
-        </Source>
-        <Target multiplicity="(2..2)" roleLabel="is owned by" polymorphic="false">
-            <Class class="SidewalkPathFin" />
-        </Target>
-    </ECRelationshipClass>
-
     <ECRelationshipClass typeName="DrivewayMidVertexOwnsTransitions" strength="embedding" strengthDirection="Forward" modifier="Sealed">
         <BaseClass>bis:ElementOwnsChildElements</BaseClass>
         <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
@@ -670,14 +587,10 @@
 
     <ECEntityClass typeName="ParkingArea" modifier="Sealed" displayLabel="Parking Area" description="Parking Area">
         <BaseClass>ShapedArea</BaseClass>
-
-        <ECNavigationProperty propertyName="CurbType" relationshipName="ParkingAreaUsesCurbType" direction="Forward" displayLabel="Curb Type" />
     </ECEntityClass>
 
     <ECEntityClass typeName="DrivewayArea" modifier="Sealed" displayLabel="Driveway Area" description="Driveway Area">
         <BaseClass>ShapedArea</BaseClass>
-
-        <ECNavigationProperty propertyName="CurbType" relationshipName="DrivewayAreaUsesCurbType" direction="Forward" displayLabel="Curb Type" />
     </ECEntityClass>
 
     <ECEntityClass typeName="SidewalkArea" modifier="Sealed" displayLabel="Sidewalk Area" description="Sidewalk Area">
@@ -686,8 +599,6 @@
 
     <ECEntityClass typeName="IslandArea" modifier="Sealed" displayLabel="Island Area" description="Island Area">
         <BaseClass>ShapedArea</BaseClass>
-
-        <ECNavigationProperty propertyName="CurbType" relationshipName="IslandAreaUsesCurbType" direction="Forward" displayLabel="Curb Type" />
     </ECEntityClass>
 
     <ECEntityClass typeName="LayoutArea" modifier="Abstract" displayLabel="Layout Area" description="Layout Area">
@@ -725,9 +636,6 @@
         <ECProperty propertyName="SurfaceDepthParkingLot" typeName="double" category="LayoutParkingArea_ParkingGrading" kindOfQuantity="rru:LENGTH_SHORT" displayLabel="Surface Depth" description="Surface or material depth." />
         <ECProperty propertyName="SurfaceTypeParkingSpaces" typeName="SurfaceType" category="LayoutParkingArea_ParkingGrading" displayLabel="Space Surface Type" description="Surface type or material for specific parking spaces." />
         <ECProperty propertyName="SurfaceDepthParkingSpaces" typeName="double" category="LayoutParkingArea_ParkingGrading" kindOfQuantity="rru:LENGTH_SHORT" displayLabel="Space Surface Depth" description="Surface or material depth for specific parking spaces." />
-
-        <ECNavigationProperty propertyName="IslandCurbType" relationshipName="LayoutParkingAreaUsesIslandCurbType" direction="Forward" displayLabel="Island Curb Type" />
-        <ECNavigationProperty propertyName="ParkingCurbType" relationshipName="LayoutParkingAreaUsesCurbType" direction="Forward" displayLabel="Curb Type" />
     </ECEntityClass>
 
     <ECEntityClass typeName="LayoutPondArea" modifier="Sealed" displayLabel="Pond" description="Layout pond area.">
@@ -790,7 +698,6 @@
         </ECProperty>
 
         <ECProperty propertyName="DriveOnRight" typeName="boolean" category="DrivewayPath_Direction" displayLabel="Drive On Right" description="Sets the primary drive side, true to drive on the right-hand side." />
-        <ECNavigationProperty propertyName="CurbType" relationshipName="DrivewayPathUsesCurbType" direction="Forward" displayLabel="Curb Type" />
     </ECEntityClass>
 
     <ECEntityClass typeName="ParkingDirectionPath" modifier="Sealed" displayLabel="Parking Direction" description="Parking direction path.">
