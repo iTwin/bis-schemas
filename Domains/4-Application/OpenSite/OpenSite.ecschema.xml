@@ -835,7 +835,7 @@
         <ECProperty propertyName="Surface" typeName="Bentley.Geometry.Common.IGeometry" displayLabel="Top Surface Geometry" />
     </ECEntityClass>
 
-    <ECEntityClass typeName="ContourLinesAspect" modifier="Sealed" displayLabel="Contour Lines" description="Terrain contour lines">
+    <ECEntityClass typeName="ContourLinesAspect" modifier="Sealed" displayLabel="Contour Lines" description="Terrain contour lines" >
         <BaseClass>bis:ElementUniqueAspect</BaseClass>
 
         <ECProperty propertyName="MinorStep" typeName="double" kindOfQuantity="rru:LENGTH" displayLabel="Minor Step" description="Minor steps interval size" />
@@ -1195,7 +1195,7 @@
         </ECCustomAttributes>
     </ECEntityClass>
 
-    <ECEntityClass typeName="SurfaceControlVertex" modifier="None" displayLabel="Control Vertex" description="Defines a location point which controls control object.">
+    <ECEntityClass typeName="SurfaceControlVertex" modifier="None" displayLabel="Control Vertex" description="A 3D point on a surface whose elevation is used in spatial interpolation with other control points.">
         <BaseClass>Vertex</BaseClass>
     </ECEntityClass>
 
@@ -1203,7 +1203,7 @@
         <BaseClass>bis:InformationRecordElement</BaseClass>
     </ECEntityClass>
 
-    <ECEntityClass typeName="SurfaceControlVertexRule" modifier="Abstract" description="Surface control vertex rule.">
+    <ECEntityClass typeName="SurfaceControlVertexRule" modifier="Abstract" description="A ruled constraint between two surface control vertices.">
         <BaseClass>SurfaceControlRule</BaseClass>
 
         <ECNavigationProperty propertyName="StartVertex" relationshipName="SurfaceControlVertexRuleStartsAtVertex" direction="Forward" />
@@ -1228,31 +1228,31 @@
         </Target>
     </ECRelationshipClass>
 
-    <ECEntityClass typeName="SurfaceControlVertexDeltaRule" modifier="Sealed" displayLabel="Surface Control Vertex Delta Rule" description="Surface control vertex delta rule.">
+    <ECEntityClass typeName="SurfaceControlVertexDeltaRule" modifier="Sealed" displayLabel="Surface Control Vertex Delta Rule" description="Constrains two surface control vertices to have a constant elevation difference between each other.">
         <BaseClass>SurfaceControlVertexRule</BaseClass>
 
         <ECProperty propertyName="ControlVertexDelta" typeName="double" category="SurfaceControl_Vertex" kindOfQuantity="rru:LENGTH" displayLabel="Delta" description="Delta defined by a control vertex override." />
     </ECEntityClass>
 
-    <ECEntityClass typeName="SurfaceControlVertexSlopeRule" modifier="Sealed" displayLabel="Surface Control Vertex Slope Rule" description="Surface control vertex slope rule.">
+    <ECEntityClass typeName="SurfaceControlVertexSlopeRule" modifier="Sealed" displayLabel="Surface Control Vertex Slope Rule" description="Constrains two surface control vertices to lie on the same line defined by the slope between them.">
         <BaseClass>SurfaceControlVertexRule</BaseClass>
 
         <ECProperty propertyName="ControlVertexSlope" typeName="double" category="SurfaceControl_Vertex" kindOfQuantity="rru:SLOPE" displayLabel="Slope" description="Slope defined by a control vertex override." />
     </ECEntityClass>
 
-    <ECEntityClass typeName="SurfaceSlopedControlVertex" modifier="None" displayLabel="Sloped Control Vertex" description="Defines a location point with slope information to control a control object.">
+    <ECEntityClass typeName="SurfaceSlopedControlVertex" modifier="None" displayLabel="Sloped Control Vertex" description="Specialized control vertex that uses slope constraints in the spatial interpolation calculation.">
         <BaseClass>SurfaceControlVertex</BaseClass>
 
-        <ECProperty propertyName="Slope" typeName="double" category="SurfaceControl_Vertex" kindOfQuantity="rru:SLOPE" displayLabel="Slope" description="Slope defined by a control vertex override." />
-        <ECProperty propertyName="MinSlope" typeName="double" category="SurfaceControl_Vertex" kindOfQuantity="rru:SLOPE" displayLabel="Min. Slope" description="Minimum slope defined by a control vertex override." />
-        <ECProperty propertyName="MaxSlope" typeName="double" category="SurfaceControl_Vertex" kindOfQuantity="rru:SLOPE" displayLabel="Max. Slope" description="Maximum slope defined by a control vertex override." />
+        <ECProperty propertyName="Slope" typeName="double" category="SurfaceControl_Vertex" kindOfQuantity="rru:SLOPE" displayLabel="Slope" description="Slope of the line emanating from this vertex position." />
+        <ECProperty propertyName="MinSlope" typeName="double" category="SurfaceControl_Vertex" kindOfQuantity="rru:SLOPE" displayLabel="Min. Slope" description="Minimum slope constraint." />
+        <ECProperty propertyName="MaxSlope" typeName="double" category="SurfaceControl_Vertex" kindOfQuantity="rru:SLOPE" displayLabel="Max. Slope" description="Maximum slope constraint." />
 
     </ECEntityClass>
 
-    <ECEntityClass typeName="SurfaceSlopedDirectionControlVertex" modifier="Sealed" displayLabel="Sloped Direction Control Vertex" description="Defines a location point with slope and direction information to control a control object.">
+    <ECEntityClass typeName="SurfaceSlopedDirectionControlVertex" modifier="Sealed" displayLabel="Sloped Direction Control Vertex" description="Specialized control vertex that uses slope constraints along a single direction in the spatial interpolation calculation.">
         <BaseClass>SurfaceSlopedControlVertex</BaseClass>
 
-        <ECProperty propertyName="Direction" typeName="Point3d" category="SurfaceControl_Vertex" displayLabel="Direction" description="Direction defined by a sloped control vertex override."/>
+        <ECProperty propertyName="Direction" typeName="Point2d" category="SurfaceControl_Vertex" displayLabel="Direction" description="Direction of the line emanating from this vertex position that constrains the elevation interpolation."/>
         <ECProperty propertyName="IsMirrored" typeName="boolean" category="SurfaceControl_Vertex" displayLabel="Is Mirrored" description="Set to true to mirror the surface about its reference direction."/>
     </ECEntityClass>
 
@@ -1311,19 +1311,19 @@
         </Target>
     </ECRelationshipClass>
 
-    <ECEntityClass typeName="SurfaceControlSettingsAspect" modifier="Sealed" displayLabel="Surface Control Settings">
+    <ECEntityClass typeName="SurfaceControlOptionsAspect" modifier="Sealed" displayLabel="Surface Control Options">
         <BaseClass>bis:ElementUniqueAspect</BaseClass>
 
-        <ECProperty propertyName="Resolution" typeName="double" kindOfQuantity="rru:LENGTH" category="SurfaceControl_Vertex" displayLabel="Resolution" description="Control surface resolution." />
+        <ECProperty propertyName="Resolution" typeName="double" kindOfQuantity="rru:LENGTH" category="SurfaceControl_Vertex" displayLabel="Resolution" description="Controls the spacing of the XY grid used when generating the triangulation for the interpolated surface." />
     </ECEntityClass>
 
-    <ECRelationshipClass typeName="SurfaceControlOwnsSettingsAspect" modifier="Sealed" strength="embedding">
+    <ECRelationshipClass typeName="SurfaceControlOwnsOptionsAspect" modifier="Sealed" strength="embedding">
         <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
         <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
             <Class class="ISurfaceControl" />
         </Source>
         <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
-            <Class class="SurfaceControlSettingsAspect" />
+            <Class class="SurfaceControlOptionsAspect" />
         </Target>
     </ECRelationshipClass>
 </ECSchema>
