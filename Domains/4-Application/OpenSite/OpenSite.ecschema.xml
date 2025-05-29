@@ -105,6 +105,12 @@
         <ECEnumerator value="4" name="FLEXIBLE" displayLabel="Flexible" />
     </ECEnumeration>
 
+    <ECEnumeration typeName="IntermediatePointType" backingTypeName="int" isStrict="true" displayLabel="Intermediate Point Type" description="Specifies the source of the intermediate point used when generating strokes for surface control rules.">
+        <ECEnumerator value="1" name="NONE" displayLabel="None" />
+        <ECEnumerator value="2" name="COPYSTART" displayLabel="Copy Start" />
+        <ECEnumerator value="3" name="COPYEND" displayLabel="Copy End" />
+    </ECEnumeration>
+
     <ECEntityClass typeName="Vertex" modifier="Abstract" displayLabel="Vertex">
         <BaseClass>bis:SpatialLocationElement</BaseClass>
 
@@ -1195,8 +1201,17 @@
         </ECCustomAttributes>
     </ECEntityClass>
 
+    <ECEntityClass typeName="ISurfaceControlObject" modifier="Abstract" displayLabel="Surface Control Object" description="An interface that can be mixed-into a control vertex or control line to indicate that it can be an input for surface control.">
+        <ECCustomAttributes>
+            <IsMixin xmlns="CoreCustomAttributes.01.00.03">
+                <AppliesToEntityClass>bis:SpatialLocationElement</AppliesToEntityClass>
+            </IsMixin>
+        </ECCustomAttributes>
+    </ECEntityClass>
+
     <ECEntityClass typeName="SurfaceControlVertex" modifier="None" displayLabel="Control Vertex" description="A 3D point on a surface whose elevation is used in spatial interpolation with other control points.">
         <BaseClass>Vertex</BaseClass>
+        <BaseClass>ISurfaceControlObject</BaseClass>
     </ECEntityClass>
 
     <ECEntityClass typeName="SurfaceControlRule" modifier="Abstract" description="Surface control rule.">
@@ -1208,6 +1223,9 @@
 
         <ECNavigationProperty propertyName="StartVertex" relationshipName="SurfaceControlVertexRuleStartsAtVertex" direction="Forward" />
         <ECNavigationProperty propertyName="EndVertex" relationshipName="SurfaceControlVertexRuleEndsAtVertex" direction="Forward" />
+
+        <ECProperty propertyName="IsStroked" typeName="boolean" category="SurfaceControl_Vertex" displayLabel="Is Stroked" description="Indicates whether this control vertex rule involves a stroke operation."/>
+        <ECProperty propertyName="IntermediatePointTypeSource" typeName="IntermediatePointType" category="SurfaceControl_Vertex" displayLabel="Intermediate Point Type Source" description="Specifies the type of intermediate point source used for this rule." />
     </ECEntityClass>
 
     <ECRelationshipClass typeName="SurfaceControlVertexRuleStartsAtVertex" strength="referencing" modifier="Sealed">
@@ -1303,11 +1321,26 @@
 
     <ECRelationshipClass typeName="SurfaceControlOwnsVertices" strength="embedding" strengthDirection="Forward" modifier="Sealed">
         <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <ECCustomAttributes>
+            <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                <Description>SurfaceControlOwnsVertices is no longer used for surface control, use SurfaceControlOwnsControlObjects instead.</Description>
+            </Deprecated>
+        </ECCustomAttributes>
         <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
             <Class class="ISurfaceControl" />
         </Source>
         <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="true">
             <Class class="SurfaceControlVertex" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="SurfaceControlOwnsControlObjects" strength="embedding" strengthDirection="Forward" modifier="Sealed">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="ISurfaceControl" />
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="true">
+            <Class class="ISurfaceControlObject" />
         </Target>
     </ECRelationshipClass>
 
@@ -1324,6 +1357,53 @@
         </Source>
         <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
             <Class class="SurfaceControlOptionsAspect" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="ControlLineEdge" modifier="Abstract" displayLabel="Control Line Edge">
+        <BaseClass>bis:SpatialLocationElement</BaseClass>
+
+        <ECProperty propertyName="Order" typeName="int">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03" />
+            </ECCustomAttributes>
+        </ECProperty>
+
+        <ECNavigationProperty propertyName="StartVertex" relationshipName="ControlLineEdgeStartsAtVertex" direction="Forward" />
+        <ECNavigationProperty propertyName="EndVertex" relationshipName="ControlLineEdgeEndsAtVertex" direction="Forward" />
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="ControlLineEdgeStartsAtVertex" strength="referencing" modifier="Sealed">
+        <Source multiplicity="(0..*)" roleLabel="starts at" polymorphic="true">
+            <Class class="ControlLineEdge" />
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="connects to" polymorphic="true">
+            <Class class="SurfaceControlVertex" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="ControlLineEdgeEndsAtVertex" strength="referencing" modifier="Sealed">
+        <Source multiplicity="(0..*)" roleLabel="ends at" polymorphic="true">
+            <Class class="ControlLineEdge" />
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="connects to" polymorphic="true">
+            <Class class="SurfaceControlVertex" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="SurfaceControlLine" modifier="Sealed" displayLabel="Surface Control Line" description="Surface control line.">
+        <BaseClass>bis:SpatialLocationElement</BaseClass>
+        <BaseClass>ISurfaceControlObject</BaseClass>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="SurfaceControlLineGroupsEdges" strength="referencing" strengthDirection="Forward" modifier="Sealed">
+        <BaseClass>bis:ElementGroupsMembers</BaseClass>
+
+        <Source multiplicity="(0..*)" roleLabel="groups" polymorphic="false">
+            <Class class="SurfaceControlLine" />
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is grouped in" polymorphic="false">
+            <Class class="ControlLineEdge" />
         </Target>
     </ECRelationshipClass>
 </ECSchema>
