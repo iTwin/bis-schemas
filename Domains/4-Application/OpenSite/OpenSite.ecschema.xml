@@ -111,6 +111,12 @@
         <ECEnumerator value="3" name="COPYEND" displayLabel="Copy End" />
     </ECEnumeration>
 
+    <ECEnumeration typeName="ControlVertexType" backingTypeName="int" isStrict="true" displayLabel="Control Vertex Type" description="Specifies the type of control vertex used for surface control.">
+        <ECEnumerator value="1" name="NORMAL" displayLabel="Normal" />
+        <ECEnumerator value="2" name="SLOPED" displayLabel="Sloped" />
+        <ECEnumerator value="3" name="SLOPEDDIRECTION" displayLabel="Sloped Direction" />
+    </ECEnumeration>
+
     <ECEntityClass typeName="Vertex" modifier="Abstract" displayLabel="Vertex">
         <BaseClass>bis:SpatialLocationElement</BaseClass>
 
@@ -1209,23 +1215,60 @@
         </ECCustomAttributes>
     </ECEntityClass>
 
+    <ECEntityClass typeName="ISurfaceControlElement" modifier="Abstract" displayLabel="Surface Control Element" description="An interface that can be mixed-into a control object or control rule to indicate that it can be an input for surface control.">
+        <ECCustomAttributes>
+            <IsMixin xmlns="CoreCustomAttributes.01.00.03">
+                <AppliesToEntityClass>bis:Element</AppliesToEntityClass>
+            </IsMixin>
+        </ECCustomAttributes>
+    </ECEntityClass>
+
     <ECEntityClass typeName="SurfaceControlVertex" modifier="None" displayLabel="Control Vertex" description="A 3D point on a surface whose elevation is used in spatial interpolation with other control points.">
         <BaseClass>Vertex</BaseClass>
         <BaseClass>ISurfaceControlObject</BaseClass>
+        <BaseClass>ISurfaceControlElement</BaseClass>
+
+        <ECProperty propertyName="VertexType" typeName="ControlVertexType" category="SurfaceControl_Vertex" displayLabel="Control Vertex Type" description="Specifies the type of control vertex used." />
+        <ECProperty propertyName="Slope" typeName="double" category="SurfaceControl_Vertex" kindOfQuantity="rru:SLOPE" displayLabel="Slope" description="Slope of the line emanating from this vertex position." />
+        <ECProperty propertyName="MinSlope" typeName="double" category="SurfaceControl_Vertex" kindOfQuantity="rru:SLOPE" displayLabel="Min. Slope" description="Minimum slope constraint." />
+        <ECProperty propertyName="MaxSlope" typeName="double" category="SurfaceControl_Vertex" kindOfQuantity="rru:SLOPE" displayLabel="Max. Slope" description="Maximum slope constraint." />
+        <ECProperty propertyName="Direction" typeName="Point2d" category="SurfaceControl_Vertex" displayLabel="Direction" description="Direction of the line emanating from this vertex position that constrains the elevation interpolation."/>
+        <ECProperty propertyName="IsMirrored" typeName="boolean" category="SurfaceControl_Vertex" displayLabel="Is Mirrored" description="Set to true to mirror the surface about its reference direction."/>
     </ECEntityClass>
 
     <ECEntityClass typeName="SurfaceControlRule" modifier="Abstract" description="Surface control rule.">
         <BaseClass>bis:InformationRecordElement</BaseClass>
+        <BaseClass>ISurfaceControlElement</BaseClass>
     </ECEntityClass>
+
+    <ECStructClass typeName="SurfaceControlStrokeOptions" description="Specifies the options for the stroke operation." modifier="Sealed">
+        <ECProperty propertyName="IsBreakline" typeName="boolean" category="SurfaceControl_Vertex" displayLabel="Is Breakline" description="Indicates whether the stroke is a breakline."/>
+        <ECProperty propertyName="EmitControlPoints" typeName="boolean" category="SurfaceControl_Vertex" displayLabel="Emit Control Points" description="Indicates whether the stroke operation emit intermediate control points." />
+        <ECProperty propertyName="ControlPointTypeSource" typeName="IntermediatePointType" category="SurfaceControl_Vertex" displayLabel="Control Point Type Source" description="Specifies the type of intermediate point source used for this rule."/>
+    </ECStructClass>
 
     <ECEntityClass typeName="SurfaceControlVertexRule" modifier="Abstract" description="A ruled constraint between two surface control vertices.">
         <BaseClass>SurfaceControlRule</BaseClass>
 
         <ECNavigationProperty propertyName="StartVertex" relationshipName="SurfaceControlVertexRuleStartsAtVertex" direction="Forward" />
         <ECNavigationProperty propertyName="EndVertex" relationshipName="SurfaceControlVertexRuleEndsAtVertex" direction="Forward" />
+        <ECStructProperty propertyName="StrokeOptions" typeName="SurfaceControlStrokeOptions" displayLabel="Stroke Options" description="Specifies the options for the stroke operation." />
 
-        <ECProperty propertyName="IsStroked" typeName="boolean" category="SurfaceControl_Vertex" displayLabel="Is Stroked" description="Indicates whether this control vertex rule involves a stroke operation."/>
-        <ECProperty propertyName="IntermediatePointTypeSource" typeName="IntermediatePointType" category="SurfaceControl_Vertex" displayLabel="Intermediate Point Type Source" description="Specifies the type of intermediate point source used for this rule." />
+        <ECProperty propertyName="IsStroked" typeName="boolean" category="SurfaceControl_Vertex" displayLabel="Is Stroked" description="Indicates whether this control vertex rule involves a stroke operation.">
+            <ECCustomAttributes>
+                <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                    <Description>IsStroked is no longer used for surface control, use StrokeOptions instead.</Description>
+                </Deprecated>
+            </ECCustomAttributes>
+        </ECProperty>
+
+        <ECProperty propertyName="IntermediatePointTypeSource" typeName="IntermediatePointType" category="SurfaceControl_Vertex" displayLabel="Intermediate Point Type Source" description="Specifies the type of intermediate point source used for this rule.">
+            <ECCustomAttributes>
+                <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                    <Description>IntermediatePointTypeSource is no longer used for surface control, use StrokeOptions instead.</Description>
+                </Deprecated>
+            </ECCustomAttributes>
+        </ECProperty>
     </ECEntityClass>
 
     <ECRelationshipClass typeName="SurfaceControlVertexRuleStartsAtVertex" strength="referencing" modifier="Sealed">
@@ -1260,7 +1303,11 @@
 
     <ECEntityClass typeName="SurfaceSlopedControlVertex" modifier="None" displayLabel="Sloped Control Vertex" description="Specialized control vertex that uses slope constraints in the spatial interpolation calculation.">
         <BaseClass>SurfaceControlVertex</BaseClass>
-
+        <ECCustomAttributes>
+            <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                <Description>SurfaceSlopedControlVertex is no longer used for surface control, use ControlVertex instead.</Description>
+            </Deprecated>
+        </ECCustomAttributes>
         <ECProperty propertyName="Slope" typeName="double" category="SurfaceControl_Vertex" kindOfQuantity="rru:SLOPE" displayLabel="Slope" description="Slope of the line emanating from this vertex position." />
         <ECProperty propertyName="MinSlope" typeName="double" category="SurfaceControl_Vertex" kindOfQuantity="rru:SLOPE" displayLabel="Min. Slope" description="Minimum slope constraint." />
         <ECProperty propertyName="MaxSlope" typeName="double" category="SurfaceControl_Vertex" kindOfQuantity="rru:SLOPE" displayLabel="Max. Slope" description="Maximum slope constraint." />
@@ -1269,7 +1316,11 @@
 
     <ECEntityClass typeName="SurfaceSlopedDirectionControlVertex" modifier="Sealed" displayLabel="Sloped Direction Control Vertex" description="Specialized control vertex that uses slope constraints along a single direction in the spatial interpolation calculation.">
         <BaseClass>SurfaceSlopedControlVertex</BaseClass>
-
+        <ECCustomAttributes>
+            <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                <Description>SurfaceSlopedDirectionControlVertex is no longer used for surface control, use ControlVertex instead.</Description>
+            </Deprecated>
+        </ECCustomAttributes>
         <ECProperty propertyName="Direction" typeName="Point2d" category="SurfaceControl_Vertex" displayLabel="Direction" description="Direction of the line emanating from this vertex position that constrains the elevation interpolation."/>
         <ECProperty propertyName="IsMirrored" typeName="boolean" category="SurfaceControl_Vertex" displayLabel="Is Mirrored" description="Set to true to mirror the surface about its reference direction."/>
     </ECEntityClass>
@@ -1394,6 +1445,9 @@
     <ECEntityClass typeName="SurfaceControlLine" modifier="Sealed" displayLabel="Surface Control Line" description="Surface control line.">
         <BaseClass>bis:SpatialLocationElement</BaseClass>
         <BaseClass>ISurfaceControlObject</BaseClass>
+        <BaseClass>ISurfaceControlElement</BaseClass>
+
+        <ECStructProperty propertyName="StrokeOptions" typeName="SurfaceControlStrokeOptions" displayLabel="Stroke Options" description="Specifies the options for the stroke operation." />
     </ECEntityClass>
 
     <ECRelationshipClass typeName="SurfaceControlLineOwnsEdges" strength="embedding" strengthDirection="Forward" modifier="Sealed">
