@@ -1207,14 +1207,6 @@
         </ECCustomAttributes>
     </ECEntityClass>
 
-    <ECEntityClass typeName="ISurfaceControlObject" modifier="Abstract" displayLabel="Surface Control Object" description="An interface that can be mixed-into a control vertex or control line to indicate that it can be an input for surface control.">
-        <ECCustomAttributes>
-            <IsMixin xmlns="CoreCustomAttributes.01.00.03">
-                <AppliesToEntityClass>bis:SpatialLocationElement</AppliesToEntityClass>
-            </IsMixin>
-        </ECCustomAttributes>
-    </ECEntityClass>
-
     <ECEntityClass typeName="ISurfaceControlElement" modifier="Abstract" displayLabel="Surface Control Element" description="An interface that can be mixed-into control objects and control rules to identify any entity that participates in surface control.">
         <ECCustomAttributes>
             <IsMixin xmlns="CoreCustomAttributes.01.00.03">
@@ -1225,7 +1217,6 @@
 
     <ECEntityClass typeName="SurfaceControlVertex" modifier="None" displayLabel="Control Vertex" description="A 3D point on a surface whose elevation is used in spatial interpolation with other control points.">
         <BaseClass>Vertex</BaseClass>
-        <BaseClass>ISurfaceControlObject</BaseClass>
         <BaseClass>ISurfaceControlElement</BaseClass>
 
         <ECProperty propertyName="VertexType" typeName="ControlVertexType" category="SurfaceControl_Vertex" displayLabel="Control Vertex Type" description="Specifies the type of control vertex used." />
@@ -1322,6 +1313,11 @@
 
     <ECRelationshipClass typeName="SurfaceControlOwnsRules" strength="embedding" strengthDirection="Forward" modifier="Sealed">
         <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <ECCustomAttributes>
+            <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                <Description>SurfaceControlOwnsRules is no longer used for surface control, use SurfaceControlOwnsControlElements instead.</Description>
+            </Deprecated>
+        </ECCustomAttributes>
         <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
             <Class class="ISurfaceControl" />
         </Source>
@@ -1334,7 +1330,7 @@
         <BaseClass>bis:ElementOwnsChildElements</BaseClass>
         <ECCustomAttributes>
             <Deprecated xmlns="CoreCustomAttributes.01.00.03">
-                <Description>SurfaceControlOwnsVertices is no longer used for surface control, use SurfaceControlOwnsControlObjects instead.</Description>
+                <Description>SurfaceControlOwnsVertices is no longer used for surface control, use SurfaceControlOwnsControlElements instead.</Description>
             </Deprecated>
         </ECCustomAttributes>
         <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
@@ -1345,13 +1341,13 @@
         </Target>
     </ECRelationshipClass>
 
-    <ECRelationshipClass typeName="SurfaceControlOwnsControlObjects" strength="embedding" strengthDirection="Forward" modifier="Sealed">
+    <ECRelationshipClass typeName="SurfaceControlOwnsControlElements" strength="embedding" strengthDirection="Forward" modifier="Sealed">
         <BaseClass>bis:ElementOwnsChildElements</BaseClass>
         <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
             <Class class="ISurfaceControl" />
         </Source>
         <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="true">
-            <Class class="ISurfaceControlObject" />
+            <Class class="ISurfaceControlElement" />
         </Target>
     </ECRelationshipClass>
 
@@ -1404,7 +1400,6 @@
 
     <ECEntityClass typeName="SurfaceControlLine" modifier="Sealed" displayLabel="Surface Control Line" description="Surface control line.">
         <BaseClass>bis:SpatialLocationElement</BaseClass>
-        <BaseClass>ISurfaceControlObject</BaseClass>
         <BaseClass>ISurfaceControlElement</BaseClass>
 
         <ECStructProperty propertyName="StrokeOptions" typeName="SurfaceControlStrokeOptions" displayLabel="Stroke Options" description="Specifies the options for the stroke operation." />
