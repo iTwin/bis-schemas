@@ -64,7 +64,7 @@
     <PropertyCategory typeName="EdgeOnSideParkingAspect_Parking" displayLabel="OnSide Parking" priority="0" />
     <PropertyCategory typeName="EdgeOnSideParkingAspect_Grading" displayLabel="OnSide Parking Grading" priority="0" />
 
-    <PropertyCategory typeName="SurfaceControl_Vertex" displayLabel="Surface Control" priority="0" />
+    <PropertyCategory typeName="SurfaceControl" displayLabel="Surface Control" priority="0" />
 
     <ECEnumeration typeName="IslandType" backingTypeName="int" isStrict="true" displayLabel="Island Type" description="Describes the parking island construction type.">
         <ECEnumerator value="0" name="UNSET" displayLabel="Not Set" />
@@ -105,10 +105,16 @@
         <ECEnumerator value="4" name="FLEXIBLE" displayLabel="Flexible" />
     </ECEnumeration>
 
-    <ECEnumeration typeName="IntermediatePointType" backingTypeName="int" isStrict="true" displayLabel="Intermediate Point Type" description="Specifies the source of the intermediate point used when generating strokes for surface control rules.">
-        <ECEnumerator value="1" name="NONE" displayLabel="None" />
-        <ECEnumerator value="2" name="COPYSTART" displayLabel="Copy Start" />
-        <ECEnumerator value="3" name="COPYEND" displayLabel="Copy End" />
+    <ECEnumeration typeName="IntermediatePointType" backingTypeName="int" isStrict="true" displayLabel="Intermediate Point Type" description="When creating intermediate points along an edge, specify which vertex (if any) of which to copy properties from.">
+        <ECEnumerator value="0" name="NONE" displayLabel="None" />
+        <ECEnumerator value="1" name="COPYSTART" displayLabel="Copy Start" />
+        <ECEnumerator value="2" name="COPYEND" displayLabel="Copy End" />
+    </ECEnumeration>
+
+    <ECEnumeration typeName="SurfaceControlVertexType" backingTypeName="int" isStrict="true" displayLabel="Control Vertex Type" description="Specifies the type of control vertex used for surface control.">
+        <ECEnumerator value="0" name="NORMAL" displayLabel="Normal" description="Control vertex that uses a fixed elevation for the spatial interpolation calculation." />
+        <ECEnumerator value="1" name="SLOPE" displayLabel="Slope" description="Specialized control vertex that uses slope constraints in the spatial interpolation calculation." />
+        <ECEnumerator value="2" name="SLOPEDIRECTION" displayLabel="Slope Direction" description="Specialized control vertex that uses slope constraints along a single direction in the spatial interpolation calculation." />
     </ECEnumeration>
 
     <ECEntityClass typeName="Vertex" modifier="Abstract" displayLabel="Vertex">
@@ -1230,10 +1236,20 @@
         </ECCustomAttributes>
     </ECEntityClass>
 
-    <ECEntityClass typeName="ISurfaceControlObject" modifier="Abstract" displayLabel="Surface Control Object" description="An interface that can be mixed-into a control vertex or control line to indicate that it can be an input for surface control.">
+    <ECEntityClass typeName="ISurfaceControlObject" modifier="Abstract" displayLabel="Surface Control Object" description="An interface that represents a spatial entity that is processed into one or more control points for controlling a surface.">
+        <BaseClass>ISurfaceControlElement</BaseClass>
+        
         <ECCustomAttributes>
             <IsMixin xmlns="CoreCustomAttributes.01.00.03">
-                <AppliesToEntityClass>bis:SpatialLocationElement</AppliesToEntityClass>
+                <AppliesToEntityClass>bis:SpatialElement</AppliesToEntityClass>
+            </IsMixin>
+        </ECCustomAttributes>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="ISurfaceControlElement" modifier="Abstract" displayLabel="Surface Control Element" description="An interface used to identify any entity that participates in surface control.">
+        <ECCustomAttributes>
+            <IsMixin xmlns="CoreCustomAttributes.01.00.03">
+                <AppliesToEntityClass>bis:Element</AppliesToEntityClass>
             </IsMixin>
         </ECCustomAttributes>
     </ECEntityClass>
@@ -1241,20 +1257,32 @@
     <ECEntityClass typeName="SurfaceControlVertex" modifier="None" displayLabel="Control Vertex" description="A 3D point on a surface whose elevation is used in spatial interpolation with other control points.">
         <BaseClass>Vertex</BaseClass>
         <BaseClass>ISurfaceControlObject</BaseClass>
+
+        <ECProperty propertyName="VertexType" typeName="SurfaceControlVertexType" category="SurfaceControl" displayLabel="Control Vertex Type" description="Specifies the type of control vertex used." />
+        <ECProperty propertyName="Slope" typeName="double" category="SurfaceControl" kindOfQuantity="rru:SLOPE" displayLabel="Slope" description="Slope of the line emanating from this vertex position." />
+        <ECProperty propertyName="MinSlope" typeName="double" category="SurfaceControl" kindOfQuantity="rru:SLOPE" displayLabel="Min. Slope" description="Minimum slope constraint." />
+        <ECProperty propertyName="MaxSlope" typeName="double" category="SurfaceControl" kindOfQuantity="rru:SLOPE" displayLabel="Max. Slope" description="Maximum slope constraint." />
+        <ECProperty propertyName="Direction" typeName="Point2d" category="SurfaceControl" displayLabel="Direction" description="Direction of the line emanating from this vertex position that constrains the elevation interpolation."/>
+        <ECProperty propertyName="Mirrored" typeName="boolean" category="SurfaceControl" displayLabel="Mirrored" description="True if the direction constraint should represent two lines emanating from the position, forming a V shape, or false if it should be a single line passing through the position."/>
     </ECEntityClass>
 
-    <ECEntityClass typeName="SurfaceControlRule" modifier="Abstract" description="Surface control rule.">
+    <ECEntityClass typeName="SurfaceControlRule" modifier="Abstract" description="Represents a rule that has update logic between one or more elements.">
         <BaseClass>bis:InformationRecordElement</BaseClass>
+        <BaseClass>ISurfaceControlElement</BaseClass>
     </ECEntityClass>
+
+    <ECStructClass typeName="SurfaceControlStrokeOptions" description="Specifies stroking options for a linear element." modifier="Sealed">
+        <ECProperty propertyName="IsBreakline" typeName="boolean" category="SurfaceControl" displayLabel="Is Breakline" description="Indicates whether the stroke is a breakline."/>
+        <ECProperty propertyName="EmitControlPoints" typeName="boolean" category="SurfaceControl" displayLabel="Emit Control Points" description="Indicates whether the stroke operation emit intermediate control points." />
+        <ECProperty propertyName="ControlPointTypeSource" typeName="IntermediatePointType" category="SurfaceControl" displayLabel="Control Point Type Source" description="Specifies the source to derive the intermediate control point type from."/>
+    </ECStructClass>
 
     <ECEntityClass typeName="SurfaceControlVertexRule" modifier="Abstract" description="A ruled constraint between two surface control vertices.">
         <BaseClass>SurfaceControlRule</BaseClass>
 
         <ECNavigationProperty propertyName="StartVertex" relationshipName="SurfaceControlVertexRuleStartsAtVertex" direction="Forward" />
         <ECNavigationProperty propertyName="EndVertex" relationshipName="SurfaceControlVertexRuleEndsAtVertex" direction="Forward" />
-
-        <ECProperty propertyName="IsStroked" typeName="boolean" category="SurfaceControl_Vertex" displayLabel="Is Stroked" description="Indicates whether this control vertex rule involves a stroke operation."/>
-        <ECProperty propertyName="IntermediatePointTypeSource" typeName="IntermediatePointType" category="SurfaceControl_Vertex" displayLabel="Intermediate Point Type Source" description="Specifies the type of intermediate point source used for this rule." />
+        <ECStructProperty propertyName="StrokeOptions" typeName="SurfaceControlStrokeOptions" displayLabel="Stroke Options" description="Specifies stroke options for adding points along the path." />
     </ECEntityClass>
 
     <ECRelationshipClass typeName="SurfaceControlVertexRuleStartsAtVertex" strength="referencing" modifier="Sealed">
@@ -1278,29 +1306,13 @@
     <ECEntityClass typeName="SurfaceControlVertexDeltaRule" modifier="Sealed" displayLabel="Surface Control Vertex Delta Rule" description="Constrains two surface control vertices to have a constant elevation difference between each other.">
         <BaseClass>SurfaceControlVertexRule</BaseClass>
 
-        <ECProperty propertyName="ControlVertexDelta" typeName="double" category="SurfaceControl_Vertex" kindOfQuantity="rru:LENGTH" displayLabel="Delta" description="Delta defined by a control vertex override." />
+        <ECProperty propertyName="ControlVertexDelta" typeName="double" category="SurfaceControl" kindOfQuantity="rru:LENGTH" displayLabel="Delta" description="Delta defined by a control vertex override." />
     </ECEntityClass>
 
     <ECEntityClass typeName="SurfaceControlVertexSlopeRule" modifier="Sealed" displayLabel="Surface Control Vertex Slope Rule" description="Constrains two surface control vertices to lie on the same line defined by the slope between them.">
         <BaseClass>SurfaceControlVertexRule</BaseClass>
 
-        <ECProperty propertyName="ControlVertexSlope" typeName="double" category="SurfaceControl_Vertex" kindOfQuantity="rru:SLOPE" displayLabel="Slope" description="Slope defined by a control vertex override." />
-    </ECEntityClass>
-
-    <ECEntityClass typeName="SurfaceSlopedControlVertex" modifier="None" displayLabel="Sloped Control Vertex" description="Specialized control vertex that uses slope constraints in the spatial interpolation calculation.">
-        <BaseClass>SurfaceControlVertex</BaseClass>
-
-        <ECProperty propertyName="Slope" typeName="double" category="SurfaceControl_Vertex" kindOfQuantity="rru:SLOPE" displayLabel="Slope" description="Slope of the line emanating from this vertex position." />
-        <ECProperty propertyName="MinSlope" typeName="double" category="SurfaceControl_Vertex" kindOfQuantity="rru:SLOPE" displayLabel="Min. Slope" description="Minimum slope constraint." />
-        <ECProperty propertyName="MaxSlope" typeName="double" category="SurfaceControl_Vertex" kindOfQuantity="rru:SLOPE" displayLabel="Max. Slope" description="Maximum slope constraint." />
-
-    </ECEntityClass>
-
-    <ECEntityClass typeName="SurfaceSlopedDirectionControlVertex" modifier="Sealed" displayLabel="Sloped Direction Control Vertex" description="Specialized control vertex that uses slope constraints along a single direction in the spatial interpolation calculation.">
-        <BaseClass>SurfaceSlopedControlVertex</BaseClass>
-
-        <ECProperty propertyName="Direction" typeName="Point2d" category="SurfaceControl_Vertex" displayLabel="Direction" description="Direction of the line emanating from this vertex position that constrains the elevation interpolation."/>
-        <ECProperty propertyName="IsMirrored" typeName="boolean" category="SurfaceControl_Vertex" displayLabel="Is Mirrored" description="Set to true to mirror the surface about its reference direction."/>
+        <ECProperty propertyName="ControlVertexSlope" typeName="double" category="SurfaceControl" kindOfQuantity="rru:SLOPE" displayLabel="Slope" description="Slope defined by a control vertex override." />
     </ECEntityClass>
 
     <ECEntityClass typeName="SurfaceControlLowPoint" modifier="Sealed" displayLabel="Control Low Point" description="Defines a location point which controls low point control object.">
@@ -1310,8 +1322,8 @@
                 <Description>SurfaceControlLowPoint is no longer used for surface control, use SurfaceSlopedControlVertex instead.</Description>
             </Deprecated>
         </ECCustomAttributes>
-        <ECProperty propertyName="ControlSlope" typeName="double" category="SurfaceControl_Vertex" kindOfQuantity="rru:SLOPE" displayLabel="Slope" description="Slope defined by a control low point override." />
-        <ECProperty propertyName="MaximumControlRadius" typeName="double" category="SurfaceControl_Vertex" kindOfQuantity="rru:LENGTH" displayLabel="Radius" description="Max radius defined by a control low point override." />
+        <ECProperty propertyName="ControlSlope" typeName="double" category="SurfaceControl" kindOfQuantity="rru:SLOPE" displayLabel="Slope" description="Slope defined by a control low point override." />
+        <ECProperty propertyName="MaximumControlRadius" typeName="double" category="SurfaceControl" kindOfQuantity="rru:LENGTH" displayLabel="Radius" description="Max radius defined by a control low point override." />
     </ECEntityClass>
 
     <ECEntityClass typeName="SurfaceControlLowPointRule" modifier="Sealed" displayLabel="Surface Control Low Point Rule" description="Surface control low point rule.">
@@ -1340,6 +1352,11 @@
 
     <ECRelationshipClass typeName="SurfaceControlOwnsRules" strength="embedding" strengthDirection="Forward" modifier="Sealed">
         <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <ECCustomAttributes>
+            <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                <Description>SurfaceControlOwnsRules is no longer used for surface control, use SurfaceControlOwnsControlElement instead.</Description>
+            </Deprecated>
+        </ECCustomAttributes>
         <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
             <Class class="ISurfaceControl" />
         </Source>
@@ -1352,7 +1369,7 @@
         <BaseClass>bis:ElementOwnsChildElements</BaseClass>
         <ECCustomAttributes>
             <Deprecated xmlns="CoreCustomAttributes.01.00.03">
-                <Description>SurfaceControlOwnsVertices is no longer used for surface control, use SurfaceControlOwnsControlObjects instead.</Description>
+                <Description>SurfaceControlOwnsVertices is no longer used for surface control, use SurfaceControlOwnsControlElement instead.</Description>
             </Deprecated>
         </ECCustomAttributes>
         <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
@@ -1363,20 +1380,20 @@
         </Target>
     </ECRelationshipClass>
 
-    <ECRelationshipClass typeName="SurfaceControlOwnsControlObjects" strength="embedding" strengthDirection="Forward" modifier="Sealed">
+    <ECRelationshipClass typeName="SurfaceControlOwnsControlElement" strength="embedding" strengthDirection="Forward" modifier="Sealed">
         <BaseClass>bis:ElementOwnsChildElements</BaseClass>
         <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
             <Class class="ISurfaceControl" />
         </Source>
         <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="true">
-            <Class class="ISurfaceControlObject" />
+            <Class class="ISurfaceControlElement" />
         </Target>
     </ECRelationshipClass>
 
     <ECEntityClass typeName="SurfaceControlOptionsAspect" modifier="Sealed" displayLabel="Surface Control Options">
         <BaseClass>bis:ElementUniqueAspect</BaseClass>
 
-        <ECProperty propertyName="Resolution" typeName="double" kindOfQuantity="rru:LENGTH" category="SurfaceControl_Vertex" displayLabel="Resolution" description="Controls the spacing of the XY grid used when generating the triangulation for the interpolated surface." />
+        <ECProperty propertyName="Resolution" typeName="double" kindOfQuantity="rru:LENGTH" category="SurfaceControl" displayLabel="Resolution" description="Controls the spacing of the XY grid used when generating the triangulation for the interpolated surface." />
     </ECEntityClass>
 
     <ECRelationshipClass typeName="SurfaceControlOwnsOptionsAspect" modifier="Sealed" strength="embedding">
@@ -1423,6 +1440,8 @@
     <ECEntityClass typeName="SurfaceControlLine" modifier="Sealed" displayLabel="Surface Control Line" description="Surface control line.">
         <BaseClass>bis:SpatialLocationElement</BaseClass>
         <BaseClass>ISurfaceControlObject</BaseClass>
+
+        <ECStructProperty propertyName="StrokeOptions" typeName="SurfaceControlStrokeOptions" displayLabel="Stroke Options" description="Specifies stroke options for adding points along the path." />
     </ECEntityClass>
 
     <ECRelationshipClass typeName="SurfaceControlLineOwnsEdges" strength="embedding" strengthDirection="Forward" modifier="Sealed">
