@@ -3,7 +3,7 @@
 |  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
 |  * See LICENSE.md in the project root for license terms and full copyright notice.
 ======================================================================================= -->
-<ECSchema schemaName="OpenSite" alias="opnsite" version="01.00.10" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" displayLabel="OpenSite" description="OpenSite+ application schema.">
+<ECSchema schemaName="OpenSite" alias="opnsite" version="01.00.09" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" displayLabel="OpenSite" description="OpenSite+ application schema.">
     <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA" />
     <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
     <ECSchemaReference name="BisCore" version="01.00.10" alias="bis" />
@@ -12,11 +12,10 @@
     <ECSchemaReference name="SpatialComposition" version="01.00.01" alias="spcomp" />
     <ECSchemaReference name="StormSewerPhysical" version="01.00.00" alias="stmswrphys" />
     <ECSchemaReference name="CivilPhysical" version="01.00.01" alias="cvphys" />
-    <ECSchemaReference name="ClassificationSystems" version="01.00.04" alias="clsf" />
 
     <ECCustomAttributes>
         <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
-            <SupportedUse>NotForProduction</SupportedUse>
+            <SupportedUse>FieldTesting</SupportedUse>
         </ProductionStatus>
         <SchemaLayerInfo xmlns="BisCustomAttributes.01.00.00">
             <Value>Application</Value>
@@ -458,15 +457,6 @@
         </Target>
     </ECRelationshipClass>
 
-    <ECRelationshipClass typeName="RetainingWallAreaUsesRetainingWallType" strength="referencing" modifier="Sealed">
-        <Source multiplicity="(0..*)" roleLabel="uses" polymorphic="false">
-            <Class class="RetainingWallArea" />
-        </Source>
-        <Target multiplicity="(0..1)" roleLabel="is used by" polymorphic="true">
-            <Class class="RetainingWallType" />
-        </Target>
-    </ECRelationshipClass>
-
     <ECRelationshipClass typeName="EdgeStartsAtVertex" strength="referencing" modifier="Sealed">
         <Source multiplicity="(0..2)" roleLabel="starts at" polymorphic="true">
             <Class class="Edge" />
@@ -652,12 +642,6 @@
 
     <ECEntityClass typeName="Area" modifier="Abstract" displayLabel="Area" description="Area">
         <BaseClass>Wire</BaseClass>
-    </ECEntityClass>
-
-    <ECEntityClass typeName="RetainingWallArea" displayLabel="Retaining Wall" description="Retaining Wall">
-        <BaseClass>Area</BaseClass>
-		<ECProperty propertyName="Width" typeName="double" kindOfQuantity="rru:LENGTH_SHORT" displayLabel="Width" description="Width of the retaining wall." />
-        <ECNavigationProperty propertyName="RetainingWallType" relationshipName="RetainingWallAreaUsesRetainingWallType" direction="Forward" displayLabel="Retaining Wall Type" />
     </ECEntityClass>
 
     <ECEntityClass typeName="ShapedArea" modifier="Abstract" displayLabel="Shaped Area" description="Shaped area">
@@ -868,20 +852,6 @@
 
         <ECProperty propertyName="MinorStep" typeName="double" kindOfQuantity="rru:LENGTH" displayLabel="Minor Step" description="Minor steps interval size" />
         <ECProperty propertyName="MajorStepMultiple" typeName="int" displayLabel="Major Step Interval" description="Number of minor intervals between two major steps" />
-    </ECEntityClass>
-
-    <ECEntityClass typeName="RetainingWallType" displayLabel="Retaining Wall Type" description="Defines a shared set of properties whose values vary per-type of RetainingWall rather than per-instance.">
-        <BaseClass>cvphys:RetainingWallType</BaseClass>
-
-        <ECProperty propertyName="FrontWallSetback" typeName="double" kindOfQuantity="rru:LENGTH" displayLabel="Front Wall Setback" description="Width of front wall setback." />
-        <ECProperty propertyName="BackWallSetback" typeName="double" kindOfQuantity="rru:LENGTH" displayLabel="Back Wall Setback" description="Width of back wall setback." />
-        <ECProperty propertyName="ExposedWallHeight" typeName="double" kindOfQuantity="rru:LENGTH" displayLabel="Exposed Wall Height" description="Height of exposed wall." />
-        <ECProperty propertyName="CoverDepth" typeName="double" kindOfQuantity="rru:LENGTH" displayLabel="Cover Depth" description="Depth of cover." />
-        <ECProperty propertyName="ToeWidth" typeName="double" kindOfQuantity="rru:LENGTH" displayLabel="Toe Width" description="Width of toe." />
-        <ECProperty propertyName="HeelWidth" typeName="double" kindOfQuantity="rru:LENGTH" displayLabel="Heel Width" description="Width of heel." />
-        <ECProperty propertyName="FootingThickness" typeName="double" kindOfQuantity="rru:LENGTH" displayLabel="Footing Thickness" description="Thickness of footing." />
-        <ECProperty propertyName="KeyWidth" typeName="double" kindOfQuantity="rru:LENGTH" displayLabel="Key Width" description="Width of key." />
-        <ECProperty propertyName="KeyHeight" typeName="double" kindOfQuantity="rru:LENGTH" displayLabel="Key Height" description="Height of key." />
     </ECEntityClass>
 
     <ECEntityClass typeName="CurbType" displayLabel="Curb Type" description="Defines a shared set of properties whose values vary per-type of Curb rather than per-instance.">
@@ -1453,26 +1423,6 @@
         </Source>
         <Target multiplicity="(1..*)" roleLabel="is owned by" polymorphic="false">
             <Class class="ControlLineEdge" />
-        </Target>
-    </ECRelationshipClass>
-
-    <ECRelationshipClass typeName="CategorySymbolizesClassification" strength="referencing" modifier="Abstract">
-		<BaseClass>bis:ElementRefersToElements</BaseClass>
-        <Source multiplicity="(1..*)" roleLabel="symbolizes" polymorphic="true">
-            <Class class="bis:Category" />
-        </Source>
-        <Target multiplicity="(1..1)" roleLabel="is symbolized by" polymorphic="true">
-            <Class class="clsf:Classification" />
-        </Target>
-    </ECRelationshipClass>
-
-    <ECRelationshipClass typeName="GenericCategorySymbolizesClassification" strength="referencing" modifier="Sealed">
-		<BaseClass>CategorySymbolizesClassification</BaseClass>
-        <Source multiplicity="(1..*)" roleLabel="symbolizes" polymorphic="true">
-            <Class class="bis:Category" />
-        </Source>
-        <Target multiplicity="(1..1)" roleLabel="is symbolized by" polymorphic="true">
-            <Class class="clsf:Classification" />
         </Target>
     </ECRelationshipClass>
 </ECSchema>
