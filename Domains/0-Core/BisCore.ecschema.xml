@@ -3,7 +3,7 @@
 |  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
 |  * See LICENSE.md in the project root for license terms and full copyright notice.
 ======================================================================================= -->
-<ECSchema schemaName="BisCore" alias="bis" version="01.00.19" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" displayLabel="BIS Core" description="The BIS core schema contains classes that all other domain schemas extend.">
+<ECSchema schemaName="BisCore" alias="bis" version="01.00.22" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" displayLabel="BIS Core" description="The BIS core schema contains classes that all other domain schemas extend.">
 
     <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
     <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
@@ -827,6 +827,15 @@
         </Source>
         <Target multiplicity="(0..1)" roleLabel="is referenced by" polymorphic="true">
             <Class class="TemplateRecipe2d"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="SpatialLocationTypeHasTemplateRecipe" strength="referencing" modifier="None">
+        <BaseClass>TypeDefinitionHasRecipe</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="has" polymorphic="true">
+            <Class class="SpatialLocationType" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is referenced by" polymorphic="true">
+            <Class class="TemplateRecipe3dInPlan"/>
         </Target>
     </ECRelationshipClass>
 
@@ -2243,11 +2252,22 @@
 
     <ECEntityClass typeName="PhysicalMaterial" modifier="Abstract" displayLabel="Physical Material" description="A bis:PhysicalMaterial defines the matter of which physical objects are made. bis:PhysicalMaterials are not used to define rendering characteristics (see bis:RenderMaterial).">
         <BaseClass>DefinitionElement</BaseClass>
-        <ECProperty propertyName="Density" typeName="double" minimumValue="0.0"/>
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.01.00.00"/>
         </ECCustomAttributes>
+        <ECProperty propertyName="Density" typeName="double" minimumValue="0.0"/>
+        <ECNavigationProperty propertyName="RenderMaterial" relationshipName="RenderMaterialSupportsDisplayOfPhysicalMaterial" direction="backward" displayLabel="Render Material" description="Optionally refers to the bis:RenderMaterial to be used to display the bis:PhysicalMaterial."/>
     </ECEntityClass>
+
+    <ECRelationshipClass typeName="RenderMaterialSupportsDisplayOfPhysicalMaterial" strength="referencing" strengthDirection="backward" modifier="Sealed" description="The relationship that determines the bis:RenderMaterial to use while displaying a bis:PhysicalMaterial.">
+        <!-- @see PhysicalMaterial.RenderMaterial ECNavigationProperty -->
+        <Source multiplicity="(0..1)" roleLabel="supports display of" polymorphic="false">
+            <Class class="RenderMaterial" />
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is displayed using" polymorphic="true">
+            <Class class="PhysicalMaterial"/>
+        </Target>
+    </ECRelationshipClass>
 
     <ECEntityClass typeName="AnnotationTextStyle" modifier="Sealed" displayLabel="Annotation Text Style">
         <BaseClass>DefinitionElement</BaseClass>
