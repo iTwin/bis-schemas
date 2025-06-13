@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ==================================================================================
+|  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
+|  * See LICENSE.md in the project root for license terms and full copyright notice.
+======================================================================================= -->
+<ECSchema schemaName="CivilPhysical" alias="cvphys" version="01.00.02" description="Main schema for the physical modeling of elements used in Civil infrastructure." xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
+    <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
+    <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
+    <ECSchemaReference name="BisCore" version="01.00.14" alias="bis"/>
+    <ECSchemaReference name="LinearReferencing" version="02.00.03" alias="lr"/>
+
+    <ECCustomAttributes>
+        <ProductionStatus xmlns="CoreCustomAttributes.01.00.00">
+            <SupportedUse>NotForProduction</SupportedUse>
+        </ProductionStatus>
+        <SchemaLayerInfo xmlns="BisCustomAttributes.01.00.00">
+            <Value>DisciplinePhysical</Value>
+        </SchemaLayerInfo>
+    </ECCustomAttributes>
+
+    <ECEntityClass typeName="Course" displayLabel="Course" description="A bis:PhysicalElement modeling a layer, usually of a single material, whose length greatly exceeds its thickness and often also its width, laid on site on top of another horizontal or nearly horizontal element.">
+        <BaseClass>lr:LinearPhysicalElement</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="CourseType" displayLabel="Course Type" description="Defines a shared set of properties whose values vary per-type of Course rather than per-instance.">
+        <BaseClass>bis:PhysicalType</BaseClass>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="CourseIsOfType" strength="referencing" modifier="None" description="A type-instance relation; one that indicates that the specific cp:Course is an instance of the defined cp:CourseType.">
+        <BaseClass>bis:PhysicalElementIsOfType</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="is of" polymorphic="true">
+            <Class class="Course" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is type of" polymorphic="true">
+            <Class class="CourseType"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="Curb" displayLabel="Curb" description="A bis:PhysicalElement intended to separate surfacings of different surfaces and to provide physical delineation or containment.">
+        <BaseClass>lr:LinearPhysicalElement</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="CurbType" displayLabel="Curb Type" description="Defines a shared set of properties whose values vary per-type of Curb rather than per-instance.">
+        <BaseClass>bis:PhysicalType</BaseClass>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="CurbIsOfType" strength="referencing" modifier="None" description="A type-instance relation; one that indicates that the specific cp:Curb is an instance of the defined cp:CurbType.">
+        <BaseClass>bis:PhysicalElementIsOfType</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="is of" polymorphic="true">
+            <Class class="Curb" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is type of" polymorphic="true">
+            <Class class="CurbType"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="RetainingWall" displayLabel="Retaining Wall" description="A lr:LinearPhysicalElement modeling a structure built to hold back soil or other materials, supporting them laterally, preventing them from sliding or eroding away.">
+
+        <BaseClass>lr:LinearPhysicalElement</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="RetainingWallType" displayLabel="Retaining Wall Type" description="Defines a shared set of properties whose values vary per-type of RetainingWall rather than per-instance.">
+        <BaseClass>bis:PhysicalType</BaseClass>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="RetainingWallIsOfType" strength="referencing" modifier="None" description="A type-instance relation; one that indicates that the specific cp:RetainingWall is an instance of the defined cp:RetainingWallType.">
+        <BaseClass>bis:PhysicalElementIsOfType</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="is of" polymorphic="true">
+            <Class class="RetainingWall" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is type of" polymorphic="true">
+            <Class class="RetainingWallType"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="SurfaceMarking" displayLabel="Surface Marking" description="A bis:PhysicalElement modeling markings on a surface.">
+        <BaseClass>bis:PhysicalElement</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="SurfaceMarkingType" displayLabel="Surface Marking Type" description="Defines a shared set of properties whose values vary per-type of SurfaceMarking rather than per-instance.">
+        <BaseClass>bis:PhysicalType</BaseClass>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="SurfaceMarkingIsOfType" strength="referencing" modifier="None" description="A type-instance relation; one that indicates that the specific SurfaceMarking is an instance of the defined SurfaceMarkingType.">
+        <BaseClass>bis:PhysicalElementIsOfType</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="is of" polymorphic="true">
+            <Class class="SurfaceMarking" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is type of" polymorphic="true">
+            <Class class="SurfaceMarkingType"/>
+        </Target>
+    </ECRelationshipClass>
+</ECSchema>
