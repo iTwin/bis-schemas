@@ -170,3 +170,17 @@ Equivalent to [IfcPile](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/H
 `PileType`s must be contained in `DefinitionModel`s.
 
 Equivalent to [IfcPileType](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcPileType.htm).
+
+### SlabFoundation
+
+A `SlabFoundation` is a flat, typically horizontal structural element made of reinforced concrete that spreads building loads over a wide area of ground. It is classified as a shallow foundation and is commonly used in residential and commercial construction where subsurface conditions are stable near the surface. 
+
+Classification of `SlabFoundation` instances can be achieved via instances of `SlabFoundationType`. `SlabFoundation`s must be contained in `PhysicalModel`s.
+
+Equivalent to [IfcSlab](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcSlab.htm) with a PredefinedType equal to [IfcSlabEnum](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcSlabTypeEnum.htm).BASESLAB.
+
+### SlabFoundationType
+
+`SlabFoundationTypes` must be contained in `DefinitionModel`s.
+
+Equivalent to [IfcSlabType](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcSlabType.htm) with a PredefindeType equal to [IfcFootingTypeEnum](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcSlabTypeEnum.htm).BASESLAB.
