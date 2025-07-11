@@ -1595,8 +1595,27 @@
         </ECProperty>
     </ECEntityClass>
 
+    <ECEntityClass typeName="ITextAnnotation" modifier="Abstract" displayLabel="Text Annotation" description="An interface that can be mixed-into a bis:GeometricElement-subclass to indicate that its GeometryStream may contain text-content computed from property-values in other Elements (aka Text-Fields).">
+        <ECCustomAttributes>
+            <IsMixin xmlns="CoreCustomAttributes.01.00.03">
+                <AppliesToEntityClass>GeometricElement</AppliesToEntityClass>
+            </IsMixin>
+        </ECCustomAttributes>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="ElementDrivesTextAnnotation" strength="referencing" modifier="None" description="A relationship indicating that the source Element instance drives a portion of the text-content of the target ITextAnnotation instance.">
+        <BaseClass>ElementDrivesElement</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="drives" polymorphic="true">
+            <Class class="Element"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is driven by" polymorphic="true">
+            <Class class="ITextAnnotation"/>
+        </Target>
+    </ECRelationshipClass>
+
     <ECEntityClass typeName="TextAnnotation2d" displayLabel="2D Text Annotation">
         <BaseClass>AnnotationElement2d</BaseClass>
+        <BaseClass>ITextAnnotation</BaseClass>
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.01.00.00"/>
         </ECCustomAttributes>
@@ -1623,6 +1642,7 @@
 
     <ECEntityClass typeName="TextAnnotation3d" displayLabel="3D Text Annotation">
         <BaseClass>GraphicalElement3d</BaseClass>
+        <BaseClass>ITextAnnotation</BaseClass>
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.01.00.00"/>
         </ECCustomAttributes>
