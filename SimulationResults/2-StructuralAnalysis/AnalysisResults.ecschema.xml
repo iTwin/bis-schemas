@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ==================================================================================
+|  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
+|  * See LICENSE.md in the project root for license terms and full copyright notice.
+======================================================================================= -->
+<ECSchema schemaName="AnalysisResults" alias="analysisr" version="01.00.00" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" displayLabel="Analysis results" description="">
+    <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
+    <ECSchemaReference name="AecUnits" version="01.00.03" alias="AECU" />
+    <ECSchemaReference name="SimResultsCore" version="01.00.00" alias="simrescore"/>
+    <!--ECSchemaReference name="AnalysisResultsDefinitions" version="01.00.00" alias="analysisrdef"/>-->
+
+    <ECEntityClass typeName="ConditionResultRecord" modifier="Abstract" displayLabel="Load Case Result Record" description="">
+        <BaseClass>simrescore:TimeVariantResultRecord</BaseClass>
+        <ECCustomAttributes>
+            <ClassMap xmlns="ECDbMap.02.00.00">
+                <MapStrategy>TablePerHierarchy</MapStrategy>
+            </ClassMap>
+            <DbIndexList xmlns="ECDbMap.02.00.02">
+                <Indexes>
+                    <DbIndex>
+                        <Name>ix_ConditionResultRecord_LoadCase_Element</Name>
+                        <IsUnique>False</IsUnique>
+                        <Properties>
+                            <string>LoadCaseId</string>
+                            <string>ElementId</string>
+                        </Properties>
+                    </DbIndex>
+                </Indexes>
+            </DbIndexList>            
+            <ShareColumns xmlns="ECDbMap.02.00.00">
+                <MaxSharedColumnsBeforeOverflow>32</MaxSharedColumnsBeforeOverflow>
+                <ApplyToSubclassesOnly>True</ApplyToSubclassesOnly>
+            </ShareColumns>
+        </ECCustomAttributes>        
+        <ECProperty propertyName="LoadCaseId" typeName="long" displayLabel="" description=""/>
+    </ECEntityClass>
+
+    <ECStructClass typeName="Displacement3d" displayLabel="Displacement" description="This struct stores the 3D displacement data.">
+        <ECProperty propertyName="tx" typeName="double" description="Translation in X axis" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="ty" typeName="double" description="Translation in Y axis" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="tz" typeName="double" description="Translation in Z axis" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="rx" typeName="double" description="Rotation about the X axis" kindOfQuantity="AECU:ANGLE" />
+        <ECProperty propertyName="ry" typeName="double" description="Rotation about the Y axis" kindOfQuantity="AECU:ANGLE" />
+        <ECProperty propertyName="rz" typeName="double" description="Rotation about the Z axis" kindOfQuantity="AECU:ANGLE" />
+    </ECStructClass>
+
+    <ECStructClass typeName="Force3d" displayLabel="Force" description="This struct stores the 3D force data.">
+        <ECProperty propertyName="fx" typeName="double" description="Force in X axis" kindOfQuantity="AECU:FORCE" />
+        <ECProperty propertyName="fy" typeName="double" description="Force in Y axis" kindOfQuantity="AECU:FORCE" />
+        <ECProperty propertyName="fz" typeName="double" description="Force in Z axis" kindOfQuantity="AECU:FORCE" />
+        <ECProperty propertyName="mx" typeName="double" description="Moment about the X axis" kindOfQuantity="AECU:MOMENT" />
+        <ECProperty propertyName="my" typeName="double" description="Moment about the Y axis" kindOfQuantity="AECU:MOMENT" />
+        <ECProperty propertyName="mz" typeName="double" description="Moment about the Z axis" kindOfQuantity="AECU:MOMENT" />
+    </ECStructClass>
+
+    <ECStructClass typeName="InternalForces" displayLabel="Internal Forces" description="This struct stores the 3D shell internal forces data.">
+        <ECProperty propertyName="fxx" typeName="double" description="Membrane direct force in X axis" kindOfQuantity="AECU:LINEAR_FORCE" />
+        <ECProperty propertyName="fyy" typeName="double" description="Membrane direct force in Y axis" kindOfQuantity="AECU:LINEAR_FORCE" />
+        <ECProperty propertyName="fxy" typeName="double" description="Membrane shear force" kindOfQuantity="AECU:LINEAR_FORCE" />
+        <ECProperty propertyName="mxx" typeName="double" description="Plate bending moment about X axis" kindOfQuantity="AECU:LINEAR_MOMENT" />
+        <ECProperty propertyName="myy" typeName="double" description="Plate bending moment about Y axis" kindOfQuantity="AECU:LINEAR_MOMENT" />
+        <ECProperty propertyName="mxy" typeName="double" description="Plate twisting moment" kindOfQuantity="AECU:LINEAR_MOMENT" />
+        <ECProperty propertyName="vxz" typeName="double" description="Plate transverse shear force XZ plane" kindOfQuantity="AECU:LINEAR_FORCE" />
+        <ECProperty propertyName="vyz" typeName="double" description="Plate transverse shear force YZ plane" kindOfQuantity="AECU:LINEAR_FORCE" />
+    </ECStructClass>
+
+    <ECStructClass typeName="ShellStresses" displayLabel="Shell stresses" description="This struct stores the 3D shell stresses data.">
+        <ECProperty propertyName="sxx" typeName="double" description="Stress along local X axis" kindOfQuantity="AECU:AREA_FORCE" />
+        <ECProperty propertyName="syy" typeName="double" description="Stress along local Y axis" kindOfQuantity="AECU:AREA_FORCE" />
+        <ECProperty propertyName="szz" typeName="double" description="Stress perpendicular to top surface" kindOfQuantity="AECU:AREA_FORCE" />
+        <ECProperty propertyName="sxy" typeName="double" description="Shear stress" kindOfQuantity="AECU:AREA_FORCE" />
+        <ECProperty propertyName="sxz" typeName="double" description="Average transverse shear stress XZ plane" kindOfQuantity="AECU:AREA_FORCE" />
+        <ECProperty propertyName="syz" typeName="double" description="Average transverse shear stress XZ plane" kindOfQuantity="AECU:AREA_FORCE" />
+    </ECStructClass>
+
+    <ECEntityClass typeName="NodeDisplacement" displayLabel="Node Displacement" description="This class stores the node displacement data.">
+        <BaseClass>ConditionResultRecord</BaseClass>
+        <ECStructProperty propertyName="Displacement" typeName="Displacement3d" description="Nodal displacement"/>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="BeamDisplacement" displayLabel="Beam Displacement" description="This class stores the beam displacement data for a station.">
+        <BaseClass>ConditionResultRecord</BaseClass>
+        <ECProperty propertyName="Location" typeName="double" description="Beam location relative to beam length 0 to 1"/>
+        <ECStructProperty propertyName="Displacement" typeName="Displacement3d" description="Beam displacement at location"/>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="BeamForce" displayLabel="Beam Force" description="This class stores the beam force data for a station.">
+        <BaseClass>ConditionResultRecord</BaseClass>
+        <ECProperty propertyName="Location" typeName="double" description="Beam location relative to beam length 0 to 1"/>
+        <ECStructProperty propertyName="Force" typeName="Force3d" description="Beam force at location"/>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="ShellInternalForces" displayLabel="Shell Force" description="This class stores the shell internal forces data in corners.">
+        <BaseClass>ConditionResultRecord</BaseClass>
+        <ECStructProperty propertyName="Force1" typeName="InternalForces" description="Shell internal force at corner 1"/>
+        <ECStructProperty propertyName="Force2" typeName="InternalForces" description="Shell internal force at corner 2"/>
+        <ECStructProperty propertyName="Force3" typeName="InternalForces" description="Shell internal force at corner 3"/>
+        <ECStructProperty propertyName="Force4" typeName="InternalForces" description="Shell internal force at corner 4"/>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="ShellStressAtTop" displayLabel="Shell Stresses at Top" description="This class stores the shell stresses data at the top per corners.">
+        <BaseClass>ConditionResultRecord</BaseClass>
+        <ECStructProperty propertyName="Stress1" typeName="ShellStresses" description="Shell stress at corner 1"/>
+        <ECStructProperty propertyName="Stress2" typeName="ShellStresses" description="Shell stress at corner 2"/>
+        <ECStructProperty propertyName="Stress3" typeName="ShellStresses" description="Shell stress at corner 3"/>
+        <ECStructProperty propertyName="Stress4" typeName="ShellStresses" description="Shell stress at corner 4"/>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="ShellStressAtBottom" displayLabel="Shell Stresses at Bottom" description="This class stores the shell stresses data at the bottom per corners.">
+        <BaseClass>ConditionResultRecord</BaseClass>
+        <ECStructProperty propertyName="Stress1" typeName="ShellStresses" description="Shell stress at corner 1"/>
+        <ECStructProperty propertyName="Stress2" typeName="ShellStresses" description="Shell stress at corner 2"/>
+        <ECStructProperty propertyName="Stress3" typeName="ShellStresses" description="Shell stress at corner 3"/>
+        <ECStructProperty propertyName="Stress4" typeName="ShellStresses" description="Shell stress at corner 4"/>
+    </ECEntityClass>
+
+</ECSchema>
