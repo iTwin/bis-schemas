@@ -103,7 +103,6 @@ async function schemaUpgradeTest(ignoreList, output, checkAllVersions) {
     imodel = await importAndExportSchemaToIModel(schemaName, previousSchema, key.readVersion, previousReadVersion, releasedSchema, schemaDirs, imodel, output);
     console.log("-> ", chalk.default.green(`${schemaName}.${schemaVersion} successfully imported.`));
     writeLogsToFile(`-> ${schemaName}.${schemaVersion} successfully imported.\n\n`, output);
-    count++;
     previousSchema = schemaName;
     previousReadVersion = key.readVersion;
   }
