@@ -86,6 +86,7 @@ async function schemaUpgradeTest(ignoreList, output, checkAllVersions) {
 
   let imodel;
   let previousSchema;
+  let previousReadVersion;
 
   for (const releasedSchema of testSchemas) {
     console.log("\nSchema: " + releasedSchema);
@@ -99,10 +100,12 @@ async function schemaUpgradeTest(ignoreList, output, checkAllVersions) {
       continue;
     }
 
-    imodel = await importAndExportSchemaToIModel(schemaName, previousSchema, releasedSchema, schemaDirs, imodel, output);
+    imodel = await importAndExportSchemaToIModel(schemaName, previousSchema, key.readVersion, previousReadVersion, releasedSchema, schemaDirs, imodel, output);
     console.log("-> ", chalk.default.green(`${schemaName}.${schemaVersion} successfully imported.`));
     writeLogsToFile(`-> ${schemaName}.${schemaVersion} successfully imported.\n\n`, output);
+    count++;
     previousSchema = schemaName;
+    previousReadVersion = key.readVersion;
   }
   await IModelHost.shutdown();
 }
@@ -461,11 +464,7 @@ function getShortListedVersions(releasedSchemas, wipSchemas, output, checkAllVer
       check = false;
     }
 
-    if (previousSchema === schemaName && previousReadVersion !== schemaInfo.readVersion && !checkAllVersions) {
-      console.log("-> ", chalk.default.yellow(`${schemaName}.${schemaVersion} released schema is skipped.`));
-      writeLogsToFile(`-> ${schemaName}.${schemaVersion} released schema is skipped.\n`, output);
-    } else
-      shortListedVersions.push(releasedSchema);
+    shortListedVersions.push(releasedSchema);
 
     previousSchema = schemaName;
     previousVersion = schemaVersion;
@@ -477,14 +476,15 @@ function getShortListedVersions(releasedSchemas, wipSchemas, output, checkAllVer
 /**
  * Import and export schema to an imodel for schema upgrade testing
  */
-async function importAndExportSchemaToIModel(schemaName, previousSchema, releasedSchema, schemaDirs, imodel, output) {
+async function importAndExportSchemaToIModel(schemaName, previousSchema, schemaReadVersion, previousReadVersion, releasedSchema, schemaDirs, imodel, output) {
   const locater = new StubSchemaXmlFileLocater();
   locater.addSchemaSearchPaths(schemaDirs);
   const loadedSchema = locater.loadSchema(releasedSchema);
   const orderedSchemas = SchemaGraphUtil.buildDependencyOrderedSchemaList(loadedSchema);
   const schemaPaths = orderedSchemas.map((s) => s.schemaKey.fileName);
 
-  if (schemaName !== previousSchema) {
+  if ((schemaName !== previousSchema) || (schemaName === previousSchema && schemaReadVersion !== previousReadVersion)) {
+    console.log(chalk.default.yellow("-> *** It is the new schema or major version ***"));
     if (imodel) {
       imodel.close();
       await IModelHost.shutdown();
