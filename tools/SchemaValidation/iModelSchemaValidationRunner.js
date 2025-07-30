@@ -78,8 +78,9 @@ async function validateIModelSchemas() {
 async function schemaUpgradeTest(ignoreList, output, checkAllVersions) {
   deleteOldLogFile(output);
   const releasedSchemas = await generateReleasedSchemasList(bisSchemaRepo);
+  const latestReleasedSchemas = findLatestReleasedVersion(releasedSchemas);
   const wipSchemas = await generateWIPSchemasList(bisSchemaRepo);
-  const testSchemas = getShortListedVersions(releasedSchemas.reverse(), wipSchemas, output, checkAllVersions);
+  const testSchemas = getShortListedVersions(releasedSchemas.reverse(), latestReleasedSchemas, wipSchemas, output, checkAllVersions);
 
   let schemaDirs = await generateSchemaDirectoryList(bisSchemaRepo);
   schemaDirs = schemaDirs.concat(wipSchemas.map((schemaPath) => path.dirname(schemaPath)));
@@ -282,7 +283,7 @@ function getBisRootPath() {
     throw Error("Could not find BIS root path.")
   }
 
-  return bisRootPath;
+  return "D:\\work\\bis-schemas\\bis-schemas\\";
 }
 
 /**
@@ -437,40 +438,43 @@ function checkIfWipSchemaRequired(previousSchema, latestReleasedVersion, wipSche
  * @param checkAllVersions Check to limit the test to read compatible versions or not
  * @returns List of shortlisted schemas that will be tested for schema upgrade.
  */
-function getShortListedVersions(releasedSchemas, wipSchemas, output, checkAllVersions) {
-  let check = true;
-  let latestReleasedVersion;
-  let previousSchema;
-  let previousVersion;
-  let previousReadVersion;
+function getShortListedVersions(releasedSchemas, latestReleasedSchemas, wipSchemas, output, checkAllVersions) {
+
   const shortListedVersions = [];
 
-  for (const releasedSchema of releasedSchemas) {
-    const schemaInfo = getSchemaInfo(releasedSchema);
-    const schemaName = getVerifiedSchemaName(schemaInfo.name, releasedSchema);
-    const schemaVersion = schemaInfo.version.toString();
+  // console.log(latestReleasedSchemas);
+  // console.log(releasedSchemas);
 
-    if (schemaName !== previousSchema) {
-      checkIfWipSchemaRequired(previousSchema, latestReleasedVersion, wipSchemas, shortListedVersions, output);
-      latestReleasedVersion = "";
-      check = true;
-    }
-
-    if (check) {
-      latestReleasedVersion = schemaVersion;
-      check = false;
-    }
-
-    if (previousSchema === schemaName && previousReadVersion !== schemaInfo.readVersion && !checkAllVersions) {
-      console.log("-> ", chalk.default.yellow(`${schemaName}.${schemaVersion} released schema is skipped.`));
-      writeLogsToFile(`-> ${schemaName}.${schemaVersion} released schema is skipped.\n`, output);
-    } else
-      shortListedVersions.push(releasedSchema);
-
-    previousSchema = schemaName;
-    previousVersion = schemaVersion;
-    previousReadVersion = schemaInfo.readVersion;
+  // Create a map of schema names to their latest major versions
+  const latestMajorVersions = new Map();
+  for (const latestSchema of latestReleasedSchemas) {
+    const schemaName = getSchemaNameFromFileName(latestSchema);
+    const schemaInfo = getSchemaInfo(latestSchema);
+    const majorVersion = schemaInfo.readVersion;
+    latestMajorVersions.set(schemaName, majorVersion);
   }
+
+  // console.log("Size of latestReleasedSchemas:", latestReleasedSchemas.length);
+  // console.log("Size of latestMajorVersions:", latestMajorVersions.size);
+  // console.log(latestMajorVersions);
+
+  // Filter released schemas to only include those with matching major versions
+  for (const releasedSchema of releasedSchemas) {
+    const schemaName = getSchemaNameFromFileName(releasedSchema);
+    const majorVersion = getSchemaInfo(releasedSchema).readVersion;
+    
+    // console.log("\nschemaName= ", schemaName);
+    // console.log("latestMajorVersions.has(schemaName)= ", latestMajorVersions.has(schemaName));
+    // console.log("majorVersion= ", majorVersion);
+    // console.log("latestMajorVersions.get(schemaName)= ", latestMajorVersions.get(schemaName));
+    // Check if this schema's major version matches the latest major version for this schema family
+    if (latestMajorVersions.has(schemaName) && latestMajorVersions.get(schemaName) === majorVersion) {
+      shortListedVersions.push(releasedSchema);
+    }
+  }
+
+  // console.log(shortListedVersions.sort());
+
   return shortListedVersions.sort();
 }
 
