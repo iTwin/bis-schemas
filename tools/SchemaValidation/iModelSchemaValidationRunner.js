@@ -483,7 +483,6 @@ async function importAndExportSchemaToIModel(schemaName, previousSchema, schemaR
   const schemaPaths = orderedSchemas.map((s) => s.schemaKey.fileName);
 
   if ((schemaName !== previousSchema) || (schemaName === previousSchema && schemaReadVersion !== previousReadVersion)) {
-    console.log(chalk.default.yellow("-> *** It is the new schema or major version ***"));
     if (imodel) {
       imodel.close();
       await IModelHost.shutdown();
