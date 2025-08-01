@@ -60,13 +60,12 @@ async function validateIModelSchemas() {
     return;
   }
 
-  if (argv.schemaUpgradeTesting) {
-    let checkAllVersions = false;
-    if (argv.checkAllVersions)
-      checkAllVersions = argv.checkAllVersions;
-
-    await schemaUpgradeTest(ignoreList, output, checkAllVersions);
-  } else {
+  if (argv.schemaUpgradeTesting) 
+  {
+    await schemaUpgradeTest(ignoreList, output);
+  }
+  else 
+  {
     if (argv.released || !argv.wip)
       await validateReleasedSchemas(ignoreList, argv.released, output);
   
@@ -75,36 +74,56 @@ async function validateIModelSchemas() {
   }
 }
 
-async function schemaUpgradeTest(ignoreList, output, checkAllVersions) {
+async function schemaUpgradeTest(ignoreList, output) {
   deleteOldLogFile(output);
+
+  const results = {};
+  const bisSchemaRepo = getBisRootPath();
   const releasedSchemas = await generateReleasedSchemasList(bisSchemaRepo);
   const wipSchemas = await generateWIPSchemasList(bisSchemaRepo);
-  const testSchemas = getShortListedVersions(releasedSchemas.reverse(), wipSchemas, output, checkAllVersions);
+  const testSchemas = getShortListedVersions(releasedSchemas.reverse(), wipSchemas, output);
 
   let schemaDirs = await generateSchemaDirectoryList(bisSchemaRepo);
   schemaDirs = schemaDirs.concat(wipSchemas.map((schemaPath) => path.dirname(schemaPath)));
 
   let imodel;
   let previousSchema;
+  let previousReadVersion;
+  let batchStarted = true;
 
-  for (const releasedSchema of testSchemas) {
-    console.log("\nSchema: " + releasedSchema);
-    writeLogsToFile(`\nSchema:  ${releasedSchema}\n`, output);
+  for (const schema of testSchemas) {
+    console.log("\nSchema: " + schema);
+    writeLogsToFile(`\nSchema:  ${schema}\n`, output);
   
-    const key = getSchemaInfo(releasedSchema);
-    const schemaName = getVerifiedSchemaName(key.name, releasedSchema);
+    const key = getSchemaInfo(schema);
+    const schemaName = getVerifiedSchemaName(key.name, schema);
     const schemaVersion = getVersionString(key.readVersion, key.writeVersion, key.minorVersion);
+    const isWIP = wipSchemas.includes(schema);
 
-    if (excludeSchema(schemaName, schemaVersion, ignoreList)) {
+    if (excludeSchema(schemaName, schemaVersion, ignoreList, isWIP)) {
       continue;
     }
 
-    imodel = await importAndExportSchemaToIModel(schemaName, previousSchema, releasedSchema, schemaDirs, imodel, output);
+    if (!results[schemaName]) {
+      results[schemaName] = [];
+    }
+
+    if ((schemaName !== previousSchema) || (schemaName === previousSchema && key.readVersion !== previousReadVersion)) {
+      batchStarted = true;
+    }
+
+    imodel = await importAndExportSchemaToIModel(schema, schemaDirs, batchStarted, imodel, output);
+    results[schemaName].push({name: schemaName, batch: key.readVersion, batchStarted, version: schemaVersion});
     console.log("-> ", chalk.default.green(`${schemaName}.${schemaVersion} successfully imported.`));
     writeLogsToFile(`-> ${schemaName}.${schemaVersion} successfully imported.\n\n`, output);
     previousSchema = schemaName;
+    previousReadVersion = key.readVersion;
+    batchStarted = false;
   }
+
   await IModelHost.shutdown();
+
+  return results;
 }
 
 async function validateReleasedSchemas(ignoreList, singleSchemaName, output) {
@@ -233,7 +252,7 @@ function prepareOutputFile() {
  * @param excludeList List of schemas present in ignoreSchemaList.json
  * @returns Boolean based upon the decision
  */
-function excludeSchema(schemaName, schemaVersion, excludeList) {
+function excludeSchema(schemaName, schemaVersion, excludeList, isWIP=undefined) {
   if (!excludeList)
     return false;
 
@@ -248,6 +267,9 @@ function excludeSchema(schemaName, schemaVersion, excludeList) {
     return true;
 
   if (matches.some((s) => s.version === schemaVersion))
+    return true;
+
+  if (matches.some((s) => s.version === "wip" && isWIP))
     return true;
 
   return false;
@@ -437,7 +459,7 @@ function checkIfWipSchemaRequired(previousSchema, latestReleasedVersion, wipSche
  * @param checkAllVersions Check to limit the test to read compatible versions or not
  * @returns List of shortlisted schemas that will be tested for schema upgrade.
  */
-function getShortListedVersions(releasedSchemas, wipSchemas, output, checkAllVersions) {
+function getShortListedVersions(releasedSchemas, wipSchemas, output) {
   let check = true;
   let latestReleasedVersion;
   let previousSchema;
@@ -461,30 +483,26 @@ function getShortListedVersions(releasedSchemas, wipSchemas, output, checkAllVer
       check = false;
     }
 
-    if (previousSchema === schemaName && previousReadVersion !== schemaInfo.readVersion && !checkAllVersions) {
-      console.log("-> ", chalk.default.yellow(`${schemaName}.${schemaVersion} released schema is skipped.`));
-      writeLogsToFile(`-> ${schemaName}.${schemaVersion} released schema is skipped.\n`, output);
-    } else
-      shortListedVersions.push(releasedSchema);
+    shortListedVersions.push(releasedSchema);
 
     previousSchema = schemaName;
     previousVersion = schemaVersion;
     previousReadVersion = schemaInfo.readVersion;
   }
-  return shortListedVersions.sort();
+  return sortSchemas(shortListedVersions);
 }
 
 /**
  * Import and export schema to an imodel for schema upgrade testing
  */
-async function importAndExportSchemaToIModel(schemaName, previousSchema, releasedSchema, schemaDirs, imodel, output) {
+async function importAndExportSchemaToIModel(releasedSchema, schemaDirs, batchStarted, imodel, output) {
   const locater = new StubSchemaXmlFileLocater();
   locater.addSchemaSearchPaths(schemaDirs);
   const loadedSchema = locater.loadSchema(releasedSchema);
   const orderedSchemas = SchemaGraphUtil.buildDependencyOrderedSchemaList(loadedSchema);
   const schemaPaths = orderedSchemas.map((s) => s.schemaKey.fileName);
 
-  if (schemaName !== previousSchema) {
+  if (batchStarted) {
     if (imodel) {
       imodel.close();
       await IModelHost.shutdown();
@@ -506,7 +524,16 @@ async function importAndExportSchemaToIModel(schemaName, previousSchema, release
 
   if (err !== "")
     throw Error(err);
+
   return imodel;
+}
+
+function sortSchemas(schemaList) {
+  return schemaList.sort((a, b) => {
+    const schemaA = path.basename(a).toLowerCase();
+    const schemaB = path.basename(b).toLowerCase();
+    return schemaA.localeCompare(schemaB);
+  });
 }
 
 /**
@@ -663,8 +690,4 @@ async function compareSnapshotsInfo(previousInfo, currentInfo) {
   }
 }
 
-validateIModelSchemas().then()
-  .catch((error) => {
-    console.error(error);
-    process.exit(1);
-  });
+module.exports = { schemaUpgradeTest, validateIModelSchemas };
