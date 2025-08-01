@@ -7,6 +7,7 @@
     <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA" />
     <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
     <ECSchemaReference name="BisCore" version="01.00.10" alias="bis" />
+    <ECSchemaReference name="ClassificationSystems" version="01.00.05" alias="clsf" />
     <ECSchemaReference name="LinearReferencing" version="02.00.03" alias="lr" />
     <ECSchemaReference name="RoadRailUnits" version="01.00.02" alias="rru" />
     <ECSchemaReference name="SpatialComposition" version="01.00.01" alias="spcomp" />
@@ -117,6 +118,26 @@
         <ECEnumerator value="1" name="SLOPE" displayLabel="Slope" description="Specialized control vertex that uses slope constraints in the spatial interpolation calculation." />
         <ECEnumerator value="2" name="SLOPEDIRECTION" displayLabel="Slope Direction" description="Specialized control vertex that uses slope constraints along a single direction in the spatial interpolation calculation." />
     </ECEnumeration>
+
+    <ECRelationshipClass typeName="CategorySymbolizesClassification" strength="referencing" modifier="Abstract">
+        <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="symbolizes" polymorphic="false">
+            <Class class="clsf:Classification" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is symbolized by" polymorphic="true">
+            <Class class="bis:Category" />
+        </Target>
+    </ECRelationshipClass>
+    
+    <ECRelationshipClass typeName="PlanProjectionCategorySymbolizesClassification" strength="referencing" modifier="Sealed">
+        <BaseClass>CategorySymbolizesClassification</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="symbolizes" polymorphic="false">
+            <Class class="clsf:Classification" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is symbolized by" polymorphic="true">
+            <Class class="bis:Category" />
+        </Target>
+    </ECRelationshipClass>
 
     <ECEntityClass typeName="Vertex" modifier="Abstract" displayLabel="Vertex">
         <BaseClass>bis:SpatialLocationElement</BaseClass>
@@ -1464,4 +1485,6 @@
             <Class class="ControlLineEdge" />
         </Target>
     </ECRelationshipClass>
+
+    
 </ECSchema>
