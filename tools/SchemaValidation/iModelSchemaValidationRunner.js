@@ -91,15 +91,16 @@ async function schemaUpgradeTest(ignoreList, output) {
   let previousReadVersion;
   let batchStarted = true;
 
-  for (const releasedSchema of testSchemas) {
-    console.log("\nSchema: " + releasedSchema);
-    writeLogsToFile(`\nSchema:  ${releasedSchema}\n`, output);
+  for (const schema of testSchemas) {
+    console.log("\nSchema: " + schema);
+    writeLogsToFile(`\nSchema:  ${schema}\n`, output);
   
-    const key = getSchemaInfo(releasedSchema);
-    const schemaName = getVerifiedSchemaName(key.name, releasedSchema);
+    const key = getSchemaInfo(schema);
+    const schemaName = getVerifiedSchemaName(key.name, schema);
     const schemaVersion = getVersionString(key.readVersion, key.writeVersion, key.minorVersion);
+    const isWIP = wipSchemas.includes(schema);
 
-    if (excludeSchema(schemaName, schemaVersion, ignoreList)) {
+    if (excludeSchema(schemaName, schemaVersion, isWIP, ignoreList)) {
       continue;
     }
 
@@ -111,7 +112,7 @@ async function schemaUpgradeTest(ignoreList, output) {
       batchStarted = true;
     }
 
-    imodel = await importAndExportSchemaToIModel(releasedSchema, schemaDirs, batchStarted, imodel, output);
+    imodel = await importAndExportSchemaToIModel(schema, schemaDirs, batchStarted, imodel, output);
     results[schemaName].push({name: schemaName, batch: key.readVersion, batchStarted, version: schemaVersion});
     console.log("-> ", chalk.default.green(`${schemaName}.${schemaVersion} successfully imported.`));
     writeLogsToFile(`-> ${schemaName}.${schemaVersion} successfully imported.\n\n`, output);
@@ -251,7 +252,7 @@ function prepareOutputFile() {
  * @param excludeList List of schemas present in ignoreSchemaList.json
  * @returns Boolean based upon the decision
  */
-function excludeSchema(schemaName, schemaVersion, excludeList) {
+function excludeSchema(schemaName, schemaVersion, isWIP=undefined, excludeList) {
   if (!excludeList)
     return false;
 
@@ -266,6 +267,9 @@ function excludeSchema(schemaName, schemaVersion, excludeList) {
     return true;
 
   if (matches.some((s) => s.version === schemaVersion))
+    return true;
+
+  if (matches.some((s) => s.version === "wip" && isWIP))
     return true;
 
   return false;
