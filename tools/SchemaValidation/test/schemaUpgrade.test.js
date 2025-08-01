@@ -61,6 +61,9 @@ describe('Schema Upgrade Tests', function() {
     chai.expect(results["SchemaB"][3].batchStarted).to.be.true;
     chai.expect(results["SchemaB"][3].batch).to.equal(3);
     chai.expect(results["SchemaB"][3].version).to.equal("03.00.00");
+    chai.expect(results["SchemaB"][4].batchStarted).to.be.false;
+    chai.expect(results["SchemaB"][4].batch).to.equal(3);
+    chai.expect(results["SchemaB"][4].version).to.equal("03.00.01");
   });
 
   it("One or more read compatible sets present in each schema family, Schema Upgrade testing is performed in respective batches.", async function () {
@@ -120,6 +123,9 @@ describe('Schema Upgrade Tests', function() {
     chai.expect(results["SchemaD"][2].batchStarted).to.be.true;
     chai.expect(results["SchemaD"][2].batch).to.equal(2);
     chai.expect(results["SchemaD"][2].version).to.equal("02.00.00");
+    chai.expect(results["SchemaD"][3].batchStarted).to.be.false;
+    chai.expect(results["SchemaD"][3].batch).to.equal(2);
+    chai.expect(results["SchemaD"][3].version).to.equal("02.00.01");
 
     // SchemaE first batch
     chai.expect(results["SchemaE"][0].batchStarted).to.be.true;

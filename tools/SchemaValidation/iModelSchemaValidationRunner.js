@@ -455,7 +455,7 @@ function checkIfWipSchemaRequired(previousSchema, latestReleasedVersion, wipSche
  * @param checkAllVersions Check to limit the test to read compatible versions or not
  * @returns List of shortlisted schemas that will be tested for schema upgrade.
  */
-function getShortListedVersions(releasedSchemas, wipSchemas, output, checkAllVersions) {
+function getShortListedVersions(releasedSchemas, wipSchemas, output) {
   let check = true;
   let latestReleasedVersion;
   let previousSchema;
@@ -485,7 +485,7 @@ function getShortListedVersions(releasedSchemas, wipSchemas, output, checkAllVer
     previousVersion = schemaVersion;
     previousReadVersion = schemaInfo.readVersion;
   }
-  return shortListedVersions.sort();
+  return sortSchemas(shortListedVersions);
 }
 
 /**
@@ -522,6 +522,14 @@ async function importAndExportSchemaToIModel(releasedSchema, schemaDirs, batchSt
     throw Error(err);
 
   return imodel;
+}
+
+function sortSchemas(schemaList) {
+  return schemaList.sort((a, b) => {
+    const schemaA = path.basename(a).toLowerCase();
+    const schemaB = path.basename(b).toLowerCase();
+    return schemaA.localeCompare(schemaB);
+  });
 }
 
 /**
