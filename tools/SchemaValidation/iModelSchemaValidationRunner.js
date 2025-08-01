@@ -100,7 +100,7 @@ async function schemaUpgradeTest(ignoreList, output) {
     const schemaVersion = getVersionString(key.readVersion, key.writeVersion, key.minorVersion);
     const isWIP = wipSchemas.includes(schema);
 
-    if (excludeSchema(schemaName, schemaVersion, isWIP, ignoreList)) {
+    if (excludeSchema(schemaName, schemaVersion, ignoreList, isWIP)) {
       continue;
     }
 
@@ -252,7 +252,7 @@ function prepareOutputFile() {
  * @param excludeList List of schemas present in ignoreSchemaList.json
  * @returns Boolean based upon the decision
  */
-function excludeSchema(schemaName, schemaVersion, isWIP=undefined, excludeList) {
+function excludeSchema(schemaName, schemaVersion, excludeList, isWIP=undefined) {
   if (!excludeList)
     return false;
 
