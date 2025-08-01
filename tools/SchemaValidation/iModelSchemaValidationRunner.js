@@ -60,13 +60,12 @@ async function validateIModelSchemas() {
     return;
   }
 
-  if (argv.schemaUpgradeTesting) {
-    let checkAllVersions = false;
-    if (argv.checkAllVersions)
-      checkAllVersions = argv.checkAllVersions;
-
-    await schemaUpgradeTest(ignoreList, output, checkAllVersions);
-  } else {
+  if (argv.schemaUpgradeTesting) 
+  {
+    await schemaUpgradeTest(ignoreList, output);
+  }
+  else 
+  {
     if (argv.released || !argv.wip)
       await validateReleasedSchemas(ignoreList, argv.released, output);
   
@@ -75,11 +74,14 @@ async function validateIModelSchemas() {
   }
 }
 
-async function schemaUpgradeTest(ignoreList, output, checkAllVersions) {
+async function schemaUpgradeTest(ignoreList, output) {
   deleteOldLogFile(output);
+
+  const results = {};
+  const bisSchemaRepo = getBisRootPath();
   const releasedSchemas = await generateReleasedSchemasList(bisSchemaRepo);
   const wipSchemas = await generateWIPSchemasList(bisSchemaRepo);
-  const testSchemas = getShortListedVersions(releasedSchemas.reverse(), wipSchemas, output, checkAllVersions);
+  const testSchemas = getShortListedVersions(releasedSchemas.reverse(), wipSchemas, output);
 
   let schemaDirs = await generateSchemaDirectoryList(bisSchemaRepo);
   schemaDirs = schemaDirs.concat(wipSchemas.map((schemaPath) => path.dirname(schemaPath)));
@@ -87,6 +89,7 @@ async function schemaUpgradeTest(ignoreList, output, checkAllVersions) {
   let imodel;
   let previousSchema;
   let previousReadVersion;
+  let batchStarted = true;
 
   for (const releasedSchema of testSchemas) {
     console.log("\nSchema: " + releasedSchema);
@@ -100,13 +103,26 @@ async function schemaUpgradeTest(ignoreList, output, checkAllVersions) {
       continue;
     }
 
-    imodel = await importAndExportSchemaToIModel(schemaName, previousSchema, key.readVersion, previousReadVersion, releasedSchema, schemaDirs, imodel, output);
+    if (!results[schemaName]) {
+      results[schemaName] = [];
+    }
+
+    if ((schemaName !== previousSchema) || (schemaName === previousSchema && key.readVersion !== previousReadVersion)) {
+      batchStarted = true;
+    }
+
+    imodel = await importAndExportSchemaToIModel(releasedSchema, schemaDirs, batchStarted, imodel, output);
+    results[schemaName].push({name: schemaName, batch: key.readVersion, batchStarted, version: schemaVersion});
     console.log("-> ", chalk.default.green(`${schemaName}.${schemaVersion} successfully imported.`));
     writeLogsToFile(`-> ${schemaName}.${schemaVersion} successfully imported.\n\n`, output);
     previousSchema = schemaName;
     previousReadVersion = key.readVersion;
+    batchStarted = false;
   }
+
   await IModelHost.shutdown();
+
+  return results;
 }
 
 async function validateReleasedSchemas(ignoreList, singleSchemaName, output) {
@@ -475,14 +491,14 @@ function getShortListedVersions(releasedSchemas, wipSchemas, output, checkAllVer
 /**
  * Import and export schema to an imodel for schema upgrade testing
  */
-async function importAndExportSchemaToIModel(schemaName, previousSchema, schemaReadVersion, previousReadVersion, releasedSchema, schemaDirs, imodel, output) {
+async function importAndExportSchemaToIModel(releasedSchema, schemaDirs, batchStarted, imodel, output) {
   const locater = new StubSchemaXmlFileLocater();
   locater.addSchemaSearchPaths(schemaDirs);
   const loadedSchema = locater.loadSchema(releasedSchema);
   const orderedSchemas = SchemaGraphUtil.buildDependencyOrderedSchemaList(loadedSchema);
   const schemaPaths = orderedSchemas.map((s) => s.schemaKey.fileName);
 
-  if ((schemaName !== previousSchema) || (schemaName === previousSchema && schemaReadVersion !== previousReadVersion)) {
+  if (batchStarted) {
     if (imodel) {
       imodel.close();
       await IModelHost.shutdown();
@@ -504,6 +520,7 @@ async function importAndExportSchemaToIModel(schemaName, previousSchema, schemaR
 
   if (err !== "")
     throw Error(err);
+
   return imodel;
 }
 
@@ -661,8 +678,4 @@ async function compareSnapshotsInfo(previousInfo, currentInfo) {
   }
 }
 
-validateIModelSchemas().then()
-  .catch((error) => {
-    console.error(error);
-    process.exit(1);
-  });
+module.exports = { schemaUpgradeTest, validateIModelSchemas };
