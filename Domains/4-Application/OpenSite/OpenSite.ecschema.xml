@@ -3,10 +3,11 @@
 |  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
 |  * See LICENSE.md in the project root for license terms and full copyright notice.
 ======================================================================================= -->
-<ECSchema schemaName="OpenSite" alias="opnsite" version="01.00.10" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" displayLabel="OpenSite" description="OpenSite+ application schema.">
+<ECSchema schemaName="OpenSite" alias="opnsite" version="01.00.11" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" displayLabel="OpenSite" description="OpenSite+ application schema.">
     <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA" />
     <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
     <ECSchemaReference name="BisCore" version="01.00.10" alias="bis" />
+    <ECSchemaReference name="ClassificationSystems" version="01.00.05" alias="clsf" />
     <ECSchemaReference name="LinearReferencing" version="02.00.03" alias="lr" />
     <ECSchemaReference name="RoadRailUnits" version="01.00.02" alias="rru" />
     <ECSchemaReference name="SpatialComposition" version="01.00.01" alias="spcomp" />
@@ -39,11 +40,12 @@
     <PropertyCategory typeName="DrivewayPathEdge_Crowning" displayLabel="Crowning" priority="0" />
     <PropertyCategory typeName="DrivewayPathFin_Road" displayLabel="Road" priority="0" />
     <PropertyCategory typeName="DrivewayPathFin_Shoulder" displayLabel="Shoulder" priority="0" />
-    <PropertyCategory typeName="SidewalkPathFin_Road" displayLabel="Road" priority="0" />
+    <PropertyCategory typeName="SidewalkPathFin_Sidewalk" displayLabel="Sidewalk" priority="0" />
 
     <PropertyCategory typeName="ShapedArea_Optimizer" displayLabel="Optimizer" priority="0" />
     <PropertyCategory typeName="ShapedArea_Constraints" displayLabel="Constraints" priority="0" />
     <PropertyCategory typeName="ShapedArea_Surface" displayLabel="Surface" priority="0" />
+    <PropertyCategory typeName="PadArea_Layout" displayLabel="Layout" priority="0" />
     <PropertyCategory typeName="LayoutParkingArea_Parking" displayLabel="Parking" priority="0" />
     <PropertyCategory typeName="LayoutParkingArea_ParkingAisle" displayLabel="Parking Aisle" priority="0" />
     <PropertyCategory typeName="LayoutParkingArea_ParkingIsland" displayLabel="Parking Island" priority="0" />
@@ -116,6 +118,26 @@
         <ECEnumerator value="1" name="SLOPE" displayLabel="Slope" description="Specialized control vertex that uses slope constraints in the spatial interpolation calculation." />
         <ECEnumerator value="2" name="SLOPEDIRECTION" displayLabel="Slope Direction" description="Specialized control vertex that uses slope constraints along a single direction in the spatial interpolation calculation." />
     </ECEnumeration>
+
+    <ECRelationshipClass typeName="CategorySymbolizesClassification" strength="referencing" modifier="Abstract">
+        <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="symbolizes" polymorphic="false">
+            <Class class="clsf:Classification" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is symbolized by" polymorphic="true">
+            <Class class="bis:Category" />
+        </Target>
+    </ECRelationshipClass>
+    
+    <ECRelationshipClass typeName="PlanProjectionCategorySymbolizesClassification" strength="referencing" modifier="Sealed">
+        <BaseClass>CategorySymbolizesClassification</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="symbolizes" polymorphic="false">
+            <Class class="clsf:Classification" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is symbolized by" polymorphic="true">
+            <Class class="bis:Category" />
+        </Target>
+    </ECRelationshipClass>
 
     <ECEntityClass typeName="Vertex" modifier="Abstract" displayLabel="Vertex">
         <BaseClass>bis:SpatialLocationElement</BaseClass>
@@ -395,8 +417,8 @@
             </ECCustomAttributes>
         </ECProperty>
 
-        <ECProperty propertyName="SidewalkWidth" typeName="double" kindOfQuantity="rru:LENGTH" category="SidewalkPathFin_Road" displayLabel="Sidewalk Width" description="Sidewalk width for this side of the sidewalk." />        
-        <ECProperty propertyName="CrossSlope" typeName="double" kindOfQuantity="rru:SLOPE" category="SidewalkPathFin_Road" displayLabel="Cross Slope" description="Cross slope for this side of the sidewalk." />
+        <ECProperty propertyName="SidewalkWidth" typeName="double" kindOfQuantity="rru:LENGTH" category="SidewalkPathFin_Sidewalk" displayLabel="Sidewalk Width" description="Sidewalk width for this side of the sidewalk." />        
+        <ECProperty propertyName="CrossSlope" typeName="double" kindOfQuantity="rru:SLOPE" category="SidewalkPathFin_Sidewalk" displayLabel="Cross Slope" description="Cross slope for this side of the sidewalk." />
     </ECEntityClass>
 
     <ECEntityClass typeName="ParkingDirectionPathEdge" modifier="Sealed" displayLabel="Parking Direction Edge" description="Parking direction path edge.">
@@ -693,6 +715,8 @@
 
     <ECEntityClass typeName="PadArea" modifier="Sealed" displayLabel="Pad Area" description="Pad Area">
         <BaseClass>ShapedArea</BaseClass>
+
+        <ECProperty propertyName="ParkingAllowed" typeName="boolean" category="PadArea_Layout" displayLabel="Allow Parking" description="Allow parking spaces to be created inside this area." />
     </ECEntityClass>
 
     <ECEntityClass typeName="ParkingArea" modifier="Sealed" displayLabel="Parking Area" description="Parking Area">
@@ -1040,7 +1064,14 @@
     <ECEntityClass typeName="EdgeCurbAspect" modifier="Sealed" displayLabel="Curb">
         <BaseClass>bis:ElementUniqueAspect</BaseClass>
 
-        <ECProperty propertyName="CurbHeight" typeName="double" kindOfQuantity="rru:LENGTH" category="EdgeCurbAspect_Curb" displayLabel="Curb Height" description="Height of the curb." />
+        <ECProperty propertyName="CurbHeight" typeName="double" kindOfQuantity="rru:LENGTH" category="EdgeCurbAspect_Curb" displayLabel="Curb Height" description="Height of the curb.">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03" />
+                <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                    <Description> We handle curbs in the OpenSite+ application now. </Description>
+                </Deprecated>
+            </ECCustomAttributes>
+        </ECProperty>
     </ECEntityClass>
 
     <ECRelationshipClass typeName="BuildingEdgeOwnsCurbAspect" modifier="Sealed" strength="embedding">
@@ -1454,4 +1485,6 @@
             <Class class="ControlLineEdge" />
         </Target>
     </ECRelationshipClass>
+
+    
 </ECSchema>
