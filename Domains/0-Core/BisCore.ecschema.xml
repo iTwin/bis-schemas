@@ -3,7 +3,7 @@
 |  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
 |  * See LICENSE.md in the project root for license terms and full copyright notice.
 ======================================================================================= -->
-<ECSchema schemaName="BisCore" alias="bis" version="01.00.18" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" displayLabel="BIS Core" description="The BIS core schema contains classes that all other domain schemas extend.">
+<ECSchema schemaName="BisCore" alias="bis" version="01.00.23" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" displayLabel="BIS Core" description="The BIS core schema contains classes that all other domain schemas extend.">
 
     <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
     <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
@@ -392,7 +392,7 @@
             <Class class="TemplateRecipe2d" />
         </Target>
     </ECRelationshipClass>
-    <ECRelationshipClass typeName="PhysicalModelBreaksDownTemplateRecipe3d" displayLabel="PhysicalModel Sub-Models TemplateRecipe2d" strength="embedding" strengthDirection="backward" modifier="None" description="Relates a bis:PhysicalModel to the bis:TemplateRecipe3d that it sub-models.">
+    <ECRelationshipClass typeName="PhysicalModelBreaksDownTemplateRecipe3d" displayLabel="PhysicalModel Sub-Models TemplateRecipe3d" strength="embedding" strengthDirection="backward" modifier="None" description="Relates a bis:PhysicalModel to the bis:TemplateRecipe3d that it sub-models.">
         <!-- @see Model.ModeledElement ECNavigationProperty -->
         <BaseClass>ModelModelsElement</BaseClass>
         <Source multiplicity="(0..1)" roleLabel="models" polymorphic="false">
@@ -400,6 +400,16 @@
         </Source>
         <Target multiplicity="(0..1)" roleLabel="is modeled by" polymorphic="true">
             <Class class="TemplateRecipe3d" />
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="SpatialLocationModelBreaksDownTemplateRecipe3dInPlan" displayLabel="SpatialLocationModel Sub-Models TemplateRecipe3dInPlan" strength="embedding" strengthDirection="backward" modifier="None" description="Relates a bis:SpatialLocationModel to the bis:TemplateRecipe3dInPlan that it sub-models.">
+        <!-- @see Model.ModeledElement ECNavigationProperty -->
+        <BaseClass>ModelModelsElement</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="models" polymorphic="false">
+            <Class class="SpatialLocationModel"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is modeled by" polymorphic="true">
+            <Class class="TemplateRecipe3dInPlan" />
         </Target>
     </ECRelationshipClass>
     <ECRelationshipClass typeName="DocumentListModelBreaksDownDocumentPartition" displayLabel="DocumentListModel Sub-Models DocumentPartition" strength="embedding" strengthDirection="backward" modifier="None" description="Relates a bis:DocumentListModel to the bis:DocumentPartition that it sub-models.">
@@ -781,6 +791,15 @@
             <ClassHasHandler xmlns="BisCore.01.00.00"/>
         </ECCustomAttributes>
     </ECEntityClass>
+    <ECRelationshipClass typeName="SpatialLocationTypeRepresentsTypeDefinition" strength="referencing" modifier="None" description="Relates a bis:SpatialLocationType to the bis:TypeDefinitionElement that it represents.">
+        <BaseClass>ElementRefersToElements</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="represents" polymorphic="true">
+            <Class class="SpatialLocationType"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is represented by" polymorphic="true">
+            <Class class="TypeDefinitionElement"/>
+        </Target>
+    </ECRelationshipClass>
 
     <ECRelationshipClass typeName="TypeDefinitionHasRecipe" strength="referencing" modifier="Abstract">
         <!-- @see TypeDefinitionElement.Recipe ECNavigationProperty -->
@@ -808,6 +827,15 @@
         </Source>
         <Target multiplicity="(0..1)" roleLabel="is referenced by" polymorphic="true">
             <Class class="TemplateRecipe2d"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="SpatialLocationTypeHasTemplateRecipe" strength="referencing" modifier="None">
+        <BaseClass>TypeDefinitionHasRecipe</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="has" polymorphic="true">
+            <Class class="SpatialLocationType" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is referenced by" polymorphic="true">
+            <Class class="TemplateRecipe3dInPlan"/>
         </Target>
     </ECRelationshipClass>
 
@@ -877,6 +905,38 @@
             <ClassHasHandler xmlns="BisCore.01.00.00"/>
         </ECCustomAttributes>
     </ECEntityClass>
+    <ECEntityClass typeName="TemplateRecipe3dInPlan" displayLabel="Plan-Projection Template Recipe" description="A recipe that uses a Plan-Projection template for creating new instances.">
+        <BaseClass>RecipeDefinitionElement</BaseClass>
+        <BaseClass>ISubModeledElement</BaseClass>
+    </ECEntityClass>
+
+    <ECEnumeration typeName="ThumbnailImageFormat" backingTypeName="string" isStrict="true" description="Supported MIME-type formats for Thumbnail images.">
+        <ECEnumerator value="image/jpeg" name="Jpeg" displayLabel="Jpeg"/>
+        <ECEnumerator value="image/png" name="Png" displayLabel="Png"/>
+    </ECEnumeration>
+
+    <ECEntityClass typeName="DefinitionThumbnail" modifier="None" displayLabel="Thumbnail" description="A bis:DefinitionElement that captures the Thumbnail of one or more bis:DefinitionElement instances.">
+        <BaseClass>DefinitionElement</BaseClass>
+        <ECProperty propertyName="Image" typeName="binary" displayLabel="Image" description="Image of the Thumbnail.">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03"/>
+            </ECCustomAttributes>
+        </ECProperty>
+        <ECProperty propertyName="ImageFormat" typeName="ThumbnailImageFormat" displayLabel="Image Format" description="Format of the Image captured as MIME-type.">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03"/>
+            </ECCustomAttributes>
+        </ECProperty>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="DefinitionElementHasThumbnails" strength="referencing" modifier="None" description="A relationship associating one or more instances of bis:DefinitionThumbnail with a particular bis:DefinitionElement.">
+        <BaseClass>ElementRefersToElements</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="has" polymorphic="true">
+            <Class class="DefinitionElement"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is associated to" polymorphic="true">
+            <Class class="DefinitionThumbnail"/>
+        </Target>
+    </ECRelationshipClass>
 
     <ECEntityClass typeName="Subject" modifier="Sealed" description="A bis:Subject is an information element that references (by name) some real-world Object that will be modeled in this BIS repository.">
         <BaseClass>InformationReferenceElement</BaseClass>
@@ -1093,6 +1153,7 @@
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.01.00.00"/>
         </ECCustomAttributes>
+        <ECProperty propertyName="ScaleFactor" typeName="double" displayLabel="Scale Factor" description="Scale factor to be applied to any GeometricElement2d containing Text in its GeometryStream, during its creation in the associated DrawingModel, and later used when attaching this Drawing to a Sheet." />
     </ECEntityClass>
 
     <ECEntityClass typeName="SectionDrawing" displayLabel="Section Drawing" description="A bis:SectionDrawing is a bis:Drawing of a 2D section of a spatial view. A bis:SectionDrawing can be sub-modeled by a DrawingModel or a GraphicalModel3d.">
@@ -1534,8 +1595,27 @@
         </ECProperty>
     </ECEntityClass>
 
+    <ECEntityClass typeName="ITextAnnotation" modifier="Abstract" displayLabel="Text Annotation" description="An interface that can be mixed-into a bis:GeometricElement-subclass to indicate that its GeometryStream may contain text-content computed from property-values in other Elements (aka Text-Fields).">
+        <ECCustomAttributes>
+            <IsMixin xmlns="CoreCustomAttributes.01.00.03">
+                <AppliesToEntityClass>GeometricElement</AppliesToEntityClass>
+            </IsMixin>
+        </ECCustomAttributes>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="ElementDrivesTextAnnotation" strength="referencing" modifier="None" description="A relationship indicating that the source Element instance drives a portion of the text-content of the target ITextAnnotation instance.">
+        <BaseClass>ElementDrivesElement</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="drives" polymorphic="true">
+            <Class class="Element"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is driven by" polymorphic="true">
+            <Class class="ITextAnnotation"/>
+        </Target>
+    </ECRelationshipClass>
+
     <ECEntityClass typeName="TextAnnotation2d" displayLabel="2D Text Annotation">
         <BaseClass>AnnotationElement2d</BaseClass>
+        <BaseClass>ITextAnnotation</BaseClass>
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.01.00.00"/>
         </ECCustomAttributes>
@@ -1562,6 +1642,7 @@
 
     <ECEntityClass typeName="TextAnnotation3d" displayLabel="3D Text Annotation">
         <BaseClass>GraphicalElement3d</BaseClass>
+        <BaseClass>ITextAnnotation</BaseClass>
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.01.00.00"/>
         </ECCustomAttributes>
@@ -1637,6 +1718,15 @@
         </Source>
         <Target multiplicity="(0..*)" roleLabel="is assembled by" polymorphic="true">
             <Class class="PhysicalElement"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="PhysicalTypeComposesSubTypes" modifier="Abstract" strength="referencing" strengthDirection="forward" description="A relationship used to identify the bis:PhysicalType instances that are sub-parts to compose a larger bis:PhysicalType.">
+        <BaseClass>ElementGroupsMembers</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="composes" polymorphic="true">
+            <Class class="PhysicalType"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is composed by" polymorphic="true">
+            <Class class="PhysicalType"/>
         </Target>
     </ECRelationshipClass>
 
@@ -2182,11 +2272,22 @@
 
     <ECEntityClass typeName="PhysicalMaterial" modifier="Abstract" displayLabel="Physical Material" description="A bis:PhysicalMaterial defines the matter of which physical objects are made. bis:PhysicalMaterials are not used to define rendering characteristics (see bis:RenderMaterial).">
         <BaseClass>DefinitionElement</BaseClass>
-        <ECProperty propertyName="Density" typeName="double" minimumValue="0.0"/>
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.01.00.00"/>
         </ECCustomAttributes>
+        <ECProperty propertyName="Density" typeName="double" minimumValue="0.0"/>
+        <ECNavigationProperty propertyName="RenderMaterial" relationshipName="RenderMaterialSupportsDisplayOfPhysicalMaterial" direction="backward" displayLabel="Render Material" description="Optionally refers to the bis:RenderMaterial to be used to display the bis:PhysicalMaterial."/>
     </ECEntityClass>
+
+    <ECRelationshipClass typeName="RenderMaterialSupportsDisplayOfPhysicalMaterial" strength="referencing" strengthDirection="backward" modifier="Sealed" description="The relationship that determines the bis:RenderMaterial to use while displaying a bis:PhysicalMaterial.">
+        <!-- @see PhysicalMaterial.RenderMaterial ECNavigationProperty -->
+        <Source multiplicity="(0..1)" roleLabel="supports display of" polymorphic="false">
+            <Class class="RenderMaterial" />
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is displayed using" polymorphic="true">
+            <Class class="PhysicalMaterial"/>
+        </Target>
+    </ECRelationshipClass>
 
     <ECEntityClass typeName="AnnotationTextStyle" modifier="Sealed" displayLabel="Annotation Text Style">
         <BaseClass>DefinitionElement</BaseClass>
@@ -2277,6 +2378,11 @@
         <ECProperty propertyName="Data" typeName="string" extendedTypeName="Json" description="Encoded style properties" />
     </ECEntityClass>
 
+    <ECEnumeration typeName="TextureFormat" backingTypeName="int" isStrict="false" description="Supported Formats for texture data.">
+        <ECEnumerator value="0" name="Jpeg" displayLabel="Jpeg"/>
+        <ECEnumerator value="2" name="Png" displayLabel="Png"/>
+    </ECEnumeration>
+
     <ECEntityClass typeName="Texture" modifier="Sealed" description="A bis:Texture represents a named texture used for rendering purposes. The texture data is stored as a binary blob interpreted according to the specified texture format.">
         <BaseClass>DefinitionElement</BaseClass>
         <ECCustomAttributes>
@@ -2294,7 +2400,7 @@
                 <HiddenProperty xmlns="CoreCustomAttributes.01.00.03"/>
             </ECCustomAttributes>
         </ECProperty>
-        <ECProperty propertyName="Format" typeName="int" description="Format of the encoded texture data. See the ImageSourceFormat enum in the API.">
+        <ECProperty propertyName="Format" typeName="TextureFormat" description="Format of the encoded texture data.">
             <ECCustomAttributes>
                 <!-- IsNullable=False -->
                 <CustomHandledProperty xmlns="BisCore.01.00.16"/>
@@ -2703,6 +2809,16 @@
         <BaseClass>ElementRefersToElements</BaseClass>
         <Source multiplicity="(0..*)" roleLabel="represents" polymorphic="true">
             <Class class="GraphicalElement3d"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is represented by" polymorphic="true">
+            <Class class="Element"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="SpatialLocationElementRepresentsElement" strength="referencing" modifier="None" description="Relates a bis:SpatialLocationElement to the bis:Element that it represents.">
+        <BaseClass>ElementRefersToElements</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="represents" polymorphic="true">
+            <Class class="SpatialLocationElement"/>
         </Source>
         <Target multiplicity="(0..*)" roleLabel="is represented by" polymorphic="true">
             <Class class="Element"/>
