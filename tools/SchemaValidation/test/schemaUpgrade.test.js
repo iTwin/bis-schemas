@@ -5,7 +5,7 @@
 const chai = require('chai');
 const fs = require("fs-extra");
 const path = require("path");
-const { schemaUpgradeTest } = require('../../SchemaValidation/iModelSchemaValidationRunner.js');
+const { schemaUpgradeTest } = require('../../SchemaValidation/iModelSchemaValidation.js');
 chai.use(require('chai-as-promised'))
 
 describe('Schema Upgrade Tests', function() {
