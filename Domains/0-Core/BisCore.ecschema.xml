@@ -1595,13 +1595,23 @@
         </ECProperty>
     </ECEntityClass>
 
-    <ECEntityClass typeName="ITextAnnotation" modifier="Abstract" displayLabel="Text Annotation" description="An interface that can be mixed-into a bis:GeometricElement-subclass to indicate that its GeometryStream may contain text-content computed from property-values in other Elements (aka Text-Fields).">
+    <ECEntityClass typeName="ITextAnnotation" modifier="Abstract" displayLabel="Text Annotation" description="An interface that can be mixed-into a bis:GeometricElement-subclass to indicate that its GeometryStream contains structured text-content that is styled according to a referenced AnnotationTextStyle, and optionally, contains portions of text-content computed from property-values in other Elements (aka Text-Fields)">
         <ECCustomAttributes>
             <IsMixin xmlns="CoreCustomAttributes.01.00.03">
                 <AppliesToEntityClass>GeometricElement</AppliesToEntityClass>
             </IsMixin>
         </ECCustomAttributes>
+        <ECNavigationProperty propertyName="TextStyle" relationshipName="TextAnnotationUsesTextStyle" direction="Forward" displayLabel="Text Style" description="The text style used by the ITextAnnotation."/>
     </ECEntityClass>
+
+    <ECRelationshipClass typeName="TextAnnotationUsesTextStyle" strength="referencing" modifier="Sealed" description="A relationship indicating that the source ITextAnnotation instance uses the target AnnotationTextStyle instance by default.">
+        <Source multiplicity="(0..*)" roleLabel="uses" polymorphic="true">
+            <Class class="ITextAnnotation"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is used by" polymorphic="false">
+            <Class class="AnnotationTextStyle"/>
+        </Target>
+    </ECRelationshipClass>
 
     <ECRelationshipClass typeName="ElementDrivesTextAnnotation" strength="referencing" modifier="None" description="A relationship indicating that the source Element instance drives a portion of the text-content of the target ITextAnnotation instance.">
         <BaseClass>ElementDrivesElement</BaseClass>
@@ -1616,7 +1626,6 @@
     <ECEntityClass typeName="TextAnnotation2d" displayLabel="2D Text Annotation">
         <BaseClass>AnnotationElement2d</BaseClass>
         <BaseClass>ITextAnnotation</BaseClass>
-        <BaseClass>ITextStyleReferencingElement</BaseClass>
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.01.00.00"/>
         </ECCustomAttributes>
@@ -1644,7 +1653,6 @@
     <ECEntityClass typeName="TextAnnotation3d" displayLabel="3D Text Annotation">
         <BaseClass>GraphicalElement3d</BaseClass>
         <BaseClass>ITextAnnotation</BaseClass>
-        <BaseClass>ITextStyleReferencingElement</BaseClass>
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.01.00.00"/>
         </ECCustomAttributes>
@@ -2288,24 +2296,6 @@
         </Source>
         <Target multiplicity="(0..*)" roleLabel="is displayed using" polymorphic="true">
             <Class class="PhysicalMaterial"/>
-        </Target>
-    </ECRelationshipClass>
-
-    <ECEntityClass typeName="ITextStyleReferencingElement" modifier="Abstract" displayLabel="Text Style Referencing Element" description="An interface that can be mixed-into a bis:Element-subclass to indicate that it references a bis:AnnotationTextStyle.">
-        <ECCustomAttributes>
-            <IsMixin xmlns="CoreCustomAttributes.01.00.03">
-                <AppliesToEntityClass>Element</AppliesToEntityClass>
-            </IsMixin>
-        </ECCustomAttributes>
-        <ECNavigationProperty propertyName="TextStyle" relationshipName="ElementUsesTextStyle" direction="forward" displayLabel="Text Style" description="The text style used by this element."/>
-    </ECEntityClass>
-
-    <ECRelationshipClass typeName="ElementUsesTextStyle" strength="referencing" modifier="Sealed" description="A relationship indicating that the source ITextStyleReferencingElement instance uses the target AnnotationTextStyle instance.">
-        <Source multiplicity="(0..*)" roleLabel="uses" polymorphic="true">
-            <Class class="ITextStyleReferencingElement"/>
-        </Source>
-        <Target multiplicity="(0..1)" roleLabel="is used by" polymorphic="false">
-            <Class class="AnnotationTextStyle"/>
         </Target>
     </ECRelationshipClass>
 
