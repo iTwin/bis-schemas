@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ECSchema schemaName="IoTDevicePhysical" alias="iotdphys" version="01.00.00" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" description="The IoTDevice schema defines common base physical classes to be used for IoT sensor devices.">
+    <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
+    <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
+    <ECSchemaReference name="BisCore" version="01.00.14" alias="bis"/>
+    <ECSchemaReference name="DistributionSystems" version="01.00.01" alias="dsys"/>
+
+    <ECCustomAttributes>
+        <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
+            <SupportedUse>NotForProduction</SupportedUse>
+        </ProductionStatus>
+        <SchemaLayerInfo xmlns="BisCustomAttributes.01.00.00">
+            <Value>DisciplinePhysical</Value>
+        </SchemaLayerInfo>
+    </ECCustomAttributes>
+
+    <ECEntityClass typeName="DeviceType" modifier="None" displayLabel="Device Type" description="A bis:PhysicalType that defines a shared set of properties whose values vary per-type of a Device rather than per-instance.">
+        <BaseClass>bis:PhysicalType</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="SensorType" modifier="None" displayLabel="Sensor Type" description="A bis:PhysicalType that defines a shared set of properties whose values vary per-type of Sensor rather than per-instance.">
+        <BaseClass>bis:PhysicalType</BaseClass>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="SensorIsOfType" strength="referencing" modifier="None" description="A type-instance relation; one that indicates that the specific Sensor is an instance of the defined SensorType.">
+        <BaseClass>bis:PhysicalElementIsOfType</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="is of" polymorphic="true">
+            <Class class="dsys:IDistributionSensorElement" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is type of" polymorphic="true">
+            <Class class="SensorType"/>
+        </Target>
+    </ECRelationshipClass>
+</ECSchema>
