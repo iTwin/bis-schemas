@@ -1267,12 +1267,38 @@
         <BaseClass>DrainageNode</BaseClass>
         <ECProperty propertyName="StartingWaterSurfaceElevation" typeName="double" displayLabel="Starting Water Surface Elevation" category="HydraulicData" kindOfQuantity="rru:ELEVATION" description="Set water surface elevation in the pond at the beginning of the simulation."/>
         <ECStructArrayProperty propertyName="StorageElevationAreaCurve" typeName="ElevationAreaPoint" displayLabel="Elevation-Area Curve" category="HydraulicData" minOccurs="0" maxOccurs="unbounded" description="Define the volume of the pond using a stage-area curve."/>
+        <ECProperty propertyName="OverrideGlobalPipeConstraints" typeName="boolean" displayLabel="Override Global Pipe Constraints" category="DesignData" description="If true then you can override the design constraints for the current pipe." />
     </ECEntityClass>
 
     <ECStructClass typeName="ElevationAreaPoint" modifier="Sealed">
         <ECProperty propertyName="Elevation" typeName="double" displayLabel="Elevation" category="HydraulicData" kindOfQuantity="rru:LENGTH"/>
         <ECProperty propertyName="Area" typeName="double" displayLabel="Area" category="HydraulicData" kindOfQuantity="rru:AREA"/>
     </ECStructClass>
+
+    <ECEntityClass typeName="PondScenarioAspect" modifier="Sealed" displayLabel="PondScenarioAspect">
+        <BaseClass>bis:ElementMultiAspect</BaseClass>
+        <ECNavigationProperty propertyName="StormEvent" displayLabel="Storm Event" category="HydraulicData" relationshipName="PondScenarioAspectReferencesStormEvent" direction="Forward" />
+        <ECProperty propertyName="TargetPeakFlow" typeName="double" displayLabel="Target Peak Flow" category="HydraulicData" kindOfQuantity="rru:FLOW" description="The target peak flow rate for the pre-development condition."/>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="PondOwnsPondScenarioAspect" strength="embedding" modifier="Sealed">
+        <BaseClass>bis:ElementOwnsMultiAspects</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="Pond"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="owned by" polymorphic="true">
+            <Class class="PondScenarioAspect"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="PondScenarioAspectReferencesStormEvent" strength="referencing" modifier="Sealed">
+        <Source multiplicity="(0..*)" roleLabel="references" polymorphic="false">
+            <Class class="PondScenarioAspect"/>
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="referenced" polymorphic="true">
+            <Class class="RainfallEvent"/>
+        </Target>
+    </ECRelationshipClass>
 
     <ECEntityClass typeName="RainfallSet" modifier="Sealed" displayLabel="Rainfall Set">
         <BaseClass>bis:DefinitionElement</BaseClass>
