@@ -554,6 +554,10 @@ An Entity is modeled as a `bis:RoleElement` when a set of external circumstances
 This behavior applies to all `RoleElement` subclasses.
 `FunctionalElement` (from the `Functional` schema) is the most widely known subclass of `RoleElement`.
 
+### ITextAnnotation
+
+Concrete implementations may offer a way to override the default `TextStyle` instance referenced through the _DefaultTextStyle_ navigation property accordingly.
+
 ## Relationship Classes
 
 ### PhysicalTypeComposesSubTypes

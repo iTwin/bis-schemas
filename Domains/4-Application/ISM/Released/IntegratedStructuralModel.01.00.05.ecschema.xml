@@ -1,0 +1,851 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ECSchema schemaName="IntegratedStructuralModel" alias="ism" version="01.00.05" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" displayLabel="Integrated Structural Model" description="Integrated Structural Model Schema.">
+    <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
+    <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
+    <ECSchemaReference name="BisCore" version="01.00.14" alias="bis" />
+    <ECSchemaReference name="Analytical" version="01.00.00" alias="anlyt" />
+    <ECSchemaReference name="AecUnits" version="01.00.03" alias="AECU" />
+    <ECSchemaReference name="StructuralAnalysis" version="01.00.04" alias="sa" />
+
+    <ECCustomAttributes>
+        <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
+            <SupportedUse>Deprecated</SupportedUse>
+        </ProductionStatus>
+        <SchemaLayerInfo xmlns="BisCustomAttributes.01.00.00">
+            <Value>Application</Value>
+        </SchemaLayerInfo>
+        <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+            <Description>Replaced by newer generation IntegratedStructuralModel 02.00.00 schema.</Description>
+        </Deprecated>
+    </ECCustomAttributes>
+
+    <ECRelationshipClass typeName="IsmObject_Object" modifier="None" strength="referencing" strengthDirection="forward">
+        <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="has IsmObject" polymorphic="true">
+            <Class class="bis:Element" />
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is used by IsmObject" polymorphic="true">
+            <Class class="bis:Element" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="IIsmPropertyHolder" modifier="Abstract">
+        <ECCustomAttributes>
+            <IsMixin xmlns="CoreCustomAttributes.01.00.03">
+                <AppliesToEntityClass>bis:Element</AppliesToEntityClass>
+            </IsMixin>
+        </ECCustomAttributes>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="IIsmObject" displayLabel="IIsm Object" modifier="Abstract">
+        <BaseClass>IIsmPropertyHolder</BaseClass>
+        <ECCustomAttributes>
+            <IsMixin xmlns="CoreCustomAttributes.01.00.03">
+                <AppliesToEntityClass>bis:Element</AppliesToEntityClass>
+            </IsMixin>
+        </ECCustomAttributes>
+        <ECProperty propertyName="SyncId" typeName="string" displayLabel="Synchronization ID" />
+        <ECProperty propertyName="CustomProperties" typeName="string" displayLabel="Custom Property Values" />
+        <ECProperty propertyName="AutoNavigatorTransparency" typeName="double" />
+        <ECProperty propertyName="ShortId" typeName="string" displayLabel="Short ID" />
+        <ECProperty propertyName="Name" typeName="string"/>
+    </ECEntityClass>
+
+    <ECEnumeration typeName="RebarMaterialCoatingType" backingTypeName="int" isStrict="true">
+        <ECEnumerator value="10" name="Epoxy" displayLabel="Epoxy" />
+        <ECEnumerator value="20" name="Galvanized" displayLabel="Galvanized" />
+        <ECEnumerator value="30" name="None" displayLabel="None" />
+        <ECEnumerator value="1000" name="Other" displayLabel="Other" />
+    </ECEnumeration>
+
+    <ECEnumeration typeName="RebarMaterialDetailingCodeType" backingTypeName="int" isStrict="true">
+        <ECEnumerator value="100" name="A233" displayLabel="A23.3" />
+        <ECEnumerator value="200" name="ACI318" displayLabel="ACI 318" />
+        <ECEnumerator value="300" name="ACI318Metric" displayLabel="ACI 318 Metric" />
+        <ECEnumerator value="400" name="AS3600" displayLabel="AS 3600" />
+        <ECEnumerator value="500" name="BS8110" displayLabel="BS 8110" />
+        <ECEnumerator value="600" name="CP65" displayLabel="CP 65" />
+        <ECEnumerator value="700" name="EuroCode2" displayLabel="Euro Code 2" />
+        <ECEnumerator value="800" name="EuroCode2Malaysia" displayLabel="Euro Code 2 Malaysia" />
+        <ECEnumerator value="900" name="EuroCode2Singapore" displayLabel="Euro Code 2 Singapore" />
+        <ECEnumerator value="1000" name="EuroCode2UK" displayLabel="Euro Code 2 UK" />
+        <ECEnumerator value="1100" name="GB50010" displayLabel="GB 50010" />
+        <ECEnumerator value="1200" name="IS456" displayLabel="IS 456" />
+    </ECEnumeration>
+
+    <ECEnumeration typeName="RebarMaterialSurfaceType" backingTypeName="int" isStrict="true">
+        <ECEnumerator value="10" name="Deformed" displayLabel="Deformed" />
+        <ECEnumerator value="20" name="Smooth" displayLabel="Smooth" />
+        <ECEnumerator value="1000" name="Other" displayLabel="Other" />
+    </ECEnumeration>
+
+    <ECEntityClass typeName="IsmRebarMaterial" displayLabel="Rebar Material">
+        <BaseClass>bis:DefinitionElement</BaseClass>
+        <BaseClass>IIsmObject</BaseClass>
+        <ECProperty propertyName="Area" typeName="double" displayLabel="Area" kindOfQuantity="AECU:AREA_SMALL" />
+        <ECProperty propertyName="Coating" typeName="RebarMaterialCoatingType" displayLabel="Coating" />
+        <ECProperty propertyName="DetailingCode" typeName="RebarMaterialDetailingCodeType" displayLabel="Detailing Code" />
+        <ECProperty propertyName="Diameter" typeName="double" displayLabel="Diameter" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="Surface" typeName="RebarMaterialSurfaceType" displayLabel="Surface" />
+        <ECProperty propertyName="YieldStress" typeName="double" displayLabel="Yield Stress" kindOfQuantity="AECU:PRESSURE" />
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="IsmRebar_Material" modifier="None" strength="referencing" strengthDirection="forward">
+        <BaseClass>IsmObject_Object</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="has material" polymorphic="true">
+            <Class class="IsmRebar" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is used by bars" polymorphic="true">
+            <Class class="IsmRebarMaterial" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="IsmRebar_Members" modifier="None" strength="referencing" strengthDirection="forward">
+        <BaseClass>IsmObject_Object</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="has material" polymorphic="true">
+            <Class class="IsmRebar" />
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is used by bars" polymorphic="true">
+            <Class class="sa:Member" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="IIsmSubObject" displayLabel="IIsm Sub Object" modifier="Abstract">
+        <BaseClass>IIsmObject</BaseClass>
+        <ECCustomAttributes>
+            <IsMixin xmlns="CoreCustomAttributes.01.00.03">
+                <AppliesToEntityClass>bis:Element</AppliesToEntityClass>
+            </IsMixin>
+        </ECCustomAttributes>
+    </ECEntityClass>
+
+    <ECEnumeration typeName="HookType" backingTypeName="int" isStrict="true">
+        <ECEnumerator value="10" name="Anchor" displayLabel="Anchor" />
+        <ECEnumerator value="20" name="Hook90" displayLabel="Hook 90" />
+        <ECEnumerator value="30" name="Hook135" displayLabel="Hook 135" />
+        <ECEnumerator value="40" name="Hook180" displayLabel="Hook 180" />
+        <ECEnumerator value="50" name="LapSplice" displayLabel="Lap Splice" />
+        <ECEnumerator value="60" name="MechanicalSplice" displayLabel="Mechanical Splice" />
+        <ECEnumerator value="70" name="None" displayLabel="None" />
+        <ECEnumerator value="80" name="OffsetLapSplice" displayLabel="Offset Lap Splice" />
+        <ECEnumerator value="90" name="WeldedSplice" displayLabel="Welded Splice" />
+        <ECEnumerator value="1000" name="Other" displayLabel="Other" />
+    </ECEnumeration>
+
+    <ECEnumeration typeName="RebarUseType" backingTypeName="int" isStrict="true">
+        <ECEnumerator value="10" name="Primary" displayLabel="Primary" />
+        <ECEnumerator value="20" name="SeismicTie" displayLabel="Seismic Tie" />
+        <ECEnumerator value="30" name="Tie" displayLabel="Tie" />
+    </ECEnumeration>
+
+    <ECEntityClass typeName="IsmRebar" modifier="None" displayLabel="Rebar">
+        <BaseClass>anlyt:AnalyticalElement</BaseClass>
+        <BaseClass>IIsmSubObject</BaseClass>
+        <ECArrayProperty propertyName="CustomBendRadii" typeName="double" displayLabel="Custom Bend Radii" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="CustomEndHookExtension" typeName="double" displayLabel="Custom End Hook Extension" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="CustomEndHookRadius" typeName="double" displayLabel="Custom End Hook Radius" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="CustomStartHookExtension" typeName="double" displayLabel="Custom Start Hook Extension" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="CustomStartHookRadius" typeName="double" displayLabel="Custom Start Hook Radius" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="EndHook" typeName="HookType" displayLabel="End Hook" />
+        <ECProperty propertyName="StartHook" typeName="HookType" displayLabel="Start Hook" />
+        <ECProperty propertyName="Use" typeName="RebarUseType" />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="IsmRebarCage" modifier="None" displayLabel="Rebar Cage" >
+        <BaseClass>anlyt:AnalyticalElement</BaseClass>
+        <BaseClass>IIsmObject</BaseClass>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="IsmRebar_Cage" modifier="None" strength="referencing" strengthDirection="forward">
+        <BaseClass>IsmObject_Object</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="Is part of cage" polymorphic="true">
+            <Class class="IsmRebar" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="contains bars" polymorphic="false">
+            <Class class="IsmRebarCage" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEnumeration typeName="LayoutPlacementType" backingTypeName="int" isStrict="true">
+        <ECEnumerator value="10" name="SlabTopMajorDirection" displayLabel="Slab Top, Major Direction" />
+        <ECEnumerator value="20" name="SlabTopMinorDirection" displayLabel="Slab Top, Minor Direction" />
+        <ECEnumerator value="30" name="SlabCenterMajorDirection" displayLabel="Slab Center, Major Direction" />
+        <ECEnumerator value="40" name="SlabCenterMinorDirection" displayLabel="Slab Center, Minor Direction" />
+        <ECEnumerator value="50" name="SlabBottomMajorDirection" displayLabel="Slab Bottom, Major Direction" />
+        <ECEnumerator value="60" name="SlabBottomMinorDirection" displayLabel="Slab Bottom, Minor Direction" />
+        <ECEnumerator value="70" name="WallFace1MajorDirection" displayLabel="Wall Face1, Major Direction" />
+        <ECEnumerator value="80" name="WallFace1MinorDirection" displayLabel="Wall Face1, Minor Direction" />
+        <ECEnumerator value="90" name="WallCenterMajorDirection" displayLabel="Wall Center, Major Direction" />
+        <ECEnumerator value="100" name="WallCenterMinorDirection" displayLabel="Wall Center, Minor Direction" />
+        <ECEnumerator value="110" name="WallFace2MajorDirection" displayLabel="Wall Face2, Major Direction" />
+        <ECEnumerator value="120" name="WallFace2MinorDirection" displayLabel="Wall Face2, Minor Direction" />
+    </ECEnumeration>
+
+    <ECEntityClass typeName="IsmSurfaceRebar" modifier="None" displayLabel="Surface Rebar">
+        <BaseClass>IsmRebar</BaseClass>
+        <ECProperty propertyName="LayoutPlacement" typeName="LayoutPlacementType" displayLabel="Layout Placement" />
+        <ECProperty propertyName="BarDirection" typeName="point3d" displayLabel="Bar Direction" />
+        <ECProperty propertyName="BarSpacing" typeName="double" displayLabel="Bar Spacing" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="EndHookDirection" typeName="double" displayLabel="End Hook Direction" kindOfQuantity="AECU:ANGLE" />
+        <ECProperty propertyName="StartHookDirection" typeName="double" displayLabel="Start Hook Direction" kindOfQuantity="AECU:ANGLE" />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="IsmConcentratedSurfaceRebar" modifier="Sealed" displayLabel="Concentrated Surface Rebar">
+        <BaseClass>IsmSurfaceRebar</BaseClass>
+        <ECProperty propertyName="LayoutPoint" typeName="point3d" displayLabel="Layout Point" />
+        <ECProperty propertyName="LayoutDirection" typeName="point3d" displayLabel="Layout Direction" />
+        <ECProperty propertyName="BarLength" typeName="double" displayLabel="Bar Length" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="AutoDetailedLength" typeName="double" displayLabel="Detailed Length" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="AutoGroupBarWeight" typeName="double" displayLabel="Group Bar Weight" kindOfQuantity="AECU:WEIGHT" />
+        <ECProperty propertyName="BarCount" typeName="int" displayLabel="Bar Count" />
+        <ECProperty propertyName="LayoutWidth" typeName="double" displayLabel="Layout Width" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="ConstrainedDimension" typeName="ConstrainedDimensionType" displayLabel="Constrained Dimension" />
+        <ECProperty propertyName="StaggerLength" typeName="double" displayLabel="Stagger Length" kindOfQuantity="AECU:LENGTH" />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="IsmAreaSurfaceRebar" modifier="Sealed" displayLabel="Area Surface Rebar">
+        <BaseClass>IsmSurfaceRebar</BaseClass>
+        <ECProperty propertyName="LayoutBoundary" typeName="Bentley.Geometry.Common.IGeometry" displayLabel="Layout Boundary" />
+        <ECProperty propertyName="ConsiderMemberOpenings" typeName="boolean" displayLabel="Consider Member Openings" />
+        <ECProperty propertyName="EndAndSideCover" typeName="double" displayLabel="End and Side Cover" />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="IsmModelRule" modifier="None" displayLabel="Model Rule">
+        <BaseClass>bis:DefinitionElement</BaseClass>
+        <BaseClass>IIsmObject</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="IsmRebarLabelRule" modifier="None" displayLabel="Rebar Rule">
+        <BaseClass>IsmModelRule</BaseClass>
+        <ECProperty propertyName="DisplayLabelFormat" typeName="string" displayLabel="Display Label Format" />
+    </ECEntityClass>
+
+    <ECEnumeration typeName="ConstrainedDimensionType" backingTypeName="int" isStrict="true">
+        <ECEnumerator value="10" name="BarSpacing" displayLabel="Bar Spacing" />
+        <ECEnumerator value="20" name="BarCount" displayLabel="Bar Count" />
+        <ECEnumerator value="30" name="LayoutWidth" displayLabel="Layout Width" />
+    </ECEnumeration>
+
+    <ECEnumeration typeName="UnitType" backingTypeName="int" isStrict="true">
+        <ECEnumerator value="10" name="Millimeter" displayLabel="Millimeter" />
+        <ECEnumerator value="20" name="Centimeter" displayLabel="Centimeter" />
+        <ECEnumerator value="30" name="Meter" displayLabel="Meter" />
+        <ECEnumerator value="40" name="Inch" displayLabel="Inch" />
+        <ECEnumerator value="50" name="Foot" displayLabel="Foot" />
+        <ECEnumerator value="60" name="Yard" displayLabel="Yard" />
+    </ECEnumeration>
+
+    <ECEntityClass typeName="IsmConcentratedSurfaceRebarLabelRule" modifier="Sealed" displayLabel="Concentrated Surface Rebar Label Rule">
+        <BaseClass>IsmRebarLabelRule</BaseClass>
+        <ECProperty propertyName="ConstrainedDimension" typeName="ConstrainedDimensionType" displayLabel="Constrained Dimension" />
+        <ECProperty propertyName="LengthUnit" typeName="UnitType" displayLabel="Length Unit" />
+        <ECProperty propertyName="LengthDecimalPlace" typeName="int" displayLabel="Length Decimal Place" />
+        <ECProperty propertyName="SpacingUnit" typeName="UnitType" displayLabel="Spacing Unit" />
+        <ECProperty propertyName="SpacingDecimalPlace" typeName="int" displayLabel="Spacing Decimal Place" />
+        <ECProperty propertyName="WidthUnit" typeName="UnitType" displayLabel="Width Unit" />
+        <ECProperty propertyName="WidthDecimalPlace" typeName="int" displayLabel="Width Decimal Place" />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="IsmAreaSurfaceRebarLabelRule" modifier="Sealed" displayLabel="Area Surface Rebar Label Rule">
+        <BaseClass>IsmRebarLabelRule</BaseClass>
+        <ECProperty propertyName="SpacingUnit" typeName="UnitType" displayLabel="Spacing Unit" />
+        <ECProperty propertyName="SpacingDecimalPlace" typeName="int" displayLabel="Spacing Decimal Place" />
+    </ECEntityClass>
+
+    <!--
+    =========================================================================
+                              START: ISM TENDON CLASSES
+    =========================================================================
+    -->
+
+    <ECEnumeration typeName="TendonStrandType" backingTypeName="int" isStrict="true">
+        <ECEnumerator value="0" name="Unspecified" displayLabel="Unspecified" />
+        <ECEnumerator value="10" name="Wire" displayLabel="Wire" />
+        <ECEnumerator value="20" name="Strand" displayLabel="Strand" />
+        <ECEnumerator value="30" name="Bar" displayLabel="Bar" />
+    </ECEnumeration>
+
+    <!-- Deprecated renamed enum. Use "TendonDuctProfile" instead. -->
+    <ECEnumeration typeName="TendonDuctShapeType" backingTypeName="int" isStrict="true">
+        <ECEnumerator value="0" name="Unspecified" displayLabel="Unspecified" />
+        <ECEnumerator value="10" name="Flat" displayLabel="Flat" />
+        <ECEnumerator value="20" name="Round" displayLabel="Round" />
+        <ECEnumerator value="30" name="Oval" displayLabel="Oval" />
+    </ECEnumeration>
+
+    <ECEnumeration typeName="TendonDuctProfile" backingTypeName="int" isStrict="true">
+        <ECEnumerator value="0" name="Unspecified" displayLabel="Unspecified" />
+        <ECEnumerator value="10" name="Flat" displayLabel="Flat" />
+        <ECEnumerator value="20" name="Round" displayLabel="Round" />
+        <ECEnumerator value="30" name="Oval" displayLabel="Oval" />
+    </ECEnumeration>
+
+    <ECEnumeration typeName="DuctMaterial" backingTypeName="int" isStrict="true">
+        <ECEnumerator value="0" name="Unspecified" displayLabel="Unspecified" />
+        <ECEnumerator value="10" name="Plastic" displayLabel="Plastic" />
+        <ECEnumerator value="20" name="Steel" displayLabel="Steel" />
+    </ECEnumeration>
+
+    <ECEnumeration typeName="PostTensioningSystem" backingTypeName="int" isStrict="true">
+        <ECEnumerator value="0" name="Unspecified" displayLabel="Unspecified" />
+        <ECEnumerator value="10" name="Bonded" displayLabel="Bonded" />
+        <ECEnumerator value="20" name="Unbonded" displayLabel="Unbonded" />
+    </ECEnumeration>
+
+    <ECEnumeration typeName="AnchorType" backingTypeName="int" isStrict="true">
+        <ECEnumerator value="0" name="Unspecified" displayLabel="Unspecified" />
+        <ECEnumerator value="10" name="Monostrand" displayLabel="Monostrand" />
+        <ECEnumerator value="20" name="FlatMultiPlane" displayLabel="Flat Multi Plane" />
+        <ECEnumerator value="30" name="FlatSinglePlane" displayLabel="Flat Single Plane" />
+        <ECEnumerator value="40" name="CircularMultiPlane" displayLabel="Circular Multi Plane" />
+        <ECEnumerator value="50" name="CircularSinglePlane" displayLabel="Circular Single Plane" />
+        <ECEnumerator value="60" name="SquareMultiPlane" displayLabel="Square Multi Plane" />
+        <ECEnumerator value="70" name="SquareSinglePlane" displayLabel="Square Single Plane" />
+    </ECEnumeration>
+
+    <ECEntityClass typeName="IsmTendonSet" modifier="None" displayLabel="Tendon Set">
+        <BaseClass>bis:InformationRecordElement</BaseClass>
+        <BaseClass>IIsmObject</BaseClass>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="IsmTendonSet_Members" modifier="None" strength="referencing" strengthDirection="forward">
+        <BaseClass>IsmObject_Object</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="is located in members" polymorphic="false">
+            <Class class="IsmTendonSet" />
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="has tendon sets" polymorphic="true">
+            <Class class="sa:Member" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="IsmTendonNode" modifier="None" displayLabel="Tendon Node">
+        <BaseClass>anlyt:AnalyticalElement</BaseClass>
+        <BaseClass>IIsmSubObject</BaseClass>
+        <ECProperty propertyName="Location" typeName="point3d" displayLabel="Location" />
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="IsmTendonSet_Nodes" modifier="None" strength="referencing" strengthDirection="forward">
+        <BaseClass>IsmObject_Object</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="owns nodes" polymorphic="false">
+            <Class class="IsmTendonSet" />
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is owned by set" polymorphic="false">
+            <Class class="IsmTendonNode" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="IsmTendon" modifier="None" displayLabel="Tendon">
+        <BaseClass>anlyt:AnalyticalElement</BaseClass>
+        <BaseClass>IIsmSubObject</BaseClass>
+        <ECProperty propertyName="StrandCount" typeName="double" displayLabel="Strand Count" />
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="IsmTendonSet_Tendon" modifier="None" strength="referencing" strengthDirection="forward">
+        <BaseClass>IsmObject_Object</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="owns tendons" polymorphic="false">
+            <Class class="IsmTendonSet" />
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is part of a set" polymorphic="false">
+            <Class class="IsmTendon" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="IsmTendonSystem" modifier="Abstract" displayLabel="Tendon System">
+        <BaseClass>bis:DefinitionElement</BaseClass>
+        <BaseClass>IIsmObject</BaseClass>
+        <ECProperty propertyName="AngularFriction" typeName="double" displayLabel="Angular Friction" />
+        <ECProperty propertyName="WobbleFriction" typeName="double" displayLabel="Wobble Friction" />
+        <ECProperty propertyName="StrandType" typeName="TendonStrandType" displayLabel="Strand Type" />
+        <ECProperty propertyName="StrandArea" typeName="double" displayLabel="Strand Area" kindOfQuantity="AECU:AREA_SMALL" />
+        <ECProperty propertyName="StrandElasticModulus" typeName="double" displayLabel="Strand Elastic Modulus" kindOfQuantity="AECU:PRESSURE" />
+        <ECProperty propertyName="StrandUltimateTensileStrength" typeName="double" displayLabel="Strand Ultimate Tensile Strength" kindOfQuantity="AECU:PRESSURE" />
+        <ECProperty propertyName="StrandYieldStrength" typeName="double" displayLabel="Strand Yield Strength" kindOfQuantity="AECU:PRESSURE" />
+        <ECProperty propertyName="StrandFinalEffectiveStress" typeName="double" displayLabel="Strand Final Effective Stress" kindOfQuantity="AECU:PRESSURE" />
+        <ECProperty propertyName="LongTermLosses" typeName="double" displayLabel="Long Term Losses" kindOfQuantity="AECU:PRESSURE" />
+        <ECProperty propertyName="MinCurvatureRadius" typeName="double" displayLabel="Minimum Curvature Radius" kindOfQuantity="AECU:LENGTH" />
+        <ECProperty propertyName="PostTensioningSystem" typeName="PostTensioningSystem" displayLabel="Post Tensioning System" />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="IsmTendonDuctedSystem" modifier="None" displayLabel="Tendon Ducted System">
+        <BaseClass>IsmTendonSystem</BaseClass>
+        <ECProperty propertyName="DuctShape" typeName="TendonDuctShapeType" displayLabel="Duct Shape">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03"/>
+                <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                    <Description>Deprecated renamed property. Use 'DuctProfile' instead.</Description>
+                </Deprecated>
+            </ECCustomAttributes>
+        </ECProperty>
+        <ECProperty propertyName="DuctProfile" typeName="TendonDuctProfile" displayLabel="Duct Profile" />
+        <ECProperty propertyName="DuctWidth" typeName="double" displayLabel="Duct Width" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="DuctHeight" typeName="double" displayLabel="Duct Height" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="StrandsPerDuct" typeName="double" displayLabel="Strands per Duct" />
+        <ECProperty propertyName="DuctWallThickness" typeName="double" displayLabel="Duct Wall Thickness" />
+        <ECProperty propertyName="DuctMaterial" typeName="DuctMaterial" displayLabel="Duct Material" />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="IsmTendonCorrugatedDuctedSystem" modifier="Sealed" displayLabel="Tendon Corrugated Ducted System">
+        <BaseClass>IsmTendonDuctedSystem</BaseClass>
+        <ECProperty propertyName="CorrugationDimension" typeName="double" displayLabel="Corrugation Dimension" />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="IsmTendonSmoothDuctedSystem" modifier="Sealed" displayLabel="Tendon Smooth Ducted System">
+        <BaseClass>IsmTendonDuctedSystem</BaseClass>
+    </ECEntityClass>
+
+	<ECEntityClass typeName="IsmTendonTightlySheathedSystem" modifier="None" displayLabel="Tendon Tightly Sheathed System">
+        <BaseClass>IsmTendonSystem</BaseClass>
+        <ECProperty propertyName="Diameter" typeName="double" displayLabel="Diameter" />
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="IsmTendon_System" modifier="None" strength="referencing" strengthDirection="forward">
+        <BaseClass>IsmObject_Object</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="uses system" polymorphic="false">
+            <Class class="IsmTendon" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is system for" polymorphic="true">
+            <Class class="IsmTendonSystem" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="IsmTendonPart" modifier="Abstract" displayLabel="Tendon Part">
+        <BaseClass>anlyt:AnalyticalElement</BaseClass>
+        <BaseClass>IIsmSubObject</BaseClass>
+        <ECProperty propertyName="Orientation" typeName="point3d" displayLabel="Orientation" />
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="IsmTendon_TendonPart" modifier="None" strength="referencing" strengthDirection="forward">
+        <BaseClass>IsmObject_Object</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="owns parts" polymorphic="false">
+            <Class class="IsmTendon" />
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is part of tendon" polymorphic="true">
+            <Class class="IsmTendonPart" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="IsmTendonSegment" modifier="None" displayLabel="Tendon Segment">
+        <BaseClass>IsmTendonPart</BaseClass>
+        <ECProperty propertyName="Harped" typeName="boolean" displayLabel="Harped" />
+        <ECProperty propertyName="InflectionRatio" typeName="double" displayLabel="Inflection Ratio" />
+        <ECProperty propertyName="Location" typeName="Bentley.Geometry.Common.IGeometry" displayLabel="Location" />
+        <ECProperty propertyName="DuctLocation" typeName="Bentley.Geometry.Common.IGeometry" displayLabel="Duct Location" />
+        <ECProperty propertyName="StartStress" typeName="double" displayLabel="Start Stress" />
+        <ECProperty propertyName="EndStress" typeName="double" displayLabel="End Stress" />
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="IsmTendonSegment_StartNode" modifier="None" strength="referencing" strengthDirection="forward">
+        <BaseClass>IsmObject_Object</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="has start node" polymorphic="false">
+            <Class class="IsmTendonSegment" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is start node for segment" polymorphic="false">
+            <Class class="IsmTendonNode" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="IsmTendonSegment_EndNode" modifier="None" strength="referencing" strengthDirection="forward">
+        <BaseClass>IsmObject_Object</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="has end node" polymorphic="false">
+            <Class class="IsmTendonSegment" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is end node for segment" polymorphic="false">
+            <Class class="IsmTendonNode" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="IsmTendonAnchor" modifier="Abstract" displayLabel="Tendon Anchor">
+        <BaseClass>IsmTendonPart</BaseClass>
+        <ECProperty propertyName="AnchorFriction" typeName="double" displayLabel="Anchor Friction" />
+        <ECProperty propertyName="AnchorType" typeName="AnchorType" displayLabel="Anchor Type" />
+        <ECProperty propertyName="Direction" typeName="point3d" displayLabel="Direction" />
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="IsmTendonAnchor_Node" modifier="None" strength="referencing" strengthDirection="forward">
+        <BaseClass>IsmObject_Object</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="is located on a node" polymorphic="true">
+            <Class class="IsmTendonAnchor" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is location node for anchor" polymorphic="false">
+            <Class class="IsmTendonNode" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="IsmTendonTensioningEndAnchor" modifier="None" displayLabel="Tendon Tensioning-End Anchor">
+        <BaseClass>IsmTendonAnchor</BaseClass>
+        <ECProperty propertyName="JackStress" typeName="double" displayLabel="Jack Stress" kindOfQuantity="AECU:PRESSURE" />
+        <ECProperty propertyName="SeatingDistance" typeName="double" displayLabel="Seating Distance" kindOfQuantity="AECU:LENGTH_SHORT" />
+        <ECProperty propertyName="Elongation" typeName="double" displayLabel="Elongation" kindOfQuantity="AECU:LENGTH_SHORT" />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="IsmTendonFixedEndAnchor" modifier="None" displayLabel="Tendon Fixed-End Anchor">
+        <BaseClass>IsmTendonAnchor</BaseClass>
+    </ECEntityClass>
+
+    <!--
+    =========================================================================
+                              END: ISM TENDON CLASSES
+    =========================================================================
+    -->
+
+    <!--
+    =========================================================================
+                              START: ISM ANALYSIS DESIGN
+    =========================================================================
+    -->
+
+    <ECEnumeration typeName="DesignMethodType" backingTypeName="int" isStrict="true">
+        <ECEnumerator value="10" name="Check" displayLabel="Check" />
+        <ECEnumerator value="20" name="Design" displayLabel="Design" />
+        <ECEnumerator value="100" name="Other" displayLabel="Other" />
+    </ECEnumeration>
+
+    <ECEnumeration typeName="StatusType" backingTypeName="int" isStrict="true">
+        <ECEnumerator value="10" name="Fail" displayLabel="Fail" />
+        <ECEnumerator value="20" name="Pass" displayLabel="Pass" />
+        <ECEnumerator value="30" name="PassWithWarnings" displayLabel="Pass With Warnings" />
+    </ECEnumeration>
+
+    <ECEnumeration typeName="CheckNameType" backingTypeName="int" isStrict="true">
+        <ECEnumerator value="100" name="AxialCompression" displayLabel="Axial Compression" />
+        <ECEnumerator value="200" name="AxialTension" displayLabel="Axial Tension" />
+        <ECEnumerator value="300" name="Bending" displayLabel="Bending" />
+        <ECEnumerator value="400" name="CrackWidth" displayLabel="CrackWidth" />
+        <ECEnumerator value="500" name="Deflection" displayLabel="Deflection" />
+        <ECEnumerator value="600" name="Interaction" displayLabel="Interaction" />
+        <ECEnumerator value="700" name="Shear" displayLabel="Shear" />
+        <ECEnumerator value="800" name="Torsion" displayLabel="Torsion" />
+        <ECEnumerator value="1000" name="Other" displayLabel="Other" />
+    </ECEnumeration>
+
+    <ECEnumeration typeName="CheckKindType" backingTypeName="int" isStrict="true">
+        <ECEnumerator value="100" name="Serviceability" displayLabel="Serviceability" />
+        <ECEnumerator value="200" name="Strength" displayLabel="Strength" />
+        <ECEnumerator value="1000" name="Other" displayLabel="Other" />
+    </ECEnumeration>
+
+    <ECEnumeration typeName="QuantityKindType" backingTypeName="int" isStrict="true">
+        <ECEnumerator value="100" name="Angle" displayLabel="Angle" />
+        <ECEnumerator value="200" name="Area" displayLabel="Area" />
+        <ECEnumerator value="300" name="Density" displayLabel="Density" />
+        <ECEnumerator value="400" name="Force" displayLabel="Force" />
+        <ECEnumerator value="500" name="ForceMoment" displayLabel="Force Moment" />
+        <ECEnumerator value="600" name="Length" displayLabel="Length" />
+        <ECEnumerator value="700" name="Mass" displayLabel="Mass" />
+        <ECEnumerator value="800" name="Volume" displayLabel="Volume" />
+        <ECEnumerator value="900" name="Time" displayLabel="Time" />
+        <ECEnumerator value="1000" name="TemperatureAbsolute" displayLabel="Temperature Absolute" />
+        <ECEnumerator value="1100" name="TemperatureChange" displayLabel="Temperature Change" />
+        <ECEnumerator value="1110" name="ThermalExpansionCoefficient" displayLabel="Thermal Expansion Coefficient" />
+        <ECEnumerator value="1200" name="Stress" displayLabel="Stress" />
+        <ECEnumerator value="1300" name="Other" displayLabel="Other" />
+    </ECEnumeration>
+
+    <ECRelationshipClass typeName="IsmAnalysisResults_AnalysisDesign" modifier="None" strength="referencing" strengthDirection="forward">
+        <BaseClass>IsmObject_Object</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="belongs to analysis results" polymorphic="false">
+            <Class class="IsmAnalysisResults" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="owns results" polymorphic="false">
+            <Class class="IsmAnalysisDesign" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="IsmDesignResults_AnalysisDesign" modifier="None" strength="referencing" strengthDirection="forward">
+        <BaseClass>IsmObject_Object</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="is owned by analysis design" polymorphic="false">
+            <Class class="IsmDesignResults" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="owns" polymorphic="false">
+            <Class class="IsmAnalysisDesign" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="IsmMemberDesignCriteria_AnalysisDesign" modifier="None" strength="referencing" strengthDirection="forward">
+        <BaseClass>IsmObject_Object</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="is owned by analysis design" polymorphic="true">
+            <Class class="IsmMemberDesignCriteria" />
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="owns criteria" polymorphic="true">
+            <Class class="IsmAnalysisDesign" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="IsmAnalysisResults_MaxDisplacementLoadCase" modifier="None" strength="referencing" strengthDirection="forward">
+        <BaseClass>IsmObject_Object</BaseClass>
+        <ECCustomAttributes>
+            <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                <Description>Deprecated relationship. Use 'IsmAnalysisResults_MaxDisplacementLoadContainer' instead.</Description>
+            </Deprecated>
+        </ECCustomAttributes>
+        <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="false">
+            <Class class="IsmAnalysisResults" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is referred by" polymorphic="true">
+            <Class class="sa:LoadCase" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="IsmAnalysisResults_MaxDisplacementLoadContainer" modifier="None" strength="referencing" strengthDirection="forward">
+        <BaseClass>IsmObject_Object</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="false">
+            <Class class="IsmAnalysisResults" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is referred by" polymorphic="true">
+            <Class class="sa:ILoadCondition" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="IsmMemberAnalysisResults_AnalysisResults" modifier="None" strength="referencing" strengthDirection="forward">
+        <BaseClass>IsmObject_Object</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="is owned by analysis results" polymorphic="true">
+            <Class class="IsmMemberAnalysisResults" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="has member results" polymorphic="false">
+            <Class class="IsmAnalysisResults" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="IsmMemberAnalysisResults_Member" modifier="None" strength="referencing" strengthDirection="forward">
+        <BaseClass>IsmObject_Object</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="refers to a member" polymorphic="true">
+            <Class class="IsmMemberAnalysisResults" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is referred by results" polymorphic="true">
+            <Class class="sa:Member" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="IsmCurveMemberAnalysisResults_MaxDisplacementLoadCase" modifier="None" strength="referencing" strengthDirection="forward">
+        <BaseClass>IsmObject_Object</BaseClass>
+        <ECCustomAttributes>
+            <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                <Description>Deprecated relationship. Use 'IsmCurveMemberAnalysisResults_MaxDisplacementLoadContainer' instead.</Description>
+            </Deprecated>
+        </ECCustomAttributes>
+        <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="true">
+            <Class class="IsmCurveMemberAnalysisResults" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is referred by" polymorphic="true">
+            <Class class="sa:LoadCase" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="IsmCurveMemberAnalysisResults_MaxDisplacementLoadContainer" modifier="None" strength="referencing" strengthDirection="forward">
+        <BaseClass>IsmObject_Object</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="true">
+            <Class class="IsmCurveMemberAnalysisResults" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is referred by" polymorphic="true">
+            <Class class="sa:ILoadCondition" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="IsmDesignResults_CriticalMemberResults" modifier="None" strength="referencing" strengthDirection="forward">
+        <BaseClass>IsmObject_Object</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="refers to" polymorphic="false">
+            <Class class="IsmDesignResults" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is referred by" polymorphic="true">
+            <Class class="IsmMemberDesignResults" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="IsmMemberDesignResults_DesignResults" modifier="None" strength="referencing" strengthDirection="forward">
+        <BaseClass>IsmObject_Object</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="is referred by" polymorphic="true">
+            <Class class="IsmMemberDesignResults" />
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="refers to" polymorphic="false">
+            <Class class="IsmDesignResults" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="IsmMemberDesignResults_ConsideredLoadCases" modifier="None" strength="referencing" strengthDirection="forward">
+        <BaseClass>IsmObject_Object</BaseClass>
+        <ECCustomAttributes>
+            <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                <Description>Deprecated relationship. Use 'IsmMemberDesignResults_ConsideredLoadContainers' instead.</Description>
+            </Deprecated>
+        </ECCustomAttributes>
+        <Source multiplicity="(0..*)" roleLabel="is referred by" polymorphic="true">
+            <Class class="IsmMemberDesignResults" />
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="refers to" polymorphic="false">
+            <Class class="sa:LoadCase" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="IsmMemberDesignResults_ConsideredLoadContainers" modifier="None" strength="referencing" strengthDirection="forward">
+        <BaseClass>IsmObject_Object</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="is referred by" polymorphic="true">
+            <Class class="IsmMemberDesignResults" />
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="refers to" polymorphic="true">
+            <Class class="sa:ILoadCondition" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="IsmMemberDesignResults_Member" modifier="None" strength="referencing" strengthDirection="forward">
+        <BaseClass>IsmObject_Object</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="refers to a member" polymorphic="true">
+            <Class class="IsmMemberDesignResults" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is referred by results" polymorphic="true">
+            <Class class="sa:Member" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="IsmMemberCheck_MemberDesignResults" modifier="None" strength="referencing" strengthDirection="forward">
+        <BaseClass>IsmObject_Object</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="is owned by results" polymorphic="false">
+            <Class class="IsmMemberCheck" />
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="owns checks" polymorphic="true">
+            <Class class="IsmMemberDesignResults" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="IsmDesignParameter_MemberDesignCriteria" modifier="None" strength="referencing" strengthDirection="forward">
+        <BaseClass>IsmObject_Object</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="IsmDesignParameter" />
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="owns" polymorphic="true">
+            <Class class="IsmMemberDesignCriteria" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="IsmMemberDesignResults_MemberDesignCriteria" modifier="None" strength="referencing" strengthDirection="forward">
+        <BaseClass>IsmObject_Object</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="refers to a criteria" polymorphic="true">
+            <Class class="IsmMemberDesignResults" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is referred by results" polymorphic="true">
+            <Class class="IsmMemberDesignCriteria" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="IsmMemberCheck_CriticalLoadCase" modifier="None" strength="referencing" strengthDirection="forward">
+        <BaseClass>IsmObject_Object</BaseClass>
+        <ECCustomAttributes>
+            <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                <Description>Deprecated relationship. Use 'IsmMemberCheck_CriticalLoadContainer' instead.</Description>
+            </Deprecated>
+        </ECCustomAttributes>
+        <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="false">
+            <Class class="IsmMemberCheck" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is referred by" polymorphic="false">
+            <Class class="sa:LoadCase" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="IsmMemberCheck_CriticalLoadContainer" modifier="None" strength="referencing" strengthDirection="forward">
+        <BaseClass>IsmObject_Object</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="false">
+            <Class class="IsmMemberCheck" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is referred by" polymorphic="true">
+            <Class class="sa:ILoadCondition" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="IsmAnalysisDesign" displayLabel="Analysis Design" modifier="None">
+        <BaseClass>bis:InformationRecordElement</BaseClass>
+        <BaseClass>IIsmObject</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="IsmResults" modifier="Abstract" displayLabel="Results">
+        <BaseClass>bis:InformationRecordElement</BaseClass>
+        <BaseClass>IIsmSubObject</BaseClass>
+        <ECProperty propertyName="AnalysisEngine" typeName="string" displayLabel="Analysis engine name" />
+        <ECProperty propertyName="AnalysisFileName" typeName="string" displayLabel="File analysis was ran against" />
+        <ECProperty propertyName="AnalyzedTime" typeName="dateTime" displayLabel="Analyzed time" />
+        <ECProperty propertyName="AnalysisEngineVersion" typeName="string" displayLabel="Analysis engine version" />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="IsmAnalysisResults" modifier="None" displayLabel="Analysis Results">
+        <BaseClass>IsmResults</BaseClass>
+        <ECProperty propertyName="MaxDisplacedLocation" typeName="point3d" />
+        <ECProperty propertyName="MaxDisplacement" typeName="point3d" />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="IsmMemberAnalysisResults" modifier="Abstract" displayLabel="Member Analysis Results">
+        <BaseClass>bis:InformationRecordElement</BaseClass>
+        <BaseClass>IIsmSubObject</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="IsmCurveMemberAnalysisResults" modifier="None" displayLabel="Curve Member Analysis Results">
+        <BaseClass>IsmMemberAnalysisResults</BaseClass>
+        <ECProperty propertyName="MaxDisplacement" typeName="point3d" />
+        <ECProperty propertyName="MaxDisplacedLinearDistance" typeName="double" displayLabel="Max displacement location ratio" kindOfQuantity="AECU:LENGTH" />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="IsmDesignResults" displayLabel="Design Results" modifier="None">
+        <BaseClass>IsmResults</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="IsmMemberDesignResults" modifier="Abstract" displayLabel="Member Design Results">
+        <BaseClass>bis:InformationRecordElement</BaseClass>
+        <BaseClass>IIsmSubObject</BaseClass>
+        <ECProperty propertyName="Status" typeName="StatusType" displayLabel="Check name" />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="IsmMemberDesignCriteria" modifier="Abstract" displayLabel="Member design criteria">
+        <BaseClass>bis:DefinitionElement</BaseClass>
+        <BaseClass>IIsmSubObject</BaseClass>
+        <ECProperty propertyName="DesignCode" typeName="string" displayLabel="Design Code" />
+        <ECProperty propertyName="DesignMethod" typeName="DesignMethodType" displayLabel="Design Method" />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="IsmCurveMemberDesignResults" modifier="Abstract" displayLabel="Curve Member Design Results">
+        <BaseClass>IsmMemberDesignResults</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="IsmMemberCheck" modifier="None" displayLabel="Member check">
+        <BaseClass>bis:InformationRecordElement</BaseClass>
+        <BaseClass>IIsmSubObject</BaseClass>
+        <ECProperty propertyName="CriticalClause" typeName="string" displayLabel="Critical Clause" />
+        <ECProperty propertyName="Capacity" typeName="double" displayLabel="Capacity" />
+        <ECProperty propertyName="Demand" typeName="double" displayLabel="Demand" />
+        <ECProperty propertyName="UtilizationRatio" typeName="double" displayLabel="Utilization Ratio" />
+        <ECProperty propertyName="CheckName" typeName="CheckNameType" displayLabel="Check name" />
+        <ECProperty propertyName="CheckKind" typeName="CheckKindType" displayLabel="Check kind" />
+        <ECProperty propertyName="QuantityKind" typeName="QuantityKindType" displayLabel="Quantity kind" />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="IsmCurveMemberDesignCriteria" modifier="None" displayLabel="Curve member design criteria">
+        <BaseClass>IsmMemberDesignCriteria</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="IsmDesignParameter" modifier="None" displayLabel="Design Parameter">
+        <BaseClass>bis:DefinitionElement</BaseClass>
+        <BaseClass>IIsmSubObject</BaseClass>
+        <ECProperty propertyName="StringValue" typeName="string" displayLabel="String Parameter Value" />
+        <ECProperty propertyName="IntValue" typeName="int" displayLabel="Int Parameter Value" />
+        <ECProperty propertyName="DoubleValue" typeName="double" displayLabel="Double Parameter Value" />
+        <ECProperty propertyName="BooleanValue" typeName="boolean" displayLabel="Boolean Parameter Value" />
+        <ECProperty propertyName="QuantityKind" typeName="QuantityKindType" displayLabel="Quantity kind" />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="IsmCurveMemberSteelDesignResults" modifier="None" displayLabel="Curve Member Steel Design Results">
+        <BaseClass>IsmCurveMemberDesignResults</BaseClass>
+        <ECProperty propertyName="PercentComposite" typeName="double" displayLabel="Percent Composite" />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="IsmCurveMemberConcreteDesignResults" modifier="None" displayLabel="Curve Member Concrete Design Results">
+        <BaseClass>IsmCurveMemberDesignResults</BaseClass>
+        <ECProperty propertyName="LongitudinalSteelRequired" typeName="double" displayLabel="Longitudinal Steel Required" kindOfQuantity="AECU:WEIGHT" />
+        <ECProperty propertyName="LongitudinalSteelProvided" typeName="double" displayLabel="Longitudinal Steel Provided" kindOfQuantity="AECU:WEIGHT" />
+        <ECProperty propertyName="MaxTransverseSteelDensityProvided" typeName="double" displayLabel="Max Transverse Steel Density Provided" kindOfQuantity="AECU:DENSITY" />
+        <ECProperty propertyName="MaxTransverseSteelDensityRequired" typeName="double" displayLabel="Max Transverse Steel Density Required" kindOfQuantity="AECU:DENSITY" />
+    </ECEntityClass>
+
+    <!--
+    =========================================================================
+                              END: ISM ANALYSIS DESIGN
+    =========================================================================
+    -->
+
+</ECSchema>
