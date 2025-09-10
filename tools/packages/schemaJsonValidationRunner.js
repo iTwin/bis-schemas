@@ -38,11 +38,11 @@ async function compareSchemas() {
   let hasErrors = false;
 
   const outputPath = getOutputPath();
-  console.log(chalk.default.yellow("\nSchema JSON Comparison logs will be generated under " + outputPath));
+  console.log(chalk.yellow("\nSchema JSON Comparison logs will be generated under " + outputPath));
   
   for (const schemaInfo of schemas) {
     if(shouldExcludeSchema(schemaInfo, excludeSchemas)) {
-      console.log(chalk.default.yellow(`\nSkipping excluded schema ${schemaInfo.name}`));
+      console.log(chalk.yellow(`\nSkipping excluded schema ${schemaInfo.name}`));
       continue;
     }
 
@@ -78,7 +78,7 @@ async function compareSchemas() {
 
 function processResults(results) {
   if (!results || (results.length === 1) && results[0].resultType === ComparisonResultType.Message) {
-    console.log(chalk.default.green("Schema JSON comparison succeeded. No differences found."));
+    console.log(chalk.green("Schema JSON comparison succeeded. No differences found."));
     return false;
   }
 
@@ -97,11 +97,11 @@ function processResults(results) {
 }
 
 function reportError(message) {
-  console.log(chalk.default.red(`\"##vso[task.logissue type=error]${message}\"`));
+  console.log(chalk.red(`\"##vso[task.logissue type=error]${message}\"`));
 }
 
 function reportWarning(message) {
-  console.log(chalk.default.yellow(`\"##vso[task.logissue type=warning]${message}\"`));
+  console.log(chalk.yellow(`\"##vso[task.logissue type=warning]${message}\"`));
 }
 
 async function getAllSchemas() {
