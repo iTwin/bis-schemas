@@ -114,7 +114,7 @@ async function schemaUpgradeTest(ignoreList, output) {
 
     imodel = await importAndExportSchemaToIModel(schema, schemaDirs, batchStarted, imodel, output);
     results[schemaName].push({name: schemaName, batch: key.readVersion, batchStarted, version: schemaVersion});
-    console.log("-> ", chalk.default.green(`${schemaName}.${schemaVersion} successfully imported.`));
+    console.log("-> ", chalk.green(`${schemaName}.${schemaVersion} successfully imported.`));
     writeLogsToFile(`-> ${schemaName}.${schemaVersion} successfully imported.\n\n`, output);
     previousSchema = schemaName;
     previousReadVersion = key.readVersion;
@@ -127,7 +127,7 @@ async function schemaUpgradeTest(ignoreList, output) {
 }
 
 async function validateReleasedSchemas(ignoreList, singleSchemaName, output) {
-  console.log(chalk.default.yellow("\nPerforming iModel Schema Validation on Released Schemas"));
+  console.log(chalk.yellow("\nPerforming iModel Schema Validation on Released Schemas"));
 
   const results = [];
   const schemaDirectories = await generateSchemaDirectoryList(bisSchemaRepo);
@@ -158,7 +158,7 @@ async function validateReleasedSchemas(ignoreList, singleSchemaName, output) {
 }
 
 async function validateWipSchemas(ignoreList, singleSchemaName, output) {
-  console.log(chalk.default.yellow("\nPerforming iModel Schema Validation on Work In Progress Schemas"));
+  console.log(chalk.yellow("\nPerforming iModel Schema Validation on Work In Progress Schemas"));
 
   const results = [];
   let schemaList = await generateWIPSchemasList(bisSchemaRepo);
@@ -196,7 +196,7 @@ async function validateWipSchemas(ignoreList, singleSchemaName, output) {
   if (results.length > 0)
     throw new Error("\nWIP Schema validation failed.  Please see logs for more details");
   else
-    console.log(chalk.default.green("\nWIP Schema validation Succeeded"));
+    console.log(chalk.green("\nWIP Schema validation Succeeded"));
 }
 
 async function importAndExportSchema(schemaPath, schemaSearchPaths) {
@@ -215,7 +215,7 @@ async function importAndExportSchema(schemaPath, schemaSearchPaths) {
     throw new Error( `Failed to import schema ${loadedSchema.fullName} because of ${error.toString()}`);
   }
   imodel.saveChanges();
-  imodel.nativeDb.exportSchemas(exportDir);
+  imodel.exportSchemas(exportDir);
   imodel.close();
   IModelHost.shutdown();
 }
@@ -446,7 +446,7 @@ function checkIfWipSchemaRequired(previousSchema, latestReleasedVersion, wipSche
     if (wipVersion !== latestReleasedVersion)
       shortListedVersions.push(wipSchema[0]);
     else {
-      console.log("-> ", chalk.default.yellow(`${wipSchemaInfo.name}.${wipVersion} wip schema is skipped.`));
+      console.log("-> ", chalk.yellow(`${wipSchemaInfo.name}.${wipVersion} wip schema is skipped.`));
       writeLogsToFile(`-> ${wipSchemaInfo.name}.${wipVersion} wip schema is skipped.\n`, output);
     }
   }
@@ -516,7 +516,7 @@ async function importAndExportSchemaToIModel(releasedSchema, schemaDirs, batchSt
   try{
     await imodel.importSchemas(schemaPaths);
     imodel.saveChanges();
-    imodel.nativeDb.exportSchemas(exportDir);
+    imodel.exportSchemas(exportDir);
   } catch (error) {
     err = error;
     writeLogsToFile(`-> Error: ${err}\n`, output);
@@ -565,7 +565,7 @@ async function validateMultiSchema(output, testJson) {
     const schemaList = await generateReleasedSchemasList(bisSchemaRepo);
   
     for (const [schemaGroup, schemas] of Object.entries(testSchemas)) {
-      console.log(chalk.default.cyan(`\n Importing Schemas defined in group: ${schemaGroup}`));
+      console.log(chalk.cyan(`\n Importing Schemas defined in group: ${schemaGroup}`));
       for(const testSchema of schemas) {
         const schemaPath = schemaList.find((s) => path.basename(s).startsWith(testSchema));
         if (schemaPath) {
@@ -575,18 +575,18 @@ async function validateMultiSchema(output, testJson) {
           } catch (error) {
             throw new Error( `Failed to import schema ${testSchema} because ${error.toString()}`);
           }
-          console.log(chalk.default.green(`Import successful for Schema: ${testSchema}\n`));
+          console.log(chalk.green(`Import successful for Schema: ${testSchema}\n`));
           imodel.saveChanges();
         } else {
-          console.log(chalk.default.red(`No released schema was found with name: ${testSchema}\n`));
+          console.log(chalk.red(`No released schema was found with name: ${testSchema}\n`));
         }
       }
     }
-    console.log(chalk.default.cyan(" Exporting all schemas"));
-    imodel.nativeDb.exportSchemas(exportDir);
+    console.log(chalk.cyan(" Exporting all schemas"));
+    imodel.exportSchemas(exportDir);
     imodel.close();
     IModelHost.shutdown();
-    console.log(chalk.default.cyan(`\n Results are available at: ${path.dirname(output)}`));
+    console.log(chalk.cyan(`\n Results are available at: ${path.dirname(output)}`));
   } else {
     const sampleTestSchemas = {
       "Building schemas": [
@@ -600,11 +600,11 @@ async function validateMultiSchema(output, testJson) {
         "RailPhysical.01.00.00.ecschema.xml"
       ]
     };
-    console.log(chalk.default.red(`\n Test Json was not specified or unable to locate it: ${testJson}`));
-    console.log(chalk.default.yellow(`Please specify Json with schemas to test e.g. npm run iModelSchemaValidation -- --multiSchema C:\\test.json`));
-    console.log(chalk.default.yellow(`Below is a sample json:`));
+    console.log(chalk.red(`\n Test Json was not specified or unable to locate it: ${testJson}`));
+    console.log(chalk.yellow(`Please specify Json with schemas to test e.g. npm run iModelSchemaValidation -- --multiSchema C:\\test.json`));
+    console.log(chalk.yellow(`Below is a sample json:`));
     console.log(JSON.stringify(sampleTestSchemas, undefined, 4));
-    console.log(chalk.default.red(`\n Tests were not executed due to bad arguments.`));
+    console.log(chalk.red(`\n Tests were not executed due to bad arguments.`));
   }
 }
 
@@ -682,10 +682,10 @@ async function compareSnapshotsInfo(previousInfo, currentInfo) {
 
   const command = "'npm run iModelSchemaValidation -- --generateSnapshot'";
   if(previousInfo === currentInfo){
-    console.log(chalk.default.green("Snapshots are same"));
+    console.log(chalk.green("Snapshots are same"));
   } else {
-    console.log(chalk.default.red("Snapshots are different"));
-    console.log(`Command to regenerate snapshot json: ${chalk.default.yellow(`${command}`)}`);
+    console.log(chalk.red("Snapshots are different"));
+    console.log(`Command to regenerate snapshot json: ${chalk.yellow(`${command}`)}`);
     throw Error("Snapshot comparison failed");
   }
 }
