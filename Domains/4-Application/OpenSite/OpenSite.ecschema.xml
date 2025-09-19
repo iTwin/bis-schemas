@@ -55,8 +55,8 @@
     <PropertyCategory typeName="GradingArea_Surface" displayLabel="Surface" priority="0" />
     <PropertyCategory typeName="GradingArea_Constraints" displayLabel="Constraints" priority="0" />
     <PropertyCategory typeName="LayoutPondArea_Pond" displayLabel="Pond" priority="0" />
-    <PropertyCategory typeName="LayoutParcelingArea_ParcelLayout" displayLabel="Parcel Layout" priority="1" />
-    <PropertyCategory typeName="LayoutParcelingArea_BuildingLayout" displayLabel="Building Layout" priority="0" />
+    <PropertyCategory typeName="LayoutParcelingArea_ParcelLayout" displayLabel="Parcel Layout" priority="0" />
+    <PropertyCategory typeName="ParcelBuildingAspect_BuildingLayout" displayLabel="Building Layout" priority="0" />
 
     <PropertyCategory typeName="DrivewayPath_Direction" displayLabel="Direction" priority="0" />
     <PropertyCategory typeName="ParkingRowPath_Parking" displayLabel="Parking" priority="0" />
@@ -838,6 +838,23 @@
         <ECProperty propertyName="BuildingWidth" typeName="double" kindOfQuantity="rru:LENGTH" category="LayoutParcelingArea_BuildingLayout" displayLabel="Building Width" description="Width of the building on the parcel." />
         <ECProperty propertyName="BuildingDepth" typeName="double" kindOfQuantity="rru:LENGTH" category="LayoutParcelingArea_BuildingLayout" displayLabel="Building Depth" description="Depth of the building on the parcel." />
     </ECEntityClass>
+
+    <ECEntityClass typeName="ParcelBuildingAspect" modifier="Sealed" displayLabel="Building Aspect">
+        <BaseClass>bis:ElementUniqueAspect</BaseClass>
+
+        <ECProperty propertyName="BuildingWidth" typeName="double" kindOfQuantity="rru:LENGTH" category="ParcelBuildingAspect_BuildingLayout" displayLabel="Building Width" description="Width of the building on the parcel." />
+        <ECProperty propertyName="BuildingDepth" typeName="double" kindOfQuantity="rru:LENGTH" category="ParcelBuildingAspect_BuildingLayout" displayLabel="Building Depth" description="Depth of the building on the parcel." />
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="LayoutParcelingAreaOwnsParcelBuildingAspect" modifier="Sealed" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="LayoutParcelingArea" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="ParcelBuildingAspect" />
+        </Target>
+    </ECRelationshipClass>
 
     <ECEntityClass typeName="GradingArea" modifier="Abstract" displayLabel="Grading Area" description="Grading area.">
         <BaseClass>Area</BaseClass>
