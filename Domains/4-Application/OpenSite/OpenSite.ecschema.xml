@@ -55,6 +55,8 @@
     <PropertyCategory typeName="GradingArea_Surface" displayLabel="Surface" priority="0" />
     <PropertyCategory typeName="GradingArea_Constraints" displayLabel="Constraints" priority="0" />
     <PropertyCategory typeName="LayoutPondArea_Pond" displayLabel="Pond" priority="0" />
+    <PropertyCategory typeName="LayoutParcelingArea_ParcelLayout" displayLabel="Parcel Layout" priority="0" />
+    <PropertyCategory typeName="ParcelBuildingAspect_BuildingLayout" displayLabel="Building Layout" priority="0" />
 
     <PropertyCategory typeName="DrivewayPath_Direction" displayLabel="Direction" priority="0" />
     <PropertyCategory typeName="ParkingRowPath_Parking" displayLabel="Parking" priority="0" />
@@ -823,6 +825,32 @@
 		<ECProperty propertyName="TargetSurface" typeName="double" category="LayoutPondArea_Pond" kindOfQuantity="rru:AREA" displayLabel="Target Surface" description="Target surface." />
 		<ECProperty propertyName="TargetVolume" typeName="double" category="LayoutPondArea_Pond" kindOfQuantity="rru:VOLUME" displayLabel="Target Volume" description="Target volume." />
     </ECEntityClass>
+
+    <ECEntityClass typeName="LayoutParcelingArea" modifier="Sealed" displayLabel="Layout Parceling Area" description="Layout parceling area.">
+        <BaseClass>LayoutArea</BaseClass>
+
+        <ECProperty propertyName="MinParcelSurface" typeName="double" kindOfQuantity="rru:AREA" category="LayoutParcelingArea_ParcelLayout" displayLabel="Min. Parcel Surface" description="Minimum parcel surface area." />
+        <ECProperty propertyName="MaxParcelDepth" typeName="double" kindOfQuantity="rru:LENGTH" category="LayoutParcelingArea_ParcelLayout" displayLabel="Max. Parcel Depth" description="Maximum parcel depth." />
+        <ECProperty propertyName="MinParcelFrontage" typeName="double" kindOfQuantity="rru:LENGTH" category="LayoutParcelingArea_ParcelLayout" displayLabel="Min. Parcel Frontage" description="Minimum parcel frontage." />
+        <ECProperty propertyName="ParcelFrontageOffset" typeName="double" kindOfQuantity="rru:LENGTH" category="LayoutParcelingArea_ParcelLayout" displayLabel="Frontage Offset" description="Frontage offset." />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="ParcelBuildingAspect" modifier="Sealed" displayLabel="Building Aspect">
+        <BaseClass>bis:ElementUniqueAspect</BaseClass>
+
+        <ECProperty propertyName="BuildingWidth" typeName="double" kindOfQuantity="rru:LENGTH" category="ParcelBuildingAspect_BuildingLayout" displayLabel="Building Width" description="Width of the building on the parcel." />
+        <ECProperty propertyName="BuildingDepth" typeName="double" kindOfQuantity="rru:LENGTH" category="ParcelBuildingAspect_BuildingLayout" displayLabel="Building Depth" description="Depth of the building on the parcel." />
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="LayoutParcelingAreaOwnsParcelBuildingAspect" modifier="Sealed" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="LayoutParcelingArea" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="ParcelBuildingAspect" />
+        </Target>
+    </ECRelationshipClass>
 
     <ECEntityClass typeName="GradingArea" modifier="Abstract" displayLabel="Grading Area" description="Grading area.">
         <BaseClass>Area</BaseClass>
