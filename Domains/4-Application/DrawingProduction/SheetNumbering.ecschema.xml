@@ -3,10 +3,10 @@
 |  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
 |  * See LICENSE.md in the project root for license terms and full copyright notice.
 ======================================================================================= -->
-<ECSchema schemaName="SheetNumbering" alias="snum" version="01.00.00" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" description="Contains classes and relationships for sheet numbering.">
+<ECSchema schemaName="SheetNumbering" alias="snum" version="01.00.01" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" description="Contains classes and relationships for sheet numbering.">
     <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA" />
     <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
-    <ECSchemaReference name="BisCore" version="01.00.16" alias="bis"/>   
+    <ECSchemaReference name="BisCore" version="01.00.23" alias="bis"/>   
     <ECSchemaReference name="ECDbMap" version="02.00.04" alias="ecdbmap"/>
 
     <ECCustomAttributes>
@@ -54,4 +54,94 @@
             <Class class="SheetNumberAspect"/>
         </Target>
     </ECRelationshipClass>
+        <ECEntityClass typeName="SheetNumberingInfo" modifier="Abstract" displayLabel="Page and Group numbers" description="Calculates the Page and Group numbers for the SheetReferences in a SheetIndex">
+        <ECCustomAttributes>
+            <QueryView xmlns="ECDbMap.02.00.04">
+                <Query>
+                  SELECT 
+                        ECInstanceId,
+                        ECClassId,
+                        SheetNumber,
+                        PageNumber,
+                        PageCount,
+                        GroupNumber,
+                        GroupCount
+                    FROM (
+                  WITH
+                    -- General Notes:
+                    -- There are a number of times that column names are alised arbitrarily.
+                    --  This is to avoid an issue with CTEs not respecting qualifiers.  See this issue: https://github.com/iTwin/itwinjs-core/issues/8571
+
+                    -- Recursively traverses the tree from root to leaves, building hierarchical paths.
+                    -- Creates a global ordering based on depth-frist traversal with respect to EntryPriority.
+                    -- The SortPath ensures proper tree traversal order for sequential number assignment.
+                    -- AssemblyPath is included only for debubbing purposes 
+                    treeTraversal ([ECInstanceId], [ECClassId], [SheetNumber], [Priority], [DirectParentId], [AssemblyPath], [SortPath]) AS (
+                      -- Start with root nodes-SheetIndexes
+                      SELECT
+                        si.ECInstanceId,
+                        si.ECClassId,
+                        COALESCE([si].[CodeValue], [si].[UserLabel]) AS [SheetNumber],
+                        0 AS [Priority],
+                        NULL AS [DirectParentId],
+                        COALESCE([si].[CodeValue], [si].[UserLabel]) AS [AssemblyPath],
+                        -- Use string padding for consistent sorting - pad to 10 digits with leading zeros
+                        SUBSTR('0000000000' || CAST(0 AS TEXT), -10) AS [SortPath]
+                      FROM bis:SheetIndex si
+
+                      UNION ALL
+                      -- Recursively add children to parents, building hierarchical sort paths
+                      SELECT
+                        child.ECInstanceId,
+                        child.ECClassId,
+                        child.SheetNumber,
+                        child.NodePriority AS [Priority],
+                        child.NodeParentId AS [DirectParentId],
+                        parent.AssemblyPath || '->' || child.SheetNumber AS [AssemblyPath],
+                        parent.SortPath || '.' || SUBSTR('0000000000' || CAST(COALESCE(child.NodePriority, 0) AS TEXT), -10) AS [SortPath]
+                      FROM treeTraversal parent
+                      JOIN (
+                      -- A table of all possible children joined to their parents
+                          SELECT
+                              [sr].[ECInstanceId],
+                              ECClassId,
+                              COALESCE([sr].[CodeValue], [sr].[UserLabel]) AS [SheetNumber],
+                              [sr].[EntryPriority] AS [NodePriority],
+                              [sr].[Parent].[Id] AS [NodeParentId]
+                          FROM
+                              [bis].[SheetReference] [sr]
+
+                          UNION ALL
+
+                          SELECT
+                              [sif].[ECInstanceId],
+                              ECClassId,
+                              COALESCE([sif].[CodeValue], [sif].[UserLabel]) AS [SheetNumber],
+                              [sif].[EntryPriority] AS [NodePriority],
+                              [sif].[Parent].[Id] AS [NodeParentId]
+                          FROM
+                              [bis].[SheetIndexFolder] [sif]
+                      ) child ON child.NodeParentId = parent.ECInstanceId
+                    )
+                    -- Final result: Returns only SheetReference node due to inner join
+                    SELECT
+                        t.ECInstanceId AS ECInstanceId,
+                        ec_classid('SheetNumbering', 'SheetNumberingInfo') [ECClassId],
+                        t.SheetNumber AS SheetNumber,
+                        CAST(ROW_NUMBER() OVER (PARTITION BY t.ECClassId ORDER BY t.SortPath) AS INTEGER) AS PageNumber,
+                        CAST((SELECT COUNT(*) FROM treeTraversal WHERE ECClassId = ec_classid('bis', 'SheetReference')) AS INTEGER) AS PageCount,
+                        CAST(ROW_NUMBER() OVER (PARTITION BY [sr].[Parent].[Id] ORDER BY EntryPriority) AS INTEGER) AS [GroupNumber],
+                        CAST(COUNT([sr].[ECInstanceId]) OVER (PARTITION BY [sr].[Parent].[Id]) AS INTEGER) AS [GroupCount]
+                    FROM treeTraversal t JOIN bis.SheetReference sr ON sr.ECInstanceId = t.ECInstanceId
+                    ORDER BY t.SortPath
+                  )
+                </Query>
+            </QueryView>
+        </ECCustomAttributes>
+        <ECProperty propertyName="SheetNumber" typeName="string" description="The formatted sheet identifier of the sheet"/>
+        <ECProperty propertyName="GroupNumber" typeName="int" description="The sequential number of this sheet within its parent group, ordered by entry priority"/>
+        <ECProperty propertyName="GroupCount" typeName="int" description="The total number of sheets within the same parent group as this sheet"/>
+        <ECProperty propertyName="PageNumber" typeName="int" description="The global sequential page number of this sheet across the entire sheet index tree"/>
+        <ECProperty propertyName="PageCount" typeName="int" description="The total number of sheet references across the entire sheet index tree"/>
+    </ECEntityClass>
 </ECSchema>
