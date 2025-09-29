@@ -23,7 +23,7 @@
             <QueryView xmlns="ECDbMap.02.00.04">
                 <Query>
                   SELECT
-                    [sr].Sheet.id AS ECInstanceId,
+                    [sr].ECInstanceId AS ECInstanceId,
                     ec_classid('SheetNumbering', 'SheetIndexFolderView') [ECClassId],
                     -- An assigned a Row Number for rows that share a parent and are ordered by their EntryPriority 
                     --   and cast to an integer because it's a long otherwise for some reason
@@ -88,7 +88,7 @@
                     )
                     -- Final result: Returns only SheetReference node due to inner join
                     SELECT
-                      sr.sheet.id AS [ECInstanceId],
+                      sr.ECInstanceId AS [ECInstanceId],
                       ec_classid('SheetNumbering', 'SheetIndexView') [ECClassId],
                       CAST((SELECT COUNT(*) FROM treeTraversal WHERE ECClassId = ec_classid('bis', 'SheetReference')) AS INTEGER) AS PageCount
                     FROM treeTraversal t JOIN bis.SheetReference sr ON sr.ECInstanceId = t.ECInstanceId
@@ -166,7 +166,7 @@
                   )
                   -- Final result: Returns only SheetReference node due to inner join
                   SELECT
-                      sr.sheet.id AS [ECInstanceId],
+                      sr.ECInstanceId AS [ECInstanceId],
                       ec_classid('SheetNumbering', 'SheetReferenceView') [ECClassId],
                       t.SheetNumber AS SheetNumber,
                       CAST(ROW_NUMBER() OVER (PARTITION BY t.ECClassId ORDER BY t.SortPath) AS INTEGER) AS PageNumber
