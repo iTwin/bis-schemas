@@ -18,22 +18,24 @@
         </SchemaLayerInfo>
     </ECCustomAttributes>
 
-    <ECEntityClass typeName="SheetIndexFolderView" modifier="Abstract" displayLabel="SheetIndex Folder View" description="View that returns the number of children in folder (This can include the number of children under the SheetIndex)">
+    <ECEntityClass typeName="SheetIndexContainerView" modifier="Abstract" displayLabel="SheetIndex Container View" description="View that returns the number of children under a parent. This can be either a SheetIndex or SheetIndexFolder.">
         <ECCustomAttributes>
             <QueryView xmlns="ECDbMap.02.00.04">
                 <Query>
                     SELECT
                         [sr].Parent.id AS ECInstanceId,
-                        ec_classid('SheetNumbering', 'SheetIndexFolderView') [ECClassId],
+                        COALESCE([sf].ECClassId, [si].ECClassId) AS [ECClassId],
                         -- The number of SheetReferences that share a parent, again, cast to an integer
                         CAST(COUNT([sr].[ECInstanceId]) OVER (PARTITION BY [sr].[Parent].[Id]) AS INTEGER) AS [GroupCount]
-                    FROM bis.SheetReference [sr]
+                    FROM bis.SheetReference [sr] 
+                    LEFT JOIN bis.SheetIndex [si] ON si.ECInstanceId = [sr].Parent.id
+                    LEFT JOIN bis.SheetIndexFolder [sf] ON sf.ECInstanceId = [sr].Parent.id
                 </Query>
             </QueryView>
         </ECCustomAttributes>
         <ECProperty propertyName="GroupCount" typeName="int" description="The total number of sheets within the same parent group as this sheet"/>
     </ECEntityClass>
-    <ECEntityClass typeName="SheetIndexView" modifier="Abstract" displayLabel="SheetIndex View" description="View that returns the total number of sheets in a sheet index">
+    <ECEntityClass typeName="SheetIndexView" modifier="Abstract" displayLabel="SheetIndex View" description="View that returns the total number of sheets in a SheetIndex">
         <ECCustomAttributes>
             <QueryView xmlns="ECDbMap.02.00.04">
                 <Query>
@@ -48,12 +50,13 @@
                         --  This is to avoid an issue with CTEs not respecting qualifiers.  See this issue: https://github.com/iTwin/itwinjs-core/issues/8571
 
                         -- Recursively traverses the tree from root to leaves, building hierarchical paths.
-                        treeTraversal ([ECInstanceId], [ECClassId], [DirectParentId]) AS (
+                        treeTraversal ([ECInstanceId], [ECClassId], [DirectParentId], [RootId]) AS (
                         -- Start with root nodes-SheetIndexes
                         SELECT
                             si.ECInstanceId,
                             si.ECClassId,
-                            NULL AS [DirectParentId]
+                            NULL AS [DirectParentId],
+                            si.ECInstanceId AS [RootId]
                         FROM bis:SheetIndex si
 
                         UNION ALL
@@ -61,7 +64,8 @@
                             SELECT
                             child.ECInstanceId,
                             child.ECClassId,
-                            child.NodeParentId AS [DirectParentId]
+                            child.NodeParentId AS [DirectParentId],
+                            parent.RootId AS [RootId]
                             FROM treeTraversal parent
                         JOIN (
                         -- A table of all possible children joined to their parents
@@ -82,12 +86,12 @@
                                     [bis].[SheetIndexFolder] [sif]
                             ) child ON child.NodeParentId = parent.ECInstanceId
                         )
-                        -- Final result: Returns only SheetReference node due to inner join
+                        -- Final result: Counts the sheet under eact group of SheetIndex
                         SELECT
-                            sr.ECInstanceId AS [ECInstanceId],
-                            ec_classid('SheetNumbering', 'SheetIndexView') [ECClassId],
-                            CAST((SELECT COUNT(*) FROM treeTraversal WHERE ECClassId = ec_classid('bis', 'SheetReference')) AS INTEGER) AS PageCount
-                        FROM treeTraversal t JOIN bis.SheetReference sr ON sr.ECInstanceId = t.ECInstanceId
+                            RootId AS ECInstanceId,
+                            ec_classid('bis', 'SheetIndex') AS ECClassId,
+                            COUNT(ECInstanceId) AS PageCount
+                        FROM treeTraversal WHERE ECClassId = ec_classid('bis', 'SheetReference') GROUP BY RootId
                     )
                 </Query>
             </QueryView>
@@ -163,16 +167,17 @@
                     )
                     -- Final result: Returns only SheetReference node due to inner join
                     SELECT
-                        sr.ECInstanceId AS [ECInstanceId],
-                        ec_classid('SheetNumbering', 'SheetReferenceView') [ECClassId],
-                        t.SheetNumber AS SheetNumber,
+                        ECInstanceId,
+                        ECClassId,
+                        SheetNumber,
                         -- Partitioning by class to filter to SheetReferences
-                        CAST(ROW_NUMBER() OVER (PARTITION BY t.ECClassId ORDER BY t.SortPath) AS INTEGER) AS PageNumber,
+                        CAST(ROW_NUMBER() OVER (PARTITION BY ECClassId ORDER BY SortPath) AS INTEGER) AS [PageNumber],
                         -- An assigned a Row Number for rows that share a parent and are ordered by their EntryPriority 
                         --   and cast to an integer because it's a long otherwise for some reason
-                        CAST(ROW_NUMBER() OVER (PARTITION BY [sr].[Parent].[Id] ORDER BY EntryPriority) AS INTEGER) AS [GroupNumber]
-                    FROM treeTraversal t JOIN bis.SheetReference sr ON sr.ECInstanceId = t.ECInstanceId
-                    ORDER BY t.SortPath
+                        CAST(ROW_NUMBER() OVER (PARTITION BY DirectParentId ORDER BY Priority) AS INTEGER) AS [GroupNumber]
+                    FROM treeTraversal
+                    WHERE ECClassId = ec_classid('bis', 'SheetReference')
+                    ORDER BY SortPath
                     )
                 </Query>
             </QueryView>
