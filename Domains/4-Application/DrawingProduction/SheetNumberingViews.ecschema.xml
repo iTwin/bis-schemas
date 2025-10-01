@@ -24,12 +24,11 @@
                 <Query>
                     SELECT
                         [sr].Parent.id AS ECInstanceId,
-                        COALESCE([sf].ECClassId, [si].ECClassId) AS [ECClassId],
+                        [e].ECClassId AS [ECClassId],
                         -- The number of SheetReferences that share a parent, again, cast to an integer
                         CAST(COUNT([sr].[ECInstanceId]) OVER (PARTITION BY [sr].[Parent].[Id]) AS INTEGER) AS [GroupCount]
                     FROM bis.SheetReference [sr] 
-                    LEFT JOIN bis.SheetIndex [si] ON si.ECInstanceId = [sr].Parent.id
-                    LEFT JOIN bis.SheetIndexFolder [sf] ON sf.ECInstanceId = [sr].Parent.id
+                    INNER JOIN bis.Element e ON sr.Parent.id = e.ECInstanceId
                 </Query>
             </QueryView>
         </ECCustomAttributes>
