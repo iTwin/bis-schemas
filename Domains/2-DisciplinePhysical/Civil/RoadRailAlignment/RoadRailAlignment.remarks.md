@@ -4,23 +4,25 @@ remarksTarget: RoadRailAlignment.ecschema.md
 
 # RoadRailAlignment
 
-Contains the main classes to capture Alignment information primarily used in Road & Rail disciplines.
+This schema contains the main classes to capture Alignment information primarily used in Road & Rail disciplines.
+
+The following class-diagram depicts the main classes and relationships in the RoadRailAlignment schema:
 
 ![RoadRailAlignment](./media/RoadRailAlignment-classes.png)
+
+The following instance-diagram depicts an example of a typical usage of the classes from the RoadRailAlignment schema:
+
+![RoadRailAlignment](./media/RoadRailAlignment-instances.png)
 
 ## Entity Classes
 
 ### Alignment
 
-An `Alignment` that drives the design of a linear asset, it is referred to as a *Design Alignment*. Whereas an `Alignment` that describes a secondary entity of a linear asset, but it is still expected to capture the kind of data typically associated to Alignments, it is referred to as a *Linear*.
+`Alignment` instances shall be contained in a `SpatialLocationModel` or a `PhysicalModel`, that typically submodel a `SpatialLocationPartition` or a `PhysicalPartition` respectively. 
 
-By default, *Design Alignments* may use the Domain-ranked `Alignment` category, while *Linears* by default may use the Domain-ranked `Linear` category.
+If there is any need to organize `Alignment` instances that drive the design of a linear asset (i.e. *Design Alignments*) into a separate model further down the model-hierarchy of a BIS repository, it can be done by using a `SpatialLocationModel` model that submodels a `DesignAlignments` instance at a higher level.
 
-Data-writers need to decide the most appropriate organization for Alignment data. `Alignment` instances can be stored in either SpatialLocationModels or PhysicalModels. 
-
-A data-writer may choose to organize `Alignment` instances in a direct submodel of the corresponding `InformationPartitionElement`  (i.e. `PhysicalPartition` or `SpatialLocationPartition`) at the leaves of the Subject Hierarchy. That is the most typical approach. Another strategy involves storing them in models deeper in the overall Information Hierarchy in a BIS repository.
-
-In the latter strategy, `Alignment`s used for design purposes can be stored in a `SpatialLocationModel`, submodel of a `DesignAlignments` instance. Moreover `Alignment`s created for the purpose of a *Linear* can be contained in any `SpatialModel` (i.e. `PhysicalModel` or `SpatialLocationModel`).
+If there is a need to standardize the categories associated with `Alignment` instances in an organization, the RoadRailAlignment BIS domain suggests the usage of the Domain-ranked `Alignment` and `Linear` categories for *Design* and *Secondary* Alignments respectively.
 
 An `Alignment` shall always have one and only one associated `HorizontalAlignment`, but `VerticalAlignment`s are optional. When an `Alignment` has one or more associated `VerticalAlignment`s, it refers to the one used to describe its profile as being the *Main Vertical*.
 
@@ -38,27 +40,27 @@ Equivalent to [IfcAlignmentTypeEnum](https://standards.buildingsmart.org/IFC/REL
 
 ### DesignAlignments
 
-A `DesignAlignments` instance is mainly used by data-writers who do not organize Alignment data directly from the Subject hierarchy, via a PhysicalPartition or SpatialLocationPartition, but wish to do so at a deeper level of the overall Information Hierarchy. 
+A `DesignAlignments` instance shall be used when there is a need to organize `Alignment` instances that drive the design of a linear asset (i.e. *Design Alignments*) into a separate model further down the model-hierarchy of a BIS repository. In that case, `Alignment`s are organized into a `SpatialLocationModel` model that submodels a `DesignAlignments` instance at a higher level.
 
-By default, a `DesignAlignments` instace may use the Domain-ranked `Alignment` category.
+A `DesignAlignments` instance, by default, shall use the Domain-ranked `Alignment` category.
 
 ### HorizontalAlignments
 
-A data-writer may choose to organize `HorizontalAlignment` instances in a direct submodel of the corresponding `InformationPartitionElement`  (i.e. `PhysicalPartition` or `SpatialLocationPartition`) at the leaves of the Subject Hierarchy. That is the most typical approach. Another strategy involves storing them in models deeper in the overall Information Hierarchy in a BIS repository. A `HorizontalAlignments` instance is used in the latter case. That is, every set of `Alignment`s, contained in a `SpatialModel`, shall have one and only one instance of `HorizontalAlignments` leading to a *Plan-projection* `SpatialLocationModel` (i.e. with its *IsPlanProjection* property set to *true*) containing one `HorizontalAlignment` instance for each `Alignment` in the parent model.
+A `HorizontalAlignments` instance shall be used when there is a need to organize `HorizontalAlignment` instances into a separate model further down the model-hierarchy of a BIS repository. In that case, `HorizontalAlignment` instances can be contained in a `SpatialLocationModel` model that submodels a `HorizontalAlignments` instance at a higher level.
 
-Each `HorizontalAlignments` instance shall set its `CodeValue` property to "Horizontal Alignments", and by default, may use the Domain-ranked `Alignment` category in the case of *Design Alignments* or the `Linear` category in the case of *Linears*.
+Each `HorizontalAlignments` instance shall set its `CodeValue` property to "Horizontal Alignments", and by default, shall use the Domain-ranked `Alignment` category.
 
 ### HorizontalAlignment
 
-A `HorizontalAlignment` instance shall be contained in a *Plan-projection* `SpatialLocationModel` or `PhysicalModel` (i.e. with its *IsPlanProjection* property set to *true*), submodel of the corresponding `InformationPartitionElement`, or a `HorizontalAlignments` instance, depending upon the chosen data-organization strategy. A `HorizontalAlignment` instance shall be associated with one and only one `Alignment` via the `AlignmentRefersToHorizontal` relationship.
+A `HorizontalAlignment` instance shall be contained in a *Plan-projection* `SpatialLocationModel` submodel of either a `SpatialLocationPartition` or a `HorizontalAlignments` instance. It shall be associated with one `Alignment` instance via the `AlignmentRefersToHorizontal` relationship.
 
-A `HorizontalAlignment` typically has the same `CodeValue` and Category as its associated `Alignment`.
+A `HorizontalAlignment` typically has the same `CodeValue` and Category as its associated `Alignment` instance.
 
-A `HorizontalAlignment` stores its visual geometry separately from geometry used for linear-referencing and design purposes, although the two could be identical. The former shall be stored in its `GeometryStream` whereas the latter shall be stored in the `HorizontalGeometry` property, encoded as a [Path](https://www.itwinjs.org/reference/geometry-core/curve/path/). Each curve primitive in such *Path* describes a segment along the `HorizontalAlignment` as follows:
+A `HorizontalAlignment` stores its visual geometry separately from geometry used for linear-referencing and design purposes, although the two could be identical. The former shall be stored either in its `GeometryStream` or via child `GraphicalElement3d` instances, whereas the latter shall be stored in the `HorizontalGeometry` property, encoded as a [Path](https://www.itwinjs.org/reference/core-geometry/curve/path/). Each curve primitive in such *Path* describes a segment along the `HorizontalAlignment` as follows:
 
-- Linear segments shall be encoded as [LineSegment3d](https://www.itwinjs.org/reference/geometry-core/curve/linesegment3d/)s.
-- Circular arc segments shall be encoded as [Arc3d](https://www.itwinjs.org/reference/geometry-core/curve/arc3d/)s.
-- Transition segments (spirals) shall be encoded as [TransitionSpiral3d](https://www.itwinjs.org/reference/geometry-core/curve/transitionspiral3d/)s.
+- Linear segments shall be encoded as [LineSegment3d](https://www.itwinjs.org/reference/core-geometry/curve/linesegment3d/)s.
+- Circular arc segments shall be encoded as [Arc3d](https://www.itwinjs.org/reference/core-geometry/curve/arc3d/)s.
+- Transition segments (spirals) shall be encoded as [TransitionSpiral3d](https://www.itwinjs.org/reference/core-geometry/curve/transitionspiral3d/)s.
 
 The Z-coordinate of all of these primitives shall be zero.
 
@@ -86,11 +88,11 @@ A `VerticalAlignment` instance shall be contained in a `VerticalAlignmentModel` 
 
 A `VerticalAlignment` by default use the Domain-ranked `Vertical Alignment` Category.
 
-A `VerticalAlignment` stores its visual geometry separately from geometry used for linear-referencing and design purposes, although the two could be identical. The former shall be stored in its `GeometryStream` whereas the latter shall be stored in the `VerticalGeometry` property, encoded as a [Path](https://www.itwinjs.org/reference/geometry-core/curve/path/). Each curve primitive in such *Path* describes a segment along the `VerticalAlignment` as follows:
+A `VerticalAlignment` stores its visual geometry separately from geometry used for linear-referencing and design purposes, although the two could be identical. The former shall be stored either in its `GeometryStream` or via child `GraphicalElement2d` instances, whereas the latter shall be stored in the `VerticalGeometry` property, encoded as a [Path](https://www.itwinjs.org/reference/core-geometry/curve/path/). Each curve primitive in such *Path* describes a segment along the `VerticalAlignment` as follows:
 
-- Linear segments shall be encoded as [LineSegment3d](https://www.itwinjs.org/reference/geometry-core/curve/linesegment3d/)s.
-- Circular arc segments shall be encoded as [Arc3d](https://www.itwinjs.org/reference/geometry-core/curve/arc3d/)s.
-- Transition segments (parabolic) shall be encoded as [BSplineCurve3d](https://www.itwinjs.org/reference/geometry-core/bspline/bsplinecurve3d/)s.
+- Linear segments shall be encoded as [LineSegment3d](https://www.itwinjs.org/reference/core-geometry/curve/linesegment3d/)s.
+- Circular arc segments shall be encoded as [Arc3d](https://www.itwinjs.org/reference/core-geometry/curve/arc3d/)s.
+- Transition segments (parabolic) shall be encoded as [BSplineCurve3d](https://www.itwinjs.org/reference/core-geometry/bspline/bsplinecurve3d/)s.
 
 The X-coordinate of all of these primitives shall indicate *distance along* measurements in terms of the corresponding `HorizontalAlignment`. That is, an X-coordinate = 0.0 corresponds to the start location of its `HorizontalAlignment`. Y-coordinates shall indicate *elevation* at such location. Z-coordinate of all of these primitives shall be zero. 
 
@@ -107,3 +109,13 @@ Individual segments along the `VerticalAlignment` encoded as a *Path* are equiva
 `AlignmentStation`s are linearly-located elements along an `Alignment`. They shall carry the *distance along* measurement in a `LinearlyReferencedAtLocation` aspect whereas the mapped *station value* shall be stored in their `Station` property. `Alignment`s shall define its initial *station value* in their `StartStation` property.
 
 Equivalent to [IfcReferent](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcReferent.htm) with a non-zero `StartDistance` attribute and relative measurements used by linear-locations referencing it.
+
+## Relationship Classes
+
+### HorizontalAlignmentOwnsSegmentGraphics
+
+The `HorizontalAlignmentOwnsSegmentGraphics` relationship is used when the visual geometry (also referred to as symbology) of a `HorizontalAlignment` is captured via child `bis:GraphicalElement3d` instances. That strategy enables control over symbology settings via the default `SubCategory` of the associated `SpatialCategory` for each graphical segment.
+
+### VerticalAlignmentOwnsSegmentGraphics
+
+The `VerticalAlignmentOwnsSegmentGraphics` relationship is used when the visual geometry (also referred to as symbology) of a `VerticalAlignment` is captured via child `bis:GraphicalElement2d` instances. That strategy enables control over symbology settings via the default `SubCategory` of the associated `DrawingCategory` for each graphical segment.

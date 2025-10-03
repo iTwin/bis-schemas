@@ -3,10 +3,11 @@
 |  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
 |  * See LICENSE.md in the project root for license terms and full copyright notice.
 ======================================================================================= -->
-<ECSchema schemaName="DistributionSystems" alias="dsys" version="01.00.02" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" description="A schema for defining distribution systems.">
+<ECSchema schemaName="DistributionSystems" alias="dsys" version="01.00.03" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" description="A schema for defining distribution systems.">
     <ECSchemaReference name="BisCore" version="01.00.14" alias="bis" />
     <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
     <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
+    <ECSchemaReference name="ECDbMap" version="02.00.02" alias="ecdbmap"/>
 
     <ECCustomAttributes>
         <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
@@ -99,26 +100,6 @@
         <BaseClass>bis:SpatialLocationElement</BaseClass>
         <ECProperty propertyName="Description" typeName="string" displayLabel="Description" description="A human-readable description of the Distribution Port"/>
         <ECProperty propertyName="Direction" typeName="PortDirection" displayLabel="Direction" description="Direction of the port: e.g. Input, Output, InputOrOutput, InputAndOutput."/>
-        <ECProperty propertyName="LocalOrigin" typeName="point3d" description="The local placement origin of this DistributionPort in relation to its parent.">
-            <ECCustomAttributes>
-                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03"/>
-            </ECCustomAttributes>
-        </ECProperty>
-        <ECProperty propertyName="LocalYaw" typeName="double" description="The local Yaw angle (in degrees) of the orientation of this DistributionPort in relation to its parent.">
-            <ECCustomAttributes>
-                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03"/>
-            </ECCustomAttributes>
-        </ECProperty>
-        <ECProperty propertyName="LocalPitch" typeName="double" description="The local Pitch angle (in degrees) of the orientation of this DistributionPort in relation to its parent.">
-            <ECCustomAttributes>
-                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03"/>
-            </ECCustomAttributes>
-        </ECProperty>
-        <ECProperty propertyName="LocalRoll" typeName="double" description="The local Roll angle (in degrees) of the orientation of this DistributionPort in relation to its parent.">
-            <ECCustomAttributes>
-                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03"/>
-            </ECCustomAttributes>
-        </ECProperty>
     </ECEntityClass>
     
     <ECRelationshipClass typeName="DistributionElementOwnsDistributionPorts" strength="embedding" modifier="Abstract" description="A relationship that relates child distribution ports to parent distribution element.">
@@ -126,7 +107,7 @@
         <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
             <Class class="IDistributionElement"/>
         </Source>
-        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="true">
+        <Target multiplicity="(1..*)" roleLabel="is owned by" polymorphic="true">
             <Class class="DistributionPort"/>
         </Target>
     </ECRelationshipClass>
@@ -139,34 +120,33 @@
         <BaseClass>bis:InformationRecordElement</BaseClass>
     </ECEntityClass>
 
-    <ECRelationshipClass typeName="PortConnectionConnectsPorts" strength="referencing" modifier="Abstract" description="Indicates that the DistributionPort is connected to some other Distribution ports via PortConnection.">
+    <ECRelationshipClass typeName="PortConnectsToPorts" strength="referencing" modifier="Abstract" description="Indicates that the DistributionPort is connected to other DistributionPorts.">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
-        <Source multiplicity="(0..1)" roleLabel="connects" polymorphic="true">
-            <Class class="PortConnection"/>
+        <Source multiplicity="(0..*)" roleLabel="connects to" polymorphic="true">
+            <Class class="DistributionPort"/>
         </Source>
         <Target multiplicity="(0..*)" roleLabel="is connected by" polymorphic="true">
             <Class class="DistributionPort"/>
         </Target>
+        <ECNavigationProperty propertyName="PortConnection" relationshipName="PortConnectionObjectifiesConnection" direction="backward" description="The PortConnection instance objectifying this connection."/>
     </ECRelationshipClass>
 
-    <ECRelationshipClass typeName="PortConnectionConnectsTwoPorts" strength="referencing" modifier="Abstract" description="Indicates that the DistributionPort is connected to one other Distribution port via PortConnection.">
-        <BaseClass>PortConnectionConnectsPorts</BaseClass>
-        <Source multiplicity="(0..1)" roleLabel="connects" polymorphic="true">
+    <ECRelationshipClass typeName="PortConnectionObjectifiesConnection" strength="referencing" modifier="None" description="Indicates that the connection between DistributionPorts is objectified by a PortConnection element.">
+        <Source multiplicity="(0..1)" roleLabel="objectifies" polymorphic="true">
             <Class class="PortConnection"/>
         </Source>
-        <Target multiplicity="(0..2)" roleLabel="is connected by" polymorphic="true">
-            <Class class="DistributionPort"/>
+        <Target multiplicity="(0..*)" roleLabel="is objectified by" polymorphic="true">
+            <Class class="PortConnectsToPorts"/>
         </Target>
     </ECRelationshipClass>
-    
-    <ECRelationshipClass typeName="PortConnectionIsRealizedByPhysicalElements" strength="referencing" modifier="None" description="Indicates that the Port Connection is realized by some Physical Element(s).">
+
+    <ECRelationshipClass typeName="PhysicalElementRealizesConnection" strength="referencing" modifier="None" description="Indicates the Physical Element(s) that realize a Connection between DistributionPorts.">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
-        <Source multiplicity="(0..1)" roleLabel="is realized by" polymorphic="true">
-            <Class class="PortConnection"/>
-        </Source>
-        <Target multiplicity="(0..*)" roleLabel="realizes" polymorphic="true">
+        <Source multiplicity="(0..*)" roleLabel="realizes" polymorphic="true">
             <Class class="bis:PhysicalElement"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is realized by" polymorphic="true">
+            <Class class="PortConnection"/>
         </Target>
     </ECRelationshipClass>
-
 </ECSchema>

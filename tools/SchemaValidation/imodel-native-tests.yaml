@@ -6,6 +6,12 @@ pr:
   branches:
     include:
       - master
+  paths:
+    include:
+      - Domains/
+      - System/
+      - tools/SchemaValidation/imodel-native-tests.yaml
+      - SchemaInventory.json
 
 resources:
   repositories:
@@ -22,7 +28,7 @@ resources:
   - repository: itwinjs-core
     type: github
     endpoint: imodel-native
-    ref: imodel02
+    ref: master
     name: iTwin/itwinjs-core
 
 stages:
@@ -69,10 +75,9 @@ stages:
       clean: all
 
     pool:
-      name: iModelTechCI
+      name: imodelNative-Win11-VS2022
       demands:
         - 'Agent.OS -equals Windows_NT'
-        - 'NUMBER_OF_PROCESSORS -equals 24' # trying to avoid the DESKTOP-U3ENANMA agent
 
     variables:
       BB_V: '-v 4'
@@ -160,7 +165,7 @@ stages:
       clean: all
 
     pool:
-      name: iModelTechCI
+      name: imodelNative-Win11-VS2022
       demands: Agent.OS -equals Windows_NT
 
     variables:
@@ -224,11 +229,11 @@ stages:
     #should validate the imodeljs-win32-x64
     - template: common/config/azure-pipelines/templates/core-build.yaml@itwinjs-core
       parameters:
-        nodeVersion: 18.12.x
+        nodeVersion: 22.x
         runRushAudit: false
         rushBuildCacheEnabled: 0
-        currentBranch: imodel02
-        targetBranch: imodel02
+        currentBranch: master
+        targetBranch: master
 
 - stage: iModeEvolution
   displayName: iModeEvolution Tests
@@ -237,13 +242,13 @@ stages:
 
   jobs:
   - job: RuniModeEvolutionTests
-    timeoutInMinutes: 120
+    timeoutInMinutes: 240
 
     workspace:
       clean: all
 
     pool:
-      name: iModelTechCI
+      name: imodelNative-Win11-VS2022
       demands: Agent.OS -equals Windows_NT
 
     variables:
@@ -282,6 +287,11 @@ stages:
           git branch
         )
       displayName: 'Display Source Branch'
+
+    - script: |
+        pip3 install setuptools
+      displayName: 'Install SetupTools'
+      condition: and(succeeded(), in(variables['Agent.Name'], 'BuildMinion03A', 'BuildMinion03B'))
 
     - script: $(PY_EXE) $(bb) -v $(BB_V) -a $(BB_ARCH) -s $(strategy) build
       displayName: Build

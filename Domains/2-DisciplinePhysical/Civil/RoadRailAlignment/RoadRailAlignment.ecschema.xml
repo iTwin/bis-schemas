@@ -102,7 +102,16 @@
             <HiddenClass xmlns="CoreCustomAttributes.01.00.00"/>
         </ECCustomAttributes>
     </ECEntityClass>
-    <ECEntityClass typeName="HorizontalAlignments" description="Entry-point element into a bis:SpatialLocationModel capturing the Horizontal/Top perspective on Alignment instances.">
+    <ECRelationshipClass typeName="SpatialLocationModelBreaksDownDesignAlignments" strength="embedding" strengthDirection="Backward" modifier="Sealed" description="Relates a bis:SpatialLocationModel to the DesignAlignments that it sub-models.">
+        <BaseClass>bis:ModelModelsElement</BaseClass>
+        <Source multiplicity="(0..1)" polymorphic="false" roleLabel="breaks down">
+            <Class class="bis:SpatialLocationModel"/>
+        </Source>
+        <Target multiplicity="(1..1)" polymorphic="false" roleLabel="is broken down by">
+            <Class class="DesignAlignments"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="HorizontalAlignments" description="Horizontal/Top perspective on Alignments in an AlignmentModel that will be broken down in more detail in a separate HorizontalAlignmentModel.">
         <BaseClass>bis:SpatialLocationElement</BaseClass>
         <BaseClass>bis:ISubModeledElement</BaseClass>
         <ECCustomAttributes>
@@ -168,20 +177,22 @@
             <Class class="lr:ReferentElement"/>
         </Target>
     </ECRelationshipClass>
-    <ECEntityClass typeName="VerticalAlignmentViewDefinition" displayLabel="Vertical Alignment View Definition"  description="A VerticalAlignmentViewDefinition specifies parameters for a view of a VerticalAlignmentModel.">
-        <BaseClass>bis:ViewDefinition2d</BaseClass>
-    </ECEntityClass>
-    <ECEntityClass typeName="ProfileDrawing" displayLabel="Profile Drawing" description="A ProfileDrawing is a bis:Drawing based on a view of a VerticalAlignmentModel. A ProfileDrawing can be sub-modeled by a DrawingModel.">
-        <BaseClass>bis:Drawing</BaseClass>
-        <ECNavigationProperty propertyName="VerticalAlignmentView" relationshipName="ProfileDrawingIsBasedOnVerticalAlignmentView" direction="forward" displayLabel="Vertical Alignment View" description="The VerticalAlignmentViewDefinition that this ProfileDrawing is based on."/>
-    </ECEntityClass>
-    <ECRelationshipClass typeName="ProfileDrawingIsBasedOnVerticalAlignmentView" strengthDirection="backward" strength="referencing" modifier="Sealed" description="Identifies the VerticalAlignmentViewDefinition that the ProfileDrawing is based on.">
-        <!-- @see SectionDrawing.SpatialView ECNavigationProperty -->
-        <Source multiplicity="(0..*)" polymorphic="true" roleLabel="is based on">
-            <Class class="ProfileDrawing"/>
+    <ECRelationshipClass typeName="HorizontalAlignmentOwnsSegmentGraphics" strength="embedding" modifier="None" description="Relationship definitiong ownership from a HorizontalAlignment to child bis:GraphicalElement3d's, when control over the symbology of its segments is achieved via separate bis:Element's.">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(0..1)" polymorphic="false" roleLabel="owns">
+            <Class class="HorizontalAlignment"/>
         </Source>
-        <Target multiplicity="(1..1)" polymorphic="true" roleLabel="is used by">
-            <Class class="VerticalAlignmentViewDefinition"/>
+        <Target multiplicity="(0..*)" polymorphic="true" roleLabel="is owned by">
+            <Class class="bis:GraphicalElement3d"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="VerticalAlignmentOwnsSegmentGraphics" strength="embedding" modifier="None" description="Relationship definitiong ownership from a VerticalAlignment to child bis:GraphicalElement2d's, when control over the symbology of its segments is achieved via separate bis:Element's.">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(0..1)" polymorphic="false" roleLabel="owns">
+            <Class class="VerticalAlignment"/>
+        </Source>
+        <Target multiplicity="(0..*)" polymorphic="true" roleLabel="is owned by">
+            <Class class="bis:GraphicalElement2d"/>
         </Target>
     </ECRelationshipClass>
 </ECSchema>

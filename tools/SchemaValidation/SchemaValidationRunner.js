@@ -9,7 +9,10 @@
 
 const path = require("path");
 const readdirp = require("readdirp");
-const argv = require("yargs").argv;
+// 'version' is a keyword in this library, adding this workaround enables to use 'version' as user argument
+const argv = require("yargs")
+  .version(false)
+  .options({ version: { string: true} }).argv;
 const fs = require("fs");
 const chalk = require("chalk");
 const ValidationOptions = require("@bentley/schema-validator").ValidationOptions;
@@ -77,7 +80,7 @@ async function validateSchemas() {
 
 function processResults(results) {
   if (!results || (results.length === 2) && results[1].resultType === ValidationResultType.Message) {
-    console.log(chalk.default.green("Schema Validation Succeeded. No rule violations found."));
+    console.log(chalk.green("Schema Validation Succeeded. No rule violations found."));
     return false;
   }
 
@@ -108,11 +111,11 @@ function processResults(results) {
 }
 
 function reportError(message) {
-  console.log(chalk.default.red(`\"##vso[task.logissue type=error]${message}\"`));
+  console.log(chalk.red(`\"##vso[task.logissue type=error]${message}\"`));
 }
 
 function reportWarning(message) {
-  console.log(chalk.default.yellow(`\"##vso[task.logissue type=warning]${message}\"`));
+  console.log(chalk.yellow(`\"##vso[task.logissue type=warning]${message}\"`));
 }
 
 function getRefpaths(schemas, releasedOnly) {
@@ -153,7 +156,15 @@ async function getAllSchemas() {
 }
 
 function shouldExcludeSchema(schema, excludeList) {
+
+  if (argv.name && argv.version)
+    return !(argv.name == schema.name && argv.version == schema.version);
+
   if (argv.name) {
+
+    if (argv.wip)
+      return !(argv.name == schema.name && !schema.released);
+
     return argv.name !== schema.name;
   } 
 

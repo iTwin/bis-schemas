@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ==================================================================================
+|  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
+|  * See LICENSE.md in the project root for license terms and full copyright notice.
+======================================================================================= -->
+<ECSchema schemaName="CifGeotechnical" alias="cifgeotechnical" version="01.00.01" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
+    <ECSchemaReference name="BisCore" version="01.00.16" alias="bis"/>
+    <ECSchemaReference name="CifCommon" version="01.00.10" alias="cifcmn"/>
+    <ECSchemaReference name="CifUnits" version="01.00.07" alias="cifu"/>
+    <ECSchemaReference name="CoreCustomAttributes" version="01.00.04" alias="CoreCA"/>
+    <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
+    <ECCustomAttributes>
+        <ProductionStatus xmlns="CoreCustomAttributes.01.00.04">
+            <SupportedUse>Production</SupportedUse>
+        </ProductionStatus>
+        <SchemaLayerInfo xmlns="BisCustomAttributes.01.00.00">
+            <Value>Application</Value>
+        </SchemaLayerInfo>
+    </ECCustomAttributes>
+    <ECEnumeration typeName="MeshObjectSettingsAspect_CustomDisplay_Enum" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="Both" value="0" displayLabel="Both"/>
+        <ECEnumerator name="Remove_Only" value="1" displayLabel="Remove Only"/>
+    </ECEnumeration>
+    <ECEnumeration typeName="MeshObjectSettingsAspect_VolumeOption_Enum" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="Design" value="2" displayLabel="Design"/>
+        <ECEnumerator name="Existing" value="1" displayLabel="Existing"/>
+        <ECEnumerator name="None" value="0" displayLabel="None"/>
+        <ECEnumerator name="Subgrade" value="4" displayLabel="Subgrade"/>
+        <ECEnumerator name="Substrata" value="3" displayLabel="Substrata"/>
+        <ECEnumerator name="Cut" value="5" displayLabel="Cut"/>
+        <ECEnumerator name="Fill" value="6" displayLabel="Fill"/>
+        <ECEnumerator name="Unsuitable" value="7" displayLabel="Unsuitable"/>
+        <ECEnumerator name="Custom" value="8" displayLabel="Custom"/>
+    </ECEnumeration>
+    <ECEntityClass typeName="ComponentStationPropertiesClassAspect" displayLabel="&lt;- ComponentStationPropertiesClass -&gt;">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="StartStation" typeName="double" displayLabel="Start Station" category="GeometryAttributes_Geometry" priority="2020"/>
+        <ECProperty propertyName="EndStation" typeName="double" displayLabel="End Station" category="GeometryAttributes_Geometry" priority="2000"/>
+    </ECEntityClass>
+    <ECEntityClass typeName="DepthInformationAspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="DepthInformation_Depth" typeName="double" displayLabel="Depth" category="Depth_Depth" priority="300000" kindOfQuantity="cifu:LENGTH"/>
+    </ECEntityClass>
+    <ECEntityClass typeName="DepthIntervalAspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="DepthInterval_TopDepth" typeName="double" displayLabel="Top Depth" category="Depth_Interval_Depth_Interval" priority="300000" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="DepthInterval_BottomDepth" typeName="double" displayLabel="Bottom Depth" category="Depth_Interval_Depth_Interval" priority="299999" kindOfQuantity="cifu:LENGTH"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsComponentStationPropertiesClassAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="ComponentStationPropertiesClassAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="ElementOwnsDepthInformationAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="DepthInformationAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="ElementOwnsDepthIntervalAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="DepthIntervalAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="LocationAspect">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="Location_Name" typeName="string" displayLabel="Name" category="Location_Location" priority="300000"/>
+        <ECProperty propertyName="Location_Depth" typeName="double" displayLabel="Depth" category="Location_Location" priority="299999" kindOfQuantity="cifu:LENGTH"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsLocationAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="LocationAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="LocationOrientationAspect" displayLabel="Orientation">
+        <BaseClass>bis:ElementUniqueAspect</BaseClass>
+        <ECProperty propertyName="Orientation_Top" typeName="double" displayLabel="Top" category="Miscellaneous_Orientation" priority="0" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="Orientation_Base" typeName="double" displayLabel="Base" category="Miscellaneous_Orientation" priority="0" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="Orientation_Inclination" typeName="double" displayLabel="Inclination" category="Miscellaneous_Orientation" priority="0" kindOfQuantity="cifu:ANGLE"/>
+        <ECProperty propertyName="Orientation_Orientation" typeName="double" displayLabel="Orientation" category="Miscellaneous_Orientation" priority="0" kindOfQuantity="cifu:ANGLE"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsLocationOrientation" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="LocationOrientationAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="MeshObjectSettingsAspect" displayLabel="Mesh Feature">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="SurfaceGeometryAspect" typeName="string" displayLabel="Surface Feature Symbology" category="MeshObjectSettings_Mesh" priority="299999"/>
+        <ECProperty propertyName="VolumeOption" typeName="MeshObjectSettingsAspect_VolumeOption_Enum" displayLabel="Volume Option" category="MeshObjectSettings_Mesh" priority="299998"/>
+        <ECProperty propertyName="CutFactor" typeName="double" displayLabel="Cut Factor" category="MeshObjectSettings_Mesh" priority="299997"/>
+        <ECProperty propertyName="FillFactor" typeName="double" displayLabel="Fill Factor" category="MeshObjectSettings_Mesh" priority="299996"/>
+        <ECProperty propertyName="SplitMaterial" typeName="boolean" displayLabel="Split" category="MeshObjectSettings_Mesh" priority="299995"/>
+        <ECProperty propertyName="RemoveReplaceGeometryAspect" typeName="string" displayLabel="Removed and Replaced Feature Symbology" category="MeshObjectSettings_Mesh" priority="299994"/>
+        <ECProperty propertyName="ReplacedGeometryAspect" typeName="string" displayLabel="Replaced Feature Symbology" category="MeshObjectSettings_Mesh" priority="299993"/>
+        <ECProperty propertyName="RemovedGeometryAspect" typeName="string" displayLabel="Removed Feature Symbology" category="MeshObjectSettings_Mesh" priority="299993"/>
+        <ECProperty propertyName="IncludeCutInMassOrdinate" typeName="boolean" displayLabel="Include Cut In Mass Ordinate" category="MeshObjectSettings_Mesh" priority="299992"/>
+        <ECProperty propertyName="IncludeFillInMassOrdinate" typeName="boolean" displayLabel="Include Fill In Mass Ordinate" category="MeshObjectSettings_Mesh" priority="299991"/>
+        <ECProperty propertyName="CustomDisplay" typeName="MeshObjectSettingsAspect_CustomDisplay_Enum" displayLabel="Custom Display" category="MeshObjectSettings_Mesh" priority="299990"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsMeshObjectSettingsAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="MeshObjectSettingsAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="PointEntity2dInPlanAspect" displayLabel="2D Point">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="PointEntity2dPoint" typeName="point3d" displayLabel="Point" category="GeometryPointsCategoryAttributes_Geometry_Points" priority="299999"/>
+        <ECProperty propertyName="PointEntity2d_X" typeName="double" displayLabel="X" category="GeometryPointsCategoryAttributes_Geometry_Points" priority="299990" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="PointEntity2d_Y" typeName="double" displayLabel="Y" category="GeometryPointsCategoryAttributes_Geometry_Points" priority="299980" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="PointEntity2d_Elevation" typeName="double" displayLabel="Elevation" category="GeometryPointsCategoryAttributes_Geometry_Points" priority="299970" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="PointEntity2d_Rotation" typeName="double" displayLabel="Rotation" category="GeometryPointsCategoryAttributes_Geometry_Points" priority="299960" kindOfQuantity="cifu:BEARING"/>
+        <ECProperty propertyName="PointEntity2d_RotationOffset" typeName="double" displayLabel="Rotation Offset" category="GeometryPointsCategoryAttributes_Geometry_Points" priority="299955" kindOfQuantity="cifu:BEARING"/>
+        <ECProperty propertyName="PointEntity2d_RotationReference" typeName="string" displayLabel="Rotation Reference" category="GeometryPointsCategoryAttributes_Geometry_Points" priority="299953"/>
+        <ECProperty propertyName="PointEntity2d_AbsoluteAngle" typeName="boolean" displayLabel="Absolute Angle" category="GeometryPointsCategoryAttributes_Geometry_Points" priority="299950"/>
+        <ECProperty propertyName="PointEntity2d_Description" typeName="string" displayLabel="Description" category="FeatureProperties_Feature" priority="299910"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsPointEntity2dInPlanAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="PointEntity2dInPlanAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="ProfilePointEntityAspect" displayLabel="Profile Point">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+        <ECProperty propertyName="PointEntity2dPoint" typeName="point3d" displayLabel="Point" category="GeometryPointsCategoryAttributes_Geometry_Points" priority="299999"/>
+        <ECProperty propertyName="PointEntity2d_X" typeName="double" displayLabel="X" category="GeometryPointsCategoryAttributes_Geometry_Points" priority="299990" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="PointEntity2d_Y" typeName="double" displayLabel="Y" category="GeometryPointsCategoryAttributes_Geometry_Points" priority="299980" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="PointEntity2d_Rotation" typeName="double" displayLabel="Rotation" category="GeometryPointsCategoryAttributes_Geometry_Points" priority="299960" kindOfQuantity="cifu:BEARING"/>
+        <ECProperty propertyName="PointEntity2d_AbsoluteAngle" typeName="boolean" displayLabel="Absolute Angle" category="GeometryPointsCategoryAttributes_Geometry_Points" priority="299950"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsProfilePointEntityAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="ProfilePointEntityAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <PropertyCategory typeName="Depth_Depth" description="Depth" displayLabel="Depth" priority="299999"/>
+    <PropertyCategory typeName="Depth_Interval_Depth_Interval" description="Depth Interval" displayLabel="Depth Interval" priority="299999"/>
+    <PropertyCategory typeName="FeatureProperties_Feature" description="FeatureProperties" displayLabel="Feature" priority="299999"/>
+    <PropertyCategory typeName="GeometryAttributes_Geometry" description="GeometryAttributes" displayLabel="Geometry" priority="300000"/>
+    <PropertyCategory typeName="GeometryPointsCategoryAttributes_Geometry_Points" description="GeometryPointsCategoryAttributes" displayLabel="Geometry Points" priority="4294967096"/>
+    <PropertyCategory typeName="Location_Location" description="Location" displayLabel="Location" priority="299999"/>
+    <PropertyCategory typeName="MeshObjectSettings_Mesh" description="MeshObjectSettings" displayLabel="Mesh" priority="300000"/>
+    <PropertyCategory typeName="Miscellaneous_Orientation" description="Miscellaneous" displayLabel="Orientation" priority="401000"/>
+</ECSchema>

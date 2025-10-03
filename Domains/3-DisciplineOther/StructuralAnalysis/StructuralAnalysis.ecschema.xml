@@ -3,7 +3,7 @@
 |  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
 |  * See LICENSE.md in the project root for license terms and full copyright notice.
 ======================================================================================= -->
-<ECSchema schemaName="StructuralAnalysis" alias="sa" version="01.00.03" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" displayLabel="Structural Analysis" description="Structural Analysis Schema.">
+<ECSchema schemaName="StructuralAnalysis" alias="sa" version="01.00.05" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" displayLabel="Structural Analysis" description="Structural Analysis Schema.">
     <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
     <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
     <ECSchemaReference name="BisCore" version="01.00.10" alias="bis" />
@@ -77,6 +77,17 @@
         <BaseClass>anlyt:AnalyticalPartition</BaseClass>
         <ECNavigationProperty propertyName="DefaultDefinitionContainer" relationshipName="StructuralAnalysisPartitionRefersToDefinitionContainer" direction="Forward" displayLabel="Default Definition Container" description="Default location for definition elements." />
     </ECEntityClass>
+
+    <ECRelationshipClass typeName="StructuralAnalysisModelBreaksDownPartition" displayLabel="StructuralAnalysisModel Sub-Models StructuralAnalysisPartition" strength="embedding" strengthDirection="backward" modifier="None" description="Relates a StructuralAnalysisModel to the StructuralAnalysisPartition that it sub-models.">
+        <!-- @see Model.ModeledElement ECNavigationProperty -->
+        <BaseClass>bis:ModelModelsElement</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="models" polymorphic="false">
+            <Class class="StructuralAnalysisModel"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is modeled by" polymorphic="false">
+            <Class class="StructuralAnalysisPartition" />
+        </Target>
+    </ECRelationshipClass>
 
     <ECRelationshipClass typeName="StructuralAnalysisPartitionRefersToDefinitionContainer" strength="referencing" modifier="Sealed" >
         <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="false">
@@ -1182,8 +1193,17 @@
         <BaseClass>LoadContainer</BaseClass>
     </ECEntityClass>
 
+    <ECEntityClass typeName="ILoadCondition" modifier="Abstract" displayLabel="Load Condition" description="A load case or a combination of multiple factored load containers used for analysis.">
+        <ECCustomAttributes>
+            <IsMixin xmlns="CoreCustomAttributes.01.00.00">
+                <AppliesToEntityClass>bis:Element</AppliesToEntityClass>
+            </IsMixin>
+        </ECCustomAttributes>
+    </ECEntityClass>
+
     <ECEntityClass typeName="LoadCase" modifier="Sealed" displayLabel="Load Case" description="Collection of loads that act over the structure as a case.">
         <BaseClass>LoadContainer</BaseClass>
+        <BaseClass>ILoadCondition</BaseClass>
     </ECEntityClass>
 
     <ECRelationshipClass typeName="LoadCaseOwnsFactoredLoadGroupAspects" strength="embedding" modifier="Sealed">
@@ -1207,6 +1227,7 @@
 
     <ECEntityClass typeName="LoadCombinationInformation" modifier="Sealed" displayLabel="Load Combination" description="Element that groups a set of load cases that are applied to the structure simultaneously or sequentially">
         <BaseClass>bis:InformationRecordElement</BaseClass>
+        <BaseClass>ILoadCondition</BaseClass>
         <ECProperty propertyName="SrssFactor" typeName="double" description="A factor to multiply the product of SRSS added Load Conditions." />
     </ECEntityClass>
 

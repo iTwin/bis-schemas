@@ -4,16 +4,18 @@ trigger:
       - master
   paths:
     include:
-      - tools/*
+      - tools/
 
 pr:
   drafts: false
   branches:
     include:
       - master
-  # paths:
-  #   include:
-  #     - tools/*
+  paths:
+    include:
+      - tools/
+      - package.json
+      - package-lock.json
 
 workspace:
   clean: all
@@ -23,9 +25,9 @@ pool:
 
 steps:
 - task: NodeTool@0
-  displayName: 'Install Node 18.x'
+  displayName: 'Install Node 22.x'
   inputs:
-    versionSpec: 18.x
+    versionSpec: 22.x
     checkLatest: true
 
 - checkout: self
@@ -56,3 +58,9 @@ steps:
   inputs:
     command: custom
     customCommand: run testSchemaDifference
+
+- task: Npm@1
+  displayName: 'Schema Upgrade Tests'
+  inputs:
+    command: custom
+    customCommand: run testSchemaUpgrade
