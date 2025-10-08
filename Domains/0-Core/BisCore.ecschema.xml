@@ -3,7 +3,7 @@
 |  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
 |  * See LICENSE.md in the project root for license terms and full copyright notice.
 ======================================================================================= -->
-<ECSchema schemaName="BisCore" alias="bis" version="01.00.23" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" displayLabel="BIS Core" description="The BIS core schema contains classes that all other domain schemas extend.">
+<ECSchema schemaName="BisCore" alias="bis" version="01.00.24" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" displayLabel="BIS Core" description="The BIS core schema contains classes that all other domain schemas extend.">
 
     <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
     <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
@@ -1595,13 +1595,23 @@
         </ECProperty>
     </ECEntityClass>
 
-    <ECEntityClass typeName="ITextAnnotation" modifier="Abstract" displayLabel="Text Annotation" description="An interface that can be mixed-into a bis:GeometricElement-subclass to indicate that its GeometryStream may contain text-content computed from property-values in other Elements (aka Text-Fields).">
+    <ECEntityClass typeName="ITextAnnotation" modifier="Abstract" displayLabel="Text Annotation" description="An interface that can be mixed-into a bis:GeometricElement-subclass to indicate that its GeometryStream contains structured text-content that is styled according to a referenced AnnotationTextStyle, and optionally, contains portions of text-content computed from property-values in other Elements (aka Text-Fields)">
         <ECCustomAttributes>
             <IsMixin xmlns="CoreCustomAttributes.01.00.03">
                 <AppliesToEntityClass>GeometricElement</AppliesToEntityClass>
             </IsMixin>
         </ECCustomAttributes>
+        <ECNavigationProperty propertyName="DefaultTextStyle" relationshipName="TextAnnotationUsesTextStyleByDefault" direction="Forward" displayLabel="Default Text Style" description="The default text style used by the ITextAnnotation."/>
     </ECEntityClass>
+
+    <ECRelationshipClass typeName="TextAnnotationUsesTextStyleByDefault" strength="referencing" modifier="Sealed" description="A relationship indicating that the source ITextAnnotation instance uses the target AnnotationTextStyle instance by default.">
+        <Source multiplicity="(0..*)" roleLabel="is styled by" polymorphic="true">
+            <Class class="ITextAnnotation"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="styles" polymorphic="false">
+            <Class class="AnnotationTextStyle"/>
+        </Target>
+    </ECRelationshipClass>
 
     <ECRelationshipClass typeName="ElementDrivesTextAnnotation" strength="referencing" modifier="None" description="A relationship indicating that the source Element instance drives a portion of the text-content of the target ITextAnnotation instance.">
         <BaseClass>ElementDrivesElement</BaseClass>

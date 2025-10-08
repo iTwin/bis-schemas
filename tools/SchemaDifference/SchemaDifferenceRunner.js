@@ -33,7 +33,7 @@ async function compareSchemas() {
   let hasErrors = false;
 
   const outputPath = getOutputPath();
-  console.log(chalk.default.yellow("\nSchema Comparison logs will be generated under " + outputPath));
+  console.log(chalk.yellow("\nSchema Comparison logs will be generated under " + outputPath));
   
   for (const schema of schemas) {
     if (schema.released)
@@ -43,7 +43,7 @@ async function compareSchemas() {
       if(argv.name !== schema.name)
         continue;
     } else if (isExcludeSchema(schema.name)) {
-      console.log(chalk.default.yellow(`\nSkipping excluded schema ${schema.name}`));
+      console.log(chalk.yellow(`\nSkipping excluded schema ${schema.name}`));
       continue;
     }
 
@@ -52,7 +52,7 @@ async function compareSchemas() {
 
     const releasedSchema = findLatestReleasedSchema(schema, schemas);
     if (!releasedSchema) {
-      console.log(chalk.default.yellow(`No released schema found. Skipping comparison.`));
+      console.log(chalk.yellow(`No released schema found. Skipping comparison.`));
       continue;
     }
 
@@ -72,7 +72,7 @@ async function compareSchemas() {
 
 function processResults(releasedSchema, schema, results) {
   if (!results || (results.length === 2) && results[1].resultType === ComparisonResultType.Message) {
-    console.log(chalk.default.green("Schema comparison succeeded. No differences found."));
+    console.log(chalk.green("Schema comparison succeeded. No differences found."));
     return false;
   }
 
@@ -96,11 +96,11 @@ function processResults(releasedSchema, schema, results) {
 }
 
 function reportError(message) {
-  console.log(chalk.default.red(`\"##vso[task.logissue type=error]${message}\"`));
+  console.log(chalk.red(`\"##vso[task.logissue type=error]${message}\"`));
 }
 
 function reportWarning(message) {
-  console.log(chalk.default.yellow(`\"##vso[task.logissue type=warning]${message}\"`));
+  console.log(chalk.yellow(`\"##vso[task.logissue type=warning]${message}\"`));
 }
 
 function getRefpaths(schemas) {
