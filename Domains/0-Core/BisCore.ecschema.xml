@@ -1677,6 +1677,43 @@
         </Target>
     </ECRelationshipClass>
 
+    <ECEntityClass typeName="DimensionAnnotation2d" modifier="Abstract" displayLabel="DimensionAnnotation2d" description="A bis:AnnotationElement2d that displays a geometric measurement on a drawing or sheet.">
+        <BaseClass>AnnotationElement2d</BaseClass>
+        <ECProperty propertyName="DimensionData" typeName="string" extendedTypeName="Json" displayLabel="Dimension Data" description="A string property that that stores a complete description of the dimension in json format."/>
+        <ECNavigationProperty propertyName="DimensionStyle" relationshipName="DimensionAnnotationUsesDimensionStyle" direction="Forward" displayLabel="Dimension Style" description="The dimension style used by the DimensionAnnotation2d."/>
+    </ECEntityClass>  
+
+    <ECRelationshipClass typeName="DimensionAnnotationUsesDimensionStyle" strength="referencing" modifier="Sealed" description="A relationship indicating that the source DimensionAnnotation2d instance uses the target AnnotationDimensionStyle instance.">
+        <Source multiplicity="(0..*)" roleLabel="is styled by" polymorphic="true">
+            <Class class="DimensionAnnotation2d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="styles" polymorphic="false">
+            <Class class="AnnotationDimensionStyle"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="LinearDimensionAnnotation2d" displayLabel="2D Linear Dimension Annotation" description="A bis:DimensionAnnotation2d that displays a linear distance measurement.">
+        <BaseClass>DimensionAnnotation2d</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="AngularDimensionAnnotation2d" displayLabel="2D Angular Dimension Annotation" description="A bis:DimensionAnnotation2d that displays an angular measurement.">
+        <BaseClass>DimensionAnnotation2d</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="RadialDimensionAnnotation2d" displayLabel="2D Radial Dimension Annotation" description="A bis:DimensionAnnotation2d that displays the measurement of the radius or diameter of an arc.">
+        <BaseClass>DimensionAnnotation2d</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="OrdinateDimensionAnnotation2d" displayLabel="2D Ordinate Dimension Annotation" description="A bis:DimensionAnnotation2d that displays a set of linear distance measurements from a common datum.">
+        <BaseClass>DimensionAnnotation2d</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="TableAnnotation2d" displayLabel="TableAnnotation2d" description="A bis:AnnotationElement2d that displays a tabular grid of information.">
+        <BaseClass>AnnotationElement2d</BaseClass>
+        <BaseClass>ITextAnnotation</BaseClass>        
+        <ECProperty propertyName="TableData" typeName="string" extendedTypeName="Json" displayLabel="Table Data" description="A string property that stores a complete description of the table in json format."/>
+    </ECEntityClass>
+
     <ECEntityClass typeName="ViewAttachment" displayLabel="View Attachment">
         <BaseClass>GraphicalElement2d</BaseClass>
         <ECCustomAttributes>
@@ -2378,6 +2415,22 @@
             </ECCustomAttributes>
         </ECProperty>
     </ECEntityClass>
+
+    <ECEntityClass typeName="AnnotationDimensionStyle" modifier="Sealed" displayLabel="Annotation Dimension Style" description="A bis:DefinitionElement that defines the appearance of a bis:DimensionAnnotation2d.">
+        <BaseClass>DefinitionElement</BaseClass>
+        <ECNavigationProperty propertyName="TextStyle" relationshipName="DimensionStyleUsesTextStyle" direction="Forward" displayLabel="Text Style" description="The bis:AnnotationTextStyle used by the bis:AnnotationDimensionStyle."/>
+        <ECProperty propertyName="Settings" typeName="string" extendedTypeName="Json" description="Settings of the style" />
+        <ECProperty propertyName="Description" typeName="string" description="Description of the style" />
+    </ECEntityClass>  
+
+    <ECRelationshipClass typeName="DimensionStyleUsesTextStyle" strength="referencing" modifier="Sealed" description="A relationship indicating that the source AnnotationDimensionStyle instance uses the target AnnotationTextStyle instance.">
+        <Source multiplicity="(0..*)" roleLabel="is styled by" polymorphic="true">
+            <Class class="AnnotationDimensionStyle"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="styles" polymorphic="false">
+            <Class class="AnnotationTextStyle"/>
+        </Target>
+    </ECRelationshipClass> 
 
     <ECEntityClass typeName="LineStyle" modifier="Sealed" displayLabel="Line Style">
         <BaseClass>DefinitionElement</BaseClass>
