@@ -946,6 +946,12 @@
         </ECCustomAttributes>
         <ECProperty propertyName="Description" typeName="string" description="A human-readable description of the real-world Object(s) that will be modeled for this Subject"/>
     </ECEntityClass>
+    <ECEntityClass typeName="ProjectInformationRecord" modifier="Sealed" description="A bis:InformationRecordElement that captures Project-level properties associated to the real-world Entity referenced by its parent Subject.">
+        <BaseClass>InformationRecordElement</BaseClass>
+        <ECProperty propertyName="ProjectName" typeName="string" displayLabel="Project Name" description="Name of the Project associated with the Parent Subject"/>
+        <ECProperty propertyName="ProjectNumber" typeName="string" displayLabel="Project Number" description="Number of the Project associated with the Parent Subject"/>
+        <ECProperty propertyName="Location" typeName="string" displayLabel="Location" description="A human-readable description of the Location associated with the Parent Subject"/>
+    </ECEntityClass>
     <ECRelationshipClass typeName="SubjectOwnsPartitionElements" strength="embedding" modifier="None">
         <BaseClass>ElementOwnsChildElements</BaseClass>
         <Source multiplicity="(0..1)" roleLabel="owns" polymorphic="false">
@@ -962,6 +968,15 @@
         </Source>
         <Target multiplicity="(0..*)" roleLabel="is owned by parent" polymorphic="false">
             <Class class="Subject"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="SubjectOwnsProjectInformationRecord" strength="embedding" modifier="None">
+        <BaseClass>ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="Subject"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="ProjectInformationRecord"/>
         </Target>
     </ECRelationshipClass>
     <ECRelationshipClass typeName="SubjectRefersToSubject" strength="referencing" modifier="None" description="A relationship allowing a bis:Subject to express association with another bis:Subject that is not one of its children.">
@@ -1288,6 +1303,24 @@
         <BaseClass>SheetIndexEntry</BaseClass>
         <ECNavigationProperty propertyName="Sheet" relationshipName="SheetReferenceRefersToSheet" direction="forward" readOnly="true" displayLabel="Sheet" description="The bis:Sheet that this bis:SheetReference is ponting to."/>
     </ECEntityClass>
+
+    <ECEntityClass typeName="SheetInformationAspect" displayLabel="Sheet Information Aspect" modifier="None" description="A bis:ElementUniqueAspect that captures common information about a single Sheet that is typically included in its graphical layout.">
+        <BaseClass>ElementUniqueAspect</BaseClass>
+        <ECProperty propertyName="DesignedBy" typeName="string" displayLabel="Designed By"/>
+        <ECProperty propertyName="DesignedDate" typeName="dateTime" displayLabel="Designed Date"/>
+        <ECProperty propertyName="DrawnBy" typeName="string" displayLabel="Drawn By"/>
+        <ECProperty propertyName="CheckedBy" typeName="string" displayLabel="Checked By"/>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="SheetOwnsSheetInformationAspect" strength="embedding" modifier="None">
+        <BaseClass>ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="Sheet"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="true">
+            <Class class="SheetInformationAspect"/>
+        </Target>
+    </ECRelationshipClass>
 
     <ECRelationshipClass typeName="SheetReferenceRefersToSheet" strength="referencing" modifier="Sealed">
         <!-- @see SheetReference.Sheet ECNavigationProperty -->
