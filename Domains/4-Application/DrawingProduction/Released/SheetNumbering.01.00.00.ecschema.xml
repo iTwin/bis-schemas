@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ==================================================================================
+|  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
+|  * See LICENSE.md in the project root for license terms and full copyright notice.
+======================================================================================= -->
+<ECSchema schemaName="SheetNumbering" alias="snum" version="01.00.00" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" description="Contains classes and relationships for sheet numbering.">
+    <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA" />
+    <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
+    <ECSchemaReference name="BisCore" version="01.00.16" alias="bis"/>   
+    <ECSchemaReference name="ECDbMap" version="02.00.04" alias="ecdbmap"/>
+
+    <ECCustomAttributes>
+        <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
+            <SupportedUse>FieldTesting</SupportedUse>
+        </ProductionStatus>
+        <SchemaLayerInfo xmlns="BisCustomAttributes.01.00.00">
+            <Value>Application</Value>
+        </SchemaLayerInfo>
+    </ECCustomAttributes>
+
+    <ECEntityClass typeName="SheetNumberAspect" displayLabel="Sheet Number Aspect" modifier="None" description="Numbers a sheet.">
+        <BaseClass>bis:ElementUniqueAspect</BaseClass>
+        <ECProperty propertyName="Prefix" typeName="string" description="A string to append before the index number"/>
+        <ECProperty propertyName="Postfix" typeName="string" description="A string to append after the index number"/>
+        <ECProperty propertyName="Increment" typeName="int" description="Defines the amount to increase the index after the associated Sheet References (Indexes always start at 1)"/>
+        <ECProperty propertyName="NumberOfDigits" typeName="int" description="Functionally pads the index number with zero"/>
+        <ECProperty propertyName="ExcludeFromIndex" typeName="boolean" description="Sheet References associated with this flag will not be considered when processing the Sheet Number.  Their codes will not be updated, they will not increase the index."/>
+        <ECProperty propertyName="StartAt" typeName="int" description="Starts calculating the index number at this value"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="SheetReferenceOwnsSheetNumberAspect" strength="embedding" modifier="None">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="bis:SheetReference"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="SheetNumberAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="SheetIndexFolderOwnsSheetNumberAspect" strength="embedding" modifier="None">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="bis:SheetIndexFolder"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="SheetNumberAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="SheetIndexOwnsSheetNumberAspect" strength="embedding" modifier="None">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="bis:SheetIndex"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="SheetNumberAspect"/>
+        </Target>
+    </ECRelationshipClass>
+</ECSchema>
