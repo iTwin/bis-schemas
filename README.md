@@ -43,7 +43,7 @@ All other changes made outside of a domain group directory will require review b
 ### **Releasing a Bis Schema**
 
 > NOTE: You will need someone from the 'BIS Release Admins' Group to approve your PR.  For new schemas this generally requires some review of the schema by the BIS Working Group so coordinate with them early in the process to avoid delays and reworking when you are trying to release.
-
+> **NOTE:** If this is the first schema being released in a directory, create the `Released` folder as part of the PR.
 1. Create a branch of the bis-schemas repo to make all of your changes.
 1. Copy the schema to the Released directory for that domain group and change the file name to include the version
     - e.g. copy `\Domains\Core\BisCore.ecschema.xml` to `\Domains\Core\Released\BisCore.01.00.42.ecschema.xml`
@@ -196,3 +196,4 @@ See [Schema Release Process](./docs/schema-release-process.md)
 ## Schema Documentation
 
 See the documentation for writing schema documentation [here](./docs/writing-schema-documentation.md)
+
