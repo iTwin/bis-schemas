@@ -46,7 +46,8 @@ All other changes made outside of a domain group directory will require review b
 1. Create a branch of the bis-schemas repo to make all of your changes.
 1. Copy the schema to the Released directory for that domain group and change the file name to include the version
     - e.g. copy `\Domains\Core\BisCore.ecschema.xml` to `\Domains\Core\Released\BisCore.01.00.42.ecschema.xml`
-    > **NOTE:** If this is the first schema being released in a directory, create the `Released` folder as part of the PR.
+      
+    > NOTE: If this is the first schema being released in a directory, create the `Released` folder as part of the PR.
 1. [Update the Schema Inventory](#update-schema-inventory)
 1. Find the new entry added by the update schema inventory script it should look something like this:
 
@@ -196,5 +197,6 @@ See [Schema Release Process](./docs/schema-release-process.md)
 ## Schema Documentation
 
 See the documentation for writing schema documentation [here](./docs/writing-schema-documentation.md)
+
 
 
