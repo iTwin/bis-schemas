@@ -284,7 +284,7 @@ function excludeSchema(schemaName, schemaVersion, excludeList, isWIP=undefined) 
  */
 async function generateSchemaDirectoryList(schemaDirectory) {
   const filter = { fileFilter: "*.ecschema.xml", directoryFilter: ["!node_modules", "!.vscode", "!tools", "!test"] };
-  const allSchemaDirs = (await readdirp.promise(schemaDirectory, filter)).map((schemaPath) => path.dirname(schemaPath.fullPath));
+  const allSchemaDirs = (await readdirp.promise(schemaDirectory, filter)).map((schemaPath) => path.dirname(schemaPath.fullPath).replace(/\\/g, '/'));
   return Array.from(new Set(allSchemaDirs.filter((schemaDir) => /released/i.test(schemaDir))).keys());
 }
 
@@ -295,7 +295,7 @@ async function generateSchemaDirectoryList(schemaDirectory) {
  */
 async function generateReleasedSchemasList(schemaDirectory) {
   const filter = { fileFilter: "*.ecschema.xml", directoryFilter: ["!node_modules", "!.vscode", "!tools", "!Deprecated", "!test"] };
-  const allSchemaDirs = (await readdirp.promise(schemaDirectory, filter)).map((schemaPath) => schemaPath.fullPath);
+  const allSchemaDirs = (await readdirp.promise(schemaDirectory, filter)).map((schemaPath) => schemaPath.fullPath.replace(/\\/g, '/'));
   return Array.from(new Set(allSchemaDirs.filter((schemaDir) => /released/i.test(schemaDir))).keys()).sort()
 }
 
@@ -614,8 +614,8 @@ async function validateMultiSchema(output, testJson) {
  * Prepare the snapshot for the comparison
  */
 async function prepareSnapshot() {
-  const bisCoreRegex = /\\BisCore.\d\d.\d\d.\d\d.ecschema.xml/;
-  const functionalRegex = /\\Functional.\d\d.\d\d.\d\d.ecschema.xml/;
+  const bisCoreRegex = /\/BisCore.\d\d.\d\d.\d\d.ecschema.xml/;
+  const functionalRegex = /\/Functional.\d\d.\d\d.\d\d.ecschema.xml/;
   const schemaDirectories = await generateSchemaDirectoryList(bisSchemaRepo);
   console.log("***schemaDirectories: ", schemaDirectories);
   const releasedSchemasList = findLatestReleasedVersion(await generateReleasedSchemasList(bisSchemaRepo));
