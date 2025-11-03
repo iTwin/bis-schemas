@@ -28,7 +28,6 @@ const DbResult = require("@itwin/core-bentley").DbResult;
 
 const bisSchemaRepo = getBisRootPath();
 const tempDir = os.tmpdir();
-console.log("Temporary directory:", tempDir);
 const iModelDir = path.join(tempDir, "SchemaValidation", "Briefcases", "validation");
 const iModelName = "testimodel";
 const exportDir = path.join(iModelDir, iModelName, "exported");
