@@ -7,6 +7,7 @@
 
 "use strict";
 
+const os = require("os");
 const path = require("path");
 const readdirp = require("readdirp");
 const argv = require("yargs").argv;
@@ -26,7 +27,8 @@ const IModelHost = require("@itwin/core-backend").IModelHost;
 const DbResult = require("@itwin/core-bentley").DbResult;
 
 const bisSchemaRepo = getBisRootPath();
-const tempDir = process.env.TMP;
+const tempDir = os.tmpdir();
+console.log("Temporary directory:", tempDir);
 const iModelDir = path.join(tempDir, "SchemaValidation", "Briefcases", "validation");
 const iModelName = "testimodel";
 const exportDir = path.join(iModelDir, iModelName, "exported");
