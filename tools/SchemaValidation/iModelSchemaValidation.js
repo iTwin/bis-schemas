@@ -315,7 +315,7 @@ function getBisRootPath() {
  */
 async function generateWIPSchemasList(schemaDirectory) {
   const filter = { fileFilter: "*.ecschema.xml", directoryFilter: ["!node_modules", "!.vscode", "!tools", "!docs", "!Deprecated", "!Released", "!test"] };
-  const allSchemaDirs = (await readdirp.promise(schemaDirectory, filter)).map((schemaPath) => schemaPath.fullPath);
+  const allSchemaDirs = (await readdirp.promise(schemaDirectory, filter)).map((schemaPath) => schemaPath.fullPath.replace(/\\/g, '/'));
   return Array.from(new Set(allSchemaDirs.filter((schemaDir) => /.*\.ecschema\.xml/i.test(schemaDir))).keys());
 }
 
@@ -440,7 +440,7 @@ function getOutputPath() {
  * Check if the latest released version of schema is equilent to WIP schema version
  */
 function checkIfWipSchemaRequired(previousSchema, latestReleasedVersion, wipSchemas, shortListedVersions, output) {
-  const wipSchema = wipSchemas.filter((schema) => schema.endsWith("\\" + previousSchema + ".ecschema.xml"));
+  const wipSchema = wipSchemas.filter((schema) => schema.endsWith("/" + previousSchema + ".ecschema.xml"));
   if (wipSchema.length !== 0) {
     const wipSchemaInfo = getSchemaInfo(wipSchema[0]);
     const wipVersion = wipSchemaInfo.version.toString();
