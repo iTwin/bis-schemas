@@ -617,7 +617,14 @@ async function prepareSnapshot() {
   const bisCoreRegex = /\\BisCore.\d\d.\d\d.\d\d.ecschema.xml/;
   const functionalRegex = /\\Functional.\d\d.\d\d.\d\d.ecschema.xml/;
   const schemaDirectories = await generateSchemaDirectoryList(bisSchemaRepo);
+  console.log("***schemaDirectories: ", schemaDirectories);
   const releasedSchemasList = findLatestReleasedVersion(await generateReleasedSchemasList(bisSchemaRepo));
+  console.log("\n\n***releasedSchemasList: ", releasedSchemasList);
+
+  console.log("\n\nschemaDirectories Size ", schemaDirectories.length);
+  console.log("releasedSchemasList Size ", releasedSchemasList.length);
+  console.log("bisSchemaRepo: ", bisSchemaRepo);
+
   const requiredSchemas = releasedSchemasList.filter((schema) => bisCoreRegex.test(schema) || functionalRegex.test(schema));
 
   if (requiredSchemas.length === 2) {
