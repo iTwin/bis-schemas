@@ -192,6 +192,7 @@ function getInventoryPath() {
 
 function getSchemaVersion(bisRootDir, schemaPath) {
   const fullPath = path.normalize(path.join(bisRootDir, schemaPath));
+  console.log(fullPath);
   const schemaXml = fs.readFileSync(fullPath).toString();
   const versionMatch = schemaXml.match(/<ECSchema .*version="(?<read>\d+)\.(?<write>\d+)(\.(?<patch>\d+))?/);
   if (!versionMatch || !versionMatch.groups.read || !versionMatch.groups.write) {
