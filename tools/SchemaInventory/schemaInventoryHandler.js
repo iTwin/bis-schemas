@@ -114,7 +114,7 @@ async function createRepositoryInventory(bisRootDir) {
   for (const entry of allSchemas) {
     const schemaInfo = {
       name: entry.basename.match(/\w+/)[0], 
-      path: entry.path.replace(/\//g, '\\'),
+      path: entry.path,
       released: entry.path.includes("Released"), 
       version: entry.basename.match(/\d+\.\d+\.\d+/) ? entry.basename.match(/\d+\.\d+\.\d+/)[0] : ""
     };
@@ -191,7 +191,7 @@ function getInventoryPath() {
 }
 
 function getSchemaVersion(bisRootDir, schemaPath) {
-  const fullPath = path.normalize(path.join(bisRootDir, schemaPath));
+  const fullPath = path.join(bisRootDir, schemaPath);
   console.log(fullPath);
   const schemaXml = fs.readFileSync(fullPath).toString();
   const versionMatch = schemaXml.match(/<ECSchema .*version="(?<read>\d+)\.(?<write>\d+)(\.(?<patch>\d+))?/);
