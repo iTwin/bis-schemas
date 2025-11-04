@@ -44,9 +44,11 @@ async function updateSchemaInventory() {
 
   // Create schema inventory from bis-schemas repository
   const repoInventory = await createRepositoryInventory(bisRootDir);
+  console.log("\n***repoInventory: ", repoInventory);
 
   // get all possible reference directories (used for new released schema checksum generation)
   const schemaDirectories = await generateSchemaDirectoryLists(bisRootDir);
+  console.log("\n***schemaDirectories: ", schemaDirectories);
 
   let newEntries = false;
   for (const [name, schemaInfos] of Object.entries(repoInventory)) {
@@ -112,7 +114,7 @@ async function createRepositoryInventory(bisRootDir) {
   for (const entry of allSchemas) {
     const schemaInfo = {
       name: entry.basename.match(/\w+/)[0], 
-      path: entry.path, 
+      path: entry.path.replace(/\//g, '\\'),
       released: entry.path.includes("Released"), 
       version: entry.basename.match(/\d+\.\d+\.\d+/) ? entry.basename.match(/\d+\.\d+\.\d+/)[0] : ""
     };
@@ -164,7 +166,7 @@ function schemaExistsInInventory(schema, inventorySchemas) {
 
 async function generateSchemaDirectoryLists(schemaDirectory) {
   const filter = { fileFilter: "*.ecschema.xml", directoryFilter: ["!node_modules", "!.vscode"] };
-  const allSchemaDirs = (await readdirp.promise(schemaDirectory, filter)).map((schemaPath) => path.dirname(schemaPath.fullPath));
+  const allSchemaDirs = (await readdirp.promise(schemaDirectory, filter)).map((schemaPath) => path.dirname(schemaPath.fullPath).replace(/\//g, '\\'));
   return Array.from(new Set(allSchemaDirs.filter((schemaDir) => /released/i.test(schemaDir))).keys());
 }
 
