@@ -58,6 +58,7 @@ async function updateSchemaInventory() {
       if (schemaExistsInInventory(schema, inventorySchemas))
         continue;
 
+      console.log("New schema found: ", schema);
       newEntries = true;
       
       // Sets Sha1 and other release schema fields
@@ -79,14 +80,18 @@ async function updateSchemaInventory() {
       // Handle WIP schemas
       let inventoryMerged = false;
       for (const inventorySchema of inventorySchemas) {
+        console.log("inventorySchema.path: ", inventorySchema.path);
+        console.log("schema.path: ", schema.path);
         if (inventorySchema.released || ( !inventorySchema.released && !matchSchemaFileNames(inventorySchema.path, schema.path)))
           continue;
         // Existing WIP found, so replace with new
+        console.log("\n ** existing wip schema found");
         Object.assign (inventorySchema, schema);
         inventoryMerged = true;
       }
 
       // No existing WIP schema found so push new WIP schema
+      console.log("\n ** new wip schema added");
       if (!inventoryMerged)
         inventorySchemas.push(schema);
     }
