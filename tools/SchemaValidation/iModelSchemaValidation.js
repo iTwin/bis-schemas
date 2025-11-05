@@ -7,6 +7,7 @@
 
 "use strict";
 
+const os = require("os");
 const path = require("path");
 const readdirp = require("readdirp");
 const argv = require("yargs").argv;
@@ -26,7 +27,7 @@ const IModelHost = require("@itwin/core-backend").IModelHost;
 const DbResult = require("@itwin/core-bentley").DbResult;
 
 const bisSchemaRepo = getBisRootPath();
-const tempDir = process.env.TMP;
+const tempDir = os.tmpdir();
 const iModelDir = path.join(tempDir, "SchemaValidation", "Briefcases", "validation");
 const iModelName = "testimodel";
 const exportDir = path.join(iModelDir, iModelName, "exported");
@@ -282,7 +283,7 @@ function excludeSchema(schemaName, schemaVersion, excludeList, isWIP=undefined) 
  */
 async function generateSchemaDirectoryList(schemaDirectory) {
   const filter = { fileFilter: "*.ecschema.xml", directoryFilter: ["!node_modules", "!.vscode", "!tools", "!test"] };
-  const allSchemaDirs = (await readdirp.promise(schemaDirectory, filter)).map((schemaPath) => path.dirname(schemaPath.fullPath));
+  const allSchemaDirs = (await readdirp.promise(schemaDirectory, filter)).map((schemaPath) => path.dirname(schemaPath.fullPath).replace(/\\/g, '/'));
   return Array.from(new Set(allSchemaDirs.filter((schemaDir) => /released/i.test(schemaDir))).keys());
 }
 
@@ -293,7 +294,7 @@ async function generateSchemaDirectoryList(schemaDirectory) {
  */
 async function generateReleasedSchemasList(schemaDirectory) {
   const filter = { fileFilter: "*.ecschema.xml", directoryFilter: ["!node_modules", "!.vscode", "!tools", "!Deprecated", "!test"] };
-  const allSchemaDirs = (await readdirp.promise(schemaDirectory, filter)).map((schemaPath) => schemaPath.fullPath);
+  const allSchemaDirs = (await readdirp.promise(schemaDirectory, filter)).map((schemaPath) => schemaPath.fullPath.replace(/\\/g, '/'));
   return Array.from(new Set(allSchemaDirs.filter((schemaDir) => /released/i.test(schemaDir))).keys()).sort()
 }
 
@@ -314,7 +315,7 @@ function getBisRootPath() {
  */
 async function generateWIPSchemasList(schemaDirectory) {
   const filter = { fileFilter: "*.ecschema.xml", directoryFilter: ["!node_modules", "!.vscode", "!tools", "!docs", "!Deprecated", "!Released", "!test"] };
-  const allSchemaDirs = (await readdirp.promise(schemaDirectory, filter)).map((schemaPath) => schemaPath.fullPath);
+  const allSchemaDirs = (await readdirp.promise(schemaDirectory, filter)).map((schemaPath) => schemaPath.fullPath.replace(/\\/g, '/'));
   return Array.from(new Set(allSchemaDirs.filter((schemaDir) => /.*\.ecschema\.xml/i.test(schemaDir))).keys());
 }
 
@@ -439,7 +440,7 @@ function getOutputPath() {
  * Check if the latest released version of schema is equilent to WIP schema version
  */
 function checkIfWipSchemaRequired(previousSchema, latestReleasedVersion, wipSchemas, shortListedVersions, output) {
-  const wipSchema = wipSchemas.filter((schema) => schema.endsWith("\\" + previousSchema + ".ecschema.xml"));
+  const wipSchema = wipSchemas.filter((schema) => schema.endsWith("/" + previousSchema + ".ecschema.xml"));
   if (wipSchema.length !== 0) {
     const wipSchemaInfo = getSchemaInfo(wipSchema[0]);
     const wipVersion = wipSchemaInfo.version.toString();
@@ -612,8 +613,8 @@ async function validateMultiSchema(output, testJson) {
  * Prepare the snapshot for the comparison
  */
 async function prepareSnapshot() {
-  const bisCoreRegex = /\\BisCore.\d\d.\d\d.\d\d.ecschema.xml/;
-  const functionalRegex = /\\Functional.\d\d.\d\d.\d\d.ecschema.xml/;
+  const bisCoreRegex = /\/BisCore.\d\d.\d\d.\d\d.ecschema.xml/;
+  const functionalRegex = /\/Functional.\d\d.\d\d.\d\d.ecschema.xml/;
   const schemaDirectories = await generateSchemaDirectoryList(bisSchemaRepo);
   const releasedSchemasList = findLatestReleasedVersion(await generateReleasedSchemasList(bisSchemaRepo));
   const requiredSchemas = releasedSchemasList.filter((schema) => bisCoreRegex.test(schema) || functionalRegex.test(schema));

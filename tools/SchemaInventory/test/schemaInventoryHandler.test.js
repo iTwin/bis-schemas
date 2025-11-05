@@ -55,7 +55,7 @@ describe.only('Schema Inventory Tests', function() {
     function mockRepoInventory(schemaInfo, schemaVersion = undefined) {
       for (const entry of schemaInfo) {
         const version = schemaVersion === undefined ? entry.version : schemaVersion;
-        const schemaPath = path.join(assetsDir, entry.path);
+        const schemaPath = path.join(assetsDir, entry.path).replace(/\\/g, '/');
         fsReadFileSyncStub.withArgs(schemaPath).returns(`"<ECSchema version="${version}"`);
       }
       fsReadFileSyncStub.callThrough();
