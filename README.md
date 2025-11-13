@@ -47,6 +47,7 @@ All other changes made outside of a domain group directory will require review b
 1. Create a branch of the bis-schemas repo to make all of your changes.
 1. Copy the schema to the Released directory for that domain group and change the file name to include the version
     - e.g. copy `\Domains\0-Core\BisCore.ecschema.xml` to `\Domains\0-Core\Released\BisCore.01.00.42.ecschema.xml`
+    > NOTE: If this is the first schema being released in a directory, create the `Released` folder as part of the PR.
 1. [Update the Schema Inventory](#update-schema-inventory)
 1. Find the new entry added by the update schema inventory script it should look something like this:
 
@@ -59,7 +60,7 @@ All other changes made outside of a domain group directory will require review b
     "comment": "Answers the question",
     "verifier": "<First.Last of the BIS Release Admin responsible for verifying this version of the schema",
     "sha1": "<sha1 hash>",
-    "verified": "<Yes/No>", # Set to Yes when the verifier is OK with release
+    "verified": "<Yes/No>", # Set to Yes, verifier confirms this assertion when they approve the PR
     "author": "<First.Last of the person responsible for this version of the schema>",
     "date": "<MM/DD/YYYY Date for the schemas release>",
     "dynamic": "<Yes/No>", # Set to Yes if programmatically generated, else No (No is most common)
@@ -67,7 +68,7 @@ All other changes made outside of a domain group directory will require review b
     },
     ```
 
-    >NOTE: If a verifier is set as a required reviewer it is ok to set `verified` to `Yes` when you create the PR.  As their approval of the PR indicates that they have verified the schema.
+    > \* The verifier should be set as a required reviewer if they are not automatically added.  If the verifier is not set or is not a reviewer, set `verified` to `No` and let the verifier set to it `Yes` manually.
 
 1. Update entry to fill out all fields correctly, the only optional field is 'comment'.
 1. Run [Bis Rule Validation](#bis-rule-validation) and [iModel Schema Validation](#imodel-schema-validation) on your new schema and make sure they pass.
