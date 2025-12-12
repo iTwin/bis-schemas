@@ -119,3 +119,48 @@ The `HorizontalAlignmentOwnsSegmentGraphics` relationship is used when the visua
 ### VerticalAlignmentOwnsSegmentGraphics
 
 The `VerticalAlignmentOwnsSegmentGraphics` relationship is used when the visual geometry (also referred to as symbology) of a `VerticalAlignment` is captured via child `bis:GraphicalElement2d` instances. That strategy enables control over symbology settings via the default `SubCategory` of the associated `DrawingCategory` for each graphical segment.
+
+## Sample ECSQL queries
+
+- _From_ distance-along measurements along a particular _Alignment_, reported with _Station_ values.
+
+```
+SELECT
+     linearlyLocated.DistanceAlongFromStart DistanceAlong,
+     (coalesce(station.Station, alg.StartStation) +
+        (linearlyLocated.DistanceAlongFromStart - 
+        coalesce(stationAt.AtPosition.DistanceAlongFromStart, alg.StartValue, 0))) StationValue
+FROM
+    rralign.Alignment alg JOIN
+    (SELECT
+        coalesce(lrOnObj.LinearElementId, lrOnSisterObj.LinearElementId) LinearElementId,
+        coalesce(lrOnObj.DistanceAlongFromStart, lrOnSisterObj.DistanceAlongFromStart) DistanceAlongFromStart
+    FROM
+        (SELECT 
+            along.TargetECInstanceId LinearElementId, 
+            fromTo.FromPosition.DistanceAlongFromStart DistanceAlongFromStart
+        FROM 
+            lr.ILinearlyLocatedAlongILinearElement along JOIN 
+            lr.LinearlyReferencedFromToLocation fromTo ON along.SourceECInstanceId = fromTo.Element.Id
+        WHERE 
+            along.SourceECInstanceId = ?) lrOnObj FULL JOIN
+        (SELECT 
+            along.TargetECInstanceId LinearElementId, 
+            fromTo.FromPosition.DistanceAlongFromStart DistanceAlongFromStart
+        FROM 
+            lr.ILinearlyLocatedAlongILinearElement along JOIN 
+            lr.LinearlyReferencedFromToLocation fromTo ON along.SourceECInstanceId = fromTo.Element.Id JOIN 
+            lr.ILinearLocationLocatesElement locates ON locates.SourceECInstanceId = along.SourceECInstanceId
+        WHERE 
+            locates.TargetECInstanceId = ?) lrOnSisterObj
+        ON lrOnObj.LinearElementId = lrOnSisterObj.LinearElementId LIMIT 1) linearlyLocated
+    ON alg.ECInstanceId = linearlyLocated.LinearElementId LEFT JOIN 
+    rralign.AlignmentStation station ON alg.ECInstanceId = station.Parent.Id LEFT JOIN 
+    lr.LinearlyReferencedAtLocation stationAt ON station.ECInstanceId = stationAt.Element.Id
+WHERE 
+    station.ECInstanceId IS NULL 
+    OR stationAt.AtPosition.DistanceAlongFromStart <= linearlyLocated.DistanceAlongFromStart
+ORDER BY
+    stationAt.AtPosition.DistanceAlongFromStart DESC
+LIMIT 1
+```
