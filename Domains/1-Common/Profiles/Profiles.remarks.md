@@ -123,7 +123,8 @@ In addition, such Profiles have a bounding box which is centered at the center o
 - `FlangeSlope` (if set):
   - must be greater or equal to zero
   - must be less than ninety degrees
-  - `FlangeSlopeHeight` must be less or equal to half of `WebInnerEdgeLength`
+  - `FlangeSlopeHeight` must be less or equal to `WebInnerEdgeLength`
+  - `FlangeSlopeHeight` must be less or equal to double `FlangeThickness`
 
 ![CShape (only mandatory properties)](media/ProfilePictures/CShape1.png)
 ![CShape (all properties)](media/ProfilePictures/CShape2.png)
@@ -161,7 +162,8 @@ In addition, such Profiles have a bounding box which is centered at the center o
 - `TopFlangeSlope` (if set):
   - must be greater or equal to zero
   - must be less than ninety degrees
-  - `TopFlangeSlopeHeight` must be less or equal to half `WebEdgeLength`
+  - `TopFlangeSlopeHeight` must be less or equal to `WebEdgeLength`
+  - `TopFlangeSlopeHeight` must be less or equal to double `TopFlangeThickness`
 - `BottomFlangeFilletRadius` (if set):
   - must be greater or equal to zero
   - must be less or equal to half `WebEdgeLength` minus `BottomFlangeSlopeHeight`
@@ -173,7 +175,8 @@ In addition, such Profiles have a bounding box which is centered at the center o
 - `BottomFlangeSlope` (if set):
   - must be greater or equal to zero
   - must be less than ninety degrees
-  - `BottomFlangeSlopeHeight` must be less or equal to half `WebEdgeLength`
+  - `BottomFlangeSlopeHeight` must be less or equal to `WebEdgeLength`
+  - `BottomFlangeSlopeHeight` must be less or equal to double `BottomFlangeThickness`
 
 ![AsymmetricIShape (only mandatory properties)](media/ProfilePictures/AsymmetricIShape1.png)
 ![AsymmetricIShape (all properties)](media/ProfilePictures/AsymmetricIShape2.png)
@@ -204,7 +207,8 @@ In addition, such Profiles have a bounding box which is centered at the center o
 - `FlangeSlope` (if set):
   - must be greater or equal to zero
   - must be less than ninety degrees
-  - `FlangeSlopeHeight` must be less or equal to half `WebEdgeLength`
+  - `FlangeSlopeHeight` must be less or equal to `WebEdgeLength`
+  - `FlangeSlopeHeight` must be less or equal to double `FlangeThickness`
 
 ![IShape (only mandatory properties)](media/ProfilePictures/IShape1.png)
 ![IShape (all properties)](media/ProfilePictures/IShape2.png)
@@ -236,7 +240,8 @@ In addition, such Profiles have a bounding box which is centered at the center o
 - `FlangeSlope` (if set):
   - must be greater or equal to zero
   - must be less than ninety degrees
-  - `FlangeSlopeHeight` must be less or equal to half `WebEdgeLength`
+  - `FlangeSlopeHeight` must be less or equal to `WebEdgeLength`
+  - `FlangeSlopeHeight` must be less or equal to double `FlangeThickness`
 - `WebEdgeRadius` (if set):
   - must be greater or equal to zero
   - must be less or equal to half `WebEdgeLength`
@@ -244,7 +249,8 @@ In addition, such Profiles have a bounding box which is centered at the center o
 - `WebSlope` (if set):
   - must be greater or equal to zero
   - must be less than ninety degrees
-  - `WebSlopeHeight` must be less or equal to half `FlangeInnerEdgeLength`
+  - `WebSlopeHeight` must be less or equal to `FlangeInnerEdgeLength`
+  - `WebSlopeHeight` must be less or equal to `WebThickness`
 
 ![TShape (only mandatory properties)](media/ProfilePictures/TShape1.png)
 ![TShape (all properties)](media/ProfilePictures/TShape2.png)
@@ -275,8 +281,10 @@ In addition, such Profiles have a bounding box which is centered at the center o
 - `LegSlope` (if set):
   - must be greater or equal to zero
   - must be less than ninety degrees
-  - `HorizontalLegSlopeHeight` must be less or equal to half `VerticalLegInnerEdgeLength`
-  - `VerticalLegSlopeHeight` must be less or equal to half `HorizontalLegInnerEdgeLength`
+  - `HorizontalLegSlopeHeight` must be less or equal to `VerticalLegInnerEdgeLength`
+  - `VerticalLegSlopeHeight` must be less or equal to `HorizontalLegInnerEdgeLength`
+  - `HorizontalLegSlopeHeight` must be less or equal to double `Thickness`
+  - `VerticalLegSlopeHeight` must be less or equal to double `Thickness`
 
 ![LShape (only mandatory properties)](media/ProfilePictures/LShape1.png)
 ![LShape (all properties)](media/ProfilePictures/LShape2.png)
@@ -313,7 +321,8 @@ In addition, such Profiles have a bounding box which is centered at the center o
 - `FlangeSlope` (if set):
   - must be greater or equal to zero
   - must be less than ninety degrees
-  - `FlangeSlopeHeight` must be less or equal to half `WebOuterFaceLength`
+  - `FlangeSlopeHeight` must be less or equal to `WebOuterFaceLength`
+  - `FlangeSlopeHeight` must be less or equal to double `FlangeThickness`
 - `WebEdgeRadius` (if set):
   - must be greater or equal to zero
   - must be less or equal to half `WebThickness`
@@ -321,7 +330,8 @@ In addition, such Profiles have a bounding box which is centered at the center o
 - `WebSlope` (if set):
   - must be greater or equal to zero
   - must be less than ninety degrees
-  - `WebOuterSlopeHeight` must be less or equal to half `FlangeInnerFaceLength`
+  - `WebOuterSlopeHeight` must be less or equal to `FlangeInnerFaceLength`
+  - `WebOuterSlopeHeight` must be less or equal to `WebThickness`
   - `WebInnerSlopeHeight` must be less or equal to half `WebSpacing`
 
 ![TTShape (only mandatory properties)](media/ProfilePictures/TTShape1.png)
@@ -373,7 +383,8 @@ In addition, such Profiles have a bounding box which is centered at the center o
 - `FlangeSlope` (if set):
   - must be greater or equal to zero
   - must be less than ninety degrees
-  - `FlangeSlopeHeight` must be less or equal to half `WebEdgeLength`
+  - `FlangeSlopeHeight` must be less or equal to `WebEdgeLength`
+  - `FlangeSlopeHeight` must be less or equal to double `FlangeThickness`
 
 ![ZShape (only mandatory properties)](media/ProfilePictures/ZShape2.png)
 ![ZShape (all properties)](media/ProfilePictures/ZShape1.png)
