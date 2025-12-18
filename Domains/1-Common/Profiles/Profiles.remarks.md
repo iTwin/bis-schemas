@@ -293,8 +293,8 @@ In addition, such Profiles have a bounding box which is centered at the center o
 **Derivative properties:**
 - `FlangeInnerFaceLength` = (`FlangeWidth` - 2 * `WebThickness` - `WebSpacing`) / 2
 - `FlangeSlopeHeight` = `FlangeInnerFaceLength` * Tan(`FlangeSlope`)
-- `WebOuterFaceLength` = `Depth` - `FlangeThickness`
-- `WebInnerFaceLength` = `WebOuterFaceLength` - `FlangeSlopeHeight`
+- `WebOuterFaceLength` = `Depth` - `FlangeThickness` + `FlangeSlopeHeight` / 2
+- `WebInnerFaceLength` = `Depth` - `FlangeThickness` - `FlangeSlopeHeight` / 2
 - `WebOuterSlopeHeight` = `WebOuterFaceLength` * Tan(`WebSlope`)
 - `WebInnerSlopeHeight` = `WebInnerFaceLength` * Tan(`WebSlope`)
 
@@ -332,7 +332,7 @@ In addition, such Profiles have a bounding box which is centered at the center o
   - must be less than ninety degrees
   - `WebOuterSlopeHeight` must be less or equal to `FlangeInnerFaceLength`
   - `WebOuterSlopeHeight` must be less or equal to `WebThickness`
-  - `WebInnerSlopeHeight` must be less or equal to half `WebSpacing`
+  - `WebInnerSlopeHeight` must be less or equal to `WebSpacing`
 
 ![TTShape (only mandatory properties)](media/ProfilePictures/TTShape1.png)
 ![TTShape (all properties)](media/ProfilePictures/TTShape2.png)
