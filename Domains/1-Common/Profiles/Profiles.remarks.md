@@ -203,7 +203,7 @@ In addition, such Profiles have a bounding box which is centered at the center o
 - `FlangeEdgeRadius` (if set):
   - must be greater or equal to zero
   - must be less or equal to half `FlangeInnerEdgeLength`
-  - must be less or equal
+  - must be less or equal to `FlangeThickness`
 - `FlangeSlope` (if set):
   - must be greater or equal to zero
   - must be less than ninety degrees
