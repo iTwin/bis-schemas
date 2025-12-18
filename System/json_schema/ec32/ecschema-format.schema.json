@@ -1,0 +1,98 @@
+{
+  "$schema": "http://json-schema.org/draft-06/schema#",
+  "$id": "https://dev.bentley.com/json_schemas/ec/32/format",
+  "title": "Format",
+  "description": "An EC3.2 Json representation of a Format SchemaItem",
+  "type": "object",
+  "required": ["precision", "type"],
+  "allOf": [
+    { "$ref": "https://dev.bentley.com/json_schemas/ec/32/schemaitem#/definitions/schemaItemProperties" },
+    {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["decimal", "fractional", "station", "scientific"]
+        },
+        "precision": {
+          "type": "number",
+          "// TODO Update pattern": ""
+        },
+        "roundFactor": {
+          "type": "number"
+        },
+        "minWidth": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "showSignOption": {
+          "type": "string",
+          "enum": ["noSign", "onlyNegative", "signAlways", "negativeParentheses"]
+        },
+        "formatTraits": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "(trailZeroes|keepSingleZero|zeroEmpty|keepDecimalPoint|applyRounding|fractionDash|showUnitLabel|prependUnitLabel|use1000Separator|exponentOnlyNegative|[,|;])+"
+            },
+            {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "enum": ["trailZeroes", "keepSingleZero", "zeroEmpty", "keepDecimalPoint", "applyRounding", "fractionDash", "showUnitLabel", "prependUnitLabel", "use1000Separator", "exponentOnlyNegative"]
+              }
+            }
+          ]
+        },
+        "decimalSeparator": {
+          "type": "string",
+          "maxLength": 1
+        },
+        "thousandSeparator": {
+          "type": "string",
+          "maxLength": 1
+        },
+        "uomSeparator": {
+          "type": "string",
+          "maxLength": 1
+        },
+        "scientificType": {
+          "type": "string",
+          "enum": ["normalized", "zeroNormalized"]
+        },
+        "stationOffsetSize": {
+          "type": "number",
+          "minimum": 0
+        },
+        "stationSeparator": {
+          "type": "string",
+          "maxLength": 1
+        },
+        "composite": {
+          "type": "object",
+          "properties": {
+            "spacer": {
+              "type": "string"
+            },
+            "includeZero": {
+              "type": "boolean"
+            },
+            "units": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 4,
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": { "$ref": "https://dev.bentley.com/json_schemas/ec/32/schemaitem#/definitions/ecname" },
+                  "label": { "type": "string" }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}
