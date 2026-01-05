@@ -262,6 +262,8 @@ In addition, such Profiles have a bounding box which is centered at the center o
 - `VerticalLegInnerEdgeLength` = `Depth` - `Thickness`
 - `VerticalLegSlopeHeight` = `VerticalLegInnerEdgeLength` * Tan(`LegSlope`)
 
+Note that `EdgeRadius` can be bigger than thickness.
+
 **Constraints:**
 - `Width` must be greater than zero
 - `Depth` must be greater than zero
@@ -275,7 +277,6 @@ In addition, such Profiles have a bounding box which is centered at the center o
   - must be less or equal to half `VerticalLegInnerEdgeLength` minus `HorizontalLegSlopeHeight`
 - `EdgeRadius` (if set):
   - must be greater or equal to zero
-  - must be less or equal to `Thickness`
   - must be less or equal to half `HorizontalLegInnerEdgeLength` minus `VerticalLegSlopeHeight`
   - must be less or equal to half `VerticalLegInnerEdgeLength` minus `HorizontalLegSlopeHeight`
 - `LegSlope` (if set):
@@ -338,6 +339,9 @@ In addition, such Profiles have a bounding box which is centered at the center o
 ![TTShape (all properties)](media/ProfilePictures/TTShape2.png)
 
 ### SchifflerizedLShapeProfile
+
+Note that `EdgeRadius` can be bigger than thickness.
+
 **Constraints:**
 - `LegLength` must be greater than zero
 - `Thickness`
@@ -351,7 +355,6 @@ In addition, such Profiles have a bounding box which is centered at the center o
   - must be less or equal to `LegBendOffset` minus `Thickness`
 - `EdgeRadius` (if set):
   - must be greater or equal to zero
-  - must be less or equal to `Thickness`
   - must be less or equal to `LegLength` minus `LegBendOffset` minus `Thickness` multiplied by the tangent of fifteen degrees
 
 ![Schifflerized (only mandatory properties)](media/ProfilePictures/Schifflerized1.png)
