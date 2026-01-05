@@ -435,6 +435,9 @@ Note that deletion of the referenced [SinglePerimeterProfile](#singleperimeterpr
 ### CenterLineZShapeProfile
 **Constraints:**
 - `FlangeWidth` must be greater than zero
+- `BottomFlangeWidth` (if set):
+  - must be greater than zero
+  - must be greater than half `Girth` plus `WallThickness`
 - `Depth` must be greater than zero
 - `WallThickness`
   - must be greater than zero
@@ -450,6 +453,10 @@ Note that deletion of the referenced [SinglePerimeterProfile](#singleperimeterpr
     - must be less or equal to `FlangeWidth` minus `WallThickness`
 - `Girth` (if set):
   - must be greater than `WallThickness`
+- `Girth Slope` (if set):
+  - must have `Girth` set
+  - must be greater or equal to zero
+  - must be less than ninety degrees
 
 ![CenterLineZShape (only mandatory properties)](media/ProfilePictures/CenterZShape1.png)
 ![CenterLineZShape (all properties)](media/ProfilePictures/CenterZShape2.png)
