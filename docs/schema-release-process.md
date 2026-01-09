@@ -4,10 +4,10 @@
 
 BIS Schemas can be consumed via automatically published npm packages which is the best option for Typescript based software.
 
-### New Released Version Schemas
+### Released Schemas
 
-- A new npm package is created when a new version of a schema is added to the "Released" directory and meets the release criteria
-  - Creates the npm package and publish them
+- A new npm package version is published as part of a PR when a new version of a schema is added to the "Released" directory and meets the release criteria
+  - See the [Contributing section](../README.md/#contributing) for details on the release process and criteria
 - The version of the npm package will be the exact version of the schema.
   - A project that consumes a schema package will automatically update to the latest version compatible with the version tag they list in their package.json
     - Note: With the correct syntax for adding dependencies this can match how schemas versions are added to an iModel.
