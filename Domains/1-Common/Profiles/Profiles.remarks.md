@@ -438,9 +438,28 @@ Note that deletion of the referenced [SinglePerimeterProfile](#singleperimeterpr
 ### CenterLineZShapeProfile
 **Constraints:**
 - `FlangeWidth` must be greater than zero
-- `BottomFlangeWidth` (if set):
+- `Depth` must be greater than zero
+- `WallThickness`
   - must be greater than zero
-  - must be greater than half `Girth` plus `WallThickness`
+  - must be less than half `Width`
+  - must be less than half `Depth`
+- `FilletRadius` (if set):
+  - must be greater or equal to zero
+  - must be less or equal to half `Depth` minus `WallThickness`
+  - if `Girth` is set:
+    - must be less or equal to half `FlangeWidth` minus `WallThickness`
+    - must be less or equal to `Girth` minus `WallThickness`
+  - if `Girth` is not set:
+    - must be less or equal to `FlangeWidth` minus `WallThickness`
+- `Girth` (if set):
+  - must be greater than `WallThickness`
+
+![CenterLineZShape (only mandatory properties)](media/ProfilePictures/CenterZShape1.png)
+![CenterLineZShape (all properties)](media/ProfilePictures/CenterZShape2.png)
+
+### AsymmetricCenterlineZShapeProfile
+- `TopFlangeWidth` must be greater than zero
+- `BottomFlangeWidth` must be greater than zero
 - `Depth` must be greater than zero
 - `WallThickness`
   - must be greater than zero
@@ -457,12 +476,10 @@ Note that deletion of the referenced [SinglePerimeterProfile](#singleperimeterpr
 - `Girth` (if set):
   - must be greater than `WallThickness`
 - `Girth Slope` (if set):
-  - must have `Girth` set
-  - must be greater or equal to zero
-  - must be less than ninety degrees
+  - must be greater than zero
+  - must be less than or equal to ninety degrees
 
-![CenterLineZShape (only mandatory properties)](media/ProfilePictures/CenterZShape1.png)
-![CenterLineZShape (all properties)](media/ProfilePictures/CenterZShape2.png)
+![AsymmetricCenterZShape (all properties)](media/ProfilePictures/AsymmetricCenterZShape.png)
 
 ### BentPlateProfile
 **Derivative properties:**
