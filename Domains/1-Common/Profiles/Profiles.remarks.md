@@ -458,12 +458,13 @@ Note that deletion of the referenced [SinglePerimeterProfile](#singleperimeterpr
 ![CenterLineZShape (all properties)](media/ProfilePictures/CenterZShape2.png)
 
 ### AsymmetricCenterlineZShapeProfile
+**Constraints:**
 - `TopFlangeWidth` must be greater than zero
 - `BottomFlangeWidth` must be greater than zero
 - `Depth` must be greater than zero
 - `WallThickness`
   - must be greater than zero
-  - must be less than half `Width`
+  - must be less than half `TopFlangeWidth` and less than half `BottomFlangeWidth`
   - must be less than half `Depth`
 - `FilletRadius` (if set):
   - must be greater or equal to zero
