@@ -465,22 +465,25 @@ Note that deletion of the referenced [SinglePerimeterProfile](#singleperimeterpr
 - `Depth` must be greater than zero
 - `WallThickness`
   - must be greater than zero
-  - must be less than half `TopFlangeWidth` and less than half `BottomFlangeWidth`
+  - must be less than half `TopFlangeWidth`
+  - must be less than half `BottomFlangeWidth`
   - must be less than half `Depth`
 - `FilletRadius` (if set):
   - must be greater or equal to zero
   - must be less or equal to half `Depth` minus `WallThickness`
   - if `Girth` is set:
-    - must be less or equal to half `FlangeWidth` minus `WallThickness`
+    - must be less or equal to half `TopFlangeWidth` minus `WallThickness`
+    - must be less or equal to half `BottomFlangeWidth` minus `WallThickness`
     - must be less or equal to `Girth` minus `WallThickness`
   - if `Girth` is not set:
-    - must be less or equal to `FlangeWidth` minus `WallThickness`
+    - must be less or equal to `TopFlangeWidth` minus `WallThickness`
+    - must be less or equal to `BottomFlangeWidth` minus `WallThickness`
 - `Girth` (if set):
   - must be greater than zero
   - must be greater than `WallThickness`
 - `Girth Slope` (if set):
   - `Girth` must be set
-  - must be less than or equal to ninety degrees
+  - must be greater than zero and less than or equal to ninety degrees
 
 ![AsymmetricCenterZShape (all properties)](media/ProfilePictures/AsymmetricCenterZShape.png)
 
