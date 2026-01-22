@@ -479,7 +479,7 @@ Note that deletion of the referenced [SinglePerimeterProfile](#singleperimeterpr
   - must be greater than zero
   - must be greater than `WallThickness`
 - `Girth Slope` (if set):
-  - must be greater than zero
+  - `Girth` must be set
   - must be less than or equal to ninety degrees
 
 ![AsymmetricCenterZShape (all properties)](media/ProfilePictures/AsymmetricCenterZShape.png)
