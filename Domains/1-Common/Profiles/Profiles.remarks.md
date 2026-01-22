@@ -452,6 +452,7 @@ Note that deletion of the referenced [SinglePerimeterProfile](#singleperimeterpr
   - if `Girth` is not set:
     - must be less or equal to `FlangeWidth` minus `WallThickness`
 - `Girth` (if set):
+  - must be greater than zero
   - must be greater than `WallThickness`
 
 ![CenterLineZShape (only mandatory properties)](media/ProfilePictures/CenterZShape1.png)
@@ -475,6 +476,7 @@ Note that deletion of the referenced [SinglePerimeterProfile](#singleperimeterpr
   - if `Girth` is not set:
     - must be less or equal to `FlangeWidth` minus `WallThickness`
 - `Girth` (if set):
+  - must be greater than zero
   - must be greater than `WallThickness`
 - `Girth Slope` (if set):
   - must be greater than zero
