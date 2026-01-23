@@ -438,9 +438,6 @@ Note that deletion of the referenced [SinglePerimeterProfile](#singleperimeterpr
 ### CenterLineZShapeProfile
 **Constraints:**
 - `FlangeWidth` must be greater than zero
-- `BottomFlangeWidth` (if set):
-  - must be greater than zero
-  - must be greater than half `Girth` plus `WallThickness`
 - `Depth` must be greater than zero
 - `WallThickness`
   - must be greater than zero
@@ -455,14 +452,40 @@ Note that deletion of the referenced [SinglePerimeterProfile](#singleperimeterpr
   - if `Girth` is not set:
     - must be less or equal to `FlangeWidth` minus `WallThickness`
 - `Girth` (if set):
+  - must be greater than zero
   - must be greater than `WallThickness`
-- `Girth Slope` (if set):
-  - must have `Girth` set
-  - must be greater or equal to zero
-  - must be less than ninety degrees
 
 ![CenterLineZShape (only mandatory properties)](media/ProfilePictures/CenterZShape1.png)
 ![CenterLineZShape (all properties)](media/ProfilePictures/CenterZShape2.png)
+
+### AsymmetricCenterlineZShapeProfile
+**Constraints:**
+- `TopFlangeWidth` must be greater than zero
+- `BottomFlangeWidth` must be greater than zero
+- `Depth` must be greater than zero
+- `WallThickness`
+  - must be greater than zero
+  - must be less than half `TopFlangeWidth`
+  - must be less than half `BottomFlangeWidth`
+  - must be less than half `Depth`
+- `FilletRadius` (if set):
+  - must be greater or equal to zero
+  - must be less or equal to half `Depth` minus `WallThickness`
+  - if `Girth` is set:
+    - must be less or equal to half `TopFlangeWidth` minus `WallThickness`
+    - must be less or equal to half `BottomFlangeWidth` minus `WallThickness`
+    - must be less or equal to `Girth` minus `WallThickness`
+  - if `Girth` is not set:
+    - must be less or equal to `TopFlangeWidth` minus `WallThickness`
+    - must be less or equal to `BottomFlangeWidth` minus `WallThickness`
+- `Girth` (if set):
+  - must be greater than zero
+  - must be greater than `WallThickness`
+- `Girth Slope` (if set):
+  - `Girth` must be set
+  - must be greater than zero and less than or equal to ninety degrees
+
+![AsymmetricCenterZShape (all properties)](media/ProfilePictures/AsymmetricCenterZShape.png)
 
 ### BentPlateProfile
 **Derivative properties:**
