@@ -15,7 +15,7 @@ Due to the importance of IFC in coordinating spatial structure, the classes in t
 
 A `Building` represents a structure that provides shelter for its occupants or contents and stands in one place. The building is also used to provide a basic element within the spatial structure hierarchy for the components of a building project (together with site, story, and space).
 
-<!-- add notes about usage here. Placement in models. Parent-child issues; ElementAspects, key relationships. --->
+<!-- add notes about usage here. Placement in models. Parent-child issues; ElementAspectPs, key relationships. --->
 A `Building` is typically aggregated by a `Site`. A `Building` may also compose a `Site`. Decomposes into `Story` or `Space` elements.
 
 Equivalent to [IfcBuilding](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcBuilding.htm) with CompositionType == ELEMENT.
@@ -30,6 +30,11 @@ The `Space` is used to build the spatial structure of a building (that serves as
 A `Space` is typically aggregated by a `Story` or another `Space`. `Space` elements compose stories and other spaces, and they may also decompose into spaces.
 
 Equivalent to [IfcSpace](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcSpace.htm) with CompositionType != COMPLEX.
+
+
+#### Space Occupancy
+
+A `Space` can have its occupancy requirements defined within `SpaceOccupancyAspect`. The aspect will typically be assigned to `Spacetype` if one is modeled for a space, In cases where `Space` does not have `SpaceType` assigned, the `SpaceOccupancyAspect` can be related directly.
 
 ### Story
 
