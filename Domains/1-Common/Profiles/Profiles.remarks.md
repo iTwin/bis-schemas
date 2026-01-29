@@ -419,8 +419,8 @@ Note that `EdgeRadius` can be bigger than thickness.
   - must be greater or equal to zero
   - must be less or equal to `FlangeInnerEdgeWidth`
 
-![ZShape (only mandatory properties)](media/ProfilePictures/ZShape2.png)
-![ZShape (all properties)](media/ProfilePictures/ZShape1.png)
+![ZShape (only mandatory properties)](media/ProfilePictures/ZShape1.png)
+![ZShape (all properties)](media/ProfilePictures/ZShape2.png)
 
 ### DerivedProfile
 [SinglePerimeterProfile](#singleperimeterprofile) that is based on another [SinglePerimeterProfile](#singleperimeterprofile) with applied standard transformations (scale, rotation, translation, mirror). This [Profile](#profile) is defined for compatibility reasons with [IFC](#https://standards.buildingsmart.org/IFC/RELEASE/IFC4/FINAL/HTML/) and its **usage is not recommended**.
