@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ==================================================================================
+|  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
+|  * See LICENSE.md in the project root for license terms and full copyright notice.
+======================================================================================= -->
+<ECSchema schemaName="PipeNetworkHydraulicAnalysis" alias="pipeNetAnlyt" version="01.00.01"
+    xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" displayLabel="Pipe Network Hydraulic Analysis" description="Pipe Network Hydraulic Analysis Schema.">
+    <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA" />
+    <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
+    <ECSchemaReference name="BisCore" version="01.00.10" alias="bis" />
+    <ECSchemaReference name="Analytical" version="01.00.01" alias="anlyt" />
+    <ECSchemaReference name="AecUnits" version="01.00.03" alias="AECU"/>
+    <ECSchemaReference name="CivilUnits" version="01.00.00" alias="cvu"/>
+    <ECSchemaReference name="PipeworkPhysical" version="01.00.00" alias="pipphys"/>
+
+    <ECCustomAttributes>
+        <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
+            <SupportedUse>FieldTesting</SupportedUse>
+        </ProductionStatus>
+        <SchemaLayerInfo xmlns="BisCustomAttributes.01.00.00">
+            <Value>DisciplineOther</Value>
+        </SchemaLayerInfo>
+    </ECCustomAttributes>
+
+    <ECEntityClass typeName="HydraulicElementDesignAspect" displayLabel="HydraulicElementDesignAspect">
+        <BaseClass >bis:ElementUniqueAspect</BaseClass>
+        <ECProperty propertyName="IsAvailableForDesign" typeName="boolean" displayLabel="Is Available for Design" description="If true then the hydraulic element will be available for inclusion in the design algorithm."/>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="PipeElementTypeOwnsDesignAspect" strength="embedding" modifier="Sealed">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="pipphys:PipeElementType"/>
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="owned by" polymorphic="false">
+            <Class class="HydraulicElementDesignAspect"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="HydraulicMaterialAspect" modifier="Sealed" displayLabel="Hydraulic Material Aspect">
+        <BaseClass >bis:ElementUniqueAspect</BaseClass>
+        <ECProperty propertyName="ManningsN" typeName="double" kindOfQuantity="cvu:MANNINGS_N" displayLabel="Manning's n"/>
+        <ECProperty propertyName="KuttersN" typeName="double" kindOfQuantity="cvu:MANNINGS_N" displayLabel="Kutter's n"/>
+        <ECProperty propertyName="HazenWilliamsC" typeName="double" kindOfQuantity="cvu:HAZEN_WILLIAMS_C" displayLabel="Hazen-William's C"/>
+        <ECProperty propertyName="DarcyWeisbachRoughnessHeight" typeName="double" kindOfQuantity="cvu:LENGTH_SHORT" displayLabel="Darcy-Weisbach Roughness Height"/>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="PhysicalMaterialOwnsHydraulicMaterialAspect" strength="embedding" modifier="Sealed">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:PhysicalMaterial"/>
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="owned by" polymorphic="false">
+            <Class class="HydraulicMaterialAspect"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="PipeElementTypeOwnsHydraulicMaterialAspect" strength="embedding" modifier="Sealed">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="pipphys:PipeElementType"/>
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="owned by" polymorphic="false">
+            <Class class="HydraulicMaterialAspect"/>
+        </Target>
+    </ECRelationshipClass>
+
+
+</ECSchema>

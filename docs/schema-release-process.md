@@ -4,12 +4,12 @@
 
 BIS Schemas can be consumed via automatically published npm packages which is the best option for Typescript based software.
 
-### New Released Version Schemas
+### Released Schemas
 
-- A new npm package is created when a new version of a schema is added to the "Released" directory and meets the release criteria
-  - Creates the npm package and publish them
+- A new npm package version is published as part of a PR when a new version of a schema is added to the "Released" directory and meets the release criteria
+  - See the [Contributing section](../README.md/#contributing) for details on the release process and criteria
 - The version of the npm package will be the exact version of the schema.
-  - A project that consumes a schema package will automatically update to the lastest version compatible with the version tag they list in their package.json
+  - A project that consumes a schema package will automatically update to the latest version compatible with the version tag they list in their package.json
     - Note: With the correct syntax for adding dependencies this can match how schemas versions are added to an iModel.
 
 ### Non-released/pre-release Schemas
@@ -33,6 +33,7 @@ Pre-release schemas can be new versions of a schema that are still undergoing te
 The npm packages published will not have any dependencies, it will be up to the consumer to pull in all required schemas.
 
 ### Excluding a package from being published
+
 Within the tools/packages folder in the BIS-SCHEMA repository is the publishBlacklist.json file. This file is parsed automatically by the publishing scripts. The contents are parsed as a JSON array of objects that have a 'name' and 'version' property. Use a '*' as the version value to exclude all versions of a schema. Simply add a new entry to the collection to exclude a schema.
 
 Example:
