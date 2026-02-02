@@ -99,9 +99,9 @@ In addition, such Profiles have a bounding box which is centered at the center o
 
 ### CShapeProfile
 **Derivative properties:**
-- `FlangeInnerEdgeLength` = `FlangeWidth` - `WebThickness`
-- `FlangeSlopeHeight` = `FlangeInnerEdgeLength` * Tan(`FlangeSlope`)
-- `WebInnerEdgeLength` = `Depth` - `FlangeThickness` * 2
+- `FlangeInnerEdgeWidth` = `FlangeWidth` - `WebThickness`
+- `ThicknessAtToe` = `FlangeThickness` - `FlangeThicknessDistance` * Tan(`FlangeSlope`)
+- `WebInnerEdgeLength` = `Depth` - `FlangeThickness` * 2 - (`FlangeInnerEdgeWidth` - `FlangeThicknessDistance`) * Tan(`FlangeSlope`) * 2
 
 **Constraints:**
 - `FlangeWidth` must be greater than zero
@@ -114,27 +114,31 @@ In addition, such Profiles have a bounding box which is centered at the center o
   - must be less than `FlangeWidth`
 - `FilletRadius` (if set):
   - must be greater or equal to zero
-  - must be less or equal to half of `FlangeInnerEdgeLength`
-  - must be less or equal to half of `WebInnerEdgeLength` minus `FlangeSlopeHeight`
+  - must be less or equal to half of `FlangeInnerEdgeWidth`
+  - must be less or equal to half of `WebInnerEdgeLength`
 - `FlangeEdgeRadius` (if set):
   - must be greater or equal to zero
-  - must be less or equal to half of `FlangeInnerEdgeLength`
+  - must be less or equal to half of `FlangeInnerEdgeWidth`
   - must be less or equal to `FlangeThickness`
 - `FlangeSlope` (if set):
   - must be greater or equal to zero
   - must be less than ninety degrees
-  - `FlangeSlopeHeight` must be less or equal to half of `WebInnerEdgeLength`
+  - `WebInnerEdgeLength` must be greater or equal to zero
+  - `ThicknessAtToe` must be greater or equal to zero
+- `FlangeThicknessDistance` (if set):
+  - must be greater or equal to zero
+  - must be less or equal to `FlangeInnerEdgeWidth`
 
 ![CShape (only mandatory properties)](media/ProfilePictures/CShape1.png)
 ![CShape (all properties)](media/ProfilePictures/CShape2.png)
 
 ### AsymmetricIShapeProfile
 **Derivative properties:**
-- `WebEdgeLength` = `Depth` - `TopFlangeThickness` - `BottomFlangeThickness`
-- `TopFlangeInnerEdgeLength` = (`TopFlangeWidth` - `WebThickness`) / 2
-- `BottomFlangeInnerEdgeLength` = (`BottomFlangeWidth` - `WebThickness`) / 2
-- `TopFlangeSlopeHeight` = `TopFlangeInnerEdgeLength` * Tan(`TopFlangeSlope`)
-- `BottomFlangeSlopeHeight` = `BottomFlangeInnerEdgeLength` * Tan(`BottomFlangeSlope`)
+- `WebEdgeLength` = `Depth` - `TopFlangeThickness` - (`TopFlangeInnerEdgeWidth` - `TopFlangeThicknessDistance`) * Tan(`TopFlangeSlope`) - `BottomFlangeThickness` - (`BottomFlangeInnerEdgeWidth` - `BottomFlangeThicknessDistance`) * Tan(`BottomFlangeSlope`)
+- `TopFlangeInnerEdgeWidth` = (`TopFlangeWidth` - `WebThickness`) / 2
+- `BottomFlangeInnerEdgeWidth` = (`BottomFlangeWidth` - `WebThickness`) / 2
+- `TopFlangeThicknessAtToe` = `TopFlangeThickness` - `TopFlangeThicknessDistance` * Tan(`TopFlangeSlope`)
+- `BottomFlangeThicknessAtToe` = `BottomFlangeThickness` - `BottomFlangeThicknessDistance` * Tan(`BottomFlangeSlope`)
 
 **Constraints:**
 - `TopFlangeWidth` must be greater than zero
@@ -152,37 +156,45 @@ In addition, such Profiles have a bounding box which is centered at the center o
   - must be less than `BottomFlangeWidth`
 - `TopFlangeFilletRadius` (if set):
   - must be greater or equal to zero
-  - must be less or equal to half `WebEdgeLength` minus `TopFlangeSlopeHeight`
-  - must be less or equal to half `TopFlangeInnerEdgeLength`
+  - must be less or equal to half `WebEdgeLength`
+  - must be less or equal to half `TopFlangeInnerEdgeWidth`
 - `TopFlangeEdgeRadius` (if set):
   - must be greater or equal to zero
-  - must be less or equal to `TopFlangeThickness`
-  - must be less or equal to half `TopFlangeInnerEdgeLength`
+  - must be less or equal to `TopFlangeThicknessAtToe`
+  - must be less or equal to `TopFlangeInnerEdgeWidth`
 - `TopFlangeSlope` (if set):
   - must be greater or equal to zero
   - must be less than ninety degrees
-  - `TopFlangeSlopeHeight` must be less or equal to half `WebEdgeLength`
+  - `WebEdgeLength` must be greater or equal to zero
+  - `TopFlangeThicknessAtToe` must be greater or equal to zero
+- `TopFlangeThicknessDistance` (if set):
+  - must be greater or equal to zero
+  - must be less or equal to `TopFlangeInnerEdgeWidth`
 - `BottomFlangeFilletRadius` (if set):
   - must be greater or equal to zero
-  - must be less or equal to half `WebEdgeLength` minus `BottomFlangeSlopeHeight`
-  - must be less or equal to half `BottomFlangeInnerEdgeLength`
+  - must be less or equal to half `WebEdgeLength`
+  - must be less or equal to half `BottomFlangeInnerEdgeWidth`
 - `BottomFlangeEdgeRadius` (if set):
   - must be greater or equal to zero
-  - must be less or equal to `BottomFlangeThickness`
-  - must be less or equal to half `BottomFlangeInnerEdgeLength`
+  - must be less or equal to `BottomFlangeThicknessAtToe`
+  - must be less or equal to `BottomFlangeInnerEdgeWidth`
 - `BottomFlangeSlope` (if set):
   - must be greater or equal to zero
   - must be less than ninety degrees
-  - `BottomFlangeSlopeHeight` must be less or equal to half `WebEdgeLength`
+  - `WebEdgeLength` must be greater or equal to zero
+  - `BottomFlangeThicknessAtToe` must be greater or equal to zero
+- `BottomFlangeThicknessDistance` (if set):
+  - must be greater or equal to zero
+  - must be less or equal to `BottomFlangeInnerEdgeWidth`
 
 ![AsymmetricIShape (only mandatory properties)](media/ProfilePictures/AsymmetricIShape1.png)
 ![AsymmetricIShape (all properties)](media/ProfilePictures/AsymmetricIShape2.png)
 
 ### IShapeProfile
 **Derivative properties:**
-- `FlangeInnerEdgeLength` = (`FlangeWidth` - `WebThickness`) / 2
-- `FlangeSlopeHeight` = `FlangeInnerEdgeLength` * Tan(`FlangeSlope`)
-- `WebEdgeLength` = `Depth` - `FlangeThickness` * 2
+- `FlangeInnerEdgeWidth` = (`FlangeWidth` - `WebThickness`) / 2
+- `WebEdgeLength` = `Depth` - `FlangeThickness` * 2 - (`FlangeInnerEdgeWidth` - `FlangeThicknessDistance`) * Tan(`TopFlangeSlope`) * 2
+- `FlangeThicknessAtToe` = `FlangeThickness` - `FlangeThicknessDistance` * Tan(`TopFlangeSlope`)
 
 **Constraints:**
 - `FlangeWidth` must be greater than zero
@@ -195,26 +207,31 @@ In addition, such Profiles have a bounding box which is centered at the center o
   - must be less than `FlangeWidth`
 - `FilletRadius` (if set):
   - must be greater or equal to zero
-  - must be less or equal to half `FlangeInnerEdgeLength`
-  - must be less or equal to half `WebEdgeLength` minus `FlangeSlopeHeight`
+  - must be less or equal to half `FlangeInnerEdgeWidth`
+  - must be less or equal to half `WebEdgeLength`
 - `FlangeEdgeRadius` (if set):
   - must be greater or equal to zero
-  - must be less or equal to half `FlangeInnerEdgeLength`
-  - must be less or equal
+  - must be less or equal to half `FlangeInnerEdgeWidth`
+  - must be less or equal to `FlangeThickness`
 - `FlangeSlope` (if set):
   - must be greater or equal to zero
   - must be less than ninety degrees
-  - `FlangeSlopeHeight` must be less or equal to half `WebEdgeLength`
+  - `WebEdgeLength` must be greater or equal to zero
+  - `FlangeThicknessAtToe` must be greater or equal to zero
+- `FlangeThicknessDistance` (if set):
+  - must be greater or equal to zero
+  - must be less or equal to `FlangeInnerEdgeWidth`
 
 ![IShape (only mandatory properties)](media/ProfilePictures/IShape1.png)
 ![IShape (all properties)](media/ProfilePictures/IShape2.png)
 
 ### TShapeProfile
 **Derivative properties:**
-- `FlangeInnerEdgeLength` = (`FlangeWidth` - `WebThickness`) / 2
-- `FlangeSlopeHeight` = `FlangeInnerEdgeLength` * Tan(`FlangeSlope`)
-- `WebEdgeLength` = `Depth` - `FlangeThickness`
-- `WebSlopeHeight` = `WebEdgeLength` * Tan(`WebSlope`)
+- `FlangeInnerEdgeWidth` = (`FlangeWidth` - `WebThickness`) / 2
+- `FlangeThicknessAtToe` = `FlangeThickness` - `FlangeThicknessDistance` * Tan(`FlangeSlope`)
+- `WebEdgeWidth` = `Depth` - `FlangeThickness` - (`FlangeInnerEdgeWidth` - `FlangeThicknessDistance`) * Tan(`FlangeSlope`)
+- `WebSlopeHeight` = `WebEdgeWidth` * Tan(`WebSlope`)
+- `WebThicknessAtToe` = `WebThickness` - `WebThicknessDistance` * Tan(`WebSlope`) * 2
 
 **Constraints:**
 - `FlangeWidth` must be greater than zero
@@ -227,24 +244,32 @@ In addition, such Profiles have a bounding box which is centered at the center o
   - must be less than `FlangeWidth`
 - `FilletRadius` (if set):
   - must be greater or equal to zero
-  - must be less or equal to half `FlangeInnerEdgeLength` minus `WebSlopeHeight`
-  - must be less or equal to half `WebEdgeLength` minus `FlangeSlopeHeight`
+  - must be less or equal to half `FlangeInnerEdgeWidth` minus `WebSlopeHeight`
+  - must be less or equal to half `WebEdgeWidth`
 - `FlangeEdgeRadius`
   - must be greater or equal to zero
-  - must be less or equal to half `FlangeInnerEdgeLength`
-  - must be less or equal to `FlangeThickness`
+  - must be less or equal to half `FlangeInnerEdgeWidth`
+  - must be less or equal to `FlangeThicknessAtToe`
 - `FlangeSlope` (if set):
   - must be greater or equal to zero
   - must be less than ninety degrees
-  - `FlangeSlopeHeight` must be less or equal to half `WebEdgeLength`
+  - `WebEdgeWidth` must be greater or equal to zero
+  - `FlangeThicknessAtToe` must be greater or equal to zero
+- `FlangeThicknessDistance` (if set):
+  - must be greater or equal to zero
+  - must be less or equal to `FlangeInnerEdgeWidth`
 - `WebEdgeRadius` (if set):
   - must be greater or equal to zero
-  - must be less or equal to half `WebEdgeLength`
-  - must be less or equal to half `WebThickness`
+  - must be less or equal to half `WebEdgeWidth`
+  - must be less or equal to half `WebThicknessAtToe`
 - `WebSlope` (if set):
   - must be greater or equal to zero
   - must be less than ninety degrees
-  - `WebSlopeHeight` must be less or equal to half `FlangeInnerEdgeLength`
+  - `WebSlopeHeight` must be less or equal to `FlangeInnerEdgeWidth`
+  - `WebThicknessAtToe` must be greater or equal to zero
+- `WebThicknessDistance` (if set):
+  - must be greater or equal to zero
+  - must be less or equal to `WebEdgeWidth`
 
 ![TShape (only mandatory properties)](media/ProfilePictures/TShape1.png)
 ![TShape (all properties)](media/ProfilePictures/TShape2.png)
@@ -255,6 +280,8 @@ In addition, such Profiles have a bounding box which is centered at the center o
 - `HorizontalLegSlopeHeight` = `HorizontalLegInnerEdgeLength` * Tan(`LegSlope`)
 - `VerticalLegInnerEdgeLength` = `Depth` - `Thickness`
 - `VerticalLegSlopeHeight` = `VerticalLegInnerEdgeLength` * Tan(`LegSlope`)
+
+Note that `EdgeRadius` can be bigger than thickness.
 
 **Constraints:**
 - `Width` must be greater than zero
@@ -269,26 +296,29 @@ In addition, such Profiles have a bounding box which is centered at the center o
   - must be less or equal to half `VerticalLegInnerEdgeLength` minus `HorizontalLegSlopeHeight`
 - `EdgeRadius` (if set):
   - must be greater or equal to zero
-  - must be less or equal to `Thickness`
   - must be less or equal to half `HorizontalLegInnerEdgeLength` minus `VerticalLegSlopeHeight`
   - must be less or equal to half `VerticalLegInnerEdgeLength` minus `HorizontalLegSlopeHeight`
 - `LegSlope` (if set):
   - must be greater or equal to zero
   - must be less than ninety degrees
-  - `HorizontalLegSlopeHeight` must be less or equal to half `VerticalLegInnerEdgeLength`
-  - `VerticalLegSlopeHeight` must be less or equal to half `HorizontalLegInnerEdgeLength`
+  - `HorizontalLegSlopeHeight` must be less or equal to `VerticalLegInnerEdgeLength`
+  - `VerticalLegSlopeHeight` must be less or equal to `HorizontalLegInnerEdgeLength`
+  - `HorizontalLegSlopeHeight` must be less or equal to double `Thickness`
+  - `VerticalLegSlopeHeight` must be less or equal to double `Thickness`
 
 ![LShape (only mandatory properties)](media/ProfilePictures/LShape1.png)
 ![LShape (all properties)](media/ProfilePictures/LShape2.png)
 
 ### TTShapeProfile
 **Derivative properties:**
-- `FlangeInnerFaceLength` = (`FlangeWidth` - 2 * `WebThickness` - `WebSpacing`) / 2
-- `FlangeSlopeHeight` = `FlangeInnerFaceLength` * Tan(`FlangeSlope`)
-- `WebOuterFaceLength` = `Depth` - `FlangeThickness`
-- `WebInnerFaceLength` = `WebOuterFaceLength` - `FlangeSlopeHeight`
-- `WebOuterSlopeHeight` = `WebOuterFaceLength` * Tan(`WebSlope`)
-- `WebInnerSlopeHeight` = `WebInnerFaceLength` * Tan(`WebSlope`)
+- `FlangeInnerFaceWidth` = (`FlangeWidth` - 2 * `WebThickness` - `WebSpacing`) / 2
+- `FlangeSlopeHeight` = `FlangeInnerFaceWidth` * Tan(`FlangeSlope`)
+- `FlangeThicknessAtToe` = `FlangeThickness` - `FlangeThicknessDistance` * Tan(`FlangeSlope`)
+- `WebOuterFaceWidth` = `Depth` - `FlangeThickness` + `FlangeThicknessDistance` * Tan(`FlangeSlope`)
+- `WebInnerFaceWidth` = `Depth` - `FlangeThickness` - (`FlangeThickness` - `FlangeThicknessDistance`) * Tan(`FlangeSlope`)
+- `WebOuterSlopeHeight` = `WebOuterFaceWidth` * Tan(`WebSlope`)
+- `WebInnerSlopeHeight` = `WebInnerFaceWidth` * Tan(`WebSlope`)
+- `WebThicknessAtToe` = `WebThickness` - `WebThicknessDistance` * Tan(`WebSlope`) * 2
 
 **Constraints:**
 - `FlangeWidth` must be greater than zero
@@ -304,30 +334,41 @@ In addition, such Profiles have a bounding box which is centered at the center o
   - must be less than `FlangeWidth` minus two times `WebThickness`
 - `FilletRadius` (if set):
   - must be greater or equal to zero
-  - must be less or equal to half `FlangeInnerFaceLength` minus `WebOuterSlopeHeight`
-  - must be less or equal to half `OuterFaceLength` minus `FlangeSlopeHeight`
+  - must be less or equal to half `FlangeInnerFaceWidth` minus `WebOuterSlopeHeight`
+  - must be less or equal to half `WebOuterFaceWidth` minus `FlangeSlopeHeight`
 - `FlangeEdgeRadius` (if set):
   - must be greater or equal to zero
-  - must be less or equal to `FlangeThickness`
-  - must be less or equal to half `FlangeInnerFaceLength`
+  - must be less or equal to `FlangeThicknessAtToe`
+  - must be less or equal to half `FlangeInnerFaceWidth`
 - `FlangeSlope` (if set):
   - must be greater or equal to zero
   - must be less than ninety degrees
-  - `FlangeSlopeHeight` must be less or equal to half `WebOuterFaceLength`
+  - `FlangeSlopeHeight` must be less or equal to `WebOuterFaceWidth`
+  - `FlangeThicknessAtToe` must be greater or equal to zero
+- `FlangeThicknessDistance` (if set):
+  - must be greater or equal to zero
+  - must be less or equal to `FlangeInnerFaceWidth`
 - `WebEdgeRadius` (if set):
   - must be greater or equal to zero
-  - must be less or equal to half `WebThickness`
-  - must be less or equal to half `WebOuterFaceLength`
+  - must be less or equal to half `WebThicknessAtToe`
+  - must be less or equal to half `WebInnerFaceWidth`
 - `WebSlope` (if set):
   - must be greater or equal to zero
   - must be less than ninety degrees
-  - `WebOuterSlopeHeight` must be less or equal to half `FlangeInnerFaceLength`
-  - `WebInnerSlopeHeight` must be less or equal to half `WebSpacing`
+  - `WebOuterSlopeHeight` must be less or equal to `FlangeInnerFaceWidth`
+  - `WebThicknessAtToe` must be greater or equal to zero
+  - `WebInnerSlopeHeight` must be less or equal to `WebSpacing`
+- `WebThicknessDistance` (if set):
+  - must be greater or equal to zero
+  - must be less or equal to `WebInnerFaceWidth`
 
 ![TTShape (only mandatory properties)](media/ProfilePictures/TTShape1.png)
 ![TTShape (all properties)](media/ProfilePictures/TTShape2.png)
 
 ### SchifflerizedLShapeProfile
+
+Note that `EdgeRadius` can be bigger than thickness.
+
 **Constraints:**
 - `LegLength` must be greater than zero
 - `Thickness`
@@ -341,7 +382,6 @@ In addition, such Profiles have a bounding box which is centered at the center o
   - must be less or equal to `LegBendOffset` minus `Thickness`
 - `EdgeRadius` (if set):
   - must be greater or equal to zero
-  - must be less or equal to `Thickness`
   - must be less or equal to `LegLength` minus `LegBendOffset` minus `Thickness` multiplied by the tangent of fifteen degrees
 
 ![Schifflerized (only mandatory properties)](media/ProfilePictures/Schifflerized1.png)
@@ -349,9 +389,9 @@ In addition, such Profiles have a bounding box which is centered at the center o
 
 ### ZShapeProfile
 **Derivative properties:**
-- `FlangeInnerEdgeLength` = (`FlangeWidth` - `WebThickness`) / 2
-- `FlangeSlopeHeight` = `FlangeInnerEdgeLength` * Tan(`FlangeSlope`)
-- `WebEdgeLength` = `Depth` - `FlangeThickness` * 2
+- `FlangeInnerEdgeWidth` = (`FlangeWidth` - `WebThickness`) / 2
+- `FlangeThicknessAtToe` = `FlangeThickness` - `FlangeThicknessDistance` * Tan(`FlangeSlope`)
+- `WebEdgeLength` = `Depth` - `FlangeThickness` - (`FlangeInnerEdgeWidth` - `FlangeThicknessDistance`) * Tan(`FlangeSlope`)
 
 **Constraints:**
 - `FlangeWidth` must be greater than zero
@@ -364,19 +404,23 @@ In addition, such Profiles have a bounding box which is centered at the center o
   - must be less than `FlangeWith`
 - `FilletRadius` (if set):
   - must be greater or equal to zero
-  - must be less or equal to half `FlangeInnerEdgeLength`
-  - must be less or equal to half `WebEdgeLength` minus `FlangeSlopeHeight`
+  - must be less or equal to half `FlangeInnerEdgeWidth`
+  - must be less or equal to half `WebEdgeLength`
 - `FlangeEdgeRadius` (if set):
   - must be greater or equal to zero
-  - must be less or equal to `FlangeThickness`
-  - must be less or equal to half `FlangeInnerEdgeLength`
+  - must be less or equal to `FlangeThicknessAtToe`
+  - must be less or equal to half `FlangeInnerEdgeWidth`
 - `FlangeSlope` (if set):
   - must be greater or equal to zero
   - must be less than ninety degrees
-  - `FlangeSlopeHeight` must be less or equal to half `WebEdgeLength`
+  - `WebEdgeLength` must be greater or equal to zero
+  - `FlangeThicknessAtToe` must be greater or equal to zero
+- `FlangeThicknessDistance` (if set):
+  - must be greater or equal to zero
+  - must be less or equal to `FlangeInnerEdgeWidth`
 
-![ZShape (only mandatory properties)](media/ProfilePictures/ZShape2.png)
-![ZShape (all properties)](media/ProfilePictures/ZShape1.png)
+![ZShape (only mandatory properties)](media/ProfilePictures/ZShape1.png)
+![ZShape (all properties)](media/ProfilePictures/ZShape2.png)
 
 ### DerivedProfile
 [SinglePerimeterProfile](#singleperimeterprofile) that is based on another [SinglePerimeterProfile](#singleperimeterprofile) with applied standard transformations (scale, rotation, translation, mirror). This [Profile](#profile) is defined for compatibility reasons with [IFC](#https://standards.buildingsmart.org/IFC/RELEASE/IFC4/FINAL/HTML/) and its **usage is not recommended**.
@@ -438,10 +482,40 @@ Note that deletion of the referenced [SinglePerimeterProfile](#singleperimeterpr
   - if `Girth` is not set:
     - must be less or equal to `FlangeWidth` minus `WallThickness`
 - `Girth` (if set):
+  - must be greater than zero
   - must be greater than `WallThickness`
 
 ![CenterLineZShape (only mandatory properties)](media/ProfilePictures/CenterZShape1.png)
 ![CenterLineZShape (all properties)](media/ProfilePictures/CenterZShape2.png)
+
+### AsymmetricCenterlineZShapeProfile
+**Constraints:**
+- `TopFlangeWidth` must be greater than zero
+- `BottomFlangeWidth` must be greater than zero
+- `Depth` must be greater than zero
+- `WallThickness`
+  - must be greater than zero
+  - must be less than half `TopFlangeWidth`
+  - must be less than half `BottomFlangeWidth`
+  - must be less than half `Depth`
+- `FilletRadius` (if set):
+  - must be greater or equal to zero
+  - must be less or equal to half `Depth` minus `WallThickness`
+  - if `Girth` is set:
+    - must be less or equal to half `TopFlangeWidth` minus `WallThickness`
+    - must be less or equal to half `BottomFlangeWidth` minus `WallThickness`
+    - must be less or equal to `Girth` minus `WallThickness`
+  - if `Girth` is not set:
+    - must be less or equal to `TopFlangeWidth` minus `WallThickness`
+    - must be less or equal to `BottomFlangeWidth` minus `WallThickness`
+- `Girth` (if set):
+  - must be greater than zero
+  - must be greater than `WallThickness`
+- `Girth Slope` (if set):
+  - `Girth` must be set
+  - must be greater than zero and less than or equal to ninety degrees
+
+![AsymmetricCenterZShape (all properties)](media/ProfilePictures/AsymmetricCenterZShape.png)
 
 ### BentPlateProfile
 **Derivative properties:**

@@ -112,7 +112,7 @@ async function createRepositoryInventory(bisRootDir) {
   for (const entry of allSchemas) {
     const schemaInfo = {
       name: entry.basename.match(/\w+/)[0], 
-      path: entry.path, 
+      path: entry.path.replace(/\//g, '\\'),
       released: entry.path.includes("Released"), 
       version: entry.basename.match(/\d+\.\d+\.\d+/) ? entry.basename.match(/\d+\.\d+\.\d+/)[0] : ""
     };
@@ -164,7 +164,7 @@ function schemaExistsInInventory(schema, inventorySchemas) {
 
 async function generateSchemaDirectoryLists(schemaDirectory) {
   const filter = { fileFilter: "*.ecschema.xml", directoryFilter: ["!node_modules", "!.vscode"] };
-  const allSchemaDirs = (await readdirp.promise(schemaDirectory, filter)).map((schemaPath) => path.dirname(schemaPath.fullPath));
+  const allSchemaDirs = (await readdirp.promise(schemaDirectory, filter)).map((schemaPath) => path.dirname(schemaPath.fullPath).replace(/\//g, '\\'));
   return Array.from(new Set(allSchemaDirs.filter((schemaDir) => /released/i.test(schemaDir))).keys());
 }
 
@@ -189,7 +189,7 @@ function getInventoryPath() {
 }
 
 function getSchemaVersion(bisRootDir, schemaPath) {
-  const fullPath = path.join(bisRootDir, schemaPath);
+  const fullPath = path.join(bisRootDir, schemaPath).replace(/\\/g, '/');
   const schemaXml = fs.readFileSync(fullPath).toString();
   const versionMatch = schemaXml.match(/<ECSchema .*version="(?<read>\d+)\.(?<write>\d+)(\.(?<patch>\d+))?/);
   if (!versionMatch || !versionMatch.groups.read || !versionMatch.groups.write) {

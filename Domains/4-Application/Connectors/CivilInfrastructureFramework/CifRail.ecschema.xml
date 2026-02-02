@@ -3,7 +3,7 @@
 |  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
 |  * See LICENSE.md in the project root for license terms and full copyright notice.
 ======================================================================================= -->
-<ECSchema schemaName="CifRail" alias="cifrl" version="01.00.11" description="iModel Connector schema containing aspect classes with properties from OpenRail Designer." xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
+<ECSchema schemaName="CifRail" alias="cifrl" version="01.00.13" description="iModel Connector schema containing aspect classes with properties from OpenRail Designer." xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
     <ECSchemaReference name="BisCore" version="01.00.16" alias="bis"/>
     <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
     <ECSchemaReference name="CifCommon" version="01.00.10" alias="cifcmn"/>
@@ -33,6 +33,48 @@
     <ECEnumeration typeName="CableAspect_Cable_ShowCable_BoolEnum" backingTypeName="int" isStrict="true">
         <ECEnumerator name="True" value="1" displayLabel="Yes"/>
         <ECEnumerator name="False" value="0" displayLabel="No"/>
+    </ECEnumeration>
+    <ECEnumeration typeName="CantStationPointAspect_CantStationPoint_TransitionType_Enum" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="TransitionTypeNone" value="0" displayLabel="None"/>
+        <ECEnumerator name="Linear" value="1" displayLabel="Linear"/>
+        <ECEnumerator name="Circular" value="2" displayLabel="Circular"/>
+        <ECEnumerator name="Virtual" value="3" displayLabel="Virtual"/>
+        <ECEnumerator name="Clothoid" value="4" displayLabel="Clothoid"/>
+        <ECEnumerator name="CZCubic" value="5" displayLabel="CZCubic"/>
+        <ECEnumerator name="Biquadratic" value="6" displayLabel="Biquadratic"/>
+        <ECEnumerator name="Bloss" value="7" displayLabel="Bloss"/>
+        <ECEnumerator name="Sinusoid" value="8" displayLabel="Sinusoid"/>
+        <ECEnumerator name="Cosine" value="9" displayLabel="Cosine"/>
+        <ECEnumerator name="HalfCosine" value="10" displayLabel="HalfCosine"/>
+        <ECEnumerator name="Viennese" value="11" displayLabel="Viennese"/>
+        <ECEnumerator name="NSWCubic" value="12" displayLabel="NSWCubic"/>
+        <ECEnumerator name="WACubic" value="13" displayLabel="WACubic"/>
+        <ECEnumerator name="MXCubic" value="14" displayLabel="MXCubic"/>
+        <ECEnumerator name="CNCubic" value="15" displayLabel="CNCubic"/>
+        <ECEnumerator name="ITCubic" value="16" displayLabel="ITCubic"/>
+        <ECEnumerator name="AREMACubic" value="17" displayLabel="AREMACubic"/>
+        <ECEnumerator name="POCubic" value="18" displayLabel="POCubic"/>
+    </ECEnumeration>
+    <ECEnumeration typeName="CantStationPointAspect_CantStationPoint_Status_Enum" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="Undefined" value="0" displayLabel="Undefined"/>
+        <ECEnumerator name="Calculated" value="1" displayLabel="Calculated"/>
+        <ECEnumerator name="Disabled" value="2" displayLabel="Disabled"/>
+        <ECEnumerator name="UserDefinedCant" value="3" displayLabel="User Defined Cant"/>
+        <ECEnumerator name="UserDefinedLocation" value="4" displayLabel="User Defined Location"/>
+        <ECEnumerator name="UserDefinedRotateAbout" value="5" displayLabel="User Defined Rotate About"/>
+        <ECEnumerator name="UserDefinedCantAndLocation" value="6" displayLabel="User Defined Cant And Location"/>
+        <ECEnumerator name="UserDefinedCantAndRotateAbout" value="7" displayLabel="User Defined Cant And Rotate About"/>
+        <ECEnumerator name="UserDefinedLocationAndRotateAbout" value="8" displayLabel="User Defined Location And Rotate About"/>
+        <ECEnumerator name="UserDefinedCantAndLocationAndRotateAbout" value="9" displayLabel="User Defined Cant And Location And Rotate About"/>
+        <ECEnumerator name="UserDefinedCantWarning" value="10" displayLabel="User Defined Cant Warning"/>
+        <ECEnumerator name="UserDefinedLocationWarning" value="11" displayLabel="User Defined Location Warning"/>
+        <ECEnumerator name="UserDefinedRotateAboutWarning" value="12" displayLabel="User Defined Rotate About Warning"/>
+        <ECEnumerator name="UserDefinedCantAndLocationWarning" value="13" displayLabel="User Defined Cant And Location Warning"/>
+        <ECEnumerator name="UserDefinedCantAndRotateAboutWarning" value="14" displayLabel="User Defined CantAnd Rotate About Warning"/>
+        <ECEnumerator name="UserDefinedLocationAndRotateAboutWarning" value="15" displayLabel="User Defined Location And Rotate About Warning"/>
+        <ECEnumerator name="UserDefinedCantAndLocationAndRotateAboutWarning" value="16" displayLabel="User Defined Cant And Location And Rotate About Warning"/>
+        <ECEnumerator name="ProjectedCant" value="17" displayLabel="Projected Cant"/>
+        <ECEnumerator name="ProjectedCantAndLocation" value="18" displayLabel="Projected Cant And Location"/>
     </ECEnumeration>
     <ECEnumeration typeName="CantEntityAspect_CantEntity_RotateAbout_Enum" backingTypeName="int" isStrict="true">
         <ECEnumerator name="Inside_Rail" value="0" displayLabel="Inside Rail"/>
@@ -326,22 +368,71 @@
     </ECEntityClass>
     <ECEntityClass typeName="CantStationPointAspect" displayLabel="Cant Station Point">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
-        <ECProperty propertyName="CantStationPoint_TransitionType" typeName="string" displayLabel="Object Type" category="CantStationPoint_Cant_Station_Point" priority="299999"/>
+        <ECProperty propertyName="CantStationPoint_TransitionType" typeName="string" displayLabel="Object Type [Deprecated]" category="CantStationPoint_Cant_Station_Point" priority="299999">
+            <ECCustomAttributes>
+                <Deprecated xmlns="CoreCustomAttributes.01.00.04">
+                    <Description>Replaced by the new CantStationPoint_TransitionType_Enum property.</Description>
+                </Deprecated>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.04"/>
+            </ECCustomAttributes>
+        </ECProperty>
+        <ECProperty propertyName="CantStationPoint_TransitionType_Enum" typeName="CantStationPointAspect_CantStationPoint_TransitionType_Enum" displayLabel="Object Type" category="CantStationPoint_Cant_Station_Point" priority="299999"/>
         <ECProperty propertyName="CantStationPoint_Station" typeName="double" displayLabel="Station" category="CantStationPoint_Cant_Station_Point" priority="299998" kindOfQuantity="cifu:STATION"/>
         <ECProperty propertyName="CantStationPoint_DesignSpeed" typeName="double" displayLabel="Design Speed" category="CantStationPoint_Cant_Station_Point" priority="299997" kindOfQuantity="cifu:VELOCITY"/>
         <ECProperty propertyName="CantStationPoint_Radius" typeName="double" displayLabel="Radius" category="CantStationPoint_Cant_Station_Point" priority="299996" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="CantStationPoint_Length" typeName="double" displayLabel="Length" category="CantStationPoint_Cant_Station_Point" priority="299995" kindOfQuantity="cifu:LENGTH"/>
-        <ECProperty propertyName="CantStationPoint_EqilibriumCant" typeName="double" displayLabel="Equilibrium Cant" category="CantStationPoint_Cant_Station_Point" priority="299994" kindOfQuantity="cifu:LENGTH"/>
-        <ECProperty propertyName="CantStationPoint_AppliedCant" typeName="double" displayLabel="Applied Cant" category="CantStationPoint_Cant_Station_Point" priority="299993" kindOfQuantity="cifu:LENGTH"/>
-        <ECProperty propertyName="CantStationPoint_CantDeficiency" typeName="double" displayLabel="Cant Deficiency" category="CantStationPoint_Cant_Station_Point" priority="299992" kindOfQuantity="cifu:LENGTH"/>
-        <ECProperty propertyName="CantStationPoint_LateralAcceleration" typeName="string" displayLabel="Non-Comp Lat. Acc." category="CantStationPoint_Cant_Station_Point" priority="299991" kindOfQuantity="cifu:ACCELERATION"/>
-        <ECProperty propertyName="CantStationPoint_AppliedRateOfChange" typeName="string" displayLabel="Applied Rate of Change" category="CantStationPoint_Cant_Station_Point" priority="299990" kindOfQuantity="cifu:VELOCITY_SLOW"/>
-        <ECProperty propertyName="CantStationPoint_DeficiencyRateOfChange" typeName="string" displayLabel="Deficiency Rate of Change" category="CantStationPoint_Cant_Station_Point" priority="299989" kindOfQuantity="cifu:VELOCITY_SLOW"/>
-        <ECProperty propertyName="CantStationPoint_AppGrad" typeName="string" displayLabel="Applied Gradient" category="CantStationPoint_Cant_Station_Point" priority="299988"/>
-        <ECProperty propertyName="CantStationPoint_LeftRail" typeName="double" displayLabel="Left Rail" category="CantStationPoint_Cant_Station_Point" priority="299985" kindOfQuantity="cifu:LENGTH"/>
-        <ECProperty propertyName="CantStationPoint_RightRail" typeName="double" displayLabel="Right Rail" category="CantStationPoint_Cant_Station_Point" priority="299983" kindOfQuantity="cifu:LENGTH"/>
-        <ECProperty propertyName="CantStationPoint_Center" typeName="double" displayLabel="Center" category="CantStationPoint_Cant_Station_Point" priority="299984" kindOfQuantity="cifu:LENGTH"/>
-        <ECProperty propertyName="CantStationPoint_Status" typeName="string" displayLabel="Fixed" category="CantStationPoint_Cant_Station_Point" priority="299984"/>
+        <ECProperty propertyName="CantStationPoint_EqilibriumCant" typeName="double" displayLabel="Equilibrium Cant" category="CantStationPoint_Cant_Station_Point" priority="299994" kindOfQuantity="cifu:LENGTH_SHORT"/>
+        <ECProperty propertyName="CantStationPoint_AppliedCant" typeName="double" displayLabel="Applied Cant" category="CantStationPoint_Cant_Station_Point" priority="299993" kindOfQuantity="cifu:LENGTH_SHORT"/>
+        <ECProperty propertyName="CantStationPoint_CantDeficiency" typeName="double" displayLabel="Cant Deficiency" category="CantStationPoint_Cant_Station_Point" priority="299992" kindOfQuantity="cifu:LENGTH_SHORT"/>
+        <ECProperty propertyName="CantStationPoint_LateralAcceleration" typeName="string" displayLabel="Non-Comp Lat. Acc. [Deprecated]" category="CantStationPoint_Cant_Station_Point" priority="299991" kindOfQuantity="cifu:ACCELERATION">
+            <ECCustomAttributes>
+                <Deprecated xmlns="CoreCustomAttributes.01.00.04">
+                    <Description>Replaced by the new CantStationPoint_LateralAcceleration_Numeric property.</Description>
+                </Deprecated>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.04"/>
+            </ECCustomAttributes>
+        </ECProperty>
+        <ECProperty propertyName="CantStationPoint_LateralAcceleration_Numeric" typeName="double" displayLabel="Non-Comp Lat. Acc." category="CantStationPoint_Cant_Station_Point" priority="299991" kindOfQuantity="cifu:ACCELERATION"/>
+        <ECProperty propertyName="CantStationPoint_AppliedRateOfChange" typeName="string" displayLabel="Applied Rate of Change [Deprecated]" category="CantStationPoint_Cant_Station_Point" priority="299990" kindOfQuantity="cifu:VELOCITY_SLOW">
+            <ECCustomAttributes>
+                <Deprecated xmlns="CoreCustomAttributes.01.00.04">
+                    <Description>Replaced by the new CantStationPoint_AppliedRateOfChange_Numeric property.</Description>
+                </Deprecated>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.04"/>
+            </ECCustomAttributes>
+        </ECProperty>
+        <ECProperty propertyName="CantStationPoint_AppliedRateOfChange_Numeric" typeName="double" displayLabel="Applied Rate of Change" category="CantStationPoint_Cant_Station_Point" priority="299990" kindOfQuantity="cifu:VELOCITY_SLOW"/>
+        <ECProperty propertyName="CantStationPoint_DeficiencyRateOfChange" typeName="string" displayLabel="Deficiency Rate of Change [Deprecated]" category="CantStationPoint_Cant_Station_Point" priority="299989" kindOfQuantity="cifu:VELOCITY_SLOW">
+            <ECCustomAttributes>
+                <Deprecated xmlns="CoreCustomAttributes.01.00.04">
+                    <Description>Replaced by the new CantStationPoint_DeficiencyRateOfChange_Numeric property.</Description>
+                </Deprecated>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.04"/>
+            </ECCustomAttributes>
+        </ECProperty>
+        <ECProperty propertyName="CantStationPoint_DeficiencyRateOfChange_Numeric" typeName="double" displayLabel="Deficiency Rate of Change" category="CantStationPoint_Cant_Station_Point" priority="299989" kindOfQuantity="cifu:VELOCITY_SLOW"/>
+        <ECProperty propertyName="CantStationPoint_AppGrad" typeName="string" displayLabel="Applied Gradient [Deprecated]" category="CantStationPoint_Cant_Station_Point" priority="299988">
+            <ECCustomAttributes>
+                <Deprecated xmlns="CoreCustomAttributes.01.00.04">
+                    <Description>Replaced by the new CantStationPoint_AppGrad_Numeric property.</Description>
+                </Deprecated>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.04"/>
+            </ECCustomAttributes>
+        </ECProperty>
+        <ECProperty propertyName="CantStationPoint_AppGrad_Numeric" typeName="double" displayLabel="Applied Gradient" category="CantStationPoint_Cant_Station_Point" priority="299988"/>
+        <ECProperty propertyName="CantStationPoint_RotateAbout" typeName="CantEntityAspect_CantEntity_RotateAbout_Enum" displayLabel="Rotate About" category="CantStationPoint_Cant_Station_Point" priority="299988"/>
+        <ECProperty propertyName="CantStationPoint_LeftRail" typeName="double" displayLabel="Left Rail" category="CantStationPoint_Cant_Station_Point" priority="299985" kindOfQuantity="cifu:LENGTH_SHORT"/>
+        <ECProperty propertyName="CantStationPoint_RightRail" typeName="double" displayLabel="Right Rail" category="CantStationPoint_Cant_Station_Point" priority="299983" kindOfQuantity="cifu:LENGTH_SHORT"/>
+        <ECProperty propertyName="CantStationPoint_Center" typeName="double" displayLabel="Center" category="CantStationPoint_Cant_Station_Point" priority="299984" kindOfQuantity="cifu:LENGTH_SHORT"/>
+        <ECProperty propertyName="CantStationPoint_Status" typeName="string" displayLabel="Status  [Deprecated]" category="CantStationPoint_Cant_Station_Point" priority="299984">
+            <ECCustomAttributes>
+                <Deprecated xmlns="CoreCustomAttributes.01.00.04">
+                    <Description>Replaced by the new CantStationPoint_Status_Enum property.</Description>
+                </Deprecated>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.04"/>
+            </ECCustomAttributes>
+        </ECProperty>
+        <ECProperty propertyName="CantStationPoint_Status_Enum" typeName="CantStationPointAspect_CantStationPoint_Status_Enum" displayLabel="Status" category="CantStationPoint_Cant_Station_Point" priority="299984"/>
     </ECEntityClass>
     <ECEntityClass typeName="CantTableEntryAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
@@ -1204,8 +1295,8 @@
     </ECRelationshipClass>
     <ECEntityClass typeName="SleeperComponentAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
-        <ECProperty propertyName="StartDistance" typeName="double" displayLabel="Start Distance" category="RailProperties_Rail" priority="299990" kindOfQuantity="cifu:LENGTH"/>
-        <ECProperty propertyName="EndDistance" typeName="double" displayLabel="End Distance" category="RailProperties_Rail" priority="299980" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="StartDistance" typeName="double" displayLabel="Start Distance" category="RailProperties_Rail" priority="299990" kindOfQuantity="cifu:STATION"/>
+        <ECProperty propertyName="EndDistance" typeName="double" displayLabel="End Distance" category="RailProperties_Rail" priority="299980" kindOfQuantity="cifu:STATION"/>
         <ECProperty propertyName="SleeperLength" typeName="double" displayLabel="Sleeper Length" category="RailProperties_Rail" priority="299970" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="SleeperWidth" typeName="double" displayLabel="Sleeper Width" category="RailProperties_Rail" priority="299960" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="SleeperThickness" typeName="double" displayLabel="Sleeper Thickness" category="RailProperties_Rail" priority="299955" kindOfQuantity="cifu:LENGTH"/>
