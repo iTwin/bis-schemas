@@ -15,7 +15,7 @@ Due to the importance of IFC in coordinating spatial structure, the classes in t
 
 A `Building` represents a structure that provides shelter for its occupants or contents and stands in one place. The building is also used to provide a basic element within the spatial structure hierarchy for the components of a building project (together with site, story, and space).
 
-<!-- add notes about usage here. Placement in models. Parent-child issues; ElementAspectPs, key relationships. --->
+<!-- add notes about usage here. Placement in models. Parent-child issues; ElementAspects, key relationships. --->
 A `Building` is typically aggregated by a `Site`. A `Building` may also compose a `Site`. Decomposes into `Story` or `Space` elements.
 
 Equivalent to [IfcBuilding](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcBuilding.htm) with CompositionType == ELEMENT.
@@ -71,3 +71,4 @@ An `RegularStory` is typically aggregated by a `Building`. `RegularStory` elemen
 Equivalent to [IfcBuildingStorey](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcBuildingStorey.htm) with CompositionType == ELEMENT.
 
 <!-- for CompositionType != ELEMENT, we expect other subclasses of either Story or ElevationStory, i.e. SplitStory for type=PARTIAL. those subclasses would be added in the future versions of the schema. some other subclasses are also controversial, that's why we're leaving them out. i.e. SharedStory @ speedikon -->
+
