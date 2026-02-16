@@ -1,0 +1,591 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ECSchema xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" schemaName="SubstationPhysicalCustom" version="01.00.05" alias="subphyc" displayLabel="SubstationPhysicalCustom" description="This schema contains classes used for Substation Design.">
+  <ECSchemaReference name="BisCore" version="01.00.25" alias="bis"/>
+  <ECSchemaReference name="PowerSystemResourcesPhysical" version="01.00.01" alias="psrp" />
+  <ECSchemaReference name="SubstationPhysical" version="01.00.05" alias="subphy" />
+  <ECSchemaReference name="CoreCustomAttributes" version="01.00.04" alias="CoreCA" />
+  <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA" />
+  <ECCustomAttributes>
+    <ProductionStatus xmlns="CoreCustomAttributes.01.00.04">
+      <SupportedUse>NotForProduction</SupportedUse>
+    </ProductionStatus>
+    <SchemaLayerInfo xmlns="BisCustomAttributes.01.00.00">
+      <Value>Application</Value>
+    </SchemaLayerInfo>
+  </ECCustomAttributes>  
+  <ECEntityClass typeName="EquipmentCustomAspect" displayLabel="Equipment Aspect" description="Contains properties of an Aspect." modifier="None">
+    <BaseClass>psrp:EquipmentAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="StructureCustomAspect" displayLabel="Structure Aspect" description="Contains properties of an Aspect." modifier="None">
+    <BaseClass>psrp:StructureAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="FoundationCustomAspect" displayLabel="Foundation Aspect" description="Contains properties of an Aspect." modifier="None">
+    <BaseClass>psrp:FoundationAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="SubstationCustomAspect" displayLabel="Substation Aspect" description="Contains properties of an Aspect." modifier="None">
+    <BaseClass>subphy:SubstationAspect</BaseClass>
+  </ECEntityClass>
+  <ECRelationshipClass typeName="EquipmentOwnsEquipmentCustomAspect" strength="embedding" modifier="None">
+    <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+    <!-- @see ElementUniqueAspect.Element ECNavigationProperty -->
+    <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+      <Class class="psrp:Equipment"/>
+    </Source>
+    <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="true">
+      <!-- Note: multiplicity=(0..*) is correct. While an Element can only have 1 unique aspect per aspect class, it can have N unique aspects total. -->
+      <Class class="EquipmentCustomAspect"/>
+    </Target>
+  </ECRelationshipClass>
+  <ECRelationshipClass typeName="StructureOwnsStructureCustomAspect" strength="embedding" modifier="None">
+    <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+    <!-- @see ElementUniqueAspect.Element ECNavigationProperty -->
+    <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+      <Class class="psrp:Structure"/>
+    </Source>
+    <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="true">
+      <!-- Note: multiplicity=(0..*) is correct. While an Element can only have 1 unique aspect per aspect class, it can have N unique aspects total. -->
+      <Class class="StructureCustomAspect"/>
+    </Target>
+  </ECRelationshipClass>
+  <ECRelationshipClass typeName="FoundationOwnsFoundationCustomAspect" strength="embedding" modifier="None">
+    <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+    <!-- @see ElementUniqueAspect.Element ECNavigationProperty -->
+    <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+      <Class class="psrp:Foundation"/>
+    </Source>
+    <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="true">
+      <!-- Note: multiplicity=(0..*) is correct. While an Element can only have 1 unique aspect per aspect class, it can have N unique aspects total. -->
+      <Class class="FoundationCustomAspect"/>
+    </Target>
+  </ECRelationshipClass>
+  <ECRelationshipClass typeName="SubstationOwnsSubstationCustomAspect" strength="embedding" modifier="None">
+    <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+    <!-- @see ElementUniqueAspect.Element ECNavigationProperty -->
+    <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+      <Class class="subphy:Substation"/>
+    </Source>
+    <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="true">
+      <!-- Note: multiplicity=(0..*) is correct. While an Element can only have 1 unique aspect per aspect class, it can have N unique aspects total. -->
+      <Class class="SubstationCustomAspect"/>
+    </Target>
+  </ECRelationshipClass>
+  <ECEntityClass typeName="SwitchAspect" displayLabel="Switch" description="A generic device designed to close, or open, or both, one or more electric circuits.  All switches are two terminal devices including grounding switches. The ACDCTerminal.connected at the two sides of the switch shall not be considered for assessing switch connectivity, i.e. only Switch.open, .normalOpen and .locked are relevant." modifier="None">
+    <BaseClass>EquipmentCustomAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="SectionalizerAspect" displayLabel="Sectionalizer" description="Automatic switch that will lock open to isolate a faulted section. It may, or may not, have load breaking capability. Its primary purpose is to provide fault sectionalising at locations where the fault current is either too high, or too low, for proper coordination of fuses." modifier="None">
+    <BaseClass>SwitchAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="CutAspect" displayLabel="Cut" description="A cut separates a line segment into two parts. The cut appears as a switch inserted between these two parts and connects them together. As the cut is normally open there is no galvanic connection between the two line segment parts. But it is possible to close the cut to get galvanic connection.&#x000d; The cut terminals are oriented towards the line segment terminals with the same sequence number. Hence the cut terminal with sequence number equal to 1 is oriented to the line segment's terminal with sequence number equal to 1.&#x000d; The cut terminals also act as connection points for jumpers and other equipment, e.g. a mobile generator. To enable this, connectivity nodes are placed at the cut terminals. Once the connectivity nodes are in place any conducting equipment can be connected at them." modifier="None">
+    <BaseClass>SwitchAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="JumperAspect" displayLabel="Jumper" description="A short section of conductor with negligible impedance which can be manually removed and replaced if the circuit is de-energized. Note that zero-impedance branches can potentially be modelled by other equipment types." modifier="None">
+    <BaseClass>SwitchAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="FuseAspect" displayLabel="Fuse" description="An overcurrent protective device with a circuit opening fusible part that is heated and severed by the passage of overcurrent through it. A fuse is considered a switching device because it breaks current." modifier="None">
+    <BaseClass>SwitchAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="GroundDisconnectorAspect" displayLabel="Ground Disconnector" description="A manually operated or motor operated mechanical switching device used for isolating a circuit or equipment from ground.&#x000d; Also known as earthing switch" modifier="None">
+    <BaseClass>SwitchAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="DisconnectorAspect" displayLabel="Disconnector" description="A manually operated or motor operated mechanical switching device used for changing the connections in a circuit, or for isolating a circuit or equipment from a source of power. It is required to open or close circuits when negligible current is broken or made." modifier="None">
+    <BaseClass>SwitchAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="ProtectedSwitchAspect" displayLabel="Protected Switch" description="A ProtectedSwitch is a switching device that can be operated by ProtectionEquipment.&#x000d; " modifier="None">
+    <BaseClass>SwitchAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="AuxiliaryEquipmentAspect" displayLabel="Auxiliary Equipment" description="AuxiliaryEquipment describe equipment that is not performing any primary functions but support for the equipment performing the primary function.&#x000d; AuxiliaryEquipment is attached to primary equipment via an association with Terminal." modifier="None">
+    <BaseClass>EquipmentCustomAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="BreakerAspect" displayLabel="Breaker" modifier="None">
+    <BaseClass>ProtectedSwitchAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="RecloserAspect" displayLabel="Recloser" description="Pole-mounted fault interrupter with built-in phase and ground relays, current transformer (CT), and supplemental controls." modifier="None">
+    <BaseClass>ProtectedSwitchAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="LoadBreakSwitchAspect" displayLabel="Load Break Switch" description="A mechanical switching device capable of making, carrying, and breaking currents under normal operating conditions." modifier="None">
+    <BaseClass>ProtectedSwitchAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="SurgeArresterAspect" displayLabel="Surge Arrester" description="Shunt device, installed on the network, usually in the proximity of electrical equipment in order to protect the said equipment against transient voltage transients caused by lightning or switching activity." modifier="None">
+    <BaseClass>AuxiliaryEquipmentAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="FaultIndicatorAspect" displayLabel="Fault Indicator" description="A FaultIndicator is typically only an indicator (which may or may not be remotely monitored), and not a piece of equipment that actually initiates a protection event. It is used for FLISR (Fault Location, Isolation and Restoration) purposes, assisting with the dispatch of crews to &quot;most likely&quot; part of the network (i.e. assists with determining circuit section where the fault most likely happened)." modifier="None">
+    <BaseClass>AuxiliaryEquipmentAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="WaveTrapAspect" displayLabel="Wave Trap" description="Line traps are devices that impede high frequency power line carrier signals yet present a negligible impedance at the main power frequency." modifier="None">
+    <BaseClass>AuxiliaryEquipmentAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="InsulatorAspect" displayLabel="Insulator" modifier="None">
+    <BaseClass>AuxiliaryEquipmentAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="SensorAspect" displayLabel="Sensor" description="AuxiliaryEquipment describes equipment that does not perform primary functions but supports equipment that does." modifier="None">
+    <BaseClass>AuxiliaryEquipmentAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="EarthFaultCompensatorAspect" displayLabel="Earth Fault Compensator" description="A conducting equipment used to represent a connection to ground which is typically used to compensate earth faults. An earth fault compensator device modelled with a single terminal implies a second terminal solidly connected to ground. If two terminals are modelled, the ground is not assumed and normal connection rules apply.&#x000d; " modifier="None">
+    <BaseClass>EquipmentCustomAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="DisconnectingCircuitBreakerAspect" displayLabel="Circuit Breaker With Disconnector" description="A circuit breaking device including disconnecting function, eliminating the need for separate disconnectors." modifier="None">
+    <BaseClass>BreakerAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="PotentialTransformerAspect" displayLabel="Potential Transformer" description="AuxiliaryEquipment describe equipment that is not performing any primary functions but support for the equipment performing the primary function.&#x000d; AuxiliaryEquipment is attached to primary equipment via an association with Terminal." modifier="None">
+    <BaseClass>SensorAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="CurrentTransformerAspect" displayLabel="Current Transformer" modifier="None">
+    <BaseClass>SensorAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="PostLineSensorAspect" displayLabel="Post Line Sensor" description="A sensor used mainly in overhead distribution networks as the source of both current and voltage measurements" modifier="None">
+    <BaseClass>SensorAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="GroundingImpedanceAspect" displayLabel="Grounding Impedance" description="A fixed impedance device used for grounding.&#x000d; " modifier="None">
+    <BaseClass>EarthFaultCompensatorAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="PetersenCoilAspect" displayLabel="Petersen Coil" description="A variable impedance device normally used to offset line charging during single line faults in an ungrounded section of network." modifier="None">
+    <BaseClass>EarthFaultCompensatorAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="TransformerAspect" displayLabel="Transformer" description="Power transformers are utilized in transmission networks with significantly higher voltage, while distribution transformers function in distribution networks defined by lower voltages" modifier="None">
+    <BaseClass>EquipmentCustomAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="PowerTransformerAspect" displayLabel="Power Transformer" modifier="None">
+    <BaseClass>TransformerAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="CompensatorAspect" displayLabel="Compensator" description="A Series Compensator is a series capacitor or reactor or an AC transmission line without charging susceptance.  It is a two terminal device." modifier="None">
+    <BaseClass>EquipmentCustomAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="SeriesCompensatorAspect" displayLabel="Series Compensator" description="A Series Compensator is a series capacitor or reactor or an AC transmission line without charging susceptance.  It is a two terminal device." modifier="None">
+    <BaseClass>CompensatorAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="ConductorAspect" displayLabel="Conductor" modifier="None">
+    <BaseClass>EquipmentCustomAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="ClampAspect" displayLabel="Clamp" modifier="None">
+    <BaseClass>EquipmentCustomAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="ConnectorAspect" displayLabel="Connector" description="A conductor, or group of conductors, with negligible impedance, that serve to connect other conducting equipment within a single substation and are modelled with a single logical terminal." modifier="None">
+    <BaseClass>EquipmentCustomAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="BusbarSectionAspect" displayLabel="Busbar Section" description="A conductor, or group of conductors, with negligible impedance, that serve to connect other conducting equipment within a single substation. &#x000d; Voltage measurements are typically obtained from voltage transformers that are connected to busbar sections. A bus bar section may have many physical terminals but for analysis is modelled with exactly one logical terminal." modifier="None">
+    <BaseClass>ConnectorAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="JunctionAspect" displayLabel="Junction" description="A point where one or more conducting equipments are connected with zero resistance.&#x000d; " modifier="None">
+    <BaseClass>ConnectorAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="EnergyConnectionAspect" displayLabel="Energy Connection" modifier="None">
+    <BaseClass>EquipmentCustomAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="EnergySourceAspect" displayLabel="Energy Source" modifier="None">
+    <BaseClass>EnergyConnectionAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="EnergyConsumerAspect" displayLabel="Energy Consumer" modifier="None">
+    <BaseClass>EnergyConnectionAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="RegulatingConductingEqAspect" displayLabel="Regulating Conducting Equipment" modifier="None">
+    <BaseClass>EnergyConnectionAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="GroundAspect" displayLabel="Grounding Equipment" modifier="None">
+    <BaseClass>EquipmentCustomAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="FrequencyConverterAspect" displayLabel="Frequency Converter" description="A device to convert from one frequency to another (e.g., frequency F1 to F2) comprises a pair of FrequencyConverter instances. One converts from F1 to DC, the other converts the DC to F2." modifier="None">
+    <BaseClass>RegulatingConductingEqAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="StaticVarCompensatorAspect" displayLabel="Static Var Compensator" description="A facility for providing variable and controllable shunt reactive power. The SVC typically consists of a stepdown transformer, filter, thyristor-controlled reactor, and thyristor-switched capacitor arms.&#x000d; &#x000d; The SVC may operate in fixed MVar output mode or in voltage control mode. When in voltage control mode, the output of the SVC will be proportional to the deviation of voltage at the controlled bus from the voltage setpoint.  The SVC characteristic slope defines the proportion.  If the voltage at the controlled bus is equal to the voltage setpoint, the SVC MVar output is zero." modifier="None">
+    <BaseClass>RegulatingConductingEqAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="ExternalNetworkInjectionAspect" displayLabel="External Network Injection" modifier="None">
+    <BaseClass>RegulatingConductingEqAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="ShuntCompensatorAspect" displayLabel="Shunt Compensator" modifier="None">
+    <BaseClass>RegulatingConductingEqAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="PowerElectronicsConnectionAspect" displayLabel="Power Electronic Connection" modifier="None">
+    <BaseClass>RegulatingConductingEqAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="RotatingMachineAspect" displayLabel="Rotating Machine" modifier="None">
+    <BaseClass>RegulatingConductingEqAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="DERAspect" displayLabel="DER" modifier="None">
+    <BaseClass>EquipmentCustomAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="AsynchronousMachineAspect" displayLabel="Asynchronous Machine" modifier="None">
+    <BaseClass>RotatingMachineAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="SynchronousMachineAspect" displayLabel="Synchronous Machine" modifier="None">
+    <BaseClass>RotatingMachineAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="BatteryAspect" displayLabel="Battery" modifier="None">
+    <BaseClass>DERAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="SolarPanelAspect" displayLabel="Solar Panel" modifier="None">
+    <BaseClass>DERAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="WindTurbineAspect" displayLabel="Wind Turbine" modifier="None">
+    <BaseClass>DERAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="LightningProtectionAspect" displayLabel="Lightning Protection" modifier="None">
+    <BaseClass>EquipmentCustomAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="LightningMastsAspect" displayLabel="Lightning Masts" modifier="None">
+    <BaseClass>LightningProtectionAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="ShieldWireAspect" displayLabel="Shield Wire" modifier="None">
+    <BaseClass>LightningProtectionAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="OtherAuxiliaryAspect" displayLabel="Other Auxiliary" modifier="None">
+    <BaseClass>AuxiliaryEquipmentAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="EMVTAspect" displayLabel="Electromagnetic Voltage Transformers" description="Electromagnetic Voltage Transformers &#x000d; " modifier="None">
+    <BaseClass>PotentialTransformerAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="OVTAspect" displayLabel="Optical Voltage Transformers" description="Optical Voltage Transformers &#x000d; " modifier="None">
+    <BaseClass>PotentialTransformerAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="CCVTAspect" displayLabel="Capacitive Coupled Voltage Transformer" modifier="None">
+    <BaseClass>PotentialTransformerAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="CombinedCTVTAspect" displayLabel="Combined CT/VT " modifier="None">
+    <BaseClass>SensorAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="NeutralGroundingResistorAspect" displayLabel="Neutral Grounding Resistor" modifier="None">
+    <BaseClass>GroundingImpedanceAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="NeutralGroundingReactorAspect" displayLabel="Neutral Grounding Reactor" description="The conductor used to connect the non-current-carrying metal parts of equipment, raceways and other enclosures to the system grounded conductor, grounding electrode conductor, or both, at the service equipment or at the source of a separately-derived system" modifier="None">
+    <BaseClass>GroundingImpedanceAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="PowerTransformer2WindingsAspect" displayLabel="Power Transformer - 2 Windings" modifier="None">
+    <BaseClass>PowerTransformerAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="PowerTransformer3WindingsAspect" displayLabel="Power Transformer - 3 Windings" modifier="None">
+    <BaseClass>PowerTransformerAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="DistributionTransformerAspect" displayLabel="Distribution Transformer" modifier="None">
+    <BaseClass>PowerTransformerAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="GroundingTransformerwithResistorAspect" displayLabel="Zigzag Grounding Transformer with Resistor" modifier="None">
+    <BaseClass>PowerTransformerAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="SeriesCapacitorAspect" displayLabel="Series Capacitor" modifier="None">
+    <BaseClass>SeriesCompensatorAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="SeriesReactorAspect" displayLabel="Series Reactor" modifier="None">
+    <BaseClass>SeriesCompensatorAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="TCSCAspect" displayLabel="Thyristor-Controlled Series Capacitor" modifier="None">
+    <BaseClass>SeriesCompensatorAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="PowerCableAspect" displayLabel="Power Cable" modifier="None">
+    <BaseClass>ConductorAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="InsulatedPowerCableAspect" displayLabel="Insulated Power Cable" modifier="None">
+    <BaseClass>ConductorAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="CableClampsAspect" displayLabel="Cable Clamps" modifier="None">
+    <BaseClass>ClampAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="BusClampsAspect" displayLabel="Bus Clamps" modifier="None">
+    <BaseClass>ClampAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="CableConnectorAspect" displayLabel="Cable Connector" modifier="None">
+    <BaseClass>JunctionAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="BusConnectorAspect" displayLabel="Bus Connector" modifier="None">
+    <BaseClass>JunctionAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="BusAccessoriesAspect" displayLabel="Bus Accessories" modifier="None">
+    <BaseClass>ConnectorAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="CableAccessoriesAspect" displayLabel="Cable Accessories" modifier="None">
+    <BaseClass>ConnectorAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="LineHardwareAspect" displayLabel="Line Hardware" modifier="None">
+    <BaseClass>ConnectorAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="VoltageRegulatorAspect" displayLabel="Voltage Regulator" modifier="None">
+    <BaseClass>RegulatingConductingEqAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="ShuntCapacitorAspect" displayLabel="Shunt Capacitor" description="Single capacitor unit used to inject reactive power (positive Q) to improve voltage " modifier="None">
+    <BaseClass>ShuntCompensatorAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="ShuntCapacitorBankAspect" displayLabel="Shunt Capacitor Bank" description="Group of capacitor units connected in series/parallel; often switchable in steps &#x000d; " modifier="None">
+    <BaseClass>ShuntCompensatorAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="ShuntReactorAspect" displayLabel="Shunt Reactor" modifier="None">
+    <BaseClass>ShuntCompensatorAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="ShuntReactorBankAspect" displayLabel="Shunt Reactor Bank" modifier="None">
+    <BaseClass>ShuntCompensatorAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="RectifierAspect" displayLabel="Rectifier" modifier="None">
+    <BaseClass>PowerElectronicsConnectionAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="InverterAspect" displayLabel="Inverter" modifier="None">
+    <BaseClass>PowerElectronicsConnectionAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="GroundingRodAspect" displayLabel="Grounding Rod" modifier="None">
+    <BaseClass>GroundAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="GroundingGridAspect" displayLabel="Grounding Grid" modifier="None">
+    <BaseClass>GroundAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="GroundingClampsAspect" displayLabel="Grounding Clamps" modifier="None">
+    <BaseClass>GroundAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="GroundingAccessoriesAspect" displayLabel="Grounding Accessories" modifier="None">
+    <BaseClass>GroundAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="BushingAspect" displayLabel="Bushing" modifier="None">
+    <BaseClass>OtherAuxiliaryAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="LineTunerAspect" displayLabel="Line Tuner" modifier="None">
+    <BaseClass>OtherAuxiliaryAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="SurgeCounterAspect" displayLabel="Surge Counter" modifier="None">
+    <BaseClass>OtherAuxiliaryAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="GuyStrainInsulatorAspect" displayLabel="Guy Strain Insulator" modifier="None">
+    <BaseClass>OtherAuxiliaryAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="ArcHornAspect" displayLabel="Arc Horn" modifier="None">
+    <BaseClass>OtherAuxiliaryAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="CoronaRingAspect" displayLabel="Corona Ring" modifier="None">
+    <BaseClass>OtherAuxiliaryAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="AnnunciatorAspect" displayLabel="Annunciator" modifier="None">
+    <BaseClass>OtherAuxiliaryAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="StatusIndicatorAspect" displayLabel="Status Indicator" modifier="None">
+    <BaseClass>OtherAuxiliaryAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="OverheadStructureAspect" displayLabel="Overhead Structure" modifier="None">
+    <BaseClass>StructureCustomAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="BusStructureAspect" displayLabel="Bus Structure" modifier="None">
+    <BaseClass>OverheadStructureAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="EquipmentStructureAspect" displayLabel="Equipment Structure" modifier="None">
+    <BaseClass>OverheadStructureAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="DeadEndStructureAspect" displayLabel="Dead-end Structure" modifier="None">
+    <BaseClass>OverheadStructureAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="PoleAspect" displayLabel="Pole" description="Distribution pole used to support the overhead conductors and related equipment" modifier="None">
+    <BaseClass>OverheadStructureAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="SupportWireAspect" displayLabel="Support Wire" modifier="None">
+    <BaseClass>OverheadStructureAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="CableSupportsAspect" displayLabel="Cable Supports" modifier="None">
+    <BaseClass>StructureCustomAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="GuyWireAspect" displayLabel="Guy Wire" modifier="None">
+    <BaseClass>SupportWireAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="GuyWireAccessoriesAspect" displayLabel="Guy Wire Accessories" modifier="None">
+    <BaseClass>CableSupportsAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="CableSpacerAspect" displayLabel="Cable Spacer" modifier="None">
+    <BaseClass>CableSupportsAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="CableAspect" displayLabel="Cable" modifier="None">
+    <BaseClass>StructureCustomAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="SpanGuyAspect" displayLabel="Span Guy" modifier="None">
+    <BaseClass>CableAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="DownGuyAspect" displayLabel="Down Guy" modifier="None">
+    <BaseClass>CableAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="UndergroundStructureAspect" displayLabel="Underground Structure" modifier="None">
+    <BaseClass>StructureCustomAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="VaultAspect" displayLabel="Vault" modifier="None">
+    <BaseClass>UndergroundStructureAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="ManholeAspect" displayLabel="Manhole" modifier="None">
+    <BaseClass>UndergroundStructureAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="AnchorCageAspect" displayLabel="Anchor Cage" modifier="None">
+    <BaseClass>UndergroundStructureAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="FastenersAspect" displayLabel="Fasteners" modifier="None">
+    <BaseClass>StructureCustomAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="SupportsAspect" displayLabel="Supports" modifier="None">
+    <BaseClass>StructureCustomAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="BoltAspect" displayLabel="Bolt" modifier="None">
+    <BaseClass>FastenersAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="WasherAspect" displayLabel="Washer" modifier="None">
+    <BaseClass>FastenersAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="NutsAspect" displayLabel="Nuts" modifier="None">
+    <BaseClass>FastenersAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="ScrewAspect" displayLabel="Screw" modifier="None">
+    <BaseClass>FastenersAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="LiftingLugsAspect" displayLabel="Lifting Lugs" modifier="None">
+    <BaseClass>FastenersAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="BusSupportAspect" displayLabel="Bus Support" modifier="None">
+    <BaseClass>SupportsAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="BracketAspect" displayLabel="Bracket" modifier="None">
+    <BaseClass>SupportsAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="UboltAspect" displayLabel="U-Bolt" modifier="None">
+    <BaseClass>SupportsAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="MountingKitAspect" displayLabel="Mounting Kit" description="Additional components needed to mount equipment" modifier="None">
+    <BaseClass>SupportsAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="PlatformAspect" displayLabel="Platform" modifier="None">
+    <BaseClass>FoundationCustomAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="EquipmentFoundationAspect" displayLabel="Equipment Foundation" modifier="None">
+    <BaseClass>FoundationCustomAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="StructureFoundationAspect" displayLabel="Structure Foundation" modifier="None">
+    <BaseClass>FoundationCustomAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="WalkingPlatformAspect" displayLabel="Walking platform" modifier="None">
+    <BaseClass>PlatformAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="SwitchOperatorPlatformAspect" displayLabel="Switch Operator Platform" modifier="None">
+    <BaseClass>PlatformAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="ElectricalBuildingAspect" displayLabel="Electrical Building" modifier="None">
+    <BaseClass>SubstationCustomAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="LVSwitchAspect" displayLabel="LV Switches" modifier="None">
+    <BaseClass>ElectricalBuildingAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="AudioVisualDeviceAspect" displayLabel="Audio Visual Device" modifier="None">
+    <BaseClass>ElectricalBuildingAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="CommunicationDeviceAspect" displayLabel="Communication Device" modifier="None">
+    <BaseClass>ElectricalBuildingAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="ElectricPanelAspect" displayLabel="Electric Panel" modifier="None">
+    <BaseClass>ElectricalBuildingAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="LVBatteryAspect" displayLabel="Low Voltage Battery" description="A device in which electrical energy is stored and from which energy may be progressively released." modifier="None">
+    <BaseClass>ElectricalBuildingAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="ConditionerDeviceAspect" displayLabel="Conditioner Device" description="used to remove unwanted matter from an electric or electronic signal" modifier="None">
+    <BaseClass>ElectricalBuildingAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="ElectricLoadTimeControlAspect" displayLabel="Electric Load Time Control" description="A device that applies control to the provision or flow of electrical energy over time " modifier="None">
+    <BaseClass>ElectricalBuildingAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="PowerOutletAspect" displayLabel="Outlet" modifier="None">
+    <BaseClass>ElectricalBuildingAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="FanAspect" displayLabel="Fan" modifier="None">
+    <BaseClass>ElectricalBuildingAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="LightingFixtureAspect" displayLabel="Lighting Fixture" modifier="None">
+    <BaseClass>ElectricalBuildingAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="PowerBatteryAspect" displayLabel="Power Battery" modifier="None">
+    <BaseClass>ElectricalBuildingAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="EnclosureAspect" displayLabel="Enclosure" modifier="None">
+    <BaseClass>ElectricalBuildingAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="SolarDeviceAspect" displayLabel="Solar Device" modifier="None">
+    <BaseClass>ElectricalBuildingAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="RacewayAspect" displayLabel="Raceway" modifier="None">
+    <BaseClass>SubstationCustomAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="CoverAspect" displayLabel="Cover" modifier="None">
+    <BaseClass>EnclosureAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="CabinetAspect" displayLabel="Cabinet" modifier="None">
+    <BaseClass>EnclosureAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="GasketAspect" displayLabel="Gasket" modifier="None">
+    <BaseClass>EnclosureAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="SecondaryCutOutAspect" displayLabel="Secondary Cut Out" modifier="None">
+    <BaseClass>EnclosureAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="PanelboardAssemblyAspect" displayLabel="Panel Board Assembly" modifier="None">
+    <BaseClass>EnclosureAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="PullBoxAspect" displayLabel="Pull Box" modifier="None">
+    <BaseClass>EnclosureAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="JunctionBoxAspect" displayLabel="Junction Box" description="A point where one or more conducting equipments are connected with zero resistance." modifier="None">
+    <BaseClass>EnclosureAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="OutletBodyAspect" displayLabel="Outlet Body" modifier="None">
+    <BaseClass>EnclosureAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="CableTrenchAspect" displayLabel="Cable Trench" modifier="None">
+    <BaseClass>RacewayAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="DuctbankAspect" displayLabel="Duct bank" modifier="None">
+    <BaseClass>RacewayAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="CableTrayAspect" displayLabel="Cable Tray" modifier="None">
+    <BaseClass>RacewayAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="CableLadderAspect" displayLabel="Cable Ladder" modifier="None">
+    <BaseClass>RacewayAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="CableLadderFittingAspect" displayLabel="Cable Ladder Fitting" modifier="None">
+    <BaseClass>RacewayAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="CableTrayFittingsAspect" displayLabel="Cable Tray Fittings" modifier="None">
+    <BaseClass>RacewayAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="CableTrayCoverAspect" displayLabel="Cable Tray Cover" modifier="None">
+    <BaseClass>RacewayAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="WirewayAspect" displayLabel="Wireway" modifier="None">
+    <BaseClass>RacewayAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="ConduitFittingAspect" displayLabel="Conduit Fittings" modifier="None">
+    <BaseClass>RacewayAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="ConduitAspect" displayLabel="Conduit" modifier="None">
+    <BaseClass>RacewayAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="MiscellaneousAspect" displayLabel="Miscellaneous" modifier="None">
+    <BaseClass>SubstationCustomAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="FenceAspect" displayLabel="Fence" modifier="None">
+    <BaseClass>MiscellaneousAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="GateAspect" displayLabel="Gate" modifier="None">
+    <BaseClass>MiscellaneousAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="ControlBuildingAspect" displayLabel="Control Building" modifier="None">
+    <BaseClass>MiscellaneousAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="OilContainmentSystemAspect" displayLabel="Oil Containment System" modifier="None">
+    <BaseClass>MiscellaneousAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="PhysicalSafetyBarrierAspect" displayLabel="Physical Safety Barrier" modifier="None">
+    <BaseClass>MiscellaneousAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="GeneralHardwareAspect" displayLabel="General Hardware" modifier="None">
+    <BaseClass>MiscellaneousAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="NameplateAspect" displayLabel="Nameplate" description="Mounted on the equipment, and contains most relevant equipment attributes. Can be provided by manufacturer or created by utility using the data from design." modifier="None">
+    <BaseClass>MiscellaneousAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="TerrainAspect" displayLabel="Terrain" description="DTM Terrain" modifier="None">
+    <BaseClass>MiscellaneousAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="AnimalGuardAspect" displayLabel="Animal Guard" modifier="None">
+    <BaseClass>PhysicalSafetyBarrierAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="FireBarrierAspect" displayLabel="Fire Barrier" modifier="None">
+    <BaseClass>PhysicalSafetyBarrierAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="VehicleBarrierAspect" displayLabel="Vehicle Barrier" modifier="None">
+    <BaseClass>PhysicalSafetyBarrierAspect</BaseClass>
+  </ECEntityClass>
+</ECSchema>
