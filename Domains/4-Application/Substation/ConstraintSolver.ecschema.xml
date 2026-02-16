@@ -1,0 +1,149 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ECSchema schemaName="ConstraintSolver" alias="ConSol" version="01.00.01"
+    xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" displayLabel="Constraint Solver" description="The Constraint Solver schema defines classes to be used when solving geometric constraints.">
+
+    <ECSchemaReference name="BisCore" version="01.00.25" alias="bis"/>
+    <ECSchemaReference name="CoreCustomAttributes" version="01.00.04" alias="CoreCA" />
+    <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA" />
+    <ECCustomAttributes>
+        <ProductionStatus xmlns="CoreCustomAttributes.01.00.04">
+            <SupportedUse>NotForProduction</SupportedUse>
+        </ProductionStatus>
+        <SchemaLayerInfo xmlns="BisCustomAttributes.01.00.00">
+            <Value>Application</Value>
+        </SchemaLayerInfo>
+    </ECCustomAttributes>
+    <!-- TODO:                                   -->
+    <!-- TODO: Remove when available in BisCore. -->
+    <!-- TODO:                                   -->
+
+    <ECEntityClass typeName="GeometryDetailRecord" modifier="Abstract" displayLabel="Geometry Detail Record" description="An abstract InformationRecordElement that holds geometry for use by the 'feature tree' stored in the `GeometricElement3d.GeometryOperations` property of its parent Element.">
+        <BaseClass>bis:InformationRecordElement</BaseClass>
+        <ECProperty propertyName="GeometryMap" typeName="binary" extendedTypeName="GeometryMap" displayLabel="Geometry Map" description="Binary stream used to persist the geometries of this bis:Element.">
+            <ECCustomAttributes>
+                <!-- <CustomHandledProperty/> // TODO: this is needed to avoid sending geometry data with each query, but requires C++ work in the platform. -->
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03"/>
+            </ECCustomAttributes>
+        </ECProperty>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="GeometryNodeRecord" modifier="Sealed" displayLabel="Geometry Node Record" description="A GeometryDetailRecord holding geometry that does not express a discipline-specific meaning.">
+        <BaseClass>GeometryDetailRecord</BaseClass>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="GeometricElementOwnsGeometryDetailRecord" strength="embedding" modifier="None" displayLabel="GeometricElement owns GeometryDetailRecord" description="Relates GeometryDetailRecords to their parent Element (of which they describe a geometry detail).">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="describes geometry detail of" polymorphic="true">
+            <Class class="GeometryDetailRecord"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <!-- TODO:End                                   -->
+    <!-- TODO:End Remove when available in BisCore. -->
+    <!-- TODO:End                                   -->
+
+    <ECEntityClass typeName="ConstraintGeometryRecord" modifier="None" displayLabel="Constraint Geometry Record" description="A GeometryDetailRecord holding geometry that is constraint specific.">
+        <BaseClass>GeometryDetailRecord</BaseClass>
+    </ECEntityClass>
+
+    <!-- TODO: should we keep this minimal and add new constraints as requested? -->
+    <ECEnumeration typeName="ConstraintType" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="Distance" displayLabel="Distance" value="0"/>
+        <ECEnumerator name="Angle" displayLabel="Angle" value="1"/>
+        <ECEnumerator name="Concentric" displayLabel="Concentric" value="2"/>
+        <ECEnumerator name="Radius" displayLabel="Radius" value="3"/>
+        <ECEnumerator name="Parallel" displayLabel="Parallel" value="4"/>
+        <ECEnumerator name="Perpendicular" displayLabel="Perpendicular" value="5"/>
+        <ECEnumerator name="Coincident" displayLabel="Coincident" value="6"/>
+        <ECEnumerator name="Tangent" displayLabel="Tangent" value="7"/>
+        <ECEnumerator name="MajorRadius" displayLabel="Major Radius" value="10"/>
+        <ECEnumerator name="MinorRadius" displayLabel="Minor Radius" value="11"/>
+        <ECEnumerator name="EqualRadius" displayLabel="Equal Radius" value="12"/>
+        <ECEnumerator name="Midpoint" displayLabel="Midpoint" value="14"/>
+        <ECEnumerator name="Dependence" displayLabel="Dependence" value="15"/>
+        <ECEnumerator name="EqualParameter" displayLabel="Equal Parameter" value="17"/>
+        <ECEnumerator name="EqualDirection" displayLabel="Equal Direction" value="19"/>
+        <ECEnumerator name="EqualCurvature" displayLabel="Equal Curvature" value="20"/>
+        <ECEnumerator name="EqualFirstDerivative" displayLabel="Equal First Derivative" value="21"/>
+        <ECEnumerator name="EqualSecondDerivative" displayLabel="Equal Second Derivative" value="22"/>
+        <ECEnumerator name="CurveLength" displayLabel="Curve Length" value="25"/>
+        <ECEnumerator name="Symmetric" displayLabel="Symmetric" value="50"/>
+        <ECEnumerator name="HalfAngle" displayLabel="Half Angle" value="51"/>
+        <ECEnumerator name="CoincidentAroundSpine" displayLabel="Coincident Around Spine" value="52"/>
+        <ECEnumerator name="CoincidentWithSpine" displayLabel="Coincident With Spine" value="53"/>
+        <ECEnumerator name="EqualHalfAngle" displayLabel="Equal Half Angle" value="56"/>
+        <ECEnumerator name="EqualCurvatureVector" displayLabel="Equal Curvature Vector" value="59"/>
+        <ECEnumerator name="AnglePlanar" displayLabel="Angle Planar" value="60"/>
+        <ECEnumerator name="SurfaceNormal" displayLabel="Surface Normal" value="61"/>
+    </ECEnumeration>
+
+    <ECEnumeration typeName="ConstraintTo" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="NotSpecified" value="0" displayLabel="Not Specified"/>
+        <ECEnumerator name="NoExterior" value="1" displayLabel="No Exterior"/>
+        <ECEnumerator name="ToCentrePoint" value="2" displayLabel="To Centre Point"/>
+        <ECEnumerator name="ToAxis" value="3" displayLabel="To Axis"/>
+        <ECEnumerator name="ToPlane" value="4" displayLabel="To Plane"/>
+        <ECEnumerator name="ToSpine" value="5" displayLabel="To Spine"/>
+        <ECEnumerator name="ToApex" value="6" displayLabel="To Apex"/>
+    </ECEnumeration>
+
+    <ECEnumeration typeName="HalfSpace" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="NotSpecified" value="0" displayLabel="Not Specified"/>
+        <ECEnumerator name="Positive" value="1" displayLabel="Positive"/>
+        <ECEnumerator name="Negative" value="2" displayLabel="Negative"/>
+    </ECEnumeration>
+
+    <ECEnumeration typeName="ConstraintRigidity" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="NonRigid" value="0" displayLabel="Non Rigid"/>
+        <ECEnumerator name="Rigid" value="1" displayLabel="Rigid"/>
+    </ECEnumeration>
+
+    <ECEntityClass typeName="Constraint" displayLabel="Constraint" modifier="None" description="Describes a constraint between two geometries.">
+        <BaseClass>bis:InformationRecordElement</BaseClass>
+
+        <ECProperty propertyName="Type" typeName="ConstraintType" displayLabel="Type"/>
+        <!-- TODO: should/could these be stored as JSON properties? -->
+        <ECProperty propertyName="Rigidity" typeName="ConstraintRigidity" displayLabel="Rigidity"/>
+        <ECProperty propertyName="Value" typeName="double" displayLabel="Value"/>
+        <!-- TODO: do we want to have a class hierarchy for Constraint class? I.e. BoundedConstraint. -->
+        <ECProperty propertyName="MinValue" typeName="double" displayLabel="Min Value"/>
+        <ECProperty propertyName="MaxValue" typeName="double" displayLabel="Max Value"/>
+    </ECEntityClass>
+
+    <!-- TODO: is there a way to have two ECNavigationProperties with a custom entryId ECProperty? -->
+    <!-- TODO:
+        Currently it is not possible to insert a Constraint between geometries from the same ConstraintGeometryRecord.
+        Since SourceId and TargetId match. As a workaround we could have two ConstraintConstrainsGeometries relationships.
+    -->
+    <ECRelationshipClass typeName="ConstraintConstrainsGeometries" strength="referencing" modifier="Sealed" description="Relationship to define geometries of a constraint.">
+        <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <ECProperty propertyName="EntryId" typeName="int" displayLabel="Geometry Entry Id" />
+        <!-- TODO: should these be on Constraint element i.e. HelpParameter1, HelpParameter2? -->
+        <ECProperty propertyName="HelpParameter" typeName="double" displayLabel="Help Parameter"/>
+        <ECProperty propertyName="ConstraintTo" typeName="ConstraintTo" displayLabel="Constraint To"/>
+        <ECProperty propertyName="HalfSpace" typeName="HalfSpace" displayLabel="Half Space"/>
+        <Source multiplicity="(0..*)" roleLabel="constrains" polymorphic="true">
+            <Class class="Constraint"/>
+        </Source>
+        <Target multiplicity="(2..2)" roleLabel="is constrained by" polymorphic="true">
+            <Class class="ConstraintGeometryRecord"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="ConstraintGroup" modifier="None" displayLabel="Constraint group" description="GroupInformationElement that groups constraints.">
+        <BaseClass>bis:GroupInformationElement</BaseClass>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="ConstraintGroupGroupsConstraint" strength="referencing" modifier="None" description="Relates Constraint to its group">
+        <BaseClass>bis:ElementGroupsMembers</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="groups" polymorphic="true">
+            <Class class="ConstraintGroup"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is grouped in" polymorphic="true">
+            <Class class="Constraint"/>
+        </Target>
+    </ECRelationshipClass>
+</ECSchema>
