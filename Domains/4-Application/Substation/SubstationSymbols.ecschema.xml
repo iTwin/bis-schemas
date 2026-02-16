@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ECSchema xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" schemaName="SubstationSymbols" version="01.00.05" alias="subsym" displayLabel="SubstationSymbols" description="This schema contains classes used for Substation Design.">
+  <ECSchemaReference name="BisCore" version="01.00.25" alias="bis" />
+  <ECSchemaReference name="PowerSystemResourcesPhysical" version="01.00.01" alias="psrp" />
+  <ECSchemaReference name="SubstationPhysical" version="01.00.05" alias="subphy" />
+  <ECSchemaReference name="SubstationDrawing" version="01.00.05" alias="subdwg" />
+  <ECSchemaReference name="CoreCustomAttributes" version="01.00.04" alias="CoreCA" />
+  <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA" />
+  <ECCustomAttributes>
+    <ProductionStatus xmlns="CoreCustomAttributes.01.00.04">
+      <SupportedUse>NotForProduction</SupportedUse>
+    </ProductionStatus>
+    <SchemaLayerInfo xmlns="BisCustomAttributes.01.00.00">
+      <Value>Application</Value>
+    </SchemaLayerInfo>
+  </ECCustomAttributes>  
+  <ECEnumeration typeName="SymbolDrawingAffinity" backingTypeName="int" isStrict="true">
+    <ECEnumerator name="Schematic" value="0" displayLabel="Schematic Drawing" />
+    <ECEnumerator name="Layout" value="1" displayLabel="Layout Drawing" />
+    <ECEnumerator name="Wire" value="2" displayLabel="Wire Drawing" />
+    <ECEnumerator name="SingleLine" value="3" displayLabel="Single Line Drawing" />
+  </ECEnumeration>
+  <ECEntityClass typeName="ElectricalEquipmentDefinition" displayLabel="Electrical Equipment Definition" description="Represents the Functional, 2D Graphical, 3D Physical and Connection data associated with an Electrical Equipment or Device." modifier="None">
+    <BaseClass>bis:DefinitionElement</BaseClass>
+    <ECProperty propertyName="PhysicalClassName" description="Fully Qualified Class-Name of the Equipment's Physical Class." readOnly="false" priority="0" typeName="string" />
+    <ECProperty propertyName="FunctionalClassName" description="Fully Qualified Class-Name of the Equipment's Functional Class." readOnly="false" priority="0" typeName="string" />
+    <ECNavigationProperty propertyName="PhysicalType" description="Reference to the Equipment's Physical Type Class." readOnly="false" priority="0" relationshipName="PhysicalTypeReference" direction="Forward" />
+  </ECEntityClass>
+  <ECRelationshipClass typeName="PhysicalTypeReference" modifier="None" strength="Referencing" strengthDirection="Backward">
+    <Source polymorphic="true" roleLabel="refers to" multiplicity="(1..1)" abstractConstraint="ElectricalEquipmentDefinition">
+      <Class class="ElectricalEquipmentDefinition" />
+    </Source>
+    <Target polymorphic="true" roleLabel="is referred by" multiplicity="(0..1)" abstractConstraint="psrp:EquipmentPhysicalType">
+      <Class class="psrp:EquipmentPhysicalType" />
+    </Target>
+  </ECRelationshipClass>
+  <ECEntityClass typeName="EquipmentSymbolsPhysicalType" displayLabel="Equipment Symbols Physical Type" description="Represents the Physical Type that stores the name of the physical class to be instanced when an electrical equipment is placed. Further the physical type has a reference to the recipe of the graphical elements that need to instanced. These graphical elements represent the physical geometry of the equipment. Can also a shared set of properties whose values vary per-type of an ElectricalPhysicalType." modifier="None">
+    <BaseClass>psrp:EquipmentPhysicalType</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="StructureSymbolsPhysicalType" displayLabel="Structure Symbols Physical Type" description="Represents the Physical Type that stores the name of the physical class to be instanced when an electrical equipment is placed. Further the physical type has a reference to the recipe of the graphical elements that need to instanced. These graphical elements represent the physical geometry of the equipment. Can also a shared set of properties whose values vary per-type of an ElectricalPhysicalType." modifier="None">
+    <BaseClass>psrp:StructurePhysicalType</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="FoundationSymbolsPhysicalType" displayLabel="Foundation Symbols Physical Type" description="Represents the Physical Type that stores the name of the physical class to be instanced when an electrical equipment is placed. Further the physical type has a reference to the recipe of the graphical elements that need to instanced. These graphical elements represent the physical geometry of the equipment. Can also a shared set of properties whose values vary per-type of an ElectricalPhysicalType." modifier="None">
+    <BaseClass>psrp:FoundationPhysicalType</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="SubstationSymbolsPhysicalType" displayLabel="Substation Symbols Physical Type" description="Represents the Physical Type that stores the name of the physical class to be instanced when an electrical equipment is placed. Further the physical type has a reference to the recipe of the graphical elements that need to instanced. These graphical elements represent the physical geometry of the equipment. Can also a shared set of properties whose values vary per-type of an ElectricalPhysicalType." modifier="None">
+    <BaseClass>subphy:SubstationPhysicalType</BaseClass>
+  </ECEntityClass>
+  <ECRelationshipClass typeName="EquipmentDefinitionRefersToSymbol" modifier="None" strength="Referencing" strengthDirection="Forward">
+    <BaseClass>bis:ElementRefersToElements</BaseClass>
+    <ECProperty propertyName="DrawingAffinity" description="The Drawing affinity of the Equipment Definition's Symbol reference" displayLabel="Symbol Drawing Affinity" readOnly="false" priority="0" typeName="SymbolDrawingAffinity" />
+    <Source polymorphic="true" roleLabel="refers to" multiplicity="(0..*)" abstractConstraint="ElectricalEquipmentDefinition">
+      <Class class="ElectricalEquipmentDefinition" />
+    </Source>
+    <Target polymorphic="true" roleLabel="is referred by" multiplicity="(0..*)" abstractConstraint="subdwg:ElectricalSingleSymbolDefinition">
+      <Class class="subdwg:ElectricalSingleSymbolDefinition" />
+    </Target>
+  </ECRelationshipClass>
+</ECSchema>

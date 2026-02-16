@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ECSchema xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" schemaName="SubstationDrawing" version="01.00.05" alias="subdwg" displayLabel="Substation" description="This schema contains classes used for Substation Design.">
+  <ECSchemaReference name="BisCore" version="01.00.25" alias="bis"/>
+  <ECSchemaReference name="CoreCustomAttributes" version="01.00.04" alias="CoreCA" />
+  <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA" />
+  <ECCustomAttributes>
+    <ProductionStatus xmlns="CoreCustomAttributes.01.00.04">
+      <SupportedUse>NotForProduction</SupportedUse>
+    </ProductionStatus>
+    <SchemaLayerInfo xmlns="BisCustomAttributes.01.00.00">
+      <Value>Application</Value>
+    </SchemaLayerInfo>
+  </ECCustomAttributes>
+  <!-- Symbol Graphic Classes -->
+  <ECEntityClass typeName="ElectricalGraphicalType2d" modifier="None" displayLabel="Electrical Graphical Type" description="Represents the Graphical Type for Electrical Symbols.">
+    <BaseClass>bis:GraphicalType2d</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="ElectricalSingleSymbolDefinition" modifier="Sealed" displayLabel="2D Single Symbol" description="Represents the Graphical and Connection data associated with one 2D Electrical Symbol Definition. A ElectricalSingleSymbolDefinition is represented by a ElectricalSymbolGraphic2d and owns one or more ConnectionPointAspect2d Aspects.">
+    <BaseClass>bis:DefinitionElement</BaseClass>
+    <ECNavigationProperty propertyName="DrawingType" relationshipName="DrawingTypeReference" direction="Forward" description="Reference to the Drawing Type. The Elements in the Type's Recipe's template Model are placed when the users selects to place the Symbol in a Drawing Model"/>
+  </ECEntityClass>
+  <ECEntityClass typeName="ElectricalSymbolRecipe" modifier="Sealed" displayLabel="Symbol Recipe" description="Represents the Graphics, Anchor points and Property Label data associated with an Equipment's Physical (3D) Definition.">
+    <BaseClass>bis:TemplateRecipe2d</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="ElectricalSymbolGraphic2d" modifier="None" displayLabel="2D Symbol Graphic" description="Stores the Graphical data associated with one 2D Electrical Symbol. Its (0,0) the insertion point of the Symbol. A ElectricalSymbolGraphic2d Element is used two ways: (1) As the 'graphical aspect' of a 2D Symbol's definition. In this case the ElectricalSymbolGraphic2d is associated with its ElectricalSingleSymbolDefinition thru' is SingleSymbolRecipe. (2) As an instance of 2D Symbol when placed in a Substation Project's Drawing Model. In this case the SymbolGraphics2d is associated with its EquipmentFunctional by the func:DrawingGraphicRepresentsFunctionalElement relationship.">
+    <BaseClass>bis:DrawingGraphic</BaseClass>
+    <ECProperty propertyName="ScaleX" typeName="double" description="The X-Scale of the Symbol when placed in a Drawing Model"/>
+    <ECProperty propertyName="ScaleY" typeName="double" description="The Y-Scale of the Symbol when placed in a Drawing Model"/>
+  </ECEntityClass>
+  <!-- Element Classes used when an equipment is 'instanced' in an iModel -->
+  <ECEntityClass typeName="ElectricalLineSegment" modifier="None" displayLabel="Electrical Line Segment" description="An ElectricalLineSegment Element is a 2D element that connects to either a Symbol or another Segment. One or more connected ElectricalLineSegments may represent a (Functional) ElectricalWire.">
+    <BaseClass>bis:DrawingGraphic</BaseClass>
+  </ECEntityClass>
+  <!-- Relationships -->
+  <ECRelationshipClass typeName="DrawingTypeReference" strength="referencing" strengthDirection="Backward" modifier="None">
+    <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="true">
+      <Class class="ElectricalSingleSymbolDefinition"/>
+    </Source>
+    <Target multiplicity="(1..1)" roleLabel="is referred by" polymorphic="true">
+      <Class class="ElectricalGraphicalType2d"/>
+    </Target>
+  </ECRelationshipClass>  
+</ECSchema>
