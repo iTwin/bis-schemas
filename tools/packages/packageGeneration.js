@@ -158,7 +158,7 @@ async function buildPackage(outPath, packageJsonTemplate, versionInfo, schemaInf
   if (!fs.existsSync(packageDir)) fs.mkdirSync(packageDir, {recursive: true});
 
   const pkgJson = packageJsonTemplate.replace('${PACKAGE_NAME}', versionInfo.packageName)
-                                     .replace('${DOMAIN_NAME}', schemaInfo.name)
+                                     .replace(/\${DOMAIN_NAME}/g, schemaInfo.name)
                                      .replace('${PACKAGE_VERSION}', versionInfo.packageVersion);
 
   fs.writeFileSync(path.join(packageDir, "package.json"), pkgJson);
