@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ECSchema xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" schemaName="SubstationPhysicalCustom" version="01.00.05" alias="subphyc" displayLabel="SubstationPhysicalCustom" description="This schema contains classes used for Substation Design.">
+  <ECSchemaReference name="BisCore" version="01.00.25" alias="bis"/>
   <ECSchemaReference name="PowerSystemResourcesPhysical" version="01.00.01" alias="psrp" />
   <ECSchemaReference name="SubstationPhysical" version="01.00.05" alias="subphy" />
   <ECSchemaReference name="CoreCustomAttributes" version="01.00.04" alias="CoreCA" />
@@ -24,6 +25,50 @@
   <ECEntityClass typeName="SubstationCustomAspect" displayLabel="Substation Aspect" description="Contains properties of an Aspect." modifier="None">
     <BaseClass>subphy:SubstationAspect</BaseClass>
   </ECEntityClass>
+  <ECRelationshipClass typeName="EquipmentOwnsEquipmentCustomAspect" strength="embedding" modifier="None">
+    <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+    <!-- @see ElementUniqueAspect.Element ECNavigationProperty -->
+    <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+      <Class class="psrp:Equipment"/>
+    </Source>
+    <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="true">
+      <!-- Note: multiplicity=(0..*) is correct. While an Element can only have 1 unique aspect per aspect class, it can have N unique aspects total. -->
+      <Class class="EquipmentCustomAspect"/>
+    </Target>
+  </ECRelationshipClass>
+  <ECRelationshipClass typeName="StructureOwnsStructureCustomAspect" strength="embedding" modifier="None">
+    <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+    <!-- @see ElementUniqueAspect.Element ECNavigationProperty -->
+    <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+      <Class class="psrp:Structure"/>
+    </Source>
+    <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="true">
+      <!-- Note: multiplicity=(0..*) is correct. While an Element can only have 1 unique aspect per aspect class, it can have N unique aspects total. -->
+      <Class class="StructureCustomAspect"/>
+    </Target>
+  </ECRelationshipClass>
+  <ECRelationshipClass typeName="FoundationOwnsFoundationCustomAspect" strength="embedding" modifier="None">
+    <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+    <!-- @see ElementUniqueAspect.Element ECNavigationProperty -->
+    <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+      <Class class="psrp:Foundation"/>
+    </Source>
+    <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="true">
+      <!-- Note: multiplicity=(0..*) is correct. While an Element can only have 1 unique aspect per aspect class, it can have N unique aspects total. -->
+      <Class class="FoundationCustomAspect"/>
+    </Target>
+  </ECRelationshipClass>
+  <ECRelationshipClass typeName="SubstationOwnsSubstationCustomAspect" strength="embedding" modifier="None">
+    <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+    <!-- @see ElementUniqueAspect.Element ECNavigationProperty -->
+    <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+      <Class class="subphy:Substation"/>
+    </Source>
+    <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="true">
+      <!-- Note: multiplicity=(0..*) is correct. While an Element can only have 1 unique aspect per aspect class, it can have N unique aspects total. -->
+      <Class class="SubstationCustomAspect"/>
+    </Target>
+  </ECRelationshipClass>
   <ECEntityClass typeName="SwitchAspect" displayLabel="Switch" description="A generic device designed to close, or open, or both, one or more electric circuits.  All switches are two terminal devices including grounding switches. The ACDCTerminal.connected at the two sides of the switch shall not be considered for assessing switch connectivity, i.e. only Switch.open, .normalOpen and .locked are relevant." modifier="None">
     <BaseClass>EquipmentCustomAspect</BaseClass>
   </ECEntityClass>
