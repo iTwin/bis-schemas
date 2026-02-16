@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ==================================================================================
+|  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
+|  * See LICENSE.md in the project root for license terms and full copyright notice.
+======================================================================================= -->
+<ECSchema schemaName="PowerSystemResourcesPhysical" alias="pwrsysresphys" version="01.00.00" description="Base schema for the Earthwork domain." xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
+    <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
+    <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
+    <ECSchemaReference name="BisCore" version="01.00.14" alias="bis"/>
+    <ECSchemaReference name="DistributionSystems" version="01.00.02" alias="dsys"/>
+
+    <ECCustomAttributes>
+        <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
+            <SupportedUse>NotForProduction</SupportedUse>
+        </ProductionStatus>
+        <SchemaLayerInfo xmlns="BisCustomAttributes.01.00.00">
+            <Value>DisciplinePhysical</Value>
+        </SchemaLayerInfo>
+    </ECCustomAttributes>
+
+    <ECEntityClass typeName="ElectricalPort" modifier="None" displayLabel="Electrical Port" description="">
+        <BaseClass>dsys:DistributionPort</BaseClass>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="PortConnectsToPorts" strength="referencing" modifier="None" description="">
+        <BaseClass>dsys:PortConnectsToPorts</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="connects to" polymorphic="true">
+            <Class class="ElectricalPort"/>
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="is connected by" polymorphic="true">
+            <Class class="ElectricalPort"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="CableAssembly" modifier="None" displayLabel="Cable Assembly" description="">
+        <BaseClass>bis:PhysicalElement</BaseClass>
+        <BaseClass>bis:IParentElement</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="CableAssemblyType" modifier="None" displayLabel="Cable Assembly Type" description="">
+        <BaseClass>bis:PhysicalType</BaseClass>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="CableAssemblyIsOfType" strength="referencing" modifier="None" description="">
+        <BaseClass>bis:PhysicalElementIsOfType</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="is of" polymorphic="true">
+            <Class class="CableAssembly" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="classifies" polymorphic="true">
+            <Class class="CableAssemblyType"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="CableConnector" modifier="None" displayLabel="Cable Connector" description="">
+        <BaseClass>bis:PhysicalElement</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="CableConnectorType" modifier="None" displayLabel="Cable Connector Type" description="">
+        <BaseClass>bis:PhysicalType</BaseClass>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="CableConnectorIsOfType" strength="referencing" modifier="None" description="">
+        <BaseClass>bis:PhysicalElementIsOfType</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="is of" polymorphic="true">
+            <Class class="CableConnector" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="classifies" polymorphic="true">
+            <Class class="CableConnectorType"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="Transformer" modifier="None" displayLabel="Transformer" description="">
+        <BaseClass>bis:PhysicalElement</BaseClass>
+        <BaseClass>bis:IParentElement</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="TransformerType" modifier="None" displayLabel="Transformer Type" description="">
+        <BaseClass>bis:PhysicalType</BaseClass>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="TransformerIsOfType" strength="referencing" modifier="None" description="">
+        <BaseClass>bis:PhysicalElementIsOfType</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="is of" polymorphic="true">
+            <Class class="Transformer" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="classifies" polymorphic="true">
+            <Class class="TransformerType"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="Insulator" modifier="None" displayLabel="Insulator" description="">
+        <BaseClass>bis:PhysicalElement</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="InsulatorType" modifier="None" displayLabel="Insulator Type" description="">
+        <BaseClass>bis:PhysicalType</BaseClass>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="InsulatorIsOfType" strength="referencing" modifier="None" description="">
+        <BaseClass>bis:PhysicalElementIsOfType</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="is of" polymorphic="true">
+            <Class class="Insulator" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="classifies" polymorphic="true">
+            <Class class="InsulatorType"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="Structure" modifier="None" displayLabel="Structure" description="">
+        <BaseClass>bis:PhysicalElement</BaseClass>
+        <BaseClass>bis:IParentElement</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="StructureType" modifier="None" displayLabel="Structure Type" description="">
+        <BaseClass>bis:PhysicalType</BaseClass>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="StructureIsOfType" strength="referencing" modifier="None" description="">
+        <BaseClass>bis:PhysicalElementIsOfType</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="is of" polymorphic="true">
+            <Class class="Structure" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="classifies" polymorphic="true">
+            <Class class="StructureType"/>
+        </Target>
+    </ECRelationshipClass>
+</ECSchema>
