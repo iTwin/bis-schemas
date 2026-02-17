@@ -95,7 +95,7 @@
             <Class class="AlignmentType"/>
         </Target>
     </ECRelationshipClass>
-    <ECEntityClass typeName="DesignAlignments" description="Entry-point element into an AlignmentModel containing Alignments used for design purposes in given Spatial Model.">
+    <ECEntityClass typeName="DesignAlignments" description="Entry-point element into a bis:SpatialLocationModel containing Alignments used primarily for design purposes.">
         <BaseClass>bis:SpatialLocationElement</BaseClass>
         <BaseClass>bis:ISubModeledElement</BaseClass>
         <ECCustomAttributes>
@@ -195,4 +195,22 @@
             <Class class="bis:GraphicalElement2d"/>
         </Target>
     </ECRelationshipClass>
+    <ECEntityClass typeName="ProfileDrawing" displayLabel="Profile Drawing" modifier="None" description="A bis:Drawing that showcases the variations in elevation of elements of interests along an lr:ILinearElement in a graphical representation.">
+        <BaseClass>bis:Drawing</BaseClass>
+        <ECProperty propertyName="VerticalExaggeration" typeName="double" />
+        <ECNavigationProperty propertyName="ProfileLocation" relationshipName="ProfileDrawingRefersToLocation" direction="Forward" displayLabel="Profile Location"/>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ProfileDrawingRefersToLocation" strength="referencing" modifier="None" description="Relationship associating a ProfileDrawing to a  ProfileDrawingLocation.">
+        <Source multiplicity="(0..*)" roleLabel="refers to main" polymorphic="false">
+            <Class class="ProfileDrawing"/>
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="false">
+            <Class class="ProfileDrawingLocation"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECEntityClass typeName="ProfileDrawingLocation" displayLabel="Profile Drawing Location" modifier="None" description="The location, in terms of a range over a lr:ILinearElement and an elevation range, that a referencing ProfileDrawing captures.">
+        <BaseClass>lr:LinearLocationRecordElement</BaseClass>
+        <ECProperty propertyName="BottomElevation" typeName="double" kindOfQuantity="rru:ELEVATION"/>
+        <ECProperty propertyName="TopElevation" typeName="double" kindOfQuantity="rru:ELEVATION"/>
+    </ECEntityClass>
 </ECSchema>
