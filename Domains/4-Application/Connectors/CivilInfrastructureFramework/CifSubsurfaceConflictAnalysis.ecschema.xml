@@ -6,8 +6,8 @@
 <ECSchema schemaName="CifSubsurfaceConflictAnalysis" alias="cifsscfan" version="01.00.09" description="iModel Connector schema containing aspect classes with properties from the Subsurface Utilities Engineering module as part of Civil Designer applications." xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
     <ECSchemaReference name="BisCore" version="01.00.16" alias="bis"/>
     <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
-    <ECSchemaReference name="CifCommon" version="01.00.10" alias="cifcmn"/>
-    <ECSchemaReference name="CifUnits" version="01.00.08" alias="cifu"/>
+    <ECSchemaReference name="CifCommon" version="01.00.15" alias="cifcmn"/>
+    <ECSchemaReference name="CifUnits" version="01.00.07" alias="cifu"/>
     <ECSchemaReference name="CoreCustomAttributes" version="01.00.04" alias="CoreCA"/>
     <ECCustomAttributes>
         <ProductionStatus xmlns="CoreCustomAttributes.01.00.04">
@@ -43,6 +43,7 @@
         <ECEnumerator name="Under_Construction" value="5" displayLabel="Under Construction"/>
         <ECEnumerator name="Abandon_In_Place" value="6" displayLabel="Abandon In Place"/>
         <ECEnumerator name="Abandon_Filled_In" value="7" displayLabel="Abandon Filled In"/>
+        <ECEnumerator name="Existing" value="8" displayLabel="Existing"/>
     </ECEnumeration>
     <ECEnumeration typeName="BaseLink_Physical_SegmentShapeTypeAspect_SegmentShapeType_Enum" backingTypeName="int" isStrict="true">
         <ECEnumerator name="Circle" value="2" displayLabel="Circle"/>
@@ -85,6 +86,7 @@
         <ECEnumerator name="Under_Construction" value="5" displayLabel="Under Construction"/>
         <ECEnumerator name="Abandon_In_Place" value="6" displayLabel="Abandon In Place"/>
         <ECEnumerator name="Abandon_Filled_In" value="7" displayLabel="Abandon Filled In"/>
+        <ECEnumerator name="Existing" value="8" displayLabel="Existing"/>
     </ECEnumeration>
     <ECEnumeration typeName="CommunicationNode_NetworkDataAspect_CommNodeType_Enum" backingTypeName="int" isStrict="true">
         <ECEnumerator name="Access_Point" value="0" displayLabel="Access Point"/>
@@ -534,15 +536,20 @@
     </ECEntityClass>
     <ECEntityClass typeName="BaseLink_PhysicalAspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
-        <ECProperty propertyName="Physical_UpstreamInvert" typeName="double" displayLabel="Invert (Start)" category="Physical_Utilities_Physical_Utilities" priority="0" kindOfQuantity="cifu:ELEVATION"/>
-        <ECProperty propertyName="Physical_DownstreamInvert" typeName="double" displayLabel="Invert (Stop)" category="Physical_Utilities_Physical_Utilities" priority="0" kindOfQuantity="cifu:ELEVATION"/>
         <ECProperty propertyName="Physical_CalculatedSlope" typeName="double" displayLabel="Slope (Calculated)" category="Physical_Utilities_Physical_Utilities" priority="0" kindOfQuantity="cifu:SLOPE"/>
+        <ECProperty propertyName="Physical_SetInvertToUpstream" typeName="boolean" displayLabel="Set Invert to Start?" category="Physical_Utilities_Physical_Utilities" priority="0"/>
+        <ECProperty propertyName="Physical_UpstreamInvert" typeName="double" displayLabel="Invert (Start)" category="Physical_Utilities_Physical_Utilities" priority="0" kindOfQuantity="cifu:ELEVATION"/>
+        <ECProperty propertyName="Physical_SetInvertToDownstream" typeName="boolean" displayLabel="Set Invert to Stop?" category="Physical_Utilities_Physical_Utilities" priority="0"/>
+        <ECProperty propertyName="Physical_DownstreamInvert" typeName="double" displayLabel="Invert (Stop)" category="Physical_Utilities_Physical_Utilities" priority="0" kindOfQuantity="cifu:ELEVATION"/>
         <ECProperty propertyName="Physical_ConduitUnitLength" typeName="double" displayLabel="Unit Length" category="Physical_Utilities_Physical_Utilities" priority="0" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="SegmentShapeType" typeName="BaseLink_Physical_SegmentShapeTypeAspect_SegmentShapeType_Enum" displayLabel="Shape" category="Utility_Footprint_Utilities_Utility_Footprint_Utilities" priority="0"/>
+        <ECProperty propertyName="SegmentRise" typeName="double" displayLabel="Rise" category="Utility_Footprint_Utilities_Utility_Footprint_Utilities" priority="0" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="SegmentSpan" typeName="double" displayLabel="Span" category="Utility_Footprint_Utilities_Utility_Footprint_Utilities" priority="0" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="SegmentDiameter" typeName="double" displayLabel="Diameter" category="Utility_Footprint_Utilities_Utility_Footprint_Utilities" priority="0" kindOfQuantity="cifu:LENGTH_DIAMETER"/>
         <ECProperty propertyName="LinkMicroStationID" typeName="string" displayLabel="MicroStation 3D ID" category="General_Utilities_General_Utilities" priority="0"/>
         <ECProperty propertyName="LinkWallThickness" typeName="double" displayLabel="Wall Thickness" category="Physical_Utilities_Physical_Utilities" priority="0" kindOfQuantity="cifu:LENGTH"/>
         <ECProperty propertyName="LinkMicroStation2dID" typeName="string" displayLabel="MicroStation 2D ID" category="General_Utilities_General_Utilities" priority="0"/>
-        <ECProperty propertyName="Physical_SetInvertToDownstream" typeName="boolean" displayLabel="Set Invert to Stop?" category="Physical_Utilities_Physical_Utilities" priority="0"/>
-        <ECProperty propertyName="Physical_SetInvertToUpstream" typeName="boolean" displayLabel="Set Invert to Start?" category="Physical_Utilities_Physical_Utilities" priority="0"/>
+        <ECProperty propertyName="LinkFeatureDefinitionShort" typeName="string" displayLabel="Feature Definition (Short)" category="General_Utilities_General_Utilities" priority="0"/>
     </ECEntityClass>
     <ECEntityClass typeName="GlobalBase_SUE_Aspect">
         <BaseClass>cifcmn:CivilPresentation</BaseClass>
@@ -863,6 +870,7 @@
         <ECProperty propertyName="Outgoing8Invert" typeName="double" displayLabel="Outgoing 8 Invert" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ELEVATION"/>
         <ECProperty propertyName="Outgoing8Angle" typeName="double" displayLabel="Outgoing 8 Angle" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0" kindOfQuantity="cifu:ANGLE"/>
         <ECProperty propertyName="Outgoing8UtilityID" typeName="int" displayLabel="Outgoing 8 Utility ID" category="Connecting_Links_Utilities_Connecting_Links_Utilities" priority="0"/>
+        <ECProperty propertyName="NodeFeatureDefinitionShort" typeName="string" displayLabel="Feature Definition (Short)" category="General_Utilities_General_Utilities" priority="0"/>
     </ECEntityClass>
     <ECEntityClass typeName="BaseNodeAspect">
         <BaseClass>GlobalBase_SUE_Aspect</BaseClass>
