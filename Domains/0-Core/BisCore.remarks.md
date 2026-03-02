@@ -579,3 +579,130 @@ The scenario presented in such example is addressed by introducing a `SpatialLoc
 ![Class diagram](media/SpatialLocationTypeRepresents-classes.png)
 
 ![Instance diagram](media/SpatialLocationTypeRepresents-instances.png)
+
+## Sample ECSQL queries
+
+- `DrawingGraphic`s representing a particular `PhysicalElement` in a specific `Drawing`
+
+```
+SELECT
+    d.ECInstanceId
+FROM
+    bis.PhysicalElement p INNER JOIN
+    bis.DrawingGraphicRepresentsElement r ON p.ECInstanceId = r.TargetECInstanceId INNER JOIN
+    bis.DrawingGraphic d ON d.ECInstanceId = r.SourceECInstanceId
+WHERE
+    p.ECInstanceId = ?1 AND d.Model.Id = ?2
+```
+
+- Count of `GeometricElement3d`s that have assigned _Geometry_, per concrete _ECClass_.
+
+```
+SELECT
+    ec_classname(ECClassId),
+    COUNT(*)
+FROM
+    bis.GeometricElement3d
+WHERE
+    GeometryStream IS NOT NULL
+GROUP BY
+    ECClassId
+```
+
+- Count of `PhysicalElement`s per `PhysicalMaterial`.
+
+```
+SELECT 
+    pm.CodeValue,
+    COUNT(*)
+FROM 
+    bisViews.PhysicalElementMaterialView v INNER JOIN 
+    bis.PhysicalMaterial pm ON v.PhysicalMaterial.Id = pm.ECInstanceId
+GROUP BY
+    pm.ECInstanceId
+```
+
+- Count of `Element`s per associated `RepositoryLink` (provenance).
+
+```
+SELECT
+    rl.CodeValue,
+    rl.UserLabel,
+    COUNT(*)
+FROM
+    bis.RepositoryLink rl INNER JOIN
+    bis.ExternalSource s ON s.Repository.Id = rl.ECInstanceId INNER JOIN
+    bis.ExternalSourceAspect xsa ON xsa.Source.Id = s.ECInstanceId
+WHERE
+    rl.ECInstanceId = ?
+```
+
+- Subject hierarchy reported according to element-creation order.
+
+```
+SELECT 
+    ECInstanceId, 
+    CodeValue, 
+    Parent.Id, 
+    ec_classname(ECClassId), 
+    UserLabel, 
+    JsonProperties 
+FROM 
+    bis.Element
+WHERE 
+    ECClassId IS (bis.Subject, bis.InformationPartitionElement) 
+ORDER BY 
+    ECInstanceId
+```
+
+- Subject hierarchy traversed recursively (i.e. Depth-First search) starting at _Root Subject_.
+
+```
+WITH RECURSIVE elementsInHierarchy(id) AS (
+    VALUES(0x1) 
+UNION ALL 
+    SELECT 
+        ECInstanceId 
+    FROM 
+        bis.Element e, 
+        elementsInHierarchy h 
+    WHERE 
+        e.Parent.Id = h.id) 
+SELECT 
+    e.ECInstanceId, 
+    e.CodeValue, 
+    e.UserLabel, 
+    ec_classname(e.ECClassId) 
+FROM 
+    elementsInHierarchy h, 
+    bis.Element e 
+WHERE 
+    e.ECInstanceId = h.id
+```
+
+- Elements under a particular `Subject`, queried recursively.
+
+```
+WITH RECURSIVE elementsInHierarchy(id) AS (
+    VALUES(?) 
+UNION ALL 
+    SELECT 
+        e.ECInstanceId 
+    FROM 
+        bis.Element e, 
+        elementsInHierarchy h, 
+        bis.Element he 
+    WHERE 
+        (he.ECInstanceId = h.id) AND ((he.ECClassId IS (bis.IParentElement) AND e.Parent.Id = h.id) 
+        OR (he.ECClassId IS (bis.ISubModeledElement) AND e.Model.Id = h.id))) 
+SELECT 
+    e.ECInstanceId, 
+    e.CodeValue, 
+    e.UserLabel, 
+    ec_classname(e.ECClassId) 
+FROM 
+    elementsInHierarchy h, 
+    bis.Element e 
+WHERE 
+    e.ECInstanceId = h.id
+```
