@@ -126,6 +126,7 @@
         <ECEnumerator value="2" name="SLOPEDIRECTION" displayLabel="Slope Direction" description="Specialized control vertex that uses slope constraints along a single direction in the spatial interpolation calculation." />
     </ECEnumeration>
 
+    <!-- Not to be confused with a SITEOPS 'side' object, this enum dictates if the left or right side of the bay is to be overridden -->
     <ECEnumeration typeName="BaySide" backingTypeName="int" isStrict="true" displayLabel="Bay Side" description="Side of a parking bay.">
         <ECEnumerator value="0" name="LEFT" displayLabel="Left" />
         <ECEnumerator value="1" name="RIGHT" displayLabel="Right" />
@@ -347,50 +348,63 @@
     <ECEntityClass typeName="AisleCentralOverride" modifier="Sealed" displayLabel="Center Aisle Override">
         <BaseClass>ParkingOverride</BaseClass>
 
-        <ECProperty propertyName="aisleId" typeName="string" category="ParkingAisleOverride_Aisle" displayLabel="Aisle" description="The ID of the Aisle to be overridden." />
-        <ECProperty propertyName="width" typeName="double" kindOfQuantity="cvu:LENGTH" category="ParkingAisleOverride_Aisle" displayLabel="Aisle Width" description="The new width of the Aisle." />
+        <!-- 
+            Unique identifier for an 'aisle' in a parking lot. Takes the form of '[L/R][offset count]' OR 'C'
+            [L/R] for direction relative to parking direction path
+            [offset count] for how many aisles left or right of the parking direction path
+            Example: L2 refers to the second aisle to the left of the parking direction path
+                    'C' refers to the center aisle that runs along the parking direction path
+        -->
+        <ECProperty propertyName="AisleId" typeName="string" category="ParkingAisleOverride_Aisle" displayLabel="Aisle" description="The Id of the Aisle to be overridden." />
+        <ECProperty propertyName="Width" typeName="double" kindOfQuantity="cvu:LENGTH" category="ParkingAisleOverride_Aisle" displayLabel="Aisle Width" description="The new width of the Aisle." />
     </ECEntityClass>
 
     <ECEntityClass typeName="BayOverride" modifier="Abstract" displayLabel="Bay Override">
         <BaseClass>ParkingOverride</BaseClass>
 
-        <ECProperty propertyName="bayId" typeName="string" category="ParkingBayOverride_Bay" displayLabel="Bay" description="The ID of the Bay to be overridden." />
+        <!-- 
+            Unique identifier for a 'bay' in a parking lot. Takes the form of '[L/R][offset count]'
+            [L/R] for direction relative to parking direction path
+            [offset count] for how many bays left or right of the parking direction path
+            Example: R1 refers to the first bay to the right of the parking direction path
+        -->
+        <ECProperty propertyName="BayId" typeName="string" category="ParkingBayOverride_Bay" displayLabel="Bay" description="The Id of the Bay to be overridden." />
     </ECEntityClass>
 
     <ECEntityClass typeName="BayCentralOverride" modifier="Sealed" displayLabel="Bay Central Override">
         <BaseClass>BayOverride</BaseClass>
 
-        <ECProperty propertyName="medianWidth" typeName="double" kindOfQuantity="cvu:LENGTH" category="ParkingBayOverride_Bay" displayLabel="Median Width" description="The new median width of the Bay." />
+        <ECProperty propertyName="MedianWidth" typeName="double" kindOfQuantity="cvu:LENGTH" category="ParkingBayOverride_Bay" displayLabel="Median Width" description="The new median width of the Bay." />
     </ECEntityClass>
 
     <ECEntityClass typeName="BaySideOverride" modifier="Sealed" displayLabel="Bay Side Override">
         <BaseClass>BayOverride</BaseClass>
 
-        <ECProperty propertyName="sideOfBay" typeName="BaySide" category="ParkingBayOverride_Bay" displayLabel="Side of Bay" description="Side of the bay to be overridden." />
-        <ECProperty propertyName="angle" typeName="double" kindOfQuantity="cvu:ANGLE" category="ParkingBayOverride_Bay" displayLabel="Row Angle" description="The new angle of the Bay." />
-        <ECProperty propertyName="depth" typeName="double" kindOfQuantity="cvu:LENGTH" category="ParkingBayOverride_Bay" displayLabel="Row Depth" description="The new depth of the Bay." />
+        <ECProperty propertyName="SideOfBay" typeName="BaySide" category="ParkingBayOverride_Bay" displayLabel="Side of Bay" description="Side of the bay to be overridden." />
+        <ECProperty propertyName="Angle" typeName="double" kindOfQuantity="cvu:ANGLE" category="ParkingBayOverride_Bay" displayLabel="Row Angle" description="The new angle of the Bay." />
+        <ECProperty propertyName="Depth" typeName="double" kindOfQuantity="cvu:LENGTH" category="ParkingBayOverride_Bay" displayLabel="Row Depth" description="The new depth of the Bay." />
     </ECEntityClass>
 
     <ECEntityClass typeName="SpaceOverride" modifier="Abstract" displayLabel="Space Override">
         <BaseClass>ParkingOverride</BaseClass>
 
-        <ECProperty propertyName="rowIndex" typeName="int" category="ParkingSpaceOverride_Row" displayLabel="Row Index" description="The index of the row to be overridden." />
-        <ECProperty propertyName="spaceIndex" typeName="int" category="ParkingSpaceOverride_Space" displayLabel="Space Index" description="The index of the space to be overridden." />
+        <ECProperty propertyName="RowIndex" typeName="int" category="ParkingSpaceOverride_Row" displayLabel="Row Index" description="The index of the row to be overridden." />
+        <ECProperty propertyName="SpaceIndex" typeName="int" category="ParkingSpaceOverride_Space" displayLabel="Space Index" description="The index of the space to be overridden." />
 
-        <ECProperty propertyName="width" typeName="double" kindOfQuantity="cvu:LENGTH" category="ParkingSpaceOverride_Space" displayLabel="Space Width" description="The new width of the space." />
+        <ECProperty propertyName="Width" typeName="double" kindOfQuantity="cvu:LENGTH" category="ParkingSpaceOverride_Space" displayLabel="Space Width" description="The new width of the space." />
     </ECEntityClass>
 
     <ECEntityClass typeName="SpaceEdgeOverride" modifier="Sealed" displayLabel="Space Edge Override">
         <BaseClass>SpaceOverride</BaseClass>
 
-        <ECNavigationProperty propertyName="relatedEdge" relationshipName="EdgeSpaceOverrideRefersToLayoutParkingEdge" direction="Forward" displayLabel="Related Edge" description="The edge that the override is applied to." />
+        <ECNavigationProperty propertyName="RelatedEdge" relationshipName="EdgeSpaceOverrideRefersToLayoutParkingEdge" direction="Forward" displayLabel="Related Edge" description="The edge that the override is applied to." />
     </ECEntityClass>
 
     <ECEntityClass typeName="SpaceCentralOverride" modifier="Sealed" displayLabel="Space Central Override">
         <BaseClass>SpaceOverride</BaseClass>
 
-        <ECProperty propertyName="bayId" typeName="string" category="ParkingBayOverride_Bay" displayLabel="Bay" description="The ID of the Bay to be overridden." />
-        <ECProperty propertyName="sideOfBay" typeName="BaySide" category="ParkingBayOverride_Bay" displayLabel="Side of Bay" description="Side of the bay to be overridden." />
+        <ECProperty propertyName="BayId" typeName="string" category="ParkingBayOverride_Bay" displayLabel="Bay" description="The Id of the Bay to be overridden." />
+        <ECProperty propertyName="SideOfBay" typeName="BaySide" category="ParkingBayOverride_Bay" displayLabel="Side of Bay" description="Side of the bay to be overridden." />
     </ECEntityClass>
 
     <ECEntityClass typeName="ParkingVertex" modifier="Abstract" displayLabel="Parking Vertex">
