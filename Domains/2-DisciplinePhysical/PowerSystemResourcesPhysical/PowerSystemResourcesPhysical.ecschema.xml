@@ -30,10 +30,10 @@
   <ECEntityClass typeName="Foundation" displayLabel="Foundation" description="Foundation represents an Foundation when the foundation is placed in a 3D PhysicalModel." modifier="Abstract">
     <BaseClass>bis:PhysicalElement</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="ElectricalPort" displayLabel="Electrical Port" description="" modifier="None">
+  <ECEntityClass typeName="ElectricalPort" displayLabel="Electrical Port" description="Describes a geometry set that is used by the constraint solver engine for electrical items." modifier="None">
     <BaseClass>dsys:DistributionPort</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="StructuralPort" displayLabel="Structural Port" description="" modifier="None">
+  <ECEntityClass typeName="StructuralPort" displayLabel="Structural Port" description="Describes a geometry set that is used by the constraint solver engine for structural items." modifier="None">
     <BaseClass>bis:SpatialLocationElement</BaseClass>
   </ECEntityClass>
   <ECEntityClass typeName="PortConnection" displayLabel="Port Connection" description="An element that indicates a connection between 2 distribution ports." modifier="None">
@@ -45,7 +45,7 @@
   <ECEntityClass typeName="AuxiliaryEquipment" displayLabel="Auxiliary Equipment" description="AuxiliaryEquipment describes equipment that does not perform primary functions but supports equipment that does." modifier="None">
     <BaseClass>Equipment</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="Insulator" displayLabel="Insulator" description="" modifier="None">
+  <ECEntityClass typeName="Insulator" displayLabel="Insulator" description="A device used to electrically isolate conductors from supporting structures while providing mechanical support. Insulators prevent unwanted current flow to ground or between conductors." modifier="None">
     <BaseClass>AuxiliaryEquipment</BaseClass>
     <ECProperty propertyName="SerialNumber" displayLabel="Serial Number"   typeName="string" />
     <ECProperty propertyName="OverallLength" displayLabel="Overall Length"   typeName="string" />
@@ -56,13 +56,13 @@
     <BaseClass>Equipment</BaseClass>
     <ECProperty propertyName="CablePath" description="B-Spline of center line for the cable assembly" displayLabel="Cable Path"   typeName="Bentley.Geometry.Common.IGeometry" />
     <ECArrayProperty propertyName="CablePathPoints" readOnly="true" typeName="point3d" minOccurs="0" maxOccurs="2147483647" />
-    <ECProperty propertyName="Name" description="" displayLabel="Name"   priority="90" typeName="string" />
-    <ECProperty propertyName="NumberOfCables" description="" displayLabel="Number Of Cables"   priority="80" typeName="int" />
+    <ECProperty propertyName="Name" displayLabel="Name"   priority="90" typeName="string" />
+    <ECProperty propertyName="NumberOfCables" displayLabel="Number Of Cables"   priority="80" typeName="int" />
     <ECArrayProperty propertyName="WireOffsetsAtConnector" description="offsets to ports" displayLabel="Wire Offsets At Connector"   priority="70" typeName="point3d" minOccurs="0" maxOccurs="2147483647" />
     <ECProperty propertyName="WireOffsetFromConnector" description="defines second cable vertex distance because of the rigidity of a cable" displayLabel="Wire Offset From Connector"   priority="60" typeName="double" />
-    <ECProperty propertyName="UseSag" description="" displayLabel="Use Sag"   priority="50" typeName="boolean" />
+    <ECProperty propertyName="UseSag" displayLabel="Use Sag"   priority="50" typeName="boolean" />
     <ECProperty propertyName="Sag" description="manual amount of sag" displayLabel="Sag"   priority="40" typeName="double" />
-    <ECProperty propertyName="UseSpacer" description="" displayLabel="Use Spacer"   priority="30" typeName="boolean" />
+    <ECProperty propertyName="UseSpacer" displayLabel="Use Spacer"   priority="30" typeName="boolean" />
     <ECProperty propertyName="Spacer" description="Spacer spacing" displayLabel="Spacer"   priority="10" typeName="double" />
   </ECEntityClass>
   <ECEntityClass typeName="EquipmentPhysicalType" displayLabel="Equipment Physical Type" description="Represents the Equipment Physical Type that stores the name of the physical class to be instanced when an electrical equipment is placed. Further the physical type has a reference to the recipe of the graphical elements that need to instanced. These graphical elements represent the physical geometry of the equipment. Can also a shared set of properties whose values vary per-type of an ElectricalPhysicalType." modifier="None">
@@ -137,7 +137,7 @@
       <Class class="bis:PhysicalElement" />
     </Target>
   </ECRelationshipClass>
-  <ECRelationshipClass typeName="EquipmentOwnsElectricalPorts" description="" modifier="None" strength="Embedding" strengthDirection="Forward">
+  <ECRelationshipClass typeName="EquipmentOwnsElectricalPorts" description="Specifies that Equipment owns one or more ElectricalPort elements for electrical connectivity." modifier="None" strength="Embedding" strengthDirection="Forward">
     <BaseClass>dsys:DistributionElementOwnsDistributionPorts</BaseClass>
     <Source polymorphic="true" roleLabel="owns" multiplicity="(1..1)" abstractConstraint="Equipment">
       <Class class="Equipment" />
@@ -146,7 +146,7 @@
       <Class class="ElectricalPort" />
     </Target>
   </ECRelationshipClass>
-  <ECRelationshipClass typeName="EquipmentOwnsStructuralPorts" description="" modifier="None" strength="Embedding" strengthDirection="Forward">
+  <ECRelationshipClass typeName="EquipmentOwnsStructuralPorts" description="Specifies that Equipment owns one or more StructuralPort elements for structural connectivity and attachment points." modifier="None" strength="Embedding" strengthDirection="Forward">
     <BaseClass>bis:ElementOwnsChildElements</BaseClass>
     <Source polymorphic="true" roleLabel="owns" multiplicity="(1..1)" abstractConstraint="Equipment">
       <Class class="Equipment" />
@@ -155,7 +155,7 @@
       <Class class="StructuralPort" />
     </Target>
   </ECRelationshipClass>
-  <ECRelationshipClass typeName="StructureOwnsStructuralPorts" description="" modifier="None" strength="Embedding" strengthDirection="Forward">
+  <ECRelationshipClass typeName="StructureOwnsStructuralPorts" description="Specifies that Structure owns one or more StructuralPort elements for structural connectivity and attachment points." modifier="None" strength="Embedding" strengthDirection="Forward">
     <BaseClass>bis:ElementOwnsChildElements</BaseClass>
     <Source polymorphic="true" roleLabel="owns" multiplicity="(1..1)" abstractConstraint="Structure">
       <Class class="Structure" />
@@ -164,7 +164,7 @@
       <Class class="StructuralPort" />
     </Target>
   </ECRelationshipClass>
-  <ECRelationshipClass typeName="StructureOwnsInsulators" description="" modifier="None" strength="Embedding" strengthDirection="Forward">
+  <ECRelationshipClass typeName="StructureOwnsInsulators" description="Specifies that Structure owns one or more Insulator elements that provide electrical isolation and mechanical support." modifier="None" strength="Embedding" strengthDirection="Forward">
     <BaseClass>bis:ElementOwnsChildElements</BaseClass>
     <Source polymorphic="true" roleLabel="owns" multiplicity="(1..1)" abstractConstraint="Structure">
       <Class class="Structure" />
@@ -173,7 +173,7 @@
       <Class class="Insulator" />
     </Target>
   </ECRelationshipClass>
-  <ECRelationshipClass typeName="StructureOwnsFoundation" description="" modifier="None" strength="Embedding" strengthDirection="Forward">
+  <ECRelationshipClass typeName="StructureOwnsFoundation" description="Specifies that Structure owns one or more Foundation elements that provide ground support and stability." modifier="None" strength="Embedding" strengthDirection="Forward">
     <BaseClass>bis:ElementOwnsChildElements</BaseClass>
     <Source polymorphic="true" roleLabel="owns" multiplicity="(1..1)" abstractConstraint="Structure">
       <Class class="Structure" />
@@ -182,7 +182,7 @@
       <Class class="Foundation" />
     </Target>
   </ECRelationshipClass>
-  <ECRelationshipClass typeName="EquipmentIsOfType" description="" modifier="None" strength="Referencing" strengthDirection="Forward">
+  <ECRelationshipClass typeName="EquipmentIsOfType" description="Associates Equipment instances with their corresponding EquipmentPhysicalType definition." modifier="None" strength="Referencing" strengthDirection="Forward">
     <BaseClass>bis:PhysicalElementIsOfType</BaseClass>
     <Source polymorphic="true" roleLabel="is of" multiplicity="(0..*)" abstractConstraint="Equipment">
       <Class class="Equipment" />
@@ -191,7 +191,7 @@
       <Class class="EquipmentPhysicalType" />
     </Target>
   </ECRelationshipClass>
-  <ECRelationshipClass typeName="StructureIsOfType" description="" modifier="None" strength="Referencing" strengthDirection="Forward">
+  <ECRelationshipClass typeName="StructureIsOfType" description="Associates Structure instances with their corresponding StructurePhysicalType definition." modifier="None" strength="Referencing" strengthDirection="Forward">
     <BaseClass>bis:PhysicalElementIsOfType</BaseClass>
     <Source polymorphic="true" roleLabel="is of" multiplicity="(0..*)" abstractConstraint="Structure">
       <Class class="Structure" />
@@ -200,7 +200,7 @@
       <Class class="StructurePhysicalType" />
     </Target>
   </ECRelationshipClass>
-  <ECRelationshipClass typeName="FoundationIsOfType" description="" modifier="None" strength="Referencing" strengthDirection="Forward">
+  <ECRelationshipClass typeName="FoundationIsOfType" description="Associates Foundation instances with their corresponding FoundationPhysicalType definition." modifier="None" strength="Referencing" strengthDirection="Forward">
     <BaseClass>bis:PhysicalElementIsOfType</BaseClass>
     <Source polymorphic="true" roleLabel="is of" multiplicity="(0..*)" abstractConstraint="Foundation">
       <Class class="Foundation" />
