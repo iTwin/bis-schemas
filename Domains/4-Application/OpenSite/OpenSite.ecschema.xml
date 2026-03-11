@@ -392,6 +392,8 @@
         <ECProperty propertyName="SpaceIndex" typeName="int" category="ParkingSpaceOverride_Space" displayLabel="Space Index" description="The index of the space to be overridden." />
 
         <ECProperty propertyName="Width" typeName="double" kindOfQuantity="cvu:LENGTH" category="ParkingSpaceOverride_Space" displayLabel="Space Width" description="The new width of the space." />
+
+        <ECNavigationProperty propertyName="SurfaceMarkingType" relationshipName="SpaceOverrideUsesSurfaceMarkingType" direction="Forward" displayLabel="Surface Marking Type" description="The surface marking type applied to the space." />
     </ECEntityClass>
 
     <ECEntityClass typeName="SpaceEdgeOverride" modifier="Sealed" displayLabel="Space Edge Override">
@@ -623,6 +625,15 @@
     <ECEntityClass typeName="ParkingDirectionPathEdge" modifier="Sealed" displayLabel="Parking Direction Edge" description="Parking direction path edge.">
         <BaseClass>PathEdge</BaseClass>
     </ECEntityClass>
+
+    <ECRelationshipClass typeName="SpaceOverrideUsesSurfaceMarkingType" strength="referencing" modifier="Sealed">
+        <Source multiplicity="(0..*)" roleLabel="uses" polymorphic="false">
+            <Class class="SpaceOverride" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is used by" polymorphic="true">
+            <Class class="cvphys:SurfaceMarkingType" />
+        </Target>
+    </ECRelationshipClass>
 
     <ECRelationshipClass typeName="DrivewayPathUsesCurbType" strength="referencing" modifier="Sealed">
         <Source multiplicity="(0..*)" roleLabel="uses" polymorphic="false">
@@ -1143,6 +1154,14 @@
         <ECProperty propertyName="MajorStepMultiple" typeName="int" displayLabel="Major Step Interval" description="Number of minor intervals between two major steps" />
     </ECEntityClass>
 
+    <ECEntityClass typeName="HatchingAspect" modifier="Sealed" displayLabel="Hatching">
+        <BaseClass>bis:ElementUniqueAspect</BaseClass>
+
+        <ECProperty propertyName="Spacing" typeName="double" kindOfQuantity="cvu:LENGTH" displayLabel="Spacing" description="Space between the hatch lines." />
+        <ECProperty propertyName="Angle" typeName="double" kindOfQuantity="cvu:ANGLE" displayLabel="Angle" description="Angle of the hatch lines." />
+        <ECProperty propertyName="Width" typeName="double" kindOfQuantity="cvu:LENGTH" displayLabel="Width" description="Width of the hatch lines." />
+    </ECEntityClass>
+
     <ECEntityClass typeName="RetainingWallType" displayLabel="Retaining Wall Type" description="Defines a shared set of properties whose values vary per-type of RetainingWall rather than per-instance.">
         <BaseClass>cvphys:RetainingWallType</BaseClass>
 
@@ -1178,6 +1197,16 @@
         </Source>
         <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
             <Class class="ContourLinesAspect" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="SpaceOverrideOwnsHatchingAspect" modifier="Sealed" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="SpaceOverride" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="HatchingAspect" />
         </Target>
     </ECRelationshipClass>
 
