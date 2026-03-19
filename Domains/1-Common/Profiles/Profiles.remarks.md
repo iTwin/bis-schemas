@@ -103,6 +103,8 @@ In addition, such Profiles have a bounding box which is centered at the center o
 - `ThicknessAtToe` = `FlangeThickness` - `FlangeThicknessDistance` * Tan(`FlangeSlope`)
 - `WebInnerEdgeLength` = `Depth` - `FlangeThickness` * 2 - (`FlangeInnerEdgeWidth` - `FlangeThicknessDistance`) * Tan(`FlangeSlope`) * 2
 
+Note that `FlangeEdgeRadius` can be bigger than `FlangeThickness`.
+
 **Constraints:**
 - `FlangeWidth` must be greater than zero
 - `Depth` must be greater than zero
@@ -119,7 +121,6 @@ In addition, such Profiles have a bounding box which is centered at the center o
 - `FlangeEdgeRadius` (if set):
   - must be greater or equal to zero
   - must be less or equal to half of `FlangeInnerEdgeWidth`
-  - must be less or equal to `FlangeThickness`
 - `FlangeSlope` (if set):
   - must be greater or equal to zero
   - must be less than ninety degrees
@@ -196,6 +197,8 @@ In addition, such Profiles have a bounding box which is centered at the center o
 - `WebEdgeLength` = `Depth` - `FlangeThickness` * 2 - (`FlangeInnerEdgeWidth` - `FlangeThicknessDistance`) * Tan(`TopFlangeSlope`) * 2
 - `FlangeThicknessAtToe` = `FlangeThickness` - `FlangeThicknessDistance` * Tan(`TopFlangeSlope`)
 
+Note that `FlangeEdgeRadius` can be bigger than `FlangeThickness`.
+
 **Constraints:**
 - `FlangeWidth` must be greater than zero
 - `Depth` must be greater than zero
@@ -212,7 +215,6 @@ In addition, such Profiles have a bounding box which is centered at the center o
 - `FlangeEdgeRadius` (if set):
   - must be greater or equal to zero
   - must be less or equal to half `FlangeInnerEdgeWidth`
-  - must be less or equal to `FlangeThickness`
 - `FlangeSlope` (if set):
   - must be greater or equal to zero
   - must be less than ninety degrees
@@ -233,6 +235,8 @@ In addition, such Profiles have a bounding box which is centered at the center o
 - `WebSlopeHeight` = `WebEdgeWidth` * Tan(`WebSlope`)
 - `WebThicknessAtToe` = `WebThickness` - `WebThicknessDistance` * Tan(`WebSlope`) * 2
 
+Note that `FlangeEdgeRadius` can be bigger than `FlangeThickness`.
+
 **Constraints:**
 - `FlangeWidth` must be greater than zero
 - `Depth` must be greater than zero
@@ -249,7 +253,6 @@ In addition, such Profiles have a bounding box which is centered at the center o
 - `FlangeEdgeRadius`
   - must be greater or equal to zero
   - must be less or equal to half `FlangeInnerEdgeWidth`
-  - must be less or equal to `FlangeThicknessAtToe`
 - `FlangeSlope` (if set):
   - must be greater or equal to zero
   - must be less than ninety degrees
@@ -281,7 +284,7 @@ In addition, such Profiles have a bounding box which is centered at the center o
 - `VerticalLegInnerEdgeLength` = `Depth` - `Thickness`
 - `VerticalLegSlopeHeight` = `VerticalLegInnerEdgeLength` * Tan(`LegSlope`)
 
-Note that `EdgeRadius` can be bigger than thickness.
+Note that `EdgeRadius` can be bigger than `Thickness`.
 
 **Constraints:**
 - `Width` must be greater than zero
@@ -367,7 +370,7 @@ Note that `EdgeRadius` can be bigger than thickness.
 
 ### SchifflerizedLShapeProfile
 
-Note that `EdgeRadius` can be bigger than thickness.
+Note that `EdgeRadius` can be bigger than `Thickness`.
 
 **Constraints:**
 - `LegLength` must be greater than zero
