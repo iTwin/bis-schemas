@@ -93,7 +93,7 @@ To successfully run the tools described in this section, follow the steps below 
 #### Prerequisites
 
 - [Git](https://git-scm.com/)
-- [Node](https://nodejs.org/en/): an installation of the latest security patch of Node 14. The Node installation also includes the **npm** package manager.
+- [Node](https://nodejs.org/en/): an installation of the latest security patch of Node 20. The Node installation also includes the **npm** package manager.
 - [TypeScript](https://www.typescriptlang.org/): this is listed as a devDependency, so if you're building it from source, you will get it with `rush install`.
 - [Visual Studio Code](https://code.visualstudio.com/): an optional dependency, but the repository structure is optimized for its use
 
@@ -105,7 +105,7 @@ To successfully run the tools described in this section, follow the steps below 
 
 The [SchemaInventory.json](https://github.com/iTwin/bis-schemas/blob/master/SchemaInventory.json) file at the root of the bis-schemas repository contains an up-to-date inventory of all schemas in the bis-schemas repository. The schema inventory must be updated using the npm task 'updateSchemaInventory', defined in the bis-schemas package.json, for all pull-requests that define new schemas. This includes a new version of a work-in-progress schema or a new released schema.  
 
- > Missing schemas will cause the `Bis Schemas - TS Validation (Github)` build to fail during pull-requests builds of the bis-schemas repository.
+ > Missing schemas will cause the `BIS Schemas - TS Validation` pipeline to fail during pull-requests.
 
 To run the 'updateSchemaInventory' script, follow these steps:
 
