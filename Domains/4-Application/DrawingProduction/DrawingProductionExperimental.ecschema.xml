@@ -19,5 +19,22 @@
 
     <ECEntityClass typeName="ViewAttachmentPlaceHolder" displayLabel="View Attachment Placeholder" modifier="None" description="An area on a sheet where a view is to be placed.">
         <BaseClass>bis:GraphicalElement2d</BaseClass>
+        <ECNavigationProperty propertyName="overridesPrototypePlaceholder" relationshipName="PlaceholderOverride" direction="Forward" displayLabel="Overrides Prototype Placeholder" description="The prototype placeholder this local override was copied from. Absent when the placeholder matches the prototype."/>
     </ECEntityClass>
+    
+    <ECEntityClass typeName="ViewAttachmentWithPlaceHolder" displayLabel="View Attachment (with placeholder)" modifier="None" description="Attachment wrapper exposing placeholder link.">
+      <BaseClass>bis:ViewAttachment</BaseClass>
+      <ECNavigationProperty propertyName="placeHolder" relationshipName="ViewAttachmentFulfillsPlaceHolder" direction="Forward" displayLabel="PlaceHolder" description="The sheet region this ViewAttachment fills."/>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="ViewAttachmentFulfillsPlaceHolder" strength="referencing" modifier="Sealed"
+        description="Relates a ViewAttachmentWithPlaceHolder to the ViewAttachmentPlaceHolder it fills.">
+        <Source multiplicity="(0..1)" roleLabel="fills" polymorphic="true">
+            <Class class="ViewAttachmentWithPlaceHolder"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is filled by" polymorphic="true">
+            <Class class="ViewAttachmentPlaceHolder"/>
+        </Target>
+    </ECRelationshipClass>
+
 </ECSchema>
