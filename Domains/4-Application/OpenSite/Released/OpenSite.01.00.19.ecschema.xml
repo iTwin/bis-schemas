@@ -3,7 +3,7 @@
 |  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
 |  * See LICENSE.md in the project root for license terms and full copyright notice.
 ======================================================================================= -->
-<ECSchema schemaName="OpenSite" alias="opnsite" version="01.00.22" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" displayLabel="OpenSite" description="OpenSite+ application schema.">
+<ECSchema schemaName="OpenSite" alias="opnsite" version="01.00.19" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" displayLabel="OpenSite" description="OpenSite+ application schema.">
     <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA" />
     <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
     <ECSchemaReference name="BisCore" version="01.00.10" alias="bis" />
@@ -16,7 +16,7 @@
 
     <ECCustomAttributes>
         <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
-            <SupportedUse>NotForProduction</SupportedUse>
+            <SupportedUse>FieldTesting</SupportedUse>
         </ProductionStatus>
         <SchemaLayerInfo xmlns="BisCustomAttributes.01.00.00">
             <Value>Application</Value>
@@ -30,11 +30,6 @@
     <PropertyCategory typeName="ParkingIslandVertex_Island" displayLabel="Island" priority="0" />
     <PropertyCategory typeName="ParkingBayVertex_Bay" displayLabel="Bay" priority="0" />
     <PropertyCategory typeName="ParkingAisleVertex_Aisle" displayLabel="Aisle" priority="0" />
-
-    <PropertyCategory typeName="ParkingBayOverride_Bay" displayLabel="Bay" priority="0" />
-    <PropertyCategory typeName="ParkingAisleOverride_Aisle" displayLabel="Aisle" priority="0" />
-    <PropertyCategory typeName="ParkingSpaceOverride_Space" displayLabel="Space" priority="0" />
-    <PropertyCategory typeName="ParkingSpaceOverride_Row" displayLabel="Row" priority="0" />
 
     <PropertyCategory typeName="ShapedEdge_LinkHeight" displayLabel="Grading Edge Height" priority="0" />
     <PropertyCategory typeName="BuildingEdge_SlopeAway" displayLabel="Grading Slope Away" priority="0" />
@@ -124,12 +119,6 @@
         <ECEnumerator value="0" name="NORMAL" displayLabel="Normal" description="Control vertex that uses a fixed elevation for the spatial interpolation calculation." />
         <ECEnumerator value="1" name="SLOPE" displayLabel="Slope" description="Specialized control vertex that uses slope constraints in the spatial interpolation calculation." />
         <ECEnumerator value="2" name="SLOPEDIRECTION" displayLabel="Slope Direction" description="Specialized control vertex that uses slope constraints along a single direction in the spatial interpolation calculation." />
-    </ECEnumeration>
-
-    <!-- Not to be confused with a SITEOPS 'side' object, this enum dictates if the left or right side of the bay is to be overridden -->
-    <ECEnumeration typeName="BaySide" backingTypeName="int" isStrict="true" displayLabel="Bay Side" description="Side of a parking bay.">
-        <ECEnumerator value="0" name="LEFT" displayLabel="Left" />
-        <ECEnumerator value="1" name="RIGHT" displayLabel="Right" />
     </ECEnumeration>
 
     <ECRelationshipClass typeName="CategorySymbolizesClassification" strength="referencing" modifier="Abstract">
@@ -339,74 +328,6 @@
                 </Deprecated>
             </ECCustomAttributes>
         </ECProperty>
-    </ECEntityClass>
-
-    <ECEntityClass typeName="ParkingOverride" modifier="Abstract" displayLabel="Parking Override">
-        <BaseClass>bis:SpatialLocationElement</BaseClass>
-    </ECEntityClass>
-
-    <ECEntityClass typeName="AisleCentralOverride" modifier="Sealed" displayLabel="Center Aisle Override">
-        <BaseClass>ParkingOverride</BaseClass>
-
-        <!-- 
-            Unique identifier for an 'aisle' in a parking lot. Takes the form of '[L/R][offset count]' OR 'C'
-            [L/R] for direction relative to parking direction path
-            [offset count] for how many aisles left or right of the parking direction path
-            Example: L2 refers to the second aisle to the left of the parking direction path
-                    'C' refers to the center aisle that runs along the parking direction path
-        -->
-        <ECProperty propertyName="AisleId" typeName="string" category="ParkingAisleOverride_Aisle" displayLabel="Aisle" description="The Id of the Aisle to be overridden." />
-        <ECProperty propertyName="Width" typeName="double" kindOfQuantity="cvu:LENGTH" category="ParkingAisleOverride_Aisle" displayLabel="Aisle Width" description="The new width of the Aisle." />
-    </ECEntityClass>
-
-    <ECEntityClass typeName="BayOverride" modifier="Abstract" displayLabel="Bay Override">
-        <BaseClass>ParkingOverride</BaseClass>
-
-        <!-- 
-            Unique identifier for a 'bay' in a parking lot. Takes the form of '[L/R][offset count]'
-            [L/R] for direction relative to parking direction path
-            [offset count] for how many bays left or right of the parking direction path
-            Example: R1 refers to the first bay to the right of the parking direction path
-        -->
-        <ECProperty propertyName="BayId" typeName="string" category="ParkingBayOverride_Bay" displayLabel="Bay" description="The Id of the Bay to be overridden." />
-    </ECEntityClass>
-
-    <ECEntityClass typeName="BayCentralOverride" modifier="Sealed" displayLabel="Bay Central Override">
-        <BaseClass>BayOverride</BaseClass>
-
-        <ECProperty propertyName="MedianWidth" typeName="double" kindOfQuantity="cvu:LENGTH" category="ParkingBayOverride_Bay" displayLabel="Median Width" description="The new median width of the Bay." />
-    </ECEntityClass>
-
-    <ECEntityClass typeName="BaySideOverride" modifier="Sealed" displayLabel="Bay Side Override">
-        <BaseClass>BayOverride</BaseClass>
-
-        <ECProperty propertyName="SideOfBay" typeName="BaySide" category="ParkingBayOverride_Bay" displayLabel="Side of Bay" description="Side of the bay to be overridden." />
-        <ECProperty propertyName="Angle" typeName="double" kindOfQuantity="cvu:ANGLE" category="ParkingBayOverride_Bay" displayLabel="Row Angle" description="The new angle of the Bay." />
-        <ECProperty propertyName="Depth" typeName="double" kindOfQuantity="cvu:LENGTH" category="ParkingBayOverride_Bay" displayLabel="Row Depth" description="The new depth of the Bay." />
-    </ECEntityClass>
-
-    <ECEntityClass typeName="SpaceOverride" modifier="Abstract" displayLabel="Space Override">
-        <BaseClass>ParkingOverride</BaseClass>
-
-        <ECProperty propertyName="RowIndex" typeName="int" category="ParkingSpaceOverride_Row" displayLabel="Row Index" description="The index of the row to be overridden." />
-        <ECProperty propertyName="SpaceIndex" typeName="int" category="ParkingSpaceOverride_Space" displayLabel="Space Index" description="The index of the space to be overridden." />
-
-        <ECProperty propertyName="Width" typeName="double" kindOfQuantity="cvu:LENGTH" category="ParkingSpaceOverride_Space" displayLabel="Space Width" description="The new width of the space." />
-
-        <ECNavigationProperty propertyName="SurfaceMarkingType" relationshipName="SpaceOverrideUsesSurfaceMarkingType" direction="Forward" displayLabel="Surface Marking Type" description="The surface marking type applied to the space." />
-    </ECEntityClass>
-
-    <ECEntityClass typeName="SpaceEdgeOverride" modifier="Sealed" displayLabel="Space Edge Override">
-        <BaseClass>SpaceOverride</BaseClass>
-
-        <ECNavigationProperty propertyName="RelatedEdge" relationshipName="EdgeSpaceOverrideRefersToLayoutParkingEdge" direction="Forward" displayLabel="Related Edge" description="The edge that the override is applied to." />
-    </ECEntityClass>
-
-    <ECEntityClass typeName="SpaceCentralOverride" modifier="Sealed" displayLabel="Space Central Override">
-        <BaseClass>SpaceOverride</BaseClass>
-
-        <ECProperty propertyName="BayId" typeName="string" category="ParkingBayOverride_Bay" displayLabel="Bay" description="The Id of the Bay to be overridden." />
-        <ECProperty propertyName="SideOfBay" typeName="BaySide" category="ParkingBayOverride_Bay" displayLabel="Side of Bay" description="Side of the bay to be overridden." />
     </ECEntityClass>
 
     <ECEntityClass typeName="ParkingVertex" modifier="Abstract" displayLabel="Parking Vertex">
@@ -626,15 +547,6 @@
         <BaseClass>PathEdge</BaseClass>
     </ECEntityClass>
 
-    <ECRelationshipClass typeName="SpaceOverrideUsesSurfaceMarkingType" strength="referencing" modifier="Sealed">
-        <Source multiplicity="(0..*)" roleLabel="uses" polymorphic="true">
-            <Class class="SpaceOverride" />
-        </Source>
-        <Target multiplicity="(0..1)" roleLabel="is used by" polymorphic="true">
-            <Class class="cvphys:SurfaceMarkingType" />
-        </Target>
-    </ECRelationshipClass>
-
     <ECRelationshipClass typeName="DrivewayPathUsesCurbType" strength="referencing" modifier="Sealed">
         <Source multiplicity="(0..*)" roleLabel="uses" polymorphic="false">
             <Class class="DrivewayPath" />
@@ -686,15 +598,6 @@
         </Source>
         <Target multiplicity="(0..1)" roleLabel="is used by" polymorphic="true">
             <Class class="CurbType" />
-        </Target>
-    </ECRelationshipClass>
-
-    <ECRelationshipClass typeName="EdgeSpaceOverrideRefersToLayoutParkingEdge" strength="referencing" modifier="Sealed">
-        <Source multiplicity="(0..*)" roleLabel="refers to" polymorphic="false">
-            <Class class="SpaceEdgeOverride" />
-        </Source>
-        <Target multiplicity="(1..1)" roleLabel="is referenced by" polymorphic="false">
-            <Class class="LayoutParkingEdge" />
         </Target>
     </ECRelationshipClass>
 
@@ -890,16 +793,6 @@
         </Target>
     </ECRelationshipClass>
 
-    <ECRelationshipClass typeName="LayoutParkingAreaOwnsParkingOverrides" strength="embedding" strengthDirection="Forward" modifier="Sealed">
-        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
-        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
-            <Class class="LayoutParkingArea" />
-        </Source>
-        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="true">
-            <Class class="ParkingOverride" />
-        </Target>
-    </ECRelationshipClass>
-
     <ECEntityClass typeName="Area" modifier="Abstract" displayLabel="Area" description="Area">
         <BaseClass>Wire</BaseClass>
     </ECEntityClass>
@@ -984,7 +877,6 @@
             </ECCustomAttributes>
         </ECProperty>
 
-        <ECProperty propertyName="DoCentralParking" typeName="boolean" category="LayoutParkingArea_Parking" displayLabel="Add Central Parking" description="Add central parking." />
         <ECProperty propertyName="ParkingWidth" typeName="double" category="LayoutParkingArea_Parking" kindOfQuantity="cvu:LENGTH"  displayLabel="Width" description="Parking space width." />
         <ECProperty propertyName="ParkingDepth" typeName="double" category="LayoutParkingArea_Parking" kindOfQuantity="cvu:LENGTH"  displayLabel="Depth" description="Parking space depth." />
         <ECProperty propertyName="ParkingAngle" typeName="double" category="LayoutParkingArea_Parking" kindOfQuantity="cvu:ANGLE"  displayLabel="Angle" description="Parking space angle." />
@@ -1154,14 +1046,6 @@
         <ECProperty propertyName="MajorStepMultiple" typeName="int" displayLabel="Major Step Interval" description="Number of minor intervals between two major steps" />
     </ECEntityClass>
 
-    <ECEntityClass typeName="HatchingAspect" modifier="Sealed" displayLabel="Hatching">
-        <BaseClass>bis:ElementUniqueAspect</BaseClass>
-
-        <ECProperty propertyName="Spacing" typeName="double" kindOfQuantity="cvu:LENGTH" displayLabel="Spacing" description="Space between the hatch lines." />
-        <ECProperty propertyName="Angle" typeName="double" kindOfQuantity="cvu:ANGLE" displayLabel="Angle" description="Angle of the hatch lines." />
-        <ECProperty propertyName="Width" typeName="double" kindOfQuantity="cvu:LENGTH" displayLabel="Width" description="Width of the hatch lines." />
-    </ECEntityClass>
-
     <ECEntityClass typeName="RetainingWallType" displayLabel="Retaining Wall Type" description="Defines a shared set of properties whose values vary per-type of RetainingWall rather than per-instance.">
         <BaseClass>cvphys:RetainingWallType</BaseClass>
 
@@ -1197,16 +1081,6 @@
         </Source>
         <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
             <Class class="ContourLinesAspect" />
-        </Target>
-    </ECRelationshipClass>
-
-    <ECRelationshipClass typeName="SpaceOverrideOwnsHatchingAspect" modifier="Sealed" strength="embedding">
-        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
-        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
-            <Class class="SpaceOverride" />
-        </Source>
-        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
-            <Class class="HatchingAspect" />
         </Target>
     </ECRelationshipClass>
 
@@ -1623,13 +1497,11 @@
 
         <ECProperty propertyName="VertexType" typeName="SurfaceControlVertexType" description="Specifies the type of control vertex used." displayLabel="Control Vertex Type" category="SurfaceControl"/>
         <ECProperty propertyName="Slope" typeName="double" description="Slope of the line emanating from this vertex position." displayLabel="Slope" category="SurfaceControl" kindOfQuantity="cvu:SLOPE"/>
-        <ECProperty propertyName="SlopeBehind" typeName="double" description="Slope behind the line emanating from this vertex position." displayLabel="Slope Behind" category="SurfaceControl" kindOfQuantity="cvu:SLOPE"/>
         <ECProperty propertyName="MinSlope" typeName="double" description="Minimum slope constraint." displayLabel="Min. Slope" category="SurfaceControl" kindOfQuantity="cvu:SLOPE"/>
         <ECProperty propertyName="MaxSlope" typeName="double" description="Maximum slope constraint." displayLabel="Max. Slope" category="SurfaceControl" kindOfQuantity="cvu:SLOPE"/>
         <ECProperty propertyName="Direction" typeName="point2d" description="Direction of the line emanating from this vertex position that constrains the elevation interpolation." displayLabel="Direction" category="SurfaceControl"/>
         <ECProperty propertyName="Mirrored" typeName="boolean" description="True if the direction constraint should represent two lines emanating from the position, forming a V shape, or false if it should be a single line passing through the position." displayLabel="Mirrored" category="SurfaceControl"/>
         <ECProperty propertyName="ClampDistance" typeName="double" description="Distance at which to clamp slope calculations, turning elevation into a piecewise function where it stays constant beyond this distance." displayLabel="Clamp Distance" category="SurfaceControl" kindOfQuantity="cvu:LENGTH"/>
-        <ECProperty propertyName="ClampDistanceBehind" typeName="double" description="Distance at which to clamp slope calculations in opposite direction, turning elevation into a piecewise function where it stays constant beyond this distance" displayLabel="Clamp Distance Behind" category="SurfaceControl" kindOfQuantity="cvu:LENGTH"/>
     </ECEntityClass>
 
     <ECEntityClass typeName="SurfaceControlPathVertex" description="A vertex that forms a control path, which emits control points along the path." displayLabel="Surface Control Path Vertex">
@@ -1749,12 +1621,8 @@
         <BaseClass>SurfaceControlRule</BaseClass>
 
         <ECProperty propertyName="Interval" typeName="double" description="Drop interval along the path." category="SurfaceControl" kindOfQuantity="cvu:LENGTH"/>
-        <ECProperty propertyName="Slope" typeName="double" description="Slope of the line emanating from the path on the right-side." category="SurfaceControl" kindOfQuantity="cvu:SLOPE"/>
-        <ECProperty propertyName="LeftSlope" typeName="double" description="Slope of the line emanating from the path on the left-side." category="SurfaceControl" kindOfQuantity="cvu:SLOPE"/>
-        <ECProperty propertyName="Offset" typeName="double" description="Offset from the right-side of the path to attenuate the influence of the ditch elevation." category="SurfaceControl" kindOfQuantity="cvu:LENGTH"/>
-        <ECProperty propertyName="LeftOffset" typeName="double" description="Offset from the left-side of the path to attenuate the influence of the ditch elevation." category="SurfaceControl" kindOfQuantity="cvu:LENGTH"/>
-        <ECProperty propertyName="Mirrored" typeName="boolean" description="True if the right-side constraints should be mirrored on the left side, forming a V-shape. False if they can vary independently." displayLabel="Mirrored" category="SurfaceControl"/>
-        <ECProperty propertyName="RoundEnds" typeName="boolean" description="Controls whether omni slope control points are created at the ends of the ditch rule." displayLabel="Round Ends" category="SurfaceControl"/>
+        <ECProperty propertyName="Slope" typeName="double" description="Slope of the line emanating from this vertex position." category="SurfaceControl" kindOfQuantity="cvu:SLOPE"/>
+        <ECProperty propertyName="Offset" typeName="double" description="Offset from the path to attenuate the influence of the ditch." category="SurfaceControl" kindOfQuantity="cvu:LENGTH"/>
         <ECNavigationProperty propertyName="Path" relationshipName="SurfaceControlDitchRuleReplacesSurfaceInputs" direction="forward"/>
     </ECEntityClass>
 

@@ -3,7 +3,7 @@
 |  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
 |  * See LICENSE.md in the project root for license terms and full copyright notice.
 ======================================================================================= -->
-<ECSchema schemaName="OpenSite" alias="opnsite" version="01.00.22" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" displayLabel="OpenSite" description="OpenSite+ application schema.">
+<ECSchema schemaName="OpenSite" alias="opnsite" version="01.00.20" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" displayLabel="OpenSite" description="OpenSite+ application schema.">
     <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA" />
     <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
     <ECSchemaReference name="BisCore" version="01.00.10" alias="bis" />
@@ -16,7 +16,7 @@
 
     <ECCustomAttributes>
         <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
-            <SupportedUse>NotForProduction</SupportedUse>
+            <SupportedUse>FieldTesting</SupportedUse>
         </ProductionStatus>
         <SchemaLayerInfo xmlns="BisCustomAttributes.01.00.00">
             <Value>Application</Value>
@@ -627,7 +627,7 @@
     </ECEntityClass>
 
     <ECRelationshipClass typeName="SpaceOverrideUsesSurfaceMarkingType" strength="referencing" modifier="Sealed">
-        <Source multiplicity="(0..*)" roleLabel="uses" polymorphic="true">
+        <Source multiplicity="(0..*)" roleLabel="uses" polymorphic="false">
             <Class class="SpaceOverride" />
         </Source>
         <Target multiplicity="(0..1)" roleLabel="is used by" polymorphic="true">
@@ -1623,13 +1623,11 @@
 
         <ECProperty propertyName="VertexType" typeName="SurfaceControlVertexType" description="Specifies the type of control vertex used." displayLabel="Control Vertex Type" category="SurfaceControl"/>
         <ECProperty propertyName="Slope" typeName="double" description="Slope of the line emanating from this vertex position." displayLabel="Slope" category="SurfaceControl" kindOfQuantity="cvu:SLOPE"/>
-        <ECProperty propertyName="SlopeBehind" typeName="double" description="Slope behind the line emanating from this vertex position." displayLabel="Slope Behind" category="SurfaceControl" kindOfQuantity="cvu:SLOPE"/>
         <ECProperty propertyName="MinSlope" typeName="double" description="Minimum slope constraint." displayLabel="Min. Slope" category="SurfaceControl" kindOfQuantity="cvu:SLOPE"/>
         <ECProperty propertyName="MaxSlope" typeName="double" description="Maximum slope constraint." displayLabel="Max. Slope" category="SurfaceControl" kindOfQuantity="cvu:SLOPE"/>
         <ECProperty propertyName="Direction" typeName="point2d" description="Direction of the line emanating from this vertex position that constrains the elevation interpolation." displayLabel="Direction" category="SurfaceControl"/>
         <ECProperty propertyName="Mirrored" typeName="boolean" description="True if the direction constraint should represent two lines emanating from the position, forming a V shape, or false if it should be a single line passing through the position." displayLabel="Mirrored" category="SurfaceControl"/>
         <ECProperty propertyName="ClampDistance" typeName="double" description="Distance at which to clamp slope calculations, turning elevation into a piecewise function where it stays constant beyond this distance." displayLabel="Clamp Distance" category="SurfaceControl" kindOfQuantity="cvu:LENGTH"/>
-        <ECProperty propertyName="ClampDistanceBehind" typeName="double" description="Distance at which to clamp slope calculations in opposite direction, turning elevation into a piecewise function where it stays constant beyond this distance" displayLabel="Clamp Distance Behind" category="SurfaceControl" kindOfQuantity="cvu:LENGTH"/>
     </ECEntityClass>
 
     <ECEntityClass typeName="SurfaceControlPathVertex" description="A vertex that forms a control path, which emits control points along the path." displayLabel="Surface Control Path Vertex">
@@ -1749,12 +1747,8 @@
         <BaseClass>SurfaceControlRule</BaseClass>
 
         <ECProperty propertyName="Interval" typeName="double" description="Drop interval along the path." category="SurfaceControl" kindOfQuantity="cvu:LENGTH"/>
-        <ECProperty propertyName="Slope" typeName="double" description="Slope of the line emanating from the path on the right-side." category="SurfaceControl" kindOfQuantity="cvu:SLOPE"/>
-        <ECProperty propertyName="LeftSlope" typeName="double" description="Slope of the line emanating from the path on the left-side." category="SurfaceControl" kindOfQuantity="cvu:SLOPE"/>
-        <ECProperty propertyName="Offset" typeName="double" description="Offset from the right-side of the path to attenuate the influence of the ditch elevation." category="SurfaceControl" kindOfQuantity="cvu:LENGTH"/>
-        <ECProperty propertyName="LeftOffset" typeName="double" description="Offset from the left-side of the path to attenuate the influence of the ditch elevation." category="SurfaceControl" kindOfQuantity="cvu:LENGTH"/>
-        <ECProperty propertyName="Mirrored" typeName="boolean" description="True if the right-side constraints should be mirrored on the left side, forming a V-shape. False if they can vary independently." displayLabel="Mirrored" category="SurfaceControl"/>
-        <ECProperty propertyName="RoundEnds" typeName="boolean" description="Controls whether omni slope control points are created at the ends of the ditch rule." displayLabel="Round Ends" category="SurfaceControl"/>
+        <ECProperty propertyName="Slope" typeName="double" description="Slope of the line emanating from this vertex position." category="SurfaceControl" kindOfQuantity="cvu:SLOPE"/>
+        <ECProperty propertyName="Offset" typeName="double" description="Offset from the path to attenuate the influence of the ditch." category="SurfaceControl" kindOfQuantity="cvu:LENGTH"/>
         <ECNavigationProperty propertyName="Path" relationshipName="SurfaceControlDitchRuleReplacesSurfaceInputs" direction="forward"/>
     </ECEntityClass>
 
