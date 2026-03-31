@@ -143,7 +143,7 @@ FROM
             lr.ILinearlyLocatedAlongILinearElement along JOIN 
             lr.LinearlyReferencedFromToLocation fromTo ON along.SourceECInstanceId = fromTo.Element.Id
         WHERE 
-            along.SourceECInstanceId = ?) lrOnObj FULL JOIN
+            along.SourceECInstanceId = :alignmentId) lrOnObj FULL JOIN
         (SELECT 
             along.TargetECInstanceId LinearElementId, 
             fromTo.FromPosition.DistanceAlongFromStart DistanceAlongFromStart
@@ -152,7 +152,7 @@ FROM
             lr.LinearlyReferencedFromToLocation fromTo ON along.SourceECInstanceId = fromTo.Element.Id JOIN 
             lr.ILinearLocationLocatesElement locates ON locates.SourceECInstanceId = along.SourceECInstanceId
         WHERE 
-            locates.TargetECInstanceId = ?) lrOnSisterObj
+            locates.TargetECInstanceId = :alignmentId) lrOnSisterObj
         ON lrOnObj.LinearElementId = lrOnSisterObj.LinearElementId LIMIT 1) linearlyLocated
     ON alg.ECInstanceId = linearlyLocated.LinearElementId LEFT JOIN 
     rralign.AlignmentStation station ON alg.ECInstanceId = station.Parent.Id LEFT JOIN 
@@ -163,4 +163,20 @@ WHERE
 ORDER BY
     stationAt.AtPosition.DistanceAlongFromStart DESC
 LIMIT 1
+```
+
+- Queries for Code, Label, Horizontal and Vertical geometry of a particular `Alignment`.
+
+```
+SELECT
+    a.ECInstanceId [AlignmentId],
+    a.CodeValue,
+    a.UserLabel,
+    h.HorizontalGeometry,
+    v.VerticalGeometry
+FROM
+    rralign.Alignment a LEFT JOIN rralign.HorizontalAlignment h ON a.Horizontal.Id = h.ECInstanceId
+    LEFT JOIN rralign.VerticalAlignment v ON a.MainVertical.Id = v.ECInstanceId
+WHERE
+    a.ECInstanceId = :alignmentId
 ```

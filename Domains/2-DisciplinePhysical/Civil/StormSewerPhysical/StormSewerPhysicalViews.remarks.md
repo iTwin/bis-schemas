@@ -12,3 +12,29 @@ This schema contains view-classes that extend the StormSewerPhysical schema with
 ### PipeView
 
 The `PipeView` class is typically joined with the `pipphys:Pipe` class in ECSQL queries in order to retrieve both persisted and derived properties about Pipe instances.
+
+## Sample ECSQL queries
+
+- Query Length and Slope for a particular `Pipe`.
+
+```
+SELECT
+    pv.Length,
+    pv.Slope
+FROM
+    stmswrphysViews.PipeView pv INNER JOIN pipphys.Pipe p ON p.ECInstanceId = pv.ECInstanceId
+WHERE
+    p.ECInstanceId = :pipeId
+```
+
+- Query InvertElevation and CrownElevation for all PipingPorts on a particular `Pipe`
+
+```
+SELECT
+    ppv.InvertElevation,
+    ppv.CrownElevation
+FROM
+    stmswrphysViews.PipingPortView ppv INNER JOIN pipphys.Pipe p ON p.ECInstanceId = ppv.Parent.Id
+WHERE
+    p.ECInstanceId = :pipeId
+```

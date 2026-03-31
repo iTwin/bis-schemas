@@ -582,17 +582,21 @@ The scenario presented in such example is addressed by introducing a `SpatialLoc
 
 ## Sample ECSQL queries
 
-- `DrawingGraphic`s representing a particular `PhysicalElement` in a specific `Drawing`
+- `DrawingGraphic`s representing `GeometricElement3d`s, organized per `Drawing`
 
 ```
 SELECT
-    d.ECInstanceId
+    dr.ECInstanceId [DrawingId],
+    d.ECInstanceId [DrawingGraphicId],
+    g.ECInstanceId [GeometricElement3dId]
 FROM
-    bis.PhysicalElement p INNER JOIN
-    bis.DrawingGraphicRepresentsElement r ON p.ECInstanceId = r.TargetECInstanceId INNER JOIN
-    bis.DrawingGraphic d ON d.ECInstanceId = r.SourceECInstanceId
-WHERE
-    p.ECInstanceId = ?1 AND d.Model.Id = ?2
+    bis.GeometricElement3d g INNER JOIN
+    bis.DrawingGraphicRepresentsElement r ON g.ECInstanceId = r.TargetECInstanceId INNER JOIN
+    bis.DrawingGraphic d ON d.ECInstanceId = r.SourceECInstanceId INNER JOIN
+    bis.DrawingModel dm ON dm.ECInstanceId = d.Model.Id INNER JOIN
+    bis.Drawing dr ON dr.ECInstanceId = dm.ModeledElement.Id
+ORDER BY
+    dr.ECInstanceId
 ```
 
 - Count of `GeometricElement3d`s that have assigned _Geometry_, per concrete _ECClass_.
@@ -616,8 +620,12 @@ SELECT
     pm.CodeValue,
     COUNT(*)
 FROM 
-    bisViews.PhysicalElementMaterialView v INNER JOIN 
-    bis.PhysicalMaterial pm ON v.PhysicalMaterial.Id = pm.ECInstanceId
+    (SELECT 
+        pe.ECInstanceId,
+        coalesce(pe.PhysicalMaterial.Id, pt.PhysicalMaterial.Id) [PhysicalMaterialId]
+    FROM bis.PhysicalElement pe
+        LEFT JOIN bis.PhysicalType pt ON pe.TypeDefinition.Id = pt.ECInstanceId) pmat
+    INNER JOIN bis.PhysicalMaterial pm ON pmat.PhysicalMaterialId = pm.ECInstanceId
 GROUP BY
     pm.ECInstanceId
 ```
@@ -634,7 +642,7 @@ FROM
     bis.ExternalSource s ON s.Repository.Id = rl.ECInstanceId INNER JOIN
     bis.ExternalSourceAspect xsa ON xsa.Source.Id = s.ECInstanceId
 WHERE
-    rl.ECInstanceId = ?
+    rl.ECInstanceId = :repositoryLinkId
 ```
 
 - Subject hierarchy reported according to element-creation order.
@@ -655,7 +663,7 @@ ORDER BY
     ECInstanceId
 ```
 
-- Subject hierarchy traversed recursively (i.e. Depth-First search) starting at _Root Subject_.
+- Subject hierarchy (elements in the Repository Model) traversed recursively (i.e. Depth-First search) starting at the _Root Subject_.
 
 ```
 WITH RECURSIVE elementsInHierarchy(id) AS (
@@ -680,11 +688,11 @@ WHERE
     e.ECInstanceId = h.id
 ```
 
-- Elements under a particular `Subject`, queried recursively.
+- All elements under a particular `Subject`, queried recursively.
 
 ```
 WITH RECURSIVE elementsInHierarchy(id) AS (
-    VALUES(?) 
+    VALUES(:subjectId) 
 UNION ALL 
     SELECT 
         e.ECInstanceId 

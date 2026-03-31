@@ -220,3 +220,48 @@ A _Wye_ is a `PipeFitting` with three `PipingPort`s used to split or merge flow 
 `PipeFitting`s modeling _Wyes_ shall be associated with an instance of `WyeType` as its PhysicalType via the `PipeFittingIsOfType` relationship. `WyeType`s must be contained in `DefinitionModel`s.
 
 Equivalent to [IfcPipeFittingType](http://ifc43-docs.standards.buildingsmart.org/IFC/RELEASE/IFC4x3/HTML/lexical/IfcPipeFittingType.htm), with its _PredefinedType_ property set to _IfcPipeFittingTypeEnum.JUNCTION_.
+
+## Sample ECSQL queries
+
+- Query for InnerDiameter, WallThickness and number of Circular piping ports on a particular IPipingPhysicalType (e.g. PipeType, ValveType, PipeFittingType).
+
+```
+SELECT
+    cirPortT.InnerDiameter,
+    cirPortT.WallThickness,
+    ptToPortT.PortCount
+FROM
+    pipphys.IPipingPhysicalType pt
+    INNER JOIN pipphys.PipingPhysicalTypeUsesPortTypes ptToPortT ON pt.ECInstanceId = ptToPortT.SourceECInstanceId
+    INNER JOIN pipphys.CircularPortType cirPortT ON ptToPortT.TargetECInstanceId = cirPortT.ECInstanceId
+WHERE
+    pt.ECInstanceId = :pipingPhysicalTypeId
+```
+
+- Query for InnerDiameter and WallThickness of all Circular piping ports on a particular `Pipe`.
+
+```
+SELECT
+    cirPortT.InnerDiameter,
+    cirPortT.WallThickness
+FROM
+    pipphys.Pipe p
+    INNER JOIN pipphys.PipingPort pp ON p.ECInstanceId = pp.Parent.Id
+    INNER JOIN pipphys.CircularPortType cirPortT ON pp.TypeDefinition.Id = cirPortT.ECInstanceId
+WHERE
+    p.ECInstanceId = :pipeId
+```
+
+- Query for all IPipingElements (e.g. Pipes, Valves, PipeFittings) that are part of a specific Piping System.
+
+```
+SELECT
+    pe.ECInstanceId,
+    pe.ECClassId
+FROM
+    pipphys.PipingSystem ps 
+    INNER JOIN pipphys.PipingSystemGroupsPipingElements psgpe ON ps.ECInstanceId = psgpe.SourceECInstanceId
+    INNER JOIN pipphys.IPipingElement pe ON pe.ECInstanceId = psgpe.TargetECInstanceId
+WHERE
+    ps.ECInstanceId = :pipingSystemId
+```
