@@ -102,3 +102,46 @@ Note that Physical Elements realizing a Connection are not directly enabling the
 Examples include bolts, rings or cement used on Connections between Pipes.
 
 Equivalent to the _RealizingElement_ property of [IfcRelConnectsPorts](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcRelConnectsPorts.htm).
+
+## Sample ECSQL queries
+
+- Query for all connected `IDistributionElement`s to a particular `IDistributionElement`.
+
+```
+SELECT 
+    otherPort.Parent.Id
+FROM
+    dsys.DistributionPort dp
+    INNER JOIN dsys.PortConnectsToPorts connects ON connects.SourceECInstanceId = dp.ECInstanceId
+    INNER JOIN dsys.DistributionPort otherPort ON otherPort.ECInstanceId = connects.TargetECInstanceId
+WHERE
+    dp.ECInstanceId = :distElmId
+```
+
+- Query for all `IDistributionElement` reacheable starting from a particular `IDistributionElement` by traversing connected `IDistributionElement`s recursively.
+
+```
+WITH RECURSIVE connected(distElmId) AS (
+    VALUES(:startingDistElmId)
+UNION
+    SELECT 
+        otherPort.Parent.Id
+    FROM
+        dsys.DistributionPort dp, 
+        dsys.PortConnectsToPorts connects, 
+        dsys.DistributionPort otherPort,
+        connected c
+    WHERE
+        dp.Parent.Id = c.distElmId AND (
+            (connects.SourceECInstanceId = dp.ECInstanceId AND otherPort.ECInstanceId = connects.TargetECInstanceId) OR 
+            (connects.TargetECInstanceId = dp.ECInstanceId AND otherPort.ECInstanceId = connects.SourceECInstanceId))
+)
+SELECT
+    de.ECInstanceId,
+    de.ECClassId
+FROM
+    dsys.IDistributionElement de, connected c
+WHERE
+    de.ECInstanceId = c.distElmId
+```
+

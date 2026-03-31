@@ -94,3 +94,32 @@ Instances of `SidewalkType` provide an additional classification that can be app
 ### GenericAreaType
 
 Instances of `GenericAreaType` provide an additional classification that can be applied to `GenericArea`s.
+
+## Sample ECSQL queries
+
+- Query recursively for all `SpatialElement`s held by all `Site` instances, directly or indirectly through any other `SpatialStructure` element they aggregate.
+
+```
+WITH RECURSIVE subElements(organizerId) AS (
+        SELECT ECInstanceId FROM cvsp.Site
+    UNION
+        SELECT
+            csse.ECInstanceId
+        FROM
+            spcomp.SpatialStructureElement sse
+            INNER JOIN spcomp.SpatialStructureElement csse ON sse.ECInstanceId = csse.ComposingElement.Id,
+            subElements sub
+        WHERE
+            sse.ECInstanceId = sub.organizerId
+)
+SELECT
+    se.ECInstanceId [HeldElementId],
+    sse.ECInstanceId [HoldingElementId]
+FROM
+    bis.SpatialElement se 
+    INNER JOIN spcomp.SpatialOrganizerHoldsSpatialElements holds ON se.ECInstanceId = holds.TargetECInstanceId
+    INNER JOIN spcomp.SpatialStructureElement sse ON sse.ECInstanceId = holds.SourceECInstanceId, 
+    subElements sub
+WHERE
+    sse.ECInstanceId = sub.organizerId
+```

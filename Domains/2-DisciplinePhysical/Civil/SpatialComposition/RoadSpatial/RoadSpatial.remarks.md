@@ -98,3 +98,43 @@ A `Road` instance typically aggregates zero or more instances of `Intersection`.
 `Intersection`s must be contained in `SpatialLocationModel`s or `PhysicalModel`s. An instance of `Intersection` typically holds the `bis:PhysicalElement`s (e.g. *Course*s) comprising its *pavement* structure.
 
 Equivalent to [IfcFacilityPart](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcFacilityPart.htm) with its PredefinedType attribute set to [IfcRoadPartTypeEnum.INTERSECTION](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcRoadPartTypeEnum.htm).
+
+## Sample ECSQL queries
+
+- Query recursively for all `SpatialElement`s held by all `Road` instances, directly or indirectly through any other `SpatialStructure` element they aggregate or reference.
+
+```
+WITH RECURSIVE subElements(organizerId) AS (
+        SELECT ECInstanceId FROM rdsp.Road
+    UNION
+        SELECT
+            csse.ECInstanceId
+        FROM
+            spcomp.SpatialStructureElement sse
+            INNER JOIN spcomp.SpatialStructureElement csse ON sse.ECInstanceId = csse.ComposingElement.Id,
+            subElements sub
+        WHERE
+            sse.ECInstanceId = sub.organizerId
+        UNION
+        SELECT
+            otherRd.ECInstanceId
+        FROM
+            rdsp.Road rd
+            INNER JOIN rdsp.RoadIncludesJunctions junc ON rd.ECInstanceId = junc.SourceECInstanceId
+            INNER JOIN rdsp.RoadIncludesJunctions otherJunc ON otherJunc.TargetECInstanceId = junc.TargetECInstanceId
+            INNER JOIN rdsp.Road otherRd ON otherJunc.SourceECInstanceId = otherRd.ECInstanceId,
+            subElements sub
+        WHERE
+            rd.ECInstanceId = sub.organizerId
+)
+SELECT
+    se.ECInstanceId [HeldElementId],
+    sse.ECInstanceId [HoldingElementId]
+FROM
+    bis.SpatialElement se 
+    INNER JOIN spcomp.SpatialOrganizerHoldsSpatialElements holds ON se.ECInstanceId = holds.TargetECInstanceId
+    INNER JOIN spcomp.SpatialStructureElement sse ON sse.ECInstanceId = holds.SourceECInstanceId, 
+    subElements sub
+WHERE
+    sse.ECInstanceId = sub.organizerId
+```

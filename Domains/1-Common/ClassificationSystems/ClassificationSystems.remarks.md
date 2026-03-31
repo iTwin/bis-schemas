@@ -87,3 +87,36 @@ Equivalent to [IfcClassificationReference](https://standards.buildingsmart.org/I
 ### ClassificationSystemOwnsClassificationTable
 
 Following the naming convention, this relationship class should have been named `ClassificationSystemOwnsClassificationTables` (plural), but was released with the a non-compliant name that would be disruptive to change post-release.
+
+## Sample ECSQL queries
+
+- Query for all `Element`s classified under a particular `ClassificationSystem`.
+
+```
+WITH RECURSIVE subClassifications(classificationId) AS (
+        SELECT 
+            c.ECInstanceId
+        FROM
+            clsf.ClassificationSystem cs INNER JOIN clsf.ClassificationTable ct ON cs.ECInstanceId = ct.Parent.Id
+            INNER JOIN clsf.Classification c ON c.Model.Id = ct.ECInstanceId
+        WHERE
+            cs.ECInstanceId = :classificationSystemId
+    UNION
+        SELECT
+            cc.ECInstanceId
+        FROM
+            clsf.Classification c INNER JOIN clsf.Classification cc ON c.ECInstanceId = cc.Parent.Id,
+            subClassifications sub
+        WHERE
+            c.ECInstanceId = sub.classificationId
+)
+SELECT
+    e.ECInstanceId [ClassifiedElementId],
+    c.ECInstanceId [ClassificationId]
+FROM
+    bis.Element e INNER JOIN clsf.ElementHasClassifications ehc ON e.ECInstanceId = ehc.SourceECInstanceId
+    INNER JOIN clsf.Classification c ON ehc.TargetECInstanceId = c.ECInstanceId,
+    subClassifications sub
+WHERE
+    c.ECInstanceId = sub.classificationId
+```
