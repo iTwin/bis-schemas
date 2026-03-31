@@ -66,3 +66,67 @@ An `RegularStory` is typically aggregated by a `Building`. `RegularStory` elemen
 Equivalent to [IfcBuildingStorey](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcBuildingStorey.htm) with CompositionType == ELEMENT.
 
 <!-- for CompositionType != ELEMENT, we expect other subclasses of either Story or ElevationStory, i.e. SplitStory for type=PARTIAL. those subclasses would be added in the future versions of the schema. some other subclasses are also controversial, that's why we're leaving them out. i.e. SharedStory @ speedikon -->
+
+## Sample ECSQL queries
+
+- Query recursively for all `SpatialElement`s (e.g. Physical or SpatialLocation elements) held by a particular `Story` in a `Building`, directly or indirectly via any of its sub-parts.
+
+```
+WITH RECURSIVE subElements(organizerId) AS (
+        SELECT ECInstanceId FROM BuildingSpatial.Story WHERE ECInstanceId = :startingStoryId
+    UNION
+        SELECT
+            csse.ECInstanceId
+        FROM
+            spcomp.SpatialStructureElement sse
+            INNER JOIN spcomp.SpatialStructureElement csse ON sse.ECInstanceId = csse.ComposingElement.Id,
+            subElements sub
+        WHERE
+            sse.ECInstanceId = sub.organizerId
+)
+SELECT
+    se.ECInstanceId [HeldElementId],
+    sse.ECInstanceId [HoldingElementId]
+FROM
+    bis.SpatialElement se 
+    INNER JOIN spcomp.SpatialOrganizerHoldsSpatialElements holds ON se.ECInstanceId = holds.TargetECInstanceId
+    INNER JOIN spcomp.SpatialStructureElement sse ON sse.ECInstanceId = holds.SourceECInstanceId, 
+    subElements sub
+WHERE
+    sse.ECInstanceId = sub.organizerId
+```
+
+- Query for the `Story` that holds every `PhysicalElement`, directly or indirectly via any of its sub-parts.
+
+```
+WITH RECURSIVE physicalElementsHeld(storyId, organizerId, physicalElementId) AS (
+        SELECT 
+            s.ECInstanceId,
+            s.ECInstanceId,
+            pe.ECInstanceId
+        FROM 
+            BuildingSpatial.Story s 
+            LEFT JOIN spcomp.SpatialOrganizerHoldsSpatialElements holds ON s.ECInstanceId = holds.SourceECInstanceId
+            LEFT JOIN bis.PhysicalElement pe ON pe.ECInstanceId = holds.TargetECInstanceId
+    UNION
+        SELECT
+            held.storyId,
+            csse.ECInstanceId,
+            pe.ECInstanceId
+        FROM
+            spcomp.SpatialStructureElement sse
+            INNER JOIN spcomp.SpatialStructureElement csse ON sse.ECInstanceId = csse.ComposingElement.Id
+            LEFT JOIN spcomp.SpatialOrganizerHoldsSpatialElements holds ON csse.ECInstanceId = holds.SourceECInstanceId
+            LEFT JOIN bis.PhysicalElement pe ON pe.ECInstanceId = holds.TargetECInstanceId,
+            physicalElementsHeld held
+        WHERE
+            sse.ECInstanceId = held.organizerId
+)
+SELECT
+    pe.ECInstanceId [PhysicalElementId],
+    held.storyId [StoryId]
+FROM
+    bis.PhysicalElement pe, physicalElementsHeld held
+WHERE
+    pe.ECInstanceId = held.physicalElementId
+```

@@ -171,3 +171,32 @@ Mixin used to indicate that the element is of volumetric type which is most comm
 Deprecated.
 
 Use the [SpatialOrganizerHoldsSpatialElements](#spatialorganizerholdsspatialelements) or [SpatialOrganizerReferencesSpatialElements](#spatialorganizerreferencesspatialelements) relationships instead.
+
+## Sample ECSQL queries
+
+- Query for all `SpatialElement`s held by a particular `SpatialStructureElement` (e.g. Region, Site, Facility, Space) directly or indirectly through any other `SpatialStructure` element it aggregates.
+
+```
+WITH RECURSIVE subElements(organizerId) AS (
+        VALUES(:startingOrganizerId)
+    UNION
+        SELECT
+            csse.ECInstanceId
+        FROM
+            spcomp.SpatialStructureElement sse
+            INNER JOIN spcomp.SpatialStructureElement csse ON sse.ECInstanceId = csse.ComposingElement.Id,
+            subElements sub
+        WHERE
+            sse.ECInstanceId = sub.organizerId
+)
+SELECT
+    se.ECInstanceId [HeldElementId],
+    sse.ECInstanceId [HoldingElementId]
+FROM
+    bis.SpatialElement se 
+    INNER JOIN spcomp.SpatialOrganizerHoldsSpatialElements holds ON se.ECInstanceId = holds.TargetECInstanceId
+    INNER JOIN spcomp.SpatialStructureElement sse ON sse.ECInstanceId = holds.SourceECInstanceId, 
+    subElements sub
+WHERE
+    sse.ECInstanceId = sub.organizerId
+```
