@@ -8,6 +8,7 @@
     <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
     <ECSchemaReference name="BisCore" version="01.00.14" alias="bis"/>
     <ECSchemaReference name="LinearReferencing" version="02.00.03" alias="lr"/>
+    <ECSchemaReference name="CivilUnits" version="01.00.00" alias="cvu"/>
 
     <ECCustomAttributes>
         <ProductionStatus xmlns="CoreCustomAttributes.01.00.00">
@@ -18,7 +19,68 @@
         </SchemaLayerInfo>
     </ECCustomAttributes>
 
-    <ECEntityClass typeName="Course" displayLabel="Course" description="A bis:PhysicalElement modeling a layer, usually of a single material, whose length greatly exceeds its thickness and often also its width, laid on site on top of another horizontal or nearly horizontal element.">
+    <ECEntityClass typeName="LayeredStructure" modifier="Abstract" displayLabel="Layered Structure" description="A bis:PhysicalElement that assembles multiple layers, designed to provide durability, load distribution, and/or environmental resistance.">
+        <BaseClass>bis:PhysicalElement</BaseClass>
+        <BaseClass>bis:IParentElement</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="LayeredStructureType" modifier="Abstract" displayLabel="Layered Structure Type" description="Defines a shared set of properties whose values vary per-type of Layered Structure rather than per-instance.">
+        <BaseClass>bis:PhysicalType</BaseClass>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="LayeredStructureIsOfType" strength="referencing" modifier="None" description="A type-instance relation; one that indicates that the specific LayeredStructure is an instance of the defined LayeredStructureType.">
+        <BaseClass>bis:PhysicalElementIsOfType</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="is of" polymorphic="true">
+            <Class class="LayeredStructure" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is type of" polymorphic="true">
+            <Class class="LayeredStructureType"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="LayeredStructureAssemblesLayers" strength="referencing" modifier="None" description="A relationship between a LayeredStructure and the constituent layers that it assembles.">
+        <BaseClass>bis:PhysicalElementAssemblesElements</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="is of" polymorphic="true">
+            <Class class="LayeredStructure" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is type of" polymorphic="true">
+            <Class class="bis:PhysicalElement"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="LayeredStructureTypeComposesSubTypes" modifier="Abstract" strength="referencing" strengthDirection="forward" description="A relationship used to identify the bis:PhysicalType instances that are sub-parts to compose a larger LayeredStructureType.">
+        <BaseClass>bis:PhysicalTypeComposesSubTypes</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="composes" polymorphic="true">
+            <Class class="LayeredStructureType"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is composed by" polymorphic="true">
+            <Class class="bis:PhysicalType"/>
+        </Target>
+        <ECProperty propertyName="SubTypeThickness" typeName="double" displayLabel="Thickness" kindOfQuantity="cvu:LENGTH_SHORT" description="The thickness measurement of the sub-type."/>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="Pavement" displayLabel="Pavement" description="A LayeredStructure designed to support vehicular and/or pedestrian traffic, that provide durability, load distribution, and environmental resistance.">
+        <BaseClass>LayeredStructure</BaseClass>
+    </ECEntityClass>
+    <ECEntityClass typeName="PavementType" displayLabel="Pavement Type" description="Defines a shared set of properties whose values vary per-type of Pavement rather than per-instance.">
+        <BaseClass>LayeredStructureType</BaseClass>
+    </ECEntityClass>
+    <ECRelationshipClass typeName="PavementIsOfType" strength="referencing" modifier="None" description="A type-instance relation; one that indicates that the specific Pavement is an instance of the defined PavementType.">
+        <BaseClass>bis:PhysicalElementIsOfType</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="is of" polymorphic="true">
+            <Class class="Pavement" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is type of" polymorphic="true">
+            <Class class="PavementType"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="PavementTypeComposesSubTypes" modifier="Abstract" strength="referencing" strengthDirection="forward" description="A relationship used to identify the bis:PhysicalType instances that are sub-parts to compose a larger PavementType.">
+        <BaseClass>bis:PhysicalTypeComposesSubTypes</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="composes" polymorphic="true">
+            <Class class="PavementType"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is composed by" polymorphic="true">
+            <Class class="bis:PhysicalType"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="Course" displayLabel="Course" description="A bis:PhysicalElement modeling a typical layer assembled by a LayeredStructure, usually of a single material, whose length greatly exceeds its thickness and often also its width, laid on site on top of another horizontal or nearly horizontal element.">
         <BaseClass>lr:LinearPhysicalElement</BaseClass>
     </ECEntityClass>
     <ECEntityClass typeName="CourseType" displayLabel="Course Type" description="Defines a shared set of properties whose values vary per-type of Course rather than per-instance.">
