@@ -3,7 +3,7 @@
 |  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
 |  * See LICENSE.md in the project root for license terms and full copyright notice.
 ======================================================================================= -->
-<ECSchema schemaName="DrawingProductionExperimental" alias="dpex" version="01.01.00" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" description="This schema contains an experimental implementation of concepts associated with Drawing Production.">
+<ECSchema schemaName="DrawingProductionExperimental" alias="dpex" version="01.00.01" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" description="This schema contains an experimental implementation of concepts associated with Drawing Production.">
     <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA" />
     <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
     <ECSchemaReference name="BisCore" version="01.00.16" alias="bis"/>   
@@ -20,15 +20,14 @@
     <ECEntityClass typeName="ViewAttachmentPlaceHolder" displayLabel="View Attachment Placeholder" modifier="None" description="An area on a sheet where a view is to be placed.">
         <BaseClass>bis:GraphicalElement2d</BaseClass>
     </ECEntityClass>
-    
-    <ECEntityClass typeName="ViewAttachmentWithPlaceHolder" displayLabel="View Attachment (with placeholder)" modifier="None" description="Attachment wrapper exposing placeholder link.">
+    <ECEntityClass typeName="ViewAttachmentWithPlaceHolder" displayLabel="View Attachment (with placeholder)" modifier="None" description="A ViewAttachment that fills a ViewAttachmentPlaceHolder region on a sheet.">
       <BaseClass>bis:ViewAttachment</BaseClass>
-      <ECNavigationProperty propertyName="placeHolder" relationshipName="ViewAttachmentFulfillsPlaceHolder" direction="Forward" displayLabel="PlaceHolder" description="The sheet region this ViewAttachment fills."/>
+      <ECNavigationProperty propertyName="placeHolder" relationshipName="ViewAttachmentFulfillsPlaceHolder" direction="Forward" displayLabel="PlaceHolder" description="The placeholder this ViewAttachment fills."/>
     </ECEntityClass>
 
     <ECRelationshipClass typeName="ViewAttachmentFulfillsPlaceHolder" strength="referencing" modifier="Sealed"
         description="Relates a ViewAttachmentWithPlaceHolder to the ViewAttachmentPlaceHolder it fills.">
-        <Source multiplicity="(0..1)" roleLabel="fills" polymorphic="true">
+        <Source multiplicity="(0..*)" roleLabel="fills" polymorphic="true">
             <Class class="ViewAttachmentWithPlaceHolder"/>
         </Source>
         <Target multiplicity="(0..1)" roleLabel="is filled by" polymorphic="true">
