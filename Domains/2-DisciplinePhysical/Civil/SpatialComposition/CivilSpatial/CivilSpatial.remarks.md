@@ -123,3 +123,30 @@ FROM
 WHERE
     sse.ECInstanceId = sub.organizerId
 ```
+
+- Query for the _Count_ of _Parking Spaces_ per _Parking Area_.
+
+```
+WITH RECURSIVE subElementsPerParkingArea(organizerId, parkingAreaId) AS (
+        SELECT ECInstanceId, ECInstanceId FROM cvsp.ParkingArea
+    UNION
+        SELECT
+            csse.ECInstanceId, 
+            sub.parkingAreaId
+        FROM
+            spcomp.SpatialStructureElement sse
+            INNER JOIN spcomp.SpatialStructureElement csse ON sse.ECInstanceId = csse.ComposingElement.Id,
+            subElementsPerParkingArea sub
+        WHERE
+            sse.ECInstanceId = sub.organizerId
+)
+SELECT
+    sub.parkingAreaId [ParkingAreaId],
+    SUM(parkingRow.ParkingSpaceCount) [ParkingSpaceCount]
+FROM
+    subElementsPerParkingArea sub, cvsp.ParkingRow parkingRow
+WHERE
+    sub.organizerId = parkingRow.ECInstanceId
+GROUP BY
+    sub.parkingAreaId
+```
