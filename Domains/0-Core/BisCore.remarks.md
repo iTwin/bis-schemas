@@ -584,7 +584,7 @@ The scenario presented in such example is addressed by introducing a `SpatialLoc
 
 - `DrawingGraphic`s representing `GeometricElement3d`s, organized per `Drawing`
 
-```
+```sql
 SELECT
     dr.ECInstanceId [DrawingId],
     d.ECInstanceId [DrawingGraphicId],
@@ -601,7 +601,7 @@ ORDER BY
 
 - Count of `GeometricElement3d`s that have assigned _Geometry_, per concrete _ECClass_.
 
-```
+```sql
 SELECT
     ec_classname(ECClassId),
     COUNT(*)
@@ -615,7 +615,7 @@ GROUP BY
 
 - Count of `PhysicalElement`s per `PhysicalMaterial`.
 
-```
+```sql
 SELECT 
     pm.CodeValue,
     COUNT(*)
@@ -632,7 +632,7 @@ GROUP BY
 
 - Count of `Element`s per associated `RepositoryLink` (provenance).
 
-```
+```sql
 SELECT
     rl.CodeValue,
     rl.UserLabel,
@@ -647,7 +647,7 @@ WHERE
 
 - Subject hierarchy reported according to element-creation order.
 
-```
+```sql
 SELECT 
     ECInstanceId, 
     CodeValue, 
@@ -665,7 +665,7 @@ ORDER BY
 
 - Subject hierarchy (elements in the Repository Model) traversed recursively (i.e. Depth-First search) starting at the _Root Subject_.
 
-```
+```sql
 WITH RECURSIVE elementsInHierarchy(id) AS (
     VALUES(0x1) 
 UNION ALL 
@@ -690,7 +690,7 @@ WHERE
 
 - All elements under a particular `Subject`, queried recursively.
 
-```
+```sql
 WITH RECURSIVE elementsInHierarchy(id) AS (
     VALUES(:subjectId) 
 UNION ALL 
@@ -713,4 +713,62 @@ FROM
     bis.Element e 
 WHERE 
     e.ECInstanceId = h.id
+```
+
+- Query for the _Channel_ (Key and Version) in which a particular _Element_ is in. Returns '<shared>' if the _Element_ is not in any Channel explicitely.
+
+```sql
+WITH RECURSIVE ancestors(id) AS (
+    VALUES(:elementId) 
+UNION ALL 
+    SELECT 
+        coalesce(p.ECInstanceId, m.ECInstanceId) 
+    FROM 
+        bis.Element e, 
+        bis.Element m, 
+        ancestors a 
+        LEFT JOIN bis.Element p ON e.Parent.Id = p.ECInstanceId         
+    WHERE 
+        e.ECInstanceId = a.id AND e.Model.Id = m.ECInstanceId AND e.Model.id <> e.ECInstanceId) 
+SELECT 
+    coalesce(cra.Owner, '<shared>') [Channel Key],
+    coalesce(cra.Version, NULL) [Channel Version]
+FROM 
+    bis.Subject e LEFT JOIN bis.ChannelRootAspect cra ON cra.Element.Id = e.ECInstanceId,
+    ancestors a 
+WHERE 
+    e.ECInstanceId = a.id AND (cra.ECInstanceId IS NOT NULL OR e.ECInstanceId = 0x1)
+ORDER BY 
+    e.ECInstanceId DESC
+LIMIT 
+    1
+```
+
+- Query for all _Channels_ and return its _channel key_, _channel version_ and count of elements on each. Returns '<shared>' to account for any elements that are not in any particular _Channel_.
+
+```sql
+WITH RECURSIVE descendents(id, channelId) AS (
+    VALUES(0x1, 0x1)
+UNION ALL
+    SELECT 
+        e.ECInstanceId,
+        coalesce(cra.Element.Id, d.channelId)
+    FROM 
+        bis.Element e, 
+        descendents d, 
+        bis.Element he LEFT JOIN bis.ChannelRootAspect cra ON cra.Element.Id = he.ECInstanceId
+    WHERE 
+        (he.ECInstanceId = d.id) AND ((he.ECClassId IS (bis.IParentElement) AND e.Parent.Id = d.id) 
+        OR (he.ECClassId IS (bis.ISubModeledElement) AND e.Model.Id = d.id))) 
+SELECT
+    coalesce(channel.Owner, '<shared>') [Channel Key],
+    coalesce(channel.Version, NULL) [Channel Version],
+    COUNT(*)
+FROM
+   bis.Subject s LEFT JOIN bis.ChannelRootAspect channel ON s.ECInstanceId = channel.Element.Id,
+   descendents d
+WHERE
+    d.channelId = s.ECInstanceId
+GROUP BY
+    s.ECInstanceId
 ```
