@@ -225,7 +225,7 @@ Equivalent to [IfcPipeFittingType](http://ifc43-docs.standards.buildingsmart.org
 
 - Query for InnerDiameter, WallThickness and number of Circular piping ports on a particular IPipingPhysicalType (e.g. PipeType, ValveType, PipeFittingType).
 
-```
+```sql
 SELECT
     cirPortT.InnerDiameter,
     cirPortT.WallThickness,
@@ -240,7 +240,7 @@ WHERE
 
 - Query for InnerDiameter and WallThickness of all Circular piping ports on a particular `Pipe`.
 
-```
+```sql
 SELECT
     cirPortT.InnerDiameter,
     cirPortT.WallThickness
@@ -254,7 +254,7 @@ WHERE
 
 - Query for all IPipingElements (e.g. Pipes, Valves, PipeFittings) that are part of a specific Piping System.
 
-```
+```sql
 SELECT
     pe.ECInstanceId,
     pe.ECClassId

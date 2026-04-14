@@ -99,7 +99,7 @@ Instances of `GenericAreaType` provide an additional classification that can be 
 
 - Query recursively for all `SpatialElement`s held by all `Site` instances, directly or indirectly through any other `SpatialStructure` element they aggregate.
 
-```
+```sql
 WITH RECURSIVE subElements(organizerId) AS (
         SELECT ECInstanceId FROM cvsp.Site
     UNION
@@ -126,7 +126,7 @@ WHERE
 
 - Query for the _Count_ of _Parking Spaces_ per _Parking Area_.
 
-```
+```sql
 WITH RECURSIVE subElementsPerParkingArea(organizerId, parkingAreaId) AS (
         SELECT ECInstanceId, ECInstanceId FROM cvsp.ParkingArea
     UNION

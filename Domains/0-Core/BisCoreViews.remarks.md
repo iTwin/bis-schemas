@@ -15,7 +15,7 @@ The `PhysicalElementMaterialView` class is typically joined with the `bis:Physic
 
 - Count of `PhysicalElement`s per `PhysicalMaterial`.
 
-```
+```sql
 SELECT 
     pm.CodeValue,
     COUNT(*)

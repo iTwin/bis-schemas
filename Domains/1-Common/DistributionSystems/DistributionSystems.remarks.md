@@ -107,7 +107,7 @@ Equivalent to the _RealizingElement_ property of [IfcRelConnectsPorts](https://s
 
 - Query for all connected `IDistributionElement`s to a particular `IDistributionElement`.
 
-```
+```sql
 SELECT 
     otherPort.Parent.Id
 FROM
@@ -120,7 +120,7 @@ WHERE
 
 - Query for all `IDistributionElement` reacheable starting from a particular `IDistributionElement` by traversing connected `IDistributionElement`s recursively.
 
-```
+```sql
 WITH RECURSIVE connected(distElmId) AS (
     VALUES(:startingDistElmId)
 UNION

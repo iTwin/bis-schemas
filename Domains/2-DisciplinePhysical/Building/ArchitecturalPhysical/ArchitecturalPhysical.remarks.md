@@ -13,7 +13,7 @@ The schema also contains `PhysicalTypes` of all classes. However it needs to be 
 
 - Query for the _Total Net Volume_ and _Total Net Side Area_ of all `Wall`s, grouped by `PhysicalMaterial`.
 
-```
+```sql
 SELECT
     pm.CodeValue,
     SUM(wmat.NetVolume) [TotalNetVolume],

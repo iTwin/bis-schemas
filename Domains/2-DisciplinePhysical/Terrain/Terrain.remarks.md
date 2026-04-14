@@ -134,7 +134,7 @@ A `TerrainIsland` stores its geometrical details in its `GeometryStream` as clos
 
 - Query for any _features_ that are part of a particular _terrain_.
 
-```
+```sql
 SELECT
     feature.ECInstanceId,
     feature.ECClassId
@@ -147,6 +147,7 @@ WHERE
 
 - Query for terrains (stored or referenced) with a _boundary_ whose bounding-box overlaps a given X/Y point.
 
+```sql
 SELECT
     t.ECInstanceId,
     t.ECClassId
@@ -154,3 +155,4 @@ FROM
     trrn.ITerrain t INNER JOIN trrn.TerrainBoundary b ON t.ECInstanceId = b.Parent.Id
 WHERE
     b.BBoxLow.x <= :x AND b.BBoxLow.y <= :y AND b.BBoxHigh.x >= :x AND b.BBoxHigh.y >= :y
+```

@@ -51,7 +51,7 @@ Equivalent to [IfcDistributionChamberElementType](https://standards.buildingsmar
 
 - Query for the dimensions of all Rectangular piping ports on a particular `DistributionStructure`.
 
-```
+```sql
 SELECT
     recPortT.SmallerDimension,
     recPortT.LargerDimension
@@ -65,6 +65,7 @@ WHERE
 
 - Query for sub-types composed by Manholes and Catchbasins as PhysicalTypes.
 
+```sql
 SELECT
     dst.ECInstanceId [DistributionStructureId],
     pt.ECInstanceId [SubTypeId],
@@ -73,3 +74,4 @@ FROM
     stmswrphys.DistributionStructureType dst 
     INNER JOIN stmswrphys.DistributionStructureTypeComposesSubTypes comp ON comp.SourceECInstanceId = dst.ECInstanceId
     INNER JOIN bis.PhysicalType pt ON pt.ECInstanceId = comp.TargetECInstanceId
+```

@@ -103,7 +103,7 @@ Equivalent to [IfcFacilityPart](https://standards.buildingsmart.org/IFC/RELEASE/
 
 - Query recursively for all `SpatialElement`s held by all `Road` instances, directly or indirectly through any other `SpatialStructure` element they aggregate or reference.
 
-```
+```sql
 WITH RECURSIVE subElements(organizerId) AS (
         SELECT ECInstanceId FROM rdsp.Road
     UNION

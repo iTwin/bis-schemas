@@ -66,7 +66,7 @@ These assumptions are equivalent to a [IfcAxis2PlacementLinear](https://standard
 
 - Linearly-located elements, with associated distance-along measurements, along a particular Linear-Element. If the purpose of the returned Linearly-located element is to locate another element that is not itself an ILinearlyLocated, this example also returns the Id of such other element.
 
-```
+```sql
 SELECT
     ll.ECInstanceId,
     ec_classname(ll.ECClassId),

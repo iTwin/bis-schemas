@@ -23,7 +23,7 @@ Equivalent to a link to an [ISO 19650 - Information Container](https://www.iso.o
 
 - Query for the Code, Suitability, Revision, LastTimeSaved and FileSize of all `DocumentLink`s in a BIS repository.
 
-```
+```sql
 SELECT
     dl.ECInstanceId [DocumentLinkId],
     dl.CodeValue [DocumentLinkCode],

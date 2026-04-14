@@ -176,7 +176,7 @@ Use the [SpatialOrganizerHoldsSpatialElements](#spatialorganizerholdsspatialelem
 
 - Query for all `SpatialElement`s held by a particular `SpatialStructureElement` (e.g. Region, Site, Facility, Space) directly or indirectly through any other `SpatialStructure` element it aggregates.
 
-```
+```sql
 WITH RECURSIVE subElements(organizerId) AS (
         VALUES(:startingOrganizerId)
     UNION

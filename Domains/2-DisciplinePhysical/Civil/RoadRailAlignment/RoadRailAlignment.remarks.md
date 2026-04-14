@@ -124,7 +124,7 @@ The `VerticalAlignmentOwnsSegmentGraphics` relationship is used when the visual 
 
 - _From_ distance-along measurements along a particular _Alignment_, reported with _Station_ values.
 
-```
+```sql
 SELECT
      linearlyLocated.DistanceAlongFromStart DistanceAlong,
      (coalesce(station.Station, alg.StartStation) +
@@ -167,7 +167,7 @@ LIMIT 1
 
 - Queries for Code, Label, Horizontal and Vertical geometry of a particular `Alignment`.
 
-```
+```sql
 SELECT
     a.ECInstanceId [AlignmentId],
     a.CodeValue,

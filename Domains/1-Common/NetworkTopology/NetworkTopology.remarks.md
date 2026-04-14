@@ -89,7 +89,7 @@ The `NodeConnectsToNode` relationship could be used to model simple links in a g
 
 - Query for all IEdge instances connected to a particular INode.
 
-```
+```sql
 SELECT DISTINCT
     e.ECInstanceId,
     e.ECClassId
@@ -107,7 +107,7 @@ WHERE
 
 - Query for all `INode`s reacheable starting from a particular `INode` by traversing connected `ITopologyElement`s recursively.
 
-```
+```sql
 WITH RECURSIVE connected(nodeId) AS (
     VALUES(:startingNodeId)
 UNION

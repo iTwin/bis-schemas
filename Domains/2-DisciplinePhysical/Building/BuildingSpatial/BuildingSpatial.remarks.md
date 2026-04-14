@@ -71,7 +71,7 @@ Equivalent to [IfcBuildingStorey](https://standards.buildingsmart.org/IFC/RELEAS
 
 - Query recursively for all `SpatialElement`s (e.g. Physical or SpatialLocation elements) held by a particular `Story` in a `Building`, directly or indirectly via any of its sub-parts.
 
-```
+```sql
 WITH RECURSIVE subElements(organizerId) AS (
         SELECT ECInstanceId FROM BuildingSpatial.Story WHERE ECInstanceId = :startingStoryId
     UNION
@@ -98,7 +98,7 @@ WHERE
 
 - Query for the `Story` that holds every `PhysicalElement`, directly or indirectly via any of its sub-parts.
 
-```
+```sql
 WITH RECURSIVE physicalElementsHeld(storyId, organizerId, physicalElementId) AS (
         SELECT 
             s.ECInstanceId,

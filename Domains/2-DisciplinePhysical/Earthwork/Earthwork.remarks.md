@@ -56,7 +56,7 @@ Instances of `SurfaceGradeType` provide an additional classification that can be
 
 - Query for the count of Cut and Fill instances, grouped by `PhysicalType`.
 
-```
+```sql
 SELECT
     coalesce(pt.CodeValue, pt.UserLabel) [Type],
     COUNT(*)

@@ -92,7 +92,7 @@ Following the naming convention, this relationship class should have been named 
 
 - Query for all `Element`s classified under a particular `ClassificationSystem`.
 
-```
+```sql
 WITH RECURSIVE subClassifications(classificationId) AS (
         SELECT 
             c.ECInstanceId

@@ -17,7 +17,7 @@ The `PipeView` class is typically joined with the `pipphys:Pipe` class in ECSQL 
 
 - Query Length and Slope for a particular `Pipe`.
 
-```
+```sql
 SELECT
     pv.Length,
     pv.Slope
@@ -29,7 +29,7 @@ WHERE
 
 - Query InvertElevation and CrownElevation for all PipingPorts on a particular `Pipe`
 
-```
+```sql
 SELECT
     ppv.InvertElevation,
     ppv.CrownElevation
