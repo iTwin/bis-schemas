@@ -74,3 +74,33 @@ Therefore, individual `bis:PhysicalType`s (e.g. `CourseType`) composing a `Layer
 An instance of `LayeredStructureTypeComposesSubTypes` captures the _thickness_ and _order_ of a `bis:PhysicalType` at its target end-point (e.g. a `CourseType`) in context of a `LayeredStructureType` instance at its source end-point. They are captured on its _SubTypeThickness_ and _MemberPriority_ properties.
 
 By convention, the top-layer of a `LayeredStructureType` shall have the _MemberPriority_ property of this relationship set to 0 (zero). The subsequent layer down shall have this property set to 1 (one), and so on.
+
+## Sample ECSQL queries
+
+- Query for the _thickness_ of a particular layer (e.g. `Course`) in a `LayeredStructure` (e.g. Pavement).
+
+```sql
+SELECT
+    comp.SubTypeThickness [Layer Thickness]
+FROM 
+    bis.PhysicalElement layer INNER JOIN bis.PhysicalType pt ON layer.TypeDefinition.Id = pt.ECInstanceId
+    INNER JOIN cvphys.LayeredStructure structure ON structure.ECInstanceId = layer.Parent.Id
+    INNER JOIN cvphys.LayeredStructureType structType ON structure.TypeDefinition.Id = structType.ECInstanceId
+    INNER JOIN cvphys.LayeredStructureTypeComposesSubTypes comp ON comp.TargetECInstanceId = pt.ECInstanceId
+        AND comp.SourceECInstanceId = structType.ECInstanceId
+WHERE
+    layer.ECInstanceId = :layerId
+```
+
+- Compute the overall _thickness_ of a particular `LayeredStructure` (e.g. Pavement).
+
+```sql
+SELECT
+    SUM(comp.SubTypeThickness) [Overall Thickness]
+FROM
+    cvphys.LayeredStructure structure 
+    INNER JOIN cvphys.LayeredStructureType structType ON structure.TypeDefinition.Id = structType.ECInstanceId
+    INNER JOIN cvphys.LayeredStructureTypeComposesSubTypes comp ON comp.SourceECInstanceId = structType.ECInstanceId
+WHERE
+    structure.ECInstanceId = :layeredStructureId
+```
