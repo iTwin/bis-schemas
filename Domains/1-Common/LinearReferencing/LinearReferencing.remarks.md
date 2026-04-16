@@ -61,3 +61,26 @@ Values in the `LateralOffsetFromILinearElement` are assumed to be positive for l
 Values in the `VerticalOffsetFromILinearElement` are assumed to be positive for vertical offsets above the Linear-Element and negative for vertical offsets below it.
 
 These assumptions are equivalent to a [IfcAxis2PlacementLinear](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcAxis2PlacementLinear.htm) with its `Axis` and `RefDirection` attributes describing a perpendicular to the tangent at the linear location of interest along the [BasisCurve](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcPointByDistanceExpression.htm).
+
+## Sample ECSQL queries
+
+- Linearly-located elements, with associated distance-along measurements, along a particular Linear-Element. If the purpose of the returned Linearly-located element is to locate another element that is not itself an ILinearlyLocated, this example also returns the Id of such other element.
+
+```sql
+SELECT
+    ll.ECInstanceId,
+    ec_classname(ll.ECClassId),
+    atLoc.AtPosition.DistanceAlongFromStart [At Distance Along],
+    fromToLoc.FromPosition.DistanceAlongFromStart [From Distance Along],
+    fromToLoc.ToPosition.DistanceAlongFromStart [From Distance Along],
+    locates.TargetECInstanceId [Linearly-Located Element Id]
+FROM
+    lr.ILinearElement le INNER JOIN
+    lr.ILinearlyLocatedAlongILinearElement along ON le.ECInstanceId = along.TargetECInstanceId INNER JOIN
+    lr.ILinearlyLocated ll ON ll.ECInstanceId = along.SourceECInstanceId LEFT JOIN
+    lr.LinearlyReferencedAtLocation atLoc ON atLoc.Element.Id = ll.ECInstanceId LEFT JOIN
+    lr.LinearlyReferencedFromToLocation fromToLoc ON fromToLoc.Element.Id = ll.ECInstanceId LEFT JOIN
+    lr.ILinearLocationLocatesElement locates ON locates.SourceECInstanceId = ll.ECInstanceId
+WHERE
+    le.ECInstanceId = :linearElementId
+```

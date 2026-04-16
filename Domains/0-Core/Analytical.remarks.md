@@ -36,3 +36,23 @@ It is meant to be used to relate anlyt:AnalyticalType instances that are not bet
 ### AnalyticalSimulatesSpatialElement
 
 E.g. An analytical pump station in a Hydraulic analysis can be related with all the physical pumps it is simulating.
+
+## Sample ECSQL queries
+
+- Count of `AnalyticalElement`s simulating `SpatialElement`s in a particular kind of Analysis.
+
+```sql
+SELECT
+    se.ECInstanceId,
+    COUNT(*)
+FROM
+    anlyt.AnalyticalElement ae INNER JOIN anlyt.AnalyticalSimulatesSpatialElement simu ON ae.ECInstanceId = simu.SourceECInstanceId
+    INNER JOIN bis.SpatialElement se on simu.TargetECInstanceId = se.ECInstanceId
+    INNER JOIN anlyt.AnalyticalModel am ON am.ECInstanceId = ae.Model.Id
+    INNER JOIN anlyt.AnalyticalPartition ap ON ap.ECInstanceId = am.ModeledElement.Id
+    INNER JOIN meta.ECClassDef cd ON ap.ECClassId = cd.ECInstanceId
+WHERE
+    cd.Name = :analysisPartitionClassName
+GROUP BY
+    se.ECInstanceId
+```

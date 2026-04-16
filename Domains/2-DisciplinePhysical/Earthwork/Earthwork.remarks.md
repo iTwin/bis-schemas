@@ -22,7 +22,7 @@ Examples of `Fill` include subgrade or a parts of a structure above it (such as 
 
 `Fill`s shall have their *Volume* stored in their `GeometryStream` as a *Polyface*. Further classification of `Fill` instances can be achieved via instances of `FillType`. A `Fill` instance can override the *Physical Material* specified by its corresponding `FillType` via its `PhysicalMaterial` property.
 
-`Fill`s must be contained in `PhysicalModel`s. Instances of `Fill`, by default, shall use the Domain-ranked `ew:Volume` category.
+`Fill`s must be contained in `PhysicalModel`s.
 
 Equivalent to [IfcEarthworksFill](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcEarthworksFill.htm).
 
@@ -38,7 +38,7 @@ The material excavated, modeled by `Cut`s, can later be used as fill or discarde
 
 `Cut`s shall have their *Volume* stored in their `GeometryStream` as a *Polyface*.
 
-`Cut`s must be contained in `PhysicalModel`s. Instances of `Cut`, by default, shall use the Domain-ranked `ew:Volume` category.
+`Cut`s must be contained in `PhysicalModel`s.
 
 Equivalent to [IfcEarthworksCut](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcEarthworksCut.htm) with the main difference that IFC's equivalent does not model the material excavated, only the resulting void from modification of existing terrain.
 
@@ -50,4 +50,20 @@ Instances of `SurfaceGradeType` provide an additional classification that can be
 
 `SurfaceGrade`s shall have their *Surface* stored in their `GeometryStream` as a *Polyface*. A `SurfaceGrade` instance can override the *Physical Material* specified by its corresponding `SurfaceGradeType` via its `PhysicalMaterial` property.
 
-`SurfaceGrade`s must be contained in `PhysicalModel`s. Instances of `SurfaceGrade`, by default, shall use the Domain-ranked `ew:Grading` category.
+`SurfaceGrade`s must be contained in `PhysicalModel`s.
+
+## Sample ECSQL queries
+
+- Query for the count of Cut and Fill instances, grouped by `PhysicalType`.
+
+```sql
+SELECT
+    coalesce(pt.CodeValue, pt.UserLabel) [Type],
+    COUNT(*)
+FROM
+    bis.PhysicalElement pe INNER JOIN bis.PhysicalType pt ON pe.TypeDefinition.Id = pt.ECInstanceId
+WHERE
+    pe.ECClassId IS (ew.Cut, ew.Fill)
+GROUP BY
+    pt.ECInstanceId
+```
