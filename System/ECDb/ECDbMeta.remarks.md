@@ -43,3 +43,50 @@ Similar to [ClassCustomAttribute](#classcustomattribute) but returns custom attr
 ### PropertyCustomAttribute
 
 Similar to [ClassCustomAttribute](#classcustomattribute) but returns custom attributes applied to a property.
+
+## Sample ECSQL queries
+
+- Query for all EC classes in a particular schema identified by its name, that derive from bis:PhysicalElement.
+
+```sql
+SELECT
+    subClassDef.Name [Class Name]
+FROM
+    meta.ECSchemaDef bisSchemaDef 
+    INNER JOIN meta.ECClassDef bisClassDef ON bisSchemaDef.ECInstanceId = bisClassDef.Schema.Id
+    INNER JOIN meta.ClassHasAllBaseClasses baseClasses ON baseClasses.TargetECInstanceId = bisClassDef.ECInstanceId
+    INNER JOIN meta.ECClassDef subClassDef ON subClassDef.ECInstanceId = baseClasses.SourceECInstanceId
+    INNER JOIN meta.ECSchemaDef requestedSchemaDef ON requestedSchemaDef.ECInstanceId = subClassDef.Schema.Id
+WHERE
+    bisSchemaDef.Name = 'BisCore' AND bisClassDef.Name = 'PhysicalElement' AND
+    requestedSchemaDef.Name = :schemaName
+```
+
+- Query for the names of all EC schemas marked as "dynamic" in the current repository.
+
+```sql
+SELECT
+    s.Name [Schema Name]
+FROM
+    meta.SchemaCustomAttribute sca 
+    INNER JOIN meta.ECSchemaDef s ON s.ECInstanceId = sca.Schema.Id
+    INNER JOIN meta.ECClassDef cac ON cac.ECInstanceId = sca.CustomAttributeClass.Id
+    INNER JOIN meta.ECSchemaDef cas ON cas.ECInstanceId = cac.Schema.Id
+WHERE
+    cas.Name = 'CoreCustomAttributes' AND cac.Name = 'DynamicSchema'
+```
+
+- Query for the _ProductionStatus_ of all BIS schemas in the current repository.
+
+```sql
+SELECT
+    s.Name [Schem Name],
+    json_extract(Instance, '$.ProductionStatus.SupportedUse') [Production Status]
+
+FROM
+    meta.SchemaCustomAttribute sca INNER JOIN meta.ECSchemaDef s ON s.ECInstanceId = sca.Schema.Id
+    INNER JOIN meta.ECClassDef cac ON cac.ECInstanceId = sca.CustomAttributeClass.Id
+    INNER JOIN meta.ECSchemaDef cas ON cas.ECInstanceId = cac.Schema.Id
+WHERE
+    cas.Name = 'CoreCustomAttributes' AND cac.Name = 'ProductionStatus'
+```
