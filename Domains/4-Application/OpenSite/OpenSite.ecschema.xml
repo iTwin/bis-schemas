@@ -1062,8 +1062,22 @@
         <ECProperty propertyName="ParkingWidth" typeName="double" category="LayoutParkingArea_Parking" kindOfQuantity="cvu:LENGTH"  displayLabel="Width" description="Parking space width." />
         <ECProperty propertyName="ParkingDepth" typeName="double" category="LayoutParkingArea_Parking" kindOfQuantity="cvu:LENGTH"  displayLabel="Depth" description="Parking space depth." />
         <ECProperty propertyName="ParkingAngle" typeName="double" category="LayoutParkingArea_Parking" kindOfQuantity="cvu:ANGLE"  displayLabel="Angle" description="Parking space angle." />
-        <ECProperty propertyName="ParkingSpaces" typeName="int" category="LayoutParkingArea_Parking" displayLabel="Parking Spaces" description="Number of spaces." />
-        <ECProperty propertyName="ProblemSpaces" typeName="int" category="LayoutParkingArea_Parking" displayLabel="Problem Spaces" description="Number of problematic spaces." />
+        <ECProperty propertyName="ParkingSpaces" typeName="int" category="LayoutParkingArea_Parking" displayLabel="Parking Spaces" description="Number of spaces.">
+		    <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03" />
+                <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                    <Description>ParkingSpaces is deprecated for Layout Parking Area. </Description>
+                </Deprecated>
+            </ECCustomAttributes>
+        </ECProperty>
+        <ECProperty propertyName="ProblemSpaces" typeName="int" category="LayoutParkingArea_Parking" displayLabel="Problem Spaces" description="Number of problematic spaces.">
+		    <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03" />
+                <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                    <Description>ProblemSpaces is deprecated for Layout Parking Area </Description>
+                </Deprecated>
+            </ECCustomAttributes>
+        </ECProperty>
 
         <ECProperty propertyName="AisleWidth" typeName="double" kindOfQuantity="cvu:LENGTH" category="LayoutParkingArea_ParkingAisle" displayLabel="Width" description="Parking aisle width." />
 
@@ -1083,6 +1097,24 @@
 
         <ECNavigationProperty propertyName="IslandCurbType" relationshipName="LayoutParkingAreaUsesIslandCurbType" direction="Forward" displayLabel="Island Curb Type" />
         <ECNavigationProperty propertyName="ParkingCurbType" relationshipName="LayoutParkingAreaUsesCurbType" direction="Forward" displayLabel="Curb Type" />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="ParkingInformationView" modifier="Abstract" displayLabel="Parking Information">
+        <ECCustomAttributes>
+            <QueryView xmlns="ECDbMap.02.00.04">
+                <Query>
+                    SELECT
+                        pa.ECInstanceId,
+                        ec_classid('OpenSite', 'ParkingInformationView') [ECClassId],
+                        SUM(pr.ParkingSpaceCount) [ParkingSpaceCount]
+                    FROM CivilSpatial:ParkingArea pa
+                    JOIN SpatialComposition:SpatialStructureElementAggregatesElements rel ON pa.ECInstanceId=rel.SourceECInstanceId
+                    JOIN CivilSpatial.ParkingRow pr ON rel.TargetECInstanceId=pr.ECInstanceId
+                    GROUP BY pa.ECInstanceId;
+                </Query>
+            </QueryView>
+        </ECCustomAttributes>
+        <ECProperty propertyName="ParkingSpaceCount" typeName="int" />
     </ECEntityClass>
 
     <ECEntityClass typeName="LayoutPondArea" modifier="Sealed" displayLabel="Pond" description="Layout pond area.">
