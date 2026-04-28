@@ -6,7 +6,6 @@
 <ECSchema schemaName="OpenSite" alias="opnsite" version="01.00.22" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" displayLabel="OpenSite" description="OpenSite+ application schema.">
     <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA" />
     <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
-    <ECSchemaReference name="ECDbMap" version="02.00.04" alias="ecdbmap"/>
     <ECSchemaReference name="BisCore" version="01.00.10" alias="bis" />
     <ECSchemaReference name="ClassificationSystems" version="01.00.04" alias="clsf" />
     <ECSchemaReference name="LinearReferencing" version="02.00.03" alias="lr" />
@@ -1098,26 +1097,6 @@
 
         <ECNavigationProperty propertyName="IslandCurbType" relationshipName="LayoutParkingAreaUsesIslandCurbType" direction="Forward" displayLabel="Island Curb Type" />
         <ECNavigationProperty propertyName="ParkingCurbType" relationshipName="LayoutParkingAreaUsesCurbType" direction="Forward" displayLabel="Curb Type" />
-    </ECEntityClass>
-
-    <ECEntityClass typeName="ParkingInformationView" modifier="Abstract" displayLabel="Parking Information">
-        <ECCustomAttributes>
-            <QueryView xmlns="ECDbMap.02.00.04">
-                <Query>
-                    SELECT
-                        pa.ECInstanceId,
-                        ec_classid('OpenSite', 'ParkingInformationView') [ECClassId],
-                        SUM(pr.ParkingSpaceCount) [ParkingSpaceCount],
-                        SUM(pr.ProblemSpaceCount) [ProblemSpaceCount]
-                    FROM CivilSpatial:ParkingArea pa
-                    JOIN SpatialComposition:SpatialStructureElementAggregatesElements rel ON pa.ECInstanceId=rel.SourceECInstanceId
-                    JOIN CivilSpatial.ParkingRow pr ON rel.TargetECInstanceId=pr.ECInstanceId
-                    GROUP BY pa.ECInstanceId;
-                </Query>
-            </QueryView>
-        </ECCustomAttributes>
-        <ECProperty propertyName="ParkingSpaceCount" typeName="int" />
-        <ECProperty propertyName="ProblemSpaceCount" typeName="int" />
     </ECEntityClass>
 
     <ECEntityClass typeName="LayoutPondArea" modifier="Sealed" displayLabel="Pond" description="Layout pond area.">
