@@ -704,6 +704,48 @@ Extended [ArbitraryShapeProfile](#arbitraryshapeprofile) with an additional cons
 
 ![Capsule](media/ProfilePictures/Capsule.png)
 
+### ParametricDeckProfile
+
+Abstract base class for open deck [Profiles](#profile) of constant thickness. Derived classes represent specific deck shapes.
+
+### StandardDeckProfile
+
+[ParametricDeckProfile](#parametricdeckprofile) that represents a standard trapezoidal steel deck shape. The deck cross-section consists of repeating rib units, each formed by a flat top, two sloped webs, and a flat bottom rib, tiled across the `CoverageWidth`.
+
+**Constraints:**
+- `Depth` must be greater than zero
+- `TopFlatWidth` must be greater than zero
+- `BottomRibWidth` must be greater than zero
+- `DiagonalWidth` must be greater than zero
+- `CoverageWidth`
+  - must be greater than zero
+  - must be greater than the distance between the centers of two adjacent ribs
+
+### DeepDeckProfile
+
+[ParametricDeckProfile](#parametricdeckprofile) that represents a deep steel deck shape.
+
+**Constraints:**
+- `Depth` must be greater than zero
+- `TopFlatWidth` must be greater than zero
+- `RibSpacing`
+  - must be greater than zero
+  - must be greater than `TopFlatWidth` 
+- `CoverageWidth`
+  - must be greater than zero
+  - must be greater than `RibSpacing`
+
+### SineWaveDeckProfile
+
+[ParametricDeckProfile](#parametricdeckprofile) that represents a sine wave shaped steel deck. The cross-section follows a sinusoidal curve over the `CoverageWidth`.
+
+**Constraints:**
+- `Depth` must be greater than zero
+- `WaveLength` must be greater than zero
+- `CoverageWidth`
+  - must be greater than zero
+  - must be greater than `WaveLength`
+
 ## Mixin Classes
 
 ### ICenterLineProfile
