@@ -9,6 +9,7 @@
     <ECSchemaReference name="ECDbMap" version="02.00.04" alias="ecdbmap"/>
     <ECSchemaReference name="SpatialComposition" version="01.00.01" alias="spcomp" />
     <ECSchemaReference name="CivilSpatial" version="01.00.03" alias="cvsp" />
+    <ECSchemaReference name="OpenSite" version="01.00.00" alias="opnsite" />
 
     <ECCustomAttributes>
         <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
@@ -24,14 +25,21 @@
             <QueryView xmlns="ECDbMap.02.00.04">
                 <Query>
                     SELECT
-                        pa.ECInstanceId,
+                        COALESCE(pa.ECInstanceId, pr.ECInstanceId) [ECInstanceId],
                         ec_classid('OpenSiteViews', 'ParkingInformationView') [ECClassId],
                         SUM(pr.ParkingSpaceCount) [ParkingSpaceCount],
                         SUM(pr.ProblemSpaceCount) [ProblemSpaceCount]
-                    FROM CivilSpatial:ParkingArea pa
-                    JOIN SpatialComposition:SpatialStructureElementAggregatesElements rel ON pa.ECInstanceId=rel.SourceECInstanceId
-                    JOIN CivilSpatial.ParkingRow pr ON rel.TargetECInstanceId=pr.ECInstanceId
-                    GROUP BY pa.ECInstanceId;
+                    FROM CivilSpatial.ParkingRow pr
+                    LEFT JOIN SpatialComposition:SpatialStructureElementAggregatesElements relPa ON pr.ECInstanceId=relPa.TargetECInstanceId
+                    LEFT JOIN CivilSpatial:ParkingArea pa ON relPa.SourceECInstanceId=pa.ECInstanceId
+                    WHERE pa.ECInstanceId IS NOT NULL
+                        OR EXISTS (
+                            SELECT 1
+                            FROM SpatialComposition:SpatialStructureElementAggregatesElements relPrp
+                            JOIN OpenSite:ParkingRowPath prp ON relPrp.SourceECInstanceId=prp.ECInstanceId
+                            WHERE relPrp.TargetECInstanceId=pr.ECInstanceId
+                        )
+                    GROUP BY COALESCE(pa.ECInstanceId, pr.ECInstanceId);
                 </Query>
             </QueryView>
         </ECCustomAttributes>
