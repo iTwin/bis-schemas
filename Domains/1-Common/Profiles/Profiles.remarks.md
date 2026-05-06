@@ -721,6 +721,8 @@ Abstract base class for open deck [Profiles](#profile) of constant thickness. De
   - must be greater than zero
   - must be greater than the distance between the centers of two adjacent ribs
 
+![StandardDeck](media/ProfilePictures/StandardDeck.png)
+
 ### DeepDeckProfile
 
 [ParametricDeckProfile](#parametricdeckprofile) that represents a deep steel deck shape.
@@ -735,6 +737,8 @@ Abstract base class for open deck [Profiles](#profile) of constant thickness. De
   - must be greater than zero
   - must be greater than `RibSpacing`
 
+![DeepDeck](media/ProfilePictures/DeepDeck.png)
+
 ### SineWaveDeckProfile
 
 [ParametricDeckProfile](#parametricdeckprofile) that represents a sine wave shaped steel deck. The cross-section follows a sinusoidal curve over the `CoverageWidth`.
@@ -745,6 +749,8 @@ Abstract base class for open deck [Profiles](#profile) of constant thickness. De
 - `CoverageWidth`
   - must be greater than zero
   - must be greater than `WaveLength`
+
+![SineWaveDeck](media/ProfilePictures/SineWaveDeck.png)
 
 ## Mixin Classes
 
