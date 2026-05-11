@@ -26,6 +26,7 @@
     <PropertyCategory typeName="DrivewayEndVertex_CulDeSac" displayLabel="Cul-de-sac" priority="0" />
     <PropertyCategory typeName="DrivewayEndVertex_Flares" displayLabel="Flares" priority="0" />
     <PropertyCategory typeName="DrivewayMidVertex_Transition" displayLabel="Transition" priority="0" />
+    <PropertyCategory typeName="DrivewayMidVertex_Knuckle" displayLabel="Knuckle" priority="0" />
     <PropertyCategory typeName="ParkingSpaceVertex_Parking" displayLabel="Parking" priority="0" />
     <PropertyCategory typeName="ParkingIslandVertex_Island" displayLabel="Island" priority="0" />
     <PropertyCategory typeName="ParkingBayVertex_Bay" displayLabel="Bay" priority="0" />
@@ -62,6 +63,7 @@
     <PropertyCategory typeName="LayoutPondArea_Pond" displayLabel="Pond" priority="0" />
     <PropertyCategory typeName="LayoutParcelingArea_ParcelLayout" displayLabel="Parcel Layout" priority="0" />
     <PropertyCategory typeName="ParcelBuildingAspect_BuildingLayout" displayLabel="Building Layout" priority="0" />
+    <PropertyCategory typeName="ParcelSetbacksAspect_Setbacks" displayLabel="Setbacks" priority="0" />
 
     <PropertyCategory typeName="DrivewayPath_Direction" displayLabel="Direction" priority="0" />
     <PropertyCategory typeName="ParkingRowPath_Parking" displayLabel="Parking" priority="0" />
@@ -86,6 +88,12 @@
     <ECEnumeration typeName="ControlType" backingTypeName="int" isStrict="true" displayLabel="Control Type">
         <ECEnumerator value="1" name="USER_CONTROL" displayLabel="User Controlled" />
         <ECEnumerator value="2" name="COMPUTER_CONTROL" displayLabel="Computer Controlled" />
+    </ECEnumeration>
+
+    <ECEnumeration typeName="DrivewayMidVertexKnuckleType" backingTypeName="int" isStrict="true" displayLabel="Knuckle Type">
+        <ECEnumerator value="0" name="NONE" displayLabel="None" />
+        <ECEnumerator value="1" name="ELBOW" displayLabel="Elbow" />
+        <ECEnumerator value="2" name="EYEBROW" displayLabel="Eyebrow" />
     </ECEnumeration>
 
     <ECEnumeration typeName="SurfaceType" backingTypeName="int" isStrict="true" displayLabel="Surface Type" description="Describes a design surface usage and/or material.">
@@ -339,6 +347,12 @@
                 </Deprecated>
             </ECCustomAttributes>
         </ECProperty>
+
+        <ECProperty propertyName="KnuckleType" typeName="DrivewayMidVertexKnuckleType" category="DrivewayMidVertex_Knuckle" displayLabel="Type" description="Knuckle type." />
+        <ECProperty propertyName="KnuckleRadius" typeName="double" kindOfQuantity="cvu:LENGTH" category="DrivewayMidVertex_Knuckle" displayLabel="Knuckle Radius" description="Knuckle radius." />
+        <ECProperty propertyName="KnuckleOffset" typeName="double" kindOfQuantity="cvu:LENGTH" category="DrivewayMidVertex_Knuckle" displayLabel="Knuckle Offset" description="Knuckle offset." />
+        <ECProperty propertyName="CurbReturnRadius" typeName="double" kindOfQuantity="cvu:LENGTH" category="DrivewayMidVertex_Knuckle" displayLabel="Curb Return Radius" description="Curb return radius." />
+        <ECProperty propertyName="CurbReturnLength" typeName="double" kindOfQuantity="cvu:LENGTH" category="DrivewayMidVertex_Knuckle" displayLabel="Curb Return Length" description="Curb return length." />
     </ECEntityClass>
 
     <ECEntityClass typeName="ParkingOverride" modifier="Abstract" displayLabel="Parking Override">
@@ -713,7 +727,7 @@
     </ECRelationshipClass>
 
     <ECRelationshipClass typeName="ShapedAreaUsesPavementType" strength="referencing" modifier="Sealed">
-        <Source multiplicity="(0..*)" roleLabel="uses" polymorphic="false">
+        <Source multiplicity="(0..*)" roleLabel="uses" polymorphic="true">
             <Class class="ShapedArea" />
         </Source>
         <Target multiplicity="(0..1)" roleLabel="is used by" polymorphic="true">
@@ -722,7 +736,7 @@
     </ECRelationshipClass>
 
     <ECRelationshipClass typeName="CenterlinePathEdgeUsesPavementType" strength="referencing" modifier="Sealed">
-        <Source multiplicity="(0..*)" roleLabel="uses" polymorphic="false">
+        <Source multiplicity="(0..*)" roleLabel="uses" polymorphic="true">
             <Class class="CenterlinePathEdge" />
         </Source>
         <Target multiplicity="(0..1)" roleLabel="is used by" polymorphic="true">
@@ -816,6 +830,26 @@
         </Source>
         <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
             <Class class="ParkingArea" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="LayoutParcelingAreaOwnsParcelAreas" strength="embedding" strengthDirection="Forward" modifier="Sealed">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="LayoutParcelingArea" />
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="false">
+            <Class class="ParcelArea" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="LayoutParcelingAreaOwnsBuildingAreas" strength="embedding" strengthDirection="Forward" modifier="Sealed">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="LayoutParcelingArea" />
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="false">
+            <Class class="BuildingArea" />
         </Target>
     </ECRelationshipClass>
 
@@ -1062,8 +1096,22 @@
         <ECProperty propertyName="ParkingWidth" typeName="double" category="LayoutParkingArea_Parking" kindOfQuantity="cvu:LENGTH"  displayLabel="Width" description="Parking space width." />
         <ECProperty propertyName="ParkingDepth" typeName="double" category="LayoutParkingArea_Parking" kindOfQuantity="cvu:LENGTH"  displayLabel="Depth" description="Parking space depth." />
         <ECProperty propertyName="ParkingAngle" typeName="double" category="LayoutParkingArea_Parking" kindOfQuantity="cvu:ANGLE"  displayLabel="Angle" description="Parking space angle." />
-        <ECProperty propertyName="ParkingSpaces" typeName="int" category="LayoutParkingArea_Parking" displayLabel="Parking Spaces" description="Number of spaces." />
-        <ECProperty propertyName="ProblemSpaces" typeName="int" category="LayoutParkingArea_Parking" displayLabel="Problem Spaces" description="Number of problematic spaces." />
+        <ECProperty propertyName="ParkingSpaces" typeName="int" category="LayoutParkingArea_Parking" displayLabel="Parking Spaces" description="Number of spaces.">
+		    <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03" />
+                <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                    <Description>ParkingSpaces is deprecated for Layout Parking Area. </Description>
+                </Deprecated>
+            </ECCustomAttributes>
+        </ECProperty>
+        <ECProperty propertyName="ProblemSpaces" typeName="int" category="LayoutParkingArea_Parking" displayLabel="Problem Spaces" description="Number of problematic spaces.">
+		    <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03" />
+                <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                    <Description>ProblemSpaces is deprecated for Layout Parking Area </Description>
+                </Deprecated>
+            </ECCustomAttributes>
+        </ECProperty>
 
         <ECProperty propertyName="AisleWidth" typeName="double" kindOfQuantity="cvu:LENGTH" category="LayoutParkingArea_ParkingAisle" displayLabel="Width" description="Parking aisle width." />
 
@@ -1100,11 +1148,18 @@
 
     <ECEntityClass typeName="LayoutParcelingArea" modifier="Sealed" displayLabel="Layout Parceling Area" description="Layout parceling area.">
         <BaseClass>LayoutArea</BaseClass>
+        
+        <ECProperty propertyName="ControlType" typeName="ControlType">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03" />
+            </ECCustomAttributes>
+        </ECProperty>
 
         <ECProperty propertyName="MinParcelSurface" typeName="double" kindOfQuantity="cvu:AREA" category="LayoutParcelingArea_ParcelLayout" displayLabel="Min. Parcel Surface" description="Minimum parcel surface area." />
         <ECProperty propertyName="MaxParcelDepth" typeName="double" kindOfQuantity="cvu:LENGTH" category="LayoutParcelingArea_ParcelLayout" displayLabel="Max. Parcel Depth" description="Maximum parcel depth." />
         <ECProperty propertyName="MinParcelFrontage" typeName="double" kindOfQuantity="cvu:LENGTH" category="LayoutParcelingArea_ParcelLayout" displayLabel="Min. Parcel Frontage" description="Minimum parcel frontage." />
         <ECProperty propertyName="ParcelFrontageOffset" typeName="double" kindOfQuantity="cvu:LENGTH" category="LayoutParcelingArea_ParcelLayout" displayLabel="Frontage Offset" description="Frontage offset." />
+        <ECProperty propertyName="BackYardDepth" typeName="double" kindOfQuantity="cvu:LENGTH" category="LayoutParcelingArea_ParcelLayout" displayLabel="Back Yard Depth" description="Back yard depth." />
     </ECEntityClass>
 
     <ECEntityClass typeName="ParcelBuildingAspect" modifier="Sealed" displayLabel="Building Aspect">
@@ -1114,6 +1169,14 @@
         <ECProperty propertyName="BuildingDepth" typeName="double" kindOfQuantity="cvu:LENGTH" category="ParcelBuildingAspect_BuildingLayout" displayLabel="Building Depth" description="Depth of the building on the parcel." />
     </ECEntityClass>
 
+    <ECEntityClass typeName="ParcelSetbacksAspect" modifier="Sealed" displayLabel="Setbacks">
+        <BaseClass>bis:ElementUniqueAspect</BaseClass>
+
+        <ECProperty propertyName="FrontSetback" typeName="double" kindOfQuantity="cvu:LENGTH" category="ParcelSetbacksAspect_Setbacks" displayLabel="Front" description="Front setback distance." />
+        <ECProperty propertyName="SideSetback" typeName="double" kindOfQuantity="cvu:LENGTH" category="ParcelSetbacksAspect_Setbacks" displayLabel="Side" description="Side setback distance." />
+        <ECProperty propertyName="BackSetback" typeName="double" kindOfQuantity="cvu:LENGTH" category="ParcelSetbacksAspect_Setbacks" displayLabel="Back" description="Back setback distance." />
+    </ECEntityClass>
+
     <ECRelationshipClass typeName="LayoutParcelingAreaOwnsParcelBuildingAspect" modifier="Sealed" strength="embedding">
         <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
         <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
@@ -1121,6 +1184,30 @@
         </Source>
         <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
             <Class class="ParcelBuildingAspect" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="LayoutParcelingAreaOwnsParcelSetbacksAspect" modifier="Sealed" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="LayoutParcelingArea" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="ParcelSetbacksAspect" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="ParcelArea" modifier="Sealed" displayLabel="Parcel Area" description="Parcel area.">
+        <BaseClass>LayoutArea</BaseClass>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="ParcelAreaOwnsParcelSetbacksAspect" modifier="Sealed" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="ParcelArea" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="ParcelSetbacksAspect" />
         </Target>
     </ECRelationshipClass>
 
