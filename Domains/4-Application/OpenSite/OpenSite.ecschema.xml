@@ -727,7 +727,7 @@
     </ECRelationshipClass>
 
     <ECRelationshipClass typeName="ShapedAreaUsesPavementType" strength="referencing" modifier="Sealed">
-        <Source multiplicity="(0..*)" roleLabel="uses" polymorphic="false">
+        <Source multiplicity="(0..*)" roleLabel="uses" polymorphic="true">
             <Class class="ShapedArea" />
         </Source>
         <Target multiplicity="(0..1)" roleLabel="is used by" polymorphic="true">
@@ -736,7 +736,7 @@
     </ECRelationshipClass>
 
     <ECRelationshipClass typeName="CenterlinePathEdgeUsesPavementType" strength="referencing" modifier="Sealed">
-        <Source multiplicity="(0..*)" roleLabel="uses" polymorphic="false">
+        <Source multiplicity="(0..*)" roleLabel="uses" polymorphic="true">
             <Class class="CenterlinePathEdge" />
         </Source>
         <Target multiplicity="(0..1)" roleLabel="is used by" polymorphic="true">
@@ -830,6 +830,26 @@
         </Source>
         <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
             <Class class="ParkingArea" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="LayoutParcelingAreaOwnsParcelAreas" strength="embedding" strengthDirection="Forward" modifier="Sealed">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="LayoutParcelingArea" />
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="false">
+            <Class class="ParcelArea" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="LayoutParcelingAreaOwnsBuildingAreas" strength="embedding" strengthDirection="Forward" modifier="Sealed">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="LayoutParcelingArea" />
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="false">
+            <Class class="BuildingArea" />
         </Target>
     </ECRelationshipClass>
 
@@ -1128,6 +1148,12 @@
 
     <ECEntityClass typeName="LayoutParcelingArea" modifier="Sealed" displayLabel="Layout Parceling Area" description="Layout parceling area.">
         <BaseClass>LayoutArea</BaseClass>
+        
+        <ECProperty propertyName="ControlType" typeName="ControlType">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03" />
+            </ECCustomAttributes>
+        </ECProperty>
 
         <ECProperty propertyName="MinParcelSurface" typeName="double" kindOfQuantity="cvu:AREA" category="LayoutParcelingArea_ParcelLayout" displayLabel="Min. Parcel Surface" description="Minimum parcel surface area." />
         <ECProperty propertyName="MaxParcelDepth" typeName="double" kindOfQuantity="cvu:LENGTH" category="LayoutParcelingArea_ParcelLayout" displayLabel="Max. Parcel Depth" description="Maximum parcel depth." />
