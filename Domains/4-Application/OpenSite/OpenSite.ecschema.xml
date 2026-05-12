@@ -558,12 +558,12 @@
 
         <ECProperty propertyName="MinDriveSlope" typeName="double" kindOfQuantity="cvu:SLOPE" category="CenterlinePathEdge_Grading" displayLabel="Min. Slope" description="Minimum path slope for design." />
         <ECProperty propertyName="MaxDriveSlope" typeName="double" kindOfQuantity="cvu:SLOPE" category="CenterlinePathEdge_Grading" displayLabel="Max. Slope" description="Maximum path slope for design." />
-        <ECNavigationProperty propertyName="PavementType" relationshipName="CenterlinePathEdgeUsesPavementType" direction="Forward" category="CenterlinePathEdge_Grading" displayLabel="Pavement Type" description="Pavement structure (courses) of path." />
+        <ECNavigationProperty propertyName="LayeredStructureType" relationshipName="CenterlinePathEdgeUsesLayeredStructureType" direction="Forward" category="CenterlinePathEdge_Grading" displayLabel="Layered Structure" description="Layers (courses) of path." />
         <ECProperty propertyName="SurfaceType" typeName="SurfaceType" category="CenterlinePathEdge_Grading" displayLabel="Surface Type" description="Surface material type for path." >
             <ECCustomAttributes>
                 <HiddenProperty xmlns="CoreCustomAttributes.01.00.03" />
                 <Deprecated xmlns="CoreCustomAttributes.01.00.03">
-                    <Description>SurfaceType is deprecated for CenterlinePathEdge (course information is held in the PavementType property) </Description>
+                    <Description>SurfaceType is deprecated for CenterlinePathEdge (course information is held in the LayeredStructureType property) </Description>
                 </Deprecated>
             </ECCustomAttributes>
         </ECProperty>
@@ -571,7 +571,7 @@
             <ECCustomAttributes>
                 <HiddenProperty xmlns="CoreCustomAttributes.01.00.03" />
                 <Deprecated xmlns="CoreCustomAttributes.01.00.03">
-                    <Description>SurfaceDepth is deprecated for CenterlinePathEdge (course information is held in the PavementType property) </Description>
+                    <Description>SurfaceDepth is deprecated for CenterlinePathEdge (course information is held in the LayeredStructureType property) </Description>
                 </Deprecated>
             </ECCustomAttributes>
         </ECProperty>
@@ -585,12 +585,12 @@
         <BaseClass>CenterlinePathEdge</BaseClass>
         <BaseClass>bis:IParentElement</BaseClass>
 
-        <ECNavigationProperty propertyName="MedianPavementType" relationshipName="DrivewayPathEdgeUsesMedianPavementType" direction="Forward" category="DrivewayPathEdge_Median" displayLabel="Median Pavement Type" description="Pavement structure (courses) of median." />
+        <ECNavigationProperty propertyName="MedianLayeredStructureType" relationshipName="DrivewayPathEdgeUsesMedianLayeredStructureType" direction="Forward" category="DrivewayPathEdge_Median" displayLabel="Median Layered Structure" description="Layers (courses) of median." />
         <ECProperty propertyName="MedianType" typeName="SurfaceType" category="DrivewayPathEdge_Median" displayLabel="Type" description="Median type along path." >
         <ECCustomAttributes>
                 <HiddenProperty xmlns="CoreCustomAttributes.01.00.03" />
                 <Deprecated xmlns="CoreCustomAttributes.01.00.03">
-                    <Description>MedianType is deprecated for DrivewayPathEdge (course information is held in the MedianPavementType property) </Description>
+                    <Description>MedianType is deprecated for DrivewayPathEdge (course information is held in the MedianLayeredStructureType property) </Description>
                 </Deprecated>
             </ECCustomAttributes>
         </ECProperty>
@@ -726,39 +726,48 @@
         </Target>
     </ECRelationshipClass>
 
-    <ECRelationshipClass typeName="ShapedAreaUsesPavementType" strength="referencing" modifier="Sealed">
+    <ECRelationshipClass typeName="ShapedAreaUsesLayeredStructureType" strength="referencing" modifier="Sealed">
         <Source multiplicity="(0..*)" roleLabel="uses" polymorphic="true">
             <Class class="ShapedArea" />
         </Source>
         <Target multiplicity="(0..1)" roleLabel="is used by" polymorphic="true">
-            <Class class="PavementType" />
+            <Class class="LayeredStructureType" />
         </Target>
     </ECRelationshipClass>
 
-    <ECRelationshipClass typeName="CenterlinePathEdgeUsesPavementType" strength="referencing" modifier="Sealed">
+    <ECRelationshipClass typeName="CenterlinePathEdgeUsesLayeredStructureType" strength="referencing" modifier="Sealed">
         <Source multiplicity="(0..*)" roleLabel="uses" polymorphic="true">
             <Class class="CenterlinePathEdge" />
         </Source>
         <Target multiplicity="(0..1)" roleLabel="is used by" polymorphic="true">
-            <Class class="PavementType" />
+            <Class class="LayeredStructureType" />
         </Target>
     </ECRelationshipClass>
 
-    <ECRelationshipClass typeName="DrivewayPathEdgeUsesMedianPavementType" strength="referencing" modifier="Sealed">
+    <ECRelationshipClass typeName="DrivewayPathEdgeUsesMedianLayeredStructureType" strength="referencing" modifier="Sealed">
         <Source multiplicity="(0..*)" roleLabel="uses" polymorphic="false">
             <Class class="DrivewayPathEdge" />
         </Source>
         <Target multiplicity="(0..1)" roleLabel="is used by" polymorphic="true">
-            <Class class="PavementType" />
+            <Class class="LayeredStructureType" />
         </Target>
     </ECRelationshipClass>
 
-    <ECRelationshipClass typeName="EdgeSidewalkAspectUsesPavementType" strength="referencing" modifier="Sealed">
+    <ECRelationshipClass typeName="EdgeSidewalkAspectUsesLayeredStructureType" strength="referencing" modifier="Sealed">
         <Source multiplicity="(0..*)" roleLabel="uses" polymorphic="false">
             <Class class="EdgeSidewalkAspect" />
         </Source>
         <Target multiplicity="(0..1)" roleLabel="is used by" polymorphic="true">
-            <Class class="PavementType" />
+            <Class class="LayeredStructureType" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="LayoutParkingAreaUsesLayeredStructureType" strength="referencing" modifier="Sealed">
+        <Source multiplicity="(0..*)" roleLabel="uses" polymorphic="false">
+            <Class class="LayoutParkingArea" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is used by" polymorphic="true">
+            <Class class="LayeredStructureType" />
         </Target>
     </ECRelationshipClass>
 
@@ -1010,12 +1019,12 @@
         <ECProperty propertyName="DoGrade" typeName="boolean" category="ShapedArea_Optimizer" displayLabel="Grading" description="Add area grading data to grading optimizer." />
 
         <ECProperty propertyName="Topsoil" typeName="double" category="ShapedArea_Surface" kindOfQuantity="cvu:LENGTH_SHORT" displayLabel="Topsoil" description="Depth of topsoil." />
-        <ECNavigationProperty propertyName="PavementType" relationshipName="ShapedAreaUsesPavementType" direction="Forward" category="ShapedArea_Surface" displayLabel="Pavement Type" />
+        <ECNavigationProperty propertyName="LayeredStructureType" relationshipName="ShapedAreaUsesLayeredStructureType" direction="Forward" category="ShapedArea_Surface" displayLabel="Layered Structure" />
         <ECProperty propertyName="SurfaceType" typeName="SurfaceType" category="ShapedArea_Surface" displayLabel="Surface Type" description="Type definition of area." >
             <ECCustomAttributes>
                 <HiddenProperty xmlns="CoreCustomAttributes.01.00.03" />
                 <Deprecated xmlns="CoreCustomAttributes.01.00.03">
-                    <Description>SurfaceType is deprecated for ShapedArea (course information is held in the PavementType property) </Description>
+                    <Description>SurfaceType is deprecated for ShapedArea (course information is held in the LayeredStructureType property) </Description>
                 </Deprecated>
             </ECCustomAttributes>
         </ECProperty>
@@ -1023,7 +1032,7 @@
             <ECCustomAttributes>
                 <HiddenProperty xmlns="CoreCustomAttributes.01.00.03" />
                 <Deprecated xmlns="CoreCustomAttributes.01.00.03">
-                    <Description>SurfaceDepth is deprecated for ShapedArea (course information is held in the PavementType property) </Description>
+                    <Description>SurfaceDepth is deprecated for ShapedArea (course information is held in the LayeredStructureType property) </Description>
                 </Deprecated>
             </ECCustomAttributes>
         </ECProperty>
@@ -1124,13 +1133,28 @@
 
         <ECProperty propertyName="MinSlopeParkingLot" typeName="double" category="LayoutParkingArea_ParkingGrading" kindOfQuantity="cvu:SLOPE" displayLabel="Min. Design Slope" description="Minimum design slope for parking lot." />
         <ECProperty propertyName="MaxSlopeParkingLot" typeName="double" category="LayoutParkingArea_ParkingGrading" kindOfQuantity="cvu:SLOPE" displayLabel="Max. Design Slope" description="Maximum design slope for parking lot." />
-        <ECProperty propertyName="SurfaceTypeParkingLot" typeName="SurfaceType" category="LayoutParkingArea_ParkingGrading" displayLabel="Surface Type" description="Surface type or material for parking lot." />
-        <ECProperty propertyName="SurfaceDepthParkingLot" typeName="double" category="LayoutParkingArea_ParkingGrading" kindOfQuantity="cvu:LENGTH_SHORT" displayLabel="Surface Depth" description="Surface or material depth." />
+        <ECProperty propertyName="SurfaceTypeParkingLot" typeName="SurfaceType" category="LayoutParkingArea_ParkingGrading" displayLabel="Surface Type" description="Surface type or material for parking lot." >
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03" />
+                <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                    <Description>SurfaceTypeParkingLot is deprecated for LayoutParkingArea. </Description>
+                </Deprecated>
+            </ECCustomAttributes>
+        </ECProperty>
+        <ECProperty propertyName="SurfaceDepthParkingLot" typeName="double" category="LayoutParkingArea_ParkingGrading" kindOfQuantity="cvu:LENGTH_SHORT" displayLabel="Surface Depth" description="Surface or material depth." >
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03" />
+                <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                    <Description>SurfaceDepthParkingLot is deprecated for LayoutParkingArea. </Description>
+                </Deprecated>
+            </ECCustomAttributes>
+        </ECProperty>
         <ECProperty propertyName="SurfaceTypeParkingSpaces" typeName="SurfaceType" category="LayoutParkingArea_ParkingGrading" displayLabel="Space Surface Type" description="Surface type or material for specific parking spaces." />
         <ECProperty propertyName="SurfaceDepthParkingSpaces" typeName="double" category="LayoutParkingArea_ParkingGrading" kindOfQuantity="cvu:LENGTH_SHORT" displayLabel="Space Surface Depth" description="Surface or material depth for specific parking spaces." />
 
         <ECNavigationProperty propertyName="IslandCurbType" relationshipName="LayoutParkingAreaUsesIslandCurbType" direction="Forward" displayLabel="Island Curb Type" />
         <ECNavigationProperty propertyName="ParkingCurbType" relationshipName="LayoutParkingAreaUsesCurbType" direction="Forward" displayLabel="Curb Type" />
+        <ECNavigationProperty propertyName="LayeredStructureType" relationshipName="LayoutParkingAreaUsesLayeredStructureType" direction="Forward" displayLabel="Layered Structure Type" />
     </ECEntityClass>
 
     <ECEntityClass typeName="LayoutPondArea" modifier="Sealed" displayLabel="Pond" description="Layout pond area.">
@@ -1337,8 +1361,12 @@
         <ECProperty propertyName="KeyHeight" typeName="double" kindOfQuantity="cvu:LENGTH" displayLabel="Key Height" description="Height of key." />
     </ECEntityClass>
 
-    <ECEntityClass typeName="PavementType" displayLabel="Pavement Type" description="Defines a shared set of properties whose values vary per-type of layered surface rather than per-instance.">
-        <BaseClass>cvphys:PavementType</BaseClass>
+    <ECEntityClass typeName="LayeredStructure" displayLabel="Layered Structure" description="LayeredStructure for use in OpenSite+. A bis:PhysicalElement that assembles multiple layers.">
+        <BaseClass>cvphys:LayeredStructure</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="LayeredStructureType" displayLabel="Layered Structure Type" description="Defines a shared set of properties whose values vary per-type of layered surface rather than per-instance.">
+        <BaseClass>cvphys:LayeredStructureType</BaseClass>
     </ECEntityClass>
 
     <ECEntityClass typeName="CurbType" displayLabel="Curb Type" description="Defines a shared set of properties whose values vary per-type of Curb rather than per-instance.">
@@ -1467,12 +1495,12 @@
     <ECEntityClass typeName="EdgeSidewalkAspect" modifier="Sealed" displayLabel="Sidewalk Aspect">
         <BaseClass>bis:ElementUniqueAspect</BaseClass>
 
-        <ECNavigationProperty propertyName="PavementType" relationshipName="EdgeSidewalkAspectUsesPavementType" direction="Forward" category="EdgeSidewalkAspect_Sidewalk" displayLabel="Pavement Type" description="Pavement structure (courses) of sidewalk." />
+        <ECNavigationProperty propertyName="LayeredStructureType" relationshipName="EdgeSidewalkAspectUsesLayeredStructureType" direction="Forward" category="EdgeSidewalkAspect_Sidewalk" displayLabel="Layered Structure" description="Layers (courses) of sidewalk." />
         <ECProperty propertyName="SidewalkType" typeName="SurfaceType" category="EdgeSidewalkAspect_Sidewalk" displayLabel="Type" description="Defines the type of sidewalk or material." >
             <ECCustomAttributes>
                 <HiddenProperty xmlns="CoreCustomAttributes.01.00.03" />
                 <Deprecated xmlns="CoreCustomAttributes.01.00.03">
-                    <Description>SidewalkType is deprecated for EdgeSidewalkAspect (course information is held in the PavementType property) </Description>
+                    <Description>SidewalkType is deprecated for EdgeSidewalkAspect (course information is held in the LayeredStructureType property) </Description>
                 </Deprecated>
             </ECCustomAttributes>
         </ECProperty>
@@ -1482,7 +1510,7 @@
             <ECCustomAttributes>
                 <HiddenProperty xmlns="CoreCustomAttributes.01.00.03" />
                 <Deprecated xmlns="CoreCustomAttributes.01.00.03">
-                    <Description>SidewalkDepth is deprecated for EdgeSidewalkAspect (course information is held in the PavementType property) </Description>
+                    <Description>SidewalkDepth is deprecated for EdgeSidewalkAspect (course information is held in the LayeredStructureType property) </Description>
                 </Deprecated>
             </ECCustomAttributes>
         </ECProperty>
