@@ -31,6 +31,11 @@ A `Space` is typically aggregated by a `Story` or another `Space`. `Space` eleme
 
 Equivalent to [IfcSpace](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcSpace.htm) with CompositionType != COMPLEX.
 
+
+#### Space Occupancy
+
+A `Space` can have its occupancy requirements defined within `SpaceOccupancyAspect`. The aspect will typically be assigned to `Spacetype` if one is modeled for a space, In cases where `Space` does not have `SpaceType` assigned, the `SpaceOccupancyAspect` can be related directly.
+
 ### Story
 
 The building `Story` typically represents a (nearly) horizontal aggregation of spaces that are vertically bound.
@@ -66,3 +71,4 @@ An `RegularStory` is typically aggregated by a `Building`. `RegularStory` elemen
 Equivalent to [IfcBuildingStorey](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcBuildingStorey.htm) with CompositionType == ELEMENT.
 
 <!-- for CompositionType != ELEMENT, we expect other subclasses of either Story or ElevationStory, i.e. SplitStory for type=PARTIAL. those subclasses would be added in the future versions of the schema. some other subclasses are also controversial, that's why we're leaving them out. i.e. SharedStory @ speedikon -->
+
