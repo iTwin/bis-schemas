@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ==================================================================================
+|  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
+|  * See LICENSE.md in the project root for license terms and full copyright notice.
+======================================================================================= -->
+<ECSchema schemaName="OpenSiteViews" alias="opnsiteViews" version="01.00.00" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" displayLabel="OpenSite Views" description="Views that introduce derived concepts based on the OpenSite schema.">
+    <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA" />
+    <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
+    <ECSchemaReference name="ECDbMap" version="02.00.04" alias="ecdbmap"/>
+    <ECSchemaReference name="SpatialComposition" version="01.00.01" alias="spcomp" />
+    <ECSchemaReference name="CivilSpatial" version="01.00.02" alias="cvsp" />
+    <ECSchemaReference name="OpenSite" version="01.00.00" alias="opnsite" />
+
+    <ECCustomAttributes>
+        <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
+            <SupportedUse>NotForProduction</SupportedUse>
+        </ProductionStatus>
+        <SchemaLayerInfo xmlns="BisCustomAttributes.01.00.00">
+            <Value>Application</Value>
+        </SchemaLayerInfo>
+    </ECCustomAttributes>
+
+    <ECEntityClass typeName="ParkingInformationView" modifier="Abstract" displayLabel="Parking Information">
+        <ECCustomAttributes>
+            <QueryView xmlns="ECDbMap.02.00.04">
+                <Query>
+                    SELECT
+                        COALESCE(pa.ECInstanceId, pr.ECInstanceId) [ECInstanceId],
+                        ec_classid('OpenSiteViews', 'ParkingInformationView') [ECClassId],
+                        SUM(pr.ParkingSpaceCount) [ParkingSpaceCount],
+                        SUM(pr.ProblemSpaceCount) [ProblemSpaceCount]
+                    FROM CivilSpatial.ParkingRow pr
+                    LEFT JOIN SpatialComposition:SpatialStructureElementAggregatesElements relPa ON pr.ECInstanceId=relPa.TargetECInstanceId
+                    LEFT JOIN CivilSpatial:ParkingArea pa ON relPa.SourceECInstanceId=pa.ECInstanceId
+                    WHERE pa.ECInstanceId IS NOT NULL
+                        OR EXISTS (
+                            SELECT 1
+                            FROM SpatialComposition:SpatialStructureElementAggregatesElements relPrp
+                            JOIN OpenSite:ParkingRowPath prp ON relPrp.SourceECInstanceId=prp.ECInstanceId
+                            WHERE relPrp.TargetECInstanceId=pr.ECInstanceId
+                        )
+                    GROUP BY COALESCE(pa.ECInstanceId, pr.ECInstanceId);
+                </Query>
+            </QueryView>
+        </ECCustomAttributes>
+        <ECProperty propertyName="ParkingSpaceCount" typeName="int" />
+        <ECProperty propertyName="ProblemSpaceCount" typeName="int" />
+    </ECEntityClass>
+
+</ECSchema>
