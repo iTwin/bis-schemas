@@ -26,15 +26,15 @@
                 <Query>
                     SELECT
                         COALESCE(pa.ECInstanceId, pr.ECInstanceId) [ECInstanceId],
-                        ec_classid('OpenSiteViews', 'ParkingInformationView') [ECClassId],
+                        COALESCE(pa.ECClassId, pr.ECClassId) [ECClassId],
                         SUM(pr.ParkingSpaceCount) [ParkingSpaceCount],
-                        CAST(0 AS INTEGER) [ProblemSpaceCount]
+                        SUM(pr.ProblemSpaceCount) [ProblemSpaceCount]
                     FROM OpenSite:ParkingRowPath prp
                     JOIN OpenSite:ElementDrivesElementsLinearly relPrp ON prp.ECInstanceId=relPrp.SourceECInstanceId
                     JOIN CivilSpatial:ParkingRow pr ON relPrp.TargetECInstanceId=pr.ECInstanceId
                     LEFT JOIN SpatialComposition:SpatialStructureElementAggregatesElements relPa ON pr.ECInstanceId=relPa.TargetECInstanceId
                     LEFT JOIN CivilSpatial:ParkingArea pa ON relPa.SourceECInstanceId=pa.ECInstanceId
-                    GROUP BY COALESCE(pa.ECInstanceId, pr.ECInstanceId);
+                    GROUP BY COALESCE(pa.ECInstanceId, pr.ECInstanceId), COALESCE(pa.ECClassId, pr.ECClassId);
                 </Query>
             </QueryView>
         </ECCustomAttributes>
