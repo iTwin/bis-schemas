@@ -49,23 +49,11 @@ A `Curb` is typically a border of stone, concrete or other rigid material formed
 
 Equivalent to [IfcKerb](http://ifc43-docs.standards.buildingsmart.org/IFC/RELEASE/IFC4x3/HTML/lexical/IfcKerb.htm).
 
-### PavementType
-
-Instances of `PavementType` provide an additional classification that can be applied to `Pavement`s.
-
-Equivalent to [IfcPavementType](http://ifc43-docs.standards.buildingsmart.org/IFC/RELEASE/IFC4x3/HTML/lexical/IfcPavementType.htm).
-
-### Pavement
-
-`Pavement` instances must be contained in `PhysicalModel`s.
-
-Equivalent to [IfcPavement](http://ifc43-docs.standards.buildingsmart.org/IFC/RELEASE/IFC4x3/HTML/lexical/IfcPavement.htm).
-
 ### LayeredStructureType
 
 A `LayeredStructureType` associates the `bis:PhysicalType`s modeling the layers that it is composed of via the `LayeredStructureTypeComposesSubTypes` relationship. The _thickness_ and _order_ of each layer that a specifc `LayeredStructureType` is composed of is captured by the _SubTypeThickness_ and _MemberPriority_ properties of the `LayeredStructureTypeComposesSubTypes` table-relationship respectively.
 
-Therefore, individual `bis:PhysicalType`s (e.g. `CourseType`) composing a `LayeredStructureType` do not capture a _thickness_ measurement by themselves; one needs to introduce the larger context (i.e. a `LayeredStructureType` they are composing - e.g. `PavementType`) in order to capture their _thickness_ and _order_ with respect to the overall structure.
+Therefore, individual `bis:PhysicalType`s (e.g. `CourseType`) composing a `LayeredStructureType` do not capture a _thickness_ measurement by themselves; one needs to introduce the larger context (i.e. a `LayeredStructureType` they are composing - e.g. a particular Pavement Design) in order to capture their _thickness_ and _order_ with respect to the overall structure.
 
 ## Relationship Classes
 
