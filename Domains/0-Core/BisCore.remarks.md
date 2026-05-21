@@ -645,6 +645,20 @@ WHERE
     rl.ECInstanceId = :repositoryLinkId
 ```
 
+- _Name_ and _Version_ of the iModel Connector that synchronized a particular Element (if any):
+
+```sql
+SELECT
+  xs.ConnectorName,
+  xs.ConnectorVersion
+FROM
+  bis.Element e
+  INNER JOIN bis.ExternalSourceAspect xsa ON e.ECInstanceId = xsa.Element.Id
+  INNER JOIN bis.ExternalSource xs ON xs.ECInstanceId = xsa.Source.Id
+WHERE
+  e.ECInstanceId = :elementId
+```
+
 - Subject hierarchy reported according to element-creation order.
 
 ```sql
