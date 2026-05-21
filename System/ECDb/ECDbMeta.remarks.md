@@ -62,6 +62,23 @@ WHERE
     requestedSchemaDef.Name = :schemaName
 ```
 
+- Query for all relationship classes that directly target a particular class, identified by its schema name and class name.
+
+```sql
+SELECT
+  srel.Name [Relationship Schema Name],
+  rel.Name [Relationship Class Name]
+FROM
+  meta.ECClassDef c
+  INNER JOIN meta.ECSchemaDef s ON c.Schema.Id = s.ECInstanceId
+  INNER JOIN meta.RelationshipConstraintHasClasses rchc ON rchc.TargetECInstanceId = c.ECInstanceId
+  INNER JOIN meta.ECRelationshipConstraintDef constrDef ON constrDef.ECInstanceId = rchc.SourceECInstanceId
+  INNER JOIN meta.ECClassDef rel ON constrDef.RelationshipClass.Id = rel.ECInstanceId
+  INNER JOIN meta.ECSchemaDef srel ON srel.ECInstanceId = rel.Schema.Id
+WHERE
+  s.Name = :schemaName AND c.Name = :className
+```
+
 - Query for the names of all EC schemas marked as "dynamic" in the current repository.
 
 ```sql
