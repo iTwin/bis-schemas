@@ -80,6 +80,27 @@ WHERE
   s.Name = :schemaName AND c.Name = :className
 ```
 
+- Query for all relationship classes that reference a particular class, or any of its base-classes, on either of its end-points, identified by its schema name and class name.
+
+```sql
+SELECT 
+  srel.Name [Schema Name],
+  rel.Name [Relationship Class Name],
+  baseC.Name [Referenced Class Name],
+  CASE WHEN constrDef.RelationshipEnd = 0 THEN 'Source' ELSE 'Target' END [End Point]
+FROM
+  meta.ECClassDef c
+  INNER JOIN meta.ECSchemaDef s ON c.Schema.Id = s.ECInstanceId
+  INNER JOIN meta.ClassHasAllBaseClasses chabc ON c.ECInstanceId = chabc.SourceECInstanceId
+  INNER JOIN meta.ECClassDef baseC ON baseC.ECInstanceId = chabc.TargetECInstanceId
+  INNER JOIN meta.RelationshipConstraintHasClasses rchc ON rchc.TargetECInstanceId = baseC.ECInstanceId
+  INNER JOIN meta.ECRelationshipConstraintDef constrDef ON constrDef.ECInstanceId = rchc.SourceECInstanceId
+  INNER JOIN meta.ECClassDef rel ON constrDef.RelationshipClass.Id = rel.ECInstanceId
+  INNER JOIN meta.ECSchemaDef srel ON srel.ECInstanceId = rel.Schema.Id
+WHERE
+  s.Name = :schemaName AND c.Name = :className
+```
+
 - Query for the names of all EC schemas marked as "dynamic" in the current repository.
 
 ```sql
