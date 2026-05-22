@@ -46,3 +46,32 @@ Equivalent to [IfcDistributionChamberElementType](https://standards.buildingsmar
 ### DistributionStructureTypeComposesSubTypes
 
 `PhysicalType` instances composed by a `DistributionStructureType` are organized based on its vertical placement. That is, a `PhysicalType` instance at the *Bottom* of a `DistributionStructureType` shall be grouped with a `DistributionStructureTypeComposesSubTypes` relationship whose _memberPriority_ is set to 1. Similarly, a `PhysicalType` instance at its *Top* shall be composed with a _memberPriority_ is set to the highest number among the members grouped by a `DistributionStructureType`.
+
+## Sample ECSQL queries
+
+- Query for the dimensions of all Rectangular piping ports on a particular `DistributionStructure`.
+
+```sql
+SELECT
+    recPortT.SmallerDimension,
+    recPortT.LargerDimension
+FROM
+    stmswrphys.DistributionStructure ds
+    INNER JOIN pipphys.PipingPort pp ON ds.ECInstanceId = pp.Parent.Id
+    INNER JOIN pipphys.RectangularPortType recPortT ON pp.TypeDefinition.Id = recPortT.ECInstanceId
+WHERE
+    ds.ECInstanceId = :distributionStructureId
+```
+
+- Query for sub-types composed by Manholes and Catchbasins as PhysicalTypes.
+
+```sql
+SELECT
+    dst.ECInstanceId [DistributionStructureId],
+    pt.ECInstanceId [SubTypeId],
+    pt.ECClassId [SubTypeClassId]
+FROM
+    stmswrphys.DistributionStructureType dst 
+    INNER JOIN stmswrphys.DistributionStructureTypeComposesSubTypes comp ON comp.SourceECInstanceId = dst.ECInstanceId
+    INNER JOIN bis.PhysicalType pt ON pt.ECInstanceId = comp.TargetECInstanceId
+```
