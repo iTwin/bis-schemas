@@ -62,12 +62,13 @@ WHERE
     requestedSchemaDef.Name = :schemaName
 ```
 
-- Query for all relationship classes that directly target a particular class, identified by its schema name and class name.
+- Query for all relationship classes that directly reference a particular class on either of its end-points, identified by its schema name and class name.
 
 ```sql
 SELECT
   srel.Name [Relationship Schema Name],
-  rel.Name [Relationship Class Name]
+  rel.Name [Relationship Class Name],
+  CASE WHEN constrDef.RelationshipEnd = 0 THEN 'Source' ELSE 'Target' END [End Point]
 FROM
   meta.ECClassDef c
   INNER JOIN meta.ECSchemaDef s ON c.Schema.Id = s.ECInstanceId
