@@ -29,13 +29,16 @@
                         drivenParkingRows.ECInstanceId [ECInstanceId],
                         ec_classid('OpenSiteViews', 'ParkingInformationView') [ECClassId],
                         drivenParkingRows.ElementClassId [ElementClassId],
-                        NAVIGATION_VALUE(opnsiteViews.ParkingInformationView.Element, drivenParkingRows.ECInstanceId),
+                        NAVIGATION_VALUE(opnsiteViews.ParkingInformationView.LayoutParkingArea, drivenParkingRows.LayoutParkingAreaId),
+                        NAVIGATION_VALUE(opnsiteViews.ParkingInformationView.ParkingRowPath, drivenParkingRows.ParkingRowPathId),
                         SUM(drivenParkingRows.ParkingSpaceCount) [ParkingSpaceCount],
                         SUM(drivenParkingRows.ProblemSpaceCount) [ProblemSpaceCount]
                     FROM (
                         SELECT
                             COALESCE(layoutParkingArea.ECInstanceId, rowPath.ECInstanceId) [ECInstanceId],
                             COALESCE(layoutParkingArea.ECClassId, rowPath.ECClassId) [ElementClassId],
+                            layoutParkingArea.ECInstanceId [LayoutParkingAreaId],
+                            CASE WHEN layoutParkingArea.ECInstanceId IS NULL THEN rowPath.ECInstanceId END [ParkingRowPathId],
                             pr.ECInstanceId [ParkingRowId],
                             MAX(pr.ParkingSpaceCount) [ParkingSpaceCount],
                             MAX(pr.ProblemSpaceCount) [ProblemSpaceCount]
@@ -52,30 +55,21 @@
                                 CASE WHEN layoutParkingArea.ECInstanceId IS NULL THEN rowPath.ECInstanceId END,
                             pr.ECInstanceId
                     ) drivenParkingRows
-                    GROUP BY drivenParkingRows.ECInstanceId, drivenParkingRows.ElementClassId;
+                    GROUP BY drivenParkingRows.ECInstanceId, drivenParkingRows.ElementClassId, drivenParkingRows.LayoutParkingAreaId, drivenParkingRows.ParkingRowPathId;
                 </Query>
             </QueryView>
         </ECCustomAttributes>
         <ECProperty propertyName="ElementClassId" typeName="long" />
         <ECProperty propertyName="ParkingSpaceCount" typeName="int" />
         <ECProperty propertyName="ProblemSpaceCount" typeName="int" />
-		<ECNavigationProperty propertyName="Element" relationshipName="ElementHasParkingInformation" direction="backward"/>
+		<ECNavigationProperty propertyName="LayoutParkingArea" relationshipName="LayoutParkingAreaHasParkingInformation" direction="backward"/>
+		<ECNavigationProperty propertyName="ParkingRowPath" relationshipName="ParkingRowPathHasParkingInformation" direction="backward"/>
     </ECEntityClass>
 
-    <ECRelationshipClass typeName="ElementHasParkingInformation" modifier="Abstract" strength="referencing">
+    <ECRelationshipClass typeName="LayoutParkingAreaHasParkingInformation" modifier="Abstract" strength="referencing">
         <ECCustomAttributes>
             <ForeignKeyView xmlns="ECDbMap.02.00.04" />
         </ECCustomAttributes>
-        <Source multiplicity="(1..1)" roleLabel="has parking information" polymorphic="true">
-            <Class class="bis:Element"/>
-        </Source>
-        <Target multiplicity="(0..*)" roleLabel="is set on" polymorphic="true">
-            <Class class="ParkingInformationView"/>
-        </Target>
-    </ECRelationshipClass>
-
-    <ECRelationshipClass typeName="LayoutParkingAreaHasParkingInformation" modifier="Abstract" strength="referencing">
-        <BaseClass>ElementHasParkingInformation</BaseClass>
         <Source multiplicity="(1..1)" roleLabel="has parking information" polymorphic="true">
             <Class class="opnsite:LayoutParkingArea"/>
         </Source>
@@ -85,7 +79,9 @@
     </ECRelationshipClass>
 
     <ECRelationshipClass typeName="ParkingRowPathHasParkingInformation" modifier="Abstract" strength="referencing">
-        <BaseClass>ElementHasParkingInformation</BaseClass>
+        <ECCustomAttributes>
+            <ForeignKeyView xmlns="ECDbMap.02.00.04" />
+        </ECCustomAttributes>
         <Source multiplicity="(1..1)" roleLabel="has parking information" polymorphic="true">
             <Class class="opnsite:ParkingRowPath"/>
         </Source>
