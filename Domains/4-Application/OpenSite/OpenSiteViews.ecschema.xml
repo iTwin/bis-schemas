@@ -3,9 +3,10 @@
 |  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
 |  * See LICENSE.md in the project root for license terms and full copyright notice.
 ======================================================================================= -->
-<ECSchema schemaName="OpenSiteViews" alias="opnsiteViews" version="01.00.01" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" displayLabel="OpenSite Views" description="Views that introduce derived concepts based on the OpenSite schema.">
+<ECSchema schemaName="OpenSiteViews" alias="opnsiteViews" version="01.00.00" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" displayLabel="OpenSite Views" description="Views that introduce derived concepts based on the OpenSite schema.">
     <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA" />
     <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
+	<ECSchemaReference name="BisCore" version="01.00.10" alias="bis" />
     <ECSchemaReference name="ECDbMap" version="02.00.04" alias="ecdbmap"/>
     <ECSchemaReference name="SpatialComposition" version="01.00.01" alias="spcomp" />
     <ECSchemaReference name="CivilSpatial" version="01.00.03" alias="cvsp" />
@@ -13,7 +14,7 @@
 
     <ECCustomAttributes>
         <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
-            <SupportedUse>NotForProduction</SupportedUse>
+            <SupportedUse>FieldTesting</SupportedUse>
         </ProductionStatus>
         <SchemaLayerInfo xmlns="BisCustomAttributes.01.00.00">
             <Value>Application</Value>
@@ -25,21 +26,71 @@
             <QueryView xmlns="ECDbMap.02.00.04">
                 <Query>
                     SELECT
-                        COALESCE(pa.ECInstanceId, pr.ECInstanceId) [ECInstanceId],
-                        COALESCE(pa.ECClassId, pr.ECClassId) [ECClassId],
-                        SUM(pr.ParkingSpaceCount) [ParkingSpaceCount],
-                        SUM(pr.ProblemSpaceCount) [ProblemSpaceCount]
-                    FROM OpenSite:ParkingRowPath prp
-                    JOIN OpenSite:ElementDrivesElementsLinearly relPrp ON prp.ECInstanceId=relPrp.SourceECInstanceId
-                    JOIN CivilSpatial:ParkingRow pr ON relPrp.TargetECInstanceId=pr.ECInstanceId
-                    LEFT JOIN SpatialComposition:SpatialStructureElementAggregatesElements relPa ON pr.ECInstanceId=relPa.TargetECInstanceId
-                    LEFT JOIN CivilSpatial:ParkingArea pa ON relPa.SourceECInstanceId=pa.ECInstanceId
-                    GROUP BY COALESCE(pa.ECInstanceId, pr.ECInstanceId), COALESCE(pa.ECClassId, pr.ECClassId);
+                        drivenParkingRows.ECInstanceId [ECInstanceId],
+                        ec_classid('OpenSiteViews', 'ParkingInformationView') [ECClassId],
+                        drivenParkingRows.ElementClassId [ElementClassId],
+                        NAVIGATION_VALUE(opnsiteViews.ParkingInformationView.Element, drivenParkingRows.ECInstanceId),
+                        SUM(drivenParkingRows.ParkingSpaceCount) [ParkingSpaceCount],
+                        SUM(drivenParkingRows.ProblemSpaceCount) [ProblemSpaceCount]
+                    FROM (
+                        SELECT
+                            COALESCE(layoutParkingArea.ECInstanceId, rowPath.ECInstanceId) [ECInstanceId],
+                            COALESCE(layoutParkingArea.ECClassId, rowPath.ECClassId) [ElementClassId],
+                            pr.ECInstanceId [ParkingRowId],
+                            MAX(pr.ParkingSpaceCount) [ParkingSpaceCount],
+                            MAX(pr.ProblemSpaceCount) [ProblemSpaceCount]
+                        FROM CivilSpatial:ParkingRow pr
+                        JOIN bis:ElementDrivesElement relDrive ON pr.ECInstanceId=relDrive.TargetECInstanceId
+                        JOIN bis:Element drivingElement ON relDrive.SourceECInstanceId=drivingElement.ECInstanceId
+                        LEFT JOIN OpenSite:LayoutParkingArea layoutParkingArea ON drivingElement.Parent.Id=layoutParkingArea.ECInstanceId
+                        LEFT JOIN OpenSite:ParkingRowPath rowPath ON drivingElement.ECInstanceId=rowPath.ECInstanceId
+                        WHERE layoutParkingArea.ECInstanceId IS NOT NULL OR rowPath.ECInstanceId IS NOT NULL
+                        GROUP BY
+                            COALESCE(layoutParkingArea.ECInstanceId, rowPath.ECInstanceId),
+                            COALESCE(layoutParkingArea.ECClassId, rowPath.ECClassId),
+                            layoutParkingArea.ECInstanceId,
+                                CASE WHEN layoutParkingArea.ECInstanceId IS NULL THEN rowPath.ECInstanceId END,
+                            pr.ECInstanceId
+                    ) drivenParkingRows
+                    GROUP BY drivenParkingRows.ECInstanceId, drivenParkingRows.ElementClassId;
                 </Query>
             </QueryView>
         </ECCustomAttributes>
+        <ECProperty propertyName="ElementClassId" typeName="long" />
         <ECProperty propertyName="ParkingSpaceCount" typeName="int" />
         <ECProperty propertyName="ProblemSpaceCount" typeName="int" />
+		<ECNavigationProperty propertyName="Element" relationshipName="ElementHasParkingInformation" direction="backward"/>
     </ECEntityClass>
 
+    <ECRelationshipClass typeName="ElementHasParkingInformation" modifier="Abstract" strength="referencing">
+        <ECCustomAttributes>
+            <ForeignKeyView xmlns="ECDbMap.02.00.04" />
+        </ECCustomAttributes>
+        <Source multiplicity="(1..1)" roleLabel="has parking information" polymorphic="true">
+            <Class class="bis:Element"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is set on" polymorphic="true">
+            <Class class="ParkingInformationView"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="LayoutParkingAreaHasParkingInformation" modifier="Abstract" strength="referencing">
+        <BaseClass>ElementHasParkingInformation</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="has parking information" polymorphic="true">
+            <Class class="opnsite:LayoutParkingArea"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is set on" polymorphic="true">
+            <Class class="ParkingInformationView"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="ParkingRowPathHasParkingInformation" modifier="Abstract" strength="referencing">
+        <BaseClass>ElementHasParkingInformation</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="has parking information" polymorphic="true">
+            <Class class="opnsite:ParkingRowPath"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is set on" polymorphic="true">
+            <Class class="ParkingInformationView"/>
+        </Target>
+    </ECRelationshipClass>
 </ECSchema>
