@@ -48,12 +48,9 @@ process.on("unhandledRejection", err => {
   throw err;
 });
 
-async function validateSchemas() {
-  const excludeSchemas = getExcludeSchemaList();
-  const schemas = await getAllSchemas();
-  const allRefPaths = getRefpaths(schemas, false);
-  const releasedRefPaths = getRefpaths(schemas, true);
+async function validateSchemas(schemas, allRefPaths, releasedRefPaths, excludeSchemas) {
   let hasErrors = false;
+  let notForProduction = false;
 
   for (const schema of schemas) {
     if (shouldExcludeSchema(schema, excludeSchemas))
@@ -63,13 +60,16 @@ async function validateSchemas() {
     console.log(`***** Schema ${schema.name} Validation Results *****`);
     console.log(`Schema file path: ${schema.fullPath}`);
 
+    if (schema.released)
+      notForProduction = hasNotForProductionStatus(schema.fullPath)
+
     const refPaths = schema.released ? releasedRefPaths : allRefPaths;
 
     const outputPath = getOutputPath();
     const options = new ValidationOptions(schema.fullPath, refPaths, false, outputPath);
     const results = await SchemaValidator.validate(options);
 
-    if (processResults(results))
+    if (processResults(schema, notForProduction, results))
       hasErrors = true;
   }
 
@@ -78,7 +78,20 @@ async function validateSchemas() {
   }
 }
 
-function processResults(results) {
+async function RunSchemaValidation() {
+  const excludeSchemas = getExcludeSchemaList();
+  const schemas = await getAllSchemas();
+  const allRefPaths = getRefpaths(schemas, false);
+  const releasedRefPaths = getRefpaths(schemas, true);
+  await validateSchemas(schemas, allRefPaths, releasedRefPaths, excludeSchemas);
+}
+
+function processResults(schema, notForProduction, results) {
+  if (notForProduction) {
+    reportError(`Schema ${schema.name} is released but has ProductionStatus set to "NotForProduction". Released schemas must not use "NotForProduction".`);
+    return true;
+  }
+
   if (!results || (results.length === 2) && results[1].resultType === ValidationResultType.Message) {
     console.log(chalk.green("Schema Validation Succeeded. No rule violations found."));
     return false;
@@ -234,4 +247,13 @@ function isStandardSchema(schemaName) {
   return standardSchemaNames.includes(name);
 }
 
-validateSchemas();
+function hasNotForProductionStatus(schemaFilePath) {
+  const content = fs.readFileSync(schemaFilePath, "utf-8");
+  return /<SupportedUse>\s*NotForProduction\s*<\/SupportedUse>/.test(content);
+}
+
+module.exports = { validateSchemas, hasNotForProductionStatus, processResults };
+
+if (require.main === module) {
+  RunSchemaValidation();
+}
