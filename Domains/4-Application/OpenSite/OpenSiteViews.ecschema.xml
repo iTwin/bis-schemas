@@ -14,7 +14,7 @@
 
     <ECCustomAttributes>
         <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
-            <SupportedUse>FieldTesting</SupportedUse>
+            <SupportedUse>NotForProduction</SupportedUse>
         </ProductionStatus>
         <SchemaLayerInfo xmlns="BisCustomAttributes.01.00.00">
             <Value>Application</Value>
@@ -28,7 +28,6 @@
                     SELECT
                         drivenParkingRows.ECInstanceId [ECInstanceId],
                         ec_classid('OpenSiteViews', 'ParkingInformationView') [ECClassId],
-                        drivenParkingRows.ElementClassId [ElementClassId],
                         NAVIGATION_VALUE(opnsiteViews.ParkingInformationView.LayoutParkingArea, drivenParkingRows.LayoutParkingAreaId),
                         NAVIGATION_VALUE(opnsiteViews.ParkingInformationView.ParkingRowPath, drivenParkingRows.ParkingRowPathId),
                         SUM(drivenParkingRows.ParkingSpaceCount) [ParkingSpaceCount],
@@ -36,7 +35,6 @@
                     FROM (
                         SELECT
                             COALESCE(layoutParkingArea.ECInstanceId, rowPath.ECInstanceId) [ECInstanceId],
-                            COALESCE(layoutParkingArea.ECClassId, rowPath.ECClassId) [ElementClassId],
                             layoutParkingArea.ECInstanceId [LayoutParkingAreaId],
                             CASE WHEN layoutParkingArea.ECInstanceId IS NULL THEN rowPath.ECInstanceId END [ParkingRowPathId],
                             pr.ECInstanceId [ParkingRowId],
@@ -55,11 +53,10 @@
                                 CASE WHEN layoutParkingArea.ECInstanceId IS NULL THEN rowPath.ECInstanceId END,
                             pr.ECInstanceId
                     ) drivenParkingRows
-                    GROUP BY drivenParkingRows.ECInstanceId, drivenParkingRows.ElementClassId, drivenParkingRows.LayoutParkingAreaId, drivenParkingRows.ParkingRowPathId;
+                    GROUP BY drivenParkingRows.ECInstanceId, drivenParkingRows.LayoutParkingAreaId, drivenParkingRows.ParkingRowPathId;
                 </Query>
             </QueryView>
         </ECCustomAttributes>
-        <ECProperty propertyName="ElementClassId" typeName="long" />
         <ECProperty propertyName="ParkingSpaceCount" typeName="int" />
         <ECProperty propertyName="ProblemSpaceCount" typeName="int" />
 		<ECNavigationProperty propertyName="LayoutParkingArea" relationshipName="LayoutParkingAreaHasParkingInformation" direction="backward"/>
