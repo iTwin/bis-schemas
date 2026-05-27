@@ -14,7 +14,8 @@ const argv = require("yargs")
   .version(false)
   .options({ version: { string: true} }).argv;
 const fs = require("fs");
-const chalk = require("chalk");
+const chalkModule = require("chalk");
+const chalk = chalkModule.default || chalkModule;
 const ValidationOptions = require("@bentley/schema-validator").ValidationOptions;
 const ValidationResultType = require("@bentley/schema-validator").ValidationResultType;
 const SchemaValidator = require("@bentley/schema-validator").SchemaValidator;
