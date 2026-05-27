@@ -13,7 +13,7 @@
 "use strict";
 
 const fs = require("fs");
-const readdirp = require("../utils/helper");
+const readdirp = require("readdirp");
 const argv = require("yargs").argv;
 const path = require("path");
 const child_process = require('child_process');

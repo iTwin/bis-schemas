@@ -7,7 +7,7 @@
 
 const fs = require("fs");
 const path = require("path");
-const readdirp = require("../utils/helper");
+const readdirp = require("readdirp");
 
 const SchemaDeserializer = require("@bentley/native-schema-locater").SchemaDeserializer;
 const SchemaContext = require("@itwin/ecschema-metadata").SchemaContext;

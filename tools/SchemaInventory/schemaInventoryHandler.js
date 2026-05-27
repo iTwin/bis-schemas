@@ -6,7 +6,7 @@
 "use strict";
 
 const fs = require("fs-extra");
-const readdirp = require("../utils/helper");
+const readdirp = require("readdirp");
 const path = require("path");
 const computeSchemaChecksum = require("./computeSchemaChecksum");
 

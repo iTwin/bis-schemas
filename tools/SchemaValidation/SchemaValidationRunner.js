@@ -8,7 +8,7 @@
 "use strict";
 
 const path = require("path");
-const readdirp = require("../utils/helper");
+const readdirp = require("readdirp");
 // 'version' is a keyword in this library, adding this workaround enables to use 'version' as user argument
 const argv = require("yargs")
   .version(false)

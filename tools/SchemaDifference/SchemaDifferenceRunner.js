@@ -8,7 +8,7 @@
 
 const path = require("path");
 const fs = require("fs");
-const readdirp = require("../utils/helper");
+const readdirp = require("readdirp");
 const argv = require("yargs").argv;
 const chalkModule = require("chalk");
 const chalk = chalkModule.default || chalkModule;

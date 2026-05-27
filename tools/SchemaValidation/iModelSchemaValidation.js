@@ -9,7 +9,7 @@
 
 const os = require("os");
 const path = require("path");
-const readdirp = require("../utils/helper");
+const readdirp = require("readdirp");
 const argv = require("yargs").argv;
 const fs = require("fs");
 const rimraf = require("rimraf");
