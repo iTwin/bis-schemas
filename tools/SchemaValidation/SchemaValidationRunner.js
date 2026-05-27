@@ -51,9 +51,9 @@ process.on("unhandledRejection", err => {
 
 async function validateSchemas(schemas, allRefPaths, releasedRefPaths, excludeSchemas) {
   let hasErrors = false;
-  let notForProduction = false;
 
   for (const schema of schemas) {
+    let notForProduction = false;
     if (shouldExcludeSchema(schema, excludeSchemas))
       continue;
 
