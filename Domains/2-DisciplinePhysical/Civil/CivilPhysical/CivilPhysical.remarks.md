@@ -49,23 +49,11 @@ A `Curb` is typically a border of stone, concrete or other rigid material formed
 
 Equivalent to [IfcKerb](http://ifc43-docs.standards.buildingsmart.org/IFC/RELEASE/IFC4x3/HTML/lexical/IfcKerb.htm).
 
-### PavementType
-
-Instances of `PavementType` provide an additional classification that can be applied to `Pavement`s.
-
-Equivalent to [IfcPavementType](http://ifc43-docs.standards.buildingsmart.org/IFC/RELEASE/IFC4x3/HTML/lexical/IfcPavementType.htm).
-
-### Pavement
-
-`Pavement` instances must be contained in `PhysicalModel`s.
-
-Equivalent to [IfcPavement](http://ifc43-docs.standards.buildingsmart.org/IFC/RELEASE/IFC4x3/HTML/lexical/IfcPavement.htm).
-
 ### LayeredStructureType
 
 A `LayeredStructureType` associates the `bis:PhysicalType`s modeling the layers that it is composed of via the `LayeredStructureTypeComposesSubTypes` relationship. The _thickness_ and _order_ of each layer that a specifc `LayeredStructureType` is composed of is captured by the _SubTypeThickness_ and _MemberPriority_ properties of the `LayeredStructureTypeComposesSubTypes` table-relationship respectively.
 
-Therefore, individual `bis:PhysicalType`s (e.g. `CourseType`) composing a `LayeredStructureType` do not capture a _thickness_ measurement by themselves; one needs to introduce the larger context (i.e. a `LayeredStructureType` they are composing - e.g. `PavementType`) in order to capture their _thickness_ and _order_ with respect to the overall structure.
+Therefore, individual `bis:PhysicalType`s (e.g. `CourseType`) composing a `LayeredStructureType` do not capture a _thickness_ measurement by themselves; one needs to introduce the larger context (i.e. a `LayeredStructureType` they are composing - e.g. a particular Pavement Design) in order to capture their _thickness_ and _order_ with respect to the overall structure.
 
 ## Relationship Classes
 
@@ -74,3 +62,33 @@ Therefore, individual `bis:PhysicalType`s (e.g. `CourseType`) composing a `Layer
 An instance of `LayeredStructureTypeComposesSubTypes` captures the _thickness_ and _order_ of a `bis:PhysicalType` at its target end-point (e.g. a `CourseType`) in context of a `LayeredStructureType` instance at its source end-point. They are captured on its _SubTypeThickness_ and _MemberPriority_ properties.
 
 By convention, the top-layer of a `LayeredStructureType` shall have the _MemberPriority_ property of this relationship set to 0 (zero). The subsequent layer down shall have this property set to 1 (one), and so on.
+
+## Sample ECSQL queries
+
+- Query for the _thickness_ of a particular layer (e.g. `Course`) in a `LayeredStructure` (e.g. Pavement).
+
+```sql
+SELECT
+    comp.SubTypeThickness [Layer Thickness]
+FROM 
+    bis.PhysicalElement layer INNER JOIN bis.PhysicalType pt ON layer.TypeDefinition.Id = pt.ECInstanceId
+    INNER JOIN cvphys.LayeredStructure structure ON structure.ECInstanceId = layer.Parent.Id
+    INNER JOIN cvphys.LayeredStructureType structType ON structure.TypeDefinition.Id = structType.ECInstanceId
+    INNER JOIN cvphys.LayeredStructureTypeComposesSubTypes comp ON comp.TargetECInstanceId = pt.ECInstanceId
+        AND comp.SourceECInstanceId = structType.ECInstanceId
+WHERE
+    layer.ECInstanceId = :layerId
+```
+
+- Compute the overall _thickness_ of a particular `LayeredStructure` (e.g. Pavement).
+
+```sql
+SELECT
+    SUM(comp.SubTypeThickness) [Overall Thickness]
+FROM
+    cvphys.LayeredStructure structure 
+    INNER JOIN cvphys.LayeredStructureType structType ON structure.TypeDefinition.Id = structType.ECInstanceId
+    INNER JOIN cvphys.LayeredStructureTypeComposesSubTypes comp ON comp.SourceECInstanceId = structType.ECInstanceId
+WHERE
+    structure.ECInstanceId = :layeredStructureId
+```
