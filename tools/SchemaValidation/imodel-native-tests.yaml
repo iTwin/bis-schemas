@@ -54,13 +54,19 @@ stages:
       inputs:
         scriptSource: inline
         script: |
-          import sys;
-          if ( "System.PullRequest.SourceBranch" not in sys.argv[1] ):
-            branchName = sys.argv[1];
+          import sys
+
+          prBranch = sys.argv[1].strip()
+          buildBranch = sys.argv[2].strip()
+
+          if prBranch and "System.PullRequest.SourceBranch" not in prBranch:
+            branchRef = prBranch
           else:
-            branchName = sys.argv[2];
-          print ('##vso[task.setvariable variable=sourceBranch;isOutput=true;]' + branchName);
-        arguments: '$(System.PullRequest.SourceBranch) $(Build.SourceBranchName)'
+            branchRef = buildBranch
+
+          branchName = branchRef.removeprefix("refs/heads/")
+          print('##vso[task.setvariable variable=sourceBranch;isOutput=true;]' + branchName)
+        arguments: '$(System.PullRequest.SourceBranch) $(Build.SourceBranch)'
 
 - stage: iModelCore_NodeAddon
   displayName: NodeAddon and iModelCore Tests
@@ -105,14 +111,15 @@ stages:
     - script: |
         if not "%BRANCH_NAME%" == "" (
           cd /d $(BB_SRC_ROOT)/BisSchemas
-          git checkout %BRANCH_NAME%
+          git fetch origin "%BRANCH_NAME%" || exit /b 1
+          git checkout -B "%BRANCH_NAME%" FETCH_HEAD || exit /b 1
         )
       displayName: 'Set Source Branch'
 
     - script: |
         if not "%BRANCH_NAME%" == "" (
           cd /d $(BB_SRC_ROOT)/BisSchemas
-          git branch
+          git branch --all
         )
       displayName: 'Display Source Branch'
 
@@ -229,7 +236,7 @@ stages:
     #should validate the imodeljs-win32-x64
     - template: common/config/azure-pipelines/templates/core-build.yaml@itwinjs-core
       parameters:
-        nodeVersion: 22.x
+        nodeVersion: 24.15.0
         runRushAudit: false
         rushBuildCacheEnabled: 0
         currentBranch: master
@@ -277,14 +284,15 @@ stages:
     - script: |
         if not "%BRANCH_NAME%" == "" (
           cd /d $(BB_SRC_ROOT)/BisSchemas
-          git checkout %BRANCH_NAME%
+          git fetch origin "%BRANCH_NAME%" || exit /b 1
+          git checkout -B "%BRANCH_NAME%" FETCH_HEAD || exit /b 1
         )
       displayName: 'Set Source Branch'
 
     - script: |
         if not "%BRANCH_NAME%" == "" (
           cd /d $(BB_SRC_ROOT)/BisSchemas
-          git branch
+          git branch --all
         )
       displayName: 'Display Source Branch'
 
