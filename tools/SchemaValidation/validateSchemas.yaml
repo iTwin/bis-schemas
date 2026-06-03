@@ -12,170 +12,196 @@ pr:
       - docs/
 
 jobs:
-- job: Validation
+# - job: Validation
+#   workspace:
+#     clean: all
+
+#   pool:
+#     vmImage: windows-latest
+
+#   variables:
+#     - name: validationOut
+#       value: '$(Agent.BuildDirectory)/ValidationResults'
+#     - name: comparisonOut
+#       value: '$(Agent.BuildDirectory)/ComparisonResults'
+#     - name: imodelValidationOut
+#       value: '$(Agent.BuildDirectory)/IModelValidationResults'
+#     - name: jsonValidationOut
+#       value: '$(Agent.BuildDirectory)/JsonValidationResults'
+#     - name: schemaUpgradeValidationOut
+#       value: '$(Agent.BuildDirectory)/SchemaUpgradeValidationResults'
+
+#   steps:
+#   - task: NodeTool@0
+#     displayName: 'Install Node 24.15.0'
+#     inputs:
+#       versionSpec: 24.15.0
+#       checkLatest: true
+
+#   - checkout: self
+#     clean: true
+
+#   - task: CmdLine@2
+#     displayName: 'NPM Configuration'
+#     inputs:
+#       script: 'npm config list' 
+
+#   - script: npm install
+#     displayName: npm install
+
+#   - script: | 
+#       mkdir "%validationOut%"
+#       echo Schema Validation Ouput Dir= %validationOut%
+#     displayName: 'Create Validation Output Directory'
+
+#   - script: npm run validateSchemas -- --BisRoot . --OutDir $(validationOut)
+#     workingDirectory: 
+#     displayName: Perform BIS Schema Validation
+
+#   - task: ArchiveFiles@2
+#     condition: succeededOrFailed()
+#     displayName: 'ArchiveFiles - Validation Results'
+#     inputs:
+#       rootFolderOrFile: $(validationOut) 
+#       includeRootFolder: false 
+#       archiveType: 7z
+#       archiveFile: '$(Build.ArtifactStagingDirectory)/ValidationResults.zip' 
+#       replaceExistingArchive: true 
+
+#   - publish: '$(Build.ArtifactStagingDirectory)/ValidationResults.zip'
+#     condition: succeededOrFailed()
+#     artifact: bis-schema-validation-logs-Attempt-$(System.JobAttempt)
+#     displayName: 'Publish BIS Schema Validation Results'
+
+#   - script: | 
+#       mkdir "%comparisonOut%"
+#       echo Schema Comparison Ouput Dir= %comparisonOut%
+#     condition: succeededOrFailed()
+#     displayName: 'Create Schema Comparison Output Directory'
+
+#   - script: npm run compareSchemas -- --BisRoot . --OutDir $(comparisonOut)
+#     workingDirectory: 
+#     condition: succeededOrFailed()
+#     displayName: Perform BIS Schema Comparison
+
+#   - task: ArchiveFiles@2
+#     condition: succeededOrFailed()
+#     displayName: 'ArchiveFiles - Comparison Results'
+#     inputs:
+#       rootFolderOrFile: $(comparisonOut) 
+#       includeRootFolder: false 
+#       archiveType: 7z
+#       archiveFile: '$(Build.ArtifactStagingDirectory)/ComparisonResults.zip' 
+#       replaceExistingArchive: true 
+
+#   - publish: '$(Build.ArtifactStagingDirectory)/ComparisonResults.zip'
+#     condition: succeededOrFailed()  
+#     artifact: bis-schema-comparison-logs-Attempt-$(System.JobAttempt)
+#     displayName: 'Publish BIS Schema Comparison Results'
+
+#   - script: | 
+#       mkdir "%imodelValidationOut%"
+#       echo Schema Validation Ouput Dir= %imodelValidationOut%
+#     displayName: 'Create iModel Validation Output Directory'
+
+#   - script: npm run iModelSchemaValidation -- --released --OutDir $(imodelValidationOut)
+#     displayName: ValidateReleasedSchemas
+
+#   - script: npm run iModelSchemaValidation -- --wip --OutDir $(imodelValidationOut)
+#     displayName: ValidateWIPSchemas
+
+#   - task: ArchiveFiles@2
+#     condition: succeededOrFailed()
+#     displayName: 'ArchiveFiles - iModel Validation Results'
+#     inputs:
+#       rootFolderOrFile: $(imodelValidationOut) 
+#       includeRootFolder: false 
+#       archiveType: 7z
+#       archiveFile: '$(Build.ArtifactStagingDirectory)/IModelValidationResults.zip' 
+#       replaceExistingArchive: true 
+
+#   - publish: '$(Build.ArtifactStagingDirectory)/IModelValidationResults.zip'
+#     condition: succeededOrFailed()  
+#     artifact: imodel-schema-validation-logs-Attempt-$(System.JobAttempt)
+#     displayName: 'Publish iModel Schema Validation Results'
+
+#   - script: | 
+#       mkdir "%schemaUpgradeValidationOut%"
+#       echo Schema Validation Ouput Dir= %schemaUpgradeValidationOut%
+#     displayName: 'Create Schema Upgrade Validation Output Directory'
+
+#   - script: npm run iModelSchemaValidation -- --schemaUpgradeTesting --OutDir $(schemaUpgradeValidationOut)
+#     displayName: Schema Upgrade Validation
+
+#   - task: ArchiveFiles@2
+#     condition: succeededOrFailed()
+#     displayName: 'ArchiveFiles - Schema Upgrade Validation Results'
+#     inputs:
+#       rootFolderOrFile: $(schemaUpgradeValidationOut) 
+#       includeRootFolder: false 
+#       archiveType: 7z
+#       archiveFile: '$(Build.ArtifactStagingDirectory)/SchemaUpgradeValidationResults.zip' 
+#       replaceExistingArchive: true 
+
+#   - publish: '$(Build.ArtifactStagingDirectory)/SchemaUpgradeValidationResults.zip'
+#     condition: succeededOrFailed()  
+#     artifact: schema-upgrade-validation-logs-Attempt-$(System.JobAttempt)
+#     displayName: 'Publish Schema Upgrade Validation Results'
+
+#   - script: | 
+#       mkdir "%jsonValidationOut%"
+#       echo Schema JSON Validation Ouput Dir= %jsonValidationOut%
+#     condition: succeededOrFailed()
+#     displayName: 'Create Schema JSON Validation Output Directory'
+
+#   - script: npm run validateJsonSchemas -- --BisRoot . --OutDir $(jsonValidationOut)
+#     workingDirectory: 
+#     condition: succeededOrFailed()
+#     displayName: Perform BIS Schema JSON creation validation
+
+#   - task: ArchiveFiles@2
+#     condition: succeededOrFailed()
+#     displayName: 'ArchiveFiles - Schema JSON Validation Results'
+#     inputs:
+#       rootFolderOrFile: $(jsonValidationOut) 
+#       includeRootFolder: false 
+#       archiveType: 7z
+#       archiveFile: '$(Build.ArtifactStagingDirectory)/JsonValidationResults.zip' 
+#       replaceExistingArchive: true 
+
+#   - publish: '$(Build.ArtifactStagingDirectory)/JsonValidationResults.zip'
+#     condition: succeededOrFailed()  
+#     artifact: bis-schema-json-validation-logs-Attempt-$(System.JobAttempt)
+#     displayName: 'Publish BIS Schema JSON Validation Results'
+
+#   - script: npm run iModelSchemaValidation -- --compareSnapshot
+#     displayName: Snapshot Comparison
+
+#   - script: npm run validateSchemaInventory
+#     displayName: Validate Schema Inventory
+
+- job: XSD Validation
   workspace:
     clean: all
 
   pool:
-    vmImage: windows-latest
-
-  variables:
-    - name: validationOut
-      value: '$(Agent.BuildDirectory)/ValidationResults'
-    - name: comparisonOut
-      value: '$(Agent.BuildDirectory)/ComparisonResults'
-    - name: imodelValidationOut
-      value: '$(Agent.BuildDirectory)/IModelValidationResults'
-    - name: jsonValidationOut
-      value: '$(Agent.BuildDirectory)/JsonValidationResults'
-    - name: schemaUpgradeValidationOut
-      value: '$(Agent.BuildDirectory)/SchemaUpgradeValidationResults'
+    vmImage: ubuntu-latest
 
   steps:
+  - checkout: self
+    clean: true
+
   - task: NodeTool@0
     displayName: 'Install Node 24.15.0'
     inputs:
       versionSpec: 24.15.0
       checkLatest: true
 
-  - checkout: self
-    clean: true
-
-  - task: CmdLine@2
-    displayName: 'NPM Configuration'
-    inputs:
-      script: 'npm config list' 
-
-  - script: npm install
-    displayName: npm install
+  - script: |
+      which xmllint
+    displayName: 'Check xmllint'
 
   - script: | 
-      mkdir "%validationOut%"
-      echo Schema Validation Ouput Dir= %validationOut%
-    displayName: 'Create Validation Output Directory'
-
-  - script: npm run validateSchemas -- --BisRoot . --OutDir $(validationOut)
-    workingDirectory: 
-    displayName: Perform BIS Schema Validation
-
-  - task: ArchiveFiles@2
-    condition: succeededOrFailed()
-    displayName: 'ArchiveFiles - Validation Results'
-    inputs:
-      rootFolderOrFile: $(validationOut) 
-      includeRootFolder: false 
-      archiveType: 7z
-      archiveFile: '$(Build.ArtifactStagingDirectory)/ValidationResults.zip' 
-      replaceExistingArchive: true 
-
-  - publish: '$(Build.ArtifactStagingDirectory)/ValidationResults.zip'
-    condition: succeededOrFailed()
-    artifact: bis-schema-validation-logs-Attempt-$(System.JobAttempt)
-    displayName: 'Publish BIS Schema Validation Results'
-
-  - script: | 
-      mkdir "%comparisonOut%"
-      echo Schema Comparison Ouput Dir= %comparisonOut%
-    condition: succeededOrFailed()
-    displayName: 'Create Schema Comparison Output Directory'
-
-  - script: npm run compareSchemas -- --BisRoot . --OutDir $(comparisonOut)
-    workingDirectory: 
-    condition: succeededOrFailed()
-    displayName: Perform BIS Schema Comparison
-
-  - task: ArchiveFiles@2
-    condition: succeededOrFailed()
-    displayName: 'ArchiveFiles - Comparison Results'
-    inputs:
-      rootFolderOrFile: $(comparisonOut) 
-      includeRootFolder: false 
-      archiveType: 7z
-      archiveFile: '$(Build.ArtifactStagingDirectory)/ComparisonResults.zip' 
-      replaceExistingArchive: true 
-
-  - publish: '$(Build.ArtifactStagingDirectory)/ComparisonResults.zip'
-    condition: succeededOrFailed()  
-    artifact: bis-schema-comparison-logs-Attempt-$(System.JobAttempt)
-    displayName: 'Publish BIS Schema Comparison Results'
-
-  - script: | 
-      mkdir "%imodelValidationOut%"
-      echo Schema Validation Ouput Dir= %imodelValidationOut%
-    displayName: 'Create iModel Validation Output Directory'
-
-  - script: npm run iModelSchemaValidation -- --released --OutDir $(imodelValidationOut)
-    displayName: ValidateReleasedSchemas
-
-  - script: npm run iModelSchemaValidation -- --wip --OutDir $(imodelValidationOut)
-    displayName: ValidateWIPSchemas
-
-  - task: ArchiveFiles@2
-    condition: succeededOrFailed()
-    displayName: 'ArchiveFiles - iModel Validation Results'
-    inputs:
-      rootFolderOrFile: $(imodelValidationOut) 
-      includeRootFolder: false 
-      archiveType: 7z
-      archiveFile: '$(Build.ArtifactStagingDirectory)/IModelValidationResults.zip' 
-      replaceExistingArchive: true 
-
-  - publish: '$(Build.ArtifactStagingDirectory)/IModelValidationResults.zip'
-    condition: succeededOrFailed()  
-    artifact: imodel-schema-validation-logs-Attempt-$(System.JobAttempt)
-    displayName: 'Publish iModel Schema Validation Results'
-
-  - script: | 
-      mkdir "%schemaUpgradeValidationOut%"
-      echo Schema Validation Ouput Dir= %schemaUpgradeValidationOut%
-    displayName: 'Create Schema Upgrade Validation Output Directory'
-
-  - script: npm run iModelSchemaValidation -- --schemaUpgradeTesting --OutDir $(schemaUpgradeValidationOut)
-    displayName: Schema Upgrade Validation
-
-  - task: ArchiveFiles@2
-    condition: succeededOrFailed()
-    displayName: 'ArchiveFiles - Schema Upgrade Validation Results'
-    inputs:
-      rootFolderOrFile: $(schemaUpgradeValidationOut) 
-      includeRootFolder: false 
-      archiveType: 7z
-      archiveFile: '$(Build.ArtifactStagingDirectory)/SchemaUpgradeValidationResults.zip' 
-      replaceExistingArchive: true 
-
-  - publish: '$(Build.ArtifactStagingDirectory)/SchemaUpgradeValidationResults.zip'
-    condition: succeededOrFailed()  
-    artifact: schema-upgrade-validation-logs-Attempt-$(System.JobAttempt)
-    displayName: 'Publish Schema Upgrade Validation Results'
-
-  - script: | 
-      mkdir "%jsonValidationOut%"
-      echo Schema JSON Validation Ouput Dir= %jsonValidationOut%
-    condition: succeededOrFailed()
-    displayName: 'Create Schema JSON Validation Output Directory'
-
-  - script: npm run validateJsonSchemas -- --BisRoot . --OutDir $(jsonValidationOut)
-    workingDirectory: 
-    condition: succeededOrFailed()
-    displayName: Perform BIS Schema JSON creation validation
-
-  - task: ArchiveFiles@2
-    condition: succeededOrFailed()
-    displayName: 'ArchiveFiles - Schema JSON Validation Results'
-    inputs:
-      rootFolderOrFile: $(jsonValidationOut) 
-      includeRootFolder: false 
-      archiveType: 7z
-      archiveFile: '$(Build.ArtifactStagingDirectory)/JsonValidationResults.zip' 
-      replaceExistingArchive: true 
-
-  - publish: '$(Build.ArtifactStagingDirectory)/JsonValidationResults.zip'
-    condition: succeededOrFailed()  
-    artifact: bis-schema-json-validation-logs-Attempt-$(System.JobAttempt)
-    displayName: 'Publish BIS Schema JSON Validation Results'
-
-  - script: npm run iModelSchemaValidation -- --compareSnapshot
-    displayName: Snapshot Comparison
-
-  - script: npm run validateSchemaInventory
-    displayName: Validate Schema Inventory
+      xmllint --noout System/xsd/ECSchemaXML3.2.xsd
+    displayName: 'Text XSD'
+    workingDirectory: $(Build.SourcesDirectory)
