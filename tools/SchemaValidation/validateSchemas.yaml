@@ -215,5 +215,31 @@ jobs:
 
   - script: | 
       xmllint --noout System/xsd/ECSchemaXML3.2.xsd
-    displayName: 'Text XSD'
+    displayName: 'Test XSD'
+    workingDirectory: $(Build.SourcesDirectory)
+
+
+  - script: | 
+      xmllint --schema System/xsd/ECSchemaXML3.2.xsd Domains/0-Core/Released/BisCore.01.00.25.ecschema.xml --noout
+    displayName: 'Text BisCore'
+    workingDirectory: $(Build.SourcesDirectory)
+
+  - script: | 
+      xmllint --schema System/xsd/ECSchemaXML3.2.xsd Domains/0-Core/Released/BisCore.01.00.25.ecschema.xml --noout
+    displayName: 'Text BisCore'
+    workingDirectory: $(Build.SourcesDirectory)
+
+  - bash: |
+      #!/bin/bash
+      XSD="System/xsd/ECSchemaXML3.2.xsd"
+      ERRORS=0
+      for f in $(find Domains -name "*.ecschema.xml" -not -path "*/Released/*"); do
+        if ! xmllint --noout --schema "$XSD" "$f" 2>/dev/null; then
+          echo "FAIL: $f"
+          xmllint --noout --schema "$XSD" "$f" 2>&1 | grep "validity error"
+          ERRORS=$((ERRORS + 1))
+        fi
+      done
+      exit $ERRORS
+    displayName: 'Validate ECSchema XML Files'
     workingDirectory: $(Build.SourcesDirectory)
