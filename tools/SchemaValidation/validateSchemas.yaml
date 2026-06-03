@@ -198,15 +198,20 @@ jobs:
       checkLatest: true
 
   - script: |
-      if command -v xmllint &> /dev/null
+      # Check if the binary exists in the path
+      if ! command -v xmllint &> /dev/null
       then
-          echo "xmllint is installed."
-          xmllint --version
-      else
-          echo "##vso[task.logissue type=warning]xmllint is not installed on this agent."
-          echo "xmllint missing"
+          echo "##vso[task.logissue type=warning]xmllint is NOT installed on this agent."
+          echo "Proceeding with automated installation..."
+          
+          # Install it automatically so the pipeline can continue
+          sudo apt-get update && sudo apt-get install -y libxml2-utils
       fi
-    displayName: 'Check xmllint'
+
+      # Confirm it works and print the version
+      echo "Current version details:"
+      xmllint --version
+    displayName: 'Verify and Auto-Install xmllint'
 
   - script: | 
       xmllint --noout System/xsd/ECSchemaXML3.2.xsd
