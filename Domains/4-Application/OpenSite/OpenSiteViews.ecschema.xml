@@ -70,27 +70,62 @@
         <ECCustomAttributes>
             <QueryView xmlns="ECDbMap.02.00.04">
                 <Query>
+                    WITH parkingRowOwners AS (
+                    -- 1. The parking row is driven directly by the LayoutParkingArea itself.
                     SELECT
-                        layoutParkingAreaParkingRows.LayoutParkingAreaId [ECInstanceId],
-                        ec_classid('OpenSiteViews', 'LayoutParkingAreaView') [ECClassId],
-                        NAVIGATION_VALUE(opnsiteViews.LayoutParkingAreaView.LayoutParkingArea, layoutParkingAreaParkingRows.LayoutParkingAreaId),
-                        SUM(layoutParkingAreaParkingRows.ParkingSpaceCount) [ParkingSpaceCount],
-                        SUM(layoutParkingAreaParkingRows.ProblemSpaceCount) [ProblemSpaceCount]
-                    FROM (
-                        SELECT
-                            layoutParkingArea.ECInstanceId [LayoutParkingAreaId],
-                            pr.ECInstanceId [ParkingRowId],
-                            MAX(pr.ParkingSpaceCount) [ParkingSpaceCount],
-                            MAX(pr.ProblemSpaceCount) [ProblemSpaceCount]
-                        FROM OpenSite:LayoutParkingArea layoutParkingArea
-                        JOIN bis:Element drivingElement ON drivingElement.Parent.Id=layoutParkingArea.ECInstanceId
-                        JOIN bis:ElementDrivesElement relDrive ON drivingElement.ECInstanceId=relDrive.SourceECInstanceId
-                        JOIN CivilSpatial:ParkingRow pr ON relDrive.TargetECInstanceId=pr.ECInstanceId
-                        GROUP BY
-                            layoutParkingArea.ECInstanceId,
-                            pr.ECInstanceId
-                    ) layoutParkingAreaParkingRows
-                    GROUP BY layoutParkingAreaParkingRows.LayoutParkingAreaId;
+                        pr.ECInstanceId [ParkingRowId],
+                        layoutParkingArea.ECInstanceId [LayoutParkingAreaId]
+                    FROM CivilSpatial:ParkingRow pr
+                    JOIN bis:ElementDrivesElement relDrive
+                        ON relDrive.TargetECInstanceId = pr.ECInstanceId
+                    JOIN OpenSite:LayoutParkingArea layoutParkingArea
+                        ON layoutParkingArea.ECInstanceId = relDrive.SourceECInstanceId
+
+                    UNION
+
+                    -- 2. The parking row is driven by a child element of the LayoutParkingArea,
+                    --    for example a layout parking edge.
+                    SELECT
+                        pr.ECInstanceId [ParkingRowId],
+                        layoutParkingArea.ECInstanceId [LayoutParkingAreaId]
+                    FROM CivilSpatial:ParkingRow pr
+                    JOIN bis:ElementDrivesElement relDrive
+                        ON relDrive.TargetECInstanceId = pr.ECInstanceId
+                    JOIN bis:Element sourceElement
+                        ON sourceElement.ECInstanceId = relDrive.SourceECInstanceId
+                    JOIN OpenSite:LayoutParkingArea layoutParkingArea
+                        ON layoutParkingArea.ECInstanceId = sourceElement.Parent.Id
+
+                    UNION
+
+                    -- 3. The parking row is driven by a grandchild of the LayoutParkingArea,
+                    --    for example an edge under a driveway path.
+                    SELECT
+                        pr.ECInstanceId [ParkingRowId],
+                        layoutParkingArea.ECInstanceId [LayoutParkingAreaId]
+                    FROM CivilSpatial:ParkingRow pr
+                    JOIN bis:ElementDrivesElement relDrive
+                        ON relDrive.TargetECInstanceId = pr.ECInstanceId
+                    JOIN bis:Element sourceElement
+                        ON sourceElement.ECInstanceId = relDrive.SourceECInstanceId
+                    JOIN bis:Element parentElement
+                        ON parentElement.ECInstanceId = sourceElement.Parent.Id
+                    JOIN OpenSite:LayoutParkingArea layoutParkingArea
+                        ON layoutParkingArea.ECInstanceId = parentElement.Parent.Id
+                    )
+                    SELECT
+                    owners.LayoutParkingAreaId [ECInstanceId],
+                    ec_classid('OpenSiteViews', 'LayoutParkingAreaView') [ECClassId],
+                    NAVIGATION_VALUE(
+                        opnsiteViews.LayoutParkingAreaView.LayoutParkingArea,
+                        owners.LayoutParkingAreaId
+                    ),
+                    SUM(pr.ParkingSpaceCount) [ParkingSpaceCount],
+                    SUM(pr.ProblemSpaceCount) [ProblemSpaceCount]
+                    FROM parkingRowOwners owners
+                    JOIN CivilSpatial:ParkingRow pr
+                    ON pr.ECInstanceId = owners.ParkingRowId
+                    GROUP BY owners.LayoutParkingAreaId;
                 </Query>
             </QueryView>
         </ECCustomAttributes>
