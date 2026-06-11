@@ -47,7 +47,7 @@ A `ParkingRow` also captures the dimensions and orientation of its parking space
 
 - **`ParkingWidth`** — The width of each parking space, measured perpendicular to the stall dividing lines.
 - **`ParkingDepth`** — The depth of each parking space, measured along the stall dividing lines from the aisle edge to the back of the space.
-- **`ParkingAngle`** — The angle between a stall dividing line and the aisle it faces, measured in degrees. A value of 90° indicates perpendicular parking, while lower values such as 60° or 45° indicate angled parking.
+- **`ParkingAngle`** — The angle between a stall dividing line and the aisle it faces. A perpendicular arrangement indicates head-in or back-in parking, while smaller angles indicate angled parking.
 
 `ParkingRow`s must be contained in `SpatialLocationModel`s or `PhysicalModel`s.
 
