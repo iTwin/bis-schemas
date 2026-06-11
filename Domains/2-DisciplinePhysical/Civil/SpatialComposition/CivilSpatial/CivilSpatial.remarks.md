@@ -43,6 +43,12 @@ Instances of `ParkingIsland` are typically aggregated by instances of `ParkingAr
 
 The number of Parking-spaces modeled in a single instance of `ParkingRow` is captured by its `ParkingSpaceCount` property.
 
+A `ParkingRow` also captures the dimensions and orientation of its parking spaces:
+
+- **`ParkingWidth`** — The width of each parking space, measured perpendicular to the stall dividing lines.
+- **`ParkingDepth`** — The depth of each parking space, measured along the stall dividing lines from the aisle edge to the back of the space.
+- **`ParkingAngle`** — The angle between a stall dividing line and the aisle it faces, measured in degrees. A value of 90° indicates perpendicular parking, while lower values such as 60° or 45° indicate angled parking.
+
 `ParkingRow`s must be contained in `SpatialLocationModel`s or `PhysicalModel`s.
 
 ### PondArea
