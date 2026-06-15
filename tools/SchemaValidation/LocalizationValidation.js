@@ -36,9 +36,7 @@ async function validateLocalizationJsons(bisRoot) {
 
       for (const localization of schema.localizations) {
         console.log(`\nProcessing localization for ${schema.name}.${schema.version} schema '${localization.locale}' locale: ${localization.path}`);
-
         validateLocalizationPath(schema, localization);
-
         const localePath = path.join(bisRoot, localization.path);
 
         const provider = new LocalizationProvider(async (_schemaName, _locale) => {
