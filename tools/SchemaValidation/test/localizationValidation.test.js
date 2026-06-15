@@ -220,7 +220,7 @@ describe("Validate localization files", function () {
         .to.be.rejectedWith(`Validation has failed with error: Invalid localization path for SchemaX:de - file must be in a 'Locales' directory but got "Wrong\\SchemaX.de.json"`);
     });
 
-    it("should throw error when a wip localization is placed under a 'Released' directory", async function () {
+    it("should throw error when a wip localization is placed under a released directory", async function () {
       setupInventory({
         SchemaX: [{
           name: "SchemaX", version: "01.00.00", path: "SchemaX.ecschema.xml", released: false,
@@ -244,16 +244,16 @@ describe("Validate localization files", function () {
         .to.be.rejectedWith(`Validation has failed with error: Invalid localization filename for WIP schema SchemaX:de - expected "SchemaX.de.json" but got "Wrong.de.json"`);
     });
 
-    it("should throw error when a released localization is not under 'Released/Locales/'", async function () {
+    it("should throw error when a released localization is not under released path", async function () {
       setupInventory({
         SchemaReleased: [{
-          name: "SchemaReleased", version: "01.00.00", path: "Released\\SchemaReleased.01.00.00.ecschema.xml", released: true,
+          name: "ReleasedSchema", version: "01.00.00", path: "Released\\ReleasedSchema.01.00.00.ecschema.xml", released: true,
           localizations: [{ path: "Locales\\ReleasedSchema.01.00.00.de.json", locale: "de" }],
         }],
       });
 
       await expect(validateLocalizationJsons(localizationRoot))
-        .to.be.rejectedWith(`Validation has failed with error: Invalid localization path for released schema SchemaReleased:de - file must be under 'Released/Locales/' but got "Locales\\SchemaReleased.01.00.00.de.json"`);
+        .to.be.rejectedWith(`Validation has failed with error: Invalid localization path for released schema ReleasedSchema:de - file must be under 'Released/Locales/' but got "Locales\\ReleasedSchema.01.00.00.de.json"`);
     });
 
     it("should throw error when a released localization filename does not follow '{name}.{version}.{locale}.json'", async function () {
@@ -268,5 +268,4 @@ describe("Validate localization files", function () {
         .to.be.rejectedWith(`Validation has failed with error: Invalid localization filename for released schema SchemaReleased:de - expected "SchemaReleased.01.00.00.de.json" but got "SchemaReleased.de.json"`);
     });
   });
-
 });
