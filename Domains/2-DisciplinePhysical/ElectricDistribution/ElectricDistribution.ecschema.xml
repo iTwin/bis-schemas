@@ -1,0 +1,871 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ==================================================================================
+|  * Copyright (c) 2025 EPC Studio. All rights reserved.
+|  * Proposed BIS domain schema for overhead electric distribution infrastructure.
+|  * Target layer: 2-DisciplinePhysical
+|  * See design.md for full design context and UPM mapping decisions.
+|  *
+|  * NOTE: Schema reference versions confirmed against iTwin/bis-schemas as of
+|  * 2026-06-19:
+|  *   BisCore 01.00.15 (required by Analytical 01.00.02)
+|  *   Analytical 01.00.02 (actual schema header)
+|  *   DistributionSystems 01.00.03 (actual schema header)
+|  *   AecUnits 01.00.03 (schema name corrected from AECUnits; confirmed against repo)
+|  *   Units 01.00.06 (minimum released version containing u:OHM_M)
+|  *   Formats 01.00.00 (only released version; required for f: alias in custom KOQs)
+|  *   CoreCustomAttributes 01.00.03 (confirmed)
+|  *   BisCustomAttributes 01.00.00 (confirmed)
+|  *
+|  * NOTE: u:OHM and u:OHM_M confirmed as valid unit typeNames in System/Units.ecschema.xml.
+|  * anlyt:AnalyticalSimulatesSpatialElement confirmed as the correct "analyzes" relationship.
+|  * bis:InformationContentElement has NotSubclassableInReferencingSchemas; ClearanceViolation
+|  * and PoleInspection correctly use bis:InformationRecordElement.
+|  * Run ec-validator before submitting the upstream PR.
+======================================================================================= -->
+<ECSchema schemaName="ElectricDistribution" alias="edist" version="01.00.00"
+    xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2"
+    displayLabel="Electric Distribution"
+    description="BIS domain schema for overhead electric distribution infrastructure including poles, attachments, conductors, structural analysis, and field inspection.">
+
+    <ECSchemaReference name="BisCore"              version="01.00.15" alias="bis"/>
+    <ECSchemaReference name="Analytical"           version="01.00.02" alias="anlyt"/>
+    <ECSchemaReference name="DistributionSystems"  version="01.00.03" alias="dsys"/>
+    <ECSchemaReference name="AecUnits"             version="01.00.03" alias="AECU"/>
+    <ECSchemaReference name="Units"                version="01.00.06" alias="u"/>
+    <ECSchemaReference name="Formats"              version="01.00.00" alias="f"/>
+    <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
+    <ECSchemaReference name="BisCustomAttributes"  version="01.00.00" alias="bisCA"/>
+
+    <ECCustomAttributes>
+        <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
+            <SupportedUse>NotForProduction</SupportedUse>
+        </ProductionStatus>
+        <SchemaLayerInfo xmlns="BisCustomAttributes.01.00.00">
+            <Value>DisciplinePhysical</Value>
+        </SchemaLayerInfo>
+    </ECCustomAttributes>
+
+    <!-- Domain-specific KindOfQuantity not covered by AECUnits.
+         u:OHM = SI ohm (derived unit); u:OHM_M = ohm-metre for soil resistivity.
+         Verify unit alias strings against the BIS Units schema before PR. -->
+    <KindOfQuantity typeName="EDIST_RESISTANCE"   displayLabel="Resistance"       persistenceUnit="u:OHM"   relativeError="0.001" presentationUnits="f:DefaultRealU(4)[u:OHM]"/>
+    <KindOfQuantity typeName="EDIST_RESISTIVITY"  displayLabel="Soil Resistivity"  persistenceUnit="u:OHM_M" relativeError="0.001" presentationUnits="f:DefaultRealU(4)[u:OHM_M]"/>
+
+    <!-- ============================================================
+         ENUMERATIONS
+         ============================================================ -->
+
+    <ECEnumeration typeName="PoleMaterial" backingTypeName="int" isStrict="true"
+        description="Material composition of a distribution pole.">
+        <ECEnumerator name="Wood"       value="0" displayLabel="Wood"/>
+        <ECEnumerator name="Steel"      value="1" displayLabel="Steel"/>
+        <ECEnumerator name="Concrete"   value="2" displayLabel="Concrete"/>
+        <ECEnumerator name="Composite"  value="3" displayLabel="Composite"/>
+        <ECEnumerator name="Fiberglass" value="4" displayLabel="Fiberglass"/>
+    </ECEnumeration>
+
+    <ECEnumeration typeName="PoleConditionRating" backingTypeName="int" isStrict="true"
+        description="Field condition rating for a placed pole instance.">
+        <ECEnumerator name="Good"     value="0" displayLabel="Good"/>
+        <ECEnumerator name="Fair"     value="1" displayLabel="Fair"/>
+        <ECEnumerator name="Poor"     value="2" displayLabel="Poor"/>
+        <ECEnumerator name="Critical" value="3" displayLabel="Critical"/>
+    </ECEnumeration>
+
+    <ECEnumeration typeName="CrossarmMaterial" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="Wood"      value="0" displayLabel="Wood"/>
+        <ECEnumerator name="Steel"     value="1" displayLabel="Steel"/>
+        <ECEnumerator name="Fiberglass" value="2" displayLabel="Fiberglass"/>
+    </ECEnumeration>
+
+    <!-- isStrict=false: UPM FramingBreakdown.crossarm_structure Literal but adapters
+         may introduce additional values. -->
+    <ECEnumeration typeName="CrossarmSide" backingTypeName="int" isStrict="false"
+        description="Single- or double-arm configuration on a crossarm.">
+        <ECEnumerator name="Single"  value="0" displayLabel="Single"/>
+        <ECEnumerator name="Double"  value="1" displayLabel="Double"/>
+        <ECEnumerator name="Mixed"   value="2" displayLabel="Mixed"/>
+        <ECEnumerator name="Unknown" value="3" displayLabel="Unknown"/>
+    </ECEnumeration>
+
+    <!-- isStrict=false: no UPM Literal; connector maps from anchor catalog. -->
+    <ECEnumeration typeName="AnchorType" backingTypeName="int" isStrict="false">
+        <ECEnumerator name="ScrewAuger" value="0" displayLabel="Screw Auger"/>
+        <ECEnumerator name="Expanding"  value="1" displayLabel="Expanding"/>
+        <ECEnumerator name="Concrete"   value="2" displayLabel="Concrete"/>
+        <ECEnumerator name="Rock"       value="3" displayLabel="Rock"/>
+        <ECEnumerator name="StubPole"   value="4" displayLabel="Stub Pole"/>
+        <ECEnumerator name="Deadman"    value="5" displayLabel="Deadman"/>
+    </ECEnumeration>
+
+    <!-- isStrict=false: UPM insulator_type is freeform; union across SPIDA, OCalc,
+         PLS-POLE adapters produces these canonical values. Connector maps. -->
+    <ECEnumeration typeName="InsulatorType" backingTypeName="int" isStrict="false">
+        <ECEnumerator name="Pin"     value="0" displayLabel="Pin"/>
+        <ECEnumerator name="Deadend" value="1" displayLabel="Deadend"/>
+        <ECEnumerator name="Clamp"   value="2" displayLabel="Clamp"/>
+        <ECEnumerator name="Bracket" value="3" displayLabel="Bracket"/>
+        <ECEnumerator name="Unknown" value="4" displayLabel="Unknown"/>
+    </ECEnumeration>
+
+    <!-- isStrict=false: derived from clearance.py _USAGE_GROUP_FALLBACK_VOLTAGE dict;
+         adapters may emit additional usage groups. -->
+    <ECEnumeration typeName="ConductorUsageGroup" backingTypeName="int" isStrict="false"
+        description="Electrical usage classification of an overhead conductor span.">
+        <ECEnumerator name="Primary"             value="0"  displayLabel="Primary"/>
+        <ECEnumerator name="Secondary"           value="1"  displayLabel="Secondary"/>
+        <ECEnumerator name="Neutral"             value="2"  displayLabel="Neutral"/>
+        <ECEnumerator name="PrimaryNeutral"      value="3"  displayLabel="Primary Neutral"/>
+        <ECEnumerator name="Streetlight"         value="4"  displayLabel="Streetlight"/>
+        <ECEnumerator name="Communication"       value="5"  displayLabel="Communication"/>
+        <ECEnumerator name="CommunicationBundle" value="6"  displayLabel="Communication Bundle"/>
+        <ECEnumerator name="CommunicationService" value="7" displayLabel="Communication Service"/>
+        <ECEnumerator name="SecondaryDrop"       value="8"  displayLabel="Secondary Drop"/>
+        <ECEnumerator name="StaticWire"          value="9"  displayLabel="Static Wire"/>
+        <ECEnumerator name="GroundWire"          value="10" displayLabel="Ground Wire"/>
+    </ECEnumeration>
+
+    <!-- isStrict=true: closed set of sag analysis temperature/load states. -->
+    <ECEnumeration typeName="ConductorSagConditionType" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="Initial"  value="0" displayLabel="Initial"/>
+        <ECEnumerator name="Final"    value="1" displayLabel="Final"/>
+        <ECEnumerator name="Loaded"   value="2" displayLabel="Loaded"/>
+        <ECEnumerator name="FullIce"  value="3" displayLabel="Full Ice"/>
+        <ECEnumerator name="Extreme"  value="4" displayLabel="Extreme"/>
+    </ECEnumeration>
+
+    <!-- isStrict=false: guy grade from metadata; field values vary by adapter. -->
+    <ECEnumeration typeName="GuyGrade" backingTypeName="int" isStrict="false">
+        <ECEnumerator name="EHS"           value="0" displayLabel="Extra High Strength"/>
+        <ECEnumerator name="HS"            value="1" displayLabel="High Strength"/>
+        <ECEnumerator name="SiloGuy"       value="2" displayLabel="Silo Guy"/>
+        <ECEnumerator name="SoftDrawCopper" value="3" displayLabel="Soft Draw Copper"/>
+    </ECEnumeration>
+
+    <!-- isStrict=false: no UPM Literal; inferred from program name. -->
+    <ECEnumeration typeName="InspectionMethod" backingTypeName="int" isStrict="false">
+        <ECEnumerator name="Visual"      value="0" displayLabel="Visual"/>
+        <ECEnumerator name="Sounding"    value="1" displayLabel="Sounding"/>
+        <ECEnumerator name="Boring"      value="2" displayLabel="Boring"/>
+        <ECEnumerator name="ChemicalTest" value="3" displayLabel="Chemical Test"/>
+        <ECEnumerator name="Ultrasonic"  value="4" displayLabel="Ultrasonic"/>
+        <ECEnumerator name="PoleTreat"   value="5" displayLabel="Pole Treat"/>
+    </ECEnumeration>
+
+    <!-- isStrict=true: matches UPM Literal["pass","marginal","fail"] on
+         InspectionSection.pole_test_result and .verdict. -->
+    <ECEnumeration typeName="InspectionVerdict" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="Pass"     value="0" displayLabel="Pass"/>
+        <ECEnumerator name="Marginal" value="1" displayLabel="Marginal"/>
+        <ECEnumerator name="Fail"     value="2" displayLabel="Fail"/>
+    </ECEnumeration>
+
+    <!-- isStrict=false: no UPM enum; derived from visual_findings narrative. -->
+    <ECEnumeration typeName="FindingType" backingTypeName="int" isStrict="false">
+        <ECEnumerator name="SurfaceRot"        value="0" displayLabel="Surface Rot"/>
+        <ECEnumerator name="InteriorRot"       value="1" displayLabel="Interior Rot"/>
+        <ECEnumerator name="Crack"             value="2" displayLabel="Crack"/>
+        <ECEnumerator name="Woodpecker"        value="3" displayLabel="Woodpecker Damage"/>
+        <ECEnumerator name="PhysicalDamage"    value="4" displayLabel="Physical Damage"/>
+        <ECEnumerator name="LeaningExcessive"  value="5" displayLabel="Excessive Lean"/>
+        <ECEnumerator name="HardwareDamaged"   value="6" displayLabel="Hardware Damaged"/>
+        <ECEnumerator name="AttachmentLoose"   value="7" displayLabel="Attachment Loose"/>
+        <ECEnumerator name="Other"             value="8" displayLabel="Other"/>
+    </ECEnumeration>
+
+    <!-- isStrict=true: matches UPM Literal["info","warning","error","critical"]
+         on ClearanceFinding.severity. -->
+    <ECEnumeration typeName="FindingSeverity" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="Info"     value="0" displayLabel="Info"/>
+        <ECEnumerator name="Warning"  value="1" displayLabel="Warning"/>
+        <ECEnumerator name="Error"    value="2" displayLabel="Error"/>
+        <ECEnumerator name="Critical" value="3" displayLabel="Critical"/>
+    </ECEnumeration>
+
+    <!-- isStrict=true: matches UPM Literal["vertical","horizontal","radial","unknown"]
+         on ClearanceRelationship.dimension. -->
+    <ECEnumeration typeName="ClearanceDimension" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="Vertical"   value="0" displayLabel="Vertical"/>
+        <ECEnumerator name="Horizontal" value="1" displayLabel="Horizontal"/>
+        <ECEnumerator name="Radial"     value="2" displayLabel="Radial"/>
+        <ECEnumerator name="Unknown"    value="3" displayLabel="Unknown"/>
+    </ECEnumeration>
+
+    <!-- isStrict=true: same value set as FindingSeverity, kept separate for
+         schema clarity (clearance vs. inspection finding contexts differ). -->
+    <ECEnumeration typeName="ClearanceSeverity" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="Info"     value="0" displayLabel="Info"/>
+        <ECEnumerator name="Warning"  value="1" displayLabel="Warning"/>
+        <ECEnumerator name="Error"    value="2" displayLabel="Error"/>
+        <ECEnumerator name="Critical" value="3" displayLabel="Critical"/>
+    </ECEnumeration>
+
+    <!-- isStrict=false: Custom and RUS1724E200 may expand; NESC/GO95 are stable. -->
+    <ECEnumeration typeName="AnalysisCode" backingTypeName="int" isStrict="false"
+        description="Structural loading code applied in an analysis. Orthogonal to grade and district.">
+        <ECEnumerator name="NESC"        value="0" displayLabel="NESC"/>
+        <ECEnumerator name="GO95"        value="1" displayLabel="GO 95"/>
+        <ECEnumerator name="RUS1724E200" value="2" displayLabel="RUS Bulletin 1724E-200"/>
+        <ECEnumerator name="Custom"      value="3" displayLabel="Custom"/>
+    </ECEnumeration>
+
+    <!-- isStrict=true: UPM NescGrade = Literal["B","C","C_WITH_CROSSINGS","N"]
+         from domain/loading/grades.py. -->
+    <ECEnumeration typeName="NescGrade" backingTypeName="int" isStrict="true"
+        description="NESC construction grade. Orthogonal to AnalysisCode and NescDistrict.">
+        <ECEnumerator name="B"               value="0" displayLabel="Grade B"/>
+        <ECEnumerator name="C"               value="1" displayLabel="Grade C"/>
+        <ECEnumerator name="C_WITH_CROSSINGS" value="2" displayLabel="Grade C with Crossings"/>
+        <ECEnumerator name="N"               value="3" displayLabel="Grade N"/>
+    </ECEnumeration>
+
+    <!-- isStrict=true: UPM GO95Grade = Literal["A","B","C","F"]
+         from domain/loading/grades.py. -->
+    <ECEnumeration typeName="GO95Grade" backingTypeName="int" isStrict="true"
+        description="GO 95 construction grade. Orthogonal to AnalysisCode and GO95Zone.">
+        <ECEnumerator name="A" value="0" displayLabel="Grade A"/>
+        <ECEnumerator name="B" value="1" displayLabel="Grade B"/>
+        <ECEnumerator name="C" value="2" displayLabel="Grade C"/>
+        <ECEnumerator name="F" value="3" displayLabel="Grade F"/>
+    </ECEnumeration>
+
+    <!-- isStrict=true: UPM NescDistrict from domain/loading/zones.py. -->
+    <ECEnumeration typeName="NescDistrict" backingTypeName="int" isStrict="true"
+        description="NESC Rule 250B geographic loading district.">
+        <ECEnumerator name="Heavy"                   value="0" displayLabel="Heavy"/>
+        <ECEnumerator name="Medium"                  value="1" displayLabel="Medium"/>
+        <ECEnumerator name="Light"                   value="2" displayLabel="Light"/>
+        <ECEnumerator name="WarmIslandUnder9000Ft"   value="3" displayLabel="Warm Island Under 9000 ft"/>
+        <ECEnumerator name="WarmIslandOver9000Ft"    value="4" displayLabel="Warm Island Over 9000 ft"/>
+    </ECEnumeration>
+
+    <!-- isStrict=true: UPM GO95Zone = Literal["HEAVY","LIGHT"]
+         from domain/loading/zones.py. -->
+    <ECEnumeration typeName="GO95Zone" backingTypeName="int" isStrict="true"
+        description="GO 95 Rule 43 elevation-based loading zone.">
+        <ECEnumerator name="Heavy" value="0" displayLabel="Heavy"/>
+        <ECEnumerator name="Light" value="1" displayLabel="Light"/>
+    </ECEnumeration>
+
+    <!-- isStrict=true: UPM InstallType = Literal["install","replacement"] in grades.py.
+         load_case_builder.py uses "NEW"/"REPLACEMENT" — connector maps both vocabularies:
+         "install" | "NEW" -> Install; "replacement" | "REPLACEMENT" -> Replacement. -->
+    <ECEnumeration typeName="ConstructionType" backingTypeName="int" isStrict="true"
+        description="Whether the analysis is for a new installation or a replacement pole.">
+        <ECEnumerator name="Install"     value="0" displayLabel="New Installation"/>
+        <ECEnumerator name="Replacement" value="1" displayLabel="Replacement"/>
+    </ECEnumeration>
+
+    <!-- isStrict=true: UPM TransformerNameplate.cooling_class
+         Literal["ONAN","ONAF","ODAF"]. -->
+    <ECEnumeration typeName="TransformerCoolingClass" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="ONAN" value="0" displayLabel="ONAN"/>
+        <ECEnumerator name="ONAF" value="1" displayLabel="ONAF"/>
+        <ECEnumerator name="ODAF" value="2" displayLabel="ODAF"/>
+    </ECEnumeration>
+
+    <!-- isStrict=true: UPM TransformerNameplate.phase_config
+         Literal["single_phase","three_phase"]. -->
+    <ECEnumeration typeName="TransformerPhaseConfig" backingTypeName="int" isStrict="true">
+        <ECEnumerator name="SinglePhase" value="0" displayLabel="Single Phase"/>
+        <ECEnumerator name="ThreePhase"  value="1" displayLabel="Three Phase"/>
+    </ECEnumeration>
+
+    <!-- isStrict=false: UPM Equipment.equipment_type is freeform; union across
+         SPIDA, OCalc, PLS-POLE adapters. Connector maps adapter strings to this enum. -->
+    <ECEnumeration typeName="EquipmentType" backingTypeName="int" isStrict="false"
+        description="Classification of pole-mounted equipment other than distribution transformers.">
+        <ECEnumerator name="Transformer"       value="0"  displayLabel="Transformer"/>
+        <ECEnumerator name="StreetLight"       value="1"  displayLabel="Street Light"/>
+        <ECEnumerator name="CutoutArrestor"    value="2"  displayLabel="Cutout / Arrester"/>
+        <ECEnumerator name="Riser"             value="3"  displayLabel="Riser"/>
+        <ECEnumerator name="TerminationBracket" value="4" displayLabel="Termination Bracket"/>
+        <ECEnumerator name="Capacitor"         value="5"  displayLabel="Capacitor"/>
+        <ECEnumerator name="Regulator"         value="6"  displayLabel="Regulator"/>
+        <ECEnumerator name="Recloser"          value="7"  displayLabel="Recloser"/>
+        <ECEnumerator name="Switch"            value="8"  displayLabel="Switch"/>
+        <ECEnumerator name="Arrester"          value="9"  displayLabel="Arrester"/>
+        <ECEnumerator name="Communication"     value="10" displayLabel="Communication"/>
+        <ECEnumerator name="Catv"              value="11" displayLabel="CATV"/>
+        <ECEnumerator name="Telco"             value="12" displayLabel="Telco"/>
+        <ECEnumerator name="Fiber"             value="13" displayLabel="Fiber"/>
+    </ECEnumeration>
+
+    <!-- isStrict=true: UPM EnvironmentalDesignContext.fire_threat_zone
+         Literal["none","tier_2","tier_3"]. -->
+    <ECEnumeration typeName="FireThreatZone" backingTypeName="int" isStrict="true"
+        description="CPUC fire threat zone classification for a pole location.">
+        <ECEnumerator name="None"  value="0" displayLabel="None"/>
+        <ECEnumerator name="Tier2" value="1" displayLabel="Tier 2"/>
+        <ECEnumerator name="Tier3" value="2" displayLabel="Tier 3"/>
+    </ECEnumeration>
+
+    <!-- ============================================================
+         DEFINITION ELEMENTS
+         ============================================================ -->
+
+    <ECEntityClass typeName="AvianZone" displayLabel="Avian Zone"
+        description="A utility- or regulatory-designated avian protection zone. Poles reference zones via edist:PoleIsInAvianZone (many-to-many). Connector upserts by ZoneId then inserts one relationship per entry in AvianContext.in_avian_zones.">
+        <BaseClass>bis:DefinitionElement</BaseClass>
+        <ECProperty propertyName="ZoneId"    typeName="string" displayLabel="Zone ID"   description="Utility or regulatory zone identifier (e.g. PGE_AVIAN_ZONE_5)"/>
+        <ECProperty propertyName="ZoneName"  typeName="string" displayLabel="Zone Name"/>
+        <ECProperty propertyName="Authority" typeName="string" displayLabel="Authority"  description="Designating body (e.g. PGE, CPUC)"/>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="LoadCaseDefinition" displayLabel="Load Case Definition"
+        description="Reusable loading code configuration. One definition per NESC/GO95 grade+district+construction combination. Referenced by PoleLoadingResult.LoadCaseId.">
+        <BaseClass>bis:DefinitionElement</BaseClass>
+        <ECProperty propertyName="AnalysisCode"          typeName="AnalysisCode"    displayLabel="Analysis Code"/>
+        <ECProperty propertyName="NescGrade"             typeName="NescGrade"       displayLabel="NESC Grade"            description="Null when AnalysisCode is GO95"/>
+        <ECProperty propertyName="GO95Grade"             typeName="GO95Grade"       displayLabel="GO 95 Grade"           description="Null when AnalysisCode is NESC"/>
+        <ECProperty propertyName="NescDistrict"          typeName="NescDistrict"    displayLabel="NESC Loading District" description="Null when AnalysisCode is GO95"/>
+        <ECProperty propertyName="GO95Zone"              typeName="GO95Zone"        displayLabel="GO 95 Loading Zone"    description="Null when AnalysisCode is NESC"/>
+        <ECProperty propertyName="ConstructionType"      typeName="ConstructionType" displayLabel="Construction Type"/>
+        <ECProperty propertyName="NescRevision"          typeName="string"          displayLabel="NESC Revision"         description="e.g. NESC 2023, NESC 2012-2017"/>
+        <ECProperty propertyName="GO95Revision"          typeName="string"          displayLabel="GO 95 Revision"        description="e.g. GO95 01-2020"/>
+        <ECProperty propertyName="WindSpeed"             typeName="double" kindOfQuantity="AECU:VELOCITY"    displayLabel="Wind Speed"    description="Design wind speed at conductor height"/>
+        <ECProperty propertyName="IceThickness"          typeName="double" kindOfQuantity="AECU:LENGTH_SHORT" displayLabel="Ice Thickness" description="Radial ice accretion"/>
+        <ECProperty propertyName="WindOnIce"             typeName="boolean"         displayLabel="Wind on Ice"/>
+        <ECProperty propertyName="TemperatureLow"        typeName="double" kindOfQuantity="AECU:TEMPERATURE" displayLabel="Low Temperature"/>
+        <ECProperty propertyName="TemperatureHigh"       typeName="double" kindOfQuantity="AECU:TEMPERATURE" displayLabel="High Temperature"/>
+        <ECProperty propertyName="OverloadCapacityFactor" typeName="double"         displayLabel="Overload Capacity Factor" description="Dimensionless factor applied to allowable stress"/>
+        <ECProperty propertyName="WindLoadFactor"        typeName="double"          displayLabel="Wind Load Factor"         description="LRFD wind load factor; dimensionless"/>
+        <ECProperty propertyName="Description"           typeName="string"          displayLabel="Description"/>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="ClearanceRequirement" displayLabel="Clearance Requirement"
+        description="Reusable clearance rule profile definition. Referenced by ClearanceCheck.ProfileRef.">
+        <BaseClass>bis:DefinitionElement</BaseClass>
+        <ECProperty propertyName="RuleProfile"       typeName="string"      displayLabel="Rule Profile"    description="e.g. CPUC_GO95, NESC_2023"/>
+        <ECProperty propertyName="RuleVersion"       typeName="string"      displayLabel="Rule Version"    description="e.g. 01-2020"/>
+        <ECProperty propertyName="TableId"           typeName="string"      displayLabel="Table ID"        description="e.g. Table 1, Table 232-1"/>
+        <ECProperty propertyName="ApplicableCode"    typeName="AnalysisCode" displayLabel="Applicable Code"/>
+        <ECProperty propertyName="StandardSection"   typeName="string"      displayLabel="Standard Section" description="e.g. NESC Rule 232"/>
+        <ECProperty propertyName="RequiredClearance" typeName="double" kindOfQuantity="AECU:LENGTH" displayLabel="Required Clearance"/>
+        <ECProperty propertyName="ConditionClass"    typeName="string"      displayLabel="Condition Class"  description="Normal, Loaded, or Extreme"/>
+    </ECEntityClass>
+
+    <!-- ============================================================
+         PHYSICAL TYPES
+         ============================================================ -->
+
+    <ECEntityClass typeName="DistributionPoleType" displayLabel="Distribution Pole Type"
+        description="Catalog/specification record for a class of distribution pole (species, class, height). Shared across multiple DistributionPole instances via DistributionPoleIsOfType.">
+        <BaseClass>bis:PhysicalType</BaseClass>
+        <ECProperty propertyName="PoleClass"                    typeName="string"       displayLabel="Pole Class"                    description="ANSI/NESC class (1, 2, H1, H2, etc.)"/>
+        <ECProperty propertyName="ManufacturedHeight"           typeName="double" kindOfQuantity="AECU:LENGTH"       displayLabel="Manufactured Height"           description="Nominal pole length; UPM PoleGeometry.manufactured_height"/>
+        <ECProperty propertyName="PoleMaterial"                 typeName="PoleMaterial" displayLabel="Pole Material"                 description="Inferred from UPM PoleGeometry.pole_species"/>
+        <ECProperty propertyName="PoleSpecies"                  typeName="string"       displayLabel="Pole Species"                  description="Freeform (WRC, DF, SYP, GL, Steel, Concrete)"/>
+        <ECProperty propertyName="NominalGroundlineStrength"    typeName="double" kindOfQuantity="AECU:MOMENT"       displayLabel="Nominal Groundline Strength"    description="ANSI O5.1 tabulated groundline bending strength"/>
+        <ECProperty propertyName="NominalTipCircumference"      typeName="double" kindOfQuantity="AECU:LENGTH_SHORT" displayLabel="Nominal Tip Circumference"      description="UPM PoleGeometry.pole_top_circumference"/>
+        <ECProperty propertyName="NominalGroundlineCircumference" typeName="double" kindOfQuantity="AECU:LENGTH_SHORT" displayLabel="Nominal Groundline Circumference" description="Derived from ANSI O5.1 class+height+species table"/>
+        <ECProperty propertyName="TreatmentType"                typeName="string"       displayLabel="Treatment Type"                description="Preservative treatment (CCA, Penta, copper_naphthenate)"/>
+    </ECEntityClass>
+
+    <!-- ============================================================
+         PHYSICAL ELEMENTS
+         ============================================================ -->
+
+    <ECEntityClass typeName="DistributionPole" displayLabel="Distribution Pole"
+        description="A placed overhead distribution pole instance. Implements IDistributionElement (structural participant in the distribution system, not a flow element).">
+        <BaseClass>bis:PhysicalElement</BaseClass>
+        <BaseClass>dsys:IDistributionElement</BaseClass>
+        <ECProperty propertyName="InstallDate"           typeName="dateTime"           displayLabel="Install Date"           description="Not in UPM; sourced from utility GIS"/>
+        <ECProperty propertyName="SetDepth"              typeName="double" kindOfQuantity="AECU:LENGTH"       displayLabel="Set Depth"              description="UPM PoleGeometry.set_depth"/>
+        <ECProperty propertyName="GroundlineCircumference" typeName="double" kindOfQuantity="AECU:LENGTH_SHORT" displayLabel="Groundline Circumference" description="Measured; UPM PoleGeometry.ground_line_circumference"/>
+        <ECProperty propertyName="PoleTipCircumference"  typeName="double" kindOfQuantity="AECU:LENGTH_SHORT" displayLabel="Pole Tip Circumference"  description="Measured; UPM PoleGeometry.pole_top_circumference"/>
+        <ECProperty propertyName="Elevation"             typeName="double" kindOfQuantity="AECU:LENGTH"       displayLabel="Elevation"              description="WGS84 ellipsoid elevation; UPM PoleGeometry.elevation_m"/>
+        <ECProperty propertyName="HeadingDegrees"        typeName="double" kindOfQuantity="AECU:ANGLE"        displayLabel="Heading"                description="Compass bearing (0=N, 90=E); UPM PoleGeometry.heading_deg"/>
+        <ECProperty propertyName="GpsAccuracyMeters"     typeName="double" kindOfQuantity="AECU:LENGTH"       displayLabel="GPS Accuracy"           description="GPS horizontal uncertainty; UPM PoleGeometry.gps_accuracy_m"/>
+        <ECProperty propertyName="ConditionRating"       typeName="PoleConditionRating" displayLabel="Condition Rating"      description="Not a direct UPM field; derived from inspection verdict"/>
+        <ECProperty propertyName="MapNumber"             typeName="string"              displayLabel="Map Number"            description="Utility GIS map label; UPM PoleIdentity.pole_id"/>
+        <ECProperty propertyName="StructureNumber"       typeName="string"              displayLabel="Structure Number"      description="Utility asset ID; UPM PoleIdentity.structure_id"/>
+        <ECProperty propertyName="StructureName"         typeName="string"              displayLabel="Structure Name"        description="UPM PoleIdentity.structure_name"/>
+        <ECProperty propertyName="PoleOwner"             typeName="string"              displayLabel="Pole Owner"            description="Owner of record; not in UPM — sourced from GIS"/>
+        <ECProperty propertyName="JointUse"              typeName="boolean"             displayLabel="Joint Use"             description="Whether joint use attachments are present"/>
+        <ECProperty propertyName="FramingFaultCount"     typeName="int"                 displayLabel="Framing Fault Count"   description="Count of framing fault findings from validate_framing; UPM framing.framing_fault_findings[]"/>
+        <!-- Verdict summary — mirrored from AnalyticalModel for BIC Data Visualization coloring without joining to the analytical model -->
+        <ECProperty propertyName="LoadingStatus"         typeName="string"              displayLabel="Loading Status"        description="PASS / FAIL / MARGINAL; from verdicts.loading.status"/>
+        <ECProperty propertyName="UtilizationRatio"      typeName="double"              displayLabel="Utilization Ratio"     description="Governing utilization ratio (0–1+); from verdicts.loading.percent_used / 100"/>
+        <ECProperty propertyName="ClearanceStatus"       typeName="string"              displayLabel="Clearance Status"      description="PASS / FAIL / MARGINAL; from verdicts.clearance.status"/>
+        <ECProperty propertyName="ClearanceViolationCount" typeName="int"               displayLabel="Clearance Violation Count" description="Total clearance violations; from verdicts.clearance.violation_count"/>
+        <!-- Component-level safety factors — exposes per-component SF breakdown for BIC coloring by failure mode -->
+        <ECProperty propertyName="BendingSafetyFactor"   typeName="double"              displayLabel="Bending Safety Factor"    description="Computed bending SF; from verdicts.loading.bending_sf"/>
+        <ECProperty propertyName="BendingRequiredSF"     typeName="double"              displayLabel="Bending Required SF"      description="Code-required bending SF; from verdicts.loading.bending_req_sf"/>
+        <ECProperty propertyName="BucklingSafetyFactor"  typeName="double"              displayLabel="Buckling Safety Factor"   description="Computed buckling SF; from verdicts.loading.buckling_sf"/>
+        <ECProperty propertyName="BucklingRequiredSF"    typeName="double"              displayLabel="Buckling Required SF"     description="Code-required buckling SF; from verdicts.loading.buckling_req_sf"/>
+        <ECProperty propertyName="FoundationSafetyFactor" typeName="double"             displayLabel="Foundation Safety Factor" description="Computed foundation overturning SF; from verdicts.loading.foundation_sf"/>
+        <ECProperty propertyName="FoundationRequiredSF"  typeName="double"              displayLabel="Foundation Required SF"   description="Code-required foundation SF; from verdicts.loading.foundation_req_sf"/>
+        <ECProperty propertyName="GoverningComponent"    typeName="string"              displayLabel="Governing Component"      description="Failure mode with lowest SF margin; from verdicts.loading.worst_component"/>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="PoleAttachment" modifier="Abstract" displayLabel="Pole Attachment"
+        description="Abstract base for all pole-mounted attachment types. Subclasses assembled to DistributionPole via DistributionPoleAssemblesAttachments.">
+        <BaseClass>bis:PhysicalElement</BaseClass>
+        <ECProperty propertyName="AttachmentHeight" typeName="double" kindOfQuantity="AECU:LENGTH" displayLabel="Attachment Height" description="Height above grade; UPM attachment_height.value_si converted"/>
+        <ECProperty propertyName="DirectionDegrees" typeName="double" kindOfQuantity="AECU:ANGLE"  displayLabel="Direction"         description="Compass bearing (0=N, 90=E); UPM direction_deg"/>
+        <ECProperty propertyName="InstallDate"      typeName="dateTime"                            displayLabel="Install Date"      description="Not in UPM; sourced from GIS"/>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="Crossarm" displayLabel="Crossarm"
+        description="A crossarm mounted on a distribution pole. Insulators are assembled as children via PhysicalElementAssemblesElements; Insulator.CrossarmId preserves the UPM crossarm_id for external reference.">
+        <BaseClass>PoleAttachment</BaseClass>
+        <ECProperty propertyName="CrossarmType" typeName="string"       displayLabel="Crossarm Type" description="Freeform; e.g. Wood - 8 ft Double; UPM Crossarm.crossarm_type"/>
+        <ECProperty propertyName="Offset"       typeName="double" kindOfQuantity="AECU:LENGTH" displayLabel="Offset"       description="Horizontal distance from pole center; UPM Crossarm.offset"/>
+        <ECProperty propertyName="ArmSide"      typeName="CrossarmSide" displayLabel="Arm Side"    description="UPM Crossarm.side / FramingBreakdown.crossarm_structure"/>
+        <ECProperty propertyName="ArmLength"    typeName="double" kindOfQuantity="AECU:LENGTH" displayLabel="Arm Length"   description="Not a direct UPM field; inferred from span geometry or catalog"/>
+        <ECProperty propertyName="ArmMaterial"  typeName="CrossarmMaterial" displayLabel="Arm Material" description="Not in UPM; inferred from crossarm_type string"/>
+        <ECProperty propertyName="ArmSize"      typeName="string"       displayLabel="Arm Size"     description="e.g. 3.5x4.5; not in UPM"/>
+        <ECProperty propertyName="BraceType"    typeName="string"       displayLabel="Brace Type"   description="None, Single, Double; not in UPM"/>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="Insulator" displayLabel="Insulator"
+        description="An insulator position on a pole or crossarm. Conductor spans attached to this insulator are modeled as standalone OverheadConductor elements.">
+        <BaseClass>PoleAttachment</BaseClass>
+        <ECProperty propertyName="InsulatorType"      typeName="InsulatorType" displayLabel="Insulator Type"    description="UPM Insulator.insulator_type; freeform mapped to enum"/>
+        <ECProperty propertyName="CrossarmId"         typeName="string"        displayLabel="Crossarm ID"       description="External reference to parent crossarm; null for pole-mounted; UPM Insulator.crossarm_id"/>
+        <ECProperty propertyName="VerticalOffset"     typeName="double" kindOfQuantity="AECU:LENGTH" displayLabel="Vertical Offset"   description="UPM Insulator.vertical_offset"/>
+        <ECProperty propertyName="HorizontalOffset"   typeName="double" kindOfQuantity="AECU:LENGTH" displayLabel="Horizontal Offset" description="UPM Insulator.horizontal_offset"/>
+        <ECProperty propertyName="VoltageRating"      typeName="double" kindOfQuantity="AECU:ELECTRIC_POTENTIAL" displayLabel="Voltage Rating"  description="Not in UPM; sourced from wire catalog"/>
+        <ECProperty propertyName="PhaseDesignation"   typeName="string"        displayLabel="Phase Designation" description="A, B, C, N; not in UPM"/>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="SpanGuy" displayLabel="Span Guy"
+        description="A guy wire running pole-to-pole (not to a ground anchor). SPIDA models these as paired structures sharing ExternalId; each end has one SpanGuy entry.">
+        <BaseClass>PoleAttachment</BaseClass>
+        <ECProperty propertyName="ExternalId" typeName="string" displayLabel="External ID" description="Shared ID across paired poles for renderer reconstruction; UPM SpanGuy.external_id"/>
+        <ECProperty propertyName="Distance"   typeName="double" kindOfQuantity="AECU:LENGTH" displayLabel="Distance"    description="Horizontal wire length; UPM SpanGuy.distance"/>
+        <ECProperty propertyName="GuySize"    typeName="string" displayLabel="Guy Size"    description="Freeform; e.g. 3/8 EHS; UPM SpanGuy.size"/>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="GuyWire" displayLabel="Guy Wire"
+        description="A ground-anchored guy wire attached to a distribution pole. Connected to AnchorAssembly via GuyWireConnectsToAnchor.">
+        <BaseClass>PoleAttachment</BaseClass>
+        <ECProperty propertyName="AnchorId"         typeName="string"    displayLabel="Anchor ID"         description="External reference to connected anchor; UPM Guy.anchor_id"/>
+        <ECProperty propertyName="GuyType"          typeName="string"    displayLabel="Guy Type"          description="Freeform; e.g. Down Guy; UPM Guy.guy_type"/>
+        <ECProperty propertyName="GuySize"          typeName="string"    displayLabel="Guy Size"          description="e.g. 3/8 EHS, 7/16 HS; from Guy.metadata"/>
+        <ECProperty propertyName="GuyGrade"         typeName="GuyGrade"  displayLabel="Guy Grade"         description="From Guy.metadata; promoted from UPM metadata dict"/>
+        <ECProperty propertyName="GuyStrand"        typeName="string"    displayLabel="Guy Strand"        description="e.g. 7x; from Guy.metadata"/>
+        <ECProperty propertyName="LeadDistance"     typeName="double" kindOfQuantity="AECU:LENGTH" displayLabel="Lead Distance"     description="Horizontal distance to anchor; from Guy.metadata"/>
+        <ECProperty propertyName="DownAngle"        typeName="double" kindOfQuantity="AECU:ANGLE"  displayLabel="Down Angle"        description="Angle from horizontal; from Guy.metadata"/>
+        <ECProperty propertyName="PreloadedTension" typeName="double" kindOfQuantity="AECU:FORCE"  displayLabel="Preloaded Tension" description="From Guy.metadata"/>
+        <ECProperty propertyName="AllowableTension" typeName="double" kindOfQuantity="AECU:FORCE"  displayLabel="Allowable Tension" description="From Guy.metadata"/>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="AnchorAssembly" displayLabel="Anchor Assembly"
+        description="A ground-mounted anchor assembly. Associated to the pole via GuyWireConnectsToAnchor but is NOT a PoleAttachment subtype (ground-mounted, not pole-mounted).">
+        <BaseClass>bis:PhysicalElement</BaseClass>
+        <ECProperty propertyName="AnchorType"  typeName="AnchorType" displayLabel="Anchor Type" description="Not in UPM Anchor model; sourced from anchor catalog or metadata"/>
+        <ECProperty propertyName="EmbedDepth"  typeName="double" kindOfQuantity="AECU:LENGTH" displayLabel="Embed Depth" description="Not in UPM Anchor model"/>
+        <ECProperty propertyName="SoilClass"   typeName="string"     displayLabel="Soil Class"  description="For grounding analysis use GroundingConfiguration.SoilClass instead"/>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="OverheadConductor" displayLabel="Overhead Conductor"
+        description="A conductor span between two poles. Modeled as a standalone element (not nested under Insulator as in UPM). Populated from UPM Insulator.spans; each Span becomes one OverheadConductor.">
+        <BaseClass>bis:PhysicalElement</BaseClass>
+        <BaseClass>dsys:IDistributionFlowElement</BaseClass>
+        <ECProperty propertyName="WireId"               typeName="string"             displayLabel="Wire ID"               description="Wire label (e.g. Phase A, Neutral N); UPM Span.wire_id"/>
+        <ECProperty propertyName="FeederId"             typeName="string"             displayLabel="Feeder ID"             description="Feeder/project scope prefix used for conductor cross-pole stitching (e.g. project_line_one); separates the namespace prefix from WireId"/>
+        <ECProperty propertyName="WireCode"             typeName="string"             displayLabel="Wire Code"             description="Conductor size label (e.g. ACSR 336, 2/0 ACSR); UPM Span.size"/>
+        <ECProperty propertyName="ConductorUsageGroup"  typeName="ConductorUsageGroup" displayLabel="Conductor Usage Group" description="UPM Attachment.attachment_type or span metadata"/>
+        <ECProperty propertyName="NominalVoltage"       typeName="double" kindOfQuantity="AECU:ELECTRIC_POTENTIAL" displayLabel="Nominal Voltage"       description="UPM Attachment.voltage_v"/>
+        <ECProperty propertyName="SpanLength"           typeName="double" kindOfQuantity="AECU:LENGTH" displayLabel="Span Length"           description="Horizontal span length; UPM Span.length"/>
+        <ECProperty propertyName="AttachmentHeightNear" typeName="double" kindOfQuantity="AECU:LENGTH" displayLabel="Attachment Height (Near)" description="Height at near pole from parent Insulator.attachment_height"/>
+        <ECProperty propertyName="AttachmentHeightFar"  typeName="double" kindOfQuantity="AECU:LENGTH" displayLabel="Attachment Height (Far)"  description="Height at far-pole insulator"/>
+        <ECProperty propertyName="RotationDegrees"      typeName="double" kindOfQuantity="AECU:ANGLE"  displayLabel="Rotation"              description="Compass bearing from near pole; UPM Span.rotation_deg"/>
+        <ECProperty propertyName="EndpointType"         typeName="string"             displayLabel="Endpoint Type"         description="PREVIOUS_POLE, OTHER_POLE, etc.; UPM Span.endpoint_type"/>
+        <ECProperty propertyName="IsInsulated"          typeName="boolean"            displayLabel="Is Insulated"          description="Not in UPM"/>
+        <ECProperty propertyName="CoverType"            typeName="string"             displayLabel="Cover Type"            description="Tree wire, bare, spacer; not in UPM"/>
+        <ECProperty propertyName="TensionGroup"         typeName="string"             displayLabel="Tension Group"         description="full or slack; UPM Span.metadata.tension_type"/>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="DistributionTransformer" displayLabel="Distribution Transformer"
+        description="A distribution transformer mounted on a pole. Implements IDistributionFlowElement as it directly facilitates power distribution.">
+        <BaseClass>PoleAttachment</BaseClass>
+        <BaseClass>dsys:IDistributionFlowElement</BaseClass>
+        <ECProperty propertyName="RatedKva"               typeName="double" kindOfQuantity="AECU:POWER"            displayLabel="Rated kVA"               description="UPM TransformerNameplate.rated_kva; stored as W"/>
+        <ECProperty propertyName="CoolingClass"           typeName="TransformerCoolingClass"                       displayLabel="Cooling Class"           description="UPM TransformerNameplate.cooling_class"/>
+        <ECProperty propertyName="PrimaryVoltageKv"       typeName="double" kindOfQuantity="AECU:ELECTRIC_POTENTIAL" displayLabel="Primary Voltage"         description="UPM TransformerNameplate.primary_voltage_kv; stored as V"/>
+        <ECProperty propertyName="SecondaryVoltageV"      typeName="double" kindOfQuantity="AECU:ELECTRIC_POTENTIAL" displayLabel="Secondary Voltage"       description="UPM TransformerNameplate.secondary_voltage_v; stored as V"/>
+        <ECProperty propertyName="PhaseConfig"            typeName="TransformerPhaseConfig"                        displayLabel="Phase Configuration"     description="UPM TransformerNameplate.phase_config"/>
+        <ECProperty propertyName="ConnectionType"         typeName="string"                                        displayLabel="Connection Type"         description="Freeform; e.g. Delta-Wye; UPM TransformerNameplate.connection_type"/>
+        <ECProperty propertyName="LossRatioR"             typeName="double"                                        displayLabel="Loss Ratio R"            description="PCC/PNL ratio; IEEE C57.91 thermal model; UPM TransformerNameplate.loss_ratio_R"/>
+        <ECProperty propertyName="ActualLoadKva"          typeName="double" kindOfQuantity="AECU:POWER"            displayLabel="Actual Load kVA"         description="Measured or SCADA load; UPM TransformerNameplate.actual_load_kva; stored as W"/>
+        <ECProperty propertyName="RatedTopOilRiseC"       typeName="double" kindOfQuantity="AECU:TEMPERATURE"      displayLabel="Rated Top Oil Rise"      description="IEEE C57.91 thermal parameter; UPM TransformerNameplate.rated_top_oil_rise_c; stored as K"/>
+        <ECProperty propertyName="RatedHottestSpotRiseC"  typeName="double" kindOfQuantity="AECU:TEMPERATURE"      displayLabel="Rated Hottest Spot Rise" description="IEEE C57.91 thermal parameter; UPM TransformerNameplate.rated_hottest_spot_rise_c; stored as K"/>
+        <ECProperty propertyName="EquipmentSize"          typeName="string"                                        displayLabel="Equipment Size"          description="Freeform size label; UPM Equipment.equipment_size"/>
+        <ECProperty propertyName="BottomHeight"           typeName="double" kindOfQuantity="AECU:LENGTH"           displayLabel="Bottom Height"           description="Lower edge height above grade; UPM Equipment.bottom_height"/>
+        <ECProperty propertyName="SerialNumber"           typeName="string"                                        displayLabel="Serial Number"           description="Not in UPM"/>
+        <ECProperty propertyName="ServiceNetworkId"       typeName="string"                                        displayLabel="Service Network ID"      description="Interim placeholder for UPM ServiceNetworkRef.network_id. Upgrade to a relationship when the Universal Service Model BIS schema is available."/>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="PoleEquipment" displayLabel="Pole Equipment"
+        description="General pole-mounted equipment other than distribution transformers (street lights, capacitors, regulators, reclosers, switches, cutouts, arresters, risers, communication equipment).">
+        <BaseClass>PoleAttachment</BaseClass>
+        <ECProperty propertyName="EquipmentType" typeName="EquipmentType" displayLabel="Equipment Type" description="UPM Equipment.equipment_type; freeform mapped to enum"/>
+        <ECProperty propertyName="EquipmentSize" typeName="string"        displayLabel="Equipment Size" description="UPM Equipment.equipment_size"/>
+        <ECProperty propertyName="BottomHeight"  typeName="double" kindOfQuantity="AECU:LENGTH" displayLabel="Bottom Height" description="Lower edge height above grade; UPM Equipment.bottom_height"/>
+    </ECEntityClass>
+
+    <!-- ============================================================
+         ANALYTICAL ELEMENTS
+         ============================================================ -->
+
+    <ECEntityClass typeName="PoleLoadingAnalysis" displayLabel="Pole Loading Analysis"
+        description="One structural analysis run for a distribution pole. Lives in an AnalyticalModel. Per-load-case results are PoleLoadingResult aspects. BIS-only: no UPM dataclass counterpart.">
+        <BaseClass>anlyt:AnalyticalElement</BaseClass>
+        <ECProperty propertyName="AnalysisDate"              typeName="dateTime" displayLabel="Analysis Date"/>
+        <ECProperty propertyName="AnalysisSoftware"          typeName="string"   displayLabel="Analysis Software"         description="SPIDAcalc, O-Calc Pro, PLS-POLE, EPC Studio"/>
+        <ECProperty propertyName="AnalysisSoftwareVersion"   typeName="string"   displayLabel="Analysis Software Version"/>
+        <ECProperty propertyName="OverallPassFail"           typeName="boolean"  displayLabel="Overall Pass/Fail"         description="True = all load cases pass"/>
+        <ECProperty propertyName="GoverningUtilizationRatio" typeName="double"   displayLabel="Governing Utilization Ratio" description="Highest ratio across all load cases; dimensionless"/>
+        <ECProperty propertyName="GoverningLoadCase"         typeName="string"   displayLabel="Governing Load Case"       description="Name of governing load case"/>
+        <ECProperty propertyName="GoverningLoadComponent"    typeName="string"   displayLabel="Governing Load Component"  description="Wire tension, wind, vertical, etc."/>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="ClearanceCheck" displayLabel="Clearance Check"
+        description="An attachment-pair clearance analysis for a distribution pole. Lives in an AnalyticalModel. One per attachment pair per analysis run.">
+        <BaseClass>anlyt:AnalyticalElement</BaseClass>
+        <ECProperty propertyName="CheckDate"             typeName="dateTime"         displayLabel="Check Date"/>
+        <ECProperty propertyName="ProfileRef"            typeName="string"           displayLabel="Profile Reference"    description="Rule set applied; UPM ClearanceCheck.profile.rule_profile"/>
+        <ECProperty propertyName="TableId"               typeName="string"           displayLabel="Table ID"             description="Table 1, Table 2, Table 232-1, etc.; UPM ClearanceCheck.table_id"/>
+        <ECProperty propertyName="ClearanceTypeId"       typeName="int"              displayLabel="Clearance Type ID"    description="Numeric clearance type from rule table; UPM ClearanceCheck.clearance_type_id"/>
+        <ECProperty propertyName="Dimension"             typeName="ClearanceDimension" displayLabel="Dimension"          description="UPM ClearanceRelationship.dimension"/>
+        <ECProperty propertyName="SameSupport"           typeName="boolean"          displayLabel="Same Support"         description="Subject and object on same pole; UPM ClearanceRelationship.same_support"/>
+        <ECProperty propertyName="SubjectAttachmentId"   typeName="string"           displayLabel="Subject Attachment ID" description="UPM ClearanceRelationship.subject_attachment_id"/>
+        <ECProperty propertyName="ObjectAttachmentId"    typeName="string"           displayLabel="Object Attachment ID"  description="UPM ClearanceRelationship.object_attachment_id"/>
+        <ECProperty propertyName="SubjectVoltageV"       typeName="double" kindOfQuantity="AECU:ELECTRIC_POTENTIAL" displayLabel="Subject Voltage"    description="UPM ClearanceCheck.subject_voltage_v; stored as V"/>
+        <ECProperty propertyName="ObjectVoltageV"        typeName="double" kindOfQuantity="AECU:ELECTRIC_POTENTIAL" displayLabel="Object Voltage"     description="UPM ClearanceCheck.object_voltage_v; stored as V"/>
+        <ECProperty propertyName="RequiredClearance"     typeName="double" kindOfQuantity="AECU:LENGTH" displayLabel="Required Clearance"   description="UPM ClearanceCheck.required.value_si"/>
+        <ECProperty propertyName="ActualClearance"       typeName="double" kindOfQuantity="AECU:LENGTH" displayLabel="Actual Clearance"     description="UPM ClearanceCheck.actual.value_si"/>
+        <ECProperty propertyName="ClearanceDelta"        typeName="double" kindOfQuantity="AECU:LENGTH" displayLabel="Clearance Delta"      description="Positive = margin, negative = violation; UPM ClearanceCheck.delta"/>
+        <ECProperty propertyName="Passed"                typeName="boolean"          displayLabel="Passed"               description="UPM ClearanceCheck.passed"/>
+        <ECProperty propertyName="Message"               typeName="string"           displayLabel="Message"              description="UPM ClearanceCheck.message"/>
+        <ECProperty propertyName="OverallPassFail"       typeName="boolean"          displayLabel="Overall Pass/Fail"    description="Aggregate result for this check set"/>
+        <ECProperty propertyName="MinimumClearanceFound" typeName="double" kindOfQuantity="AECU:LENGTH" displayLabel="Minimum Clearance Found" description="Worst-case clearance found in this analysis"/>
+    </ECEntityClass>
+
+    <!-- ============================================================
+         INFORMATION ELEMENTS
+         ============================================================ -->
+
+    <ECEntityClass typeName="PoleInspection" displayLabel="Pole Inspection"
+        description="Field inspection record for a distribution pole. Linked to the pole via PoleInspectionInspectsPole. Individual findings are InspectionFinding aspects.">
+        <BaseClass>bis:InformationRecordElement</BaseClass>
+        <ECProperty propertyName="InspectionDate"       typeName="dateTime"        displayLabel="Inspection Date"    description="UPM InspectionSection.last_inspection_date"/>
+        <ECProperty propertyName="Inspector"            typeName="string"          displayLabel="Inspector"          description="UPM InspectionSection.inspector"/>
+        <ECProperty propertyName="InspectionProgram"    typeName="string"          displayLabel="Inspection Program" description="e.g. Annual Pole Test and Treat; UPM InspectionSection.program"/>
+        <ECProperty propertyName="InspectionMethod"     typeName="InspectionMethod" displayLabel="Inspection Method" description="Not a UPM Literal; inferred from program name or defaulted to Boring for PTT records"/>
+        <ECProperty propertyName="PoleTestResult"       typeName="InspectionVerdict" displayLabel="Pole Test Result" description="UPM InspectionSection.pole_test_result"/>
+        <ECProperty propertyName="SoundTestResult"      typeName="string"          displayLabel="Sound Test Result"  description="Freeform; e.g. no_decay, hollow_at_groundline; UPM InspectionSection.sound_test_result"/>
+        <ECProperty propertyName="BoreholeTestResult"   typeName="string"          displayLabel="Borehole Test Result" description="UPM InspectionSection.borehole_test_result"/>
+        <ECProperty propertyName="GroundlineDecayPct"   typeName="double"          displayLabel="Groundline Decay %" description="Percent of original circumference lost to decay; UPM InspectionSection.groundline_decay_pct"/>
+        <ECProperty propertyName="ResidualStrengthPct"  typeName="double"          displayLabel="Residual Strength %" description="Post-decay strength as percent of original; UPM InspectionSection.residual_strength_pct"/>
+        <ECProperty propertyName="ShellThicknessIn"     typeName="double" kindOfQuantity="AECU:LENGTH_SHORT" displayLabel="Shell Thickness"      description="From boring measurement; UPM InspectionSection.shell_thickness_in"/>
+        <ECProperty propertyName="TreatedBool"          typeName="boolean"         displayLabel="Treated"            description="Whether pole has been chemically treated; UPM InspectionSection.treated_bool"/>
+        <ECProperty propertyName="TreatmentType"        typeName="string"          displayLabel="Treatment Type"     description="Freeform; e.g. CCA-C, copper_naphthenate; UPM InspectionSection.treatment_type"/>
+        <ECProperty propertyName="LastTreatmentDate"    typeName="dateTime"        displayLabel="Last Treatment Date" description="UPM InspectionSection.last_treatment_date"/>
+        <ECProperty propertyName="ConditionFactor"      typeName="double"          displayLabel="Condition Factor"   description="(effective_circ/orig_circ)^3 — remaining strength fraction; UPM InspectionRecord.condition_factor"/>
+        <ECProperty propertyName="OrigCircumferenceIn"      typeName="double" kindOfQuantity="AECU:LENGTH_SHORT" displayLabel="Original Circumference"  description="As-installed groundline circumference (capacity baseline); UPM InspectionRecord.orig_circ_in"/>
+        <ECProperty propertyName="CurrentCircumferenceIn"   typeName="double" kindOfQuantity="AECU:LENGTH_SHORT" displayLabel="Current Circumference"   description="Current external measured circumference; UPM InspectionRecord.current_circ_in"/>
+        <ECProperty propertyName="EffectiveCircumferenceIn" typeName="double" kindOfQuantity="AECU:LENGTH_SHORT" displayLabel="Effective Circumference" description="Sound-wood equivalent-solid circumference after decay removal; UPM InspectionRecord.effective_circ_in"/>
+        <ECProperty propertyName="GlShellAvgIn"         typeName="double" kindOfQuantity="AECU:LENGTH_SHORT" displayLabel="GL Shell Average"      description="Groundline shell average from boring; UPM InspectionRecord.gl_shell_avg"/>
+        <ECProperty propertyName="WoodStrengthPct"      typeName="double"          displayLabel="Wood Strength %"    description="Utility-computed percent of original strength remaining; UPM InspectionRecord.wood_strength_pct"/>
+        <ECProperty propertyName="VisualFindings"       typeName="string"          displayLabel="Visual Findings"    description="Freeform narrative; UPM InspectionSection.visual_findings"/>
+        <ECProperty propertyName="Recommendation"       typeName="string"          displayLabel="Recommendation"     description="Freeform; e.g. Re-inspect in 5 yrs, Replace; UPM InspectionSection.recommendation"/>
+        <ECProperty propertyName="Verdict"              typeName="InspectionVerdict" displayLabel="Verdict"          description="UPM InspectionSection.verdict"/>
+        <ECProperty propertyName="InspectionStandard"   typeName="string"          displayLabel="Inspection Standard" description="ANSI O5.1, RUS, Utility custom; not in UPM"/>
+        <ECProperty propertyName="NextInspectionDate"   typeName="dateTime"        displayLabel="Next Inspection Date" description="Not in UPM"/>
+        <ECProperty propertyName="Notes"                typeName="string"          displayLabel="Notes"              description="Supplemental notes; not in UPM"/>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="ClearanceViolation" displayLabel="Clearance Violation"
+        description="A recorded clearance violation finding. One per violation identified in a clearance analysis.">
+        <BaseClass>bis:InformationRecordElement</BaseClass>
+        <ECProperty propertyName="Severity"           typeName="ClearanceSeverity" displayLabel="Severity"           description="UPM ClearanceFinding.severity"/>
+        <ECProperty propertyName="Category"           typeName="string"            displayLabel="Category"           description="UPM ClearanceFinding.category"/>
+        <ECProperty propertyName="RequiredClearance"  typeName="double" kindOfQuantity="AECU:LENGTH" displayLabel="Required Clearance"/>
+        <ECProperty propertyName="ActualClearance"    typeName="double" kindOfQuantity="AECU:LENGTH" displayLabel="Actual Clearance"/>
+        <ECProperty propertyName="DeficiencyAmount"   typeName="double" kindOfQuantity="AECU:LENGTH" displayLabel="Deficiency Amount" description="Negative = violation magnitude; UPM ClearanceCheck.delta"/>
+        <ECProperty propertyName="LocationDescription" typeName="string"           displayLabel="Location Description"/>
+        <ECProperty propertyName="StandardSection"    typeName="string"            displayLabel="Standard Section"/>
+    </ECEntityClass>
+
+    <!-- ============================================================
+         ELEMENT ASPECTS — UNIQUE (one per host element)
+         ============================================================ -->
+
+    <ECEntityClass typeName="GroundingConfiguration" displayLabel="Grounding Configuration"
+        description="Per-pole grounding rod configuration for IEEE 142 resistance calculation. One per DistributionPole.">
+        <BaseClass>bis:ElementUniqueAspect</BaseClass>
+        <ECProperty propertyName="RodCount"              typeName="int"    displayLabel="Rod Count"         description="Number of ground rods; UPM Grounding.rod_count"/>
+        <ECProperty propertyName="RodLengthFt"           typeName="double" kindOfQuantity="AECU:LENGTH"       displayLabel="Rod Length"        description="Length per rod; UPM Grounding.rod_length_ft"/>
+        <ECProperty propertyName="RodDiameterIn"         typeName="double" kindOfQuantity="AECU:LENGTH_SHORT" displayLabel="Rod Diameter"      description="Diameter per rod; UPM Grounding.rod_diameter_in"/>
+        <ECProperty propertyName="RodSpacingFt"          typeName="double" kindOfQuantity="AECU:LENGTH"       displayLabel="Rod Spacing"       description="Spacing in multi-rod arrays; UPM Grounding.rod_spacing_ft"/>
+        <ECProperty propertyName="SoilResistivityOhmM"   typeName="double" kindOfQuantity="EDIST_RESISTIVITY" displayLabel="Soil Resistivity"  description="Soil resistivity in ohm-metres; UPM Grounding.soil_resistivity_ohm_m"/>
+        <ECProperty propertyName="SoilClass"             typeName="string"  displayLabel="Soil Class"        description="Freeform soil classification; UPM Grounding.soil_class"/>
+        <ECProperty propertyName="MeasuredResistanceOhm" typeName="double" kindOfQuantity="EDIST_RESISTANCE"  displayLabel="Measured Resistance" description="Fall-of-potential test result; overrides analytical estimate; UPM Grounding.measured_resistance_ohm"/>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="EnvironmentalDesignContext" displayLabel="Environmental Design Context"
+        description="Per-pole design environmental conditions for IEEE 738 ampacity, IEEE C57.91 transformer thermal, and sag-tension analyses. One per DistributionPole.">
+        <BaseClass>bis:ElementUniqueAspect</BaseClass>
+        <ECProperty propertyName="AmbientTempDesignF" typeName="double" kindOfQuantity="AECU:TEMPERATURE" displayLabel="Design Ambient Temperature" description="Design ambient temperature for IEEE 738; UPM EnvironmentalDesignContext.ambient_temp_design_f; stored as K"/>
+        <ECProperty propertyName="WindDesignFps"      typeName="double" kindOfQuantity="AECU:VELOCITY"    displayLabel="Design Wind Speed"         description="Design wind speed for IEEE 738; UPM EnvironmentalDesignContext.wind_design_fps; stored as m/s"/>
+        <ECProperty propertyName="SolarFluxWPerFt2"   typeName="double"                                   displayLabel="Solar Flux (W/ft2)"        description="Solar irradiance for IEEE 738; UPM EnvironmentalDesignContext.solar_flux_w_per_ft2; no standard BIS KOQ for W/ft2"/>
+        <ECProperty propertyName="IceRadialIn"        typeName="double" kindOfQuantity="AECU:LENGTH_SHORT" displayLabel="Radial Ice Accretion"      description="For sag-tension analysis; UPM EnvironmentalDesignContext.ice_radial_in"/>
+        <ECProperty propertyName="FireThreatZone"     typeName="FireThreatZone"                           displayLabel="Fire Threat Zone"          description="UPM EnvironmentalDesignContext.fire_threat_zone Literal[none/tier_2/tier_3]"/>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="VegetationContext" displayLabel="Vegetation Context"
+        description="Per-pole vegetation clearance state from tree-trim survey or LiDAR scan. One per DistributionPole.">
+        <BaseClass>bis:ElementUniqueAspect</BaseClass>
+        <ECProperty propertyName="CurrentClearanceIn"                typeName="double" kindOfQuantity="AECU:LENGTH_SHORT" displayLabel="Current Tree Clearance"           description="Current tree-to-conductor clearance; UPM VegetationContext.current_clearance_in"/>
+        <ECProperty propertyName="VegetationInspectionDate"          typeName="dateTime"                                  displayLabel="Vegetation Inspection Date"        description="Date of last tree-trim survey; UPM VegetationContext.last_inspection_date"/>
+        <ECProperty propertyName="DominantConductorInsulationType"   typeName="string"                                    displayLabel="Dominant Conductor Insulation Type" description="Freeform; e.g. bare, tree_wire; UPM VegetationContext.dominant_conductor_insulation_type"/>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="AvianProtectionContext" displayLabel="Avian Protection Context"
+        description="Per-pole avian mitigation state per IEEE 1656. Zone membership modeled separately via PoleIsInAvianZone. One per DistributionPole.">
+        <BaseClass>bis:ElementUniqueAspect</BaseClass>
+        <ECProperty propertyName="WildlifeCoverPresent"      typeName="boolean"   displayLabel="Wildlife Cover Present"      description="UPM AvianContext.wildlife_cover_present"/>
+        <ECProperty propertyName="BushingCoverPresent"       typeName="boolean"   displayLabel="Bushing Cover Present"       description="UPM AvianContext.bushing_cover_present"/>
+        <ECProperty propertyName="LastAvianInspectionDate"   typeName="dateTime"  displayLabel="Last Avian Inspection Date"  description="UPM AvianContext.last_avian_inspection_date"/>
+        <ECProperty propertyName="AvianRetrofitComplete"     typeName="boolean"   displayLabel="Avian Retrofit Complete"     description="IEEE 1656 retrofit fully installed; UPM AvianContext.avian_retrofit_complete"/>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="ClearanceSummary" displayLabel="Clearance Summary"
+        description="Pole-level rollup of clearance check results. Mirrors UPM ClearanceSummary. One per DistributionPole.">
+        <BaseClass>bis:ElementUniqueAspect</BaseClass>
+        <ECProperty propertyName="Status"         typeName="string" displayLabel="Status"          description="pass, fail, or unknown; UPM ClearanceSummary.status"/>
+        <ECProperty propertyName="TotalIssues"    typeName="int"    displayLabel="Total Issues"    description="UPM ClearanceSummary.total_issues"/>
+        <ECProperty propertyName="Table1Issues"   typeName="int"    displayLabel="Table 1 Issues"  description="Conductor-to-ground/crossing; UPM ClearanceSummary.table_1_issues"/>
+        <ECProperty propertyName="Table2Issues"   typeName="int"    displayLabel="Table 2 Issues"  description="Conductor-to-conductor; UPM ClearanceSummary.table_2_issues"/>
+        <ECProperty propertyName="CriticalIssues" typeName="int"    displayLabel="Critical Issues" description="UPM ClearanceSummary.critical_issues"/>
+        <ECProperty propertyName="MinorIssues"    typeName="int"    displayLabel="Minor Issues"    description="UPM ClearanceSummary.minor_issues"/>
+    </ECEntityClass>
+
+    <!-- ============================================================
+         ELEMENT ASPECTS — MULTI (many per host element)
+         ============================================================ -->
+
+    <ECEntityClass typeName="PoleLoadingResult" displayLabel="Pole Loading Result"
+        description="Per-load-case structural analysis result. Multiple per PoleLoadingAnalysis. BIS-only: populated from SPIDAcalc analysisResults, OCalc per-case output, or PLS-POLE component utilization.">
+        <BaseClass>bis:ElementMultiAspect</BaseClass>
+        <ECProperty propertyName="LoadCaseId"          typeName="string"  displayLabel="Load Case ID"          description="References LoadCaseDefinition CodeValue; UPM load case name"/>
+        <ECProperty propertyName="UtilizationRatio"    typeName="double"  displayLabel="Utilization Ratio"     description="actualRatio / allowedRatio; 0.0-1.0+; dimensionless"/>
+        <ECProperty propertyName="PassFail"            typeName="boolean" displayLabel="Pass/Fail"             description="SPIDA analysisResults.passes"/>
+        <ECProperty propertyName="ActualMoment"        typeName="double" kindOfQuantity="AECU:MOMENT" displayLabel="Actual Moment"        description="Groundline moment from moment-method tools (SPIDAcalc, O-Calc)"/>
+        <ECProperty propertyName="AllowableMoment"     typeName="double" kindOfQuantity="AECU:MOMENT" displayLabel="Allowable Moment"/>
+        <ECProperty propertyName="GoverningComponent"  typeName="string"  displayLabel="Governing Component"   description="Which load direction or component governed (PLS: pole shaft, guy, anchor)"/>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="InspectionFinding" displayLabel="Inspection Finding"
+        description="An individual structural or condition finding from a pole inspection. Multiple per PoleInspection.">
+        <BaseClass>bis:ElementMultiAspect</BaseClass>
+        <ECProperty propertyName="FindingType"    typeName="FindingType"   displayLabel="Finding Type"    description="Not a UPM Literal; derived from visual_findings narrative"/>
+        <ECProperty propertyName="Severity"       typeName="FindingSeverity" displayLabel="Severity"      description="UPM ClearanceFinding.severity pattern"/>
+        <ECProperty propertyName="HeightLocation" typeName="double" kindOfQuantity="AECU:LENGTH" displayLabel="Height Location" description="Height above grade where finding was observed"/>
+        <ECProperty propertyName="Description"    typeName="string"        displayLabel="Description"/>
+        <ECProperty propertyName="PhotoReference" typeName="string"        displayLabel="Photo Reference" description="URI to attached photo"/>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="ConductorSagCondition" displayLabel="Conductor Sag Condition"
+        description="Sag geometry at a specific temperature or load state on one overhead conductor. Multiple per OverheadConductor.">
+        <BaseClass>bis:ElementMultiAspect</BaseClass>
+        <ECProperty propertyName="Condition"                typeName="ConductorSagConditionType" displayLabel="Condition"/>
+        <ECProperty propertyName="Temperature"              typeName="double" kindOfQuantity="AECU:TEMPERATURE" displayLabel="Temperature"               description="Analysis temperature; stored as K"/>
+        <ECProperty propertyName="MidspanSag"               typeName="double" kindOfQuantity="AECU:LENGTH"      displayLabel="Midspan Sag"/>
+        <ECProperty propertyName="HorizontalTension"        typeName="double" kindOfQuantity="AECU:FORCE"       displayLabel="Horizontal Tension"/>
+        <ECProperty propertyName="VerticalClearanceAtMidspan" typeName="double" kindOfQuantity="AECU:LENGTH"    displayLabel="Vertical Clearance at Midspan" description="Clearance to grade at midspan"/>
+    </ECEntityClass>
+
+    <!-- ============================================================
+         RELATIONSHIPS
+         ============================================================ -->
+
+    <!-- Type / instance -->
+    <ECRelationshipClass typeName="DistributionPoleIsOfType" strength="referencing" modifier="None"
+        displayLabel="Distribution Pole Is Of Type"
+        description="Relates a placed DistributionPole instance to its DistributionPoleType catalog record.">
+        <BaseClass>bis:PhysicalElementIsOfType</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="is of type" polymorphic="true">
+            <Class class="DistributionPole"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is type of" polymorphic="true">
+            <Class class="DistributionPoleType"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <!-- Assembly -->
+    <ECRelationshipClass typeName="DistributionPoleAssemblesAttachments" strength="embedding" modifier="None"
+        displayLabel="Distribution Pole Assembles Attachments"
+        description="A distribution pole assembles its directly mounted attachments (crossarms, guys, insulators, equipment). Crossarm-to-Insulator assembly uses the same relationship class at the next hierarchy level.">
+        <BaseClass>bis:PhysicalElementAssemblesElements</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="assembles" polymorphic="true">
+            <Class class="DistributionPole"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is assembled by" polymorphic="true">
+            <Class class="PoleAttachment"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <!-- Analytical: loading analysis → pole.
+         BaseClass is anlyt:AnalyticalSimulatesSpatialElement (the only "analyzes" relationship
+         in the Analytical schema). DistributionPole extends bis:PhysicalElement which extends
+         bis:SpatialElement, so it satisfies the base class target constraint. -->
+    <ECRelationshipClass typeName="PoleLoadingAnalysisAnalyzesPole" strength="referencing" modifier="None"
+        displayLabel="Pole Loading Analysis Analyzes Pole"
+        description="Associates a PoleLoadingAnalysis analytical element to the DistributionPole it simulates/analyzes.">
+        <BaseClass>anlyt:AnalyticalSimulatesSpatialElement</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="analyzes" polymorphic="true">
+            <Class class="PoleLoadingAnalysis"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is analyzed by" polymorphic="true">
+            <Class class="DistributionPole"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <!-- Analytical: clearance check → pole -->
+    <ECRelationshipClass typeName="ClearanceCheckAnalyzesPole" strength="referencing" modifier="None"
+        displayLabel="Clearance Check Analyzes Pole"
+        description="Associates a ClearanceCheck to the DistributionPole whose attachment clearances were checked.">
+        <BaseClass>anlyt:AnalyticalSimulatesSpatialElement</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="analyzes" polymorphic="true">
+            <Class class="ClearanceCheck"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is analyzed by" polymorphic="true">
+            <Class class="DistributionPole"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <!-- Reference: guy wire → anchor -->
+    <ECRelationshipClass typeName="GuyWireConnectsToAnchor" strength="referencing" modifier="None"
+        displayLabel="Guy Wire Connects To Anchor"
+        description="Associates a GuyWire to its AnchorAssembly. UPM Guy.anchor_id is the external reference that the connector resolves to an AnchorAssembly element.">
+        <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="connects to" polymorphic="true">
+            <Class class="GuyWire"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is connected by" polymorphic="true">
+            <Class class="AnchorAssembly"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <!-- Reference: pole → avian zone (many-to-many) -->
+    <ECRelationshipClass typeName="PoleIsInAvianZone" strength="referencing" modifier="None"
+        displayLabel="Pole Is In Avian Zone"
+        description="Many-to-many: a DistributionPole belongs to zero or more AvianZones; a zone contains many poles. Connector inserts one relationship instance per entry in AvianContext.in_avian_zones.">
+        <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="is in zone" polymorphic="true">
+            <Class class="DistributionPole"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="contains pole" polymorphic="true">
+            <Class class="AvianZone"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <!-- Reference: inspection → pole -->
+    <ECRelationshipClass typeName="PoleInspectionInspectsPole" strength="referencing" modifier="None"
+        displayLabel="Pole Inspection Inspects Pole"
+        description="Associates a PoleInspection record to the DistributionPole it documents.">
+        <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="inspects" polymorphic="true">
+            <Class class="PoleInspection"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is inspected by" polymorphic="true">
+            <Class class="DistributionPole"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <!-- Aspect ownership — UniqueAspect relationships -->
+    <ECRelationshipClass typeName="DistributionPoleOwnsGroundingConfiguration" strength="embedding" modifier="None"
+        displayLabel="Distribution Pole Owns Grounding Configuration">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="DistributionPole"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="GroundingConfiguration"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="DistributionPoleOwnsEnvironmentalContext" strength="embedding" modifier="None"
+        displayLabel="Distribution Pole Owns Environmental Design Context">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="DistributionPole"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="EnvironmentalDesignContext"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="DistributionPoleOwnsVegetationContext" strength="embedding" modifier="None"
+        displayLabel="Distribution Pole Owns Vegetation Context">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="DistributionPole"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="VegetationContext"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="DistributionPoleOwnsAvianProtectionContext" strength="embedding" modifier="None"
+        displayLabel="Distribution Pole Owns Avian Protection Context">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="DistributionPole"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="AvianProtectionContext"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="DistributionPoleOwnsClearanceSummary" strength="embedding" modifier="None"
+        displayLabel="Distribution Pole Owns Clearance Summary">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="DistributionPole"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="ClearanceSummary"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <!-- Aspect ownership — MultiAspect relationships -->
+    <ECRelationshipClass typeName="PoleLoadingAnalysisOwnsPoleLoadingResult" strength="embedding" modifier="None"
+        displayLabel="Pole Loading Analysis Owns Pole Loading Result">
+        <BaseClass>bis:ElementOwnsMultiAspects</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="PoleLoadingAnalysis"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="false">
+            <Class class="PoleLoadingResult"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="PoleInspectionOwnsInspectionFinding" strength="embedding" modifier="None"
+        displayLabel="Pole Inspection Owns Inspection Finding">
+        <BaseClass>bis:ElementOwnsMultiAspects</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="PoleInspection"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="false">
+            <Class class="InspectionFinding"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="OverheadConductorOwnsSagCondition" strength="embedding" modifier="None"
+        displayLabel="Overhead Conductor Owns Sag Condition">
+        <BaseClass>bis:ElementOwnsMultiAspects</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="OverheadConductor"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="false">
+            <Class class="ConductorSagCondition"/>
+        </Target>
+    </ECRelationshipClass>
+
+</ECSchema>
