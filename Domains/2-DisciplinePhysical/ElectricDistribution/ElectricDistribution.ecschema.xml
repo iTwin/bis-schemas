@@ -5,16 +5,17 @@
 |  * Target layer: 2-DisciplinePhysical
 |  * See design.md for full design context and UPM mapping decisions.
 |  *
-|  * NOTE: Schema reference versions confirmed against iTwin/bis-schemas as of
-|  * 2026-06-19:
-|  *   BisCore 01.00.15 (required by Analytical 01.00.02)
-|  *   Analytical 01.00.02 (actual schema header)
-|  *   DistributionSystems 01.00.03 (actual schema header)
-|  *   AecUnits 01.00.03 (schema name corrected from AECUnits; confirmed against repo)
-|  *   Units 01.00.06 (minimum released version containing u:OHM_M)
-|  *   Formats 01.00.00 (only released version; required for f: alias in custom KOQs)
-|  *   CoreCustomAttributes 01.00.03 (confirmed)
-|  *   BisCustomAttributes 01.00.00 (confirmed)
+|  * Per iTwin/bis-schemas PR #733 review (Alfredo Contreras): this schema now
+|  * EXTENDS the shared PowerSystemResourcesPhysical (psrp) base instead of
+|  * deriving the physical classes directly from bis:PhysicalElement, so electric
+|  * distribution is a sub-domain of the common power-system schema rather than a
+|  * parallel one. Reference versions aligned to psrp 01.00.02's requirements:
+|  *   BisCore 01.00.25 (psrp requirement)
+|  *   Analytical 01.00.02
+|  *   DistributionSystems 01.00.02 (psrp requirement; 01.00.03 is not released)
+|  *   PowerSystemResourcesPhysical 01.00.02 (NEW — shared power-system base)
+|  *   AecUnits 01.00.03 / Units 01.00.06 / Formats 01.00.00
+|  *   CoreCustomAttributes 01.00.04 (psrp requirement) / BisCustomAttributes 01.00.00
 |  *
 |  * NOTE: u:OHM and u:OHM_M confirmed as valid unit typeNames in System/Units.ecschema.xml.
 |  * anlyt:AnalyticalSimulatesSpatialElement confirmed as the correct "analyzes" relationship.
@@ -27,17 +28,18 @@
     displayLabel="Electric Distribution"
     description="BIS domain schema for overhead electric distribution infrastructure including poles, attachments, conductors, structural analysis, and field inspection.">
 
-    <ECSchemaReference name="BisCore"              version="01.00.15" alias="bis"/>
-    <ECSchemaReference name="Analytical"           version="01.00.02" alias="anlyt"/>
-    <ECSchemaReference name="DistributionSystems"  version="01.00.03" alias="dsys"/>
-    <ECSchemaReference name="AecUnits"             version="01.00.03" alias="AECU"/>
-    <ECSchemaReference name="Units"                version="01.00.06" alias="u"/>
-    <ECSchemaReference name="Formats"              version="01.00.00" alias="f"/>
-    <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
-    <ECSchemaReference name="BisCustomAttributes"  version="01.00.00" alias="bisCA"/>
+    <ECSchemaReference name="BisCore"                     version="01.00.25" alias="bis"/>
+    <ECSchemaReference name="Analytical"                  version="01.00.02" alias="anlyt"/>
+    <ECSchemaReference name="DistributionSystems"         version="01.00.02" alias="dsys"/>
+    <ECSchemaReference name="PowerSystemResourcesPhysical" version="01.00.02" alias="psrp"/>
+    <ECSchemaReference name="AecUnits"                    version="01.00.03" alias="AECU"/>
+    <ECSchemaReference name="Units"                       version="01.00.06" alias="u"/>
+    <ECSchemaReference name="Formats"                     version="01.00.00" alias="f"/>
+    <ECSchemaReference name="CoreCustomAttributes"        version="01.00.04" alias="CoreCA"/>
+    <ECSchemaReference name="BisCustomAttributes"         version="01.00.00" alias="bisCA"/>
 
     <ECCustomAttributes>
-        <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
+        <ProductionStatus xmlns="CoreCustomAttributes.01.00.04">
             <SupportedUse>NotForProduction</SupportedUse>
         </ProductionStatus>
         <SchemaLayerInfo xmlns="BisCustomAttributes.01.00.00">
@@ -368,7 +370,7 @@
 
     <ECEntityClass typeName="DistributionPole" displayLabel="Distribution Pole"
         description="A placed overhead distribution pole instance. Implements IDistributionElement (structural participant in the distribution system, not a flow element).">
-        <BaseClass>bis:PhysicalElement</BaseClass>
+        <BaseClass>psrp:Structure</BaseClass>
         <BaseClass>dsys:IDistributionElement</BaseClass>
         <ECProperty propertyName="InstallDate"           typeName="dateTime"           displayLabel="Install Date"           description="Not in UPM; sourced from utility GIS"/>
         <ECProperty propertyName="SetDepth"              typeName="double" kindOfQuantity="AECU:LENGTH"       displayLabel="Set Depth"              description="UPM PoleGeometry.set_depth"/>
@@ -401,7 +403,7 @@
 
     <ECEntityClass typeName="PoleAttachment" modifier="Abstract" displayLabel="Pole Attachment"
         description="Abstract base for all pole-mounted attachment types. Subclasses assembled to DistributionPole via DistributionPoleAssemblesAttachments.">
-        <BaseClass>bis:PhysicalElement</BaseClass>
+        <BaseClass>psrp:AuxiliaryEquipment</BaseClass>
         <ECProperty propertyName="AttachmentHeight" typeName="double" kindOfQuantity="AECU:LENGTH" displayLabel="Attachment Height" description="Height above grade; UPM attachment_height.value_si converted"/>
         <ECProperty propertyName="DirectionDegrees" typeName="double" kindOfQuantity="AECU:ANGLE"  displayLabel="Direction"         description="Compass bearing (0=N, 90=E); UPM direction_deg"/>
         <ECProperty propertyName="InstallDate"      typeName="dateTime"                            displayLabel="Install Date"      description="Not in UPM; sourced from GIS"/>
@@ -454,7 +456,7 @@
 
     <ECEntityClass typeName="AnchorAssembly" displayLabel="Anchor Assembly"
         description="A ground-mounted anchor assembly. Associated to the pole via GuyWireConnectsToAnchor but is NOT a PoleAttachment subtype (ground-mounted, not pole-mounted).">
-        <BaseClass>bis:PhysicalElement</BaseClass>
+        <BaseClass>psrp:Foundation</BaseClass>
         <ECProperty propertyName="AnchorType"  typeName="AnchorType" displayLabel="Anchor Type" description="Not in UPM Anchor model; sourced from anchor catalog or metadata"/>
         <ECProperty propertyName="EmbedDepth"  typeName="double" kindOfQuantity="AECU:LENGTH" displayLabel="Embed Depth" description="Not in UPM Anchor model"/>
         <ECProperty propertyName="SoilClass"   typeName="string"     displayLabel="Soil Class"  description="For grounding analysis use GroundingConfiguration.SoilClass instead"/>
@@ -462,8 +464,7 @@
 
     <ECEntityClass typeName="OverheadConductor" displayLabel="Overhead Conductor"
         description="A conductor span between two poles. Modeled as a standalone element (not nested under Insulator as in UPM). Populated from UPM Insulator.spans; each Span becomes one OverheadConductor.">
-        <BaseClass>bis:PhysicalElement</BaseClass>
-        <BaseClass>dsys:IDistributionFlowElement</BaseClass>
+        <BaseClass>psrp:Equipment</BaseClass>
         <ECProperty propertyName="WireId"               typeName="string"             displayLabel="Wire ID"               description="Wire label (e.g. Phase A, Neutral N); UPM Span.wire_id"/>
         <ECProperty propertyName="FeederId"             typeName="string"             displayLabel="Feeder ID"             description="Feeder/project scope prefix used for conductor cross-pole stitching (e.g. project_line_one); separates the namespace prefix from WireId"/>
         <ECProperty propertyName="WireCode"             typeName="string"             displayLabel="Wire Code"             description="Conductor size label (e.g. ACSR 336, 2/0 ACSR); UPM Span.size"/>
@@ -482,7 +483,6 @@
     <ECEntityClass typeName="DistributionTransformer" displayLabel="Distribution Transformer"
         description="A distribution transformer mounted on a pole. Implements IDistributionFlowElement as it directly facilitates power distribution.">
         <BaseClass>PoleAttachment</BaseClass>
-        <BaseClass>dsys:IDistributionFlowElement</BaseClass>
         <ECProperty propertyName="RatedKva"               typeName="double" kindOfQuantity="AECU:POWER"            displayLabel="Rated kVA"               description="UPM TransformerNameplate.rated_kva; stored as W"/>
         <ECProperty propertyName="CoolingClass"           typeName="TransformerCoolingClass"                       displayLabel="Cooling Class"           description="UPM TransformerNameplate.cooling_class"/>
         <ECProperty propertyName="PrimaryVoltageKv"       typeName="double" kindOfQuantity="AECU:ELECTRIC_POTENTIAL" displayLabel="Primary Voltage"         description="UPM TransformerNameplate.primary_voltage_kv; stored as V"/>
