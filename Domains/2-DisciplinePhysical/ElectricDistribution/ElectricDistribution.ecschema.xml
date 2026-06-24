@@ -353,7 +353,7 @@
 
     <ECEntityClass typeName="DistributionPoleType" displayLabel="Distribution Pole Type"
         description="Catalog/specification record for a class of distribution pole (species, class, height). Shared across multiple DistributionPole instances via DistributionPoleIsOfType.">
-        <BaseClass>bis:PhysicalType</BaseClass>
+        <BaseClass>psrp:PolePhysicalType</BaseClass>
         <ECProperty propertyName="PoleClass"                    typeName="string"       displayLabel="Pole Class"                    description="ANSI/NESC class (1, 2, H1, H2, etc.)"/>
         <ECProperty propertyName="ManufacturedHeight"           typeName="double" kindOfQuantity="AECU:LENGTH"       displayLabel="Manufactured Height"           description="Nominal pole length; UPM PoleGeometry.manufactured_height"/>
         <ECProperty propertyName="PoleMaterial"                 typeName="PoleMaterial" displayLabel="Pole Material"                 description="Inferred from UPM PoleGeometry.pole_species"/>
@@ -370,7 +370,7 @@
 
     <ECEntityClass typeName="DistributionPole" displayLabel="Distribution Pole"
         description="A placed overhead distribution pole instance. Implements IDistributionElement (structural participant in the distribution system, not a flow element).">
-        <BaseClass>psrp:Structure</BaseClass>
+        <BaseClass>psrp:Pole</BaseClass>
         <BaseClass>dsys:IDistributionElement</BaseClass>
         <ECProperty propertyName="InstallDate"           typeName="dateTime"           displayLabel="Install Date"           description="Not in UPM; sourced from utility GIS"/>
         <ECProperty propertyName="SetDepth"              typeName="double" kindOfQuantity="AECU:LENGTH"       displayLabel="Set Depth"              description="UPM PoleGeometry.set_depth"/>
@@ -402,8 +402,12 @@
     </ECEntityClass>
 
     <ECEntityClass typeName="PoleAttachment" modifier="Abstract" displayLabel="Pole Attachment"
-        description="Abstract base for all pole-mounted attachment types. Subclasses assembled to DistributionPole via DistributionPoleAssemblesAttachments.">
-        <BaseClass>psrp:AuxiliaryEquipment</BaseClass>
+        description="Mixin for pole-mounted attachments. Applied to attachment classes that each derive from their natural psrp base (Structure or Equipment branch); carries the shared attachment properties and is the target of DistributionPoleAssemblesAttachments.">
+        <ECCustomAttributes>
+            <IsMixin xmlns="CoreCustomAttributes.01.00.04">
+                <AppliesToEntityClass>bis:PhysicalElement</AppliesToEntityClass>
+            </IsMixin>
+        </ECCustomAttributes>
         <ECProperty propertyName="AttachmentHeight" typeName="double" kindOfQuantity="AECU:LENGTH" displayLabel="Attachment Height" description="Height above grade; UPM attachment_height.value_si converted"/>
         <ECProperty propertyName="DirectionDegrees" typeName="double" kindOfQuantity="AECU:ANGLE"  displayLabel="Direction"         description="Compass bearing (0=N, 90=E); UPM direction_deg"/>
         <ECProperty propertyName="InstallDate"      typeName="dateTime"                            displayLabel="Install Date"      description="Not in UPM; sourced from GIS"/>
@@ -411,6 +415,7 @@
 
     <ECEntityClass typeName="Crossarm" displayLabel="Crossarm"
         description="A crossarm mounted on a distribution pole. Insulators are assembled as children via PhysicalElementAssemblesElements; Insulator.CrossarmId preserves the UPM crossarm_id for external reference.">
+        <BaseClass>psrp:CableSupports</BaseClass>
         <BaseClass>PoleAttachment</BaseClass>
         <ECProperty propertyName="CrossarmType" typeName="string"       displayLabel="Crossarm Type" description="Freeform; e.g. Wood - 8 ft Double; UPM Crossarm.crossarm_type"/>
         <ECProperty propertyName="Offset"       typeName="double" kindOfQuantity="AECU:LENGTH" displayLabel="Offset"       description="Horizontal distance from pole center; UPM Crossarm.offset"/>
@@ -423,6 +428,7 @@
 
     <ECEntityClass typeName="Insulator" displayLabel="Insulator"
         description="An insulator position on a pole or crossarm. Conductor spans attached to this insulator are modeled as standalone OverheadConductor elements.">
+        <BaseClass>psrp:Insulator</BaseClass>
         <BaseClass>PoleAttachment</BaseClass>
         <ECProperty propertyName="InsulatorType"      typeName="InsulatorType" displayLabel="Insulator Type"    description="UPM Insulator.insulator_type; freeform mapped to enum"/>
         <ECProperty propertyName="CrossarmId"         typeName="string"        displayLabel="Crossarm ID"       description="External reference to parent crossarm; null for pole-mounted; UPM Insulator.crossarm_id"/>
@@ -434,6 +440,7 @@
 
     <ECEntityClass typeName="SpanGuy" displayLabel="Span Guy"
         description="A guy wire running pole-to-pole (not to a ground anchor). SPIDA models these as paired structures sharing ExternalId; each end has one SpanGuy entry.">
+        <BaseClass>psrp:SpanGuy</BaseClass>
         <BaseClass>PoleAttachment</BaseClass>
         <ECProperty propertyName="ExternalId" typeName="string" displayLabel="External ID" description="Shared ID across paired poles for renderer reconstruction; UPM SpanGuy.external_id"/>
         <ECProperty propertyName="Distance"   typeName="double" kindOfQuantity="AECU:LENGTH" displayLabel="Distance"    description="Horizontal wire length; UPM SpanGuy.distance"/>
@@ -442,6 +449,7 @@
 
     <ECEntityClass typeName="GuyWire" displayLabel="Guy Wire"
         description="A ground-anchored guy wire attached to a distribution pole. Connected to AnchorAssembly via GuyWireConnectsToAnchor.">
+        <BaseClass>psrp:GuyWire</BaseClass>
         <BaseClass>PoleAttachment</BaseClass>
         <ECProperty propertyName="AnchorId"         typeName="string"    displayLabel="Anchor ID"         description="External reference to connected anchor; UPM Guy.anchor_id"/>
         <ECProperty propertyName="GuyType"          typeName="string"    displayLabel="Guy Type"          description="Freeform; e.g. Down Guy; UPM Guy.guy_type"/>
@@ -455,8 +463,8 @@
     </ECEntityClass>
 
     <ECEntityClass typeName="AnchorAssembly" displayLabel="Anchor Assembly"
-        description="A ground-mounted anchor assembly. Associated to the pole via GuyWireConnectsToAnchor but is NOT a PoleAttachment subtype (ground-mounted, not pole-mounted).">
-        <BaseClass>psrp:Foundation</BaseClass>
+        description="A ground-mounted anchor assembly. Associated to the pole via GuyWireConnectsToAnchor but is NOT a PoleAttachment (ground-mounted, not pole-mounted).">
+        <BaseClass>psrp:AnchorCage</BaseClass>
         <ECProperty propertyName="AnchorType"  typeName="AnchorType" displayLabel="Anchor Type" description="Not in UPM Anchor model; sourced from anchor catalog or metadata"/>
         <ECProperty propertyName="EmbedDepth"  typeName="double" kindOfQuantity="AECU:LENGTH" displayLabel="Embed Depth" description="Not in UPM Anchor model"/>
         <ECProperty propertyName="SoilClass"   typeName="string"     displayLabel="Soil Class"  description="For grounding analysis use GroundingConfiguration.SoilClass instead"/>
@@ -464,7 +472,7 @@
 
     <ECEntityClass typeName="OverheadConductor" displayLabel="Overhead Conductor"
         description="A conductor span between two poles. Modeled as a standalone element (not nested under Insulator as in UPM). Populated from UPM Insulator.spans; each Span becomes one OverheadConductor.">
-        <BaseClass>psrp:Equipment</BaseClass>
+        <BaseClass>psrp:Conductor</BaseClass>
         <ECProperty propertyName="WireId"               typeName="string"             displayLabel="Wire ID"               description="Wire label (e.g. Phase A, Neutral N); UPM Span.wire_id"/>
         <ECProperty propertyName="FeederId"             typeName="string"             displayLabel="Feeder ID"             description="Feeder/project scope prefix used for conductor cross-pole stitching (e.g. project_line_one); separates the namespace prefix from WireId"/>
         <ECProperty propertyName="WireCode"             typeName="string"             displayLabel="Wire Code"             description="Conductor size label (e.g. ACSR 336, 2/0 ACSR); UPM Span.size"/>
@@ -481,7 +489,8 @@
     </ECEntityClass>
 
     <ECEntityClass typeName="DistributionTransformer" displayLabel="Distribution Transformer"
-        description="A distribution transformer mounted on a pole. Implements IDistributionFlowElement as it directly facilitates power distribution.">
+        description="A distribution transformer mounted on a pole. Inherits IDistributionFlowElement via psrp:Transformer → Equipment.">
+        <BaseClass>psrp:Transformer</BaseClass>
         <BaseClass>PoleAttachment</BaseClass>
         <ECProperty propertyName="RatedKva"               typeName="double" kindOfQuantity="AECU:POWER"            displayLabel="Rated kVA"               description="UPM TransformerNameplate.rated_kva; stored as W"/>
         <ECProperty propertyName="CoolingClass"           typeName="TransformerCoolingClass"                       displayLabel="Cooling Class"           description="UPM TransformerNameplate.cooling_class"/>
@@ -501,6 +510,7 @@
 
     <ECEntityClass typeName="PoleEquipment" displayLabel="Pole Equipment"
         description="General pole-mounted equipment other than distribution transformers (street lights, capacitors, regulators, reclosers, switches, cutouts, arresters, risers, communication equipment).">
+        <BaseClass>psrp:AuxiliaryEquipment</BaseClass>
         <BaseClass>PoleAttachment</BaseClass>
         <ECProperty propertyName="EquipmentType" typeName="EquipmentType" displayLabel="Equipment Type" description="UPM Equipment.equipment_type; freeform mapped to enum"/>
         <ECProperty propertyName="EquipmentSize" typeName="string"        displayLabel="Equipment Size" description="UPM Equipment.equipment_size"/>

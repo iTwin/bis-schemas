@@ -17,24 +17,30 @@ alongside substation rather than a parallel one.
 
 ### Physical Elements
 
+Each class derives from its specific `psrp` class (not a generic base), reusing
+the power-system domain hierarchy. `PoleAttachment` is a **mixin** (applies to
+`bis:PhysicalElement`) carrying the shared attachment properties + the assembly
+relationship target, since the attachment classes land on different psrp branches
+(`Structure` vs `Equipment`).
+
 | Class | Base | Notes |
 |---|---|---|
-| `DistributionPole` | `psrp:Structure` + `dsys:IDistributionElement` | Primary structural host |
-| `PoleAttachment` | `psrp:AuxiliaryEquipment` (abstract) | Base for all pole-mounted hardware |
-| `Crossarm` | `PoleAttachment` | Horizontal timber or steel arm |
-| `Insulator` | `PoleAttachment` | Pin, disc, or deadend insulator |
-| `SpanGuy` | `PoleAttachment` | Guy attachment point on the pole |
-| `GuyWire` | `PoleAttachment` | Tensioned cable from pole to anchor |
-| `AnchorAssembly` | `psrp:Foundation` | Ground anchor terminating a guy wire |
-| `OverheadConductor` | `psrp:Equipment` (inherits `dsys:IDistributionFlowElement`) | Primary, neutral, or secondary wire |
-| `DistributionTransformer` | `PoleAttachment` (inherits `dsys:IDistributionFlowElement`) | Single- or three-phase transformer |
-| `PoleEquipment` | `PoleAttachment` | Capacitors, regulators, switches, arresters |
+| `DistributionPole` | `psrp:Pole` + `dsys:IDistributionElement` | `Pole → OverheadStructure → Structure` |
+| `Crossarm` | `psrp:CableSupports` + `PoleAttachment` | `CableSupports → Structure` |
+| `Insulator` | `psrp:Insulator` + `PoleAttachment` | reuses `psrp:Insulator` (`AuxiliaryEquipment`) |
+| `SpanGuy` | `psrp:SpanGuy` + `PoleAttachment` | `SpanGuy → Cable → Structure` |
+| `GuyWire` | `psrp:GuyWire` + `PoleAttachment` | `GuyWire → SupportWire → OverheadStructure` |
+| `AnchorAssembly` | `psrp:AnchorCage` | `AnchorCage → UndergroundStructure → Structure` |
+| `OverheadConductor` | `psrp:Conductor` | `Conductor → Equipment` (inherits `dsys:IDistributionFlowElement`) |
+| `DistributionTransformer` | `psrp:Transformer` + `PoleAttachment` | `Transformer → Equipment` |
+| `PoleEquipment` | `psrp:AuxiliaryEquipment` + `PoleAttachment` | non-transformer pole equipment |
+| `PoleAttachment` | *mixin* (`IsMixin`, applies to `bis:PhysicalElement`) | shared attachment props + assembly target |
 
 ### Type Catalog
 
 | Class | Base |
 |---|---|
-| `DistributionPoleType` | `bis:PhysicalType` |
+| `DistributionPoleType` | `psrp:PolePhysicalType` |
 
 ### Analytical Elements
 

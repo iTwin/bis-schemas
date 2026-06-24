@@ -34,10 +34,12 @@ BIS schemas are organized into layers. This schema belongs at layer
 It references schemas from:
 
 - `2-DisciplinePhysical`: `PowerSystemResourcesPhysical` (alias `psrp`) — the
-  **shared power-system base schema** this domain extends. Distribution physical
-  classes derive from `psrp:Structure` / `psrp:Equipment` / `psrp:AuxiliaryEquipment`
-  / `psrp:Foundation` so they share the same bases as the substation+ domain
-  (per iTwin/bis-schemas PR #733 review).
+  **shared power-system schema** this domain extends. Distribution classes derive
+  from their specific psrp classes (`Pole`, `Conductor`, `Transformer`,
+  `Insulator`, `GuyWire`, `SpanGuy`, `AnchorCage`, `CableSupports`,
+  `AuxiliaryEquipment`, `PolePhysicalType`) so they reuse the power-system domain
+  hierarchy shared with the substation+ domain rather than re-deriving from
+  `bis:PhysicalElement` (per iTwin/bis-schemas PR #733 review).
 - `0-Core`: `BisCore` — `psrp` bases ultimately subclass `bis:PhysicalElement`
 - `0-Core`: `Analytical` — for loading analysis elements
 - `1-Common`: `DistributionSystems` (alias `dsys`) — flow/control mixin source
@@ -175,7 +177,7 @@ same species/class/height combination.
 
 #### `edist:DistributionPole` — placed instance
 
-Subclass of `psrp:Structure` (shared power-system structural base). Implements `dsys:IDistributionElement`.
+Subclass of `psrp:Pole` (`Pole → OverheadStructure → Structure`). Implements `dsys:IDistributionElement`.
 
 | BIS Property | UPM Field | Type | Unit | Notes |
 |---|---|---|---|---|
@@ -318,7 +320,7 @@ Subclass of `anlyt:AnalyticalElementAnalyzesElement`.
 
 ### General pattern
 
-All direct pole attachments subclass `edist:PoleAttachment` → `psrp:AuxiliaryEquipment`.
+All direct pole attachments derive from their specific `psrp` class and apply the `edist:PoleAttachment` mixin.
 They are assembled to the pole via `bis:PhysicalElementAssemblesElements`. Each
 has an `AttachmentHeight` (ft above grade) derived from the UPM `attachment_height`
 MeasuredValue (metres in UPM).
@@ -333,7 +335,13 @@ MeasuredValue (metres in UPM).
 
 #### `edist:PoleAttachment` — abstract base
 
-Subclass of `psrp:AuxiliaryEquipment`. Abstract. (Inherits the `dsys:IDistributionFlowElement` and `spi:IStructuralElement` mixins via `psrp:Equipment`.)
+A **mixin** (`IsMixin`, applies to `bis:PhysicalElement`) carrying the shared
+attachment properties (AttachmentHeight, DirectionDegrees, InstallDate); it is
+the target of `DistributionPoleAssemblesAttachments`. Each attachment class
+derives from its specific psrp base (e.g. `Crossarm → CableSupports`,
+`Insulator → Insulator`, `GuyWire → GuyWire`, `Transformer → Transformer`) **and**
+applies this mixin, since the attachments span both the `Structure` and
+`Equipment` psrp branches and no longer share a single entity base.
 
 | BIS Property | UPM Field | Type | Description |
 |---|---|---|---|
@@ -431,7 +439,7 @@ Subclass of `edist:PoleAttachment`.
 
 #### `edist:AnchorAssembly`
 
-Subclass of `psrp:Foundation` (ground-embedded support). Associated to the pole, not a subtype of
+Subclass of `psrp:AnchorCage` (`AnchorCage → UndergroundStructure → Structure`). Associated to the pole, not a subtype of
 `PoleAttachment` (anchors are ground-mounted, not pole-mounted).
 
 | BIS Property | UPM Field | Type | Description |
@@ -454,7 +462,7 @@ New relationship. `edist:GuyWire` → `edist:AnchorAssembly`.
 
 #### `edist:OverheadConductor`
 
-Subclass of `psrp:Equipment` (inherits `dsys:IDistributionFlowElement`).
+Subclass of `psrp:Conductor` (`Conductor → Equipment`; inherits `dsys:IDistributionFlowElement`).
 Represents a conductor span between two poles. Populated from UPM `Span` objects
 (which are nested under `Insulator.spans` in the UPM).
 
