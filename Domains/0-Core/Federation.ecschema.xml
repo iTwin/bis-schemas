@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ==================================================================================
+|  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
+|  * See LICENSE.md in the project root for license terms and full copyright notice.
+======================================================================================= -->
+<ECSchema schemaName="Federation" alias="fed" version="01.00.00" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" description="Defines the 'Federation' domain. Contains base and concrete classes to be used to federate bis:Element instances.">
+    <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
+    <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
+    <ECSchemaReference name="BisCore" version="01.00.15" alias="bis"/>
+
+    <ECCustomAttributes>
+        <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
+            <SupportedUse>NotForProduction</SupportedUse>
+        </ProductionStatus>
+        <SchemaLayerInfo xmlns="BisCustomAttributes.01.00.00">
+            <Value>Core</Value>
+        </SchemaLayerInfo>
+    </ECCustomAttributes>
+
+    <ECEntityClass typeName="IFederationElement" modifier="Abstract" displayLabel="Federation Element Mix-in" description="An interface that can be mixed-into a bis:RoleElement subclass to indicate that it carries federation information - in the form of a Code, FederationGuid or both, applicable to other bis:Elements.">
+        <ECCustomAttributes>
+            <IsMixin xmlns="CoreCustomAttributes.01.00.03">
+                <!-- Only subclasses of bis:RoleElement can implement the ISubModeledElement interface -->
+                <AppliesToEntityClass>bis:RoleElement</AppliesToEntityClass>
+            </IsMixin>
+        </ECCustomAttributes>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="FederationPartition" displayLabel="Federation Partition" description="A FederationPartition element establishes a 'Federated' Modeling Perspective for its parent bis:Subject.">
+        <BaseClass>bis:InformationPartitionElement</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="FederationModel" displayLabel="Federation Model" description="A container for persisting FederationElement instances.">
+        <BaseClass>bis:RoleModel</BaseClass>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="FederationModelBreaksDownFederationPartition" displayLabel="FederationModel Sub-Models FederationPartition" strength="embedding" strengthDirection="backward" modifier="None" description="Relates a FederationModel to the FederationPartition that it sub-models.">
+        <!-- @see Model.ModeledElement ECNavigationProperty -->
+        <BaseClass>bis:ModelModelsElement</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="models" polymorphic="false">
+            <Class class="FederationModel"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is modeled by" polymorphic="false">
+            <Class class="FederationPartition" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="FederationElement" modifier="Abstract" displayLabel="Federation Element" description="A base class for IFederationElement implementations that model federation information applicable to one or more bis:Element instances.">
+        <BaseClass>bis:RoleElement</BaseClass>
+        <BaseClass>IFederationElement</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="Federation" modifier="None" displayLabel="Federation" description="A generic concrete implementation of the IFederationElement mix-in.">
+        <BaseClass>FederationElement</BaseClass>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="ElementFederatedByFederationElement" strength="referencing" modifier="None" description="Relates FederatedElement instances to the bis:Element instances that are federated by them." >
+        <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="is federated by" polymorphic="true">
+            <Class class="bis:Element"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="federates" polymorphic="true">
+            <Class class="IFederationElement"/>
+        </Target>
+    </ECRelationshipClass>
+</ECSchema>
