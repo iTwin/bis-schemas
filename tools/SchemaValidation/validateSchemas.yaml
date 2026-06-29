@@ -33,9 +33,9 @@ jobs:
 
   steps:
   - task: NodeTool@0
-    displayName: 'Install Node 22.x'
+    displayName: 'Install Node 24.15.0'
     inputs:
-      versionSpec: 22.x
+      versionSpec: 24.15.0
       checkLatest: true
 
   - checkout: self
@@ -173,6 +173,11 @@ jobs:
     condition: succeededOrFailed()  
     artifact: bis-schema-json-validation-logs-Attempt-$(System.JobAttempt)
     displayName: 'Publish BIS Schema JSON Validation Results'
+
+  - script: npm run validateLocalizations
+    workingDirectory: 
+    condition: succeededOrFailed()
+    displayName: Validate Localizations
 
   - script: npm run iModelSchemaValidation -- --compareSnapshot
     displayName: Snapshot Comparison
