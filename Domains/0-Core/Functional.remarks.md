@@ -48,3 +48,18 @@ There may be other relationships (defined elsewhere) to indicate a `PhysicalType
 ### DrawingGraphicRepresentsFunctionalElement
 
 Used to relate schematic drawings to `FunctionalElement`s.
+
+## Sample ECSQL queries
+
+- Query for any `FunctionalElement`s that are not fulfilled by any `PhysicalElement`.
+
+```sql
+SELECT
+    fe.ECInstanceId,
+    ec_classname(fe.ECClassId)
+FROM
+    func.FunctionalElement fe 
+    LEFT JOIN func.PhysicalElementFulfillsFunction fulfills ON fe.ECInstanceId = fulfills.TargetECInstanceId
+WHERE
+    fulfills.ECInstanceId IS NULL
+```

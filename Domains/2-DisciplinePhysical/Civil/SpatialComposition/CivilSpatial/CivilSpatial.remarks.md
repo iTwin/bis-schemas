@@ -43,6 +43,12 @@ Instances of `ParkingIsland` are typically aggregated by instances of `ParkingAr
 
 The number of Parking-spaces modeled in a single instance of `ParkingRow` is captured by its `ParkingSpaceCount` property.
 
+A `ParkingRow` also captures the dimensions and orientation of its parking spaces:
+
+- **`ParkingWidth`** — The width of each parking space, measured perpendicular to the stall dividing lines.
+- **`ParkingDepth`** — The depth of each parking space, measured along the stall dividing lines from the aisle edge to the back of the space.
+- **`ParkingAngle`** — The angle between a stall dividing line and the aisle it faces. A perpendicular arrangement indicates head-in or back-in parking, while smaller angles indicate angled parking.
+
 `ParkingRow`s must be contained in `SpatialLocationModel`s or `PhysicalModel`s.
 
 ### PondArea
@@ -94,3 +100,59 @@ Instances of `SidewalkType` provide an additional classification that can be app
 ### GenericAreaType
 
 Instances of `GenericAreaType` provide an additional classification that can be applied to `GenericArea`s.
+
+## Sample ECSQL queries
+
+- Query recursively for all `SpatialElement`s held by all `Site` instances, directly or indirectly through any other `SpatialStructure` element they aggregate.
+
+```sql
+WITH RECURSIVE subElements(organizerId) AS (
+        SELECT ECInstanceId FROM cvsp.Site
+    UNION
+        SELECT
+            csse.ECInstanceId
+        FROM
+            spcomp.SpatialStructureElement sse
+            INNER JOIN spcomp.SpatialStructureElement csse ON sse.ECInstanceId = csse.ComposingElement.Id,
+            subElements sub
+        WHERE
+            sse.ECInstanceId = sub.organizerId
+)
+SELECT
+    se.ECInstanceId [HeldElementId],
+    sse.ECInstanceId [HoldingElementId]
+FROM
+    bis.SpatialElement se 
+    INNER JOIN spcomp.SpatialOrganizerHoldsSpatialElements holds ON se.ECInstanceId = holds.TargetECInstanceId
+    INNER JOIN spcomp.SpatialStructureElement sse ON sse.ECInstanceId = holds.SourceECInstanceId, 
+    subElements sub
+WHERE
+    sse.ECInstanceId = sub.organizerId
+```
+
+- Query for the _Count_ of _Parking Spaces_ per _Parking Area_.
+
+```sql
+WITH RECURSIVE subElementsPerParkingArea(organizerId, parkingAreaId) AS (
+        SELECT ECInstanceId, ECInstanceId FROM cvsp.ParkingArea
+    UNION
+        SELECT
+            csse.ECInstanceId, 
+            sub.parkingAreaId
+        FROM
+            spcomp.SpatialStructureElement sse
+            INNER JOIN spcomp.SpatialStructureElement csse ON sse.ECInstanceId = csse.ComposingElement.Id,
+            subElementsPerParkingArea sub
+        WHERE
+            sse.ECInstanceId = sub.organizerId
+)
+SELECT
+    sub.parkingAreaId [ParkingAreaId],
+    SUM(parkingRow.ParkingSpaceCount) [ParkingSpaceCount]
+FROM
+    subElementsPerParkingArea sub, cvsp.ParkingRow parkingRow
+WHERE
+    sub.organizerId = parkingRow.ECInstanceId
+GROUP BY
+    sub.parkingAreaId
+```

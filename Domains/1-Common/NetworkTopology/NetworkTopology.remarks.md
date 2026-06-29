@@ -84,3 +84,69 @@ The `NodeConnectsToNode` relationship could be used to model simple links in a g
 ### TopologyElementRepresentsElement
 
 `ITopologyElement` instances can be found via the `TopologyElementRepresentsElement` relationship in workflows and trace-operations where the former are not directly manipulated.
+
+## Sample ECSQL queries
+
+- Query for all IEdge instances connected to a particular INode.
+
+```sql
+SELECT DISTINCT
+    e.ECInstanceId,
+    e.ECClassId
+FROM
+    net.INode n,
+    net.EdgeStartsAtNode edgeStartsAt, 
+    net.EdgeEndsAtNode edgeEndsAt,
+    net.IEdge e LEFT JOIN net.EdgeInnerConnectsToNode i ON e.ECInstanceId = i.SourceECInstanceId
+WHERE
+    n.ECInstanceId = :nodeId AND
+    ((edgeStartsAt.TargetECInstanceId = n.ECInstanceId AND e.ECInstanceId = edgeStartsAt.SourceECInstanceId) OR 
+    (edgeEndsAt.TargetECInstanceId = n.ECInstanceId AND e.ECInstanceId = edgeEndsAt.SourceECInstanceId) OR
+    (i.ECInstanceId IS NOT NULL AND i.TargetECInstanceId = n.ECInstanceId))
+```
+
+- Query for all `INode`s reacheable starting from a particular `INode` by traversing connected `ITopologyElement`s recursively.
+
+```sql
+WITH RECURSIVE connected(nodeId) AS (
+    VALUES(:startingNodeId)
+UNION
+    SELECT DISTINCT
+        otherNode.ECInstanceId [NodeId]
+    FROM
+        net.EdgeStartsAtNode edgeStartsAt, 
+        net.EdgeEndsAtNode edgeEndsAt,
+        net.IEdge e, net.INode otherNode,
+        connected c
+    WHERE
+        (edgeStartsAt.TargetECInstanceId = c.nodeId AND e.ECInstanceId = edgeStartsAt.SourceECInstanceId AND edgeEndsAt.SourceECInstanceId = e.ECInstanceId AND otherNode.ECInstanceId = edgeEndsAt.TargetECInstanceId) OR 
+        (edgeEndsAt.TargetECInstanceId = c.nodeId AND e.ECInstanceId = edgeEndsAt.SourceECInstanceId AND edgeStartsAt.SourceECInstanceId = e.ECInstanceId AND otherNode.ECInstanceId = edgeStartsAt.TargetECInstanceId)
+    UNION
+    SELECT DISTINCT
+        otherNode.ECInstanceId [NodeId]
+    FROM
+        net.NodeConnectsToNode connects,
+        net.INode otherNode,
+        connected c
+    WHERE
+        (connects.TargetECInstanceId = c.nodeId AND otherNode.ECInstanceId = connects.SourceECInstanceId) OR 
+        (connects.SourceECInstanceId = c.nodeId AND otherNode.ECInstanceId = connects.TargetECInstanceId)
+    UNION
+    SELECT DISTINCT
+        ecn.TargetECInstanceId [NodeId]
+    FROM
+        net.EdgeInnerConnectsToNode i INNER JOIN net.IEdgeInnerConnection eic ON i.SourceECInstanceId = eic.ECInstanceId
+        INNER JOIN lr.ILinearlyLocatedAlongILinearElement along ON along.SourceECInstanceId = eic.ECInstanceId
+        INNER JOIN net.IEdge e ON e.ECInstanceId = along.TargetECInstanceId 
+        INNER JOIN net.EdgeConnectsToNode ecn ON ecn.SourceECInstanceId = e.ECInstanceId,
+        connected c
+    WHERE
+        i.TargetECInstanceId = c.nodeId)
+SELECT
+    n.ECInstanceId,
+    n.ECClassId
+FROM
+    net.INode n, connected c
+WHERE
+    n.ECInstanceId = c.nodeId
+```
