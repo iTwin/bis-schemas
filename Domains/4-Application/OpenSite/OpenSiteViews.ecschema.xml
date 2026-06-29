@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ==================================================================================
+|  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
+|  * See LICENSE.md in the project root for license terms and full copyright notice.
+======================================================================================= -->
+<ECSchema schemaName="OpenSiteViews" alias="opnsiteViews" version="01.00.03" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" displayLabel="OpenSite Views" description="Views that introduce derived concepts based on the OpenSite schema.">
+    <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA" />
+    <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
+	<ECSchemaReference name="BisCore" version="01.00.10" alias="bis" />
+    <ECSchemaReference name="ECDbMap" version="02.00.04" alias="ecdbmap"/>
+    <ECSchemaReference name="SpatialComposition" version="01.00.01" alias="spcomp" />
+    <ECSchemaReference name="CivilSpatial" version="01.00.03" alias="cvsp" />
+    <ECSchemaReference name="OpenSite" version="01.00.22" alias="opnsite" />
+
+    <ECCustomAttributes>
+        <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
+            <SupportedUse>NotForProduction</SupportedUse>
+        </ProductionStatus>
+        <SchemaLayerInfo xmlns="BisCustomAttributes.01.00.00">
+            <Value>Application</Value>
+        </SchemaLayerInfo>
+    </ECCustomAttributes>
+
+    <ECEntityClass typeName="ParkingInformationView" modifier="Abstract" displayLabel="Parking Information">
+        <ECCustomAttributes>
+            <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                <Description>This view has been split into LayoutParkingAreaView and ParkingRowPathView. </Description>
+            </Deprecated>
+            <QueryView xmlns="ECDbMap.02.00.04">
+                <Query>
+                    SELECT
+                        drivenParkingRows.ECInstanceId [ECInstanceId],
+                        ec_classid('OpenSiteViews', 'ParkingInformationView') [ECClassId],
+                        NAVIGATION_VALUE(opnsiteViews.ParkingInformationView.LayoutParkingArea, drivenParkingRows.LayoutParkingAreaId),
+                        NAVIGATION_VALUE(opnsiteViews.ParkingInformationView.ParkingRowPath, drivenParkingRows.ParkingRowPathId),
+                        SUM(drivenParkingRows.ParkingSpaceCount) [ParkingSpaceCount],
+                        SUM(drivenParkingRows.ProblemSpaceCount) [ProblemSpaceCount]
+                    FROM (
+                        SELECT
+                            COALESCE(layoutParkingArea.ECInstanceId, rowPath.ECInstanceId) [ECInstanceId],
+                            layoutParkingArea.ECInstanceId [LayoutParkingAreaId],
+                            CASE WHEN layoutParkingArea.ECInstanceId IS NULL THEN rowPath.ECInstanceId END [ParkingRowPathId],
+                            pr.ECInstanceId [ParkingRowId],
+                            MAX(pr.ParkingSpaceCount) [ParkingSpaceCount],
+                            MAX(pr.ProblemSpaceCount) [ProblemSpaceCount]
+                        FROM CivilSpatial:ParkingRow pr
+                        JOIN bis:ElementDrivesElement relDrive ON pr.ECInstanceId=relDrive.TargetECInstanceId
+                        JOIN bis:Element drivingElement ON relDrive.SourceECInstanceId=drivingElement.ECInstanceId
+                        LEFT JOIN OpenSite:LayoutParkingArea layoutParkingArea ON drivingElement.Parent.Id=layoutParkingArea.ECInstanceId
+                        LEFT JOIN OpenSite:ParkingRowPath rowPath ON drivingElement.ECInstanceId=rowPath.ECInstanceId
+                        WHERE layoutParkingArea.ECInstanceId IS NOT NULL OR rowPath.ECInstanceId IS NOT NULL
+                        GROUP BY
+                            COALESCE(layoutParkingArea.ECInstanceId, rowPath.ECInstanceId),
+                            COALESCE(layoutParkingArea.ECClassId, rowPath.ECClassId),
+                            layoutParkingArea.ECInstanceId,
+                                CASE WHEN layoutParkingArea.ECInstanceId IS NULL THEN rowPath.ECInstanceId END,
+                            pr.ECInstanceId
+                    ) drivenParkingRows
+                    GROUP BY drivenParkingRows.ECInstanceId, drivenParkingRows.LayoutParkingAreaId, drivenParkingRows.ParkingRowPathId;
+                </Query>
+            </QueryView>
+        </ECCustomAttributes>
+        <ECNavigationProperty propertyName="LayoutParkingArea" relationshipName="LayoutParkingAreaHasParkingInformation" direction="backward"/>
+		<ECNavigationProperty propertyName="ParkingRowPath" relationshipName="ParkingRowPathHasParkingInformation" direction="backward"/>
+        <ECProperty propertyName="ParkingSpaceCount" typeName="int" />
+        <ECProperty propertyName="ProblemSpaceCount" typeName="int" />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="LayoutParkingAreaView" modifier="Abstract" displayLabel="Layout Parking Area">
+        <ECCustomAttributes>
+            <QueryView xmlns="ECDbMap.02.00.04">
+                <Query>
+                    WITH parkingRowOwners AS (
+                    -- 1. The parking row is driven directly by the LayoutParkingArea itself.
+                    SELECT
+                        pr.ECInstanceId [ParkingRowId],
+                        layoutParkingArea.ECInstanceId [LayoutParkingAreaId]
+                    FROM CivilSpatial:ParkingRow pr
+                    JOIN bis:ElementDrivesElement relDrive
+                        ON relDrive.TargetECInstanceId = pr.ECInstanceId
+                    JOIN OpenSite:LayoutParkingArea layoutParkingArea
+                        ON layoutParkingArea.ECInstanceId = relDrive.SourceECInstanceId
+
+                    UNION
+
+                    -- 2. The parking row is driven by a child element of the LayoutParkingArea,
+                    --    for example a layout parking edge.
+                    SELECT
+                        pr.ECInstanceId [ParkingRowId],
+                        layoutParkingArea.ECInstanceId [LayoutParkingAreaId]
+                    FROM CivilSpatial:ParkingRow pr
+                    JOIN bis:ElementDrivesElement relDrive
+                        ON relDrive.TargetECInstanceId = pr.ECInstanceId
+                    JOIN bis:Element sourceElement
+                        ON sourceElement.ECInstanceId = relDrive.SourceECInstanceId
+                    JOIN OpenSite:LayoutParkingArea layoutParkingArea
+                        ON layoutParkingArea.ECInstanceId = sourceElement.Parent.Id
+
+                    UNION
+
+                    -- 3. The parking row is driven by a grandchild of the LayoutParkingArea,
+                    --    for example an edge under a driveway path.
+                    SELECT
+                        pr.ECInstanceId [ParkingRowId],
+                        layoutParkingArea.ECInstanceId [LayoutParkingAreaId]
+                    FROM CivilSpatial:ParkingRow pr
+                    JOIN bis:ElementDrivesElement relDrive
+                        ON relDrive.TargetECInstanceId = pr.ECInstanceId
+                    JOIN bis:Element sourceElement
+                        ON sourceElement.ECInstanceId = relDrive.SourceECInstanceId
+                    JOIN bis:Element parentElement
+                        ON parentElement.ECInstanceId = sourceElement.Parent.Id
+                    JOIN OpenSite:LayoutParkingArea layoutParkingArea
+                        ON layoutParkingArea.ECInstanceId = parentElement.Parent.Id
+                    )
+                    SELECT
+                    owners.LayoutParkingAreaId [ECInstanceId],
+                    ec_classid('OpenSiteViews', 'LayoutParkingAreaView') [ECClassId],
+                    NAVIGATION_VALUE(
+                        opnsiteViews.LayoutParkingAreaView.LayoutParkingArea,
+                        owners.LayoutParkingAreaId
+                    ),
+                    SUM(pr.ParkingSpaceCount) [ParkingSpaceCount],
+                    SUM(pr.ProblemSpaceCount) [ProblemSpaceCount]
+                    FROM parkingRowOwners owners
+                    JOIN CivilSpatial:ParkingRow pr
+                    ON pr.ECInstanceId = owners.ParkingRowId
+                    GROUP BY owners.LayoutParkingAreaId;
+                </Query>
+            </QueryView>
+        </ECCustomAttributes>
+        <ECNavigationProperty propertyName="LayoutParkingArea" relationshipName="LayoutParkingAreaHasLayoutParkingAreaView" direction="backward"/>
+        <ECProperty propertyName="ParkingSpaceCount" typeName="int" />
+        <ECProperty propertyName="ProblemSpaceCount" typeName="int" />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="ParkingRowPathView" modifier="Abstract" displayLabel="Parking Row Path">
+        <ECCustomAttributes>
+            <QueryView xmlns="ECDbMap.02.00.04">
+                <Query>
+                    SELECT
+                        parkingRowPathParkingRows.ParkingRowPathId [ECInstanceId],
+                        ec_classid('OpenSiteViews', 'ParkingRowPathView') [ECClassId],
+                        NAVIGATION_VALUE(opnsiteViews.ParkingRowPathView.ParkingRowPath, parkingRowPathParkingRows.ParkingRowPathId),
+                        SUM(parkingRowPathParkingRows.ParkingSpaceCount) [ParkingSpaceCount],
+                        SUM(parkingRowPathParkingRows.ProblemSpaceCount) [ProblemSpaceCount]
+                    FROM (
+                        SELECT
+                            rowPath.ECInstanceId [ParkingRowPathId],
+                            pr.ECInstanceId [ParkingRowId],
+                            MAX(pr.ParkingSpaceCount) [ParkingSpaceCount],
+                            MAX(pr.ProblemSpaceCount) [ProblemSpaceCount]
+                        FROM OpenSite:ParkingRowPath rowPath
+                        JOIN bis:ElementDrivesElement relDrive ON rowPath.ECInstanceId=relDrive.SourceECInstanceId
+                        JOIN CivilSpatial:ParkingRow pr ON relDrive.TargetECInstanceId=pr.ECInstanceId
+                        GROUP BY
+                            rowPath.ECInstanceId,
+                            pr.ECInstanceId
+                    ) parkingRowPathParkingRows
+                    GROUP BY parkingRowPathParkingRows.ParkingRowPathId;
+                </Query>
+            </QueryView>
+        </ECCustomAttributes>
+        <ECNavigationProperty propertyName="ParkingRowPath" relationshipName="ParkingRowPathHasParkingRowPathView" direction="backward"/>
+        <ECProperty propertyName="ParkingSpaceCount" typeName="int" />
+        <ECProperty propertyName="ProblemSpaceCount" typeName="int" />
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="LayoutParkingAreaHasParkingInformation" modifier="Abstract" strength="referencing">
+        <ECCustomAttributes>
+            <ForeignKeyView xmlns="ECDbMap.02.00.04" />
+            <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                <Description>This relationship has been replaced by LayoutParkingAreaHasLayoutParkingAreaView. </Description>
+            </Deprecated>
+        </ECCustomAttributes>
+        <Source multiplicity="(1..1)" roleLabel="has parking information" polymorphic="true">
+            <Class class="opnsite:LayoutParkingArea"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is set on" polymorphic="true">
+            <Class class="ParkingInformationView"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="LayoutParkingAreaHasLayoutParkingAreaView" modifier="Abstract" strength="referencing">
+        <ECCustomAttributes>
+            <ForeignKeyView xmlns="ECDbMap.02.00.04" />
+        </ECCustomAttributes>
+        <Source multiplicity="(1..1)" roleLabel="has layout parking area view" polymorphic="true">
+            <Class class="opnsite:LayoutParkingArea"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is set on" polymorphic="true">
+            <Class class="LayoutParkingAreaView"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="ParkingRowPathHasParkingInformation" modifier="Abstract" strength="referencing">
+        <ECCustomAttributes>
+            <ForeignKeyView xmlns="ECDbMap.02.00.04" />
+            <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                <Description>This relationship has been replaced by ParkingRowPathHasParkingRowPathView. </Description>
+            </Deprecated>
+        </ECCustomAttributes>
+        <Source multiplicity="(1..1)" roleLabel="has parking information" polymorphic="true">
+            <Class class="opnsite:ParkingRowPath"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is set on" polymorphic="true">
+            <Class class="ParkingInformationView"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="ParkingRowPathHasParkingRowPathView" modifier="Abstract" strength="referencing">
+        <ECCustomAttributes>
+            <ForeignKeyView xmlns="ECDbMap.02.00.04" />
+        </ECCustomAttributes>
+        <Source multiplicity="(1..1)" roleLabel="has parking row path view" polymorphic="true">
+            <Class class="opnsite:ParkingRowPath"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is set on" polymorphic="true">
+            <Class class="ParkingRowPathView"/>
+        </Target>
+    </ECRelationshipClass>
+</ECSchema>
