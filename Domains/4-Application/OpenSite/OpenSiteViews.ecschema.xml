@@ -166,6 +166,62 @@
         <ECProperty propertyName="ProblemSpaceCount" typeName="int" />
     </ECEntityClass>
 
+    <ECEntityClass typeName="AreaView" modifier="Abstract" displayLabel="Area">
+        <ECCustomAttributes>
+            <QueryView xmlns="ECDbMap.02.00.04">
+                <Query>
+                   WITH RECURSIVE AggregationDepth(id, depth) AS (
+					  SELECT ECInstanceId, 0 FROM CivilSpatial.Site
+					  UNION ALL
+					  SELECT agg.TargetECInstanceId, parent.depth + 1
+					  FROM SpatialComposition.SpatialStructureElementAggregatesElements agg
+					  JOIN AggregationDepth parent ON agg.SourceECInstanceId = parent.id
+					)
+					SELECT
+					  drv.SourceECInstanceId [ECInstanceId],
+					  ec_classid('OpenSiteViews', 'AreaView') [ECClassId],
+                      NAVIGATION_VALUE(opnsiteViews.AreaView.Area, drv.SourceECInstanceId),
+					  SUM(ce.FootprintArea) [TotalFootprintArea]
+					FROM AggregationDepth ad
+					JOIN OpenSite.AuthoringElementDrivesPlanElements drv ON drv.TargetECInstanceId = ad.id
+					JOIN SpatialComposition.CompositeElement ce ON ce.ECInstanceId = ad.id
+					WHERE ad.depth = 1
+					GROUP BY drv.SourceECInstanceId
+                </Query>
+            </QueryView>
+        </ECCustomAttributes>
+        <ECNavigationProperty propertyName="Area" relationshipName="AreaHasAreaView" direction="backward"/>
+        <ECProperty propertyName="TotalFootprintArea" typeName="double" kindOfQuantity="cvu:AREA" />
+    </ECEntityClass>
+	
+	<ECEntityClass typeName="ControlledAreaView" modifier="Abstract" displayLabel="Area">
+        <ECCustomAttributes>
+            <QueryView xmlns="ECDbMap.02.00.04">
+                <Query>
+                   WITH RECURSIVE AggregationDepth(id, depth) AS (
+					  SELECT ECInstanceId, 0 FROM CivilSpatial.Site
+					  UNION ALL
+					  SELECT agg.TargetECInstanceId, parent.depth + 1
+					  FROM SpatialComposition.SpatialStructureElementAggregatesElements agg
+					  JOIN AggregationDepth parent ON agg.SourceECInstanceId = parent.id
+					)
+					SELECT
+					  drv.SourceECInstanceId [ECInstanceId],
+					  ec_classid('OpenSiteViews', 'ControlledAreaView') [ECClassId],
+                      NAVIGATION_VALUE(opnsiteViews.ControlledAreaView.Area, drv.SourceECInstanceId),
+					  SUM(ce.FootprintArea) [TotalFootprintArea]
+					FROM AggregationDepth ad
+					JOIN OpenSite.AuthoringElementDrivesPlanElements drv ON drv.TargetECInstanceId = ad.id
+					JOIN SpatialComposition.CompositeElement ce ON ce.ECInstanceId = ad.id
+					WHERE ad.depth = 2
+					GROUP BY drv.SourceECInstanceId
+                </Query>
+            </QueryView>
+        </ECCustomAttributes>
+        <ECNavigationProperty propertyName="Area" relationshipName="ControlledAreaHasControlledAreaView" direction="backward"/>
+        <ECProperty propertyName="TotalFootprintArea" typeName="double" kindOfQuantity="cvu:AREA" />
+    </ECEntityClass>
+
     <ECRelationshipClass typeName="LayoutParkingAreaHasParkingInformation" modifier="Abstract" strength="referencing">
         <ECCustomAttributes>
             <ForeignKeyView xmlns="ECDbMap.02.00.04" />
@@ -217,6 +273,30 @@
         </Source>
         <Target multiplicity="(0..*)" roleLabel="is set on" polymorphic="true">
             <Class class="ParkingRowPathView"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="AreaHasAreaView" modifier="Abstract" strength="referencing">
+        <ECCustomAttributes>
+            <ForeignKeyView xmlns="ECDbMap.02.00.04" />
+        </ECCustomAttributes>
+        <Source multiplicity="(1..1)" roleLabel="has area view" polymorphic="true">
+            <Class class="opnsite:Area"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is set on" polymorphic="true">
+            <Class class="AreaView"/>
+        </Target>
+    </ECRelationshipClass>
+	
+	<ECRelationshipClass typeName="ControlledAreaHasControlledAreaView" modifier="Abstract" strength="referencing">
+        <ECCustomAttributes>
+            <ForeignKeyView xmlns="ECDbMap.02.00.04" />
+        </ECCustomAttributes>
+        <Source multiplicity="(1..1)" roleLabel="has area view" polymorphic="true">
+            <Class class="opnsite:Area"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is set on" polymorphic="true">
+            <Class class="ControlledAreaView"/>
         </Target>
     </ECRelationshipClass>
 </ECSchema>
