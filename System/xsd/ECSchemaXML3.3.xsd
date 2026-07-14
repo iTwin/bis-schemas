@@ -21,7 +21,7 @@
         <xsd:unique name="UniqueClassName">
             <xsd:selector xpath="ec:ECEntityClass|ec:ECRelationshipClass|ec:ECCustomAttributeClass|ec:ECStructClass|
                                     ec:KindOfQuantity|ec:ECEnumeration|ec:PropertyCategory|ec:UnitSystem|
-                                    ec:Unit|ec:Constant|ec:InvertedUnit|ec:Phenomenon|ec:Format" />
+                                    ec:Unit|ec:Constant|ec:InvertedUnit|ec:Phenomenon|ec:Format|ec:JsonDescription" />
             <xsd:field xpath="@typeName" />
         </xsd:unique>
     </xsd:element>
@@ -79,6 +79,7 @@
             <xsd:element ref="ec:InvertedUnit" />
             <xsd:element ref="ec:Constant" />
             <xsd:element ref="ec:Phenomenon" />
+            <xsd:element ref="ec:JsonDescription" />
         </xsd:choice>
     </xsd:group>
   
@@ -506,6 +507,20 @@
         </xsd:complexContent>
     </xsd:complexType>
 
+    <!--
+        JSON DESCRIPTION: A reusable JSON Schema definition that json-typed properties can reference.
+    -->
+    <xsd:element name="JsonDescription" type="ec:JsonDescriptionType"/>
+    <xsd:complexType name="JsonDescriptionType">
+        <xsd:simpleContent>
+            <xsd:extension base="xsd:string">
+                <xsd:attribute name="typeName"     type="ec:name"       use="required"/>
+                <xsd:attribute name="description"  type="xsd:string"    use="optional"/>
+                <xsd:attribute name="displayLabel" type="xsd:string"    use="optional"/>
+            </xsd:extension>
+        </xsd:simpleContent>
+    </xsd:complexType>
+
     <!-- ========================================================================================================== -->
     <!-- ECProperties -->
     <!-- ========================================================================================================== -->
@@ -545,6 +560,7 @@
                         <xsd:documentation>Standard extended types are BeGuid, GeometryStream, JSON and URI</xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+                <xsd:attribute name="jsonDescription" type="ec:mockName" use="optional"/>
                 <xsd:attribute name="typeName" type="ec:ECPropertyTypeName" use="required"/>
             </xsd:extension>
         </xsd:complexContent>
