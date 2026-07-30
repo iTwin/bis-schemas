@@ -46,17 +46,17 @@
     <ECEntityClass typeName="ScaleBarCallout" displayLabel="Scale Bar Callout" modifier="None"
         description="A bis:AnnotationElement2d that displays a scale bar on a sheet.">
         <BaseClass>bis:AnnotationElement2d</BaseClass>
-         <ECProperty propertyName="Scale" typeName="double" displayLabel="Scale" description="The scale factor the scale bar was created at." />
-+        <ECNavigationProperty propertyName="ScaleBarStyle" relationshipName="ScaleBarCalloutUsesScaleBarStyle" direction="Forward" displayLabel="Scale Bar Style" description="The ScaleBarStyle used by this ScaleBarCallout."/>
+        <ECProperty propertyName="Scale" typeName="double" displayLabel="Scale" description="The scale factor the scale bar was created at." />
+        <ECNavigationProperty propertyName="ScaleBarStyle" relationshipName="ScaleBarCalloutUsesScaleBarStyle" direction="Forward" displayLabel="Scale Bar Style" description="The ScaleBarStyle used by this ScaleBarCallout."/>
     </ECEntityClass>
     
     <ECEntityClass typeName="ScaleBarStyle" displayLabel="Scale Bar Style" modifier="None"
-+        description="A bis:DefinitionElement that defines the appearance of a ScaleBarCallout.">
-+        <BaseClass>bis:DefinitionElement</BaseClass>
-         <ECProperty propertyName="Settings" typeName="string" extendedTypeName="Json" displayLabel="Settings" description="The settings for a scale bar in a versioned JSON format." />
-         <ECProperty propertyName="Description" typeName="string" description="Description of the style" />
-+        <ECNavigationProperty propertyName="TextStyle" relationshipName="ScaleBarStyleUsesTextStyle" direction="Forward" displayLabel="Text Style" description="The bis:AnnotationTextStyle used by the ScaleBarStyle."/>
-     </ECEntityClass>
+        description="A bis:DefinitionElement that defines the appearance of a ScaleBarCallout.">
+        <BaseClass>bis:DefinitionElement</BaseClass>
+        <ECProperty propertyName="Settings" typeName="string" extendedTypeName="Json" displayLabel="Settings" description="The settings for a scale bar in a versioned JSON format." />
+        <ECProperty propertyName="Description" typeName="string" description="Description of the style" />
+        <ECNavigationProperty propertyName="TextStyle" relationshipName="ScaleBarStyleUsesTextStyle" direction="Forward" displayLabel="Text Style" description="The bis:AnnotationTextStyle used by the ScaleBarStyle."/>
+    </ECEntityClass>
 
     <ECEntityClass typeName="ScaleBarCalloutDefinition" displayLabel="Scale Bar Callout Definition" modifier="None"
         description="A bis:GraphicalType2d that defines the properties of a ScaleBarCallout.">
@@ -72,9 +72,9 @@
         <ECNavigationProperty propertyName="TextStyle" relationshipName="ScaleBarStyleUsesTextStyle" direction="Forward" displayLabel="Text Style" description="The bis:AnnotationTextStyle used by the ScaleBarCalloutDefinition."/>
     </ECEntityClass>
     
-    <ECRelationshipClass typeName="ScaleBarStyleUsesTextStyle" strength="referencing" modifier="Sealed" description="A relationship indicating that the source ScaleBarCalloutDefinition instance uses the target AnnotationTextStyle instance.">
+    <ECRelationshipClass typeName="ScaleBarStyleUsesTextStyle" strength="referencing" modifier="Sealed" description="A relationship indicating that the source ScaleBarStyle instance uses the target AnnotationTextStyle instance.">
         <Source multiplicity="(0..*)" roleLabel="is styled by" polymorphic="true">
-            <Class class="ScaleBarCalloutDefinition"/>
+            <Class class="ScaleBarStyle"/>
         </Source>
         <Target multiplicity="(0..1)" roleLabel="styles" polymorphic="false">
             <Class class="bis:AnnotationTextStyle"/>
@@ -82,11 +82,12 @@
     </ECRelationshipClass> 
     
     <ECRelationshipClass typeName="ScaleBarCalloutUsesScaleBarStyle" strength="referencing" modifier="Sealed" description="A relationship indicating that the source ScaleBarCallout instance uses the target ScaleBarStyle instance.">
-+        <Source multiplicity="(0..*)" roleLabel="is styled by" polymorphic="true">
-+            <Class class="ScaleBarCallout"/>
-+        </Source>
-+        <Target multiplicity="(0..1)" roleLabel="styles" polymorphic="false">
-+            <Class class="ScaleBarStyle"/>
-+        </Target>
-</ECRelationshipClass>
+        <Source multiplicity="(0..*)" roleLabel="is styled by" polymorphic="true">
+            <Class class="ScaleBarCallout"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="styles" polymorphic="false">
+            <Class class="ScaleBarStyle"/>
+        </Target>
+    </ECRelationshipClass>
+
 </ECSchema>
