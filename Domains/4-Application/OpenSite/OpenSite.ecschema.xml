@@ -37,7 +37,7 @@
     <PropertyCategory typeName="ParkingSpaceOverride_Space" displayLabel="Space" priority="0" />
     <PropertyCategory typeName="ParkingSpaceOverride_Row" displayLabel="Row" priority="0" />
 
-    <PropertyCategory typeName="ShapedEdge_LinkHeight" displayLabel="Grading Edge Height" priority="0" />
+    <PropertyCategory typeName="ShapedEdge_LinkHeight" displayLabel="Wall" priority="0" />
     <PropertyCategory typeName="BuildingEdge_SlopeAway" displayLabel="Grading Slope Away" priority="0" />
     <PropertyCategory typeName="PropertyEdge_Setbacks" displayLabel="Setbacks" priority="0" />
     <PropertyCategory typeName="CenterlinePathEdge_Grading" displayLabel="Grading" priority="0" />
@@ -138,6 +138,12 @@
     <ECEnumeration typeName="BaySide" backingTypeName="int" isStrict="true" displayLabel="Bay Side" description="Side of a parking bay.">
         <ECEnumerator value="0" name="LEFT" displayLabel="Left" />
         <ECEnumerator value="1" name="RIGHT" displayLabel="Right" />
+    </ECEnumeration>
+    
+    <ECEnumeration typeName="WallMode" backingTypeName="int" isStrict="true" displayLabel="Wall Mode" description="Describes whether a retaining wall may be placed along an edge and how its height is constrained.">
+        <ECEnumerator value="0" name="NO_WALL" displayLabel="No Wall" />
+        <ECEnumerator value="1" name="FIXED_WALL_HEIGHT" displayLabel="Fixed Wall Height" />
+        <ECEnumerator value="2" name="VARIABLE_WALL_HEIGHT" displayLabel="Variable Wall Height" />
     </ECEnumeration>
 
     <ECRelationshipClass typeName="CategorySymbolizesClassification" strength="referencing" modifier="Abstract">
@@ -488,7 +494,11 @@
             </ECCustomAttributes>
         </ECProperty>
 
+        <ECProperty propertyName="WallMode" typeName="WallMode" category="ShapedEdge_LinkHeight" displayLabel="Wall Mode" description="Whether a retaining wall may be placed along the edge and how its height is constrained." />
         <ECProperty propertyName="UseWallInCost" typeName="boolean" category="ShapedEdge_LinkHeight" displayLabel="Use Wall in Cost" description="Treat as a wall for cost optimization." />
+        <ECNavigationProperty propertyName="WallType" relationshipName="ShapedEdgeUsesRetainingWallType" direction="Forward" category="ShapedEdge_LinkHeight" displayLabel="Wall Type" description="Retaining wall type placed along the edge. When not set (None), a flat, non-extruded retaining wall is placed." />
+        <ECProperty propertyName="MinWallHeight" minimumValue="-304.8" maximumValue="304.8" typeName="double" kindOfQuantity="cvu:LENGTH" category="ShapedEdge_LinkHeight" displayLabel="Min. Wall Height" description="Minimum wall height used when a fixed height is not set." />
+        <ECProperty propertyName="MaxWallHeight" minimumValue="-304.8" maximumValue="304.8" typeName="double" kindOfQuantity="cvu:LENGTH" category="ShapedEdge_LinkHeight" displayLabel="Max. Wall Height" description="Maximum wall height used when a fixed height is not set." />
     </ECEntityClass>
 
     <ECEntityClass typeName="PropertyEdge" modifier="Sealed" displayLabel="Grading Limit Edge">
@@ -542,7 +552,7 @@
 
     <ECEntityClass typeName="PadEdge" modifier="Sealed" displayLabel="Pad Edge">
         <BaseClass>ShapedEdge</BaseClass>
-        <ECProperty propertyName="FixedHeightDifference" minimumValue="0" maximumValue="30.48" typeName="double" kindOfQuantity="cvu:LENGTH" category="ShapedEdge_LinkHeight" displayLabel="Fixed Height Difference" description="Height of an edge." />
+        <ECProperty propertyName="FixedHeightDifference" minimumValue="-30.48" maximumValue="30.48" typeName="double" kindOfQuantity="cvu:LENGTH" category="ShapedEdge_LinkHeight" displayLabel="Fixed Height Difference" description="Height of an edge." />
     </ECEntityClass>
 
     <ECEntityClass typeName="LayoutParkingEdge" modifier="Sealed" displayLabel="Layout Parking Edge" description="Parking lot">
@@ -809,6 +819,15 @@
     <ECRelationshipClass typeName="RetainingWallAreaUsesRetainingWallType" strength="referencing" modifier="Sealed">
         <Source multiplicity="(0..*)" roleLabel="uses" polymorphic="false">
             <Class class="RetainingWallArea" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is used by" polymorphic="true">
+            <Class class="RetainingWallType" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="ShapedEdgeUsesRetainingWallType" strength="referencing" modifier="Sealed">
+        <Source multiplicity="(0..*)" roleLabel="uses" polymorphic="true">
+            <Class class="ShapedEdge" />
         </Source>
         <Target multiplicity="(0..1)" roleLabel="is used by" polymorphic="true">
             <Class class="RetainingWallType" />
