@@ -139,7 +139,7 @@
         <ECEnumerator value="0" name="LEFT" displayLabel="Left" />
         <ECEnumerator value="1" name="RIGHT" displayLabel="Right" />
     </ECEnumeration>
-    
+
     <ECEnumeration typeName="WallMode" backingTypeName="int" isStrict="true" displayLabel="Wall Mode" description="Describes whether a retaining wall may be placed along an edge and how its height is constrained.">
         <ECEnumerator value="0" name="NO_WALL" displayLabel="No Wall" />
         <ECEnumerator value="1" name="FIXED_WALL_HEIGHT" displayLabel="Fixed Wall Height" />
@@ -1053,7 +1053,14 @@
 
     <ECEntityClass typeName="RetainingWallArea" displayLabel="Retaining Wall" description="Retaining Wall">
         <BaseClass>Area</BaseClass>
-		<ECProperty propertyName="Width" minimumValue="0" maximumValue="30.48" typeName="double" kindOfQuantity="cvu:LENGTH_SHORT" displayLabel="Width" description="Width of the retaining wall." />
+		<ECProperty propertyName="Width" minimumValue="0" maximumValue="30.48" typeName="double" kindOfQuantity="cvu:LENGTH_SHORT" displayLabel="Width" description="Width of the retaining wall." >
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03" />
+                <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                    <Description>Width is deprecated for RetainingWallArea (wall thickness is held in the WallThickness property of the RetainingWallType).</Description>
+                </Deprecated>
+            </ECCustomAttributes>
+        </ECProperty>
         <ECNavigationProperty propertyName="RetainingWallType" relationshipName="RetainingWallAreaUsesRetainingWallType" direction="Forward" displayLabel="Retaining Wall Type" />
     </ECEntityClass>
 
@@ -1405,6 +1412,7 @@
     <ECEntityClass typeName="RetainingWallType" displayLabel="Retaining Wall Type" description="Defines a shared set of properties whose values vary per-type of RetainingWall rather than per-instance.">
         <BaseClass>cvphys:RetainingWallType</BaseClass>
 
+        <ECProperty propertyName="WallThickness" minimumValue="0" maximumValue="30.48" typeName="double" kindOfQuantity="cvu:LENGTH" displayLabel="Wall Thickness" description="Thickness of the wall body." />
         <ECProperty propertyName="FrontWallSetback" minimumValue="0" maximumValue="30.48" typeName="double" kindOfQuantity="cvu:LENGTH" displayLabel="Front Wall Setback" description="Width of front wall setback." />
         <ECProperty propertyName="BackWallSetback" minimumValue="0" maximumValue="30.48" typeName="double" kindOfQuantity="cvu:LENGTH" displayLabel="Back Wall Setback" description="Width of back wall setback." />
         <ECProperty propertyName="ExposedWallHeight" minimumValue="0" maximumValue="304.8" typeName="double" kindOfQuantity="cvu:LENGTH" displayLabel="Exposed Wall Height" description="Height of exposed wall." />
