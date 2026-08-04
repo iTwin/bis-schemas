@@ -19,10 +19,16 @@
 
     <ECEntityClass typeName="ViewAttachmentPlaceHolder" displayLabel="View Attachment Placeholder" modifier="None" description="An area on a sheet where a view is to be placed.">
         <BaseClass>bis:GraphicalElement2d</BaseClass>
+        <ECNavigationProperty propertyName="OverridesPrototypePlaceHolder" 
+            relationshipName= "PlaceHolderOverridesPlaceHolder" direction="Forward"
+            displayLabel="Overrides Prototype Placeholder"
+            description="The prototype-side ViewAttachmentPlaceHolder that this placeholder overrides on its sheet."
+        />
     </ECEntityClass>
+
     <ECEntityClass typeName="ViewAttachmentWithPlaceHolder" displayLabel="View Attachment (with placeholder)" modifier="None" description="A ViewAttachment that fills a ViewAttachmentPlaceHolder region on a sheet.">
       <BaseClass>bis:ViewAttachment</BaseClass>
-      <ECNavigationProperty propertyName="placeHolder" relationshipName="ViewAttachmentFulfillsPlaceHolder" direction="Forward" displayLabel="PlaceHolder" description="The placeholder this ViewAttachment fills."/>
+      <ECNavigationProperty propertyName="PlaceHolder" relationshipName="ViewAttachmentFulfillsPlaceHolder" direction="Forward" displayLabel="PlaceHolder" description="The placeholder this ViewAttachment fills."/>
     </ECEntityClass>
 
     <ECRelationshipClass typeName="ViewAttachmentFulfillsPlaceHolder" strength="referencing" modifier="Sealed"
@@ -32,6 +38,121 @@
         </Source>
         <Target multiplicity="(0..1)" roleLabel="is filled by" polymorphic="true">
             <Class class="ViewAttachmentPlaceHolder"/>
+        </Target>
+    </ECRelationshipClass>
+    
+    <ECEntityClass typeName="SheetPrototype" displayLabel="SheetPrototype" modifier="None"
+        description="A reusable, catalog-shareable definition of a sheet layout. Its sub-model contains the per-sheet content (placeholders, callouts, annotations) that is copied into every sheet created from this prototype.">
+        <BaseClass>bis:DefinitionElement</BaseClass>
+        <BaseClass>bis:ISubModeledElement</BaseClass>
+        <ECProperty propertyName="Scale" typeName="double"
+            description="Drawing scale to apply to sheets created from this prototype."/>
+        <ECProperty propertyName="Height" typeName="double"
+            description="Sheet height in meters."/>
+        <ECProperty propertyName="Width" typeName="double"
+            description="Sheet width in meters."/>
+        <ECNavigationProperty propertyName="Border" relationshipName="SheetPrototypeHasSheetBorderPrototype"
+            direction="Forward" displayLabel="Border"
+            description="The SheetBorderPrototype that supplies the border and title-block content for sheets created from this prototype."/>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="SheetBorderPrototype" displayLabel="Sheet Border Prototype" modifier="None"
+        description="A reusable, catalog-shareable border and title-block definition. Its sub-model (a bis:DrawingModel) contains the border line-art and title-block content that is copied into every sheet whose SheetPrototype references this border.">
+        <BaseClass>bis:DefinitionElement</BaseClass>
+        <BaseClass>bis:ISubModeledElement</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="SheetPrototypeModel" displayLabel="Sheet Prototype Model" modifier="None"
+        description="Container for the graphical content of a SheetPrototype: ViewAttachmentPlaceHolder elements and any other sheet-level annotations the prototype author wants stamped into every sheet created from this prototype.">
+        <BaseClass>bis:GraphicalModel2d</BaseClass>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="SheetPrototypeModelBreaksDownSheetPrototype" displayLabel="Sheet Prototype Model Sub-Models Sheet Prototype"
+        strength="embedding" strengthDirection="backward" modifier="Sealed"
+        description="Relates a SheetPrototypeModel to the SheetPrototype that it sub-models.">
+        <BaseClass>bis:ModelModelsElement</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel= "models" polymorphic="false">
+            <Class class="SheetPrototypeModel"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel= "is modeled by" polymorphic="true"> 
+            <Class class="SheetPrototype"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="DrawingModelBreaksDownSheetBorderPrototype" displayLabel="Sheet Border Prototype Model Sub-Models Sheet Border Prototype"
+        strength="embedding" strengthDirection="backward" modifier="Sealed"
+        description="Relates a bis:DrawingModel to the SheetBorderPrototype that it sub-models.">
+        <BaseClass>bis:ModelModelsElement</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="models" polymorphic="false">
+            <Class class="bis:DrawingModel"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is modeled by" polymorphic="true">
+            <Class class="SheetBorderPrototype"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="SheetPrototypeHasSheetBorderPrototype" displayLabel="Sheet Prototype References Sheet Border Prototype"
+        strength="referencing" modifier="Sealed"
+        description="Relates a SheetPrototype to the SheetBorderPrototype that supplies its border and title-block content.">
+        <Source multiplicity="(0..*)" roleLabel="has" polymorphic="true">
+            <Class class="SheetPrototype"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is referenced by" polymorphic="true">
+            <Class class="SheetBorderPrototype"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="SheetWithPrototype" displayLabel="Sheet from prototype" modifier="None"
+        description="A bis:Sheet that was created from a SheetPrototype. Holds the per-sheet flat copy of the prototype's content and a reference back to the SheetPrototype it was instantiated from.">
+        <BaseClass>bis:Sheet</BaseClass>
+        <ECNavigationProperty propertyName="Prototype" relationshipName="SheetHasSheetPrototype" direction="Forward" 
+            displayLabel="Prototype"
+            description="The SheetPrototype this sheet was created from."/>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="SheetHasSheetPrototype" strength="referencing" modifier="Sealed"
+        description="Relates a SheetWithPrototype to the SheetPrototype it was created from.">
+        <Source multiplicity="(0..*)" roleLabel="has" polymorphic="true">
+            <Class class="SheetWithPrototype"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is defined by" polymorphic="true">
+            <Class class="SheetPrototype"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="PlaceHolderOverridesPlaceHolder" strength="referencing" modifier="Sealed"
+        description="Relates a sheet-side ViewAttachmentPlaceHolder to the prototype-side ViewAttachmentPlaceHolder it overrides.">
+        <Source multiplicity="(0..*)" roleLabel="overrides" polymorphic="true">
+            <Class class="ViewAttachmentPlaceHolder"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is overridden by" polymorphic="true">
+            <Class class="ViewAttachmentPlaceHolder"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="Template2dAspect" modifier="Sealed">
+        <BaseClass>bis:ElementUniqueAspect</BaseClass>
+        <ECNavigationProperty propertyName="TemplateElement" relationshipName="Template2dAspectIsFromPrototypeElement" direction="Forward"
+            description="The element in a SheetPrototype's sub-model that this element was copied from." />
+        <ECProperty propertyName="IsModified" typeName="boolean"
+            description="True if this element has been modified since it was copied from its prototype source element." />
+    </ECEntityClass>
+    <ECRelationshipClass typeName="ElementOwnsTemplate2dAspect" strength="embedding" modifier="Sealed"
+        description="Relates a bis:GraphicalElement2d to the Template2dAspect it owns.">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GraphicalElement2d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="Template2dAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="Template2dAspectIsFromPrototypeElement" strength="referencing" modifier="Sealed">
+        <Source multiplicity="(0..*)" roleLabel="references" polymorphic="true">
+            <Class class="Template2dAspect"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is referenced by" polymorphic="true">
+            <Class class="bis:GraphicalElement2d"/>
         </Target>
     </ECRelationshipClass>
 
