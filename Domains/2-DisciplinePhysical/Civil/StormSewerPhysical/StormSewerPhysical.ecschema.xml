@@ -3,7 +3,7 @@
 |  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
 |  * See LICENSE.md in the project root for license terms and full copyright notice.
 ======================================================================================= -->
-<ECSchema schemaName="StormSewerPhysical" alias="stmswrphys" version="01.00.03" description="Main schema for the physical modeling of elements used in Storm Water and Sewer Systems." xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
+<ECSchema schemaName="StormSewerPhysical" alias="stmswrphys" version="01.00.04" description="Main schema for the physical modeling of elements used in Storm Water and Sewer Systems." xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
     <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
     <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
     <ECSchemaReference name="BisCore" version="01.00.10" alias="bis"/>
@@ -33,9 +33,37 @@
         <BaseClass>pipphys:IPipingElement</BaseClass>
         <ECProperty propertyName="InvertElevation" typeName="double" kindOfQuantity="cvu:LENGTH" description="Elevation of the inside bottom of the Distribution Structure"/>
     </ECEntityClass>
+    
+    <ECEntityClass typeName="RimElevationAspect" modifier="None" displayLabel="RimElevationAspect">
+        <BaseClass >bis:ElementUniqueAspect</BaseClass>
+        <ECProperty propertyName="RimElevation" displayLabel="Rim Elevation" typeName="double" kindOfQuantity="cvu:LENGTH" description="Elevation at top of of distribution structure."/>
+        <ECProperty propertyName="RimToGroundElevation" displayLabel="Rim to Ground" typeName="boolean" description="If true then the rim elevation of the associated structure will automatically be set to the local ground elevation."/>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="DistributionStructureOwnsRimElevationAspect" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="DistributionStructure"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="owned by" polymorphic="true">
+            <Class class="RimElevationAspect"/>
+        </Target>
+    </ECRelationshipClass>
+    
     <ECEntityClass typeName="DistributionStructureType" modifier="Abstract" displayLabel="Distribution Structure Type" description="Defines a shared set of properties whose values vary per-type of DistributionStructure rather than per-instance.">
         <BaseClass>bis:PhysicalType</BaseClass>
     </ECEntityClass>
+
+    <ECRelationshipClass typeName="DistributionStructureTypeOwnsPorts" strength="embedding" description="Assign predefined ports to a distribution structure type.">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="DistributionStructureType"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="true">
+            <Class class="DistributionPort"/>
+        </Target>
+    </ECRelationshipClass>
+
     <ECRelationshipClass typeName="DistributionStructureIsOfType" strength="referencing" modifier="None" description="A type-instance relation; one that indicates that the specific DistributionStructure is an instance of the defined DistributionStructureType.">
         <BaseClass>bis:PhysicalElementIsOfType</BaseClass>
         <Source multiplicity="(0..*)" roleLabel="is of" polymorphic="true">
