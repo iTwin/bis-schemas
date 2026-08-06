@@ -77,6 +77,12 @@
 
     <PropertyCategory typeName="SurfaceControl" displayLabel="Surface Control" priority="0" />
 
+    <PropertyCategory typeName="EventPoint_Anchor" displayLabel="Event Point" priority="0" />
+    <PropertyCategory typeName="DistanceAnchorAspect_Distance" displayLabel="Distance" priority="0" />
+    <PropertyCategory typeName="PercentAnchorAspect_Percent" displayLabel="Percent" priority="0" />
+    <PropertyCategory typeName="RayAnchorAspect_Ray" displayLabel="Ray" priority="0" />
+    <PropertyCategory typeName="ClosestAnchorAspect_Closest" displayLabel="Closest" priority="0" />
+
     <ECEnumeration typeName="IslandType" backingTypeName="int" isStrict="true" displayLabel="Island Type" description="Describes the parking island construction type.">
         <ECEnumerator value="0" name="UNSET" displayLabel="Not Set" />
         <ECEnumerator value="1" name="LANDSCAPED" displayLabel="Landscaped" />
@@ -464,6 +470,75 @@
 
         <ECProperty propertyName="IslandWidth" minimumValue="0" maximumValue="304.8" typeName="double" category="ParkingIslandVertex_Island" kindOfQuantity="cvu:LENGTH" displayLabel="Island Width" description="Defines the island override for it's width." />
     </ECEntityClass>
+
+    <ECEntityClass typeName="EventPoint" modifier="Sealed" displayLabel="Event Point" description="A rule-driven point along a wire that resolves to a location each solve, subdividing the affected side into spans.">
+        <BaseClass>Vertex</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="ParametricAnchorAspect" modifier="Abstract" displayLabel="Parametric Anchor" description="Base for the authored anchor-rule parameters of an EventPoint; the concrete subclass identifies the anchor mode.">
+        <BaseClass>bis:ElementUniqueAspect</BaseClass>
+
+        <ECNavigationProperty propertyName="StartVertex" relationshipName="EventPointAnchorStartsAtVertex" direction="Forward" category="EventPoint_Anchor" displayLabel="Start Vertex" description="Primary anchor vertex (or EventPoint) the rule measures from. On Ray/Closest, StartPoint is used instead when this is unset (authored input)." />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="DirectedAnchorAspect" modifier="Abstract" displayLabel="Directed Anchor" description="Base for anchor modes defined by a directed pair of anchors (Start then End).">
+        <BaseClass>ParametricAnchorAspect</BaseClass>
+
+        <ECNavigationProperty propertyName="EndVertex" relationshipName="EventPointAnchorEndsAtVertex" direction="Forward" category="EventPoint_Anchor" displayLabel="End Vertex" description="Second anchor vertex (or EventPoint) that, with StartVertex, gives the direction. On Ray, EndPoint is used instead when this is unset (authored input)." />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="DistanceAnchorAspect" modifier="Sealed" displayLabel="Distance Anchor" description="Distance mode: a signed arc-length from StartVertex along the wire.">
+        <BaseClass>ParametricAnchorAspect</BaseClass>
+
+        <ECProperty propertyName="Distance" typeName="double" kindOfQuantity="cvu:LENGTH" category="DistanceAnchorAspect_Distance" displayLabel="Distance" description="Signed arc-length from StartVertex along the wire; positive is wire-forward, negative is wire-backward (authored input)." />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="ClosestAnchorAspect" modifier="Sealed" displayLabel="Closest Anchor" description="Closest mode: the point on the wire closest to the anchor.">
+        <BaseClass>ParametricAnchorAspect</BaseClass>
+
+        <ECProperty propertyName="StartPoint" typeName="Point3d" category="ClosestAnchorAspect_Closest" displayLabel="Anchor Point" description="World-space anchor whose nearest point on the wire positions the EventPoint; read only when StartVertex is unset (authored input)." />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="PercentAnchorAspect" modifier="Sealed" displayLabel="Percent Anchor" description="Percent mode: a fractional position from StartVertex toward EndVertex.">
+        <BaseClass>DirectedAnchorAspect</BaseClass>
+
+        <ECProperty propertyName="Percent" minimumValue="0" maximumValue="1" typeName="double" category="PercentAnchorAspect_Percent" displayLabel="Percent" description="Fractional position (0..1) along the wire from StartVertex toward EndVertex; direction comes from anchor order (authored input)." />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="RayAnchorAspect" modifier="Sealed" displayLabel="Ray Anchor" description="Ray mode: a ray from Start to End projected onto the wire.">
+        <BaseClass>DirectedAnchorAspect</BaseClass>
+
+        <ECProperty propertyName="StartPoint" typeName="Point3d" category="RayAnchorAspect_Ray" displayLabel="Ray Start" description="World-space ray start; read only when StartVertex is unset (authored input)." />
+        <ECProperty propertyName="EndPoint" typeName="Point3d" category="RayAnchorAspect_Ray" displayLabel="Ray End" description="World-space ray end; the ray points from Start toward End and is projected onto the wire. Read only when EndVertex is unset (authored input)." />
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="EventPointOwnsParametricAnchorAspect" modifier="Sealed" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="EventPoint" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="true">
+            <Class class="ParametricAnchorAspect" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="EventPointAnchorStartsAtVertex" strength="referencing" modifier="Sealed">
+        <Source multiplicity="(0..*)" roleLabel="starts at" polymorphic="true">
+            <Class class="ParametricAnchorAspect" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is start anchor for" polymorphic="true">
+            <Class class="Vertex" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="EventPointAnchorEndsAtVertex" strength="referencing" modifier="Sealed">
+        <Source multiplicity="(0..*)" roleLabel="ends at" polymorphic="true">
+            <Class class="DirectedAnchorAspect" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is end anchor for" polymorphic="true">
+            <Class class="Vertex" />
+        </Target>
+    </ECRelationshipClass>
 
     <ECEntityClass typeName="Edge" modifier="Abstract" displayLabel="Edge">
         <BaseClass>bis:SpatialLocationElement</BaseClass>
@@ -1011,6 +1086,26 @@
         <BaseClass>bis:ElementOwnsChildElements</BaseClass>
         <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
             <Class class="Wire" />
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="true">
+            <Class class="Edge" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="WireOwnsEventPoints" strength="embedding" strengthDirection="Forward" modifier="Sealed">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="Wire" />
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="false">
+            <Class class="EventPoint" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="EdgeOwnsSpanEdges" strength="embedding" strengthDirection="Forward" modifier="Sealed">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="Edge" />
         </Source>
         <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="true">
             <Class class="Edge" />
