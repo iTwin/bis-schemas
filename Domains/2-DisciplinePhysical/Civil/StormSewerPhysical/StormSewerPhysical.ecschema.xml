@@ -34,10 +34,16 @@
         <ECProperty propertyName="InvertElevation" typeName="double" kindOfQuantity="cvu:LENGTH" description="Elevation of the inside bottom of the Distribution Structure"/>
     </ECEntityClass>
     
-    <ECEntityClass typeName="RimElevationAspect" modifier="None" displayLabel="RimElevationAspect">
+    <ECEntityClass typeName="RimElevationAspect" modifier="Abstract" displayLabel="RimElevationAspect">
         <BaseClass >bis:ElementUniqueAspect</BaseClass>
-        <ECProperty propertyName="RimElevation" displayLabel="Rim Elevation" typeName="double" kindOfQuantity="cvu:LENGTH" description="Elevation at top of of distribution structure."/>
-        <ECProperty propertyName="RimToGroundElevation" displayLabel="Rim to Ground" typeName="boolean" description="If true then the rim elevation of the associated structure will automatically be set to the local ground elevation."/>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="RimElevationSetToGroundAspect">
+        <ECProperty propertyName="RimElevation" displayLabel="Rim Elevation" readOnly="True" typeName="double" kindOfQuantity="cvu:LENGTH" description="Elevation at top of of distribution structure."/>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="RimElevationEditableAspect">
+        <ECProperty propertyName="RimElevation" displayLabel="Rim Elevation" readOnly="False" typeName="double" kindOfQuantity="cvu:LENGTH" description="Elevation at top of of distribution structure."/>
     </ECEntityClass>
 
     <ECRelationshipClass typeName="DistributionStructureOwnsRimElevationAspect" strength="embedding">
@@ -53,16 +59,6 @@
     <ECEntityClass typeName="DistributionStructureType" modifier="Abstract" displayLabel="Distribution Structure Type" description="Defines a shared set of properties whose values vary per-type of DistributionStructure rather than per-instance.">
         <BaseClass>bis:PhysicalType</BaseClass>
     </ECEntityClass>
-
-    <ECRelationshipClass typeName="DistributionStructureTypeOwnsPorts" strength="embedding" description="Assign predefined ports to a distribution structure type.">
-        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
-        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
-            <Class class="DistributionStructureType"/>
-        </Source>
-        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="true">
-            <Class class="DistributionPort"/>
-        </Target>
-    </ECRelationshipClass>
 
     <ECRelationshipClass typeName="DistributionStructureIsOfType" strength="referencing" modifier="None" description="A type-instance relation; one that indicates that the specific DistributionStructure is an instance of the defined DistributionStructureType.">
         <BaseClass>bis:PhysicalElementIsOfType</BaseClass>
