@@ -257,7 +257,8 @@ describe.only('Schema Inventory Tests', function() {
             author: "", 
             date: "Unknown", 
             dynamic: "No", 
-            approved: "No"
+            approved: "No",
+            localizations: []
           }
         ]
       };
@@ -411,7 +412,7 @@ describe.only('Schema Inventory Tests', function() {
       await inventoryHandler.updateSchemaInventory();
       const inventory = JSON.parse(fs.readFileSync(inventoryFile));
       
-      chai.expect(Object.keys(inventory).length).to.equal(3);
+      chai.expect(Object.keys(inventory).length).to.equal(10);
       chai.expect(inventory["SchemaA"]).to.not.be.undefined;
       chai.expect(inventory["SchemaA"].length).to.equal(3);
       chai.expect(inventory["SchemaA"][0].version).to.equal("01.01.02");  
@@ -460,6 +461,99 @@ describe.only('Schema Inventory Tests', function() {
       chai.expect(inventory["SchemaC"][0].dynamic).to.equal("No");  
       chai.expect(inventory["SchemaC"][0].name).to.equal("SchemaC");
       chai.expect(inventory["SchemaC"][0].sha1).to.equal("MockChecksum");
+    });
+
+    it("Localizations added for an existing released and wip schemas, inventory items updated", async function() {
+      await inventoryHandler.updateSchemaInventory();
+      const inventory = JSON.parse(fs.readFileSync(inventoryFile));
+
+      chai.expect(inventory["SchemaE"]).to.not.be.undefined;
+      chai.expect(inventory["SchemaE"].length).to.equal(2);
+
+      chai.expect(inventory["SchemaE"][0].version).to.equal("03.00.00");
+      chai.expect(inventory["SchemaE"][0].released).to.be.false;
+      chai.expect(inventory["SchemaE"][0].localizations[0].locale).to.equal("de");
+      chai.expect(inventory["SchemaE"][0].localizations[0].path).to.equal("Sys\\Locales\\SchemaE.de.json");
+
+      chai.expect(inventory["SchemaE"][1].version).to.equal("02.00.00");
+      chai.expect(inventory["SchemaE"][1].released).to.be.true;
+      chai.expect(inventory["SchemaE"][1].localizations[0].locale).to.equal("de");
+      chai.expect(inventory["SchemaE"][1].localizations[0].path).to.equal("Sys\\Released\\Locales\\SchemaE.02.00.00.de.json");
+    });
+
+    it("A localization added for an existing wip schema, inventory item updated", async function() {
+      await inventoryHandler.updateSchemaInventory();
+      const inventory = JSON.parse(fs.readFileSync(inventoryFile));
+
+      chai.expect(inventory["SchemaD"]).to.not.be.undefined;
+      chai.expect(inventory["SchemaD"].length).to.equal(1);
+
+      chai.expect(inventory["SchemaD"][0].version).to.equal("01.00.00");
+      chai.expect(inventory["SchemaD"][0].localizations[0].locale).to.equal("fr-CA");
+      chai.expect(inventory["SchemaD"][0].localizations[0].path).to.equal("Sys\\Locales\\SchemaD.fr-CA.json");
+    });
+
+    it("New localization added for an existing released schema having an existing but different locale, inventory item updated", async function() {
+      await inventoryHandler.updateSchemaInventory();
+      const inventory = JSON.parse(fs.readFileSync(inventoryFile));
+
+      chai.expect(inventory["SchemaG"]).to.not.be.undefined;
+      chai.expect(inventory["SchemaG"].length).to.equal(1);
+
+      chai.expect(inventory["SchemaG"][0].version).to.equal("01.00.00");
+      chai.expect(inventory["SchemaG"][0].localizations[0].locale).to.equal("de");
+      chai.expect(inventory["SchemaG"][0].localizations[0].path).to.equal("Sys\\Released\\Locales\\SchemaG.01.00.00.de.json");
+
+      chai.expect(inventory["SchemaG"][0].localizations[1].locale).to.equal("fr-CA");
+      chai.expect(inventory["SchemaG"][0].localizations[1].path).to.equal("Sys\\Released\\Locales\\SchemaG.01.00.00.fr-CA.json");
+    });
+
+    it("New wip schema without any locale, added to inventory with empty localizations", async function() {
+      await inventoryHandler.updateSchemaInventory();
+      const inventory = JSON.parse(fs.readFileSync(inventoryFile));
+
+      chai.expect(inventory["SchemaF"]).to.not.be.undefined;
+      chai.expect(inventory["SchemaF"].length).to.equal(1);
+      chai.expect(inventory["SchemaF"][0].version).to.equal("01.00.00");
+      chai.expect(inventory["SchemaF"][0].released).to.be.false;
+      chai.expect(inventory["SchemaF"][0].localizations).to.be.an("array").that.is.empty;
+    });
+
+    it("New released schema without any locale, added to the inventory with empty localizations", async function() {
+      await inventoryHandler.updateSchemaInventory();
+      const inventory = JSON.parse(fs.readFileSync(inventoryFile));
+
+      chai.expect(inventory["SchemaH"]).to.not.be.undefined;
+      chai.expect(inventory["SchemaH"].length).to.equal(1);
+      chai.expect(inventory["SchemaH"][0].version).to.equal("02.00.01");
+      chai.expect(inventory["SchemaH"][0].released).to.be.true;
+      chai.expect(inventory["SchemaH"][0].localizations).to.be.an("array").that.is.empty;
+    });
+
+    it("New wip schema with a locale, added to the inventory with respective localizations", async function() {
+      await inventoryHandler.updateSchemaInventory();
+      const inventory = JSON.parse(fs.readFileSync(inventoryFile));
+
+      chai.expect(inventory["SchemaI"]).to.not.be.undefined;
+      chai.expect(inventory["SchemaI"].length).to.equal(1);
+      chai.expect(inventory["SchemaI"][0].version).to.equal("03.00.00");
+      chai.expect(inventory["SchemaI"][0].released).to.be.false;
+      chai.expect(inventory["SchemaI"][0].localizations[0].locale).to.equal("de");
+      chai.expect(inventory["SchemaI"][0].localizations[0].path).to.equal("Sys\\Locales\\SchemaI.de.json");
+    });
+
+    it("New released schema with multiple locales, added to the inventory with respective localizations", async function() {
+      await inventoryHandler.updateSchemaInventory();
+      const inventory = JSON.parse(fs.readFileSync(inventoryFile));
+
+      chai.expect(inventory["SchemaJ"]).to.not.be.undefined;
+      chai.expect(inventory["SchemaJ"].length).to.equal(1);
+      chai.expect(inventory["SchemaJ"][0].version).to.equal("01.00.00");
+      chai.expect(inventory["SchemaJ"][0].released).to.be.true;
+      chai.expect(inventory["SchemaJ"][0].localizations[0].locale).to.equal("de");
+      chai.expect(inventory["SchemaJ"][0].localizations[0].path).to.equal("Sys\\Released\\Locales\\SchemaJ.01.00.00.de.json");
+      chai.expect(inventory["SchemaJ"][0].localizations[1].locale).to.equal("fr-CA");
+      chai.expect(inventory["SchemaJ"][0].localizations[1].path).to.equal("Sys\\Released\\Locales\\SchemaJ.01.00.00.fr-CA.json");
     });
   });
 });

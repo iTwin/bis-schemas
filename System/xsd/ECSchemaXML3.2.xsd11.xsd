@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ==================================================================================
+|  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
+|  * See LICENSE.md in the project root for license terms and full copyright notice.
+======================================================================================= -->
+<!--
+  XSD 1.1 companion for ECSchemaXML 3.2.
+
+  ECSchemaXML3.2.xsd remains the primary XSD 1.0 schema for broad tool and .NET support.
+  This schema layers XSD 1.1 assertions over the same namespace for validators that support
+  them. VS Code's built-in XML schema validation may report XSD 1.1 constructs in this file
+  as invalid because it validates schema documents using XSD 1.0 rules.
+-->
+<xsd:schema targetNamespace="http://www.bentley.com/schemas/Bentley.ECXML.3.2" version="1.1" elementFormDefault="qualified"
+            xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" xmlns:ec="http://www.bentley.com/schemas/Bentley.ECXML.3.2"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:vc="http://www.w3.org/2007/XMLSchema-versioning"
+            vc:minVersion="1.1">
+
+    <xsd:override schemaLocation="ECSchemaXML3.2.xsd">
+        <xsd:complexType name="ECRelationshipClassType">
+            <xsd:choice minOccurs="0" maxOccurs="unbounded">
+                <xsd:element name="BaseClass" type="ec:mockName" minOccurs="0" maxOccurs="unbounded" />
+                <xsd:element ref="ec:ECCustomAttributes" minOccurs="0" maxOccurs="unbounded" />
+                <xsd:group ref="ec:ECPropertyTypes" minOccurs="0" maxOccurs="unbounded" />
+                <xsd:element name="Source" type="ec:ECRelationshipConstraintType" minOccurs="1" maxOccurs="1" />
+                <xsd:element name="Target" type="ec:ECRelationshipConstraintType" minOccurs="1" maxOccurs="1" />
+            </xsd:choice>
+            <xsd:attribute name="typeName" type="ec:name" use="required" />
+            <xsd:attribute name="description" type="xsd:string" use="optional" />
+            <xsd:attribute name="displayLabel" type="xsd:string" use="optional" />
+            <xsd:attribute name="modifier" type="ec:ECClassModifierType" use="optional" />
+            <xsd:attribute name="strength" type="ec:ECRelationshipStrengthType" default="referencing" use="optional" />
+            <xsd:attribute name="strengthDirection" type="ec:ECRelationshipDirectionType" default="forward" use="optional" />
+            <xsd:assert test="count(ec:Source) = 1 and count(ec:Target) = 1" />
+        </xsd:complexType>
+
+        <xsd:complexType name="ECRelationshipConstraintType" >
+            <xsd:choice minOccurs="1" maxOccurs="unbounded">
+                <xsd:element ref ="ec:ECCustomAttributes" minOccurs="0" maxOccurs="unbounded" />
+                <xsd:element name="Class" type="ec:ECRelationshipConstraintClassType" minOccurs="1" maxOccurs="unbounded" />
+            </xsd:choice>
+
+            <xsd:attribute name="multiplicity" type="ec:ECRelationshipMultiplicityType" default="(0..*)" use="optional" />
+            <xsd:attribute name="roleLabel" type="xsd:string" use="optional" />
+            <xsd:attribute name="polymorphic" type="ec:boolean" use="required"/>
+            <xsd:attribute name="abstractConstraint" type="ec:mockName" use="optional" />
+            <xsd:assert test="if (local-name() = 'Source') then count(ec:Class) = 1 else count(ec:Class) ge 1" />
+        </xsd:complexType>
+
+        <xsd:complexType name="ECEnumerationType">
+            <xsd:complexContent>
+                <xsd:extension base="ec:SchemaItemType">
+                    <xsd:sequence>
+                        <xsd:element ref="ec:ECEnumerator" minOccurs="0" maxOccurs="unbounded" />
+                    </xsd:sequence>
+                    <xsd:attribute name="name" type="ec:name" use="optional">
+                        <xsd:annotation>
+                            <xsd:documentation>Legacy alias for typeName found in some schemas. New schemas should use typeName.</xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:attribute>
+                    <xsd:attribute name="backingTypeName" type="xsd:string" use="required" />
+                    <xsd:attribute name="isStrict" type ="ec:boolean" use="optional" />
+                    <xsd:assert test="not(@name) or @name = @typeName" />
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:override>
+
+</xsd:schema>

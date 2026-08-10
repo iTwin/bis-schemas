@@ -9,7 +9,8 @@ const path = require("path");
 const fs = require("fs");
 const readdirp = require("readdirp");
 const argv = require("yargs").argv;
-const chalk = require("chalk");
+const chalkModule = require("chalk");
+const chalk = chalkModule.default || chalkModule;
 
 const SchemaContext = require("@itwin/ecschema-metadata").SchemaContext;
 const Schema = require("@itwin/ecschema-metadata").Schema;

@@ -93,7 +93,7 @@ To successfully run the tools described in this section, follow the steps below 
 #### Prerequisites
 
 - [Git](https://git-scm.com/)
-- [Node](https://nodejs.org/en/): an installation of the latest security patch of Node 14. The Node installation also includes the **npm** package manager.
+- [Node](https://nodejs.org/en/): an installation of Node 24.15. The Node installation also includes the **npm** package manager.
 - [TypeScript](https://www.typescriptlang.org/): this is listed as a devDependency, so if you're building it from source, you will get it with `rush install`.
 - [Visual Studio Code](https://code.visualstudio.com/): an optional dependency, but the repository structure is optimized for its use
 

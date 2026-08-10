@@ -53,8 +53,11 @@ async function updateSchemaInventory() {
     const inventorySchemas = existingInventory[name];
     
     for (const schema of schemaInfos) {
-      if (schemaExistsInInventory(schema, inventorySchemas))
+      if (schemaExistsInInventory(schema, inventorySchemas)) {
+        if (updateLocalizationsInfo(schema, inventorySchemas))
+          newEntries = true;
         continue;
+      }
 
       newEntries = true;
       
@@ -126,7 +129,9 @@ async function createRepositoryInventory(bisRootDir) {
 
     if (!schemaInfo.released)
       schemaInfo.comment = "Working Copy";
-    
+
+    schemaInfo.localizations = getLocalizationsInfo(schemaInfo, bisRootDir);
+
     if (repoInventory[schemaInfo.name] == undefined) {
       repoInventory[schemaInfo.name] = [];
     }
@@ -158,6 +163,46 @@ function schemaExistsInInventory(schema, inventorySchemas) {
     if (inventorySchema.version === schema.version && inventorySchema.released === schema.released) {
       return true;
     }
+  }
+  return false;
+}
+
+function getLocalizationsInfo(schemaInfo, bisRootDir) {
+  const schemaRelDir = path.dirname(schemaInfo.path);
+  const localesDir = path.join(bisRootDir, schemaRelDir, "Locales");
+
+  if (!fs.existsSync(localesDir))
+    return [];
+
+  const prefix = schemaInfo.released
+    ? `${schemaInfo.name}.${schemaInfo.version}.`
+    : `${schemaInfo.name}.`;
+
+  const files = fs.globSync(`${prefix}+([a-zA-Z]){,-+([a-zA-Z])}.json`, {cwd: localesDir});
+
+  const localizationInfo = files.map((file) => ({
+    path: path.join(schemaRelDir, "Locales", file).replace(/\//g, '\\'),
+    locale: file.slice(prefix.length, -".json".length),
+  }));
+
+  return localizationInfo;
+}
+
+function updateLocalizationsInfo(schema, inventorySchemas) {
+  if (!inventorySchemas)
+    return false;
+
+  for (const inventorySchema of inventorySchemas) {
+    if (inventorySchema.version !== schema.version || inventorySchema.released !== schema.released)
+      continue;
+
+    const existingPaths = new Set(inventorySchema.localizations.map((l) => l.path));
+    const missingLocalizations = schema.localizations.filter((l) => !existingPaths.has(l.path));
+    if (missingLocalizations.length === 0)
+      return false;
+
+    inventorySchema.localizations.push(...missingLocalizations);
+    return true;
   }
   return false;
 }
