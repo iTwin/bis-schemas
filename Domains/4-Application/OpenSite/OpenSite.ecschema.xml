@@ -37,7 +37,7 @@
     <PropertyCategory typeName="ParkingSpaceOverride_Space" displayLabel="Space" priority="0" />
     <PropertyCategory typeName="ParkingSpaceOverride_Row" displayLabel="Row" priority="0" />
 
-    <PropertyCategory typeName="ShapedEdge_LinkHeight" displayLabel="Grading Edge Height" priority="0" />
+    <PropertyCategory typeName="ShapedEdge_LinkHeight" displayLabel="Wall" priority="0" />
     <PropertyCategory typeName="BuildingEdge_SlopeAway" displayLabel="Grading Slope Away" priority="0" />
     <PropertyCategory typeName="PropertyEdge_Setbacks" displayLabel="Setbacks" priority="0" />
     <PropertyCategory typeName="CenterlinePathEdge_Grading" displayLabel="Grading" priority="0" />
@@ -48,6 +48,7 @@
     <PropertyCategory typeName="DrivewayPathFin_Shoulder" displayLabel="Shoulder" priority="0" />
     <PropertyCategory typeName="SidewalkPathFin_Sidewalk" displayLabel="Sidewalk" priority="0" />
 
+    <PropertyCategory typeName="RetainingWallArea_Wall" displayLabel="Wall" priority="0" />
     <PropertyCategory typeName="ShapedArea_Optimizer" displayLabel="Optimizer" priority="0" />
     <PropertyCategory typeName="ShapedArea_Constraints" displayLabel="Constraints" priority="0" />
     <PropertyCategory typeName="ShapedArea_Surface" displayLabel="Surface" priority="0" />
@@ -138,6 +139,18 @@
     <ECEnumeration typeName="BaySide" backingTypeName="int" isStrict="true" displayLabel="Bay Side" description="Side of a parking bay.">
         <ECEnumerator value="0" name="LEFT" displayLabel="Left" />
         <ECEnumerator value="1" name="RIGHT" displayLabel="Right" />
+    </ECEnumeration>
+
+    <ECEnumeration typeName="WallMode" backingTypeName="int" isStrict="true" displayLabel="Wall Mode" description="Describes whether a retaining wall may be placed along an edge and how its height is constrained.">
+        <ECEnumerator value="0" name="NO_WALL" displayLabel="No Wall" />
+        <ECEnumerator value="1" name="FIXED_WALL_HEIGHT" displayLabel="Fixed Wall Height" />
+        <ECEnumerator value="2" name="VARIABLE_WALL_HEIGHT" displayLabel="Variable Wall Height" />
+    </ECEnumeration>
+
+    <!-- A standalone retaining wall always is a wall, so unlike WallMode there is no "No Wall" option. -->
+    <ECEnumeration typeName="RetainingWallMode" backingTypeName="int" isStrict="true" displayLabel="Wall Mode" description="Describes how the height of a standalone retaining wall is constrained.">
+        <ECEnumerator value="1" name="FIXED_WALL_HEIGHT" displayLabel="Fixed Wall Height" />
+        <ECEnumerator value="2" name="VARIABLE_WALL_HEIGHT" displayLabel="Variable Wall Height" />
     </ECEnumeration>
 
     <ECRelationshipClass typeName="CategorySymbolizesClassification" strength="referencing" modifier="Abstract">
@@ -289,13 +302,13 @@
     <ECEntityClass typeName="AreaVertex" modifier="Sealed" displayLabel="Area Vertex">
         <BaseClass>Vertex</BaseClass>
 
-        <ECProperty propertyName="Radius" typeName="double" kindOfQuantity="cvu:LENGTH" />
+        <ECProperty propertyName="Radius" minimumValue="0" maximumValue="304.8" typeName="double" kindOfQuantity="cvu:LENGTH" />
     </ECEntityClass>
 
     <ECEntityClass typeName="PathVertex" modifier="Abstract" displayLabel="Path Vertex">
         <BaseClass>Vertex</BaseClass>
 
-        <ECProperty propertyName="Radius" typeName="double" kindOfQuantity="cvu:LENGTH" />
+        <ECProperty propertyName="Radius" minimumValue="0" maximumValue="304.8" typeName="double" kindOfQuantity="cvu:LENGTH" />
     </ECEntityClass>
 
     <ECEntityClass typeName="PathEndVertex" modifier="None" displayLabel="Path End Vertex" description="Path Vertex that is located at the start or end of a Path, in other words, it only has a single PathEdge attached to it">
@@ -305,7 +318,7 @@
     <ECEntityClass typeName="PathMidVertex" modifier="None" displayLabel="Path Mid Vertex" description="Path Vertex that has two PathEdge instances attached to it, in other words.">
         <BaseClass>Vertex</BaseClass>
 
-        <ECProperty propertyName="Radius" typeName="double" kindOfQuantity="cvu:LENGTH" />
+        <ECProperty propertyName="Radius" minimumValue="0" maximumValue="304.8" typeName="double" kindOfQuantity="cvu:LENGTH" />
     </ECEntityClass>
 
     <ECEntityClass typeName="DrivewayEndVertex" modifier="Sealed" displayLabel="Driveway End Vertex" description="The first and last Vertex of a DrivewayPath.">
@@ -488,7 +501,11 @@
             </ECCustomAttributes>
         </ECProperty>
 
+        <ECProperty propertyName="WallMode" typeName="WallMode" category="ShapedEdge_LinkHeight" displayLabel="Wall Mode" description="Whether a retaining wall may be placed along the edge and how its height is constrained." />
         <ECProperty propertyName="UseWallInCost" typeName="boolean" category="ShapedEdge_LinkHeight" displayLabel="Use Wall in Cost" description="Treat as a wall for cost optimization." />
+        <ECNavigationProperty propertyName="WallType" relationshipName="ShapedEdgeUsesRetainingWallType" direction="Forward" category="ShapedEdge_LinkHeight" displayLabel="Wall Type" description="Retaining wall type placed along the edge. When not set (None), a flat, non-extruded retaining wall is placed." />
+        <ECProperty propertyName="MinWallHeight" minimumValue="-304.8" maximumValue="304.8" typeName="double" kindOfQuantity="cvu:LENGTH" category="ShapedEdge_LinkHeight" displayLabel="Min. Wall Height" description="Minimum wall height used when a fixed height is not set." />
+        <ECProperty propertyName="MaxWallHeight" minimumValue="-304.8" maximumValue="304.8" typeName="double" kindOfQuantity="cvu:LENGTH" category="ShapedEdge_LinkHeight" displayLabel="Max. Wall Height" description="Maximum wall height used when a fixed height is not set." />
     </ECEntityClass>
 
     <ECEntityClass typeName="PropertyEdge" modifier="Sealed" displayLabel="Grading Limit Edge">
@@ -542,7 +559,7 @@
 
     <ECEntityClass typeName="PadEdge" modifier="Sealed" displayLabel="Pad Edge">
         <BaseClass>ShapedEdge</BaseClass>
-        <ECProperty propertyName="FixedHeightDifference" minimumValue="0" maximumValue="30.48" typeName="double" kindOfQuantity="cvu:LENGTH" category="ShapedEdge_LinkHeight" displayLabel="Fixed Height Difference" description="Height of an edge." />
+        <ECProperty propertyName="FixedHeightDifference" minimumValue="-30.48" maximumValue="30.48" typeName="double" kindOfQuantity="cvu:LENGTH" category="ShapedEdge_LinkHeight" displayLabel="Fixed Height Difference" description="Height of an edge." />
     </ECEntityClass>
 
     <ECEntityClass typeName="LayoutParkingEdge" modifier="Sealed" displayLabel="Layout Parking Edge" description="Parking lot">
@@ -815,6 +832,15 @@
         </Target>
     </ECRelationshipClass>
 
+    <ECRelationshipClass typeName="ShapedEdgeUsesRetainingWallType" strength="referencing" modifier="Sealed">
+        <Source multiplicity="(0..*)" roleLabel="uses" polymorphic="true">
+            <Class class="ShapedEdge" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is used by" polymorphic="true">
+            <Class class="RetainingWallType" />
+        </Target>
+    </ECRelationshipClass>
+
     <ECRelationshipClass typeName="EdgeStartsAtVertex" strength="referencing" modifier="Sealed">
         <Source multiplicity="(0..2)" roleLabel="starts at" polymorphic="true">
             <Class class="Edge" />
@@ -1034,8 +1060,20 @@
 
     <ECEntityClass typeName="RetainingWallArea" displayLabel="Retaining Wall" description="Retaining Wall">
         <BaseClass>Area</BaseClass>
-		<ECProperty propertyName="Width" minimumValue="0" maximumValue="30.48" typeName="double" kindOfQuantity="cvu:LENGTH_SHORT" displayLabel="Width" description="Width of the retaining wall." />
+		<ECProperty propertyName="Width" minimumValue="0" maximumValue="30.48" typeName="double" kindOfQuantity="cvu:LENGTH_SHORT" displayLabel="Width" description="Width of the retaining wall." >
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03" />
+                <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                    <Description>Width is deprecated for RetainingWallArea (wall thickness is held in the WallThickness property of the RetainingWallType).</Description>
+                </Deprecated>
+            </ECCustomAttributes>
+        </ECProperty>
         <ECNavigationProperty propertyName="RetainingWallType" relationshipName="RetainingWallAreaUsesRetainingWallType" direction="Forward" displayLabel="Retaining Wall Type" />
+
+        <ECProperty propertyName="WallMode" typeName="RetainingWallMode" category="RetainingWallArea_Wall" displayLabel="Wall Mode" description="How the height of the retaining wall is constrained." />
+        <ECProperty propertyName="FixedHeightDifference" minimumValue="-30.48" maximumValue="30.48" typeName="double" kindOfQuantity="cvu:LENGTH" category="RetainingWallArea_Wall" displayLabel="Fixed Height Difference" description="Height of the retaining wall when a fixed height is used." />
+        <ECProperty propertyName="MinWallHeight" minimumValue="-304.8" maximumValue="304.8" typeName="double" kindOfQuantity="cvu:LENGTH" category="RetainingWallArea_Wall" displayLabel="Min. Wall Height" description="Minimum wall height used when a fixed height is not set." />
+        <ECProperty propertyName="MaxWallHeight" minimumValue="-304.8" maximumValue="304.8" typeName="double" kindOfQuantity="cvu:LENGTH" category="RetainingWallArea_Wall" displayLabel="Max. Wall Height" description="Maximum wall height used when a fixed height is not set." />
     </ECEntityClass>
 
     <ECEntityClass typeName="ShapedArea" modifier="Abstract" displayLabel="Shaped Area" description="Shaped area">
@@ -1386,6 +1424,7 @@
     <ECEntityClass typeName="RetainingWallType" displayLabel="Retaining Wall Type" description="Defines a shared set of properties whose values vary per-type of RetainingWall rather than per-instance.">
         <BaseClass>cvphys:RetainingWallType</BaseClass>
 
+        <ECProperty propertyName="WallThickness" minimumValue="0" maximumValue="30.48" typeName="double" kindOfQuantity="cvu:LENGTH" displayLabel="Wall Thickness" description="Thickness of the wall body." />
         <ECProperty propertyName="FrontWallSetback" minimumValue="0" maximumValue="30.48" typeName="double" kindOfQuantity="cvu:LENGTH" displayLabel="Front Wall Setback" description="Width of front wall setback." />
         <ECProperty propertyName="BackWallSetback" minimumValue="0" maximumValue="30.48" typeName="double" kindOfQuantity="cvu:LENGTH" displayLabel="Back Wall Setback" description="Width of back wall setback." />
         <ECProperty propertyName="ExposedWallHeight" minimumValue="0" maximumValue="304.8" typeName="double" kindOfQuantity="cvu:LENGTH" displayLabel="Exposed Wall Height" description="Height of exposed wall." />
