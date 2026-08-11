@@ -48,6 +48,7 @@
     <PropertyCategory typeName="DrivewayPathFin_Shoulder" displayLabel="Shoulder" priority="0" />
     <PropertyCategory typeName="SidewalkPathFin_Sidewalk" displayLabel="Sidewalk" priority="0" />
 
+    <PropertyCategory typeName="RetainingWallArea_Wall" displayLabel="Wall" priority="0" />
     <PropertyCategory typeName="ShapedArea_Optimizer" displayLabel="Optimizer" priority="0" />
     <PropertyCategory typeName="ShapedArea_Constraints" displayLabel="Constraints" priority="0" />
     <PropertyCategory typeName="ShapedArea_Surface" displayLabel="Surface" priority="0" />
@@ -148,6 +149,12 @@
 
     <ECEnumeration typeName="WallMode" backingTypeName="int" isStrict="true" displayLabel="Wall Mode" description="Describes whether a retaining wall may be placed along an edge and how its height is constrained.">
         <ECEnumerator value="0" name="NO_WALL" displayLabel="No Wall" />
+        <ECEnumerator value="1" name="FIXED_WALL_HEIGHT" displayLabel="Fixed Wall Height" />
+        <ECEnumerator value="2" name="VARIABLE_WALL_HEIGHT" displayLabel="Variable Wall Height" />
+    </ECEnumeration>
+
+    <!-- A standalone retaining wall always is a wall, so unlike WallMode there is no "No Wall" option. -->
+    <ECEnumeration typeName="RetainingWallMode" backingTypeName="int" isStrict="true" displayLabel="Wall Mode" description="Describes how the height of a standalone retaining wall is constrained.">
         <ECEnumerator value="1" name="FIXED_WALL_HEIGHT" displayLabel="Fixed Wall Height" />
         <ECEnumerator value="2" name="VARIABLE_WALL_HEIGHT" displayLabel="Variable Wall Height" />
     </ECEnumeration>
@@ -1157,6 +1164,11 @@
             </ECCustomAttributes>
         </ECProperty>
         <ECNavigationProperty propertyName="RetainingWallType" relationshipName="RetainingWallAreaUsesRetainingWallType" direction="Forward" displayLabel="Retaining Wall Type" />
+
+        <ECProperty propertyName="WallMode" typeName="RetainingWallMode" category="RetainingWallArea_Wall" displayLabel="Wall Mode" description="How the height of the retaining wall is constrained." />
+        <ECProperty propertyName="FixedHeightDifference" minimumValue="-30.48" maximumValue="30.48" typeName="double" kindOfQuantity="cvu:LENGTH" category="RetainingWallArea_Wall" displayLabel="Fixed Height Difference" description="Height of the retaining wall when a fixed height is used." />
+        <ECProperty propertyName="MinWallHeight" minimumValue="-304.8" maximumValue="304.8" typeName="double" kindOfQuantity="cvu:LENGTH" category="RetainingWallArea_Wall" displayLabel="Min. Wall Height" description="Minimum wall height used when a fixed height is not set." />
+        <ECProperty propertyName="MaxWallHeight" minimumValue="-304.8" maximumValue="304.8" typeName="double" kindOfQuantity="cvu:LENGTH" category="RetainingWallArea_Wall" displayLabel="Max. Wall Height" description="Maximum wall height used when a fixed height is not set." />
     </ECEntityClass>
 
     <ECEntityClass typeName="ShapedArea" modifier="Abstract" displayLabel="Shaped Area" description="Shaped area">
