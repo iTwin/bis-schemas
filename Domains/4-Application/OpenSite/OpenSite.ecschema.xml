@@ -68,6 +68,8 @@
     <PropertyCategory typeName="LayoutParcelingArea_ParcelLayout" displayLabel="Parcel Layout" priority="0" />
     <PropertyCategory typeName="ParcelBuildingAspect_BuildingLayout" displayLabel="Building Layout" priority="0" />
     <PropertyCategory typeName="ParcelSetbacksAspect_Setbacks" displayLabel="Setbacks" priority="0" />
+    <PropertyCategory typeName="ParcelGradingAspect_Grading" displayLabel="Grading" priority="0" />
+    <PropertyCategory typeName="BuildingWallAspect_Walls" displayLabel="Walls" priority="0" />
 
     <PropertyCategory typeName="DrivewayPath_Direction" displayLabel="Direction" priority="0" />
     <PropertyCategory typeName="ParkingRowPath_Parking" displayLabel="Parking" priority="0" />
@@ -1377,7 +1379,7 @@
         <ECProperty propertyName="MaxParcelDepth" minimumValue="0" maximumValue="3048" typeName="double" kindOfQuantity="cvu:LENGTH" category="LayoutParcelingArea_ParcelLayout" displayLabel="Max. Parcel Depth" description="Maximum parcel depth." />
         <ECProperty propertyName="MinParcelFrontage" minimumValue="0" maximumValue="3048" typeName="double" kindOfQuantity="cvu:LENGTH" category="LayoutParcelingArea_ParcelLayout" displayLabel="Min. Parcel Frontage" description="Minimum parcel frontage." />
         <ECProperty propertyName="ParcelFrontageOffset" minimumValue="0" maximumValue="3048" typeName="double" kindOfQuantity="cvu:LENGTH" category="LayoutParcelingArea_ParcelLayout" displayLabel="Frontage Offset" description="Frontage offset." />
-        <ECProperty propertyName="BackYardDepth" minimumValue="0" maximumValue="3048" typeName="double" kindOfQuantity="cvu:LENGTH" category="LayoutParcelingArea_ParcelLayout" displayLabel="Back Yard Depth" description="Back yard depth." />
+        <ECProperty propertyName="BackYardDepth" minimumValue="0" maximumValue="3048" typeName="double" kindOfQuantity="cvu:LENGTH" category="ParcelGradingAspect_Grading" displayLabel="Back Yard Depth" description="Back yard depth." />
     </ECEntityClass>
 
     <ECEntityClass typeName="ParcelBuildingAspect" modifier="Sealed" displayLabel="Building Aspect">
@@ -1393,6 +1395,28 @@
         <ECProperty propertyName="FrontSetback" minimumValue="0" maximumValue="304.8" typeName="double" kindOfQuantity="cvu:LENGTH" category="ParcelSetbacksAspect_Setbacks" displayLabel="Front" description="Front setback distance." />
         <ECProperty propertyName="SideSetback" minimumValue="0" maximumValue="304.8" typeName="double" kindOfQuantity="cvu:LENGTH" category="ParcelSetbacksAspect_Setbacks" displayLabel="Side" description="Side setback distance." />
         <ECProperty propertyName="BackSetback" minimumValue="0" maximumValue="304.8" typeName="double" kindOfQuantity="cvu:LENGTH" category="ParcelSetbacksAspect_Setbacks" displayLabel="Back" description="Back setback distance." />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="ParcelGradingAspect" modifier="Sealed" displayLabel="Parcel Grading">
+        <BaseClass>bis:ElementUniqueAspect</BaseClass>
+
+        <ECProperty propertyName="MinFrontYardSlope" minimumValue="-10" maximumValue="10" typeName="double" kindOfQuantity="cvu:SLOPE" category="ParcelGradingAspect_Grading" displayLabel="Min. Front Yard Slope" description="Minimum front yard slope." />
+        <ECProperty propertyName="MaxFrontYardSlope" minimumValue="-10" maximumValue="10" typeName="double" kindOfQuantity="cvu:SLOPE" category="ParcelGradingAspect_Grading" displayLabel="Max. Front Yard Slope" description="Maximum front yard slope." />
+        <ECProperty propertyName="MinSideYardSlope" minimumValue="-10" maximumValue="10" typeName="double" kindOfQuantity="cvu:SLOPE" category="ParcelGradingAspect_Grading" displayLabel="Min. Side Yard Slope" description="Minimum side yard slope." />
+        <ECProperty propertyName="MaxSideYardSlope" minimumValue="-10" maximumValue="10" typeName="double" kindOfQuantity="cvu:SLOPE" category="ParcelGradingAspect_Grading" displayLabel="Max. Side Yard Slope" description="Maximum side yard slope." />
+        <ECProperty propertyName="MinBackYardSlope" minimumValue="-10" maximumValue="10" typeName="double" kindOfQuantity="cvu:SLOPE" category="ParcelGradingAspect_Grading" displayLabel="Min. Back Yard Slope" description="Minimum back yard slope." />
+        <ECProperty propertyName="MaxBackYardSlope" minimumValue="-10" maximumValue="10" typeName="double" kindOfQuantity="cvu:SLOPE" category="ParcelGradingAspect_Grading" displayLabel="Max. Back Yard Slope" description="Maximum back yard slope." />
+        <ECProperty propertyName="MinTieInSlope" minimumValue="-10" maximumValue="10" typeName="double" kindOfQuantity="cvu:SLOPE" category="ParcelGradingAspect_Grading" displayLabel="Min. Tie-In Slope" description="Minimum tie-in slope." />
+        <ECProperty propertyName="MaxTieInSlope" minimumValue="-10" maximumValue="10" typeName="double" kindOfQuantity="cvu:SLOPE" category="ParcelGradingAspect_Grading" displayLabel="Max. Tie-In Slope" description="Maximum tie-in slope." />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="BuildingWallAspect" modifier="Sealed" displayLabel="Building Wall">
+        <BaseClass>bis:ElementUniqueAspect</BaseClass>
+
+        <ECProperty propertyName="BuildingWallFront" minimumValue="0" maximumValue="304.8" typeName="double" kindOfQuantity="cvu:LENGTH" category="BuildingWallAspect_Walls" displayLabel="Front" description="Building wall front offset." />
+        <ECProperty propertyName="BuildingWallBack" minimumValue="0" maximumValue="304.8" typeName="double" kindOfQuantity="cvu:LENGTH" category="BuildingWallAspect_Walls" displayLabel="Back" description="Building wall back offset." />
+        <ECProperty propertyName="BuildingWallLeft" minimumValue="0" maximumValue="304.8" typeName="double" kindOfQuantity="cvu:LENGTH" category="BuildingWallAspect_Walls" displayLabel="Left" description="Building wall left offset." />
+        <ECProperty propertyName="BuildingWallRight" minimumValue="0" maximumValue="304.8" typeName="double" kindOfQuantity="cvu:LENGTH" category="BuildingWallAspect_Walls" displayLabel="Right" description="Building wall right offset." />
     </ECEntityClass>
 
     <ECRelationshipClass typeName="LayoutParcelingAreaOwnsParcelBuildingAspect" modifier="Sealed" strength="embedding">
@@ -1412,6 +1436,26 @@
         </Source>
         <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
             <Class class="ParcelSetbacksAspect" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="LayoutParcelingAreaOwnsParcelGradingAspect" modifier="Sealed" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="LayoutParcelingArea" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="ParcelGradingAspect" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="LayoutParcelingAreaOwnsBuildingWallAspect" modifier="Sealed" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="LayoutParcelingArea" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="BuildingWallAspect" />
         </Target>
     </ECRelationshipClass>
 
