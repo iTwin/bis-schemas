@@ -1496,10 +1496,32 @@
         <BaseClass>bis:SpatialLocationElement</BaseClass>
         <ECCustomAttributes>
             <HiddenClass xmlns="CoreCustomAttributes.01.00.03" />
+            <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                <Description>Use UnclippedTopSurfaceAspect instead</Description>
+            </Deprecated>
         </ECCustomAttributes>
 
         <ECProperty propertyName="Surface" typeName="Bentley.Geometry.Common.IGeometry" displayLabel="Top Surface Geometry" />
     </ECEntityClass>
+
+    <ECEntityClass typeName="UnclippedTopSurfaceAspect" modifier="Sealed" displayLabel="Unclipped Top Surface Aspect" description="Unclipped Top Surface geometry.">
+        <BaseClass>bis:ElementMultiAspect</BaseClass>
+        <ECCustomAttributes>
+            <HiddenClass xmlns="CoreCustomAttributes.01.00.03" />
+        </ECCustomAttributes>
+
+        <ECProperty propertyName="Surface" typeName="Bentley.Geometry.Common.IGeometry" displayLabel="Unclipped Top Surface Geometry" />
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="PhysicalElementOwnsUnclippedTopSurfaceAspects" modifier="Sealed" strength="embedding">
+        <BaseClass>bis:ElementOwnsMultiAspects</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:PhysicalElement" />
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="false">
+            <Class class="UnclippedTopSurfaceAspect" />
+        </Target>
+    </ECRelationshipClass>
 
     <ECEntityClass typeName="ContourLinesAspect" modifier="Sealed" displayLabel="Contour Lines" description="Terrain contour lines" >
         <BaseClass>bis:ElementUniqueAspect</BaseClass>
