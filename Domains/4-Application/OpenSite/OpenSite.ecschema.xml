@@ -47,6 +47,8 @@
     <PropertyCategory typeName="DrivewayPathFin_Road" displayLabel="Road" priority="0" />
     <PropertyCategory typeName="DrivewayPathFin_Shoulder" displayLabel="Shoulder" priority="0" />
     <PropertyCategory typeName="SidewalkPathFin_Sidewalk" displayLabel="Sidewalk" priority="0" />
+    <PropertyCategory typeName="PedestrianPathEdge_Path" displayLabel="Path" priority="0" />
+    <PropertyCategory typeName="PedestrianPathVertex_Elevation" displayLabel="Elevation" priority="0" />
 
     <PropertyCategory typeName="RetainingWallArea_Wall" displayLabel="Wall" priority="0" />
     <PropertyCategory typeName="ShapedArea_Optimizer" displayLabel="Optimizer" priority="0" />
@@ -77,6 +79,7 @@
     <PropertyCategory typeName="EdgeCurbAspect_Curb" displayLabel="Curb" priority="0" />
     <PropertyCategory typeName="EdgeOnSideParkingAspect_Parking" displayLabel="OnSide Parking" priority="0" />
     <PropertyCategory typeName="EdgeOnSideParkingAspect_Grading" displayLabel="OnSide Parking Grading" priority="0" />
+    <PropertyCategory typeName="EdgeStairsAspect_Stairs" displayLabel="Stairs" priority="0" />
 
     <PropertyCategory typeName="SurfaceControl" displayLabel="Surface Control" priority="0" />
 
@@ -374,6 +377,18 @@
         <ECProperty propertyName="KnuckleOffset" minimumValue="-304.8" maximumValue="304.8" typeName="double" kindOfQuantity="cvu:LENGTH" category="DrivewayMidVertex_Knuckle" displayLabel="Knuckle Offset" description="Knuckle offset." />
         <ECProperty propertyName="CurbReturnRadius" minimumValue="0" maximumValue="304.8" typeName="double" kindOfQuantity="cvu:LENGTH" category="DrivewayMidVertex_Knuckle" displayLabel="Curb Return Radius" description="Curb return radius." />
         <ECProperty propertyName="CurbReturnLength" minimumValue="0" maximumValue="304.8" typeName="double" kindOfQuantity="cvu:LENGTH" category="DrivewayMidVertex_Knuckle" displayLabel="Curb Return Length" description="Curb return length." />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="PedestrianPathEndVertex" modifier="Sealed" displayLabel="Pedestrian Path End Vertex" description="The first and last Vertex of a PedestrianPath.">
+        <BaseClass>PathEndVertex</BaseClass>
+
+        <ECProperty propertyName="Elevation" minimumValue="-304.8" maximumValue="9144" typeName="double" kindOfQuantity="cvu:LENGTH" category="PedestrianPathVertex_Elevation" displayLabel="Elevation" description="Fixed elevation for this vertex, used to compute stairs along the adjoining edges." />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="PedestrianPathMidVertex" modifier="Sealed" displayLabel="Pedestrian Path Mid Vertex" description="Vertex of a PedestrianPath that has two PedestrianPathEdge instances attached to it.">
+        <BaseClass>PathMidVertex</BaseClass>
+
+        <ECProperty propertyName="Elevation" minimumValue="-304.8" maximumValue="9144" typeName="double" kindOfQuantity="cvu:LENGTH" category="PedestrianPathVertex_Elevation" displayLabel="Elevation" description="Fixed elevation for this vertex, used to compute stairs along the adjoining edges." />
     </ECEntityClass>
 
     <ECEntityClass typeName="ParkingOverride" modifier="Abstract" displayLabel="Parking Override">
@@ -754,6 +769,12 @@
 
     <ECEntityClass typeName="ParkingDirectionPathEdge" modifier="Sealed" displayLabel="Parking Direction Edge" description="Parking direction path edge.">
         <BaseClass>PathEdge</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="PedestrianPathEdge" modifier="Sealed" displayLabel="Pedestrian Path Edge" description="Side of a pedestrian path, optionally computed as a set of stairs.">
+        <BaseClass>PathEdge</BaseClass>
+
+        <ECProperty propertyName="Width" minimumValue="0" maximumValue="304.8" typeName="double" kindOfQuantity="cvu:LENGTH" category="PedestrianPathEdge_Path" displayLabel="Width" description="Width of this side of the pedestrian path. When not set, the Width of the parent PedestrianPath is used." />
     </ECEntityClass>
 
     <ECRelationshipClass typeName="SpaceOverrideUsesSurfaceMarkingType" strength="referencing" modifier="Sealed">
@@ -1900,6 +1921,25 @@
         </Source>
         <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
             <Class class="EdgeCurbAspect" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="EdgeStairsAspect" modifier="Sealed" displayLabel="Stairs" description="Parameters used to generate a set of stairs along an edge.">
+        <BaseClass>bis:ElementUniqueAspect</BaseClass>
+
+        <ECProperty propertyName="MaxStepCount" minimumValue="1" maximumValue="1000" typeName="int" category="EdgeStairsAspect_Stairs" displayLabel="Number of Steps (Max)" description="Maximum number of steps to generate for this side." />
+        <ECProperty propertyName="TreadWidth" minimumValue="0" maximumValue="30.48" typeName="double" kindOfQuantity="cvu:LENGTH_SHORT" category="EdgeStairsAspect_Stairs" displayLabel="Tread Width" description="Depth of each step's tread." />
+        <ECProperty propertyName="StepHeight" minimumValue="0" maximumValue="30.48" typeName="double" kindOfQuantity="cvu:LENGTH_SHORT" category="EdgeStairsAspect_Stairs" displayLabel="Step Height" description="Riser height of each step." />
+        <ECProperty propertyName="EndElevation" minimumValue="-304.8" maximumValue="9144" typeName="double" kindOfQuantity="cvu:LENGTH" readOnly="True" category="EdgeStairsAspect_Stairs" displayLabel="End Elevation" description="Calculated elevation reached at the end of the stairs." />
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="PedestrianPathEdgeOwnsStairsAspect" modifier="Sealed" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="PedestrianPathEdge" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="EdgeStairsAspect" />
         </Target>
     </ECRelationshipClass>
 
