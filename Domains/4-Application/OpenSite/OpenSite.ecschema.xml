@@ -77,6 +77,7 @@
     <PropertyCategory typeName="EdgeParkingAspect_Parking" displayLabel="Parking" priority="0" />
     <PropertyCategory typeName="EdgeSidewalkAspect_Sidewalk" displayLabel="Sidewalk" priority="0" />
     <PropertyCategory typeName="EdgeCurbAspect_Curb" displayLabel="Curb" priority="0" />
+    <PropertyCategory typeName="EdgeHatchingAspect_Hatching" displayLabel="Hatching" priority="0" />
     <PropertyCategory typeName="EdgeOnSideParkingAspect_Parking" displayLabel="OnSide Parking" priority="0" />
     <PropertyCategory typeName="EdgeOnSideParkingAspect_Grading" displayLabel="OnSide Parking Grading" priority="0" />
     <PropertyCategory typeName="EdgeStairsAspect_Stairs" displayLabel="Stairs" priority="0" />
@@ -235,6 +236,16 @@
     </ECRelationshipClass>
 
     <ECRelationshipClass typeName="SidewalkCategorySymbolizesClassification" strength="referencing" modifier="Sealed">
+        <BaseClass>CategorySymbolizesClassification</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="symbolizes" polymorphic="true">
+            <Class class="bis:Category" />
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is symbolized by" polymorphic="false">
+            <Class class="clsf:Classification" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="HatchingCategorySymbolizesClassification" strength="referencing" modifier="Sealed">
         <BaseClass>CategorySymbolizesClassification</BaseClass>
         <Source multiplicity="(0..1)" roleLabel="symbolizes" polymorphic="true">
             <Class class="bis:Category" />
@@ -1578,7 +1589,15 @@
 
         <ECProperty propertyName="Spacing" minimumValue="0" maximumValue="30.48" typeName="double" kindOfQuantity="cvu:LENGTH" displayLabel="Spacing" description="Space between the hatch lines." />
         <ECProperty propertyName="Angle" minimumValue="-3.141592653589793" maximumValue="3.141592653589793" typeName="double" kindOfQuantity="cvu:ANGLE" displayLabel="Angle" description="Angle of the hatch lines." />
-        <ECProperty propertyName="Width" minimumValue="0" maximumValue="30.48" typeName="double" kindOfQuantity="cvu:LENGTH" displayLabel="Width" description="Width of the hatch lines." />
+        <ECProperty propertyName="Width" minimumValue="0" maximumValue="30.48" typeName="double" kindOfQuantity="cvu:LENGTH" displayLabel="Width" description="Width of the hatch lines." >
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03" />
+                <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                    <Description>Width is controlled by symbology, not by this property.</Description>
+                </Deprecated>
+            </ECCustomAttributes>
+        </ECProperty>
+        <ECProperty propertyName="ShowBoundary" typeName="boolean" category="EdgeHatchingAspect_Hatching" displayLabel="Show Boundary" description="Whether the hatched area's outline is drawn along with the hatch pattern lines." />
     </ECEntityClass>
 
     <ECEntityClass typeName="RetainingWallType" displayLabel="Retaining Wall Type" description="Defines a shared set of properties whose values vary per-type of RetainingWall rather than per-instance.">
@@ -1709,6 +1728,16 @@
         </Source>
         <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
             <Class class="EdgeParkingAspect" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="PedestrianPathEdgeOwnsHatchingAspect" modifier="Sealed" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="PedestrianPathEdge" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
+            <Class class="HatchingAspect" />
         </Target>
     </ECRelationshipClass>
 
