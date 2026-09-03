@@ -16,7 +16,7 @@ const SchemaComparison = require("@bentley/schema-comparer").SchemaComparison;
 const CompareOptions = require("@bentley/schema-comparer").CompareOptions;
 const ComparisonResultType = require("@bentley/schema-comparer").ComparisonResultType;
 
-// Add the name(s) of schemas that should be skipped from schema differencing.
+// Add the name(s) of schemas that should be skipped from schema differencing
 const excludedSchemaNames = [
 ];
 
