@@ -31,6 +31,8 @@ process.on("unhandledRejection", err => {
 async function compareSchemas() {
   const schemas = await getAllSchemas();
   const refPaths = getRefpaths(schemas)
+  // The released schema's reference closure must be resolved using only released schema directories.
+  const releasedRefPaths = getRefpaths(schemas, true);
   let hasErrors = false;
 
   const outputPath = getOutputPath();
@@ -57,10 +59,9 @@ async function compareSchemas() {
       continue;
     }
 
-    console.log(`Found latest ${schema.name} schema at ${releasedSchema.fullPath}.`)
-
+    console.log(`Found latest ${schema.name} schema at ${releasedSchema.fullPath}.`);
     
-    const options = new CompareOptions(releasedSchema.fullPath, schema.fullPath, refPaths, refPaths, outputPath);
+    const options = new CompareOptions(releasedSchema.fullPath, schema.fullPath, releasedRefPaths, refPaths, outputPath);
     const results = await SchemaComparison.compare(options);
     if (processResults(releasedSchema, schema, results))
       hasErrors = true;
@@ -104,9 +105,12 @@ function reportWarning(message) {
   console.log(chalk.yellow(`\"##vso[task.logissue type=warning]${message}\"`));
 }
 
-function getRefpaths(schemas) {
+function getRefpaths(schemas, releasedOnly = false) {
   const referencePaths = [];
   for (const schema of schemas) {
+    if (releasedOnly && !schema.released)
+      continue;
+
     const dir = path.dirname(schema.fullPath);
     if (referencePaths.includes(dir))
       continue;
