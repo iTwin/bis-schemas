@@ -1572,10 +1572,32 @@
         <BaseClass>bis:SpatialLocationElement</BaseClass>
         <ECCustomAttributes>
             <HiddenClass xmlns="CoreCustomAttributes.01.00.03" />
+            <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                <Description>Use UnclippedTopSurfaceAspect instead</Description>
+            </Deprecated>
         </ECCustomAttributes>
 
         <ECProperty propertyName="Surface" typeName="Bentley.Geometry.Common.IGeometry" displayLabel="Top Surface Geometry" />
     </ECEntityClass>
+
+    <ECEntityClass typeName="UnclippedTopSurfaceAspect" modifier="Sealed" displayLabel="Unclipped Top Surface Aspect" description="Unclipped Top Surface geometry.">
+        <BaseClass>bis:ElementMultiAspect</BaseClass>
+        <ECCustomAttributes>
+            <HiddenClass xmlns="CoreCustomAttributes.01.00.03" />
+        </ECCustomAttributes>
+
+        <ECProperty propertyName="Surface" typeName="Bentley.Geometry.Common.IGeometry" displayLabel="Unclipped Top Surface Geometry" />
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="PhysicalElementOwnsUnclippedTopSurfaceAspects" modifier="Sealed" strength="embedding">
+        <BaseClass>bis:ElementOwnsMultiAspects</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:PhysicalElement" />
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="false">
+            <Class class="UnclippedTopSurfaceAspect" />
+        </Target>
+    </ECRelationshipClass>
 
     <ECEntityClass typeName="ContourLinesAspect" modifier="Sealed" displayLabel="Contour Lines" description="Terrain contour lines" >
         <BaseClass>bis:ElementUniqueAspect</BaseClass>
@@ -1637,15 +1659,16 @@
     <ECEntityClass typeName="CurbType" displayLabel="Curb Type" description="Defines a shared set of properties whose values vary per-type of Curb rather than per-instance.">
         <BaseClass>cvphys:CurbType</BaseClass>
 
-        <ECProperty propertyName="PanWidth" minimumValue="0" maximumValue="30.48" typeName="double" kindOfQuantity="cvu:LENGTH" displayLabel="Pan Width" description="Width of curb pan." />
-        <ECProperty propertyName="PanThickness" minimumValue="0" maximumValue="30.48" typeName="double" kindOfQuantity="cvu:LENGTH" displayLabel="Pan Thickness" description="Thickness of curb pan." />
-        <ECProperty propertyName="StoneExtension" minimumValue="0" maximumValue="30.48" typeName="double" kindOfQuantity="cvu:LENGTH" displayLabel="Stone Extension" description="Width of stone extension." />
-        <ECProperty propertyName="StoneThickness" minimumValue="0" maximumValue="30.48" typeName="double" kindOfQuantity="cvu:LENGTH" displayLabel="Stone Thickness" description="Thickness of stone extension." />
-        <ECProperty propertyName="CurbHeight" minimumValue="0" maximumValue="30.48" typeName="double" kindOfQuantity="cvu:LENGTH" displayLabel="Curb Height" description="Height of curb." />
-        <ECProperty propertyName="CurbTopWidth" minimumValue="0" maximumValue="30.48" typeName="double" kindOfQuantity="cvu:LENGTH" displayLabel="Curb Top Width" description="Width of curb top." />
-        <ECProperty propertyName="CurbBottomWidth" minimumValue="0" maximumValue="30.48" typeName="double" kindOfQuantity="cvu:LENGTH" displayLabel="Curb Bottom Width" description="Width of curb bottom." />
-        <ECProperty propertyName="MiterWidth" minimumValue="0" maximumValue="30.48" typeName="double" kindOfQuantity="cvu:LENGTH" displayLabel="Miter Width" description="Width of curb miter." />
-        <ECProperty propertyName="MiterHeight" minimumValue="0" maximumValue="30.48" typeName="double" kindOfQuantity="cvu:LENGTH" displayLabel="Miter Height" description="Height of curb miter." />
+        <ECProperty propertyName="PanWidth" minimumValue="0" maximumValue="30.48" typeName="double" kindOfQuantity="cvu:LENGTH_SHORT" displayLabel="Pan Width" description="Width of curb pan." />
+        <ECProperty propertyName="PanThickness" minimumValue="0" maximumValue="30.48" typeName="double" kindOfQuantity="cvu:LENGTH_SHORT" displayLabel="Pan Thickness" description="Thickness of curb pan." />
+        <ECProperty propertyName="StoneExtension" minimumValue="0" maximumValue="30.48" typeName="double" kindOfQuantity="cvu:LENGTH_SHORT" displayLabel="Stone Extension" description="Width of stone extension." />
+        <ECProperty propertyName="StoneThickness" minimumValue="0" maximumValue="30.48" typeName="double" kindOfQuantity="cvu:LENGTH_SHORT" displayLabel="Stone Thickness" description="Thickness of stone extension." />
+        <ECProperty propertyName="CurbHeight" minimumValue="0" maximumValue="30.48" typeName="double" kindOfQuantity="cvu:LENGTH_SHORT" displayLabel="Curb Height" description="Height of curb." />
+        <ECProperty propertyName="CurbTopWidth" minimumValue="0" maximumValue="30.48" typeName="double" kindOfQuantity="cvu:LENGTH_SHORT" displayLabel="Curb Top Width" description="Width of curb top." />
+        <ECProperty propertyName="CurbBottomWidth" minimumValue="0" maximumValue="30.48" typeName="double" kindOfQuantity="cvu:LENGTH_SHORT" displayLabel="Curb Bottom Width" description="Width of curb bottom." />
+        <ECProperty propertyName="MiterWidth" minimumValue="0" maximumValue="30.48" typeName="double" kindOfQuantity="cvu:LENGTH_SHORT" displayLabel="Miter Width" description="Width of curb miter." />
+        <ECProperty propertyName="MiterHeight" minimumValue="0" maximumValue="30.48" typeName="double" kindOfQuantity="cvu:LENGTH_SHORT" displayLabel="Miter Height" description="Height of curb miter." />
+        <ECProperty propertyName="PanSlope" minimumValue="-0.1" maximumValue="0.1" typeName="double" kindOfQuantity="cvu:SLOPE" displayLabel="Pan Slope" description="Slope of curb pan." />
     </ECEntityClass>
 
     <ECRelationshipClass typeName="WireOwnsContourLinesAspect" modifier="Sealed" strength="embedding">
