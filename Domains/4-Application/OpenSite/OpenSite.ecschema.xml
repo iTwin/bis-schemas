@@ -642,10 +642,14 @@
 
     <ECEntityClass typeName="ParkingEdge" modifier="Sealed" displayLabel="Parking Edge">
         <BaseClass>ShapedEdge</BaseClass>
+
+        <ECNavigationProperty propertyName="CurbType" relationshipName="ParkingEdgeUsesCurbType" direction="Forward" displayLabel="Curb Type" />
     </ECEntityClass>
 
     <ECEntityClass typeName="IslandEdge" modifier="Sealed" displayLabel="Island Edge">
         <BaseClass>ShapedEdge</BaseClass>
+
+        <ECNavigationProperty propertyName="CurbType" relationshipName="IslandEdgeUsesCurbType" direction="Forward" displayLabel="Curb Type" />
     </ECEntityClass>
 
     <ECEntityClass typeName="SidewalkEdge" modifier="Sealed" displayLabel="Sidewalk Area Edge">
@@ -654,6 +658,8 @@
 
     <ECEntityClass typeName="DrivewayAreaEdge" modifier="Sealed" displayLabel="Driveway Area Edge">
         <BaseClass>ShapedEdge</BaseClass>
+
+        <ECNavigationProperty propertyName="CurbType" relationshipName="DrivewayAreaEdgeUsesCurbType" direction="Forward" displayLabel="Curb Type" />
     </ECEntityClass>
 
     <ECEntityClass typeName="PondEdge" modifier="Sealed" displayLabel="Pond Edge">
@@ -667,6 +673,8 @@
 
     <ECEntityClass typeName="LayoutParkingEdge" modifier="Sealed" displayLabel="Layout Parking Edge" description="Parking lot">
         <BaseClass>AreaEdge</BaseClass>
+
+        <ECNavigationProperty propertyName="CurbType" relationshipName="LayoutParkingEdgeUsesCurbType" direction="Forward" displayLabel="Curb Type" />
     </ECEntityClass>
 
     <ECEntityClass typeName="PathEdge" modifier="None" displayLabel="Path Edge">
@@ -740,6 +748,8 @@
         <ECProperty propertyName="ShoulderSlope" minimumValue="-10" maximumValue="10" typeName="double" kindOfQuantity="cvu:SLOPE" category="DrivewayPathFin_Shoulder" displayLabel="Shoulder Slope" description="Slope of shoulder on this side of driveway." />
         <ECProperty propertyName="DitchOffset" minimumValue="0" maximumValue="304.8" typeName="double" kindOfQuantity="cvu:LENGTH" category="DrivewayPathFin_Shoulder" displayLabel="Ditch Offset" description="Offset to ditch on this side of driveway." />
         <ECProperty propertyName="DitchSlope" minimumValue="-10" maximumValue="10" typeName="double" kindOfQuantity="cvu:SLOPE" category="DrivewayPathFin_Shoulder" displayLabel="Ditch Slope" description="Ditch slope for this side of driveway." />
+
+        <ECNavigationProperty propertyName="CurbType" relationshipName="DrivewayPathFinUsesCurbType" direction="Forward" displayLabel="Curb Type" />
     </ECEntityClass>
 
     <ECEntityClass typeName="DrivewayTransition" modifier="Sealed" displayLabel="Transition">
@@ -798,6 +808,11 @@
     </ECRelationshipClass>
 
     <ECRelationshipClass typeName="DrivewayPathUsesCurbType" strength="referencing" modifier="Sealed">
+        <ECCustomAttributes>
+            <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                <Description>DrivewayPathUsesCurbType is deprecated. Curb type is now authored per-edge via DrivewayPathFinUsesCurbType. </Description>
+            </Deprecated>
+        </ECCustomAttributes>
         <Source multiplicity="(0..*)" roleLabel="uses" polymorphic="false">
             <Class class="DrivewayPath" />
         </Source>
@@ -807,6 +822,11 @@
     </ECRelationshipClass>
 
     <ECRelationshipClass typeName="DrivewayAreaUsesCurbType" strength="referencing" modifier="Sealed">
+        <ECCustomAttributes>
+            <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                <Description>DrivewayAreaUsesCurbType is deprecated. Curb type is now authored per-edge via DrivewayAreaEdgeUsesCurbType. </Description>
+            </Deprecated>
+        </ECCustomAttributes>
         <Source multiplicity="(0..*)" roleLabel="uses" polymorphic="false">
             <Class class="DrivewayArea" />
         </Source>
@@ -816,6 +836,11 @@
     </ECRelationshipClass>
 
     <ECRelationshipClass typeName="IslandAreaUsesCurbType" strength="referencing" modifier="Sealed">
+        <ECCustomAttributes>
+            <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                <Description>IslandAreaUsesCurbType is deprecated. Curb type is now authored per-edge via IslandEdgeUsesCurbType. </Description>
+            </Deprecated>
+        </ECCustomAttributes>
         <Source multiplicity="(0..*)" roleLabel="uses" polymorphic="false">
             <Class class="IslandArea" />
         </Source>
@@ -825,6 +850,11 @@
     </ECRelationshipClass>
 
     <ECRelationshipClass typeName="ParkingAreaUsesCurbType" strength="referencing" modifier="Sealed">
+        <ECCustomAttributes>
+            <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                <Description>ParkingAreaUsesCurbType is deprecated. Curb type is now authored per-edge via ParkingEdgeUsesCurbType. </Description>
+            </Deprecated>
+        </ECCustomAttributes>
         <Source multiplicity="(0..*)" roleLabel="uses" polymorphic="false">
             <Class class="ParkingArea" />
         </Source>
@@ -834,6 +864,11 @@
     </ECRelationshipClass>
 
     <ECRelationshipClass typeName="LayoutParkingAreaUsesCurbType" strength="referencing" modifier="Sealed">
+        <ECCustomAttributes>
+            <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                <Description>LayoutParkingAreaUsesCurbType is deprecated. Curb type is now authored per-edge via LayoutParkingEdgeUsesCurbType. </Description>
+            </Deprecated>
+        </ECCustomAttributes>
         <Source multiplicity="(0..*)" roleLabel="uses" polymorphic="false">
             <Class class="LayoutParkingArea" />
         </Source>
@@ -845,6 +880,51 @@
     <ECRelationshipClass typeName="LayoutParkingAreaUsesIslandCurbType" strength="referencing" modifier="Sealed">
         <Source multiplicity="(0..*)" roleLabel="uses" polymorphic="false">
             <Class class="LayoutParkingArea" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is used by" polymorphic="true">
+            <Class class="CurbType" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="ParkingEdgeUsesCurbType" strength="referencing" modifier="Sealed">
+        <Source multiplicity="(0..*)" roleLabel="uses" polymorphic="false">
+            <Class class="ParkingEdge" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is used by" polymorphic="true">
+            <Class class="CurbType" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="IslandEdgeUsesCurbType" strength="referencing" modifier="Sealed">
+        <Source multiplicity="(0..*)" roleLabel="uses" polymorphic="false">
+            <Class class="IslandEdge" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is used by" polymorphic="true">
+            <Class class="CurbType" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="DrivewayAreaEdgeUsesCurbType" strength="referencing" modifier="Sealed">
+        <Source multiplicity="(0..*)" roleLabel="uses" polymorphic="false">
+            <Class class="DrivewayAreaEdge" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is used by" polymorphic="true">
+            <Class class="CurbType" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="LayoutParkingEdgeUsesCurbType" strength="referencing" modifier="Sealed">
+        <Source multiplicity="(0..*)" roleLabel="uses" polymorphic="false">
+            <Class class="LayoutParkingEdge" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is used by" polymorphic="true">
+            <Class class="CurbType" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="DrivewayPathFinUsesCurbType" strength="referencing" modifier="Sealed">
+        <Source multiplicity="(0..*)" roleLabel="uses" polymorphic="false">
+            <Class class="DrivewayPathFin" />
         </Source>
         <Target multiplicity="(0..1)" roleLabel="is used by" polymorphic="true">
             <Class class="CurbType" />
@@ -1261,13 +1341,27 @@
     <ECEntityClass typeName="ParkingArea" modifier="Sealed" displayLabel="Parking Area" description="Parking Area">
         <BaseClass>ShapedArea</BaseClass>
 
-        <ECNavigationProperty propertyName="CurbType" relationshipName="ParkingAreaUsesCurbType" direction="Forward" displayLabel="Curb Type" />
+        <ECNavigationProperty propertyName="CurbType" relationshipName="ParkingAreaUsesCurbType" direction="Forward" displayLabel="Curb Type">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03" />
+                <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                    <Description>CurbType is deprecated for ParkingArea. Curb type is now authored per-edge via the CurbType navigation property on ParkingEdge. </Description>
+                </Deprecated>
+            </ECCustomAttributes>
+        </ECNavigationProperty>
     </ECEntityClass>
 
     <ECEntityClass typeName="DrivewayArea" modifier="Sealed" displayLabel="Driveway Area" description="Driveway Area">
         <BaseClass>ShapedArea</BaseClass>
 
-        <ECNavigationProperty propertyName="CurbType" relationshipName="DrivewayAreaUsesCurbType" direction="Forward" displayLabel="Curb Type" />
+        <ECNavigationProperty propertyName="CurbType" relationshipName="DrivewayAreaUsesCurbType" direction="Forward" displayLabel="Curb Type">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03" />
+                <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                    <Description>CurbType is deprecated for DrivewayArea. Curb type is now authored per-edge via the CurbType navigation property on DrivewayAreaEdge. </Description>
+                </Deprecated>
+            </ECCustomAttributes>
+        </ECNavigationProperty>
     </ECEntityClass>
 
     <ECEntityClass typeName="SidewalkArea" modifier="Sealed" displayLabel="Sidewalk Area" description="Sidewalk Area">
@@ -1277,7 +1371,14 @@
     <ECEntityClass typeName="IslandArea" modifier="Sealed" displayLabel="Island Area" description="Island Area">
         <BaseClass>ShapedArea</BaseClass>
 
-        <ECNavigationProperty propertyName="CurbType" relationshipName="IslandAreaUsesCurbType" direction="Forward" displayLabel="Curb Type" />
+        <ECNavigationProperty propertyName="CurbType" relationshipName="IslandAreaUsesCurbType" direction="Forward" displayLabel="Curb Type">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03" />
+                <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                    <Description>CurbType is deprecated for IslandArea. Curb type is now authored per-edge via the CurbType navigation property on IslandEdge. </Description>
+                </Deprecated>
+            </ECCustomAttributes>
+        </ECNavigationProperty>
     </ECEntityClass>
 
     <ECEntityClass typeName="LayoutArea" modifier="Abstract" displayLabel="Layout Area" description="Layout Area">
@@ -1353,7 +1454,14 @@
         <ECProperty propertyName="SurfaceDepthParkingSpaces" minimumValue="0" maximumValue="30.48" typeName="double" category="LayoutParkingArea_ParkingGrading" kindOfQuantity="cvu:LENGTH_SHORT" displayLabel="Space Surface Depth" description="Surface or material depth for specific parking spaces." />
 
         <ECNavigationProperty propertyName="IslandCurbType" relationshipName="LayoutParkingAreaUsesIslandCurbType" direction="Forward" displayLabel="Island Curb Type" />
-        <ECNavigationProperty propertyName="ParkingCurbType" relationshipName="LayoutParkingAreaUsesCurbType" direction="Forward" displayLabel="Curb Type" />
+        <ECNavigationProperty propertyName="ParkingCurbType" relationshipName="LayoutParkingAreaUsesCurbType" direction="Forward" displayLabel="Curb Type">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03" />
+                <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                    <Description>ParkingCurbType is deprecated for LayoutParkingArea. Curb type is now authored per-edge via the CurbType navigation property on LayoutParkingEdge. </Description>
+                </Deprecated>
+            </ECCustomAttributes>
+        </ECNavigationProperty>
         <ECNavigationProperty propertyName="IslandLayeredStructureType" relationshipName="LayoutParkingAreaUsesIslandLayeredStructureType" direction="Forward" displayLabel="Island Layered Structure Type" />
         <ECNavigationProperty propertyName="ParkingLayeredStructureType" relationshipName="LayoutParkingAreaUsesLayeredStructureType" direction="Forward" displayLabel="Layered Structure Type" />
     </ECEntityClass>
@@ -1525,7 +1633,14 @@
         </ECProperty>
 
         <ECProperty propertyName="DriveOnRight" typeName="boolean" category="DrivewayPath_Direction" displayLabel="Drive On Right" description="Sets the primary drive side, true to drive on the right-hand side." />
-        <ECNavigationProperty propertyName="CurbType" relationshipName="DrivewayPathUsesCurbType" direction="Forward" displayLabel="Curb Type" />
+        <ECNavigationProperty propertyName="CurbType" relationshipName="DrivewayPathUsesCurbType" direction="Forward" displayLabel="Curb Type">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03" />
+                <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                    <Description>CurbType is deprecated for DrivewayPath. Curb type is now authored per-edge via the CurbType navigation property on DrivewayPathFin. </Description>
+                </Deprecated>
+            </ECCustomAttributes>
+        </ECNavigationProperty>
         <ECNavigationProperty propertyName="LayeredStructureType" relationshipName="DrivewayPathUsesLayeredStructureType" direction="Forward" displayLabel="Layered Structure Type" />
     </ECEntityClass>
 
@@ -1863,6 +1978,11 @@
 
     <ECRelationshipClass typeName="ParkingEdgeOwnsCurbAspect" modifier="Sealed" strength="embedding">
         <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <ECCustomAttributes>
+            <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                <Description>ParkingEdgeOwnsCurbAspect is deprecated. Curb type is now authored via the CurbType navigation property on ParkingEdge. </Description>
+            </Deprecated>
+        </ECCustomAttributes>
         <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
             <Class class="ParkingEdge" />
         </Source>
@@ -1873,6 +1993,11 @@
 
     <ECRelationshipClass typeName="IslandEdgeOwnsCurbAspect" modifier="Sealed" strength="embedding">
         <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <ECCustomAttributes>
+            <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                <Description>IslandEdgeOwnsCurbAspect is deprecated. Curb type is now authored via the CurbType navigation property on IslandEdge. </Description>
+            </Deprecated>
+        </ECCustomAttributes>
         <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
             <Class class="IslandEdge" />
         </Source>
@@ -1893,6 +2018,11 @@
 
     <ECRelationshipClass typeName="DrivewayAreaEdgeOwnsCurbAspect" modifier="Sealed" strength="embedding">
         <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <ECCustomAttributes>
+            <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                <Description>DrivewayAreaEdgeOwnsCurbAspect is deprecated. Curb type is now authored via the CurbType navigation property on DrivewayAreaEdge. </Description>
+            </Deprecated>
+        </ECCustomAttributes>
         <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
             <Class class="DrivewayAreaEdge" />
         </Source>
@@ -1913,6 +2043,11 @@
 
     <ECRelationshipClass typeName="LayoutParkingEdgeOwnsCurbAspect" modifier="Sealed" strength="embedding">
         <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <ECCustomAttributes>
+            <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                <Description>LayoutParkingEdgeOwnsCurbAspect is deprecated. Curb type is now authored via the CurbType navigation property on LayoutParkingEdge. </Description>
+            </Deprecated>
+        </ECCustomAttributes>
         <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
             <Class class="LayoutParkingEdge" />
         </Source>
@@ -1923,6 +2058,11 @@
 
     <ECRelationshipClass typeName="DrivewayPathFinOwnsCurbAspect" modifier="Sealed" strength="embedding">
         <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <ECCustomAttributes>
+            <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                <Description>DrivewayPathFinOwnsCurbAspect is deprecated. Curb type is now authored via the CurbType navigation property on DrivewayPathFin. </Description>
+            </Deprecated>
+        </ECCustomAttributes>
         <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
             <Class class="DrivewayPathFin" />
         </Source>
