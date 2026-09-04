@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ==================================================================================
+|  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
+|  * See LICENSE.md in the project root for license terms and full copyright notice.
+======================================================================================= -->
+<ECSchema schemaName="RebarModeler" alias="cifrbr" version="01.00.00" description="iModel Connector schema containing aspect classes with properties from Rebar tool." xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2">
+    <ECSchemaReference name="BisCore" version="01.00.16" alias="bis"/>
+    <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
+    <ECSchemaReference name="CifCommon" version="01.00.10" alias="cifcmn"/>
+    <ECSchemaReference name="CifUnits" version="01.00.07" alias="cifu"/>
+    <ECSchemaReference name="CoreCustomAttributes" version="01.00.04" alias="CoreCA"/>
+
+    <ECCustomAttributes>
+        <ProductionStatus xmlns="CoreCustomAttributes.01.00.04">
+            <SupportedUse>NotForProduction</SupportedUse>
+        </ProductionStatus>
+        <SchemaLayerInfo xmlns="BisCustomAttributes.01.00.00">
+            <Value>Application</Value>
+        </SchemaLayerInfo>
+    </ECCustomAttributes>
+
+    <!-- Property Categories -->
+    <PropertyCategory typeName="RebarSetProperties" description="Rebar Set Properties" displayLabel="Rebar Set" priority="4294967266"/>
+    <PropertyCategory typeName="RebarShapeProperties" description="Rebar Shape Properties" displayLabel="Rebar Shape" priority="4294967265"/>
+    <PropertyCategory typeName="RebarEndDeviceProperties" description="Rebar End Device Properties" displayLabel="Rebar End Device" priority="4294967264"/>
+    <PropertyCategory typeName="RebarDimDataProperties" description="Rebar Dim. Properties" displayLabel="Rebar Dim. Data" priority="4294967263"/>
+
+    <!-- Struct Class for Dimension Data -->
+    <ECStructClass typeName="RebarDimData" description="Dimension data for rebar segments">
+        <ECProperty propertyName="DimName" typeName="string" category="RebarDimDataProperties"/>
+        <ECProperty propertyName="DimType" typeName="int" category="RebarDimDataProperties"/>
+        <ECProperty propertyName="FromPtIndex" typeName="int" category="RebarDimDataProperties"/>
+        <ECProperty propertyName="ToPtIndex" typeName="int" category="RebarDimDataProperties"/>
+        <ECProperty propertyName="DimLength" typeName="double" category="RebarDimDataProperties" kindOfQuantity="cifu:LENGTH"/>
+    </ECStructClass>
+
+    <!-- Abstract Base Aspect for Rebar Components -->
+    <ECEntityClass typeName="RebarAspectBase" modifier="Abstract">
+        <BaseClass>cifcmn:CivilPresentation</BaseClass>
+    </ECEntityClass>
+
+    <!-- Concrete Rebar Aspect Classes -->
+    <ECEntityClass typeName="RebarEndDevice">
+        <BaseClass>RebarAspectBase</BaseClass>
+        <ECProperty propertyName="EndDeviceName" typeName="string" category="RebarEndDeviceProperties"/>
+        <ECProperty propertyName="ManufacturerName" typeName="string" category="RebarEndDeviceProperties"/>
+        <ECProperty propertyName="EndDeviceType" typeName="string" category="RebarEndDeviceProperties"/>
+        <ECProperty propertyName="EndDeviceDescription" typeName="string" category="RebarEndDeviceProperties"/>
+        <ECProperty propertyName="ApplicationType" typeName="string" category="RebarEndDeviceProperties"/>
+        <ECProperty propertyName="PrepManufacturerName" typeName="string" category="RebarEndDeviceProperties"/>
+        <ECProperty propertyName="PrepDescription" typeName="string" category="RebarEndDeviceProperties"/>
+        <ECProperty propertyName="PrepCode" typeName="string" category="RebarEndDeviceProperties"/>
+        <ECProperty propertyName="PrepHoldBack" typeName="double" category="RebarEndDeviceProperties"/>
+        <ECProperty propertyName="IsReverse" typeName="int" category="RebarEndDeviceProperties"/>
+        <ECProperty propertyName="ScrewType" typeName="int" category="RebarEndDeviceProperties"/>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="RebarSet">
+        <BaseClass>RebarAspectBase</BaseClass>
+        <ECProperty propertyName="Number" typeName="int" category="RebarSetProperties"/>
+        <ECProperty propertyName="NominalSpacing" typeName="double" category="RebarSetProperties" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="Layer" typeName="string" category="RebarSetProperties"/>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="RebarShape">
+        <BaseClass>RebarAspectBase</BaseClass>
+        <ECProperty propertyName="BarDiameter" typeName="double" category="RebarShapeProperties" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="BarMark" typeName="string" category="RebarShapeProperties"/>
+        <ECProperty propertyName="SizeKey" typeName="string" category="RebarShapeProperties"/>
+        <ECProperty propertyName="Length" typeName="double" category="RebarShapeProperties" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="NominalLength" typeName="double" category="RebarShapeProperties" kindOfQuantity="cifu:LENGTH"/>
+        <ECProperty propertyName="Posnum" typeName="string" category="RebarShapeProperties"/>
+        <ECProperty propertyName="Grade" typeName="string" category="RebarShapeProperties"/>
+        <ECProperty propertyName="Catalog" typeName="string" category="RebarShapeProperties"/>
+        <ECProperty propertyName="Weight" typeName="double" category="RebarShapeProperties"/>
+        <ECProperty propertyName="IsStirrup" typeName="boolean" category="RebarShapeProperties"/>
+        <ECProperty propertyName="ShapeCode" typeName="string" category="RebarShapeProperties"/>
+        <ECProperty propertyName="Coating" typeName="string" category="RebarShapeProperties"/>
+        <ECProperty propertyName="Surface" typeName="string" category="RebarShapeProperties"/>
+        <ECProperty propertyName="NumDimensions" typeName="int" category="RebarShapeProperties"/>
+        <ECProperty propertyName="BarIsBend" typeName="boolean" category="RebarShapeProperties"/>
+        <ECProperty propertyName="VarySetId" typeName="int" category="RebarShapeProperties"/>
+        <ECStructArrayProperty propertyName="RebarDimDataArray" typeName="RebarDimData" category="RebarShapeProperties" minOccurs="0" maxOccurs="unbounded"/>
+        <ECProperty propertyName="NumDevices" typeName="int" category="RebarShapeProperties"/>
+    </ECEntityClass>
+
+    <!-- Polymorphic Ownership Relationship -->
+    <ECRelationshipClass typeName="ElementOwnsRebarAspect" modifier="None" strength="embedding">
+        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="bis:GeometricElement3d"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="true">
+            <Class class="RebarAspectBase"/>
+        </Target>
+    </ECRelationshipClass>
+</ECSchema>
