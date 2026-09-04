@@ -3,7 +3,7 @@
 |  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
 |  * See LICENSE.md in the project root for license terms and full copyright notice.
 ======================================================================================= -->
-<ECSchema xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" schemaName="PowerSystemResourcesPhysical" version="01.00.02" alias="psrp" displayLabel="PowerSystemResourcesPhysical" description="Base schema for the PowerSystemResources domain.">
+<ECSchema xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" schemaName="PowerSystemResourcesPhysical" version="02.00.00" alias="psrp" displayLabel="PowerSystemResourcesPhysical" description="Base schema for the PowerSystemResources domain.">
   <ECSchemaReference name="BisCore" version="01.00.25" alias="bis" />
   <ECSchemaReference name="DistributionSystems" version="01.00.02" alias="dsys" />
   <ECSchemaReference name="StructuralPhysicalInterop" version="01.00.00" alias="spi" />
@@ -62,10 +62,10 @@
   <ECEntityClass typeName="StructuralPort" displayLabel="Structural Port" description="Describes a geometry set that is used by the constraint solver engine for structural items." modifier="None">
     <BaseClass>bis:SpatialLocationElement</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="PortConnection" displayLabel="Port Connection" description="An element that indicates a connection between 2 distribution ports." modifier="None">
+  <ECEntityClass typeName="ElectricalPortConnection" displayLabel="Electrical Port Connection" description="An element that indicates a connection between 2 electrical ports." modifier="None">
     <BaseClass>dsys:PortConnection</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="EquipmentConnection" displayLabel="Equipment Connection" description="An element that indicates a connection between 2 distribution ports." modifier="None">
+  <ECEntityClass typeName="StructuralPortConnection" displayLabel="Structural Port Connection" description="An element that indicates a connection between 2 structural ports." modifier="None">
     <BaseClass>bis:InformationRecordElement</BaseClass>
   </ECEntityClass>
   <ECEntityClass typeName="AuxiliaryEquipment" displayLabel="Auxiliary Equipment" description="AuxiliaryEquipment describes equipment that does not perform primary functions but supports equipment that does." modifier="None">
@@ -122,15 +122,6 @@
   <ECEntityClass typeName="CableAssemblyAspect" displayLabel="Cable Assembly Aspect" description="Contains properties of a Cable Assembly Aspect." modifier="Abstract">
     <BaseClass>bis:ElementUniqueAspect</BaseClass>
   </ECEntityClass>
-  <ECRelationshipClass typeName="PhysicalElementConnectsPhysicalElement" description="Replaces EquipmentConnectionConnectsEquipment" modifier="Sealed" strength="Referencing" strengthDirection="Forward">
-    <BaseClass>bis:ElementRefersToElements</BaseClass>
-    <Source polymorphic="true" roleLabel="connects" multiplicity="(0..1)" abstractConstraint="bis:PhysicalElement">
-      <Class class="bis:PhysicalElement" />
-    </Source>
-    <Target polymorphic="true" roleLabel="is connected to" multiplicity="(0..2)" abstractConstraint="bis:PhysicalElement">
-      <Class class="bis:PhysicalElement" />
-    </Target>
-  </ECRelationshipClass>
   <ECRelationshipClass typeName="PhysicalEquipmentOwnsChildren" description="Specifies a Non Graphical Physical Equipment owns Child Primary Physical Elements." modifier="None" strength="Embedding" strengthDirection="Forward">
     <BaseClass>bis:ElementOwnsChildElements</BaseClass>
     <Source polymorphic="true" roleLabel="owns child" multiplicity="(0..1)" abstractConstraint="bis:PhysicalElement">
@@ -214,8 +205,8 @@
   </ECRelationshipClass>
   <ECRelationshipClass typeName="PortConnectionConnectsElectricalPort" description="Indicates that a PortConnection is associated/connected to a ElectricalPort." modifier="Sealed" strength="Referencing" strengthDirection="Forward">
     <BaseClass>bis:ElementRefersToElements</BaseClass>
-    <Source polymorphic="true" roleLabel="connects" multiplicity="(0..1)" abstractConstraint="PortConnection">
-      <Class class="PortConnection" />
+    <Source polymorphic="true" roleLabel="connects" multiplicity="(0..1)" abstractConstraint="ElectricalPortConnection">
+      <Class class="ElectricalPortConnection" />
     </Source>
     <Target polymorphic="true" roleLabel="is connected to" multiplicity="(0..*)" abstractConstraint="ElectricalPort">
       <Class class="ElectricalPort" />
@@ -223,8 +214,8 @@
   </ECRelationshipClass>
   <ECRelationshipClass typeName="PortConnectionConnectsStructuralPort" description="Indicates that a PortConnection is associated/connected to a StructuralPort." modifier="Sealed" strength="Referencing" strengthDirection="Forward">
     <BaseClass>bis:ElementRefersToElements</BaseClass>
-    <Source polymorphic="true" roleLabel="connects" multiplicity="(0..1)" abstractConstraint="PortConnection">
-      <Class class="PortConnection" />
+    <Source polymorphic="true" roleLabel="connects" multiplicity="(0..1)" abstractConstraint="StructuralPortConnection">
+      <Class class="StructuralPortConnection" />
     </Source>
     <Target polymorphic="true" roleLabel="is connected to" multiplicity="(0..*)" abstractConstraint="StructuralPort">
       <Class class="StructuralPort" />
