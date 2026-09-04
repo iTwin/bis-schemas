@@ -3,9 +3,9 @@
 |  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
 |  * See LICENSE.md in the project root for license terms and full copyright notice.
 ======================================================================================= -->
-<ECSchema xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" schemaName="SubstationPhysical" version="01.00.06" alias="subphy" displayLabel="SubstationPhysical" description="This schema contains classes used for Substation Design.">
+<ECSchema xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" schemaName="SubstationPhysical" version="02.00.00" alias="subphy" displayLabel="SubstationPhysical" description="This schema contains classes used for Substation Design.">
   <ECSchemaReference name="BisCore" version="01.00.25" alias="bis" />
-  <ECSchemaReference name="PowerSystemResourcesPhysical" version="01.00.01" alias="psrp" />
+  <ECSchemaReference name="PowerSystemResourcesPhysical" version="02.00.00" alias="psrp" />
   <ECSchemaReference name="Terrain" version="01.00.00" alias="trrn" />
   <ECSchemaReference name="Fasteners" version="01.00.00" alias="fst" />
   <ECSchemaReference name="ConstraintSolver" version="01.00.01" alias="consol" />
@@ -72,6 +72,24 @@
   <ECEntityClass typeName="Substation" displayLabel="Substation" description="Substation represents an Substation when the Substation is placed in a 3D PhysicalModel." modifier="None">
     <BaseClass>bis:PhysicalElement</BaseClass>
   </ECEntityClass>
+  <ECRelationshipClass typeName="DesignStatusGroupsSubstation" strength="referencing" modifier="None" displayLabel="Design Status Groups Substation" description="A relationship used to identify the Substation elements that are members of a Design Status Group.">
+    <BaseClass>bis:ElementGroupsMembers</BaseClass>
+    <Source multiplicity="(0..*)" roleLabel="groups" polymorphic="true">
+      <Class class="psrp:DesignStatus"/>
+    </Source>
+    <Target multiplicity="(0..*)" roleLabel="is grouped by" polymorphic="true">
+      <Class class="Substation"/>
+    </Target>
+  </ECRelationshipClass>
+  <ECRelationshipClass typeName="DesignActionGroupsSubstation" strength="referencing" modifier="None" displayLabel="Design Action Groups Substation" description="A relationship used to identify the Substation elements that are members of a Design Action.">
+    <BaseClass>bis:ElementGroupsMembers</BaseClass>
+    <Source multiplicity="(0..*)" roleLabel="groups" polymorphic="true">
+      <Class class="psrp:DesignAction"/>
+    </Source>
+    <Target multiplicity="(0..*)" roleLabel="is grouped by" polymorphic="true">
+      <Class class="Substation"/>
+    </Target>
+  </ECRelationshipClass>
   <ECEntityClass typeName="PhysicalSubstationAdditionalPart" displayLabel="Physical Substation Additional Part" description="An psrp:Substation represents an Electrical Substation Additional Part when the Substation is placed in a 3D PhysicalModel." modifier="None">
     <BaseClass>Substation</BaseClass>
     <ECProperty propertyName="AdditionalPartNumbers" displayLabel="Additional Part Number"   typeName="string" />
