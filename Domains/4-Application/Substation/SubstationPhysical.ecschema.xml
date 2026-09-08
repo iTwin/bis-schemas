@@ -8,7 +8,6 @@
   <ECSchemaReference name="PowerSystemResourcesPhysical" version="02.00.00" alias="psrp" />
   <ECSchemaReference name="Terrain" version="01.00.00" alias="trrn" />
   <ECSchemaReference name="Fasteners" version="01.00.00" alias="fst" />
-  <ECSchemaReference name="ConstraintSolver" version="01.00.01" alias="consol" />
   <ECSchemaReference name="CoreCustomAttributes" version="01.00.04" alias="CoreCA" />
   <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA" />
   <ECCustomAttributes>
@@ -19,10 +18,6 @@
       <Value>Application</Value>
     </SchemaLayerInfo>
   </ECCustomAttributes>  
-  <ECEnumeration typeName="ConstraintType" backingTypeName="int" isStrict="true">
-    <ECEnumerator name="Free" value="0" displayLabel="Free" />
-    <ECEnumerator name="Fixed" value="1" displayLabel="Fixed" />
-  </ECEnumeration>
   <ECEntityClass typeName="PhysicalContainer" displayLabel="Physical Container" description="Container for definition-oriented physical elements." modifier="None">
     <BaseClass>bis:DefinitionElement</BaseClass>
     <BaseClass>bis:ISubModeledElement</BaseClass>
@@ -105,28 +100,6 @@
   <ECEntityClass typeName="Nuts" displayLabel="Nuts" modifier="None">
     <BaseClass>fst:Nut</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="PhysicalConstraint" displayLabel="Physical Constraint" description="Describes a geometry set that is used by the constraint solver engine." modifier="None">
-    <BaseClass>consol:ConstraintGeometryRecord</BaseClass>
-    <ECProperty propertyName="Type" description="" displayLabel="Constraint Type"   priority="90" typeName="ConstraintType" />
-  </ECEntityClass>
-  <ECRelationshipClass typeName="ElectricalPortOwnsPhysicalConstraint" description="Relationship to associate constraint geometry with Electrical Port." modifier="Sealed" strength="Embedding" strengthDirection="Forward">
-    <BaseClass>bis:ElementOwnsChildElements</BaseClass>
-    <Source polymorphic="true" roleLabel="owns" multiplicity="(1..1)" abstractConstraint="psrp:ElectricalPort">
-      <Class class="psrp:ElectricalPort" />
-    </Source>
-    <Target polymorphic="true" roleLabel="is owned by" multiplicity="(1..*)" abstractConstraint="PhysicalConstraint">
-      <Class class="PhysicalConstraint" />
-    </Target>
-  </ECRelationshipClass>
-  <ECRelationshipClass typeName="StructuralPortOwnsPhysicalConstraint" description="Relationship to associate constraint geometry with Structural Port." modifier="Sealed" strength="Embedding" strengthDirection="Forward">
-    <BaseClass>bis:ElementOwnsChildElements</BaseClass>
-    <Source polymorphic="true" roleLabel="owns" multiplicity="(1..1)" abstractConstraint="psrp:StructuralPort">
-      <Class class="psrp:StructuralPort" />
-    </Source>
-    <Target polymorphic="true" roleLabel="is owned by" multiplicity="(1..*)" abstractConstraint="PhysicalConstraint">
-      <Class class="PhysicalConstraint" />
-    </Target>
-  </ECRelationshipClass>
   <ECEntityClass typeName="LiveMember" displayLabel="Live Member" modifier="None">
     <BaseClass>bis:PhysicalElement</BaseClass>
   </ECEntityClass>
