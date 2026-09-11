@@ -67,6 +67,24 @@
   <ECEntityClass typeName="Substation" displayLabel="Substation" description="Substation represents an Substation when the Substation is placed in a 3D PhysicalModel." modifier="None">
     <BaseClass>bis:PhysicalElement</BaseClass>
   </ECEntityClass>
+  <ECRelationshipClass typeName="DesignStatusGroupsSubstation" strength="referencing" modifier="None" displayLabel="Design Status Groups Substation" description="A relationship used to identify the Substation elements that are members of a Design Status Group.">
+    <BaseClass>bis:ElementGroupsMembers</BaseClass>
+    <Source multiplicity="(0..*)" roleLabel="groups" polymorphic="true">
+      <Class class="psrp:DesignStatus"/>
+    </Source>
+    <Target multiplicity="(0..*)" roleLabel="is grouped by" polymorphic="true">
+      <Class class="Substation"/>
+    </Target>
+  </ECRelationshipClass>
+  <ECRelationshipClass typeName="DesignActionGroupsSubstation" strength="referencing" modifier="None" displayLabel="Design Action Groups Substation" description="A relationship used to identify the Substation elements that are members of a Design Action.">
+    <BaseClass>bis:ElementGroupsMembers</BaseClass>
+    <Source multiplicity="(0..*)" roleLabel="groups" polymorphic="true">
+      <Class class="psrp:DesignAction"/>
+    </Source>
+    <Target multiplicity="(0..*)" roleLabel="is grouped by" polymorphic="true">
+      <Class class="Substation"/>
+    </Target>
+  </ECRelationshipClass>
   <ECEntityClass typeName="PhysicalSubstationAdditionalPart" displayLabel="Physical Substation Additional Part" description="An psrp:Substation represents an Electrical Substation Additional Part when the Substation is placed in a 3D PhysicalModel." modifier="None">
     <BaseClass>Substation</BaseClass>
     <ECProperty propertyName="AdditionalPartNumbers" displayLabel="Additional Part Number"   typeName="string" />
@@ -82,9 +100,96 @@
   <ECEntityClass typeName="SubstationPhysicalType" displayLabel="Substation Physical Type" modifier="None">
     <BaseClass>bis:PhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="SubstationAspect" displayLabel="Substation Aspect" modifier="Abstract">
+  <ECEntityClass typeName="SubstationPhysicalAspect" displayLabel="Substation Aspect" modifier="Abstract">
     <BaseClass>bis:ElementUniqueAspect</BaseClass>
+    <ECProperty propertyName="DesignId" displayLabel="Design Id" description="Unique identifier during design phase."  typeName="string" />
+    <ECProperty propertyName="AssetId" displayLabel="Asset Id" description="Unique identifier after being built."  typeName="string" />
+    <ECProperty propertyName="AssetDescription" displayLabel="Asset Desc"   typeName="string" />
+    <ECProperty propertyName="Area" displayLabel="Area"   typeName="string" />
+    <ECProperty propertyName="LifecycleStatus" displayLabel="Lifecycle Status"   typeName="string" />
+    <ECProperty propertyName="InstallDate" displayLabel="Install Date"   typeName="dateTime" />
+    <ECProperty propertyName="RetireDate" displayLabel="Retire Date"   typeName="dateTime" />
+    <ECProperty propertyName="Elevation" displayLabel="Elevation"   typeName="double" />
   </ECEntityClass>
+  <ECEntityClass typeName="EquipmentPhysicalAspect" displayLabel="Equipment Aspect" description="Contains properties of an Aspect." modifier="None">
+    <BaseClass>psrp:EquipmentAspect</BaseClass>
+    <ECProperty propertyName="DesignId" displayLabel="Design Id" description="Unique identifier during design phase."  typeName="string" />
+    <ECProperty propertyName="AssetId" displayLabel="Asset Id" description="Unique identifier after being built."  typeName="string" />
+    <ECProperty propertyName="AssetDescription" displayLabel="Asset Desc"   typeName="string" />
+    <ECProperty propertyName="Area" displayLabel="Area"   typeName="string" />
+    <ECProperty propertyName="LifecycleStatus" displayLabel="Lifecycle Status"   typeName="string" />
+    <ECProperty propertyName="InstallDate" displayLabel="Install Date"   typeName="dateTime" />
+    <ECProperty propertyName="RetireDate" displayLabel="Retire Date"   typeName="dateTime" />
+    <ECProperty propertyName="Elevation" displayLabel="Elevation"   typeName="double" />
+  </ECEntityClass>
+  <ECEntityClass typeName="StructurePhysicalAspect" displayLabel="Structure Aspect" description="Contains properties of an Aspect." modifier="None">
+    <BaseClass>psrp:StructureAspect</BaseClass>
+    <ECProperty propertyName="DesignId" displayLabel="Design Id" description="Unique identifier during design phase."  typeName="string" />
+    <ECProperty propertyName="AssetId" displayLabel="Asset Id" description="Unique identifier after being built."  typeName="string" />
+    <ECProperty propertyName="AssetDescription" displayLabel="Asset Desc"   typeName="string" />
+    <ECProperty propertyName="Area" displayLabel="Area"   typeName="string" />
+    <ECProperty propertyName="LifecycleStatus" displayLabel="Lifecycle Status"   typeName="string" />
+    <ECProperty propertyName="InstallDate" displayLabel="Install Date"   typeName="dateTime" />
+    <ECProperty propertyName="RetireDate" displayLabel="Retire Date"   typeName="dateTime" />
+    <ECProperty propertyName="Elevation" displayLabel="Elevation"   typeName="double" />
+  </ECEntityClass>
+  <ECEntityClass typeName="FoundationPhysicalAspect" displayLabel="Foundation Aspect" description="Contains properties of an Aspect." modifier="None">
+    <BaseClass>psrp:FoundationAspect</BaseClass>
+    <ECProperty propertyName="DesignId" displayLabel="Design Id" description="Unique identifier during design phase."  typeName="string" />
+    <ECProperty propertyName="AssetId" displayLabel="Asset Id" description="Unique identifier after being built."  typeName="string" />
+    <ECProperty propertyName="AssetDescription" displayLabel="Asset Desc"   typeName="string" />
+    <ECProperty propertyName="Area" displayLabel="Area"   typeName="string" />
+    <ECProperty propertyName="LifecycleStatus" displayLabel="Lifecycle Status"   typeName="string" />
+    <ECProperty propertyName="InstallDate" displayLabel="Install Date"   typeName="dateTime" />
+    <ECProperty propertyName="RetireDate" displayLabel="Retire Date"   typeName="dateTime" />
+    <ECProperty propertyName="Elevation" displayLabel="Elevation"   typeName="double" />
+    <ECProperty propertyName="PlacementMethod" displayLabel="Placement Method" typeName="string"  description="The placement method used for placing the foundation"/>
+    <ECProperty propertyName="RevealHeight" displayLabel="Reveal Height" typeName="double" description="The reveal height, in meters, used when foundation was placed with the specific elevation value for TOC, or the specific reveal height for Fixed Reveal."/>
+  </ECEntityClass>
+  <ECRelationshipClass typeName="EquipmentOwnsEquipmentPhysicalAspect" strength="embedding" modifier="None">
+    <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+    <!-- @see ElementUniqueAspect.Element ECNavigationProperty -->
+    <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+      <Class class="psrp:Equipment"/>
+    </Source>
+    <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="true">
+      <!-- Note: multiplicity=(0..*) is correct. While an Element can only have 1 unique aspect per aspect class, it can have N unique aspects total. -->
+      <Class class="EquipmentPhysicalAspect"/>
+    </Target>
+  </ECRelationshipClass>
+  <ECRelationshipClass typeName="StructureOwnsStructurePhysicalCustomAspect" strength="embedding" modifier="None">
+    <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+    <!-- @see ElementUniqueAspect.Element ECNavigationProperty -->
+    <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+      <Class class="psrp:Structure"/>
+    </Source>
+    <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="true">
+      <!-- Note: multiplicity=(0..*) is correct. While an Element can only have 1 unique aspect per aspect class, it can have N unique aspects total. -->
+      <Class class="StructurePhysicalCustomAspect"/>
+    </Target>
+  </ECRelationshipClass>
+  <ECRelationshipClass typeName="FoundationOwnsFoundationPhysicalCustomAspect" strength="embedding" modifier="None">
+    <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+    <!-- @see ElementUniqueAspect.Element ECNavigationProperty -->
+    <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+      <Class class="psrp:Foundation"/>
+    </Source>
+    <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="true">
+      <!-- Note: multiplicity=(0..*) is correct. While an Element can only have 1 unique aspect per aspect class, it can have N unique aspects total. -->
+      <Class class="FoundationPhysicalCustomAspect"/>
+    </Target>
+  </ECRelationshipClass>
+  <ECRelationshipClass typeName="SubstationOwnsSubstationPhysicalCustomAspect" strength="embedding" modifier="None">
+    <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+    <!-- @see ElementUniqueAspect.Element ECNavigationProperty -->
+    <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+      <Class class="Substation"/>
+    </Source>
+    <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="true">
+      <!-- Note: multiplicity=(0..*) is correct. While an Element can only have 1 unique aspect per aspect class, it can have N unique aspects total. -->
+      <Class class="SubstationPhysicalCustomAspect"/>
+    </Target>
+  </ECRelationshipClass>
   <ECEntityClass typeName="SubstationPhysicalTypeAspect" displayLabel="Substation Physical Type Aspect" modifier="Abstract">
     <BaseClass>bis:ElementUniqueAspect</BaseClass>
   </ECEntityClass>
