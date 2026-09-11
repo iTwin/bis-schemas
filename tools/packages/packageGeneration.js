@@ -68,7 +68,7 @@ function isBlackListed(schema, blackList) {
 function getPublishedSchemas (packageName) {
   let npmOutput = {};
   try {
-    npmOutput = JSON.parse(child_process.execSync(`npm view ${packageName} time --json`, {stdio:['inherit']}));
+    npmOutput = JSON.parse(child_process.execFileSync("npm", ["view", packageName, "time", "--json"], {stdio:['inherit']}));
   } catch (e) {
     if (!e.message.includes("E404")) {
       throw e;
