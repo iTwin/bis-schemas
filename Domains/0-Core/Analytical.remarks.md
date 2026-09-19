@@ -33,6 +33,10 @@ A catalog of Storm Events to be used in a Hydrological analysis is an example wh
 
 It is meant to be used to relate anlyt:AnalyticalType instances that are not better represented by a bis:PhysicalType instance. E.g. an analytical Storm instance used in a Hydrological Analysis is of type N-years Storm Event.
 
+### AnalyticalTypeRepresentsTypeDefinition
+
+The `TypeDefinitionElement` represented is usually a `PhysicalType`.
+
 ### AnalyticalSimulatesSpatialElement
 
 E.g. An analytical pump station in a Hydraulic analysis can be related with all the physical pumps it is simulating.
