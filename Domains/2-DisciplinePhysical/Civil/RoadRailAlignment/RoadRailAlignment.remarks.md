@@ -24,7 +24,7 @@ If there is any need to organize `Alignment` instances that drive the design of 
 
 If there is a need to standardize the categories associated with `Alignment` instances in an organization, the RoadRailAlignment BIS domain suggests the usage of the Domain-ranked `Alignment` and `Linear` categories for *Design* and *Secondary* Alignments respectively.
 
-An `Alignment` shall always have an associated `HorizontalAlignment`, but `VerticalAlignment`s are optional. When an `Alignment` has one or more associated `VerticalAlignment`s, it refers to the one used to describe its profile as being the *Main Vertical*.
+An `Alignment` shall always have one and only one associated `HorizontalAlignment`, but `VerticalAlignment`s are optional. When an `Alignment` has one or more associated `VerticalAlignment`s, it refers to the one used to describe its profile as being the *Main Vertical*.
 
 The `Alignment` class inherits its `LengthValue` property from the `ILinearElement` mix-in. In the case of `Alignment`s, such property shall store its horizontal length rather than its 3D length. Such horizontal length is computed from the associated `HorizontalAlignment` instance and cached into the `LengthValue` property of the `Alignment`.
 
