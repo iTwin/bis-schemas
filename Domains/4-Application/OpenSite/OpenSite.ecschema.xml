@@ -12,6 +12,7 @@
     <ECSchemaReference name="CivilUnits" version="01.00.00" alias="cvu"/>
     <ECSchemaReference name="SpatialComposition" version="01.00.01" alias="spcomp" />
     <ECSchemaReference name="StormSewerPhysical" version="01.00.00" alias="stmswrphys" />
+    <ECSchemaReference name="PipeworkPhysical" version="01.00.00" alias="pipphys" />
     <ECSchemaReference name="CivilPhysical" version="01.00.03" alias="cvphys" />
 
     <ECCustomAttributes>
@@ -164,6 +165,11 @@
     <ECEnumeration typeName="RetainingWallMode" backingTypeName="int" isStrict="true" displayLabel="Wall Mode" description="Describes how the height of a standalone retaining wall is constrained.">
         <ECEnumerator value="1" name="FIXED_WALL_HEIGHT" displayLabel="Fixed Wall Height" />
         <ECEnumerator value="2" name="VARIABLE_WALL_HEIGHT" displayLabel="Variable Wall Height" />
+    </ECEnumeration>
+
+    <ECEnumeration typeName="PipeShape" backingTypeName="int" isStrict="true" displayLabel="Pipe Shape" description="Describes the cross-sectional shape of a pipe.">
+        <ECEnumerator value="0" name="CIRCULAR" displayLabel="Circular" />
+        <ECEnumerator value="1" name="RECTANGULAR" displayLabel="Rectangular" />
     </ECEnumeration>
 
     <ECRelationshipClass typeName="CategorySymbolizesClassification" strength="referencing" modifier="Abstract">
@@ -1802,6 +1808,16 @@
         <ECProperty propertyName="MiterWidth" minimumValue="0" maximumValue="30.48" typeName="double" kindOfQuantity="cvu:LENGTH_SHORT" displayLabel="Miter Width" description="Width of curb miter." />
         <ECProperty propertyName="MiterHeight" minimumValue="0" maximumValue="30.48" typeName="double" kindOfQuantity="cvu:LENGTH_SHORT" displayLabel="Miter Height" description="Height of curb miter." />
         <ECProperty propertyName="PanSlope" minimumValue="-0.1" maximumValue="0.1" typeName="double" kindOfQuantity="cvu:SLOPE" displayLabel="Pan Slope" description="Slope of curb pan." />
+    </ECEntityClass>
+
+    <ECEntityClass typeName="PipeType" displayLabel="Pipe Type" description="Defines a shared set of properties whose values vary per-type of Pipe rather than per-instance.">
+        <BaseClass>pipphys:PipeType</BaseClass>
+
+        <ECProperty propertyName="Shape" typeName="PipeShape" displayLabel="Shape" description="Cross-sectional shape of the pipe." />
+        <ECProperty propertyName="WallThickness" minimumValue="0" maximumValue="30.48" typeName="double" kindOfQuantity="cvu:LENGTH_SHORT" displayLabel="Wall Thickness" description="Radial thickness of the pipe wall." />
+        <ECProperty propertyName="InnerDiameter" minimumValue="0" maximumValue="30.48" typeName="double" kindOfQuantity="cvu:LENGTH_SHORT" displayLabel="Inner Diameter" description="Diameter of the bore. Applies when Shape is Circular." />
+        <ECProperty propertyName="SmallerDimension" minimumValue="0" maximumValue="30.48" typeName="double" kindOfQuantity="cvu:LENGTH_SHORT" displayLabel="Smaller Dimension" description="Smaller inside dimension of the bore. Applies when Shape is Rectangular." />
+        <ECProperty propertyName="LargerDimension" minimumValue="0" maximumValue="30.48" typeName="double" kindOfQuantity="cvu:LENGTH_SHORT" displayLabel="Larger Dimension" description="Larger inside dimension of the bore. Applies when Shape is Rectangular." />
     </ECEntityClass>
 
     <ECRelationshipClass typeName="WireOwnsContourLinesAspect" modifier="Sealed" strength="embedding">
