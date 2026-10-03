@@ -42,7 +42,33 @@
             <Class class="AnalyticalType"/>
         </Target>
     </ECRelationshipClass>
-    
+
+    <ECRelationshipClass typeName="AnalyticalTypeRepresentsTypeDefinition" strength="referencing" modifier="None" description="Relates an anlyt:AnalyticalType to the bis:TypeDefinitionElement that it represents.">
+        <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="represents" polymorphic="true">
+            <Class class="AnalyticalType"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is represented by" polymorphic="true">
+            <Class class="bis:TypeDefinitionElement"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="TemplateRecipeAnalytical" modifier="Abstract" displayLabel="Template Recipe Analytical" description="A recipe that uses an analytical template for creating new instances.">
+        <BaseClass>bis:RecipeDefinitionElement</BaseClass>
+        <BaseClass>bis:ISubModeledElement</BaseClass>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="AnalyticalModelBreaksDownTemplateRecipe" modifier="Abstract" displayLabel="AnalyticalModel Sub-Models TemplateRecipe" strength="embedding" strengthDirection="backward" description="Relates an anlyt:AnalyticalModel to the anlyt:TemplateRecipeAnalytical that it sub-models.">
+        <!-- @see Model.ModeledElement ECNavigationProperty -->
+        <BaseClass>bis:ModelModelsElement</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="models" polymorphic="true">
+            <Class class="AnalyticalModel"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is modeled by" polymorphic="true">
+            <Class class="TemplateRecipeAnalytical" />
+        </Target>
+    </ECRelationshipClass>
+
     <ECRelationshipClass typeName="AnalyticalSimulatesSpatialElement" strength="referencing" modifier="None" description="Relates an anlyt:AnalyticalElement to the bis:SpatialLocationElement or bis:PhysicalElement it is simulating, in light of a specialized analytical perspective.">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
         <Source multiplicity="(0..*)" roleLabel="simulates" polymorphic="true">
