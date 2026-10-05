@@ -53,8 +53,11 @@ async function updateSchemaInventory() {
     const inventorySchemas = existingInventory[name];
     
     for (const schema of schemaInfos) {
-      if (schemaExistsInInventory(schema, inventorySchemas))
+      if (schemaExistsInInventory(schema, inventorySchemas)) {
+        if (updateLocalizationsInfo(schema, inventorySchemas))
+          newEntries = true;
         continue;
+      }
 
       newEntries = true;
       
@@ -112,7 +115,7 @@ async function createRepositoryInventory(bisRootDir) {
   for (const entry of allSchemas) {
     const schemaInfo = {
       name: entry.basename.match(/\w+/)[0], 
-      path: entry.path, 
+      path: entry.path.replace(/\//g, '\\'),
       released: entry.path.includes("Released"), 
       version: entry.basename.match(/\d+\.\d+\.\d+/) ? entry.basename.match(/\d+\.\d+\.\d+/)[0] : ""
     };
@@ -126,7 +129,9 @@ async function createRepositoryInventory(bisRootDir) {
 
     if (!schemaInfo.released)
       schemaInfo.comment = "Working Copy";
-    
+
+    schemaInfo.localizations = getLocalizationsInfo(schemaInfo, bisRootDir);
+
     if (repoInventory[schemaInfo.name] == undefined) {
       repoInventory[schemaInfo.name] = [];
     }
@@ -162,9 +167,49 @@ function schemaExistsInInventory(schema, inventorySchemas) {
   return false;
 }
 
+function getLocalizationsInfo(schemaInfo, bisRootDir) {
+  const schemaRelDir = path.dirname(schemaInfo.path);
+  const localesDir = path.join(bisRootDir, schemaRelDir, "Locales");
+
+  if (!fs.existsSync(localesDir))
+    return [];
+
+  const prefix = schemaInfo.released
+    ? `${schemaInfo.name}.${schemaInfo.version}.`
+    : `${schemaInfo.name}.`;
+
+  const files = fs.globSync(`${prefix}+([a-zA-Z]){,-+([a-zA-Z])}.json`, {cwd: localesDir});
+
+  const localizationInfo = files.map((file) => ({
+    path: path.join(schemaRelDir, "Locales", file).replace(/\//g, '\\'),
+    locale: file.slice(prefix.length, -".json".length),
+  }));
+
+  return localizationInfo;
+}
+
+function updateLocalizationsInfo(schema, inventorySchemas) {
+  if (!inventorySchemas)
+    return false;
+
+  for (const inventorySchema of inventorySchemas) {
+    if (inventorySchema.version !== schema.version || inventorySchema.released !== schema.released)
+      continue;
+
+    const existingPaths = new Set(inventorySchema.localizations.map((l) => l.path));
+    const missingLocalizations = schema.localizations.filter((l) => !existingPaths.has(l.path));
+    if (missingLocalizations.length === 0)
+      return false;
+
+    inventorySchema.localizations.push(...missingLocalizations);
+    return true;
+  }
+  return false;
+}
+
 async function generateSchemaDirectoryLists(schemaDirectory) {
   const filter = { fileFilter: "*.ecschema.xml", directoryFilter: ["!node_modules", "!.vscode"] };
-  const allSchemaDirs = (await readdirp.promise(schemaDirectory, filter)).map((schemaPath) => path.dirname(schemaPath.fullPath));
+  const allSchemaDirs = (await readdirp.promise(schemaDirectory, filter)).map((schemaPath) => path.dirname(schemaPath.fullPath).replace(/\//g, '\\'));
   return Array.from(new Set(allSchemaDirs.filter((schemaDir) => /released/i.test(schemaDir))).keys());
 }
 
@@ -189,7 +234,7 @@ function getInventoryPath() {
 }
 
 function getSchemaVersion(bisRootDir, schemaPath) {
-  const fullPath = path.join(bisRootDir, schemaPath);
+  const fullPath = path.join(bisRootDir, schemaPath).replace(/\\/g, '/');
   const schemaXml = fs.readFileSync(fullPath).toString();
   const versionMatch = schemaXml.match(/<ECSchema .*version="(?<read>\d+)\.(?<write>\d+)(\.(?<patch>\d+))?/);
   if (!versionMatch || !versionMatch.groups.read || !versionMatch.groups.write) {

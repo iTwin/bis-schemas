@@ -10,12 +10,13 @@ const path = require("path");
 const fs = require("fs");
 const readdirp = require("readdirp");
 const argv = require("yargs").argv;
-const chalk = require("chalk");
+const chalkModule = require("chalk");
+const chalk = chalkModule.default || chalkModule;
 const SchemaComparison = require("@bentley/schema-comparer").SchemaComparison;
 const CompareOptions = require("@bentley/schema-comparer").CompareOptions;
 const ComparisonResultType = require("@bentley/schema-comparer").ComparisonResultType;
 
-// Add the name(s) of schemas that should be skipped from schema differencing.
+// Add the name(s) of schemas that should be skipped from schema differencing
 const excludedSchemaNames = [
 ];
 
@@ -30,10 +31,12 @@ process.on("unhandledRejection", err => {
 async function compareSchemas() {
   const schemas = await getAllSchemas();
   const refPaths = getRefpaths(schemas)
+  // The released schema's reference closure must be resolved using only released schema directories.
+  const releasedRefPaths = getRefpaths(schemas, true);
   let hasErrors = false;
 
   const outputPath = getOutputPath();
-  console.log(chalk.default.yellow("\nSchema Comparison logs will be generated under " + outputPath));
+  console.log(chalk.yellow("\nSchema Comparison logs will be generated under " + outputPath));
   
   for (const schema of schemas) {
     if (schema.released)
@@ -43,7 +46,7 @@ async function compareSchemas() {
       if(argv.name !== schema.name)
         continue;
     } else if (isExcludeSchema(schema.name)) {
-      console.log(chalk.default.yellow(`\nSkipping excluded schema ${schema.name}`));
+      console.log(chalk.yellow(`\nSkipping excluded schema ${schema.name}`));
       continue;
     }
 
@@ -52,14 +55,13 @@ async function compareSchemas() {
 
     const releasedSchema = findLatestReleasedSchema(schema, schemas);
     if (!releasedSchema) {
-      console.log(chalk.default.yellow(`No released schema found. Skipping comparison.`));
+      console.log(chalk.yellow(`No released schema found. Skipping comparison.`));
       continue;
     }
 
-    console.log(`Found latest ${schema.name} schema at ${releasedSchema.fullPath}.`)
-
+    console.log(`Found latest ${schema.name} schema at ${releasedSchema.fullPath}.`);
     
-    const options = new CompareOptions(releasedSchema.fullPath, schema.fullPath, refPaths, refPaths, outputPath);
+    const options = new CompareOptions(releasedSchema.fullPath, schema.fullPath, releasedRefPaths, refPaths, outputPath);
     const results = await SchemaComparison.compare(options);
     if (processResults(releasedSchema, schema, results))
       hasErrors = true;
@@ -72,7 +74,7 @@ async function compareSchemas() {
 
 function processResults(releasedSchema, schema, results) {
   if (!results || (results.length === 2) && results[1].resultType === ComparisonResultType.Message) {
-    console.log(chalk.default.green("Schema comparison succeeded. No differences found."));
+    console.log(chalk.green("Schema comparison succeeded. No differences found."));
     return false;
   }
 
@@ -96,16 +98,19 @@ function processResults(releasedSchema, schema, results) {
 }
 
 function reportError(message) {
-  console.log(chalk.default.red(`\"##vso[task.logissue type=error]${message}\"`));
+  console.log(chalk.red(`\"##vso[task.logissue type=error]${message}\"`));
 }
 
 function reportWarning(message) {
-  console.log(chalk.default.yellow(`\"##vso[task.logissue type=warning]${message}\"`));
+  console.log(chalk.yellow(`\"##vso[task.logissue type=warning]${message}\"`));
 }
 
-function getRefpaths(schemas) {
+function getRefpaths(schemas, releasedOnly = false) {
   const referencePaths = [];
   for (const schema of schemas) {
+    if (releasedOnly && !schema.released)
+      continue;
+
     const dir = path.dirname(schema.fullPath);
     if (referencePaths.includes(dir))
       continue;

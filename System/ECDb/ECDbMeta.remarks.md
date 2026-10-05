@@ -43,3 +43,89 @@ Similar to [ClassCustomAttribute](#classcustomattribute) but returns custom attr
 ### PropertyCustomAttribute
 
 Similar to [ClassCustomAttribute](#classcustomattribute) but returns custom attributes applied to a property.
+
+## Sample ECSQL queries
+
+- Query for all EC classes in a particular schema identified by its name, that derive from bis:PhysicalElement.
+
+```sql
+SELECT
+    subClassDef.Name [Class Name]
+FROM
+    meta.ECSchemaDef bisSchemaDef 
+    INNER JOIN meta.ECClassDef bisClassDef ON bisSchemaDef.ECInstanceId = bisClassDef.Schema.Id
+    INNER JOIN meta.ClassHasAllBaseClasses baseClasses ON baseClasses.TargetECInstanceId = bisClassDef.ECInstanceId
+    INNER JOIN meta.ECClassDef subClassDef ON subClassDef.ECInstanceId = baseClasses.SourceECInstanceId
+    INNER JOIN meta.ECSchemaDef requestedSchemaDef ON requestedSchemaDef.ECInstanceId = subClassDef.Schema.Id
+WHERE
+    bisSchemaDef.Name = 'BisCore' AND bisClassDef.Name = 'PhysicalElement' AND
+    requestedSchemaDef.Name = :schemaName
+```
+
+- Query for all relationship classes that directly reference a particular class on either of its end-points, identified by its schema name and class name.
+
+```sql
+SELECT
+  srel.Name [Relationship Schema Name],
+  rel.Name [Relationship Class Name],
+  CASE WHEN constrDef.RelationshipEnd = 0 THEN 'Source' ELSE 'Target' END [End Point]
+FROM
+  meta.ECClassDef c
+  INNER JOIN meta.ECSchemaDef s ON c.Schema.Id = s.ECInstanceId
+  INNER JOIN meta.RelationshipConstraintHasClasses rchc ON rchc.TargetECInstanceId = c.ECInstanceId
+  INNER JOIN meta.ECRelationshipConstraintDef constrDef ON constrDef.ECInstanceId = rchc.SourceECInstanceId
+  INNER JOIN meta.ECClassDef rel ON constrDef.RelationshipClass.Id = rel.ECInstanceId
+  INNER JOIN meta.ECSchemaDef srel ON srel.ECInstanceId = rel.Schema.Id
+WHERE
+  s.Name = :schemaName AND c.Name = :className
+```
+
+- Query for all relationship classes that reference a particular class, or any of its base-classes, on either of its end-points, identified by its schema name and class name.
+
+```sql
+SELECT 
+  srel.Name [Schema Name],
+  rel.Name [Relationship Class Name],
+  baseC.Name [Referenced Class Name],
+  CASE WHEN constrDef.RelationshipEnd = 0 THEN 'Source' ELSE 'Target' END [End Point]
+FROM
+  meta.ECClassDef c
+  INNER JOIN meta.ECSchemaDef s ON c.Schema.Id = s.ECInstanceId
+  INNER JOIN meta.ClassHasAllBaseClasses chabc ON c.ECInstanceId = chabc.SourceECInstanceId
+  INNER JOIN meta.ECClassDef baseC ON baseC.ECInstanceId = chabc.TargetECInstanceId
+  INNER JOIN meta.RelationshipConstraintHasClasses rchc ON rchc.TargetECInstanceId = baseC.ECInstanceId
+  INNER JOIN meta.ECRelationshipConstraintDef constrDef ON constrDef.ECInstanceId = rchc.SourceECInstanceId
+  INNER JOIN meta.ECClassDef rel ON constrDef.RelationshipClass.Id = rel.ECInstanceId
+  INNER JOIN meta.ECSchemaDef srel ON srel.ECInstanceId = rel.Schema.Id
+WHERE
+  s.Name = :schemaName AND c.Name = :className
+```
+
+- Query for the names of all EC schemas marked as "dynamic" in the current repository.
+
+```sql
+SELECT
+    s.Name [Schema Name]
+FROM
+    meta.SchemaCustomAttribute sca 
+    INNER JOIN meta.ECSchemaDef s ON s.ECInstanceId = sca.Schema.Id
+    INNER JOIN meta.ECClassDef cac ON cac.ECInstanceId = sca.CustomAttributeClass.Id
+    INNER JOIN meta.ECSchemaDef cas ON cas.ECInstanceId = cac.Schema.Id
+WHERE
+    cas.Name = 'CoreCustomAttributes' AND cac.Name = 'DynamicSchema'
+```
+
+- Query for the _ProductionStatus_ of all BIS schemas in the current repository.
+
+```sql
+SELECT
+    s.Name [Schem Name],
+    json_extract(Instance, '$.ProductionStatus.SupportedUse') [Production Status]
+
+FROM
+    meta.SchemaCustomAttribute sca INNER JOIN meta.ECSchemaDef s ON s.ECInstanceId = sca.Schema.Id
+    INNER JOIN meta.ECClassDef cac ON cac.ECInstanceId = sca.CustomAttributeClass.Id
+    INNER JOIN meta.ECSchemaDef cas ON cas.ECInstanceId = cac.Schema.Id
+WHERE
+    cas.Name = 'CoreCustomAttributes' AND cac.Name = 'ProductionStatus'
+```

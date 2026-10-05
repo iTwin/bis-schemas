@@ -18,3 +18,20 @@ Instances of `DocumentLink` are typically contained in the `RepositoryModel` of 
 Other metadata attributes specific to a CDE solution can be introduced via a subclass of `DocumentLink` or aspect-classes associated to it.
 
 Equivalent to a link to an [ISO 19650 - Information Container](https://www.iso.org/obp/ui/#iso:std:iso:19650:-1:ed-1:v1:en).
+
+## Sample ECSQL queries
+
+- Query for the Code, Suitability, Revision, LastTimeSaved and FileSize of all `DocumentLink`s in a BIS repository.
+
+```sql
+SELECT
+    dl.ECInstanceId [DocumentLinkId],
+    dl.CodeValue [DocumentLinkCode],
+    dl.Suitability [Suitability],
+    dl.Revision [Revision],
+    dia.LastSaveTime,
+    CAST(dia.FileSize AS INTEGER) [FileSizeInBytes]
+FROM
+    dmd.DocumentLink dl 
+    LEFT JOIN dmd.DocumentInfoAspect dia ON dl.ECInstanceId = dia.Element.Id
+```

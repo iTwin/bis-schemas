@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ==================================================================================
+|  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
+|  * See LICENSE.md in the project root for license terms and full copyright notice.
+======================================================================================= -->
+<ECSchema schemaName="SheetNumberingViews" alias="snumViews" version="01.00.00" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" description="Contains classes and relationships for sheet numbering.">
+    <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA" />
+    <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
+    <ECSchemaReference name="BisCore" version="01.00.16" alias="bis"/>   
+    <ECSchemaReference name="ECDbMap" version="02.00.04" alias="ecdbmap"/>
+
+    <ECCustomAttributes>
+        <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
+            <SupportedUse>NotForProduction</SupportedUse>
+        </ProductionStatus>
+        <SchemaLayerInfo xmlns="BisCustomAttributes.01.00.00">
+            <Value>Application</Value>
+        </SchemaLayerInfo>
+    </ECCustomAttributes>
+
+    <ECEntityClass typeName="SheetIndexContainerView" modifier="Abstract" displayLabel="SheetIndex Container View" description="View that returns the number of children under a parent. This can be either a SheetIndex or SheetIndexFolder.">
+        <ECCustomAttributes>
+            <QueryView xmlns="ECDbMap.02.00.04">
+                <Query>
+                    SELECT
+                        [sr].Parent.id AS ECInstanceId,
+                        [e].ECClassId AS [ECClassId],
+                        -- The number of SheetReferences that share a parent, again, cast to an integer
+                        CAST(COUNT([sr].[ECInstanceId]) OVER (PARTITION BY [sr].[Parent].[Id]) AS INTEGER) AS [GroupCount]
+                    FROM bis.SheetReference [sr] 
+                    INNER JOIN bis.Element e ON sr.Parent.id = e.ECInstanceId
+                </Query>
+            </QueryView>
+        </ECCustomAttributes>
+        <ECProperty propertyName="GroupCount" typeName="int" description="The total number of sheets within the same parent group as this sheet"/>
+    </ECEntityClass>
+    <ECEntityClass typeName="SheetIndexView" modifier="Abstract" displayLabel="SheetIndex View" description="View that returns the total number of sheets in a SheetIndex">
+        <ECCustomAttributes>
+            <QueryView xmlns="ECDbMap.02.00.04">
+                <Query>
+                    SELECT 
+                        ECInstanceId,
+                        ECClassId,
+                        PageCount
+                    FROM (
+                        WITH
+                        -- General Notes:
+                        -- There are a number of times that column names are aliased arbitrarily.
+                        --  This is to avoid an issue with CTEs not respecting qualifiers.  See this issue: https://github.com/iTwin/itwinjs-core/issues/8571
+
+                        -- Recursively traverses the tree from root to leaves, building hierarchical paths.
+                        treeTraversal ([ECInstanceId], [ECClassId], [DirectParentId], [RootId]) AS (
+                        -- Start with root nodes-SheetIndexes
+                        SELECT
+                            si.ECInstanceId,
+                            si.ECClassId,
+                            NULL AS [DirectParentId],
+                            si.ECInstanceId AS [RootId]
+                        FROM bis:SheetIndex si
+
+                        UNION ALL
+                            -- Recursively add children to parents, building hierarchical sort paths
+                            SELECT
+                            child.ECInstanceId,
+                            child.ECClassId,
+                            child.NodeParentId AS [DirectParentId],
+                            parent.RootId AS [RootId]
+                            FROM treeTraversal parent
+                        JOIN (
+                        -- A table of all possible children joined to their parents
+                                SELECT
+                                    [sr].[ECInstanceId],
+                                    ECClassId,
+                                    [sr].[Parent].[Id] AS [NodeParentId]
+                                FROM
+                                    [bis].[SheetReference] [sr]
+
+                                UNION ALL
+
+                                SELECT
+                                    [sif].[ECInstanceId],
+                                    ECClassId,
+                                    [sif].[Parent].[Id] AS [NodeParentId]
+                                FROM
+                                    [bis].[SheetIndexFolder] [sif]
+                            ) child ON child.NodeParentId = parent.ECInstanceId
+                        )
+                        -- Final result: Counts the sheet under eact group of SheetIndex
+                        SELECT
+                            RootId AS ECInstanceId,
+                            ec_classid('bis', 'SheetIndex') AS ECClassId,
+                            CAST(COUNT(ECInstanceId) AS INTEGER) AS PageCount
+                        FROM treeTraversal WHERE ECClassId = ec_classid('bis', 'SheetReference') GROUP BY RootId
+                    )
+                </Query>
+            </QueryView>
+        </ECCustomAttributes>
+        <ECProperty propertyName="PageCount" typeName="int" description="The total number of sheet references across the entire sheet index tree"/>
+    </ECEntityClass>
+    <ECEntityClass typeName="SheetReferenceView" modifier="Abstract" displayLabel="SheetReference View" description="Views the calculated properties of a SheetReference">
+        <ECCustomAttributes>
+            <QueryView xmlns="ECDbMap.02.00.04">
+                <Query>
+                    SELECT 
+                        ECInstanceId,
+                        ECClassId,
+                        SheetNumber,
+                        GroupNumber,
+                        PageNumber
+                    FROM (
+                    WITH
+                    -- General Notes:
+                    -- There are a number of times that column names are aliased arbitrarily.
+                    --  This is to avoid an issue with CTEs not respecting qualifiers.  See this issue: https://github.com/iTwin/itwinjs-core/issues/8571
+
+                    -- Recursively traverses the tree from root to leaves, building hierarchical paths.
+                    -- Creates a global ordering based on depth-frist traversal with respect to EntryPriority.
+                    -- The SortPath ensures proper tree traversal order for sequential number assignment.
+                    -- AssemblyPath is included only for debugging purposes 
+                    treeTraversal ([ECInstanceId], [ECClassId], [SheetNumber], [Priority], [DirectParentId], [AssemblyPath], [SortPath]) AS (
+                        -- Start with root nodes-SheetIndexes
+                        SELECT
+                        si.ECInstanceId,
+                        si.ECClassId,
+                        COALESCE([si].[CodeValue], [si].[UserLabel]) AS [SheetNumber],
+                        0 AS [Priority],
+                        NULL AS [DirectParentId],
+                        COALESCE([si].[CodeValue], [si].[UserLabel]) AS [AssemblyPath],
+                        -- Use string padding for consistent sorting - pad to 10 digits with leading zeros
+                        SUBSTR('0000000000' || CAST(0 AS TEXT), -10) AS [SortPath]
+                        FROM bis:SheetIndex si
+
+                        UNION ALL
+                        -- Recursively add children to parents, building hierarchical sort paths
+                        SELECT
+                        child.ECInstanceId,
+                        child.ECClassId,
+                        child.SheetNumber,
+                        child.NodePriority AS [Priority],
+                        child.NodeParentId AS [DirectParentId],
+                        parent.AssemblyPath || '->' || child.SheetNumber AS [AssemblyPath],
+                        parent.SortPath || '.' || SUBSTR('0000000000' || CAST(COALESCE(child.NodePriority, 0) AS TEXT), -10) AS [SortPath]
+                        FROM treeTraversal parent
+                        JOIN (
+                        -- A table of all possible children joined to their parents
+                            SELECT
+                                [sr].[ECInstanceId],
+                                ECClassId,
+                                COALESCE([sr].[CodeValue], [sr].[UserLabel]) AS [SheetNumber],
+                                [sr].[EntryPriority] AS [NodePriority],
+                                [sr].[Parent].[Id] AS [NodeParentId]
+                            FROM
+                                [bis].[SheetReference] [sr]
+
+                            UNION ALL
+
+                            SELECT
+                                [sif].[ECInstanceId],
+                                ECClassId,
+                                COALESCE([sif].[CodeValue], [sif].[UserLabel]) AS [SheetNumber],
+                                [sif].[EntryPriority] AS [NodePriority],
+                                [sif].[Parent].[Id] AS [NodeParentId]
+                            FROM
+                                [bis].[SheetIndexFolder] [sif]
+                        ) child ON child.NodeParentId = parent.ECInstanceId
+                    )
+                    -- Final result: Returns only SheetReference node due to inner join
+                    SELECT
+                        ECInstanceId,
+                        ECClassId,
+                        SheetNumber,
+                        -- Partitioning by class to filter to SheetReferences
+                        CAST(ROW_NUMBER() OVER (PARTITION BY ECClassId ORDER BY SortPath) AS INTEGER) AS [PageNumber],
+                        -- An assigned a Row Number for rows that share a parent and are ordered by their EntryPriority 
+                        --   and cast to an integer because it's a long otherwise for some reason
+                        CAST(ROW_NUMBER() OVER (PARTITION BY DirectParentId ORDER BY Priority) AS INTEGER) AS [GroupNumber]
+                    FROM treeTraversal
+                    WHERE ECClassId = ec_classid('bis', 'SheetReference')
+                    ORDER BY SortPath
+                    )
+                </Query>
+            </QueryView>
+        </ECCustomAttributes>
+        <ECProperty propertyName="SheetNumber" typeName="string" description="The formatted sheet identifier of the sheet"/>
+        <ECProperty propertyName="GroupNumber" typeName="int" description="The sequential number of this sheet within its parent group, ordered by entry priority"/>
+        <ECProperty propertyName="PageNumber" typeName="int" description="The global sequential page number of this sheet across the entire sheet index tree"/>
+    </ECEntityClass>
+</ECSchema>
