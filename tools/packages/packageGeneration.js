@@ -148,9 +148,16 @@ function resolveContainedMediaPath(baseDir, item) {
 }
 
 /**
- * Add the remarks file and the relevant media files to the package
+ * Add the remarks file and the relevant media files to the package.
+ *
+ * Every media reference in the remarks file must resolve to a location inside the `media/`
+ * directory next to the remarks file (source) and inside the `media/` directory of the package
+ * (destination).
+ * A reference that escapes either directory (e.g. `media/../../secret.txt`) is a aborts package generation with an error.
+ *
  * @param schemaInfo Object containing schema information from the inventory
  * @param packageDir Schema package directory
+ * @throws Error if a media reference resolves outside of the allowed media directories
  */
 function addDocsToPackage(schemaInfo, packageDir) {
   const remarkFile = getRemarksFilePath(schemaInfo.path)
@@ -165,8 +172,7 @@ function addDocsToPackage(schemaInfo, packageDir) {
         const mediaFileSrc = resolveContainedMediaPath(remarkFileDir, item);
         const mediaFileDest = resolveContainedMediaPath(packageDir, item);
         if (mediaFileSrc === undefined || mediaFileDest === undefined) {
-          console.warn(`Skipping media reference '${item}' in ${remarkFile}: path escapes the media directory.`);
-          continue;
+          throw new Error(`Invalid media reference '${item}' in ${remarkFile}: media paths must stay inside the 'media' directory next to the remarks file. Package generation aborted for ${schemaInfo.name}.`);
         }
 
         if (fs.existsSync(mediaFileSrc)) {

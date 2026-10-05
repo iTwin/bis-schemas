@@ -60,6 +60,19 @@ An example of a remarks file for a the [Fields.ecschema.xml](./remarks-example/F
 
 For more information visit the [Schema documentation style guide](./schema-documentation-style-guide.md).
 
+### Referencing Media (images) from a Remarks File
+
+Images and other media referenced from a `*.remarks.md` file must be stored in a `media` directory located next to the remarks file. Sub directories inside `media` are allowed for grouping. References are written as relative Markdown links, with or without a leading `./`:
+
+```markdown
+media/overview.png
+./media/Shapes/detail.png
+```
+
+When a schema package is generated (see [packageGeneration.js](../tools/packages/packageGeneration.js)), every media reference found in the remarks file is copied into the package's `media` directory.
+After resolution the path must remain inside the `media` directory next to the remarks file, and the destination must remain inside the package's `media` directory.
+Violation of this rule will result in **package generation failing with an error**.
+
 ## Viewing the Schema Docs in a local iTwin.js build
 
 Check the wiki page in `BIS` section to get more information.

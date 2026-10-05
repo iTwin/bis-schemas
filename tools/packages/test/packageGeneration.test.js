@@ -230,9 +230,8 @@ describe('Package Generation', function() {
         .map((d) => path.join(d.parentPath ?? d.path, d.name));
     }
 
-    function assertOnlyLegitMediaCopied() {
-      // The legitimate reference is still honored.
-      chai.expect(fs.existsSync(path.join(packageDir, 'media', 'legit.png'))).to.be.true;
+    function assertTraversalRejected(schemaInfo) {
+      chai.expect(() => pkgGen.addDocsToPackage(schemaInfo, packageDir)).to.throw(Error, /Invalid media reference/);
       // Nothing outside of packageDir was created or modified.
       const outsidePkg = collectFiles(outDir).filter((f) => !f.startsWith(packageDir + path.sep));
       chai.expect(outsidePkg).to.deep.equal([path.join(outDir, 'victim', 'secret.txt')]);
@@ -267,16 +266,15 @@ describe('Package Generation', function() {
         fs.rmSync(root, { recursive: true, force: true });
     });
 
-    it('Should not copy a file referenced via "media/../../" outside of the media directory', function() {
+    it('Should fail and not copy a file referenced via "media/../../" outside of the media directory', function() {
       const schemaInfo = setupRemarks('media/../../victim/secret.txt');
-      pkgGen.addDocsToPackage(schemaInfo, packageDir);
-      assertOnlyLegitMediaCopied();
+      assertTraversalRejected(schemaInfo);
     });
 
-    it('Should not overwrite an existing file outside of the package directory', function() {
+    it('Should fail and not overwrite an existing file outside of the package directory', function() {
       // Source resolves to <root>/victim/secret.txt, destination resolves to <root>/out/victim/secret.txt
       const schemaInfo = setupRemarks('media/../../victim/secret.txt');
-      pkgGen.addDocsToPackage(schemaInfo, packageDir);
+      chai.expect(() => pkgGen.addDocsToPackage(schemaInfo, packageDir)).to.throw(Error, /Invalid media reference/);
       const target = path.join(outDir, 'victim', 'secret.txt');
       chai.expect(fs.readFileSync(target, 'utf8')).to.equal(originalOutContent);
     });
@@ -290,30 +288,26 @@ describe('Package Generation', function() {
       chai.expect(fs.existsSync(path.join(packageDir, 'media', 'Shapes', 'image2.png'))).to.be.true;
     });
 
-    it('Should reject nested traversal that first descends into a sub directory', function() {
+    it('Should fail on nested traversal that first descends into a sub directory', function() {
       fs.mkdirSync(path.join(srcDir, 'media', 'Shapes'), { recursive: true });
       const schemaInfo = setupRemarks('media/Shapes/../../../victim/secret.txt');
-      pkgGen.addDocsToPackage(schemaInfo, packageDir);
-      assertOnlyLegitMediaCopied();
+      assertTraversalRejected(schemaInfo);
     });
 
-    it('Should reject traversal using "./media/" prefix', function() {
+    it('Should fail on traversal using "./media/" prefix', function() {
       const schemaInfo = setupRemarks('./media/../../victim/secret.txt');
-      pkgGen.addDocsToPackage(schemaInfo, packageDir);
-      assertOnlyLegitMediaCopied();
+      assertTraversalRejected(schemaInfo);
     });
 
-    it('Should reject traversal using mixed path separators', function() {
+    it('Should fail on traversal using mixed path separators', function() {
       const schemaInfo = setupRemarks('media/..\\..\\victim\\secret.txt');
-      pkgGen.addDocsToPackage(schemaInfo, packageDir);
-      assertOnlyLegitMediaCopied();
+      assertTraversalRejected(schemaInfo);
     });
 
-    it('Should reject traversal to an absolute path', function() {
+    it('Should fail on traversal to an absolute path', function() {
       const absolute = path.join(victimDir, 'secret.txt').replace(/\\/g, '/');
       const schemaInfo = setupRemarks(`media/../${absolute}`);
-      pkgGen.addDocsToPackage(schemaInfo, packageDir);
-      assertOnlyLegitMediaCopied();
+      assertTraversalRejected(schemaInfo);
     });
   });
 
