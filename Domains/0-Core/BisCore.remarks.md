@@ -558,6 +558,10 @@ This behavior applies to all `RoleElement` subclasses.
 
 Concrete implementations may offer a way to override the default `TextStyle` instance referenced through the _DefaultTextStyle_ navigation property accordingly.
 
+### FormatSet
+
+A [Format](https://www.itwinjs.org/reference/ecschema-metadata/metadata/format/) is used to control how unitized values shall be displayed in the user-interface. [FormatSets](https://www.itwinjs.org/reference/ecschema-metadata/metadata/formatset/) are typically maintained outside of BIS Repositories. However, there are use-cases that need FormatSets to be stored in BIS Repositories as `DefinitionElement`s (shared data). The latter cases shall use the `FormatSet` BIS class to capture their settings.
+
 ## Relationship Classes
 
 ### PhysicalTypeComposesSubTypes
