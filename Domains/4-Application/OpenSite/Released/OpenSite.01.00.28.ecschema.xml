@@ -3,7 +3,7 @@
 |  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
 |  * See LICENSE.md in the project root for license terms and full copyright notice.
 ======================================================================================= -->
-<ECSchema schemaName="OpenSite" alias="opnsite" version="01.00.29" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" displayLabel="OpenSite" description="OpenSite+ application schema.">
+<ECSchema schemaName="OpenSite" alias="opnsite" version="01.00.28" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" displayLabel="OpenSite" description="OpenSite+ application schema.">
     <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA" />
     <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
     <ECSchemaReference name="BisCore" version="01.00.10" alias="bis" />
@@ -16,7 +16,7 @@
 
     <ECCustomAttributes>
         <ProductionStatus xmlns="CoreCustomAttributes.01.00.03">
-            <SupportedUse>NotForProduction</SupportedUse>
+            <SupportedUse>FieldTesting</SupportedUse>
         </ProductionStatus>
         <SchemaLayerInfo xmlns="BisCustomAttributes.01.00.00">
             <Value>Application</Value>
@@ -81,7 +81,6 @@
     <PropertyCategory typeName="EdgeHatchingAspect_Hatching" displayLabel="Hatching" priority="0" />
     <PropertyCategory typeName="EdgeOnSideParkingAspect_Parking" displayLabel="OnSide Parking" priority="0" />
     <PropertyCategory typeName="EdgeOnSideParkingAspect_Grading" displayLabel="OnSide Parking Grading" priority="0" />
-    <PropertyCategory typeName="EdgeBufferAspect_Buffer" displayLabel="Buffer" priority="0" />
     <PropertyCategory typeName="EdgeStairsAspect_Stairs" displayLabel="Stairs" priority="0" />
 
     <PropertyCategory typeName="SurfaceControl" displayLabel="Surface Control" priority="0" />
@@ -91,8 +90,6 @@
     <PropertyCategory typeName="PercentAnchorAspect_Percent" displayLabel="Percent" priority="0" />
     <PropertyCategory typeName="RayAnchorAspect_Ray" displayLabel="Ray" priority="0" />
     <PropertyCategory typeName="ClosestAnchorAspect_Closest" displayLabel="Closest" priority="0" />
-
-    <ECCustomAttributeClass typeName="DrivewayCrossSectionTemplateProperty" appliesTo="AnyProperty" modifier="Sealed" />
 
     <ECEnumeration typeName="IslandType" backingTypeName="int" isStrict="true" displayLabel="Island Type" description="Describes the parking island construction type.">
         <ECEnumerator value="0" name="UNSET" displayLabel="Not Set" />
@@ -721,29 +718,19 @@
         <BaseClass>bis:IParentElement</BaseClass>
 
         <ECProperty propertyName="MedianType" typeName="SurfaceType" category="DrivewayPathEdge_Median" displayLabel="Type" description="Median type along path." >
-            <ECCustomAttributes>
+        <ECCustomAttributes>
                 <HiddenProperty xmlns="CoreCustomAttributes.01.00.03" />
                 <Deprecated xmlns="CoreCustomAttributes.01.00.03">
                     <Description>MedianType is deprecated for DrivewayPathEdge (course information is held in the MedianLayeredStructureType property) </Description>
                 </Deprecated>
             </ECCustomAttributes>
         </ECProperty>
-        <ECProperty propertyName="MedianWidth" minimumValue="0" maximumValue="304.8" typeName="double" kindOfQuantity="cvu:LENGTH"  category="DrivewayPathEdge_Median" displayLabel="Width" description="Median width for path.">
-            <ECCustomAttributes>
-                <DrivewayCrossSectionTemplateProperty xmlns="OpenSite.01.00.28" />
-            </ECCustomAttributes>
-        </ECProperty>
-        <ECNavigationProperty propertyName="MedianLayeredStructureType" relationshipName="DrivewayPathEdgeUsesMedianLayeredStructureType" direction="Forward" category="DrivewayPathEdge_Median" displayLabel="Median Layered Structure" description="Layers (courses) of median." >
-            <ECCustomAttributes>
-                <DrivewayCrossSectionTemplateProperty xmlns="OpenSite.01.00.28" />
-            </ECCustomAttributes>
-        </ECNavigationProperty>
+        <ECProperty propertyName="MedianWidth" minimumValue="0" maximumValue="304.8" typeName="double" kindOfQuantity="cvu:LENGTH"  category="DrivewayPathEdge_Median" displayLabel="Width" description="Median width for path." />
+        <ECNavigationProperty propertyName="MedianLayeredStructureType" relationshipName="DrivewayPathEdgeUsesMedianLayeredStructureType" direction="Forward" category="DrivewayPathEdge_Median" displayLabel="Median Layered Structure" description="Layers (courses) of median." />
 
         <ECProperty propertyName="CrowningType" typeName="CrownType" category="DrivewayPathEdge_Crowning" displayLabel="Crown Type" description="Type of crown design for path." />
         <ECProperty propertyName="KValueSag" minimumValue="0" maximumValue="1000" typeName="double" category="DrivewayPathEdge_Crowning" displayLabel="Sag K Value" description="Design K-Value for sag vertical curves." />
         <ECProperty propertyName="KValueSummit" minimumValue="0" maximumValue="1000" typeName="double" category="DrivewayPathEdge_Crowning" displayLabel="Crest K Value" description="Design K-Value for crest vertical curves." />
-
-        <ECNavigationProperty propertyName="EdgeTemplate" relationshipName="DrivewayPathEdgeIsSeededByTemplate" direction="Forward" displayLabel="Template" description="Edge cross-section template this driveway edge is seeded from." />
     </ECEntityClass>
 
     <ECEntityClass typeName="DrivewayPathFin" modifier="Sealed" displayLabel="Driveway Fin" description="One of two sides to a Driveway Path Edge.">
@@ -759,27 +746,15 @@
             </ECCustomAttributes>
         </ECProperty>
 
-        <ECProperty propertyName="CrossSlope" minimumValue="-10" maximumValue="10" typeName="double" kindOfQuantity="cvu:SLOPE" category="DrivewayPathFin_Road" displayLabel="Cross Slope" description="Cross slope for this side of driveway.">
-            <ECCustomAttributes>
-                <DrivewayCrossSectionTemplateProperty xmlns="OpenSite.01.00.28" />
-            </ECCustomAttributes>
-        </ECProperty>
-        <ECProperty propertyName="DrivewayWidth" minimumValue="0" maximumValue="304.8" typeName="double" kindOfQuantity="cvu:LENGTH" category="DrivewayPathFin_Road" displayLabel="Driveway Width" description="Driveway width on this side.">
-            <ECCustomAttributes>
-                <DrivewayCrossSectionTemplateProperty xmlns="OpenSite.01.00.28" />
-            </ECCustomAttributes>
-        </ECProperty>
+        <ECProperty propertyName="CrossSlope" minimumValue="-10" maximumValue="10" typeName="double" kindOfQuantity="cvu:SLOPE" category="DrivewayPathFin_Road" displayLabel="Cross Slope" description="Cross slope for this side of driveway." />
+        <ECProperty propertyName="DrivewayWidth" minimumValue="0" maximumValue="304.8" typeName="double" kindOfQuantity="cvu:LENGTH" category="DrivewayPathFin_Road" displayLabel="Driveway Width" description="Driveway width on this side." />
 
         <ECProperty propertyName="ShoulderWidth" minimumValue="0" maximumValue="304.8" typeName="double" kindOfQuantity="cvu:LENGTH" category="DrivewayPathFin_Shoulder" displayLabel="Shoulder Width" description="Width of shoulder on this side of driveway." />
         <ECProperty propertyName="ShoulderSlope" minimumValue="-10" maximumValue="10" typeName="double" kindOfQuantity="cvu:SLOPE" category="DrivewayPathFin_Shoulder" displayLabel="Shoulder Slope" description="Slope of shoulder on this side of driveway." />
         <ECProperty propertyName="DitchOffset" minimumValue="0" maximumValue="304.8" typeName="double" kindOfQuantity="cvu:LENGTH" category="DrivewayPathFin_Shoulder" displayLabel="Ditch Offset" description="Offset to ditch on this side of driveway." />
         <ECProperty propertyName="DitchSlope" minimumValue="-10" maximumValue="10" typeName="double" kindOfQuantity="cvu:SLOPE" category="DrivewayPathFin_Shoulder" displayLabel="Ditch Slope" description="Ditch slope for this side of driveway." />
 
-        <ECNavigationProperty propertyName="CurbType" relationshipName="DrivewayPathFinUsesCurbType" direction="Forward" displayLabel="Curb Type">
-            <ECCustomAttributes>
-                <DrivewayCrossSectionTemplateProperty xmlns="OpenSite.01.00.28" />
-            </ECCustomAttributes>
-        </ECNavigationProperty>
+        <ECNavigationProperty propertyName="CurbType" relationshipName="DrivewayPathFinUsesCurbType" direction="Forward" displayLabel="Curb Type" />
     </ECEntityClass>
 
     <ECEntityClass typeName="DrivewayTransition" modifier="Sealed" displayLabel="Transition">
@@ -985,15 +960,6 @@
         </Source>
         <Target multiplicity="(0..1)" roleLabel="is used by" polymorphic="true">
             <Class class="LayeredStructureType" />
-        </Target>
-    </ECRelationshipClass>
-
-    <ECRelationshipClass typeName="DrivewayPathEdgeIsSeededByTemplate" strength="referencing" modifier="Sealed">
-        <Source multiplicity="(0..*)" roleLabel="is seeded by" polymorphic="false">
-            <Class class="DrivewayPathEdge" />
-        </Source>
-        <Target multiplicity="(0..1)" roleLabel="seeds" polymorphic="false">
-            <Class class="DrivewayEdgeTemplate" />
         </Target>
     </ECRelationshipClass>
 
@@ -1721,15 +1687,6 @@
 		<ECProperty propertyName="Width" minimumValue="0" maximumValue="304.8" typeName="double" kindOfQuantity="cvu:LENGTH" displayLabel="Width" description="Width of the pedestrian path." />
     </ECEntityClass>
 
-    <ECEntityClass typeName="DitchPath" modifier="Sealed" displayLabel="Ditch Path" description="Ditch path.">
-        <BaseClass>LayoutPath</BaseClass>
-        <ECProperty propertyName="ChannelSlope" typeName="double" kindOfQuantity="cvu:SLOPE" displayLabel="Channel Slope" description="Longitudinal slope of the ditch channel." />
-        <ECProperty propertyName="Depth" typeName="double" kindOfQuantity="cvu:LENGTH" displayLabel="Depth" description="Depth of the ditch." />
-        <ECProperty propertyName="LeftSideSlope" typeName="double" kindOfQuantity="cvu:SLOPE" displayLabel="Left Side Slope" description="Slope of the left side of the ditch." />
-        <ECProperty propertyName="RightSideSlope" typeName="double" kindOfQuantity="cvu:SLOPE" displayLabel="Right Side Slope" description="Slope of the right side of the ditch." />
-        <ECProperty propertyName="BottomWidth" typeName="double" kindOfQuantity="cvu:LENGTH" displayLabel="Bottom Width" description="Bottom width of the ditch." />
-    </ECEntityClass>
-
     <ECEntityClass typeName="CachedLinear" modifier="Sealed" displayLabel="Cached Linear" description="Cached 3D Linear geometry.">
         <BaseClass>bis:SpatialLocationElement</BaseClass>
         <ECCustomAttributes>
@@ -1939,11 +1896,7 @@
         <BaseClass>bis:ElementUniqueAspect</BaseClass>
 
         <ECProperty propertyName="OnSideParkingWidth" minimumValue="0" maximumValue="304.8" typeName="double" kindOfQuantity="cvu:LENGTH" category="EdgeOnSideParkingAspect_Parking" displayLabel="Onside Parking Width" description="Onside parking space width for this side of driveway." />
-        <ECProperty propertyName="OnSideParkingDepth" minimumValue="0" maximumValue="304.8" typeName="double" kindOfQuantity="cvu:LENGTH" category="EdgeOnSideParkingAspect_Parking" displayLabel="Onside Parking Depth" description="Onside parking space depth for this side of driveway.">
-            <ECCustomAttributes>
-                <DrivewayCrossSectionTemplateProperty xmlns="OpenSite.01.00.28" />
-            </ECCustomAttributes>
-        </ECProperty>
+        <ECProperty propertyName="OnSideParkingDepth" minimumValue="0" maximumValue="304.8" typeName="double" kindOfQuantity="cvu:LENGTH" category="EdgeOnSideParkingAspect_Parking" displayLabel="Onside Parking Depth" description="Onside parking space depth for this side of driveway." />
         <ECProperty propertyName="OnSideParkingAngle" minimumValue="-3.141592653589793" maximumValue="3.141592653589793" typeName="double" kindOfQuantity="cvu:ANGLE" category="EdgeOnSideParkingAspect_Parking" displayLabel="Onside Parking Angle" description="Onside parking space angle for this side of driveway." />
         <ECProperty propertyName="OnSideParksPerIsland" minimumValue="0" maximumValue="1000" typeName="int" category="EdgeOnSideParkingAspect_Parking" displayLabel="Onside Parks Per Island" description="Onside parking space count per island on this side of driveway." />
         <ECProperty propertyName="OnSideIslandWidth" minimumValue="0" maximumValue="304.8" typeName="double" kindOfQuantity="cvu:LENGTH" category="EdgeOnSideParkingAspect_Parking" displayLabel="Onside Island Width" description="Onside parking island width for this side of driveway." />
@@ -1965,17 +1918,9 @@
                 </Deprecated>
             </ECCustomAttributes>
         </ECProperty>
-        <ECNavigationProperty propertyName="LayeredStructureType" relationshipName="EdgeOnSideParkingAspectUsesLayeredStructureType" direction="Forward" category="EdgeOnSideParkingAspect_Grading" displayLabel="Layered Structure Type">
-            <ECCustomAttributes>
-                <DrivewayCrossSectionTemplateProperty xmlns="OpenSite.01.00.28" />
-            </ECCustomAttributes>
-        </ECNavigationProperty>
+        <ECNavigationProperty propertyName="LayeredStructureType" relationshipName="EdgeOnSideParkingAspectUsesLayeredStructureType" direction="Forward" category="EdgeOnSideParkingAspect_Grading" displayLabel="Layered Structure Type" />
         <ECProperty propertyName="OnSideParkingMinSlope" minimumValue="-10" maximumValue="10" typeName="double" kindOfQuantity="cvu:SLOPE" category="EdgeOnSideParkingAspect_Grading" displayLabel="Onside Parking Min. Slope" description="Onside parking minimum design slope for this side of driveway." />
-        <ECProperty propertyName="OnSideParkingMaxSlope" minimumValue="-10" maximumValue="10" typeName="double" kindOfQuantity="cvu:SLOPE" category="EdgeOnSideParkingAspect_Grading" displayLabel="Onside Parking Max. Slope" description="Onside parking maximum design slope for this side of driveway." >
-                <ECCustomAttributes>
-                <DrivewayCrossSectionTemplateProperty xmlns="OpenSite.01.00.28" />
-            </ECCustomAttributes>
-        </ECProperty>
+        <ECProperty propertyName="OnSideParkingMaxSlope" minimumValue="-10" maximumValue="10" typeName="double" kindOfQuantity="cvu:SLOPE" category="EdgeOnSideParkingAspect_Grading" displayLabel="Onside Parking Max. Slope" description="Onside parking maximum design slope for this side of driveway." />
     </ECEntityClass>
 
     <ECRelationshipClass typeName="DrivewayPathFinOwnsOnSideParkingAspect" modifier="Sealed" strength="embedding">
@@ -1988,40 +1933,10 @@
         </Target>
     </ECRelationshipClass>
 
-    <ECEntityClass typeName="EdgeBufferAspect" modifier="Sealed" displayLabel="Buffer">
-        <BaseClass>bis:ElementUniqueAspect</BaseClass>
-
-        <ECProperty propertyName="BufferWidth" minimumValue="0" maximumValue="304.8" typeName="double" kindOfQuantity="cvu:LENGTH" category="EdgeBufferAspect_Buffer" displayLabel="Width" description="Width of the buffer on this side of driveway.">
-            <ECCustomAttributes>
-                <DrivewayCrossSectionTemplateProperty xmlns="OpenSite.01.00.28" />
-            </ECCustomAttributes>
-        </ECProperty>
-        <ECProperty propertyName="BufferMinSlope" minimumValue="-10" maximumValue="10" typeName="double" kindOfQuantity="cvu:SLOPE" category="EdgeBufferAspect_Buffer" displayLabel="Min. Slope" description="Minimum design slope of the buffer on this side of driveway." />
-        <ECProperty propertyName="BufferMaxSlope" minimumValue="-10" maximumValue="10" typeName="double" kindOfQuantity="cvu:SLOPE" category="EdgeBufferAspect_Buffer" displayLabel="Max. Slope" description="Maximum design slope of the buffer on this side of driveway.">
-            <ECCustomAttributes>
-                <DrivewayCrossSectionTemplateProperty xmlns="OpenSite.01.00.28" />
-            </ECCustomAttributes>
-        </ECProperty>
-    </ECEntityClass>
-
-    <ECRelationshipClass typeName="DrivewayPathFinOwnsBufferAspect" modifier="Sealed" strength="embedding">
-        <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
-        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
-            <Class class="DrivewayPathFin" />
-        </Source>
-        <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="false">
-            <Class class="EdgeBufferAspect" />
-        </Target>
-    </ECRelationshipClass>
-
     <ECEntityClass typeName="EdgeSidewalkAspect" modifier="Sealed" displayLabel="Sidewalk Aspect">
         <BaseClass>bis:ElementUniqueAspect</BaseClass>
 
-        <ECNavigationProperty propertyName="LayeredStructureType" relationshipName="EdgeSidewalkAspectUsesLayeredStructureType" direction="Forward" category="EdgeSidewalkAspect_Sidewalk" displayLabel="Layered Structure" description="Layers (courses) of sidewalk.">
-            <ECCustomAttributes>
-                <DrivewayCrossSectionTemplateProperty xmlns="OpenSite.01.00.28" />
-            </ECCustomAttributes>
-        </ECNavigationProperty>
+        <ECNavigationProperty propertyName="LayeredStructureType" relationshipName="EdgeSidewalkAspectUsesLayeredStructureType" direction="Forward" category="EdgeSidewalkAspect_Sidewalk" displayLabel="Layered Structure" description="Layers (courses) of sidewalk." />
         <ECProperty propertyName="SidewalkType" typeName="SurfaceType" category="EdgeSidewalkAspect_Sidewalk" displayLabel="Type" description="Defines the type of sidewalk or material." >
             <ECCustomAttributes>
                 <HiddenProperty xmlns="CoreCustomAttributes.01.00.03" />
@@ -2030,19 +1945,8 @@
                 </Deprecated>
             </ECCustomAttributes>
         </ECProperty>
-        <ECProperty propertyName="SidewalkWidth" minimumValue="0" maximumValue="304.8" typeName="double" kindOfQuantity="cvu:LENGTH" category="EdgeSidewalkAspect_Sidewalk" displayLabel="Width" description="Width of sidewalk.">
-            <ECCustomAttributes>
-                <DrivewayCrossSectionTemplateProperty xmlns="OpenSite.01.00.28" />
-            </ECCustomAttributes>
-        </ECProperty>
-        <ECProperty propertyName="SidewalkOffset" minimumValue="0" maximumValue="304.8" typeName="double" kindOfQuantity="cvu:LENGTH" category="EdgeSidewalkAspect_Sidewalk" displayLabel="Offset" description="Offset distance for sidewalk.">
-            <ECCustomAttributes>
-                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03" />
-                <Deprecated xmlns="CoreCustomAttributes.01.00.03">
-                    <Description>SidewalkOffset is deprecated for EdgeSidewalkAspect. Use BufferWidth on EdgeBufferAspect instead.</Description>
-                </Deprecated>
-            </ECCustomAttributes>
-        </ECProperty>
+        <ECProperty propertyName="SidewalkWidth" minimumValue="0" maximumValue="304.8" typeName="double" kindOfQuantity="cvu:LENGTH" category="EdgeSidewalkAspect_Sidewalk" displayLabel="Width" description="Width of sidewalk." />
+        <ECProperty propertyName="SidewalkOffset" minimumValue="0" maximumValue="304.8" typeName="double" kindOfQuantity="cvu:LENGTH" category="EdgeSidewalkAspect_Sidewalk" displayLabel="Offset" description="Offset distance for sidewalk." />
         <ECProperty propertyName="SidewalkDepth" minimumValue="0" maximumValue="30.48" typeName="double" kindOfQuantity="cvu:LENGTH" category="EdgeSidewalkAspect_Sidewalk" displayLabel="Depth" description="Depth of sidewalk material." >
             <ECCustomAttributes>
                 <HiddenProperty xmlns="CoreCustomAttributes.01.00.03" />
@@ -2716,10 +2620,6 @@
     </ECEntityClass>
 
     <ECEntityClass typeName="DrivewayPathType" modifier="Sealed" displayLabel="Driveway Path Type" description="Driveway path type.">
-        <BaseClass>bis:SpatialLocationType</BaseClass>
-    </ECEntityClass>
-
-    <ECEntityClass typeName="DrivewayEdgeTemplate" modifier="Sealed" displayLabel="Driveway Edge Template" description="Reusable driveway cross-section template. It seeds a driveway edge by copying its values onto it. The edge can then be edited independently.">
         <BaseClass>bis:SpatialLocationType</BaseClass>
     </ECEntityClass>
 
