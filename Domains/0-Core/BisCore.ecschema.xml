@@ -78,6 +78,13 @@
         <ECEnumerator value="2" name="Application" displayLabel="Application"/>
         <ECEnumerator value="3" name="User" displayLabel="User"/>
     </ECEnumeration>
+    
+    <ECEnumeration typeName="DesignStatusRank" backingTypeName="int" isStrict="true">
+        <ECEnumerator value="0" name="System" displayLabel="System"/>
+        <ECEnumerator value="1" name="Domain" displayLabel="Domain"/>
+        <ECEnumerator value="2" name="Application" displayLabel="Application"/>
+        <ECEnumerator value="3" name="User" displayLabel="User"/>
+    </ECEnumeration>
 
     <ECCustomAttributeClass typeName="AutoHandledProperty" description="Applied to an element's property to indicate that select, update, and insert of the property's value are handled automatically by the platform." appliesTo="AnyProperty">
         <ECProperty propertyName="StatementTypes" typeName="AutoHandledPropertyStatementType" description="Indicates the statement types that are relevant for a particular auto-handled property." />
@@ -2203,6 +2210,35 @@
         </Source>
         <Target multiplicity="(0..*)" roleLabel="is serviced by" polymorphic="true">
             <Class class="SpatialElement"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="DesignStatus" modifier="Sealed" displayLabel="Design Status" description="A bis:GroupInformationElement meant to advertise the status of the design work of GeometricElements in associated Categories.">
+        <BaseClass>GroupInformationElement</BaseClass>
+        <ECProperty propertyName="Rank" typeName="DesignStatusRank" description="The Rank of a Design Status indicates how it was created, who is aware of it and where it can be used.">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03"/>
+            </ECCustomAttributes>
+        </ECProperty>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="DesignStatusDescribesCategories" strength="referencing" modifier="None" displayLabel="Design Status Describes Categories" description="A relationship used to indicate that a Design Status gives an account of the design state encoded in one or more Categories.">
+        <BaseClass>ElementGroupsMembers</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="describes" polymorphic="false">
+            <Class class="DesignStatus"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is described by" polymorphic="true">
+            <Class class="Category"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="DesignStatusGeneralizesDesignStatuses" strength="referencing" modifier="None" displayLabel="Design Status Generalizes Design Statuses" description="A relationship used to indicate that one Design Status emboddies a broader generalization of other more specific Design Statuses.">
+        <BaseClass>ElementGroupsMembers</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="generalizes" polymorphic="false">
+            <Class class="DesignStatus"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is generalized by" polymorphic="false">
+            <Class class="DesignStatus"/>
         </Target>
     </ECRelationshipClass>
 

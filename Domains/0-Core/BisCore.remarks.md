@@ -562,6 +562,16 @@ Concrete implementations may offer a way to override the default `TextStyle` ins
 
 A [Format](https://www.itwinjs.org/reference/ecschema-metadata/metadata/format/) is used to control how unitized values shall be displayed in the user-interface. [FormatSets](https://www.itwinjs.org/reference/ecschema-metadata/metadata/formatset/) are typically maintained outside of BIS Repositories. However, there are use-cases that need FormatSets to be stored in BIS Repositories as `DefinitionElement`s (shared data). The latter cases shall use the `FormatSet` BIS class to capture their settings.
 
+### DesignStatus
+
+Hierarchies of `DesignStatus` instances can be setup via the `DesignStatusGeneralizesDesignStatuses` relationship. In that case, only the leaf `DesignStatus`es in such a hierarchy are expected to be associated with `Category` instances. Note that such association makes leaf `DesignStatus`es mutually exclusive, same as `Category` instances: A `GeometricElement` can only be associated to one and only one `Category` instance, and therefore, one and only one `DesignStatus` instance.
+
+Leaf `DesignStatus` instances can be deemed equivalent to status lists in various International Standards, such as:
+- [United States National CAD Standard](https://www.nationalcadstandard.org/ncs7/pdfs/ncs6_clg_lnf.pdf)
+- [IFC's PEnum_ElementStatus](https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/PEnum_ElementStatus.htm)
+
+If needed, a generalized `DesignStatus` instance can optionally provide an order to its more specific `DesignStatus`es by using the `MemberPriority` property that the `DesignStatusGeneralizesDesignStatuses` relationship inherits.
+
 ## Relationship Classes
 
 ### PhysicalTypeComposesSubTypes
