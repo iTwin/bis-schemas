@@ -515,6 +515,26 @@
             <Class class="Sheet" />
         </Target>
     </ECRelationshipClass>
+    <ECRelationshipClass typeName="SheetModelBreaksDownSheetPrototype" displayLabel="SheetModel Sub-Models SheetPrototype" strength="embedding" strengthDirection="backward" modifier="None" description="Relates a bis:SheetModel to the bis:SheetPrototype that it sub-models.">
+        <!-- @see Model.ModeledElement ECNavigationProperty -->
+        <BaseClass>ModelModelsElement</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="sub-models" polymorphic="true">
+            <Class class="SheetModel"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is sub-modeled by" polymorphic="true">
+            <Class class="SheetPrototype" />
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="DrawingModelBreaksDownSheetBorderPrototype" displayLabel="DrawingModel Sub-Models SheetBorderPrototype" strength="embedding" strengthDirection="backward" modifier="None" description="Relates a bis:DrawingModel to the bis:SheetBorderPrototype that it sub-models.">
+        <!-- @see Model.ModeledElement ECNavigationProperty -->
+        <BaseClass>ModelModelsElement</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="sub-models" polymorphic="true">
+            <Class class="DrawingModel"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is sub-modeled by" polymorphic="true">
+            <Class class="SheetBorderPrototype" />
+        </Target>
+    </ECRelationshipClass>
     <ECRelationshipClass typeName="ModelBreaksDownRepositoryLink" displayLabel="Model Sub-Models RepositoryLink" strength="embedding" strengthDirection="backward" modifier="None" description="Relates a bis:Model to the bis:RepositoryLink that it sub-models.">
         <!-- @see Model.ModeledElement ECNavigationProperty -->
         <BaseClass>ModelModelsElement</BaseClass>
@@ -1238,6 +1258,8 @@
         <ECProperty propertyName="Width" typeName="double" description="Width of the Sheet (in meters)"/>
         <!-- Template is optional -->
         <ECNavigationProperty propertyName="SheetTemplate" relationshipName="SheetHasSheetTemplate" direction="forward" displayLabel="Sheet Template" />
+        <!-- Prototype is optional -->
+        <ECNavigationProperty propertyName="SheetPrototype" relationshipName="SheetHasSheetPrototype" direction="forward" displayLabel="Sheet Prototype" description="The bis:SheetPrototype this Sheet was created from, if any."/>
     </ECEntityClass>
 
     <ECRelationshipClass typeName="SheetHasSheetTemplate" strength="referencing" modifier="Sealed">
@@ -1247,6 +1269,44 @@
         </Source>
         <Target multiplicity="(0..1)" roleLabel="defines" polymorphic="true">
             <Class class="SheetTemplate"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="SheetHasSheetPrototype" strength="referencing" modifier="Sealed" description="Relates a bis:Sheet to the bis:SheetPrototype it was created from.">
+        <!-- @see Sheet.SheetPrototype ECNavigationProperty -->
+        <Source multiplicity="(0..*)" roleLabel="was created from" polymorphic="true">
+            <Class class="Sheet" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="was used to create" polymorphic="true">
+            <Class class="SheetPrototype"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="SheetPrototype" displayLabel="Sheet Prototype" description="A reusable, catalog-shareable definition of a sheet layout. A bis:SheetPrototype is sub-modeled by a bis:SheetModel that holds the sheet-level content (such as view attachment placeholders and annotations) copied into every bis:Sheet created from this prototype.">
+        <BaseClass>DefinitionElement</BaseClass>
+        <BaseClass>ISubModeledElement</BaseClass>
+        <ECProperty propertyName="Scale" typeName="double" description="The drawing scale applied to Sheets created from this prototype."/>
+        <!-- Height and Width will be locked to the border, if there is one -->
+        <ECProperty propertyName="Height" typeName="double" description="Height of Sheets created from this prototype (in meters)"/>
+        <ECProperty propertyName="Width" typeName="double" description="Width of Sheets created from this prototype (in meters)"/>
+        <!-- Border is optional -->
+        <ECNavigationProperty propertyName="Border" relationshipName="SheetPrototypeHasSheetBorderPrototype" direction="forward" displayLabel="Border" description="The bis:SheetBorderPrototype that supplies the border and title-block content for Sheets created from this prototype, if any."/>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="SheetBorderPrototype" displayLabel="Sheet Border Prototype" description="A reusable, catalog-shareable border and title-block definition. A bis:SheetBorderPrototype is sub-modeled by a bis:DrawingModel that holds the border line-art and title-block content copied into every bis:Sheet whose bis:SheetPrototype references this border.">
+        <BaseClass>DefinitionElement</BaseClass>
+        <BaseClass>ISubModeledElement</BaseClass>
+        <ECProperty propertyName="Height" typeName="double" description="Height of the sheet border (in meters)"/>
+        <ECProperty propertyName="Width" typeName="double" description="Width of the sheet border (in meters)"/>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="SheetPrototypeHasSheetBorderPrototype" strength="referencing" modifier="Sealed" description="Relates a bis:SheetPrototype to the bis:SheetBorderPrototype that supplies its border and title-block content.">
+        <!-- @see SheetPrototype.Border ECNavigationProperty -->
+        <Source multiplicity="(0..*)" roleLabel="has" polymorphic="true">
+            <Class class="SheetPrototype" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is referenced by" polymorphic="true">
+            <Class class="SheetBorderPrototype"/>
         </Target>
     </ECRelationshipClass>
 
