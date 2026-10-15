@@ -165,6 +165,18 @@ A more consistent name for this relationship would have been 'DrawingModelSubMod
 
 A more consistent name for this relationship would have been 'SheetModelSubModelsSheet', but the existing name cannot be changed in this generation of BIS. At times, we use "breaks down" as a synonym for "sub-models", but we are standardizing on "sub-models", reserving "breakdown" for use with various engineering breakdown structures.
 
+### SheetModelBreaksDownSheetPrototype
+
+Named for consistency with `SheetModelBreaksDownSheet`. A `SheetModel` that sub-models a `SheetPrototype` holds the sheet-level content (such as view attachment placeholders and annotations) that is copied into every `Sheet` created from that prototype.
+
+> Behavior: The domain handler (TypeScript) for `SheetPrototype` ensures that it is only ever sub-modeled by a `SheetModel`.
+
+### DrawingModelBreaksDownSheetBorderPrototype
+
+Named for consistency with `DrawingModelBreaksDownDrawing`. A `DrawingModel` that sub-models a `SheetBorderPrototype` holds the border line-art and title-block content that is copied into every `Sheet` whose `SheetPrototype` references that border.
+
+> Behavior: The domain handler (TypeScript) for `SheetBorderPrototype` ensures that it is only ever sub-modeled by a `DrawingModel`.
+
 ### SubjectRefersToSubject
 
 A `bis:Subject` can be referenced by zero or more `bis:Subject` instances as opposed to the `bis:SubjectOwnsSubjects` relationship that leads to a strict hierarchy. This relationship is typically needed when the referencing and referenced `bis:Subject`s are located in different branches of the Subject hierarchy. With this relationship, the referencing `bis:Subject` is stating an association with the referenced `bis:Subject`s without duplicating them into its own branch. The concrete semantics behind such association is left for the data-writer or a human being to interpret, as it is generally the case with all `bis:Subject` instances on the Subject hierarchy as a whole.
@@ -264,6 +276,26 @@ See [GeometricElement3d.TypeDefinition ECNavigationProperty](#GeometricElement3d
 ### SheetHasSheetTemplate
 
 See [Sheet.SheetTemplate ECNavigationProperty](#Sheet) ECNavigationProperty
+
+### SheetHasSheetPrototype
+
+See [Sheet.SheetPrototype ECNavigationProperty](#Sheet) ECNavigationProperty
+
+### SheetPrototype
+
+A `SheetPrototype` is the reusable definition from which `Sheet`s are created. Being a `DefinitionElement`, it lives in a `DefinitionModel` and can be shared via catalogs. Its sub-model is a `SheetModel` whose content is copied into each `Sheet` created from the prototype; the `Sheet` records its origin via `Sheet.SheetPrototype`.
+
+`SheetPrototype` supersedes the earlier `SheetTemplate`, which was a `Document` without a sub-model and therefore could not hold the content to be copied.
+
+### SheetBorderPrototype
+
+A `SheetBorderPrototype` is the reusable border and title-block definition referenced by `SheetPrototype.Border`. Its sub-model is a `DrawingModel` holding the border line-art and title-block graphics. Its `Height` and `Width` define the paper size; a `SheetPrototype` that references a border is expected to adopt the border's `Height` and `Width`.
+
+`SheetBorderPrototype` supersedes the earlier `SheetBorderTemplate` / `SheetBorder` pair.
+
+### SheetPrototypeHasSheetBorderPrototype
+
+See [SheetPrototype.Border ECNavigationProperty](#SheetPrototype) ECNavigationProperty
 
 ### SheetTemplateHasSheetBorder
 
