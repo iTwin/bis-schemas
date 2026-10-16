@@ -3,7 +3,7 @@
 |  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
 |  * See LICENSE.md in the project root for license terms and full copyright notice.
 ======================================================================================= -->
-<ECSchema schemaName="BisCore" alias="bis" version="01.00.26" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" displayLabel="BIS Core" description="The BIS core schema contains classes that all other domain schemas extend.">
+<ECSchema schemaName="BisCore" alias="bis" version="01.00.27" xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" displayLabel="BIS Core" description="The BIS core schema contains classes that all other domain schemas extend.">
 
     <ECSchemaReference name="CoreCustomAttributes" version="01.00.03" alias="CoreCA"/>
     <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA"/>
@@ -513,6 +513,26 @@
         </Source>
         <Target multiplicity="(1..1)" roleLabel="is sub-modeled by" polymorphic="true">
             <Class class="Sheet" />
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="SheetModelBreaksDownSheetPrototype" displayLabel="SheetModel Sub-Models SheetPrototype" strength="embedding" strengthDirection="backward" modifier="None" description="Relates a bis:SheetModel to the bis:SheetPrototype that it sub-models.">
+        <!-- @see Model.ModeledElement ECNavigationProperty -->
+        <BaseClass>ModelModelsElement</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="sub-models" polymorphic="true">
+            <Class class="SheetModel"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is sub-modeled by" polymorphic="true">
+            <Class class="SheetPrototype" />
+        </Target>
+    </ECRelationshipClass>
+    <ECRelationshipClass typeName="DrawingModelBreaksDownSheetBorderPrototype" displayLabel="DrawingModel Sub-Models SheetBorderPrototype" strength="embedding" strengthDirection="backward" modifier="None" description="Relates a bis:DrawingModel to the bis:SheetBorderPrototype that it sub-models.">
+        <!-- @see Model.ModeledElement ECNavigationProperty -->
+        <BaseClass>ModelModelsElement</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="sub-models" polymorphic="true">
+            <Class class="DrawingModel"/>
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is sub-modeled by" polymorphic="true">
+            <Class class="SheetBorderPrototype" />
         </Target>
     </ECRelationshipClass>
     <ECRelationshipClass typeName="ModelBreaksDownRepositoryLink" displayLabel="Model Sub-Models RepositoryLink" strength="embedding" strengthDirection="backward" modifier="None" description="Relates a bis:Model to the bis:RepositoryLink that it sub-models.">
@@ -1190,29 +1210,38 @@
         </Target>
     </ECRelationshipClass>
 
-    <ECEntityClass typeName="SheetBorderTemplate" displayLabel="Sheet Border Template">
+    <ECEntityClass typeName="SheetBorderTemplate" displayLabel="Sheet Border Template" description="DEPRECATED: Use bis:SheetBorderPrototype instead.">
         <BaseClass>Document</BaseClass>
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.01.00.00"/>
+            <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                <Description>Use SheetBorderPrototype instead.</Description>
+            </Deprecated>
         </ECCustomAttributes>
         <ECProperty propertyName="Height" typeName="double" description="Height of the sheet border."/>
         <ECProperty propertyName="Width" typeName="double" description="Width of the sheet border."/>
     </ECEntityClass>
 
-    <ECEntityClass typeName="SheetBorder" displayLabel="Sheet Border">
+    <ECEntityClass typeName="SheetBorder" displayLabel="Sheet Border" description="DEPRECATED: Use bis:SheetBorderPrototype instead.">
         <BaseClass>DrawingGraphic</BaseClass>
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.01.00.00"/>
+            <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                <Description>Use SheetBorderPrototype instead.</Description>
+            </Deprecated>
         </ECCustomAttributes>
         <!-- Template is required -->
         <!-- Should have IsNullable=False ...? -->
         <ECNavigationProperty propertyName="BorderTemplate" relationshipName="SheetBorderHasSheetBorderTemplate" direction="forward" displayLabel="Border Template"/>
     </ECEntityClass>
 
-    <ECEntityClass typeName="SheetTemplate" displayLabel="Sheet Template">
+    <ECEntityClass typeName="SheetTemplate" displayLabel="Sheet Template" description="DEPRECATED: Use bis:SheetPrototype instead.">
         <BaseClass>Document</BaseClass>
         <ECCustomAttributes>
             <ClassHasHandler xmlns="BisCore.01.00.00"/>
+            <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                <Description>Use SheetPrototype instead.</Description>
+            </Deprecated>
         </ECCustomAttributes>
         <!-- Height and Width will be locked to the border, if there is one -->
         <ECProperty propertyName="Height" typeName="double" description="Height of the sheet."/>
@@ -1237,10 +1266,23 @@
         <ECProperty propertyName="Height" typeName="double" description="Height of the Sheet (in meters)"/>
         <ECProperty propertyName="Width" typeName="double" description="Width of the Sheet (in meters)"/>
         <!-- Template is optional -->
-        <ECNavigationProperty propertyName="SheetTemplate" relationshipName="SheetHasSheetTemplate" direction="forward" displayLabel="Sheet Template" />
+        <ECNavigationProperty propertyName="SheetTemplate" relationshipName="SheetHasSheetTemplate" direction="forward"         displayLabel="Sheet Template" description="DEPRECATED: Use Sheet.SheetPrototype instead.">
+                    <ECCustomAttributes>
+                        <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                            <Description>Use Sheet.SheetPrototype instead.</Description>
+                        </Deprecated>
+                    </ECCustomAttributes>
+                </ECNavigationProperty>
+                <!-- Prototype is optional -->
+        <ECNavigationProperty propertyName="SheetPrototype" relationshipName="SheetHasSheetPrototype" direction="forward" displayLabel="Sheet Prototype" description="The bis:SheetPrototype this Sheet was created from, if any."/>
     </ECEntityClass>
 
-    <ECRelationshipClass typeName="SheetHasSheetTemplate" strength="referencing" modifier="Sealed">
+    <ECRelationshipClass typeName="SheetHasSheetTemplate" strength="referencing" modifier="Sealed" description="DEPRECATED: Use bis:SheetHasSheetPrototype instead.">
+        <ECCustomAttributes>
+            <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                <Description>Use SheetHasSheetPrototype instead.</Description>
+            </Deprecated>
+        </ECCustomAttributes>
         <!-- @see Sheet.SheetTemplate ECNavigationProperty -->
         <Source multiplicity="(0..*)" roleLabel="has" polymorphic="true">
             <Class class="Sheet" />
@@ -1250,7 +1292,50 @@
         </Target>
     </ECRelationshipClass>
 
-    <ECRelationshipClass typeName="SheetTemplateHasSheetBorder" strength="referencing" modifier="Sealed">
+    <ECRelationshipClass typeName="SheetHasSheetPrototype" strength="referencing" modifier="Sealed" description="Relates a bis:Sheet to the bis:SheetPrototype it was created from.">
+        <!-- @see Sheet.SheetPrototype ECNavigationProperty -->
+        <Source multiplicity="(0..*)" roleLabel="was created from" polymorphic="true">
+            <Class class="Sheet" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="was used to create" polymorphic="true">
+            <Class class="SheetPrototype"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECEntityClass typeName="SheetPrototype" displayLabel="Sheet Prototype" description="A reusable, catalog-shareable definition of a sheet layout.">
+        <BaseClass>DefinitionElement</BaseClass>
+        <BaseClass>ISubModeledElement</BaseClass>
+        <ECProperty propertyName="Scale" typeName="double" description="The drawing scale applied to Sheets created from this prototype."/>
+        <!-- Height and Width will be locked to the border, if there is one -->
+        <ECProperty propertyName="Height" typeName="double" description="Height of Sheets created from this prototype (in meters)"/>
+        <ECProperty propertyName="Width" typeName="double" description="Width of Sheets created from this prototype (in meters)"/>
+        <!-- Border is optional -->
+        <ECNavigationProperty propertyName="Border" relationshipName="SheetPrototypeHasSheetBorderPrototype" direction="forward" displayLabel="Border" description="The bis:SheetBorderPrototype that supplies the border and title-block content for Sheets created from this prototype, if any."/>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="SheetBorderPrototype" displayLabel="Sheet Border Prototype" description="A reusable, catalog-shareable border and title-block definition.">
+        <BaseClass>DefinitionElement</BaseClass>
+        <BaseClass>ISubModeledElement</BaseClass>
+        <ECProperty propertyName="Height" typeName="double" description="Height of the sheet border (in meters)"/>
+        <ECProperty propertyName="Width" typeName="double" description="Width of the sheet border (in meters)"/>
+    </ECEntityClass>
+
+    <ECRelationshipClass typeName="SheetPrototypeHasSheetBorderPrototype" strength="referencing" modifier="Sealed" description="Relates a bis:SheetPrototype to the bis:SheetBorderPrototype that supplies its border and title-block content.">
+        <!-- @see SheetPrototype.Border ECNavigationProperty -->
+        <Source multiplicity="(0..*)" roleLabel="has" polymorphic="true">
+            <Class class="SheetPrototype" />
+        </Source>
+        <Target multiplicity="(0..1)" roleLabel="is referenced by" polymorphic="true">
+            <Class class="SheetBorderPrototype"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="SheetTemplateHasSheetBorder" strength="referencing" modifier="Sealed" description="DEPRECATED: Use bis:SheetPrototypeHasSheetBorderPrototype instead.">
+        <ECCustomAttributes>
+            <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                <Description>Use SheetPrototypeHasSheetBorderPrototype instead.</Description>
+            </Deprecated>
+        </ECCustomAttributes>
         <!-- @see SheetTemplate.Border ECNavigationProperty -->
         <Source multiplicity="(0..*)" roleLabel="has" polymorphic="true">
             <Class class="SheetTemplate" />
@@ -1260,7 +1345,12 @@
         </Target>
     </ECRelationshipClass>
 
-    <ECRelationshipClass typeName="SheetBorderHasSheetBorderTemplate" strength="referencing" modifier="Sealed">
+    <ECRelationshipClass typeName="SheetBorderHasSheetBorderTemplate" strength="referencing" modifier="Sealed" description="DEPRECATED: Use bis:SheetPrototypeHasSheetBorderPrototype instead.">
+        <ECCustomAttributes>
+            <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                <Description>Use SheetPrototypeHasSheetBorderPrototype instead.</Description>
+            </Deprecated>
+        </ECCustomAttributes>
         <!-- @see SheetBorder.BorderTemplate ECNavigationProperty -->
         <Source multiplicity="(0..*)" roleLabel="has" polymorphic="true">
             <Class class="SheetBorder" />
@@ -2470,6 +2560,11 @@
             <Class class="AnnotationTextStyle"/>
         </Target>
     </ECRelationshipClass> 
+
+    <ECEntityClass typeName="FormatSet" modifier="Sealed" displayLabel="Format Set" description="A bis:DefinitionElement that captures the settings of a set of formats in need to be maintained in BIS Repositories.">
+        <BaseClass>DefinitionElement</BaseClass>
+        <ECProperty propertyName="Settings" typeName="string" extendedTypeName="Json" displayLabel="Settings" description="The settings for the format set in a versioned JSON format." />
+    </ECEntityClass>
 
     <ECEntityClass typeName="LineStyle" modifier="Sealed" displayLabel="Line Style">
         <BaseClass>DefinitionElement</BaseClass>
