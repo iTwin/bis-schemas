@@ -3,7 +3,7 @@
 |  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
 |  * See LICENSE.md in the project root for license terms and full copyright notice.
 ======================================================================================= -->
-<ECSchema schemaName="DrawingProduction" alias="dp" version="01.00.05"
+<ECSchema schemaName="DrawingProduction" alias="dp" version="01.00.07"
     xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2"
     description="This schema contains Drawing Production concepts. They should be considered domain agnostic.">
     <ECSchemaReference name="BisCore" version="01.00.25" alias="bis" />
@@ -32,6 +32,16 @@
         description="A recipe for creating blank drawings. For example, Standard Details.">
         <BaseClass>DrawingRecipe</BaseClass>
     </ECEntityClass>
+
+    <ECRelationshipClass typeName="DrawingRecipeUsesDefinition" strength="referencing" modifier="None" description="The relationship between a drawing recipe element and a definition element the drawing recipe uses. For example, the drawing recipe uses a text style.">
+        <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="uses" polymorphic="true">
+            <Class class="DrawingRecipe"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is used by" polymorphic="true">
+            <Class class="bis:DefinitionElement"/>
+        </Target>
+    </ECRelationshipClass>
 
     <ECEntityClass typeName="NorthArrowCallout" displayLabel="North Arrow Callout" modifier="None"
         description="A bis:AnnotationElement2d that displays a north arrow on a sheet.">
