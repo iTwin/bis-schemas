@@ -622,6 +622,69 @@ describe('Package Generation', function() {
       chai.expect(localePkgJson.name).to.equal('@bentley/schema-a-schema-de');
       chai.expect(localePkgJson.version).to.equal('1.0.0-dev.1');
     });
+
+    it('schemas in ignore list should only skip if the name and version match', async function() {
+      const inventory = {
+        SchemaA: [
+          {
+            name: 'SchemaA',
+            version: '01.00.00',
+            released: true,
+            path: 'tools\\packages\\test\\assets\\SchemaA.ecschema.xml',
+            localizations: [],
+          },
+          {
+            name: 'SchemaA',
+            version: '01.01.01',
+            released: false,
+            approved: 'Yes',
+            sha1: 'f61b2ba6b58723aafac9d066a37b40e228ff4f1d',
+            path: 'tools\\packages\\test\\assets\\Released\\SchemaA.01.01.01.ecschema.xml',
+            localizations: [],
+          },
+        ],
+      };
+      fs.writeFileSync(inventoryPath, JSON.stringify(inventory));
+      // Only the released 01.00.00 version is on the skip list; the WIP 01.01.01 must still be packaged.
+      fs.writeFileSync(skipListPath, JSON.stringify([{ name: 'SchemaA', version: '01.00.00', reason: 'test' }]));
+
+      const { stubbed } = loadStubbedPkgGen();
+      await stubbed.createPackages(inventoryPath, skipListPath, outDir, templatePath, false, false);
+
+      chai.expect(fs.existsSync(path.join(outDir, 'SchemaA.1.0.0'))).to.be.false;
+      chai.expect(fs.existsSync(path.join(outDir, 'SchemaA.1.1.1-dev.1'))).to.be.true;
+    });
+
+    it('should skip every version of a schema when the skip list entry uses version "*"', async function() {
+      const inventory = {
+        SchemaA: [
+          {
+            name: 'SchemaA',
+            version: '01.00.00',
+            released: false,
+            path: 'tools\\packages\\test\\assets\\SchemaA.ecschema.xml',
+            localizations: [],
+          },
+          {
+            name: 'SchemaA',
+            version: '01.01.01',
+            released: true,
+            approved: 'Yes',
+            sha1: 'f61b2ba6b58723aafac9d066a37b40e228ff4f1d',
+            path: 'tools\\packages\\test\\assets\\Released\\SchemaA.01.01.01.ecschema.xml',
+            localizations: [],
+          },
+        ],
+      };
+      fs.writeFileSync(inventoryPath, JSON.stringify(inventory));
+      fs.writeFileSync(skipListPath, JSON.stringify([{ name: 'SchemaA', version: '*' }]));
+
+      const { stubbed } = loadStubbedPkgGen();
+      await stubbed.createPackages(inventoryPath, skipListPath, outDir, templatePath, false, false);
+
+      chai.expect(fs.existsSync(path.join(outDir, 'SchemaA.1.0.0'))).to.be.false;
+      chai.expect(fs.existsSync(path.join(outDir, 'SchemaA.1.1.1-dev.1'))).to.be.false;
+    });
   });
 
 });
