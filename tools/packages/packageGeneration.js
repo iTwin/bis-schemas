@@ -65,6 +65,25 @@ function isBlackListed(schema, blackList) {
   return !match.allowInternal;
 }
 
+/**
+ * Checks whether a specific schema version is on the skip list (ignoreSchemaList.json).
+ * An entry with version "*" skips every version of the schema, otherwise only the
+ * matching version is skipped. Mirrors `excludeSchema` in the validation tools.
+ * @param schema Schema info entry from the inventory
+ * @param skipList Parsed contents of the skip list
+ * @returns true if this schema version should not be packaged
+ */
+function isInSkipList(schema, skipList) {
+  if (!skipList)
+    return false;
+
+  const matches = skipList.filter((s) => s.name === schema.name);
+  if (matches.length === 0)
+    return false;
+
+  return matches.some((s) => s.version === "*" || !schema.version || s.version === schema.version);
+}
+
 function getPublishedSchemas (packageName) {
   let npmOutput = {};
   try {
@@ -306,8 +325,9 @@ async function createPackages(inventoryPath, skipListPath, outDir, packageTempla
   const publishBlackList = getPublishBlackList();
 
   for (const [name, schemaInfoList] of Object.entries(schemaInventory)) {
-    if (skipList.find((schemaToSkip) => { return schemaToSkip.name === name })) {
-      console.log(`Skipping ${name} because it is on the skip list`);
+    // If every version of this schema is skipped ("*"), avoid the npm lookup entirely.
+    if (skipList.some((s) => s.name === name && s.version === "*")) {
+      console.log(`Skipping all versions of ${name} because it is on the skip list`);
       continue;
     }
 
@@ -319,6 +339,11 @@ async function createPackages(inventoryPath, skipListPath, outDir, packageTempla
     for (const schemaInfo of schemaInfoList) {
       if(!schemaInfo.path) {
         console.log(`Skipping ${schemaInfo.name}.${schemaInfo.version} because entry has no path defined.`);
+        continue;
+      }
+
+      if (isInSkipList(schemaInfo, skipList)) {
+        console.log(`Skipping ${schemaInfo.name}.${schemaInfo.version} because it is on the skip list`);
         continue;
       }
 
