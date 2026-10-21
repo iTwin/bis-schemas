@@ -679,11 +679,13 @@ describe('Package Generation', function() {
       fs.writeFileSync(inventoryPath, JSON.stringify(inventory));
       fs.writeFileSync(skipListPath, JSON.stringify([{ name: 'SchemaA', version: '*' }]));
 
-      const { stubbed } = loadStubbedPkgGen();
+      const { stubbed, execStub } = loadStubbedPkgGen();
       await stubbed.createPackages(inventoryPath, skipListPath, outDir, templatePath, false, false);
 
       chai.expect(fs.existsSync(path.join(outDir, 'SchemaA.1.0.0'))).to.be.false;
       chai.expect(fs.existsSync(path.join(outDir, 'SchemaA.1.1.1-dev.1'))).to.be.false;
+      // A "*" entry should short-circuit before any npm lookup is made for the schema.
+      chai.expect(execStub.called).to.be.false;
     });
   });
 

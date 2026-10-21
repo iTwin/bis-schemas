@@ -325,6 +325,12 @@ async function createPackages(inventoryPath, skipListPath, outDir, packageTempla
   const publishBlackList = getPublishBlackList();
 
   for (const [name, schemaInfoList] of Object.entries(schemaInventory)) {
+    // If every version of this schema is skipped ("*"), avoid the npm lookup entirely.
+    if (skipList.some((s) => s.name === name && s.version === "*")) {
+      console.log(`Skipping all versions of ${name} because it is on the skip list`);
+      continue;
+    }
+
     let formattedName = name.replace(/([a-z]|[0-9]+D{0,1})([A-Z])/g, '$1-$2').toLowerCase();
     
     const schemaPkgeName = `@bentley/${formattedName}-schema`;
