@@ -3,7 +3,7 @@
 |  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
 |  * See LICENSE.md in the project root for license terms and full copyright notice.
 ======================================================================================= -->
-<ECSchema schemaName="DrawingProduction" alias="dp" version="01.00.05"
+<ECSchema schemaName="DrawingProduction" alias="dp" version="01.00.07"
     xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2"
     description="This schema contains Drawing Production concepts. They should be considered domain agnostic.">
     <ECSchemaReference name="BisCore" version="01.00.25" alias="bis" />
@@ -33,6 +33,16 @@
         <BaseClass>DrawingRecipe</BaseClass>
     </ECEntityClass>
 
+    <ECRelationshipClass typeName="DrawingRecipeUsesDefinition" strength="referencing" modifier="None" description="The relationship between a drawing recipe element and a definition element the drawing recipe uses. For example, the drawing recipe uses a text style.">
+        <BaseClass>bis:ElementRefersToElements</BaseClass>
+        <Source multiplicity="(0..*)" roleLabel="uses" polymorphic="true">
+            <Class class="DrawingRecipe"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is used by" polymorphic="true">
+            <Class class="bis:DefinitionElement"/>
+        </Target>
+    </ECRelationshipClass>
+
     <ECEntityClass typeName="NorthArrowCallout" displayLabel="North Arrow Callout" modifier="None"
         description="A bis:AnnotationElement2d that displays a north arrow on a sheet.">
         <BaseClass>bis:AnnotationElement2d</BaseClass>
@@ -42,6 +52,28 @@
         description="A bis:GraphicalType2d that defines the properties of a NorthArrowCallout.">
         <BaseClass>bis:GraphicalType2d</BaseClass>
     </ECEntityClass>
+
+    <ECRelationshipClass typeName="ViewAttachmentDrivesNorthArrowCallout" strength="referencing" modifier="Sealed"
+        description="The source bis:ViewAttachment drives the orientation of the target NorthArrowCallout.">
+        <BaseClass>bis:ElementDrivesElement</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="drives" polymorphic="true">
+            <Class class="bis:ViewAttachment"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is driven by" polymorphic="true">
+            <Class class="NorthArrowCallout"/>
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="SectionDrawingDrivesNorthArrowCallout" strength="referencing" modifier="Sealed"
+        description="The source bis:SectionDrawing drives the orientation of the target NorthArrowCallout.">
+        <BaseClass>bis:ElementDrivesElement</BaseClass>
+        <Source multiplicity="(0..1)" roleLabel="drives" polymorphic="true">
+            <Class class="bis:SectionDrawing"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is driven by" polymorphic="true">
+            <Class class="NorthArrowCallout"/>
+        </Target>
+    </ECRelationshipClass>
     
     <ECEntityClass typeName="ScaleBarCallout" displayLabel="Scale Bar Callout" modifier="None"
         description="A bis:AnnotationElement2d that displays a scale bar on a sheet.">

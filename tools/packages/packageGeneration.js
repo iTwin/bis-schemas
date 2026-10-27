@@ -65,6 +65,25 @@ function isBlackListed(schema, blackList) {
   return !match.allowInternal;
 }
 
+/**
+ * Checks whether a specific schema version is on the skip list (ignoreSchemaList.json).
+ * An entry with version "*" skips every version of the schema, otherwise only the
+ * matching version is skipped. Mirrors `excludeSchema` in the validation tools.
+ * @param schema Schema info entry from the inventory
+ * @param skipList Parsed contents of the skip list
+ * @returns true if this schema version should not be packaged
+ */
+function isInSkipList(schema, skipList) {
+  if (!skipList)
+    return false;
+
+  const matches = skipList.filter((s) => s.name === schema.name);
+  if (matches.length === 0)
+    return false;
+
+  return matches.some((s) => s.version === "*" || !schema.version || s.version === schema.version);
+}
+
 function getPublishedSchemas (packageName) {
   let npmOutput = {};
   try {
@@ -124,9 +143,40 @@ function getMediaFromRemarksFile(remarkFile) {
 }
 
 /**
- * Add the remarks file and the relevant media files to the package
+ * Resolves a relative media reference against a base directory and verifies that the
+ * resulting path stays inside `<baseDir>/media`.
+ * Returns undefined when the reference is absolute, contains traversal segments, or otherwise escapes the media directory.
+ * @param baseDir Trusted base directory (remarks file directory or package directory)
+ * @param item Media reference extracted from the remarks file (e.g. "media/Shapes/image.png")
+ * @returns Resolved absolute path, or undefined if the reference is not allowed
+ */
+function resolveContainedMediaPath(baseDir, item) {
+  // Reject absolute paths and any explicit traversal segment, regardless of separator style.
+  if (path.isAbsolute(item) || path.win32.isAbsolute(item) || /(^|[\\/])\.\.([\\/]|$)/.test(item))
+    return undefined;
+
+  const mediaRoot = path.resolve(baseDir, "media");
+  const resolved = path.resolve(baseDir, item);
+  const relative = path.relative(mediaRoot, resolved);
+
+  // Must be strictly inside the media root (not the root itself, not a sibling, not another drive).
+  if (relative === "" || relative.startsWith("..") || path.isAbsolute(relative))
+    return undefined;
+
+  return resolved;
+}
+
+/**
+ * Add the remarks file and the relevant media files to the package.
+ *
+ * Every media reference in the remarks file must resolve to a location inside the `media/`
+ * directory next to the remarks file (source) and inside the `media/` directory of the package
+ * (destination).
+ * A reference that escapes either directory (e.g. `media/../../secret.txt`) is a aborts package generation with an error.
+ *
  * @param schemaInfo Object containing schema information from the inventory
  * @param packageDir Schema package directory
+ * @throws Error if a media reference resolves outside of the allowed media directories
  */
 function addDocsToPackage(schemaInfo, packageDir) {
   const remarkFile = getRemarksFilePath(schemaInfo.path)
@@ -138,9 +188,13 @@ function addDocsToPackage(schemaInfo, packageDir) {
     if (media.length != 0) {
       const remarkFileDir = path.dirname(remarkFile);
       for (const item of media) {
-        const mediaFileSrc = path.resolve(path.join(remarkFileDir, item));
+        const mediaFileSrc = resolveContainedMediaPath(remarkFileDir, item);
+        const mediaFileDest = resolveContainedMediaPath(packageDir, item);
+        if (mediaFileSrc === undefined || mediaFileDest === undefined) {
+          throw new Error(`Invalid media reference '${item}' in ${remarkFile}: media paths must stay inside the 'media' directory next to the remarks file. Package generation aborted for ${schemaInfo.name}.`);
+        }
+
         if (fs.existsSync(mediaFileSrc)) {
-          const mediaFileDest = path.resolve(path.join(packageDir, item));
           const mediaFileDestDir = path.dirname(mediaFileDest);
           if (!fs.existsSync(mediaFileDestDir)) {
             fs.mkdirSync(mediaFileDestDir, { recursive: true });
@@ -271,8 +325,9 @@ async function createPackages(inventoryPath, skipListPath, outDir, packageTempla
   const publishBlackList = getPublishBlackList();
 
   for (const [name, schemaInfoList] of Object.entries(schemaInventory)) {
-    if (skipList.find((schemaToSkip) => { return schemaToSkip.name === name })) {
-      console.log(`Skipping ${name} because it is on the skip list`);
+    // If every version of this schema is skipped ("*"), avoid the npm lookup entirely.
+    if (skipList.some((s) => s.name === name && s.version === "*")) {
+      console.log(`Skipping all versions of ${name} because it is on the skip list`);
       continue;
     }
 
@@ -284,6 +339,11 @@ async function createPackages(inventoryPath, skipListPath, outDir, packageTempla
     for (const schemaInfo of schemaInfoList) {
       if(!schemaInfo.path) {
         console.log(`Skipping ${schemaInfo.name}.${schemaInfo.version} because entry has no path defined.`);
+        continue;
+      }
+
+      if (isInSkipList(schemaInfo, skipList)) {
+        console.log(`Skipping ${schemaInfo.name}.${schemaInfo.version} because it is on the skip list`);
         continue;
       }
 
