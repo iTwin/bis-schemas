@@ -520,6 +520,27 @@ Note that deletion of the referenced [SinglePerimeterProfile](#singleperimeterpr
 
 ![AsymmetricCenterZShape (all properties)](media/ProfilePictures/AsymmetricCenterZShape.png)
 
+### HatShapeProfile
+**Derivative properties:**
+- `TotalWidth` = 2 * `FlangeWidth` + `Width` - 2 * `WallThickness`
+
+**Constraints:**
+- `FlangeWidth` must be greater than zero
+- `Width` must be greater than zero
+- `Depth` must be greater than zero
+- `WallThickness`
+  - must be greater than zero
+  - must be less than `FlangeWidth`
+  - must be less than half `Width`
+  - must be less than half `Depth`
+- `FilletRadius` (if set):
+  - must be greater or equal to zero
+  - must be less or equal to `FlangeWidth` minus `WallThickness`
+  - must be less or equal to half `Width` minus `WallThickness`
+  - must be less or equal to half `Depth` minus `WallThickness`
+
+![HatShape](media/ProfilePictures/HatShape.png)
+
 ### BentPlateProfile
 **Derivative properties:**
 - `MaximumWallThickness` = Min(`Width` - `BendOffset`, `BendOffset`) * Tan(`BendAngle` / 2) * 2
