@@ -94,6 +94,7 @@
     <PropertyCategory typeName="SurfaceControl" displayLabel="Surface Control" priority="0" />
 
     <PropertyCategory typeName="EventPoint_Anchor" displayLabel="Event Point" priority="0" />
+    <PropertyCategory typeName="ParcelConnectionPoint_Engine" displayLabel="Connection Point" priority="0" />
     <PropertyCategory typeName="DistanceAnchorAspect_Distance" displayLabel="Distance" priority="0" />
     <PropertyCategory typeName="PercentAnchorAspect_Percent" displayLabel="Percent" priority="0" />
     <PropertyCategory typeName="RayAnchorAspect_Ray" displayLabel="Ray" priority="0" />
@@ -591,8 +592,15 @@
         <ECProperty propertyName="IslandWidth" minimumValue="0" maximumValue="304.8" typeName="double" category="ParkingIslandVertex_Island" kindOfQuantity="cvu:LENGTH" displayLabel="Island Width" description="Defines the island override for it's width." />
     </ECEntityClass>
 
-    <ECEntityClass typeName="EventPoint" modifier="Sealed" displayLabel="Event Point" description="A rule-driven point along a wire that resolves to a location each solve, subdividing the affected side into spans.">
+    <ECEntityClass typeName="EventPoint" displayLabel="Event Point" description="A rule-driven point along a wire that resolves to a location each solve, subdividing the affected side into spans.">
         <BaseClass>Vertex</BaseClass>
+    </ECEntityClass>
+
+    <ECEntityClass typeName="ParcelConnectionPoint" modifier="Sealed" displayLabel="Parcel Connection Point" description="An event point on a parceling area boundary that marks where a driveway connects, used as an input to the AI auto-subdivide engine.">
+        <BaseClass>EventPoint</BaseClass>
+
+        <ECProperty propertyName="Direction" minimumValue="-3.141592653589793" maximumValue="3.141592653589793" typeName="double" kindOfQuantity="cvu:ANGLE" category="ParcelConnectionPoint_Engine" displayLabel="Direction" description="Optional hint for the AI engine: the absolute world direction of the connection, in radians, measured counter-clockwise from the +X axis. When unset, the engine decides." />
+        <ECProperty propertyName="DistanceBeforeIntersection" minimumValue="0" typeName="double" kindOfQuantity="cvu:LENGTH" category="ParcelConnectionPoint_Engine" displayLabel="Distance Before Intersection" description="Optional hint for the AI engine: the distance, in meters, to travel from this point before the connection may intersect another. When unset, the engine decides." />
     </ECEntityClass>
 
     <ECEntityClass typeName="ParametricAnchorAspect" modifier="Abstract" displayLabel="Parametric Anchor" description="Base for the authored anchor-rule parameters of an EventPoint; the concrete subclass identifies the anchor mode.">
@@ -634,7 +642,7 @@
 
     <ECRelationshipClass typeName="EventPointOwnsParametricAnchorAspect" modifier="Sealed" strength="embedding">
         <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
-        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
             <Class class="EventPoint" />
         </Source>
         <Target multiplicity="(0..1)" roleLabel="is owned by" polymorphic="true">
@@ -1348,7 +1356,7 @@
         <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
             <Class class="Wire" />
         </Source>
-        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="false">
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="true">
             <Class class="EventPoint" />
         </Target>
     </ECRelationshipClass>
