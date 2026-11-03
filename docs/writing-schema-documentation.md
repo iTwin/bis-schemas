@@ -71,7 +71,7 @@ media/overview.png
 
 When a schema package is generated (see [packageGeneration.js](../tools/packages/packageGeneration.js)), every media reference found in the remarks file is copied into the package's `media` directory.
 After resolution the path must remain inside the `media` directory next to the remarks file, and the destination must remain inside the package's `media` directory.
-Violation of this rule will result in **package generation failing with an error**.
+Symbolic links are not allowed anywhere on the path to a media file, because copying follows them and could pull in files from outside the `media` directory.
 
 ## Viewing the Schema Docs in a local iTwin.js build
 
