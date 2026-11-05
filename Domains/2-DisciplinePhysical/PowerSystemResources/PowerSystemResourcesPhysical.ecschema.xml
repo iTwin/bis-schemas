@@ -89,17 +89,20 @@
         <Class class="Foundation"/>
       </Target>
     </ECRelationshipClass>
-  <ECEntityClass typeName="Equipment" displayLabel="Equipment" description="Equipment represents an Equipment when the equipment is placed in a 3D PhysicalModel." modifier="Abstract">
+  <ECEntityClass typeName="CommonPhysical" displayLabel="Common Physical" description="Common base class for physical elements placed in a 3D PhysicalModel." modifier="Abstract">
     <BaseClass>bis:PhysicalElement</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="Equipment" displayLabel="Equipment" description="Equipment represents an Equipment when the equipment is placed in a 3D PhysicalModel." modifier="Abstract">
+    <BaseClass>CommonPhysical</BaseClass>
     <BaseClass>dsys:IDistributionFlowElement</BaseClass>
     <BaseClass>spi:IStructuralElement</BaseClass>
   </ECEntityClass>
   <ECEntityClass typeName="Structure" displayLabel="Structure" description="Structure represents a Structure when the structure is placed in a 3D PhysicalModel." modifier="Abstract">
-    <BaseClass>bis:PhysicalElement</BaseClass>
+    <BaseClass>CommonPhysical</BaseClass>
     <BaseClass>spi:IStructuralAssembly</BaseClass>
   </ECEntityClass>
   <ECEntityClass typeName="Foundation" displayLabel="Foundation" description="Foundation represents an Foundation when the foundation is placed in a 3D PhysicalModel." modifier="Abstract">
-    <BaseClass>bis:PhysicalElement</BaseClass>
+    <BaseClass>CommonPhysical</BaseClass>
   </ECEntityClass>
   <ECEntityClass typeName="ElectricalPort" displayLabel="Electrical Port" description="Describes a geometry set that is used for electrical items." modifier="None">
     <BaseClass>dsys:DistributionPort</BaseClass>
@@ -136,38 +139,82 @@
     <ECProperty propertyName="IsSagUsed" displayLabel="Is Sag Used" priority="50" typeName="boolean" />
     <ECProperty propertyName="IsSpacerUsed" displayLabel="Is Spacer Used" priority="30" typeName="boolean" />
   </ECEntityClass>
-  <ECEntityClass typeName="EquipmentPhysicalType" displayLabel="Equipment Physical Type" description="Represents the Equipment Physical Type that stores the name of the physical class to be instanced when an electrical equipment is placed. Further the physical type has a reference to the recipe of the graphical elements that need to instanced. These graphical elements represent the physical geometry of the equipment. Can also a shared set of properties whose values vary per-type of an ElectricalPhysicalType." modifier="None">
+  <ECEntityClass typeName="CommonPhysicalType" displayLabel="Common Physical Type" description="Common base Physical Type that stores the name of the physical class to be instanced when an element is placed, together with a reference to the recipe of the graphical elements to be instanced and a shared set of properties whose values vary per-type." modifier="Abstract">
     <BaseClass>bis:PhysicalType</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="EquipmentPhysicalType" displayLabel="Equipment Physical Type" description="Represents the Equipment Physical Type that stores the name of the physical class to be instanced when an electrical equipment is placed. Further the physical type has a reference to the recipe of the graphical elements that need to instanced. These graphical elements represent the physical geometry of the equipment. Can also a shared set of properties whose values vary per-type of an ElectricalPhysicalType." modifier="None">
+    <BaseClass>CommonPhysicalType</BaseClass>
   </ECEntityClass>
   <ECEntityClass typeName="StructurePhysicalType" displayLabel="Structure Physical Type" description="Represents the Structure Physical Type that stores the name of the physical class to be instanced when an electrical equipment is placed. Further the physical type has a reference to the recipe of the graphical elements that need to instanced. These graphical elements represent the physical geometry of the equipment. Can also a shared set of properties whose values vary per-type of an ElectricalPhysicalType." modifier="None">
-    <BaseClass>bis:PhysicalType</BaseClass>
+    <BaseClass>CommonPhysicalType</BaseClass>
   </ECEntityClass>
   <ECEntityClass typeName="FoundationPhysicalType" displayLabel="Foundation Physical Type" description="Represents the Foundation Physical Type that stores the name of the physical class to be instanced when an electrical equipment is placed. Further the physical type has a reference to the recipe of the graphical elements that need to instanced. These graphical elements represent the physical geometry of the equipment. Can also a shared set of properties whose values vary per-type of an ElectricalPhysicalType." modifier="None">
-    <BaseClass>bis:PhysicalType</BaseClass>
+    <BaseClass>CommonPhysicalType</BaseClass>
   </ECEntityClass>
   <ECEntityClass typeName="Joint" displayLabel="Joint" description="A Joint is an area where two or more ends, surfaces or edges of individual members are attached." modifier="None">
     <BaseClass>sc:Joint</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="EquipmentPhysicalTypeAspect" displayLabel="EquipmentPhysical Type Aspect" description="Contains properties of an Physical Type Aspect." modifier="Abstract">
+  <ECEntityClass typeName="CommonPhysicalTypeAspect" displayLabel="CommonPhysical Type Aspect" description="Contains common properties of a Physical Type Aspect." modifier="Abstract">
     <BaseClass>bis:ElementUniqueAspect</BaseClass>
+    <ECProperty propertyName="Name" displayLabel="Name"   typeName="string" />
+    <ECProperty propertyName="Description" displayLabel="Description"   typeName="string" />
+    <ECProperty propertyName="DetailedDescription1" displayLabel="Short Description"   typeName="string" />
+    <ECProperty propertyName="DetailedDescription2" displayLabel="Detailed Description 2"   typeName="string" />
+    <ECProperty propertyName="DetailedDescription3" displayLabel="Detailed Description 3"   typeName="string" />
+    <ECProperty propertyName="DetailedDescription4" displayLabel="Detailed Description 4"   typeName="string" />
+    <ECProperty propertyName="DetailedDescription5" displayLabel="Detailed Description 5"   typeName="string" />
+    <ECProperty propertyName="IsAddedOnTheFly" displayLabel="Is Added on the fly"   typeName="boolean" />
+    <ECProperty propertyName="PartType" displayLabel="Part Type"   typeName="string" />
+    <ECProperty propertyName="CatalogNumber" displayLabel="Catalog Number"   typeName="string" />
+    <ECProperty propertyName="Discipline" displayLabel="Discipline"   typeName="string" />
+    <ECProperty propertyName="Category" displayLabel="Category"   typeName="string" />
+    <ECProperty propertyName="Manufacturer" displayLabel="Manufacturer"   typeName="string" />
+    <ECProperty propertyName="Supplier" displayLabel="Supplier"   typeName="string" />
+    <ECProperty propertyName="URL" displayLabel="URL"   typeName="string" />
+    <ECProperty propertyName="Family" displayLabel="Family"   typeName="string" />
+    <ECProperty propertyName="BalloonNumber" displayLabel="Balloon Number"   typeName="string" />
+    <ECProperty propertyName="TagMnemonic" displayLabel="Tag Mnemonic"   typeName="string" />
+    <ECProperty propertyName="IsGeneric" description="If true, this is a generic representation rather than a specific part." displayLabel="Is Generic"   typeName="boolean" />
+    <ECProperty propertyName="SymbolType" displayLabel="Symbol Type"   typeName="subinf:SymbolType" />
+    <ECProperty propertyName="QuantityPerUnit" displayLabel="Quantity Per Unit"   typeName="string" />
+    <ECProperty propertyName="UnitOfMeasure" displayLabel="Unit Of Measure"   typeName="string" />
+    <ECProperty propertyName="OrderUnit" displayLabel="Order Unit"   typeName="string" />
+    <ECProperty propertyName="BuyingPrice" displayLabel="Buying Price"   typeName="string" />
+    <ECProperty propertyName="DimensionX" displayLabel="Dimension X"   typeName="string" />
+    <ECProperty propertyName="DimensionY" displayLabel="Dimension Y"   typeName="string" />
+    <ECProperty propertyName="DimensionZ" displayLabel="Dimension Z"   typeName="string" />
+    <ECProperty propertyName="DateCreated" displayLabel="Date Created"   typeName="dateTime" />
+    <ECProperty propertyName="DateModified" displayLabel="Date Modified"   typeName="dateTime" />
+    <ECProperty propertyName="DetailedDrawings" displayLabel="Detailed Drawings" typeName="string" />
+  </ECEntityClass>
+  <ECEntityClass typeName="EquipmentPhysicalTypeAspect" displayLabel="EquipmentPhysical Type Aspect" description="Contains properties of an Physical Type Aspect." modifier="Abstract">
+    <BaseClass>CommonPhysicalTypeAspect</BaseClass>
   </ECEntityClass>
   <ECEntityClass typeName="StructurePhysicalTypeAspect" displayLabel="StructurePhysical Type Aspect" description="Contains properties of an Physical Type Aspect." modifier="Abstract">
-    <BaseClass>bis:ElementUniqueAspect</BaseClass>
+    <BaseClass>CommonPhysicalTypeAspect</BaseClass>
   </ECEntityClass>
   <ECEntityClass typeName="FoundationPhysicalTypeAspect" displayLabel="FoundationPhysical Type Aspect" description="Contains properties of an Physical Type Aspect." modifier="Abstract">
+    <BaseClass>CommonPhysicalTypeAspect</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="CommonAspect" displayLabel="Common Aspect" description="Contains common properties of an Aspect." modifier="Abstract">
     <BaseClass>bis:ElementUniqueAspect</BaseClass>
+    <ECProperty propertyName="DesignId" displayLabel="Design Id" description="Unique identifier during design phase."  typeName="string" />
+    <ECProperty propertyName="AssetId" displayLabel="Asset Id" description="Unique identifier after being built."  typeName="string" />
+    <ECProperty propertyName="AssetDescription" displayLabel="Asset Desc"   typeName="string" />
+    <ECProperty propertyName="Area" displayLabel="Area"   typeName="string" />
+    <ECProperty propertyName="LifecycleStatus" displayLabel="Lifecycle Status"   typeName="string" />
+    <ECProperty propertyName="InstallDate" displayLabel="Install Date"   typeName="dateTime" />
+    <ECProperty propertyName="RetireDate" displayLabel="Retire Date"   typeName="dateTime" />
+    <ECProperty propertyName="Elevation" displayLabel="Elevation"   typeName="double" />
   </ECEntityClass>
   <ECEntityClass typeName="EquipmentAspect" displayLabel="Equipment Aspect" description="Contains properties of an Equipment Aspect." modifier="Abstract">
-    <BaseClass>bis:ElementUniqueAspect</BaseClass>
+    <BaseClass>CommonAspect</BaseClass>
   </ECEntityClass>
   <ECEntityClass typeName="StructureAspect" displayLabel="Structure Aspect" description="Contains properties of an Structure Aspect." modifier="Abstract">
-    <BaseClass>bis:ElementUniqueAspect</BaseClass>
+    <BaseClass>CommonAspect</BaseClass>
   </ECEntityClass>
   <ECEntityClass typeName="FoundationAspect" displayLabel="Foundation Aspect" description="Contains properties of an Foundation Aspect." modifier="Abstract">
-    <BaseClass>bis:ElementUniqueAspect</BaseClass>
-  </ECEntityClass>
-  <ECEntityClass typeName="CableAssemblyAspect" displayLabel="Cable Assembly Aspect" description="Contains properties of a Cable Assembly Aspect." modifier="Abstract">
-    <BaseClass>bis:ElementUniqueAspect</BaseClass>
+    <BaseClass>CommonAspect</BaseClass>
   </ECEntityClass>
   <ECRelationshipClass typeName="PhysicalEquipmentOwnsChildren" description="Specifies a Non Graphical Physical Equipment owns Child Primary Physical Elements." modifier="None" strength="Embedding" strengthDirection="Forward">
     <BaseClass>bis:ElementOwnsChildElements</BaseClass>
