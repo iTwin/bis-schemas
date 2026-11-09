@@ -2637,6 +2637,12 @@
     <ECRelationshipClass typeName="SurfaceControlOwnsControlElement" modifier="Sealed" strength="embedding" strengthDirection="forward">
         <BaseClass>bis:ElementOwnsChildElements</BaseClass>
 
+        <ECCustomAttributes>
+            <Deprecated xmlns="CoreCustomAttributes.01.00.04">
+                <Description>SurfaceControlOwnsControlElement is no longer used for surface control, use ControlGroupOwnsControlElement instead.</Description>
+            </Deprecated>
+        </ECCustomAttributes>
+
         <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
             <Class class="ISurfaceControl"/>
         </Source>
@@ -2656,14 +2662,48 @@
         </Target>
     </ECRelationshipClass>
 
+    <ECRelationshipClass typeName="ControlGroupHoldsSurfaceControl" modifier="None" strength="referencing" strengthDirection="forward">
+        <BaseClass>bis:ElementRefersToElements</BaseClass>
+
+        <Source multiplicity="(0..1)" roleLabel="holds" polymorphic="false">
+            <Class class="SurfaceControlGroup" />
+        </Source>
+        <Target multiplicity="(1..*)" roleLabel="is held by" polymorphic="true">
+            <Class class="ISurfaceControl" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="ControlGroupOwnsControlElement" modifier="Sealed" strength="embedding" strengthDirection="forward">
+        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
+            <Class class="SurfaceControlGroup"/>
+        </Source>
+        <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="true">
+            <Class class="ISurfaceControlElement"/>
+        </Target>
+    </ECRelationshipClass>
+
     <ECEntityClass typeName="SurfaceControlOptionsAspect" displayLabel="Surface Control Options" modifier="Sealed">
         <BaseClass>bis:ElementUniqueAspect</BaseClass>
+
+        <ECCustomAttributes>
+            <Deprecated xmlns="CoreCustomAttributes.01.00.04">
+                <Description>SurfaceControlOptionsAspect is no longer used for surface control.</Description>
+            </Deprecated>
+        </ECCustomAttributes>
 
         <ECProperty propertyName="Resolution" typeName="double" description="Controls the spacing of the XY grid used when generating the triangulation for the interpolated surface." displayLabel="Resolution" category="SurfaceControl" kindOfQuantity="cvu:LENGTH"/>
     </ECEntityClass>
 
     <ECRelationshipClass typeName="SurfaceControlOwnsOptionsAspect" modifier="Sealed" strength="embedding" strengthDirection="forward">
         <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
+
+        <ECCustomAttributes>
+            <Deprecated xmlns="CoreCustomAttributes.01.00.04">
+                <Description>SurfaceControlOptionsAspect is no longer used for surface control.</Description>
+            </Deprecated>
+        </ECCustomAttributes>
 
         <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
             <Class class="ISurfaceControl"/>
@@ -2677,7 +2717,14 @@
         <ECProperty propertyName="IsBreakline" typeName="boolean" description="Indicates whether the stroke is a breakline." displayLabel="Is Breakline" category="SurfaceControl"/>
         <ECProperty propertyName="EmitControlPoints" typeName="boolean" description="Indicates whether the stroke operation emit intermediate control points." displayLabel="Emit Control Points" category="SurfaceControl"/>
         <ECProperty propertyName="ControlPointTypeSource" typeName="IntermediatePointType" description="Specifies the source to derive the intermediate control point type from." displayLabel="Control Point Type Source" category="SurfaceControl"/>
+        <ECProperty propertyName="Resolution" typeName="double" description="Controls the spacing of the XY grid used when generating the triangulation for the interpolated surface." displayLabel="Resolution" category="SurfaceControl" kindOfQuantity="cvu:LENGTH"/>
     </ECStructClass>
+
+    <ECEntityClass typeName="SurfaceControlGroup" description="A group that holds surface control objects." displayLabel="Surface Control Group" modifier="Sealed">
+      <BaseClass>bis:InformationRecordElement</BaseClass>
+
+        <ECProperty propertyName="Resolution" typeName="double" description="Controls the spacing of the XY grid used when generating the triangulation for the interpolated surface." displayLabel="Resolution" category="SurfaceControl" kindOfQuantity="cvu:LENGTH"/>
+    </ECEntityClass>
 
     <!--Surface Control Objects-->
 
@@ -2826,7 +2873,15 @@
     <ECEntityClass typeName="SurfaceControlDitchRule" description="Models a ditch-like parametric template that is applied to a control path." displayLabel="Surface Control Ditch Rule" modifier="Sealed" >
         <BaseClass>SurfaceControlRule</BaseClass>
 
-        <ECProperty propertyName="Interval" typeName="double" description="Drop interval along the path." category="SurfaceControl" kindOfQuantity="cvu:LENGTH"/>
+        <ECProperty propertyName="Interval" typeName="double" description="Drop interval along the path." category="SurfaceControl" kindOfQuantity="cvu:LENGTH">
+            <ECCustomAttributes>
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03" />
+                <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                    <Description>Interval is deprecated. Use Resolution in SurfaceControlStrokeOptions instead. </Description>
+                </Deprecated>
+            </ECCustomAttributes>
+        </ECProperty>
+
         <ECProperty propertyName="Slope" minimumValue="-10" maximumValue="10" typeName="double" description="Slope of the line emanating from the path on the right-side." category="SurfaceControl" kindOfQuantity="cvu:SLOPE"/>
         <ECProperty propertyName="LeftSlope" minimumValue="-10" maximumValue="10" typeName="double" description="Slope of the line emanating from the path on the left-side." category="SurfaceControl" kindOfQuantity="cvu:SLOPE"/>
         <ECProperty propertyName="Offset" typeName="double" description="Offset from the right-side of the path to attenuate the influence of the ditch elevation." category="SurfaceControl" kindOfQuantity="cvu:LENGTH"/>
