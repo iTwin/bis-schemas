@@ -65,6 +65,25 @@ function isBlackListed(schema, blackList) {
   return !match.allowInternal;
 }
 
+/**
+ * Checks whether a specific schema version is on the skip list (ignoreSchemaList.json).
+ * An entry with version "*" skips every version of the schema, otherwise only the
+ * matching version is skipped. Mirrors `excludeSchema` in the validation tools.
+ * @param schema Schema info entry from the inventory
+ * @param skipList Parsed contents of the skip list
+ * @returns true if this schema version should not be packaged
+ */
+function isInSkipList(schema, skipList) {
+  if (!skipList)
+    return false;
+
+  const matches = skipList.filter((s) => s.name === schema.name);
+  if (matches.length === 0)
+    return false;
+
+  return matches.some((s) => s.version === "*" || !schema.version || s.version === schema.version);
+}
+
 function getPublishedSchemas (packageName) {
   let npmOutput = {};
   try {
@@ -124,9 +143,40 @@ function getMediaFromRemarksFile(remarkFile) {
 }
 
 /**
- * Add the remarks file and the relevant media files to the package
+ * Resolves a relative media reference against a base directory and verifies that the
+ * resulting path stays inside `<baseDir>/media`.
+ * Returns undefined when the reference is absolute, contains traversal segments, or otherwise escapes the media directory.
+ * @param baseDir Trusted base directory (remarks file directory or package directory)
+ * @param item Media reference extracted from the remarks file (e.g. "media/Shapes/image.png")
+ * @returns Resolved absolute path, or undefined if the reference is not allowed
+ */
+function resolveContainedMediaPath(baseDir, item) {
+  // Reject absolute paths and any explicit traversal segment, regardless of separator style.
+  if (path.isAbsolute(item) || path.win32.isAbsolute(item) || /(^|[\\/])\.\.([\\/]|$)/.test(item))
+    return undefined;
+
+  const mediaRoot = path.resolve(baseDir, "media");
+  const resolved = path.resolve(baseDir, item);
+  const relative = path.relative(mediaRoot, resolved);
+
+  // Must be strictly inside the media root (not the root itself, not a sibling, not another drive).
+  if (relative === "" || relative.startsWith("..") || path.isAbsolute(relative))
+    return undefined;
+
+  return resolved;
+}
+
+/**
+ * Add the remarks file and the relevant media files to the package.
+ *
+ * Every media reference in the remarks file must resolve to a location inside the `media/`
+ * directory next to the remarks file (source) and inside the `media/` directory of the package
+ * (destination).
+ * A reference that escapes either directory (e.g. `media/../../secret.txt`) is a aborts package generation with an error.
+ *
  * @param schemaInfo Object containing schema information from the inventory
  * @param packageDir Schema package directory
+ * @throws Error if a media reference resolves outside of the allowed media directories
  */
 function addDocsToPackage(schemaInfo, packageDir) {
   const remarkFile = getRemarksFilePath(schemaInfo.path)
@@ -138,9 +188,13 @@ function addDocsToPackage(schemaInfo, packageDir) {
     if (media.length != 0) {
       const remarkFileDir = path.dirname(remarkFile);
       for (const item of media) {
-        const mediaFileSrc = path.resolve(path.join(remarkFileDir, item));
+        const mediaFileSrc = resolveContainedMediaPath(remarkFileDir, item);
+        const mediaFileDest = resolveContainedMediaPath(packageDir, item);
+        if (mediaFileSrc === undefined || mediaFileDest === undefined) {
+          throw new Error(`Invalid media reference '${item}' in ${remarkFile}: media paths must stay inside the 'media' directory next to the remarks file. Package generation aborted for ${schemaInfo.name}.`);
+        }
+
         if (fs.existsSync(mediaFileSrc)) {
-          const mediaFileDest = path.resolve(path.join(packageDir, item));
           const mediaFileDestDir = path.dirname(mediaFileDest);
           if (!fs.existsSync(mediaFileDestDir)) {
             fs.mkdirSync(mediaFileDestDir, { recursive: true });
@@ -150,6 +204,14 @@ function addDocsToPackage(schemaInfo, packageDir) {
       }
     }
   }
+}
+
+function writeLicenseAndReadme(packageDir, packageName) {
+  const pkgLicense = path.join(packageDir, "LICENSE.md");
+  fs.copyFileSync(path.resolve("./tools/packages/LICENSE.md"), pkgLicense);
+  const readmeText = fs.readFileSync(path.resolve("./tools/packages/README.md.template"), 'utf8');
+  var updatedReadme = readmeText.replace(/{package-name}/g, packageName)
+  fs.writeFileSync(path.join(packageDir, "README.md"), updatedReadme);
 }
 
 async function buildPackage(outPath, packageJsonTemplate, versionInfo, schemaInfo) {
@@ -163,18 +225,13 @@ async function buildPackage(outPath, packageJsonTemplate, versionInfo, schemaInf
 
   fs.writeFileSync(path.join(packageDir, "package.json"), pkgJson);
   const schemaFileName = `${schemaInfo.name}.ecschema.xml`;
-  const packageSchemaPath = path.join(packageDir, schemaFileName);
-  fs.copyFileSync(schemaInfo.path, packageSchemaPath);
-  fs.copyFileSync(path.resolve("./tools/packages/LICENSE.md"), path.join(packageDir, "LICENSE.md"));
+  fs.copyFileSync(schemaInfo.path, path.join(packageDir, schemaFileName));
   addDocsToPackage(schemaInfo, packageDir);
-
 
   // create json schema
   await createSchemaJson(schemaInfo, packageDir);
-  
-  const readmeText = fs.readFileSync(path.resolve("./tools/packages/README.md.template"), 'utf8');
-  var updatedReadme = readmeText.replace(/{package-name}/g, versionInfo.packageName);
-  fs.writeFileSync(path.join(packageDir, "README.md"), updatedReadme);
+
+  writeLicenseAndReadme(packageDir, versionInfo.packageName);
 }
 
 function getReleaseVersion(schemaInfo, publishedVersions, alwaysGen) {
@@ -238,6 +295,21 @@ function shouldPublish(schemaInfo, versionInfo) {
   return true;
 }
 
+function resolveVersionInfo(schemaInfo, schemaInfoList, publishedVersions, skipBetaPackages, alwaysGen) {
+  let versionInfo = {needToPublish: false};
+  // if released check npm for package, build if does not exist
+  if (schemaInfo.released) {
+    versionInfo = getReleaseVersion(schemaInfo, publishedVersions, alwaysGen);
+  } else if (!skipBetaPackages) {
+    versionInfo = getNextBetaVersion(schemaInfo, publishedVersions, alwaysGen);
+    // Even if needToPublish is true don't publish beta package if it's also in the released folder
+    const released = schemaInfoList.find((info) => info.name === schemaInfo.name && info.version === schemaInfo.version && info.released === true);
+    if (versionInfo.needToPublish)
+      versionInfo.needToPublish = undefined === released;
+  }
+ return versionInfo;
+}
+
 async function createPackages(inventoryPath, skipListPath, outDir, packageTemplatePath, skipBetaPackages, alwaysGen) {
   if (skipBetaPackages) console.log("Skipping beta packages because the '--skipBetaPackages' flag is set");
 
@@ -253,19 +325,25 @@ async function createPackages(inventoryPath, skipListPath, outDir, packageTempla
   const publishBlackList = getPublishBlackList();
 
   for (const [name, schemaInfoList] of Object.entries(schemaInventory)) {
-    if (skipList.find((schemaToSkip) => { return schemaToSkip.name === name })) {
-      console.log(`Skipping ${name} because it is on the skip list`);
+    // If every version of this schema is skipped ("*"), avoid the npm lookup entirely.
+    if (skipList.some((s) => s.name === name && s.version === "*")) {
+      console.log(`Skipping all versions of ${name} because it is on the skip list`);
       continue;
     }
 
     let formattedName = name.replace(/([a-z]|[0-9]+D{0,1})([A-Z])/g, '$1-$2').toLowerCase();
     
-    const packageName = `@bentley/${formattedName}-schema`;
-    console.log(`Looking for packages published with the name ${packageName} for schema ${name}`);
-    const publishedVersions = getPublishedSchemas(packageName);
+    const schemaPkgeName = `@bentley/${formattedName}-schema`;
+    console.log(`Looking for packages published with the name ${schemaPkgeName} for schema ${name}`);
+    const publishedVersions = getPublishedSchemas(schemaPkgeName);
     for (const schemaInfo of schemaInfoList) {
       if(!schemaInfo.path) {
         console.log(`Skipping ${schemaInfo.name}.${schemaInfo.version} because entry has no path defined.`);
+        continue;
+      }
+
+      if (isInSkipList(schemaInfo, skipList)) {
+        console.log(`Skipping ${schemaInfo.name}.${schemaInfo.version} because it is on the skip list`);
         continue;
       }
 
@@ -274,28 +352,69 @@ async function createPackages(inventoryPath, skipListPath, outDir, packageTempla
         continue;
       }
 
-      let versionInfo = {needToPublish: false};
-      // if released check npm for package, build if does not exist
-      if (schemaInfo.released) {
-        versionInfo = getReleaseVersion(schemaInfo, publishedVersions, alwaysGen);
-      } else if (!skipBetaPackages) {
-        versionInfo = getNextBetaVersion(schemaInfo, publishedVersions, alwaysGen);
-        // Even if needToPublish is true don't publish beta package if it's also in the released folder
-        const released = schemaInfoList.find((info) => info.name === schemaInfo.name && info.version === schemaInfo.version && info.released === true);
-        if (versionInfo.needToPublish)
-          versionInfo.needToPublish = undefined === released;
-      }
-    
+      let versionInfo = resolveVersionInfo(schemaInfo, schemaInfoList, publishedVersions, skipBetaPackages, alwaysGen);
+
       if (versionInfo.needToPublish) {
         if(false === shouldPublish(schemaInfo, versionInfo)) {
           console.log(`Skipping package generation for ${schemaInfo.name}.${schemaInfo.version} because it is not valid.`);
           continue;
         }
-        versionInfo.packageName = packageName;
+        versionInfo.packageName = schemaPkgeName;
         versionInfo.packageVersion = formatPackageVersion(versionInfo);
         await buildPackage(outDir, packageJsonTemplate, versionInfo, schemaInfo);      }
+
+      await createLocalizationPackages(outDir, schemaPkgeName, schemaInfo, schemaInfoList, skipBetaPackages, alwaysGen);
     }
   }
 }
 
-module.exports = {parseNpmOutputAndSort, formatPackageVersion, createPackages, shouldPublish, parseVersionString, addDocsToPackage};
+function buildLocalizationPackage(outPath, versionInfo, schemaInfo, localization) {
+  console.log(`Building localization package ${versionInfo.packageName}.${versionInfo.packageVersion} for file ${localization.path}`);
+  const packageDir = path.join(outPath, `${schemaInfo.name}.${localization.locale}.${versionInfo.packageVersion}`);
+  if (!fs.existsSync(packageDir)) fs.mkdirSync(packageDir, {recursive: true});
+
+  const localeFileName = `${schemaInfo.name}.${localization.locale}.json`;
+  fs.copyFileSync(localization.path, path.join(packageDir, localeFileName));
+
+  const pkgJson = {
+    name: versionInfo.packageName,
+    license: "MIT",
+    version: versionInfo.packageVersion,
+    homepage: "https://www.itwinjs.org/",
+    keywords: ["Bentley", "BIS", "iModel"],
+    description: `${schemaInfo.name} BIS Domain localization (${localization.locale})`,
+    author: { name: "Bentley Systems, Inc.", url: "http://www.bentley.com" },
+    exports: { [`./${localeFileName}`]: `./${localeFileName}` },
+  };
+  fs.writeFileSync(path.join(packageDir, "package.json"), JSON.stringify(pkgJson, null, 2));
+
+  writeLicenseAndReadme(packageDir, versionInfo.packageName);
+}
+
+function createLocalizationPackages(outDir, schemaPkgeName, schemaInfo, schemaInfoList, skipBetaPackages, alwaysGen) {
+  if (!schemaInfo.localizations || schemaInfo.localizations.length === 0)
+    return;
+
+  if (schemaInfo.released && !/yes/i.test(schemaInfo.approved)) {
+    console.log(`Skipping localizations for ${schemaInfo.name}.${schemaInfo.version} because this schema is not approved.`);
+    return;
+  }
+
+  for (const localization of schemaInfo.localizations) {
+    const localePackageName = `${schemaPkgeName}-${localization.locale.toLowerCase()}`;
+    console.log(`Looking for packages published with the name ${localePackageName} for ${schemaInfo.name}.${localization.locale}`);
+    const localePublishedVersions = getPublishedSchemas(localePackageName);
+
+    const localeSchemaInfo = { ...schemaInfo, path: localization.path };
+    const localeVersionInfo = resolveVersionInfo(localeSchemaInfo, schemaInfoList, localePublishedVersions, skipBetaPackages, alwaysGen);
+
+    if (!localeVersionInfo.needToPublish)
+      continue;
+
+    localeVersionInfo.packageName = localePackageName;
+    localeVersionInfo.packageVersion = formatPackageVersion(localeVersionInfo);
+    buildLocalizationPackage(outDir, localeVersionInfo, schemaInfo, localization);
+  }
+}
+
+module.exports = {parseNpmOutputAndSort, formatPackageVersion, createPackages, shouldPublish, parseVersionString, addDocsToPackage, buildLocalizationPackage, createLocalizationPackages};

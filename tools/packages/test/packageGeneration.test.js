@@ -5,6 +5,9 @@
 const fs = require('fs');
 const path = require('path');
 const chai = require('chai');
+const sinon = require('sinon');
+const proxyquire = require('proxyquire');
+const child_process = require('child_process');
 const pkgGen = require('../packageGeneration.js');
 
 describe('Package Generation', function() {
@@ -196,8 +199,493 @@ describe('Package Generation', function() {
       chai.expect(isExists).to.be.false;
 
       const media = path.join(packageDir, 'media');
-      isExists = fs.existsSync(media)
+      isExists = fs.existsSync(media);
       chai.expect(isExists).to.be.false;
+    });
+  });
+
+  describe('Media path traversal protection', function() {
+    // Layout created for every test:
+    //   <root>/src/SchemaX.remarks.md          - remarks file with a malicious media reference
+    //   <root>/src/media/legit.png             - legitimate media file
+    //   <root>/victim/secret.txt               - file outside the media directory (traversal read target)
+    //   <root>/out/pkg                         - packageDir
+    //   <root>/out/victim/secret.txt           - pre-existing file outside packageDir (traversal overwrite target)
+    let root, srcDir, victimDir, outDir, packageDir;
+    const secretContent = 'SENSITIVE SYNTHETIC FILE';
+    const originalOutContent = 'ORIGINAL CONTENT - MUST NOT BE OVERWRITTEN';
+
+    function setupRemarks(mediaReference) {
+      const remarksFile = path.join(srcDir, 'SchemaX.remarks.md');
+      fs.writeFileSync(remarksFile, `# SchemaX\n\n![legit](media/legit.png)\n\n![malicious](${mediaReference})\n`);
+      return { name: 'SchemaX', path: path.join(srcDir, 'SchemaX.ecschema.xml'), released: false };
+    }
+
+    function collectFiles(dir) {
+      if (!fs.existsSync(dir))
+        return [];
+
+      return fs.readdirSync(dir, { withFileTypes: true, recursive: true })
+        .filter((d) => d.isFile())
+        .map((d) => path.join(d.parentPath ?? d.path, d.name));
+    }
+
+    function assertTraversalRejected(schemaInfo) {
+      chai.expect(() => pkgGen.addDocsToPackage(schemaInfo, packageDir)).to.throw(Error, /Invalid media reference/);
+      // Nothing outside of packageDir was created or modified.
+      const outsidePkg = collectFiles(outDir).filter((f) => !f.startsWith(packageDir + path.sep));
+      chai.expect(outsidePkg).to.deep.equal([path.join(outDir, 'victim', 'secret.txt')]);
+      chai.expect(fs.readFileSync(path.join(outDir, 'victim', 'secret.txt'), 'utf8')).to.equal(originalOutContent);
+      // The secret was not copied anywhere inside the package either.
+      const leaked = collectFiles(packageDir).filter((f) => fs.readFileSync(f, 'utf8') === secretContent);
+      chai.expect(leaked).to.deep.equal([]);
+    }
+
+    beforeEach(function() {
+      root = path.join(__dirname, 'testTraversal');
+      if (fs.existsSync(root))
+        fs.rmSync(root, { recursive: true, force: true });
+
+      srcDir = path.join(root, 'src');
+      victimDir = path.join(root, 'victim');
+      outDir = path.join(root, 'out');
+      packageDir = path.join(outDir, 'pkg');
+
+      fs.mkdirSync(path.join(srcDir, 'media'), { recursive: true });
+      fs.mkdirSync(victimDir, { recursive: true });
+      fs.mkdirSync(packageDir, { recursive: true });
+      fs.mkdirSync(path.join(outDir, 'victim'), { recursive: true });
+
+      fs.writeFileSync(path.join(srcDir, 'media', 'legit.png'), 'legit media');
+      fs.writeFileSync(path.join(victimDir, 'secret.txt'), secretContent);
+      fs.writeFileSync(path.join(outDir, 'victim', 'secret.txt'), originalOutContent);
+    });
+
+    after(function() {
+      if (fs.existsSync(root))
+        fs.rmSync(root, { recursive: true, force: true });
+    });
+
+    it('Should fail and not copy a file referenced via "media/../../" outside of the media directory', function() {
+      const schemaInfo = setupRemarks('media/../../victim/secret.txt');
+      assertTraversalRejected(schemaInfo);
+    });
+
+    it('Should fail and not overwrite an existing file outside of the package directory', function() {
+      // Source resolves to <root>/victim/secret.txt, destination resolves to <root>/out/victim/secret.txt
+      const schemaInfo = setupRemarks('media/../../victim/secret.txt');
+      chai.expect(() => pkgGen.addDocsToPackage(schemaInfo, packageDir)).to.throw(Error, /Invalid media reference/);
+      const target = path.join(outDir, 'victim', 'secret.txt');
+      chai.expect(fs.readFileSync(target, 'utf8')).to.equal(originalOutContent);
+    });
+
+    it('Should still copy legitimate media in nested sub directories', function() {
+      fs.mkdirSync(path.join(srcDir, 'media', 'Shapes'), { recursive: true });
+      fs.writeFileSync(path.join(srcDir, 'media', 'Shapes', 'image2.png'), 'nested media');
+      const schemaInfo = setupRemarks('media/Shapes/image2.png');
+      pkgGen.addDocsToPackage(schemaInfo, packageDir);
+      chai.expect(fs.existsSync(path.join(packageDir, 'media', 'legit.png'))).to.be.true;
+      chai.expect(fs.existsSync(path.join(packageDir, 'media', 'Shapes', 'image2.png'))).to.be.true;
+    });
+
+    it('Should fail on nested traversal that first descends into a sub directory', function() {
+      fs.mkdirSync(path.join(srcDir, 'media', 'Shapes'), { recursive: true });
+      const schemaInfo = setupRemarks('media/Shapes/../../../victim/secret.txt');
+      assertTraversalRejected(schemaInfo);
+    });
+
+    it('Should fail on traversal using "./media/" prefix', function() {
+      const schemaInfo = setupRemarks('./media/../../victim/secret.txt');
+      assertTraversalRejected(schemaInfo);
+    });
+
+    it('Should fail on traversal using mixed path separators', function() {
+      const schemaInfo = setupRemarks('media/..\\..\\victim\\secret.txt');
+      assertTraversalRejected(schemaInfo);
+    });
+
+    it('Should fail on traversal to an absolute path', function() {
+      const absolute = path.join(victimDir, 'secret.txt').replace(/\\/g, '/');
+      const schemaInfo = setupRemarks(`media/../${absolute}`);
+      assertTraversalRejected(schemaInfo);
+    });
+  });
+
+  describe('Localization package generation', function() {
+    let outDir;
+
+    beforeEach(function() {
+      outDir = path.normalize(__dirname + "/../../../testOut/packageGeneration");
+      if (fs.existsSync(outDir)) {
+        fs.rmSync(outDir, { recursive: true });
+      }
+      fs.mkdirSync(outDir, { recursive: true });
+    });
+
+    after(function() {
+      if (fs.existsSync(outDir)) {
+        fs.rmSync(outDir, { recursive: true });
+      }
+    });
+
+    it('Correctly build the localization package version with all required files', async function() {
+      const schemaInfo = {
+        name: 'SchemaA',
+        version: '01.00.00',
+        released: false,
+      };
+
+      const localization = {
+        path: 'tools\\packages\\test\\assets\\Locales\\SchemaA.de.json',
+        locale: 'de',
+      };
+
+      const versionInfo = {
+        packageName: '@bentley/schema-a-schema-de',
+        packageVersion: '1.0.0-dev.1',
+      };
+
+      await pkgGen.buildLocalizationPackage(outDir, versionInfo, schemaInfo, localization);
+
+      const pkgDir = path.join(outDir, 'SchemaA.de.1.0.0-dev.1');
+      chai.expect(fs.existsSync(pkgDir)).to.be.true;
+      chai.expect(fs.existsSync(path.join(pkgDir, 'SchemaA.de.json'))).to.be.true;
+      chai.expect(fs.existsSync(path.join(pkgDir, 'package.json'))).to.be.true;
+      chai.expect(fs.existsSync(path.join(pkgDir, 'README.md'))).to.be.true;
+      chai.expect(fs.existsSync(path.join(pkgDir, 'LICENSE.md'))).to.be.true;
+    });
+
+    it('Generated package should have right content in package.json file', async function() {
+      const schemaInfo = {
+        name: 'SchemaA',
+        version: '01.00.00',
+        released: false,
+      };
+
+      const localization = {
+        path: 'tools\\packages\\test\\assets\\Locales\\SchemaA.de.json',
+        locale: 'de',
+      };
+
+      const versionInfo = {
+        packageName: '@bentley/schema-a-schema-de',
+        packageVersion: '1.0.0-dev.1',
+      };
+
+      await pkgGen.buildLocalizationPackage(outDir, versionInfo, schemaInfo, localization);
+
+      const pkgJsonPath = path.join(outDir, 'SchemaA.de.1.0.0-dev.1', 'package.json');
+      const pkgJson = JSON.parse(fs.readFileSync(pkgJsonPath, 'utf8'));
+      chai.expect(pkgJson.name).to.equal('@bentley/schema-a-schema-de');
+      chai.expect(pkgJson.version).to.equal('1.0.0-dev.1');
+      chai.expect(pkgJson.license).to.equal('MIT');
+      chai.expect(pkgJson.keywords).to.include.members(['Bentley', 'BIS', 'iModel']);
+      chai.expect(pkgJson.exports).to.deep.equal({ './SchemaA.de.json': './SchemaA.de.json' });
+    });
+
+    it('Correct package name should be present in the readme file', async function() {
+      const schemaInfo = { 
+        name: 'SchemaA', 
+        version: '01.00.00', 
+        released: false 
+      };
+
+      const localization = { 
+        path: 'tools\\packages\\test\\assets\\Locales\\SchemaA.de.json', 
+        locale: 'de' 
+      };
+
+      const versionInfo = { 
+        packageName: '@bentley/schema-a-schema-de', 
+        packageVersion: '1.0.0-dev.1' 
+      };
+
+      await pkgGen.buildLocalizationPackage(outDir, versionInfo, schemaInfo, localization);
+
+      const readme = fs.readFileSync(path.join(outDir, 'SchemaA.de.1.0.0-dev.1', 'README.md'), 'utf8');
+      chai.expect(readme).to.include('@bentley/schema-a-schema-de');
+      chai.expect(readme).to.not.include('{package-name}');
+    });
+
+    it('should not create package when localizations are empty', async function() {
+      const schemaInfo = { 
+        name: 'SchemaA', 
+        version: '01.00.00', 
+        released: false,
+        localizations: []
+      };
+
+      await pkgGen.createLocalizationPackages(outDir, '@bentley/schema-a-schema', schemaInfo, [], false, false);
+
+      chai.expect(fs.readdirSync(outDir)).to.be.an('array').that.is.empty;
+    });
+
+    it('should skip localized package generation for a released schema that is not approved', async function() {
+      const schemaInfo = {
+        name: 'SchemaA',
+        version: '01.01.01',
+        released: true,
+        approved: 'No',
+        sha1: 'f61b2ba6b58723aafac9d066a37b40e228ff4f1d',
+        localizations: [{ 
+          path: 'tools\\packages\\test\\assets\\Locales\\SchemaA.de.json', 
+          locale: 'de' 
+        }],
+      };
+
+      await pkgGen.createLocalizationPackages(outDir, '@bentley/schema-a-schema', schemaInfo, [schemaInfo], false, false);
+
+      chai.expect(fs.readdirSync(outDir)).to.be.an('array').that.is.empty;
+    });
+
+    it('should create the localization package for an approved released schema', async function() {
+      // Stub npm view
+      const execStub = sinon.stub(child_process, 'execSync').throws(new Error('E404 not found'));
+
+      try {
+        const schemaInfo = {
+          name: 'SchemaA',
+          version: '01.01.01',
+          released: true,
+          approved: 'Yes',
+          sha1: 'f61b2ba6b58723aafac9d066a37b40e228ff4f1d',
+          localizations: [{
+            path: 'tools\\packages\\test\\assets\\Locales\\SchemaA.de.json',
+            locale: 'de',
+          }],
+        };
+
+        await pkgGen.createLocalizationPackages(outDir, '@bentley/schema-a-schema', schemaInfo, [schemaInfo], false, false);
+
+        const pkgDir = path.join(outDir, 'SchemaA.de.1.1.1');
+        chai.expect(fs.existsSync(pkgDir)).to.be.true;
+        chai.expect(fs.existsSync(path.join(pkgDir, 'SchemaA.de.json'))).to.be.true;
+        chai.expect(fs.existsSync(path.join(pkgDir, 'package.json'))).to.be.true;
+        chai.expect(fs.existsSync(path.join(pkgDir, 'README.md'))).to.be.true;
+        chai.expect(fs.existsSync(path.join(pkgDir, 'LICENSE.md'))).to.be.true;
+
+        const pkgJson = JSON.parse(fs.readFileSync(path.join(pkgDir, 'package.json'), 'utf8'));
+        chai.expect(pkgJson.name).to.equal('@bentley/schema-a-schema-de');
+        chai.expect(pkgJson.version).to.equal('1.1.1');
+      } finally {
+        execStub.restore();
+      }
+    });
+
+    it('should create the localization package for a WIP schema', async function() {
+      // Stub npm view
+      const execStub = sinon.stub(child_process, 'execSync').throws(new Error('E404 not found'));
+
+      try {
+        const schemaInfo = {
+          name: 'SchemaA',
+          version: '01.00.00',
+          released: false,
+          localizations: [{
+            path: 'tools\\packages\\test\\assets\\Locales\\SchemaA.de.json',
+            locale: 'de',
+          }],
+        };
+
+        await pkgGen.createLocalizationPackages(outDir, '@bentley/schema-a-schema', schemaInfo, [schemaInfo], false, false);
+
+        const pkgDir = path.join(outDir, 'SchemaA.de.1.0.0-dev.1');
+        chai.expect(fs.existsSync(pkgDir)).to.be.true;
+        chai.expect(fs.existsSync(path.join(pkgDir, 'SchemaA.de.json'))).to.be.true;
+        chai.expect(fs.existsSync(path.join(pkgDir, 'package.json'))).to.be.true;
+        chai.expect(fs.existsSync(path.join(pkgDir, 'README.md'))).to.be.true;
+        chai.expect(fs.existsSync(path.join(pkgDir, 'LICENSE.md'))).to.be.true;
+
+        const pkgJson = JSON.parse(fs.readFileSync(path.join(pkgDir, 'package.json'), 'utf8'));
+        chai.expect(pkgJson.name).to.equal('@bentley/schema-a-schema-de');
+        chai.expect(pkgJson.version).to.equal('1.0.0-dev.1');
+      } finally {
+        execStub.restore();
+      }
+    });
+
+    it('should skip localized package generation for a WIP schema when --skipBetaPackages is set', async function() {
+      const execStub = sinon.stub(child_process, 'execSync').throws(new Error('E404 not found'));
+
+      try {
+        const schemaInfo = {
+          name: 'SchemaA',
+          version: '01.00.00',
+          released: false,
+          localizations: [{
+            path: 'tools\\packages\\test\\assets\\Locales\\SchemaA.de.json',
+            locale: 'de',
+          }],
+        };
+
+        await pkgGen.createLocalizationPackages(outDir, '@bentley/schema-a-schema', schemaInfo, [schemaInfo], true, false);
+
+        chai.expect(fs.readdirSync(outDir)).to.be.an('array').that.is.empty;
+      } finally {
+        execStub.restore();
+      }
+    });
+  });
+
+  describe('Overall package generation', function() {
+    let outDir;
+    let inventoryPath;
+    let skipListPath;
+    const templatePath = path.resolve('./tools/packages/package.json.template');
+
+    beforeEach(function() {
+      outDir = path.normalize(__dirname + "/../../../testOut/packageGeneration");
+      if (fs.existsSync(outDir)) 
+        fs.rmSync(outDir, { recursive: true });
+
+      fs.mkdirSync(outDir, { recursive: true });
+      inventoryPath = path.join(outDir, 'inventory.json');
+      skipListPath = path.join(outDir, 'skipList.json');
+    });
+
+    after(function() {
+      if (fs.existsSync(outDir)) 
+        fs.rmSync(outDir, { recursive: true});
+    });
+
+    function loadStubbedPkgGen() {
+      const execStub = sinon.stub().throws(new Error('E404 not found'));
+      const stubbed = proxyquire('../packageGeneration.js', {
+        './schemaJsonCreator': { createSchemaJson: async () => undefined },
+        'child_process': { execSync: execStub, spawnSync: child_process.spawnSync },
+      });
+      return { stubbed, execStub };
+    }
+
+    it('should be able to create the schema and localization packages for a release schema and locale', async function() {
+      const inventory = {
+        SchemaA: [{
+          name: 'SchemaA',
+          version: '01.01.01',
+          released: true,
+          approved: 'Yes',
+          sha1: 'f61b2ba6b58723aafac9d066a37b40e228ff4f1d',
+          path: 'tools\\packages\\test\\assets\\Released\\SchemaA.01.01.01.ecschema.xml',
+          localizations: [{
+            path: 'tools\\packages\\test\\assets\\Released\\Locales\\SchemaA.01.01.01.de.json',
+            locale: 'de',
+          }],
+        }],
+      };
+      fs.writeFileSync(inventoryPath, JSON.stringify(inventory));
+      fs.writeFileSync(skipListPath, JSON.stringify([]));
+
+      const { stubbed } = loadStubbedPkgGen();
+      await stubbed.createPackages(inventoryPath, skipListPath, outDir, templatePath, false, false);
+
+      const schemaPkgDir = path.join(outDir, 'SchemaA.1.1.1');
+      chai.expect(fs.existsSync(schemaPkgDir)).to.be.true;
+      chai.expect(fs.existsSync(path.join(schemaPkgDir, 'SchemaA.ecschema.xml'))).to.be.true;
+      chai.expect(fs.existsSync(path.join(schemaPkgDir, 'package.json'))).to.be.true;
+
+      const localePkgDir = path.join(outDir, 'SchemaA.de.1.1.1');
+      chai.expect(fs.existsSync(localePkgDir)).to.be.true;
+      chai.expect(fs.existsSync(path.join(localePkgDir, 'SchemaA.de.json'))).to.be.true;
+      const localePkgJson = JSON.parse(fs.readFileSync(path.join(localePkgDir, 'package.json'), 'utf8'));
+      chai.expect(localePkgJson.name).to.equal('@bentley/schema-a-schema-de');
+      chai.expect(localePkgJson.version).to.equal('1.1.1');
+    });
+
+    it('should be able to create the schema and localization packages for a wip schema and locale', async function() {
+      const inventory = {
+        SchemaA: [{
+          name: 'SchemaA',
+          version: '01.00.00',
+          released: false,
+          path: 'tools\\packages\\test\\assets\\SchemaA.ecschema.xml',
+          localizations: [{
+            path: 'tools\\packages\\test\\assets\\Locales\\SchemaA.de.json',
+            locale: 'de',
+          }],
+        }],
+      };
+      fs.writeFileSync(inventoryPath, JSON.stringify(inventory));
+      fs.writeFileSync(skipListPath, JSON.stringify([]));
+
+      const { stubbed } = loadStubbedPkgGen();
+      await stubbed.createPackages(inventoryPath, skipListPath, outDir, templatePath, false, false);
+
+      const schemaPkgDir = path.join(outDir, 'SchemaA.1.0.0-dev.1');
+      chai.expect(fs.existsSync(schemaPkgDir)).to.be.true;
+      chai.expect(fs.existsSync(path.join(schemaPkgDir, 'SchemaA.ecschema.xml'))).to.be.true;
+      chai.expect(fs.existsSync(path.join(schemaPkgDir, 'package.json'))).to.be.true;
+
+      const localePkgDir = path.join(outDir, 'SchemaA.de.1.0.0-dev.1');
+      chai.expect(fs.existsSync(localePkgDir)).to.be.true;
+      chai.expect(fs.existsSync(path.join(localePkgDir, 'SchemaA.de.json'))).to.be.true;
+      const localePkgJson = JSON.parse(fs.readFileSync(path.join(localePkgDir, 'package.json'), 'utf8'));
+      chai.expect(localePkgJson.name).to.equal('@bentley/schema-a-schema-de');
+      chai.expect(localePkgJson.version).to.equal('1.0.0-dev.1');
+    });
+
+    it('schemas in ignore list should only skip if the name and version match', async function() {
+      const inventory = {
+        SchemaA: [
+          {
+            name: 'SchemaA',
+            version: '01.00.00',
+            released: true,
+            path: 'tools\\packages\\test\\assets\\SchemaA.ecschema.xml',
+            localizations: [],
+          },
+          {
+            name: 'SchemaA',
+            version: '01.01.01',
+            released: false,
+            approved: 'Yes',
+            sha1: 'f61b2ba6b58723aafac9d066a37b40e228ff4f1d',
+            path: 'tools\\packages\\test\\assets\\Released\\SchemaA.01.01.01.ecschema.xml',
+            localizations: [],
+          },
+        ],
+      };
+      fs.writeFileSync(inventoryPath, JSON.stringify(inventory));
+      // Only the released 01.00.00 version is on the skip list; the WIP 01.01.01 must still be packaged.
+      fs.writeFileSync(skipListPath, JSON.stringify([{ name: 'SchemaA', version: '01.00.00', reason: 'test' }]));
+
+      const { stubbed } = loadStubbedPkgGen();
+      await stubbed.createPackages(inventoryPath, skipListPath, outDir, templatePath, false, false);
+
+      chai.expect(fs.existsSync(path.join(outDir, 'SchemaA.1.0.0'))).to.be.false;
+      chai.expect(fs.existsSync(path.join(outDir, 'SchemaA.1.1.1-dev.1'))).to.be.true;
+    });
+
+    it('should skip every version of a schema when the skip list entry uses version "*"', async function() {
+      const inventory = {
+        SchemaA: [
+          {
+            name: 'SchemaA',
+            version: '01.00.00',
+            released: false,
+            path: 'tools\\packages\\test\\assets\\SchemaA.ecschema.xml',
+            localizations: [],
+          },
+          {
+            name: 'SchemaA',
+            version: '01.01.01',
+            released: true,
+            approved: 'Yes',
+            sha1: 'f61b2ba6b58723aafac9d066a37b40e228ff4f1d',
+            path: 'tools\\packages\\test\\assets\\Released\\SchemaA.01.01.01.ecschema.xml',
+            localizations: [],
+          },
+        ],
+      };
+      fs.writeFileSync(inventoryPath, JSON.stringify(inventory));
+      fs.writeFileSync(skipListPath, JSON.stringify([{ name: 'SchemaA', version: '*' }]));
+
+      const { stubbed, execStub } = loadStubbedPkgGen();
+      await stubbed.createPackages(inventoryPath, skipListPath, outDir, templatePath, false, false);
+
+      chai.expect(fs.existsSync(path.join(outDir, 'SchemaA.1.0.0'))).to.be.false;
+      chai.expect(fs.existsSync(path.join(outDir, 'SchemaA.1.1.1-dev.1'))).to.be.false;
+      // A "*" entry should short-circuit before any npm lookup is made for the schema.
+      chai.expect(execStub.called).to.be.false;
     });
   });
 

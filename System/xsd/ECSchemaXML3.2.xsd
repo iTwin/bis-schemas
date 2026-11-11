@@ -20,7 +20,8 @@
     <xsd:element name="ECSchema" type="ECSchemaType">
         <xsd:unique name="UniqueClassName">
             <xsd:selector xpath="ec:ECEntityClass|ec:ECRelationshipClass|ec:ECCustomAttributeClass|ec:ECStructClass|
-                                    ec:KindOfQuantity|ec:ECEnumeration|ec:Unit|ec:Constand|ec:InvertedUnit|ec:Format" />
+                                    ec:KindOfQuantity|ec:ECEnumeration|ec:PropertyCategory|ec:UnitSystem|
+                                    ec:Unit|ec:Constant|ec:InvertedUnit|ec:Phenomenon|ec:Format" />
             <xsd:field xpath="@typeName" />
         </xsd:unique>
     </xsd:element>
@@ -45,7 +46,7 @@
     -->
     <xsd:element name ="ECSchemaReference" type="ec:ECSchemaReferenceType" />
     <xsd:complexType name="ECSchemaReferenceType">
-        <xsd:attribute name="name" type="ec:name" />
+        <xsd:attribute name="name" type="ec:name" use="required" />
         <xsd:attribute name="version" type="ec:schemaVersion" use="required" />
         <xsd:attribute name="alias" type="ec:schemaAlias" use="required" />
     </xsd:complexType>
@@ -104,18 +105,7 @@
                     <xsd:element ref="ec:ECCustomAttributes" minOccurs="0" maxOccurs="unbounded" />
                     <xsd:group ref="ec:ECPropertyTypes" minOccurs="0" maxOccurs="unbounded" />
                 </xsd:choice>
-                <xsd:attribute name="modifier" use="optional">
-                    <xsd:simpleType>
-                        <xsd:restriction base="xsd:string">
-                            <xsd:annotation>
-                                <xsd:documentation>None, Abstract, Sealed</xsd:documentation>
-                            </xsd:annotation>
-                            <xsd:enumeration value="None" />
-                            <xsd:enumeration value="Abstract" />
-                            <xsd:enumeration value="Sealed" />
-                        </xsd:restriction>
-                    </xsd:simpleType>
-                </xsd:attribute>
+                <xsd:attribute name="modifier" type="ec:ECClassModifierType" use="optional" />
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -160,7 +150,7 @@
                             <xsd:annotation>
                                 <xsd:documentation>Schema, EntityClass, CustomAttributeClass, StructClass, RelationshipClass, AnyClass, PrimitiveProperty, StructProperty, ArrayProperty, StructArrayProperty, NavigationProperty, AnyProperty, SourceRelationshipConstraint, TargetRelationshipConstraint, AnyRelationshipConstraint, Any</xsd:documentation>
                             </xsd:annotation>
-                            <xsd:pattern value="(Schema|EntityClass|CustomAttributeClass|StructClass|RelationshipClass|AnyClass|PrimitiveProperty|StructProperty|ArrayProperty|StructArrayProperty|NavigationProperty|AnyProperty|SourceRelationshipConstraint|TargetRelationshipConstraint|AnyRelationshipConstraint|Any)(\s*,\s*(Schema|EntityClass|CustomAttributeClass|StructClass|RelationshipClass|AnyClass|PrimitiveProperty|StructProperty|ArrayProperty|StructArrayProperty|NavigationProperty|AnyProperty|SourceRelationshipConstraint|TargetRelationshipConstraint|AnyRelationshipConstraint|Any))*"/>
+                            <xsd:pattern value="(Schema|EntityClass|CustomAttributeClass|StructClass|RelationshipClass|AnyClass|PrimitiveProperty|StructProperty|ArrayProperty|StructArrayProperty|NavigationProperty|AnyProperty|SourceRelationshipConstraint|TargetRelationshipConstraint|AnyRelationshipConstraint|Any)(\s*[,;|]\s*(Schema|EntityClass|CustomAttributeClass|StructClass|RelationshipClass|AnyClass|PrimitiveProperty|StructProperty|ArrayProperty|StructArrayProperty|NavigationProperty|AnyProperty|SourceRelationshipConstraint|TargetRelationshipConstraint|AnyRelationshipConstraint|Any))*"/>
                         </xsd:restriction>
                     </xsd:simpleType>
                 </xsd:attribute>
@@ -175,8 +165,25 @@
             <xsd:annotation>
                 <xsd:documentation>forward, backward</xsd:documentation>
             </xsd:annotation>
-            <xsd:enumeration value="forward" />
-            <xsd:enumeration value="backward" />
+            <xsd:pattern value="[Ff][Oo][Rr][Ww][Aa][Rr][Dd]|[Bb][Aa][Cc][Kk][Ww][Aa][Rr][Dd]" />
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="ECRelationshipStrengthType">
+        <xsd:restriction base="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>referencing, holding, embedding</xsd:documentation>
+            </xsd:annotation>
+            <xsd:pattern value="[Rr][Ee][Ff][Ee][Rr][Ee][Nn][Cc][Ii][Nn][Gg]|[Hh][Oo][Ll][Dd][Ii][Nn][Gg]|[Ee][Mm][Bb][Ee][Dd][Dd][Ii][Nn][Gg]" />
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="ECClassModifierType">
+        <xsd:restriction base="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>None, Abstract, Sealed</xsd:documentation>
+            </xsd:annotation>
+            <xsd:pattern value="[Nn][Oo][Nn][Ee]|[Aa][Bb][Ss][Tt][Rr][Aa][Cc][Tt]|[Ss][Ee][Aa][Ll][Ee][Dd]" />
         </xsd:restriction>
     </xsd:simpleType>
     
@@ -195,42 +202,19 @@
     </xsd:element>
 
     <xsd:complexType name="ECRelationshipClassType">
-        <xsd:complexContent>
-            <xsd:extension base="ec:ECClassType">
-                <xsd:choice minOccurs="2" maxOccurs="unbounded">
-                    <xsd:element name="Source" type="ec:ECRelationshipConstraintType" minOccurs="1" maxOccurs="1" />
-                    <xsd:element name="Target" type="ec:ECRelationshipConstraintType" minOccurs="1" maxOccurs="1" />
-                </xsd:choice>
-
-                <!-- 
-                The strength and strengthDirection are defined as enumerables with a fixed set of values to choose
-                from. Other values aren't supported by ECXML and definition wil be invalid.
-                -->
-                <xsd:attribute name="strength" default="referencing" use="optional">
-                    <xsd:simpleType>
-                        <xsd:restriction base="xsd:string">
-                            <xsd:annotation>
-                                <xsd:documentation>referencing, holding, embedding</xsd:documentation>
-                            </xsd:annotation>
-                            <xsd:enumeration value="referencing" />
-                            <xsd:enumeration value="holding" />
-                            <xsd:enumeration value="embedding" />
-                        </xsd:restriction>
-                    </xsd:simpleType>
-                </xsd:attribute>
-                <xsd:attribute name="strengthDirection" default="forward" use="optional">
-                    <xsd:simpleType>
-                        <xsd:restriction base="xsd:string">
-                            <xsd:annotation>
-                                <xsd:documentation>forward, backward</xsd:documentation>
-                            </xsd:annotation>
-                            <xsd:enumeration value="forward" />
-                            <xsd:enumeration value="backward" />
-                        </xsd:restriction>
-                    </xsd:simpleType>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
+        <xsd:choice minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="BaseClass" type="ec:mockName" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element ref="ec:ECCustomAttributes" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:group ref="ec:ECPropertyTypes" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="Source" type="ec:ECRelationshipConstraintType" minOccurs="1" maxOccurs="1" />
+            <xsd:element name="Target" type="ec:ECRelationshipConstraintType" minOccurs="1" maxOccurs="1" />
+        </xsd:choice>
+        <xsd:attribute name="typeName" type="ec:name" use="required" />
+        <xsd:attribute name="description" type="xsd:string" use="optional" />
+        <xsd:attribute name="displayLabel" type="xsd:string" use="optional" />
+        <xsd:attribute name="modifier" type="ec:ECClassModifierType" use="optional" />
+        <xsd:attribute name="strength" type="ec:ECRelationshipStrengthType" default="referencing" use="optional" />
+        <xsd:attribute name="strengthDirection" type="ec:ECRelationshipDirectionType" default="forward" use="optional" />
     </xsd:complexType>
 
     <!--
@@ -264,11 +248,7 @@
             <xsd:annotation>
                 <xsd:documentation>(0..*), (0..1), (1..1), (1..*), (x..y) where x >= 0 and y >= x or y = *</xsd:documentation>
             </xsd:annotation>
-            <xsd:enumeration value="(0..*)" />
-            <xsd:enumeration value="(0..1)" />
-            <xsd:enumeration value="(1..1)" />
-            <xsd:enumeration value="(1..*)" />
-            <xsd:pattern value="\((0|[1-9][0-9]*)\.\.(\*|0|[1-9][0-9]*)\)" />
+            <xsd:pattern value="\([0-9]+\s*\.\.\s*([0-9]+|\*)\)" />
         </xsd:restriction>
     </xsd:simpleType>
 
@@ -294,7 +274,7 @@
     <xsd:complexType name="PropertyCategoryType">
         <xsd:complexContent>
             <xsd:extension base="ec:SchemaItemType">
-                <xsd:attribute name="priority" type ="xsd:nonNegativeInteger" use="required" />
+                <xsd:attribute name="priority" type ="xsd:long" use="required" />
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -319,6 +299,11 @@
                 <xsd:sequence>
                     <xsd:element ref="ec:ECEnumerator" minOccurs="0" maxOccurs="unbounded" />
                 </xsd:sequence>
+                <xsd:attribute name="name" type="ec:name" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>Legacy alias for typeName found in some schemas. New schemas should use typeName.</xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
                 <xsd:attribute name="backingTypeName" type="xsd:string" use="required" />
                 <xsd:attribute name="isStrict" type ="ec:boolean" use="optional" />
             </xsd:extension>
@@ -352,7 +337,7 @@
 
     <xsd:simpleType name="positiveDecimal">
         <xsd:restriction base="xsd:string">
-            <xsd:pattern value="(0|[1-9]\d*)(\.\d+)?(e-?(0{0,3}[1-9]\d*))?"/>
+            <xsd:pattern value="((0|[1-9][0-9]*)(\.[0-9]+)?|\.[0-9]+)([eE]-?(0{0,3}[1-9][0-9]*))?"/>
         </xsd:restriction>
     </xsd:simpleType>
 
@@ -540,9 +525,9 @@
         <xsd:attribute name="description" type ="xsd:string" use="optional" />
         <xsd:attribute name="displayLabel" type ="xsd:string" use="optional" />
         <xsd:attribute name="readOnly" type ="ec:boolean" use="optional" />
-        <xsd:attribute name="kindOfQuantity" type="xsd:string" use="optional"/>
-        <xsd:attribute name="category" type="xsd:string" use="optional"/>
-        <xsd:attribute name="priority" type="xsd:string" use="optional"/>
+        <xsd:attribute name="kindOfQuantity" type="ec:mockName" use="optional"/>
+        <xsd:attribute name="category" type="ec:mockName" use="optional"/>
+        <xsd:attribute name="priority" type="xsd:long" use="optional"/>
     </xsd:complexType>
 
     <!--
@@ -598,7 +583,7 @@
     <xsd:complexType name="ECArrayPropertyType">
         <xsd:complexContent>
             <xsd:extension base="ec:AbstractECPropertyType">
-                <xsd:attribute name="typeName" type="ec:name" use="required" />
+                <xsd:attribute name="typeName" type="ec:ECPropertyTypeName" use="required" />
                 <xsd:attribute name="isStruct" type="ec:boolean" use="optional" />
                 <xsd:attribute name="minOccurs" type="xsd:nonNegativeInteger" default="0" use="optional"/>
                 <xsd:attribute name="maxOccurs" type="ec:arrayMaxBound" default="unbounded" use="optional" />
@@ -610,7 +595,7 @@
     <xsd:complexType name="ECNavigationPropertyType">
         <xsd:complexContent>
             <xsd:extension base="ec:AbstractECPropertyType">
-                <xsd:attribute name="relationshipName"/>
+                <xsd:attribute name="relationshipName" type="ec:mockName" use="required" />
                 <xsd:attribute name="direction" type="ec:ECRelationshipDirectionType" default="forward">
                 </xsd:attribute>
             </xsd:extension>
@@ -728,8 +713,7 @@
             <xsd:annotation>
                 <xsd:documentation>true, false</xsd:documentation>
             </xsd:annotation>
-            <xsd:enumeration value="true" />
-            <xsd:enumeration value="false" />
+            <xsd:pattern value="[Tt][Rr][Uu][Ee]|[Ff][Aa][Ll][Ss][Ee]" />
         </xsd:restriction>
     </xsd:simpleType>
 

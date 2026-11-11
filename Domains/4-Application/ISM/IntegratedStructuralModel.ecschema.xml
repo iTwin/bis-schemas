@@ -32,9 +32,7 @@
         <ECEnumerator value="ismEllipticalArc3d" name="IsmEllipticalArc3d" displayLabel="Ism Elliptical Arc 3d" />
         <ECEnumerator value="ismCylinder3d" name="IsmCylinder3d" displayLabel="Ism Cylinder 3d" />
         <ECEnumerator value="ismBsplineCurve3d" name="IsmBsplineCurve3d" displayLabel="Ism Bspline Curve 3d" />
-        <ECEnumerator value="ismVolumeExtrusion3d" name="IsmVolumeExtrusion3d" displayLabel="Ism Volume Extrusion 3d" />
         <ECEnumerator value="ismEllipticalCylinder3d" name="IsmEllipticalCylinder3d" displayLabel="Ism Elliptical Cylinder 3d" />
-        <ECEnumerator value="ismSolidExtrusion3d" name="IsmSolidExtrusion3d" displayLabel="Ism Solid Extrusion 3d" />
         <ECEnumerator value="ismPolyline2d" name="IsmPolyline2d" displayLabel="Ism Polyline 2d" />
         <ECEnumerator value="ismPolyline3d" name="IsmPolyline3d" displayLabel="Ism Polyline 3d" />
         <ECEnumerator value="ismCurveChain3d" name="IsmCurveChain3d" displayLabel="Ism CurveChain 3d" />
@@ -53,6 +51,10 @@
     <ECStructClass typeName="IsmArrayGeometry" description="Array Geometry" modifier="Sealed">
         <ECProperty propertyName="type" typeName="IsmGeometryType" description="Type of geometry defined in ISM API format." />
         <ECArrayProperty propertyName="geometry" typeName="Bentley.Geometry.Common.IGeometry" displayLabel="Geometry" kindOfQuantity="AECU:LENGTH" description="An array of geometries representing more complex geometry." />
+    </ECStructClass>
+
+    <ECStructClass typeName="IsmCustomGeometry" description="Geometry stored as a JSON string, used for geometry that cannot be described by a fixed struct (for example recursive boolean operations)." modifier="Sealed">
+        <ECProperty propertyName="geometryJson" typeName="string" description="Geometry serialized as a JSON string. The geometry type is part of the JSON." />
     </ECStructClass>
 
     <ECRelationshipClass typeName="IsmObject_Object" modifier="None" strength="referencing" strengthDirection="forward">
@@ -1250,7 +1252,7 @@
     <PropertyCategory typeName="IsmFeatureAddition_category" displayLabel="Feature Addition" priority="180" />
     <ECEntityClass typeName="IsmFeatureAddition" modifier="Sealed" displayLabel="Feature Addition">
         <BaseClass>IsmFeature</BaseClass>
-        <ECStructProperty propertyName="Location" typeName="IsmArrayGeometry" category="IsmFeatureAddition_category" description="The volume that augments the Member." />
+        <ECStructProperty propertyName="Location" typeName="IsmCustomGeometry" category="IsmFeatureAddition_category" description="The volume that augments the Member." />
         <ECProperty propertyName="Use" typeName="FeatureUse" category="IsmFeatureAddition_category" description="The purpose of this addition." />
     </ECEntityClass>
 
@@ -1283,7 +1285,7 @@
     <PropertyCategory typeName="IsmFeatureSubtraction_category" displayLabel="Feature Subtraction" priority="180" />
     <ECEntityClass typeName="IsmFeatureSubtraction" modifier="Sealed" displayLabel="Feature Subtraction">
         <BaseClass>IsmFeature</BaseClass>
-        <ECStructProperty propertyName="Location" typeName="IsmArrayGeometry" category="IsmFeatureSubtraction_category" description="The volume that is subtracted from the Member and from all Feature Additions." />
+        <ECStructProperty propertyName="Location" typeName="IsmCustomGeometry" category="IsmFeatureSubtraction_category" description="The volume that is subtracted from the Member and from all Feature Additions." />
         <ECProperty propertyName="Use" typeName="SubtractionUse" category="IsmFeatureSubtraction_category" description="The purpose of this subtraction." />
     </ECEntityClass>
 
@@ -2318,7 +2320,7 @@
     <ECEntityClass typeName="IsmProxy" modifier="None" displayLabel="Proxy">
         <BaseClass>bis:PhysicalElement</BaseClass>
         <BaseClass>IIsmObject</BaseClass>
-        <ECStructArrayProperty propertyName="Location" typeName="IsmArrayGeometry" category="IsmProxy_category" kindOfQuantity="AECU:LENGTH" description="The geometry that should be displayed for the proxy object." />
+        <ECStructArrayProperty propertyName="Location" typeName="IsmCustomGeometry" category="IsmProxy_category" kindOfQuantity="AECU:LENGTH" description="The geometry that should be displayed for the proxy object." />
         <ECProperty propertyName="ProxyType" typeName="string" displayLabel="Proxy Type" category="IsmProxy_category" description="The object type that this proxy represents." />
     </ECEntityClass>
 

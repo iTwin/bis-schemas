@@ -86,6 +86,8 @@ async function schemaUpgradeTest(ignoreList, output) {
   const testSchemas = getShortListedVersions(releasedSchemas.reverse(), wipSchemas, output);
 
   let schemaDirs = await generateSchemaDirectoryList(bisSchemaRepo);
+  // Released schemas must resolve their references against released directories only.
+  const releasedSchemaDirs = schemaDirs.slice();
   schemaDirs = schemaDirs.concat(wipSchemas.map((schemaPath) => path.dirname(schemaPath)));
 
   let imodel;
@@ -114,7 +116,7 @@ async function schemaUpgradeTest(ignoreList, output) {
       batchStarted = true;
     }
 
-    imodel = await importAndExportSchemaToIModel(schema, schemaDirs, batchStarted, imodel, output);
+    imodel = await importAndExportSchemaToIModel(schema, isWIP ? schemaDirs : releasedSchemaDirs, batchStarted, imodel, output);
     results[schemaName].push({name: schemaName, batch: key.readVersion, batchStarted, version: schemaVersion});
     console.log("-> ", chalk.green(`${schemaName}.${schemaVersion} successfully imported.`));
     writeLogsToFile(`-> ${schemaName}.${schemaVersion} successfully imported.\n\n`, output);
