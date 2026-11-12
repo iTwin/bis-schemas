@@ -16,20 +16,19 @@
       <Value>DisciplinePhysical</Value>
     </SchemaLayerInfo>
   </ECCustomAttributes>
-  <ECEntityClass typeName="EquipmentFunctional" displayLabel="Electrical Functional Element" description="An EquipmentFunctional models functionality of an Electrical Equipment that will either be fulfilled by a physical Entity (when the equipment is placed in a 3D Physical Model) or will be represented by one or more Electrical Symbols (when the equipment is placed in 2D Drawing Model, such as a Schematic Diagram, Single Line Diagram, etc.). It represents the primary element of an Electrical equipment. All non-graphical properties of the equipment are expected to be stored with an EquipmentFunctional, or its ElectricalFunctionalType." modifier="Abstract">
+  <ECEntityClass typeName="CommonFunctional" displayLabel="Common Functional Element" description="Common base class for Functional elements that model the functionality of an Electrical element, either fulfilled by a physical Entity (when placed in a 3D Physical Model) or represented by one or more Electrical Symbols (when placed in a 2D Drawing Model). All non-graphical properties of the element are expected to be stored with the Functional element, or its ElectricalFunctionalType." modifier="Abstract">
     <BaseClass>func:FunctionalComponentElement</BaseClass>
     <ECProperty propertyName="CodeValue" displayLabel="Device Id"   typeName="string" />
     <ECProperty propertyName="DeviceTag" displayLabel="Device Tag"   typeName="string" />
+  </ECEntityClass>
+  <ECEntityClass typeName="EquipmentFunctional" displayLabel="Electrical Functional Element" description="An EquipmentFunctional models functionality of an Electrical Equipment that will either be fulfilled by a physical Entity (when the equipment is placed in a 3D Physical Model) or will be represented by one or more Electrical Symbols (when the equipment is placed in 2D Drawing Model, such as a Schematic Diagram, Single Line Diagram, etc.). It represents the primary element of an Electrical equipment. All non-graphical properties of the equipment are expected to be stored with an EquipmentFunctional, or its ElectricalFunctionalType." modifier="Abstract">
+    <BaseClass>CommonFunctional</BaseClass>
   </ECEntityClass>
   <ECEntityClass typeName="StructureFunctional" displayLabel="Structure Functional Element" description="A Structure Functional models functionality of an Electrical Structure that will either be fulfilled by a physical Entity (when the Structure is placed in a 3D Physical Model) or will be represented by one or more Electrical Symbols (when the Structure is placed in 2D Drawing Model, such as a Schematic Diagram, Single Line Diagram, etc.). It represents the primary element of an Electrical Structure. All non-graphical properties of the Structure are expected to be stored with an StructureFunctional, or its ElectricalFunctionalType." modifier="Abstract">
-    <BaseClass>func:FunctionalComponentElement</BaseClass>
-    <ECProperty propertyName="CodeValue" displayLabel="Device Id"   typeName="string" />
-    <ECProperty propertyName="DeviceTag" displayLabel="Device Tag"   typeName="string" />
+    <BaseClass>CommonFunctional</BaseClass>
   </ECEntityClass>
   <ECEntityClass typeName="FoundationFunctional" displayLabel="Foundation Functional Element" description="An Foundation Functional models functionality of an Electrical Foundation that will either be fulfilled by a physical Entity (when the Foundation is placed in a 3D Physical Model) or will be represented by one or more Electrical Symbols (when the Foundation is placed in 2D Drawing Model, such as a Schematic Diagram, Single Line Diagram, etc.). It represents the primary element of an Electrical Foundation. All non-graphical properties of the Foundation are expected to be stored with an FoundationFunctional, or its ElectricalFunctionalType." modifier="Abstract">
-    <BaseClass>func:FunctionalComponentElement</BaseClass>
-    <ECProperty propertyName="CodeValue" displayLabel="Device Id"   typeName="string" />
-    <ECProperty propertyName="DeviceTag" displayLabel="Device Tag"   typeName="string" />
+    <BaseClass>CommonFunctional</BaseClass>
   </ECEntityClass>
   <ECEntityClass typeName="WorkOrderAspect" displayLabel="Work Order Aspect" description="Contains properties of an Work Order Aspect." modifier="None">
     <BaseClass>bis:ElementMultiAspect</BaseClass>
@@ -44,14 +43,23 @@
       <Class class="WorkOrderAspect"/>
     </Target>
   </ECRelationshipClass>
-  <ECEntityClass typeName="EquipmentFunctionalAspect" displayLabel="Equipment Functional Aspect" description="Contains properties of an Functional Equipment Aspect." modifier="Abstract">
+  <ECEntityClass typeName="CommonFunctionalAspect" displayLabel="Common Functional Aspect" description="Contains properties of an Functional Aspect." modifier="Abstract">
     <BaseClass>bis:ElementUniqueAspect</BaseClass>
+    <ECProperty propertyName="IsUsingSharedDeviceId" displayLabel="Is Using Shared Device Id"   typeName="boolean" />
+    <ECProperty propertyName="DesignWorkOrderNumber" displayLabel="Design Work Order Number"   typeName="string" />
+    <ECProperty propertyName="Location" displayLabel="Location"   typeName="string" />
+    <ECProperty propertyName="Installation" displayLabel="Installation"   typeName="string" />
+    <ECProperty propertyName="BOMDocumentVersion" displayLabel="BOM Document Version"   typeName="string" />
+    <ECProperty propertyName="DesignRevisionNumber" displayLabel="Design Revision Number"   typeName="string" />
+  </ECEntityClass>
+  <ECEntityClass typeName="EquipmentFunctionalAspect" displayLabel="Equipment Functional Aspect" description="Contains properties of an Functional Equipment Aspect." modifier="Abstract">
+    <BaseClass>CommonFunctionalAspect</BaseClass>
   </ECEntityClass>
   <ECEntityClass typeName="StructureFunctionalAspect" displayLabel="Structure Functional Aspect" description="Contains properties of an Functional Equipment Aspect." modifier="Abstract">
-    <BaseClass>bis:ElementUniqueAspect</BaseClass>
+    <BaseClass>CommonFunctionalAspect</BaseClass>
   </ECEntityClass>
   <ECEntityClass typeName="FoundationFunctionalAspect" displayLabel="Foundation Functional Aspect" description="Contains properties of an Functional Equipment Aspect." modifier="Abstract">
-    <BaseClass>bis:ElementUniqueAspect</BaseClass>
+    <BaseClass>CommonFunctionalAspect</BaseClass>
   </ECEntityClass>
   <ECEntityClass typeName="ElectricalTerminal" displayLabel="Electrical Terminal" description="An ElectricalTerminal Element is a functional element owned by an EquipmentFunctional. It represents a location (or anchor) on the ElectricalFunctionalElement to which a connection to one or more ElectricalTerminals of other ElectricalFunctionalElements. An ElectricalTerminal Element is represented graphically by ElectricalGraphicsPoint2d Elements (in a Drawing Model) or TBD... by ElectricalGraphicPoint3dElements (in a Physical Model)." modifier="None">
     <BaseClass>func:FunctionalComponentElement</BaseClass>
