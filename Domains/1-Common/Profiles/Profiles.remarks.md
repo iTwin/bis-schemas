@@ -475,8 +475,10 @@ Note that deletion of the referenced [SinglePerimeterProfile](#singleperimeterpr
 - `WallThickness`
   - must be greater than zero
   - must be less than half `Depth`
-  - if `Girth` is set, must be less than half `FlangeWidth`
-  - if `Girth` is not set, must be less than `FlangeWidth`
+  - if `Girth` is set:
+    - must be less than half `FlangeWidth`
+  - if `Girth` is not set:
+    - must be less than `FlangeWidth`
 - `FilletRadius` (if set):
   - must be greater or equal to zero
   - must be less or equal to half `Depth` minus `WallThickness`
@@ -500,8 +502,12 @@ Note that deletion of the referenced [SinglePerimeterProfile](#singleperimeterpr
 - `WallThickness`
   - must be greater than zero
   - must be less than half `Depth`
-  - if `Girth` is set, must be less than half `TopFlangeWidth` and half `BottomFlangeWidth`
-  - if `Girth` is not set, must be less than `TopFlangeWidth` and `BottomFlangeWidth`
+  - if `Girth` is set:
+    - must be less than half `TopFlangeWidth`
+    - must be less than half `BottomFlangeWidth`
+  - if `Girth` is not set:
+    - must be less than `TopFlangeWidth`
+    - must be less than `BottomFlangeWidth`
 - `FilletRadius` (if set):
   - must be greater or equal to zero
   - must be less or equal to half `Depth` minus `WallThickness`
@@ -745,16 +751,10 @@ Abstract base class for open deck [Profiles](#profile) of constant thickness. De
 **Constraints:**
 - `Depth`
   - must be greater than zero
-  - must be greater than `Thickness`
-- `TopFlatWidth`
-  - must be greater than zero
-  - must be greater than `Thickness`
-- `BottomRibWidth`
-  - must be greater than zero
-  - must be greater than `Thickness`
-- `DiagonalWidth`
-  - must be greater than zero
-  - must be greater than `Thickness`
+  - must be greater than double `Thickness`
+- `TopFlatWidth` must be greater than zero
+- `BottomRibWidth` must be greater than zero
+- `DiagonalWidth` must be greater than zero
 - `CoverageWidth` must be greater or equal to `RibSpacing`
 
 ![StandardDeck](media/ProfilePictures/StandardDeck.png)
@@ -766,10 +766,10 @@ Abstract base class for open deck [Profiles](#profile) of constant thickness. De
 **Constraints:**
 - `Depth`
   - must be greater than zero
-  - must be greater than twice `Thickness`
+  - must be greater than double `Thickness`
 - `TopFlatWidth`
   - must be greater than zero
-  - must be greater than `Thickness`
+  - must be greater than double `Thickness`
 - `RibSpacing`
   - must be greater than zero
   - must be greater than `TopFlatWidth`
@@ -784,7 +784,7 @@ Abstract base class for open deck [Profiles](#profile) of constant thickness. De
 **Constraints:**
 - `Depth`
   - must be greater than zero
-  - must be greater than `Thickness`
+  - must be greater than double `Thickness`
 - `WaveLength` must be greater than zero
 - `CoverageWidth` must be greater or equal to `WaveLength`
 
