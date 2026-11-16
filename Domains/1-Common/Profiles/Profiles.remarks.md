@@ -41,13 +41,13 @@ The top level Element of StandardOrganization structure is defined as a single s
 
 <u>Classification Systems</u>
 
-"Standard Organizations" `DefinitionContainer` is broken down to a model that stores Elements that represents manuals. Manuals are defined as `ClassificationSystem` Elements where each Element represents only a single revision/edition of a catalog released, maintained by Standard Organization. `Code` value of the Manual element is expected to be concatination of StandardOrganization name and the manual name itself, e.g. `ClassificationSystem` that represents Standard Organization "CEN"'s "EU 19-53" Profile catalog edition would have a Code with value "CEN EU 19-53". `CodeScope` is expected to be set to `DictionaryModel` id, `CodeSpec` to `clsf:ClassificationSystem`.
+"Standard Organizations" `DefinitionContainer` is broken down to a model that stores Elements that represents manuals. Manuals are defined as `ClassificationSystem` Elements where each Element represents only a single revision/edition of a catalog released, maintained by Standard Organization. `Code` value of the Manual element is expected to be concatenation of StandardOrganization name and the manual name itself, e.g. `ClassificationSystem` that represents Standard Organization "CEN"'s "EU 19-53" Profile catalog edition would have a Code with value "CEN EU 19-53". `CodeScope` is expected to be set to `DictionaryModel` id, `CodeSpec` to `clsf:ClassificationSystem`.
 
 <u>Classification Table</u>
 
 The Manuals are expected to have child Elements (`ClassificationTable`) that divide the manual into groups by use case. e.g. Same manual might define both Beam Profiles and Steel Decks. The CodeScope of each `ClassificationTable` should be set to `ParentElement`. CodeSpec to "bis:ClassificationTable". Code values depend on the `ClassificationTable`'s use case:
 
-- Structural Profile Classifaction Table should have CodeValue set to "Structural Profiles"
+- Structural Profile Classification Table should have CodeValue set to "Structural Profiles"
 - Steel Decks to "Structural Steel Decks"
 - Joists to "Structural Joists"
 
@@ -55,7 +55,7 @@ Each `ClassificationTable` is then broken down by a model that stores separate `
 
 <u>Classifications</u>
 
-`Classification` Elements define the actual entries of any Standard Catalog, e.g. AISC 7th Edition Structural Profile Catalog entires would be defined as separate `Classification` containing all entries from that specific catalog edition.
+`Classification` Elements define the actual entries of any Standard Catalog, e.g. AISC 7th Edition Structural Profile Catalog entries would be defined as separate `Classification` containing all entries from that specific catalog edition.
 
 Each `Classification` CodeScope would be set to `Model`, each CodeSpec to `clsf:Classification`. The value would be set as Designation of that entry. (e.g. "W44X335"). `Classification` Elements would not define any properties that are defined by the actual real world catalog entries. Instead, such properties would be defined by separate Elements that reference classification using `ElementHasClassifications` relationship.
 
@@ -82,7 +82,7 @@ Defines standard [Profiles](#profile). This should always be sub-modeled by a mo
 
 ### Manufacturer
 
-Produces structural members defined by a standard [Profile]. Manufacturer is always stored in a model that models [standards organization](#standardsorganization) whichs' rules are used to define profiles. Manufacturer is always sub-modeled and it's model contains revisions for profiles.
+Produces structural members defined by a standard [Profile]. Manufacturer is always stored in a model that models [standards organization](#standardsorganization) whose rules are used to define profiles. Manufacturer is always sub-modeled and its model contains revisions for profiles.
 
 ### Revision
 
@@ -194,8 +194,8 @@ Note that `FlangeEdgeRadius` can be bigger than `FlangeThickness`.
 ### IShapeProfile
 **Derivative properties:**
 - `FlangeInnerEdgeWidth` = (`FlangeWidth` - `WebThickness`) / 2
-- `WebEdgeLength` = `Depth` - `FlangeThickness` * 2 - (`FlangeInnerEdgeWidth` - `FlangeThicknessDistance`) * Tan(`TopFlangeSlope`) * 2
-- `FlangeThicknessAtToe` = `FlangeThickness` - `FlangeThicknessDistance` * Tan(`TopFlangeSlope`)
+- `WebEdgeLength` = `Depth` - `FlangeThickness` * 2 - (`FlangeInnerEdgeWidth` - `FlangeThicknessDistance`) * Tan(`FlangeSlope`) * 2
+- `FlangeThicknessAtToe` = `FlangeThickness` - `FlangeThicknessDistance` * Tan(`FlangeSlope`)
 
 Note that `FlangeEdgeRadius` can be bigger than `FlangeThickness`.
 
@@ -250,7 +250,7 @@ Note that `FlangeEdgeRadius` can be bigger than `FlangeThickness`.
   - must be greater or equal to zero
   - must be less or equal to half `FlangeInnerEdgeWidth` minus `WebSlopeHeight`
   - must be less or equal to half `WebEdgeWidth`
-- `FlangeEdgeRadius`
+- `FlangeEdgeRadius` (if set):
   - must be greater or equal to zero
   - must be less or equal to half `FlangeInnerEdgeWidth`
 - `FlangeSlope` (if set):
@@ -392,7 +392,7 @@ Note that `EdgeRadius` can be bigger than `Thickness`.
 
 ### ZShapeProfile
 **Derivative properties:**
-- `FlangeInnerEdgeWidth` = (`FlangeWidth` - `WebThickness`) / 2
+- `FlangeInnerEdgeWidth` = `FlangeWidth` - `WebThickness`
 - `FlangeThicknessAtToe` = `FlangeThickness` - `FlangeThicknessDistance` * Tan(`FlangeSlope`)
 - `WebEdgeLength` = `Depth` - `FlangeThickness` - (`FlangeInnerEdgeWidth` - `FlangeThicknessDistance`) * Tan(`FlangeSlope`)
 
@@ -404,7 +404,7 @@ Note that `EdgeRadius` can be bigger than `Thickness`.
   - must be less than half `Depth`
 - `WebThickness`
   - must be greater than zero
-  - must be less than `FlangeWith`
+  - must be less than `FlangeWidth`
 - `FilletRadius` (if set):
   - must be greater or equal to zero
   - must be less or equal to half `FlangeInnerEdgeWidth`
@@ -426,7 +426,7 @@ Note that `EdgeRadius` can be bigger than `Thickness`.
 ![ZShape (all properties)](media/ProfilePictures/ZShape2.png)
 
 ### DerivedProfile
-[SinglePerimeterProfile](#singleperimeterprofile) that is based on another [SinglePerimeterProfile](#singleperimeterprofile) with applied standard transformations (scale, rotation, translation, mirror). This [Profile](#profile) is defined for compatibility reasons with [IFC](#https://standards.buildingsmart.org/IFC/RELEASE/IFC4/FINAL/HTML/) and its **usage is not recommended**.
+[SinglePerimeterProfile](#singleperimeterprofile) that is based on another [SinglePerimeterProfile](#singleperimeterprofile) with applied standard transformations (scale, rotation, translation, mirror). This [Profile](#profile) is defined for compatibility reasons with [IFC](https://standards.buildingsmart.org/IFC/RELEASE/IFC4/FINAL/HTML/) and its **usage is not recommended**.
 
 Note that deletion of the referenced [SinglePerimeterProfile](#singleperimeterprofile) is prohibited if there are [DerivedProfiles](#derivedprofile) that reference it.
 
@@ -474,8 +474,9 @@ Note that deletion of the referenced [SinglePerimeterProfile](#singleperimeterpr
 - `Depth` must be greater than zero
 - `WallThickness`
   - must be greater than zero
-  - must be less than half `Width`
   - must be less than half `Depth`
+  - if `Girth` is set, must be less than half `FlangeWidth`
+  - if `Girth` is not set, must be less than `FlangeWidth`
 - `FilletRadius` (if set):
   - must be greater or equal to zero
   - must be less or equal to half `Depth` minus `WallThickness`
@@ -498,9 +499,9 @@ Note that deletion of the referenced [SinglePerimeterProfile](#singleperimeterpr
 - `Depth` must be greater than zero
 - `WallThickness`
   - must be greater than zero
-  - must be less than half `TopFlangeWidth`
-  - must be less than half `BottomFlangeWidth`
   - must be less than half `Depth`
+  - if `Girth` is set, must be less than half `TopFlangeWidth` and half `BottomFlangeWidth`
+  - if `Girth` is not set, must be less than `TopFlangeWidth` and `BottomFlangeWidth`
 - `FilletRadius` (if set):
   - must be greater or equal to zero
   - must be less or equal to half `Depth` minus `WallThickness`
@@ -556,7 +557,7 @@ Note that deletion of the referenced [SinglePerimeterProfile](#singleperimeterpr
 - `BendOffset`
   - must be greater than zero
   - must be less than `Width`
-- `FilletRadius`
+- `FilletRadius` (if set):
   - must be greater than zero
   - must be less or equal to half `MaximumWallThickness` minus half `WallThickness`
 
@@ -569,7 +570,7 @@ Abstract [Profile](#profile) class that is comprised of multiple [SinglePerimete
 ### ArbitraryCompositeProfile
 Instantiable [CompositeProfile](#compositeprofile) that is used to define an arbitrary [Profile](#profile) with multiple areas.
 
-This Profile is constructed by inserting [ArbitraryCompositeProfileAspects](#arbitrarycompositeprofileaspects) that reference and transform [SinglePerimeterProfiles](#singleperimeterprofile). [ArbitraryCompositeProfile](#arbitrarycompositeprofile) can reference the same [SinglePerimeterProfile](#singleperimeterprofile) multiple times, but apply different transformations.
+This Profile is constructed by inserting [ArbitraryCompositeProfileAspects](#arbitrarycompositeprofileaspect) that reference and transform [SinglePerimeterProfiles](#singleperimeterprofile). [ArbitraryCompositeProfile](#arbitrarycompositeprofile) can reference the same [SinglePerimeterProfile](#singleperimeterprofile) multiple times, but apply different transformations.
 
 **Examples:**
 - An [ArbitraryCompositeProfile](#arbitrarycompositeprofile) that is made up of 2 [Profiles](#profile):
@@ -598,12 +599,12 @@ Note that deletion of the referenced [LShapeProfile](#lshapeprofile) is prohibit
 ### DoubleCShapeProfile
 Instantiable [CompositeProfile](#compositeprofile) that models a Double C shape profile where the single [CShapeProfiles](#cshapeprofile) are placed back to back with specified gap between them. This [Profile](#profile) references and requires a [CShapeProfile](#cshapeprofile) to exist in the BIS repository.
 
-Note that deletion of the referenced [CShapeProfile](#cshapeprofile) is prohibited if there are [DoubleCShapeProfiles](#doublelshapeprofile) that reference it.
+Note that deletion of the referenced [CShapeProfile](#cshapeprofile) is prohibited if there are [DoubleCShapeProfiles](#doublecshapeprofile) that reference it.
 
 **Constraints:**
 - `Spacing` must be equal or greater than zero
 
-![DoubleCShape (DoubleLShortLegs)](media/ProfilePictures/DoubleCShape.png)
+![DoubleCShape](media/ProfilePictures/DoubleCShape.png)
 
 ### ArbitraryShapeProfile
 
@@ -627,7 +628,7 @@ can be formed using a [ParityRegion](https://www.itwinjs.org/reference/core-geom
 
 ### ArbitraryCenterLineProfile
 
-Extended [ArbitraryShapeProfile](#arbitraryshapeprofile) with an additional constraint that the defined single perimeter (area) must have a non self intersecting centerline. Geometry of such [Profile](#proflile) is created by applying a constant thickness to the centerline.
+Extended [ArbitraryShapeProfile](#arbitraryshapeprofile) with an additional constraint that the defined single perimeter (area) must have a non self intersecting centerline. Geometry of such [Profile](#profile) is created by applying a constant thickness to the centerline.
 
 [ArbitraryCenterLineProfiles](#arbitrarycenterlineprofile) are often used to model cold-formed sections.
 
@@ -644,14 +645,14 @@ Extended [ArbitraryShapeProfile](#arbitraryshapeprofile) with an additional cons
 
 ### EllipseProfile
 **Constraints:**
-- `XRadius` must be greater tan zero
-- `YRadius` must be greater tan zero
+- `XRadius` must be greater than zero
+- `YRadius` must be greater than zero
 
 ![Ellipse](media/ProfilePictures/Ellipse.png)
 
 ### CircleProfile
 **Constraints:**
-- `Radius` must be greater tan zero
+- `Radius` must be greater than zero
 
 ![Circle](media/ProfilePictures/Circle.png)
 
@@ -698,7 +699,7 @@ Extended [ArbitraryShapeProfile](#arbitraryshapeprofile) with an additional cons
   - must be greater or equal to zero
   - must be less or equal to half `Width`
   - must be less or equal to half `Depth`
-  - must be greater than `InnerFilletRadius` plus `WallThickness` multiplied by `2 * Sqrt(2)`
+  - must be less than `InnerFilletRadius` plus `WallThickness` multiplied by `2 + Sqrt(2)`
 
 ![HollowRectangle (only mandatory properties)](media/ProfilePictures/HollowRectangle1.png)
 ![HollowRectangle (all properties)](media/ProfilePictures/HollowRectangle2.png)
@@ -729,18 +730,32 @@ Extended [ArbitraryShapeProfile](#arbitraryshapeprofile) with an additional cons
 
 Abstract base class for open deck [Profiles](#profile) of constant thickness. Derived classes represent specific deck shapes.
 
+**Constraints:**
+- `CoverageWidth` must be greater than zero
+- `Thickness` must be greater than zero
+- `CelluralPlateThickness` (if set) must be greater than zero
+
 ### StandardDeckProfile
 
 [ParametricDeckProfile](#parametricdeckprofile) that represents a standard trapezoidal steel deck shape. The deck cross-section consists of repeating rib units, each formed by a flat top, two sloped webs, and a flat bottom rib, tiled across the `CoverageWidth`.
 
+**Derivative properties:**
+- `RibSpacing` = `TopFlatWidth` + 2 * `DiagonalWidth` + `BottomRibWidth`
+
 **Constraints:**
-- `Depth` must be greater than zero
-- `TopFlatWidth` must be greater than zero
-- `BottomRibWidth` must be greater than zero
-- `DiagonalWidth` must be greater than zero
-- `CoverageWidth`
+- `Depth`
   - must be greater than zero
-  - must be greater than the distance between the centers of two adjacent ribs
+  - must be greater than `Thickness`
+- `TopFlatWidth`
+  - must be greater than zero
+  - must be greater than `Thickness`
+- `BottomRibWidth`
+  - must be greater than zero
+  - must be greater than `Thickness`
+- `DiagonalWidth`
+  - must be greater than zero
+  - must be greater than `Thickness`
+- `CoverageWidth` must be greater or equal to `RibSpacing`
 
 ![StandardDeck](media/ProfilePictures/StandardDeck.png)
 
@@ -749,14 +764,16 @@ Abstract base class for open deck [Profiles](#profile) of constant thickness. De
 [ParametricDeckProfile](#parametricdeckprofile) that represents a deep steel deck shape.
 
 **Constraints:**
-- `Depth` must be greater than zero
-- `TopFlatWidth` must be greater than zero
+- `Depth`
+  - must be greater than zero
+  - must be greater than twice `Thickness`
+- `TopFlatWidth`
+  - must be greater than zero
+  - must be greater than `Thickness`
 - `RibSpacing`
   - must be greater than zero
-  - must be greater than `TopFlatWidth` 
-- `CoverageWidth`
-  - must be greater than zero
-  - must be greater than `RibSpacing`
+  - must be greater than `TopFlatWidth`
+- `CoverageWidth` must be greater or equal to `RibSpacing`
 
 ![DeepDeck](media/ProfilePictures/DeepDeck.png)
 
@@ -765,11 +782,11 @@ Abstract base class for open deck [Profiles](#profile) of constant thickness. De
 [ParametricDeckProfile](#parametricdeckprofile) that represents a sine wave shaped steel deck. The cross-section follows a sinusoidal curve over the `CoverageWidth`.
 
 **Constraints:**
-- `Depth` must be greater than zero
-- `WaveLength` must be greater than zero
-- `CoverageWidth`
+- `Depth`
   - must be greater than zero
-  - must be greater than `WaveLength`
+  - must be greater than `Thickness`
+- `WaveLength` must be greater than zero
+- `CoverageWidth` must be greater or equal to `WaveLength`
 
 ![SineWaveDeck](media/ProfilePictures/SineWaveDeck.png)
 
