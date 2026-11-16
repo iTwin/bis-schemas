@@ -430,7 +430,7 @@ Note that `EdgeRadius` can be bigger than `Thickness`.
 
 Note that deletion of the referenced [SinglePerimeterProfile](#singleperimeterprofile) is prohibited if there are [DerivedProfiles](#derivedprofile) that reference it.
 
-### CenterLineCShapeProfile
+### CenterlineCShapeProfile
 **Constraints:**
 - `FlangeWidth` must be greater than zero
 - `Depth` must be greater than zero
@@ -449,7 +449,7 @@ Note that deletion of the referenced [SinglePerimeterProfile](#singleperimeterpr
 ![CenterLineCShape (only mandatory properties)](media/ProfilePictures/CenterCShape1.png)
 ![CenterLineCShape (all properties)](media/ProfilePictures/CenterCShape2.png)
 
-### CenterLineLShapeProfile
+### CenterlineLShapeProfile
 **Constraints:**
 - `Width` must be greater than zero
 - `Depth` must be greater than zero
@@ -468,7 +468,7 @@ Note that deletion of the referenced [SinglePerimeterProfile](#singleperimeterpr
 ![CenterLineLShape (only mandatory properties)](media/ProfilePictures/CenterLShape1.png)
 ![CenterLineLShape (all properties)](media/ProfilePictures/CenterLShape2.png)
 
-### CenterLineZShapeProfile
+### CenterlineZShapeProfile
 **Constraints:**
 - `FlangeWidth` must be greater than zero
 - `Depth` must be greater than zero
@@ -570,7 +570,7 @@ Abstract [Profile](#profile) class that is comprised of multiple [SinglePerimete
 ### ArbitraryCompositeProfile
 Instantiable [CompositeProfile](#compositeprofile) that is used to define an arbitrary [Profile](#profile) with multiple areas.
 
-This Profile is constructed by inserting [ArbitraryCompositeProfileAspects](#arbitrarycompositeprofileaspect) that reference and transform [SinglePerimeterProfiles](#singleperimeterprofile). [ArbitraryCompositeProfile](#arbitrarycompositeprofile) can reference the same [SinglePerimeterProfile](#singleperimeterprofile) multiple times, but apply different transformations.
+This Profile is constructed by inserting [ArbitraryCompositeProfileComponentAspects](#arbitrarycompositeprofilecomponentaspect) that reference and transform [SinglePerimeterProfiles](#singleperimeterprofile). [ArbitraryCompositeProfile](#arbitrarycompositeprofile) can reference the same [SinglePerimeterProfile](#singleperimeterprofile) multiple times, but apply different transformations.
 
 **Examples:**
 - An [ArbitraryCompositeProfile](#arbitrarycompositeprofile) that is made up of 2 [Profiles](#profile):
@@ -578,7 +578,7 @@ This Profile is constructed by inserting [ArbitraryCompositeProfileAspects](#arb
   - [RectangleProfile](#rectangleprofile) - referenced twice with different `Offset`.
   - ![ArbitraryComposite (cross)](media/ProfilePictures/ArbitraryComposite1.png)
 
-### ArbitraryCompositeProfileAspect
+### ArbitraryCompositeProfileComponentAspect
 
 Aspect that is used by [ArbitraryCompositeProfile](#arbitrarycompositeprofile) to reference [SinglePerimeterProfile](#singleperimeterprofile) from which it is composed.
 
@@ -626,14 +626,14 @@ can be formed using a [ParityRegion](https://www.itwinjs.org/reference/core-geom
 ([LineString](https://www.itwinjs.org/reference/core-geometry/curve/linestring3d/)) and the `Shape` of an [IShapeProfile](#ishapeprofile).
   - ![ArbitraryShape (IShapeProfile encasing)](media/ProfilePictures/ArbitraryShape2.png)
 
-### ArbitraryCenterLineProfile
+### ArbitraryCenterlineProfile
 
 Extended [ArbitraryShapeProfile](#arbitraryshapeprofile) with an additional constraint that the defined single perimeter (area) must have a non self intersecting centerline. Geometry of such [Profile](#profile) is created by applying a constant thickness to the centerline.
 
-[ArbitraryCenterLineProfiles](#arbitrarycenterlineprofile) are often used to model cold-formed sections.
+[ArbitraryCenterlineProfiles](#arbitrarycenterlineprofile) are often used to model cold-formed sections.
 
 **Examples:**
-- [ArbitraryCenterLineProfile](#arbitrarycenterlineprofile) that defines a "hat" shape profile.
+- [ArbitraryCenterlineProfile](#arbitrarycenterlineprofile) that defines a "hat" shape profile.
   - ![ArbitraryCenterline (hat)](media/ProfilePictures/ArbitraryCenterline1.png)
 
 **Constraints:**
@@ -792,9 +792,9 @@ Abstract base class for open deck [Profiles](#profile) of constant thickness. De
 
 ## Mixin Classes
 
-### ICenterLineProfile
+### ICenterlineProfile
 
-Mixin class used to define [Profiles](#profile) with a non self intersecting centerline and a constant thickness. These [Profiles](#profile) are often used to model cold-formed sections. See [CenterLineCShapeProfile](#centerlinecshapeprofile), [CenterLineLShapeProfile](#centerlinelshapeprofile), [CenterLineZShapeProfile](#centerlinezshapeprofile).
+Mixin class used to define [Profiles](#profile) with a non self intersecting centerline and a constant thickness. These [Profiles](#profile) are often used to model cold-formed sections. See [CenterlineCShapeProfile](#centerlinecshapeprofile), [CenterlineLShapeProfile](#centerlinelshapeprofile), [CenterlineZShapeProfile](#centerlinezshapeprofile).
 
 ## Struct Classes
 
