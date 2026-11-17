@@ -525,7 +525,7 @@
   <ECEntityClass typeName="SeriesCompensatorPhysicalType" displayLabel="Series Compensator Physical Type" description="A Series Compensator is a series capacitor or reactor or an AC transmission line without charging susceptance.  It is a two terminal device." modifier="None">
     <BaseClass>CompensatorPhysicalType</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="BusbarSectionPhysicalType" displayLabel="Busbar Section Physical Type" description="A conductor, or group of conductors, with negligible impedance, that serve to connect other conducting equipment within a single substation. &#x000d; Voltage measurements are typically obtained from voltage transformers that are connected to busbar sections. A bus bar section may have many physical terminals but for analysis is modelled with exactly one logical terminal." modifier="None">
+  <ECEntityClass typeName="BusbarPhysicalType" displayLabel="Busbar Physical Type" description="A conductor, or group of conductors, with negligible impedance, that serve to connect other conducting equipment within a single substation. &#x000d; Voltage measurements are typically obtained from voltage transformers that are connected to busbars. A busbar may have many physical terminals but for analysis is modelled with exactly one logical terminal." modifier="None">
     <BaseClass>ConnectorPhysicalType</BaseClass>
   </ECEntityClass>
   <ECEntityClass typeName="JunctionPhysicalType" displayLabel="Junction Physical Type" description="A point where one or more conducting equipments are connected with zero resistance.&#x000d; " modifier="None">
@@ -612,7 +612,7 @@
   <ECEntityClass typeName="SeriesCompensator" displayLabel="Series Compensator" description="A Series Compensator is a series capacitor or reactor or an AC transmission line without charging susceptance.  It is a two terminal device." modifier="None">
     <BaseClass>Compensator</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="BusbarSection" displayLabel="Busbar Section" description="A conductor, or group of conductors, with negligible impedance, that serve to connect other conducting equipment within a single substation. &#x000d; Voltage measurements are typically obtained from voltage transformers that are connected to busbar sections. A bus bar section may have many physical terminals but for analysis is modelled with exactly one logical terminal." modifier="None">
+  <ECEntityClass typeName="Busbar" displayLabel="Busbar" description="A conductor, or group of conductors, with negligible impedance, that serve to connect other conducting equipment within a single substation. &#x000d; Voltage measurements are typically obtained from voltage transformers that are connected to busbars. A busbar may have many physical terminals but for analysis is modelled with exactly one logical terminal." modifier="None">
     <BaseClass>Connector</BaseClass>
     <ECProperty propertyName="OverallLength" displayLabel="Overall Length"   typeName="string" />
   </ECEntityClass>
@@ -831,9 +831,51 @@
   <ECEntityClass typeName="PetersenCoilAssembly" displayLabel="Petersen Coil Assembly" description="A variable impedance device normally used to offset line charging during single line faults in an ungrounded section of network." modifier="None">
     <BaseClass>Equipment</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="BusbarSectionAssembly" displayLabel="Busbar Section Assembly" description="A conductor, or group of conductors, with negligible impedance, that serve to connect other conducting equipment within a single substation. &#x000d; Voltage measurements are typically obtained from voltage transformers that are connected to busbar sections. A bus bar section may have many physical terminals but for analysis is modelled with exactly one logical terminal." modifier="None">
+  <ECEntityClass typeName="BusbarSectionAssembly" displayLabel="Busbar Section Assembly" description="A three-phase bus assembly. A conductor, or group of conductors, with negligible impedance, that serve to connect other conducting equipment within a single substation. &#x000d; Voltage measurements are typically obtained from voltage transformers that are connected to busbar sections. A bus bar section may have many physical terminals but for analysis is modelled with exactly one logical terminal." modifier="None">
     <BaseClass>Equipment</BaseClass>
   </ECEntityClass>
+  <ECEntityClass typeName="BusbarAssembly" displayLabel="Busbar Assembly" description="A single-phase bus assembly. A conductor, or group of conductors, with negligible impedance, that serve to connect other conducting equipment within a single substation. A busbar may have many physical terminals but for analysis is modelled with exactly one logical terminal." modifier="None">
+    <BaseClass>Equipment</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="CableSectionAssembly" displayLabel="Cable Section Assembly" description="A section of cable, together with its connectors and supporting hardware, that fulfills an AC Line Segment." modifier="None">
+    <BaseClass>Equipment</BaseClass>
+  </ECEntityClass>
+  <ECRelationshipClass typeName="BusbarAssemblyOwnsBusbar" description="Specifies that a single-phase BusbarAssembly owns the Busbar elements that make up the assembly." modifier="None" strength="Embedding" strengthDirection="Forward">
+    <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+    <Source polymorphic="true" roleLabel="owns" multiplicity="(0..1)" abstractConstraint="BusbarAssembly">
+      <Class class="BusbarAssembly" />
+    </Source>
+    <Target polymorphic="true" roleLabel="is owned by" multiplicity="(0..*)" abstractConstraint="Busbar">
+      <Class class="Busbar" />
+    </Target>
+  </ECRelationshipClass>
+  <ECRelationshipClass typeName="BusbarSectionAssemblyOwnsBusbar" description="Specifies that a three-phase BusbarSectionAssembly owns the Busbar elements that make up the assembly." modifier="None" strength="Embedding" strengthDirection="Forward">
+    <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+    <Source polymorphic="true" roleLabel="owns" multiplicity="(0..1)" abstractConstraint="BusbarSectionAssembly">
+      <Class class="BusbarSectionAssembly" />
+    </Source>
+    <Target polymorphic="true" roleLabel="is owned by" multiplicity="(0..*)" abstractConstraint="Busbar">
+      <Class class="Busbar" />
+    </Target>
+  </ECRelationshipClass>
+  <ECRelationshipClass typeName="CableAssemblyOwnsCableSpacer" description="Specifies that a CableAssembly owns the CableSpacer elements that make up the assembly." modifier="None" strength="Embedding" strengthDirection="Forward">
+    <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+    <Source polymorphic="true" roleLabel="owns" multiplicity="(0..1)" abstractConstraint="CableAssembly">
+      <Class class="CableAssembly" />
+    </Source>
+    <Target polymorphic="true" roleLabel="is owned by" multiplicity="(0..*)" abstractConstraint="CableSpacer">
+      <Class class="CableSpacer" />
+    </Target>
+  </ECRelationshipClass>
+  <ECRelationshipClass typeName="CableSectionAssemblyOwnsCableSpacer" description="Specifies that a CableSectionAssembly owns the CableSpacer elements that make up the assembly." modifier="None" strength="Embedding" strengthDirection="Forward">
+    <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+    <Source polymorphic="true" roleLabel="owns" multiplicity="(0..1)" abstractConstraint="CableSectionAssembly">
+      <Class class="CableSectionAssembly" />
+    </Source>
+    <Target polymorphic="true" roleLabel="is owned by" multiplicity="(0..*)" abstractConstraint="CableSpacer">
+      <Class class="CableSpacer" />
+    </Target>
+  </ECRelationshipClass>
   <ECEntityClass typeName="EnergySourceAssembly" displayLabel="Energy Source Assembly" modifier="None">
     <BaseClass>Equipment</BaseClass>
   </ECEntityClass>
