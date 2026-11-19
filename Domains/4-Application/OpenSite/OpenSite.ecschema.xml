@@ -868,6 +868,20 @@
         <ECNavigationProperty propertyName="CurbType" relationshipName="DrivewayPathFinUsesCurbType" direction="Forward" displayLabel="Curb Type">
             <ECCustomAttributes>
                 <DrivewayCrossSectionTemplateProperty xmlns="OpenSite.01.00.29" />
+                <HiddenProperty xmlns="CoreCustomAttributes.01.00.03" />
+                <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                    <Description>CurbType is deprecated for DrivewayPathFin. Curb types are now authored via InnerCurb and OuterCurb on DrivewayPathFin. </Description>
+                </Deprecated>
+            </ECCustomAttributes>
+        </ECNavigationProperty>
+        <ECNavigationProperty propertyName="InnerCurb" relationshipName="DrivewayPathFinUsesInnerCurbType" direction="Forward" displayLabel="Inner Curb" description="Curb type for the inner curb on this side of the driveway, nearest the median.">
+            <ECCustomAttributes>
+                <DrivewayCrossSectionTemplateProperty xmlns="OpenSite.01.00.29" />
+            </ECCustomAttributes>
+        </ECNavigationProperty>
+        <ECNavigationProperty propertyName="OuterCurb" relationshipName="DrivewayPathFinUsesOuterCurbType" direction="Forward" displayLabel="Outer Curb" description="Curb type for the outer curb on this side of the driveway, away from the median.">
+            <ECCustomAttributes>
+                <DrivewayCrossSectionTemplateProperty xmlns="OpenSite.01.00.29" />
             </ECCustomAttributes>
         </ECNavigationProperty>
     </ECEntityClass>
@@ -930,7 +944,7 @@
     <ECRelationshipClass typeName="DrivewayPathUsesCurbType" strength="referencing" modifier="Sealed">
         <ECCustomAttributes>
             <Deprecated xmlns="CoreCustomAttributes.01.00.03">
-                <Description>DrivewayPathUsesCurbType is deprecated. Curb type is now authored per-edge via DrivewayPathFinUsesCurbType. </Description>
+                <Description>DrivewayPathUsesCurbType is deprecated. Curb types are now authored via InnerCurb and OuterCurb on DrivewayPathFin. </Description>
             </Deprecated>
         </ECCustomAttributes>
         <Source multiplicity="(0..*)" roleLabel="uses" polymorphic="false">
@@ -1043,6 +1057,11 @@
     </ECRelationshipClass>
 
     <ECRelationshipClass typeName="DrivewayPathFinUsesCurbType" strength="referencing" modifier="Sealed">
+        <ECCustomAttributes>
+            <Deprecated xmlns="CoreCustomAttributes.01.00.03">
+                <Description>DrivewayPathFinUsesCurbType is deprecated. Use DrivewayPathFinUsesInnerCurbType and DrivewayPathFinUsesOuterCurbType instead. </Description>
+            </Deprecated>
+        </ECCustomAttributes>
         <Source multiplicity="(0..*)" roleLabel="uses" polymorphic="false">
             <Class class="DrivewayPathFin" />
         </Source>
@@ -1978,7 +1997,7 @@
             <ECCustomAttributes>
                 <HiddenProperty xmlns="CoreCustomAttributes.01.00.03" />
                 <Deprecated xmlns="CoreCustomAttributes.01.00.03">
-                    <Description>CurbType is deprecated for DrivewayPath. Curb type is now authored per-edge via the CurbType navigation property on DrivewayPathFin. </Description>
+                    <Description>CurbType is deprecated for DrivewayPath. Curb types are now authored via InnerCurb and OuterCurb on DrivewayPathFin. </Description>
                 </Deprecated>
             </ECCustomAttributes>
         </ECNavigationProperty>
@@ -2374,6 +2393,24 @@
         </Target>
     </ECRelationshipClass>
 
+    <ECRelationshipClass typeName="DrivewayPathFinUsesInnerCurbType" strength="referencing" modifier="Sealed">
+        <Source multiplicity="(0..*)" roleLabel="uses inner curb type" polymorphic="false">
+            <Class class="DrivewayPathFin" />
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="is used as inner curb by" polymorphic="true">
+            <Class class="CurbType" />
+        </Target>
+    </ECRelationshipClass>
+
+    <ECRelationshipClass typeName="DrivewayPathFinUsesOuterCurbType" strength="referencing" modifier="Sealed">
+        <Source multiplicity="(0..*)" roleLabel="uses outer curb type" polymorphic="false">
+            <Class class="DrivewayPathFin" />
+        </Source>
+        <Target multiplicity="(1..1)" roleLabel="is used as outer curb by" polymorphic="true">
+            <Class class="CurbType" />
+        </Target>
+    </ECRelationshipClass>
+
     <ECEntityClass typeName="EdgeCurbAspect" modifier="Sealed" displayLabel="Curb">
         <BaseClass>bis:ElementUniqueAspect</BaseClass>
 
@@ -2481,7 +2518,7 @@
         <BaseClass>bis:ElementOwnsUniqueAspect</BaseClass>
         <ECCustomAttributes>
             <Deprecated xmlns="CoreCustomAttributes.01.00.03">
-                <Description>DrivewayPathFinOwnsCurbAspect is deprecated. Curb type is now authored via the CurbType navigation property on DrivewayPathFin. </Description>
+                <Description>DrivewayPathFinOwnsCurbAspect is deprecated. Curb types are now authored via InnerCurb and OuterCurb on DrivewayPathFin. </Description>
             </Deprecated>
         </ECCustomAttributes>
         <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
