@@ -6,6 +6,7 @@
 <ECSchema xmlns="http://www.bentley.com/schemas/Bentley.ECXML.3.2" schemaName="PowerSystemResourcesFunctional" version="02.00.00" alias="psrf" displayLabel="PowerSystemResourcesFunctional" description="Base schema for the PowerSystemResources domain.">
   <ECSchemaReference name="BisCore" version="01.00.25" alias="bis" />
   <ECSchemaReference name="Functional" version="01.00.04" alias="func" />
+  <ECSchemaReference name="PowerSystemResourcesPhysical" version="02.00.00" alias="psrp" />
   <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA" />
   <ECSchemaReference name="CoreCustomAttributes" version="01.00.04" alias="CoreCA" />
   <ECCustomAttributes>
@@ -70,6 +71,15 @@
   <ECEntityClass typeName="ACLineSegment" displayLabel="AC Line Segment" description="" modifier="None">
     <BaseClass>EquipmentFunctional</BaseClass>
   </ECEntityClass>
+  <ECRelationshipClass typeName="CableSectionAssemblyFulfillsACLineSegment" description="Relates an ACLineSegment (which models the required function) to the psrp:CableSectionAssembly instances that model the physical cable section fulfilling that function." modifier="None" strength="Referencing" strengthDirection="Forward">
+    <BaseClass>func:PhysicalElementFulfillsFunction</BaseClass>
+    <Source polymorphic="true" roleLabel="fulfills" multiplicity="(0..*)" abstractConstraint="psrp:CableSectionAssembly">
+      <Class class="psrp:CableSectionAssembly" />
+    </Source>
+    <Target polymorphic="true" roleLabel="is fulfilled by" multiplicity="(0..*)" abstractConstraint="ACLineSegment">
+      <Class class="ACLineSegment" />
+    </Target>
+  </ECRelationshipClass>
   <ECRelationshipClass typeName="EquipmentFunctionalOwnsElectricalTerminal" description="" modifier="None" strength="Embedding" strengthDirection="Forward">
     <BaseClass>bis:ElementOwnsChildElements</BaseClass>
     <Source polymorphic="true" roleLabel="owns" multiplicity="(1..1)" abstractConstraint="EquipmentFunctional">
@@ -188,7 +198,7 @@
   <ECEntityClass typeName="SeriesCompensatorFunctional" displayLabel="Series Compensator" description="A Series Compensator is a series capacitor or reactor or an AC transmission line without charging susceptance.  It is a two terminal device." modifier="None">
     <BaseClass>CompensatorFunctional</BaseClass>
   </ECEntityClass>
-  <ECEntityClass typeName="BusbarSectionFunctional" displayLabel="Busbar Section" description="A conductor, or group of conductors, with negligible impedance, that serve to connect other conducting equipment within a single substation. &#x000d; Voltage measurements are typically obtained from voltage transformers that are connected to busbar sections. A bus bar section may have many physical terminals but for analysis is modelled with exactly one logical terminal." modifier="None">
+  <ECEntityClass typeName="BusbarFunctional" displayLabel="Busbar" description="A conductor, or group of conductors, with negligible impedance, that serve to connect other conducting equipment within a single substation. &#x000d; Voltage measurements are typically obtained from voltage transformers that are connected to busbars. A busbar may have many physical terminals but for analysis is modelled with exactly one logical terminal." modifier="None">
     <BaseClass>ConnectorFunctional</BaseClass>
   </ECEntityClass>
   <ECEntityClass typeName="JunctionFunctional" displayLabel="Junction" description="A point where one or more conducting equipments are connected with zero resistance.&#x000d; " modifier="None">
