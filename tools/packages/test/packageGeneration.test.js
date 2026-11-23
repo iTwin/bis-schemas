@@ -309,6 +309,86 @@ describe('Package Generation', function() {
       const schemaInfo = setupRemarks(`media/../${absolute}`);
       assertTraversalRejected(schemaInfo);
     });
+
+    it('Should fail when a referenced media file does not exist', function() {
+      // A missing file would otherwise be silently dropped from a package that cannot be reverted once published.
+      const schemaInfo = setupRemarks('media/missing.png');
+      chai.expect(() => pkgGen.addDocsToPackage(schemaInfo, packageDir))
+        .to.throw(Error, /Invalid media reference 'media\/missing\.png'.*does not exist/);
+    });
+
+    it('Should fail when a referenced media file in a sub directory does not exist', function() {
+      const schemaInfo = setupRemarks('media/NoSuchDir/missing.png');
+      chai.expect(() => pkgGen.addDocsToPackage(schemaInfo, packageDir))
+        .to.throw(Error, /Invalid media reference 'media\/NoSuchDir\/missing\.png'.*does not exist/);
+    });
+
+    describe('symbolic links in media references', function() {
+      // Skip when not symlink creation is not permitted.
+      function createLink(ctx, target, linkPath, type) {
+        try {
+          fs.symlinkSync(target, linkPath, type);
+        } catch (e) {
+          if (e.code === 'EPERM' || e.code === 'EACCES' || e.code === 'ENOSYS') {
+            ctx.skip();
+          }
+          throw e;
+        }
+      }
+
+      it('Should fail when a media file is a symlink to a file outside of the media directory', function() {
+        // The reference string is innocent, only the file on disk is a link.
+        createLink(this, path.join(victimDir, 'secret.txt'), path.join(srcDir, 'media', 'evil.png'), 'file');
+        const schemaInfo = setupRemarks('media/evil.png');
+        assertTraversalRejected(schemaInfo);
+        chai.expect(fs.existsSync(path.join(packageDir, 'media', 'evil.png'))).to.be.false;
+      });
+
+      it('Should fail when a media sub directory is a link to a directory outside of the media directory', function() {
+        createLink(this, victimDir, path.join(srcDir, 'media', 'linked'), 'junction');
+        const schemaInfo = setupRemarks('media/linked/secret.txt');
+        assertTraversalRejected(schemaInfo);
+        chai.expect(fs.existsSync(path.join(packageDir, 'media', 'linked'))).to.be.false;
+      });
+
+      it('Should fail when a media file is a dangling symlink', function() {
+        createLink(this, path.join(root, 'does-not-exist.txt'), path.join(srcDir, 'media', 'dangling.png'), 'file');
+        const schemaInfo = setupRemarks('media/dangling.png');
+        assertTraversalRejected(schemaInfo);
+      });
+
+      it('Should fail instead of writing through a symlink in the package directory', function() {
+        // packageDir/media/legit.png -> <out>/victim/secret.txt would make copyFileSync overwrite the target.
+        fs.mkdirSync(path.join(packageDir, 'media'), { recursive: true });
+        createLink(this, path.join(outDir, 'victim', 'secret.txt'), path.join(packageDir, 'media', 'legit.png'), 'file');
+        const schemaInfo = setupRemarks('media/legit.png');
+        chai.expect(() => pkgGen.addDocsToPackage(schemaInfo, packageDir)).to.throw(Error, /Invalid media reference/);
+        chai.expect(fs.readFileSync(path.join(outDir, 'victim', 'secret.txt'), 'utf8')).to.equal(originalOutContent);
+      });
+
+      it('Should fail when the remarks file is a symlink to a file outside of the source directory', function() {
+        // No media reference is needed: the remarks file itself would be copied into the package.
+        createLink(this, path.join(victimDir, 'secret.txt'), path.join(srcDir, 'SchemaX.remarks.md'), 'file');
+        const schemaInfo = { name: 'SchemaX', path: path.join(srcDir, 'SchemaX.ecschema.xml'), released: false };
+        chai.expect(() => pkgGen.addDocsToPackage(schemaInfo, packageDir)).to.throw(Error, /Invalid media reference/);
+        chai.expect(fs.existsSync(path.join(packageDir, 'SchemaX.remarks.md'))).to.be.false;
+        chai.expect(collectFiles(packageDir).filter((f) => fs.readFileSync(f, 'utf8') === secretContent)).to.deep.equal([]);
+      });
+
+      it('Should fail when the remarks file is a dangling symlink', function() {
+        // existsSync would report false for a dangling link and silently skip the docs.
+        createLink(this, path.join(root, 'does-not-exist.md'), path.join(srcDir, 'SchemaX.remarks.md'), 'file');
+        const schemaInfo = { name: 'SchemaX', path: path.join(srcDir, 'SchemaX.ecschema.xml'), released: false };
+        chai.expect(() => pkgGen.addDocsToPackage(schemaInfo, packageDir)).to.throw(Error, /Invalid media reference/);
+      });
+
+      it('Should fail instead of writing the remarks file through a symlink in the package directory', function() {
+        createLink(this, path.join(outDir, 'victim', 'secret.txt'), path.join(packageDir, 'SchemaX.remarks.md'), 'file');
+        const schemaInfo = setupRemarks('media/legit.png');
+        chai.expect(() => pkgGen.addDocsToPackage(schemaInfo, packageDir)).to.throw(Error, /Invalid media reference/);
+        chai.expect(fs.readFileSync(path.join(outDir, 'victim', 'secret.txt'), 'utf8')).to.equal(originalOutContent);
+      });
+    });
   });
 
   describe('Localization package generation', function() {

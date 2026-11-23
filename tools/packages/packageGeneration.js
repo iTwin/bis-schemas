@@ -167,6 +167,30 @@ function resolveContainedMediaPath(baseDir, item) {
 }
 
 /**
+ * Verifies that no existing component of `target` below `baseDir` is a symlink or junction.
+ * @param baseDir Directory the media path was resolved against
+ * @param target Resolved absolute path
+ * @param item Original media reference, used for the error reporting
+ * @throws Error if a link is found
+ */
+function assertNoSymlinkInPath(baseDir, target, item) {
+  let current = path.resolve(baseDir);
+  for (const segment of path.relative(current, target).split(path.sep)) {
+    current = path.join(current, segment);
+    let stats;
+    try {
+      stats = fs.lstatSync(current);
+    } catch (e) {
+      if (e.code === "ENOENT")
+        return; // Nothing further exists, so no further links are possible.
+      throw e;
+    }
+    if (stats.isSymbolicLink())
+      throw new Error(`Invalid media reference '${item}': '${current}' is a symbolic link. Symbolic links are not allowed.`);
+  }
+}
+
+/**
  * Add the remarks file and the relevant media files to the package.
  *
  * Every media reference in the remarks file must resolve to a location inside the `media/`
@@ -176,12 +200,14 @@ function resolveContainedMediaPath(baseDir, item) {
  *
  * @param schemaInfo Object containing schema information from the inventory
  * @param packageDir Schema package directory
- * @throws Error if a media reference resolves outside of the allowed media directories
+ * @throws Error if a media reference resolves outside of the allowed media directories or uses a symbolic link
  */
 function addDocsToPackage(schemaInfo, packageDir) {
   const remarkFile = getRemarksFilePath(schemaInfo.path)
+  assertNoSymlinkInPath(path.dirname(remarkFile), remarkFile, path.basename(remarkFile));
   if (fs.existsSync(remarkFile)) {
     const pkgRemarksPath = path.join(packageDir, `${schemaInfo.name}.remarks.md`)
+    assertNoSymlinkInPath(packageDir, pkgRemarksPath, path.basename(pkgRemarksPath));
     fs.copyFileSync(remarkFile, pkgRemarksPath);
 
     const media = getMediaFromRemarksFile(remarkFile);
@@ -194,12 +220,19 @@ function addDocsToPackage(schemaInfo, packageDir) {
           throw new Error(`Invalid media reference '${item}' in ${remarkFile}: media paths must stay inside the 'media' directory next to the remarks file. Package generation aborted for ${schemaInfo.name}.`);
         }
 
+        // Reject links before touching the filesystem: copyFileSync follows them.
+        assertNoSymlinkInPath(remarkFileDir, mediaFileSrc, item);
+        assertNoSymlinkInPath(packageDir, mediaFileDest, item);
+
         if (fs.existsSync(mediaFileSrc)) {
           const mediaFileDestDir = path.dirname(mediaFileDest);
           if (!fs.existsSync(mediaFileDestDir)) {
             fs.mkdirSync(mediaFileDestDir, { recursive: true });
           }
           fs.copyFileSync(mediaFileSrc, mediaFileDest);
+        } else {
+          // Fail instead of skipping: a published package cannot be reverted, so a missing media file would permanently ship a broken image.
+          throw new Error(`Invalid media reference '${item}' in ${remarkFile}: media file '${mediaFileSrc}' does not exist. Package generation aborted for ${schemaInfo.name}.`);
         }
       }
     }
