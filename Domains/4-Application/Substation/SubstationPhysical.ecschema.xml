@@ -8,6 +8,7 @@
   <ECSchemaReference name="PowerSystemResourcesPhysical" version="02.00.00" alias="psrp" />
   <ECSchemaReference name="Terrain" version="01.00.00" alias="trrn" />
   <ECSchemaReference name="Fasteners" version="01.00.00" alias="fst" />
+  <ECSchemaReference name="AecUnits" version="01.00.03" alias="AECU" />
   <ECSchemaReference name="CoreCustomAttributes" version="01.00.04" alias="CoreCA" />
   <ECSchemaReference name="BisCustomAttributes" version="01.00.00" alias="bisCA" />
   <ECCustomAttributes>
@@ -21,6 +22,27 @@
   <ECEnumeration typeName="PlacementMethod" backingTypeName="int" isStrict="true" displayLabel="Placement Method">
     <ECEnumerator value="0" name="FixedReveal" displayLabel="Fixed Reveal"/>
     <ECEnumerator value="1" name="TOC" displayLabel="TOC"/>
+  </ECEnumeration>
+  <ECEnumeration typeName="CableSagMode" backingTypeName="int" isStrict="true" displayLabel="Cable Sag Mode" description="How the sag of each free span of a cable conductor is determined.">
+    <ECEnumerator value="0" name="None" displayLabel="None" description="Straight spans."/>
+    <ECEnumerator value="1" name="Manual" displayLabel="Manual" description="The same midpoint drop below the chord for every free span (ManualSag)."/>
+    <ECEnumerator value="2" name="PercentOfSpan" displayLabel="Percent of Span" description="The midpoint drop is a percentage of each free span's horizontal length (SagPercent)."/>
+    <ECEnumerator value="3" name="Calculated" displayLabel="Calculated" description="Calculated from the conductor's weight per length and the horizontal tension (Engineering)."/>
+  </ECEnumeration>
+  <ECEnumeration typeName="CableTensionMode" backingTypeName="int" isStrict="true" displayLabel="Cable Tension Mode" description="How the horizontal tension of a calculated sag was specified.">
+    <ECEnumerator value="0" name="Force" displayLabel="Force"/>
+    <ECEnumerator value="1" name="Percentage" displayLabel="Percentage of Rated Strength"/>
+  </ECEnumeration>
+  <ECEnumeration typeName="CableValueOrigin" backingTypeName="int" isStrict="true" displayLabel="Cable Value Origin" description="Where captured conductor engineering values came from.">
+    <ECEnumerator value="0" name="Library" displayLabel="Library"/>
+    <ECEnumerator value="1" name="Placement" displayLabel="Placement"/>
+  </ECEnumeration>
+  <ECEnumeration typeName="CableFinish" backingTypeName="int" isStrict="true" displayLabel="Cable Finish" description="Display finish of a conductor.">
+    <ECEnumerator value="0" name="Bright" displayLabel="Bright"/>
+    <ECEnumerator value="1" name="Weathered" displayLabel="Weathered"/>
+    <ECEnumerator value="2" name="Matte" displayLabel="Matte"/>
+    <ECEnumerator value="3" name="SemiGloss" displayLabel="Semi-Gloss"/>
+    <ECEnumerator value="4" name="Painted" displayLabel="Painted"/>
   </ECEnumeration>
   <ECEntityClass typeName="PhysicalContainer" displayLabel="Physical Container" description="Container for definition-oriented physical elements." modifier="None">
     <BaseClass>bis:DefinitionElement</BaseClass>
@@ -462,7 +484,91 @@
   </ECEntityClass>
   <ECEntityClass typeName="PowerCable" displayLabel="Power Cable" modifier="None">
     <BaseClass>psrp:Conductor</BaseClass>
+    <ECStructArrayProperty propertyName="Conductors" typeName="CableConductor" minOccurs="0" maxOccurs="unbounded" displayLabel="Conductors" description="The conductors of the cable bundle. Their rays are relative to the element placement, so they move with the element."/>
+    <ECStructArrayProperty propertyName="Supports" typeName="CableSupport" minOccurs="0" maxOccurs="unbounded" displayLabel="Supports" description="Point supports the cable route passes through, in route order."/>
+    <ECProperty propertyName="SpacerMaxSpacing" typeName="double" kindOfQuantity="AECU:LENGTH" displayLabel="Spacer Maximum Spacing" description="Largest distance allowed between neighbouring spacers."/>
+    <ECProperty propertyName="SpacerMinEndClearance" typeName="double" kindOfQuantity="AECU:LENGTH" displayLabel="Spacer Minimum End Clearance" description="Smallest distance allowed from a cable end to the nearest spacer."/>
+    <ECStructProperty propertyName="SpacerHardware" typeName="CableSpacerHardware" displayLabel="Spacer Hardware" description="Grip geometry of the spacer, captured so spacers can be re-seated without the library."/>
+    <ECNavigationProperty propertyName="SpacerDefinition" relationshipName="PowerCableRefersToSpacerDefinition" direction="forward" displayLabel="Spacer Definition" description="The definition the cable's spacers are created from."/>
   </ECEntityClass>
+  <ECRelationshipClass typeName="PowerCableRefersToSpacerDefinition" strength="referencing" modifier="None" displayLabel="Power Cable Refers To Spacer Definition" description="Relates a PowerCable to the definition its spacers are created from.">
+    <!-- @see PowerCable.SpacerDefinition ECNavigationProperty -->
+    <Source multiplicity="(0..*)" roleLabel="refers to spacer definition" polymorphic="true">
+      <Class class="PowerCable"/>
+    </Source>
+    <Target multiplicity="(0..1)" roleLabel="is spacer definition for" polymorphic="true">
+      <Class class="bis:DefinitionElement"/>
+    </Target>
+  </ECRelationshipClass>
+  <ECStructClass typeName="CableConductor" displayLabel="Cable Conductor" description="One conductor of a cable bundle. Points and directions are relative to the cable element placement.">
+    <ECProperty propertyName="ConductorId" typeName="string" displayLabel="Conductor ID" description="Identifies the conductor within the cable. Support attachments and spacer contacts refer to it."/>
+    <ECProperty propertyName="StartOrigin" typeName="point3d" displayLabel="Start Origin"/>
+    <ECProperty propertyName="StartDirection" typeName="point3d" displayLabel="Start Direction" description="Direction the conductor leaves the start connector."/>
+    <ECProperty propertyName="EndOrigin" typeName="point3d" displayLabel="End Origin"/>
+    <ECProperty propertyName="EndDirection" typeName="point3d" displayLabel="End Direction" description="Direction the conductor leaves the end connector."/>
+    <ECProperty propertyName="Radius" typeName="double" kindOfQuantity="AECU:LENGTH" displayLabel="Radius"/>
+    <ECProperty propertyName="SagMode" typeName="CableSagMode" displayLabel="Sag Mode" description="Empty for a conductor placed without sag settings, which keeps the geometry of its straight rays."/>
+    <ECProperty propertyName="StartRigidExitLength" typeName="double" kindOfQuantity="AECU:LENGTH" displayLabel="Start Rigid Exit Length"/>
+    <ECProperty propertyName="EndRigidExitLength" typeName="double" kindOfQuantity="AECU:LENGTH" displayLabel="End Rigid Exit Length"/>
+    <ECProperty propertyName="ManualSag" typeName="double" kindOfQuantity="AECU:LENGTH" displayLabel="Manual Sag" description="Midpoint drop below the chord of each free span when SagMode is Manual. Negative arches the conductor up."/>
+    <ECProperty propertyName="SagPercent" typeName="double" displayLabel="Sag Percent of Span" description="Midpoint drop as a percentage of each free span's horizontal length when SagMode is PercentOfSpan."/>
+    <ECProperty propertyName="MinimumBendRadius" typeName="double" kindOfQuantity="AECU:LENGTH" displayLabel="Minimum Bend Radius" description="Centerline bend radius at the rigid exits. Empty for a conductor placed before bends were blended."/>
+    <ECProperty propertyName="MinimumBendRadiusMultiplier" typeName="double" displayLabel="Minimum Bend Radius Multiplier" description="Diameter multiplier the minimum bend radius was derived from."/>
+    <ECProperty propertyName="RigidOffsetMultiplier" typeName="double" displayLabel="Rigid Offset Multiplier" description="Diameter multiplier the rigid exit lengths were derived from."/>
+    <ECProperty propertyName="OffsetsLinked" typeName="boolean" displayLabel="Offsets Linked" description="Whether the start and end rigid exits are edited together."/>
+    <ECProperty propertyName="ConductorDiameter" typeName="double" kindOfQuantity="AECU:LENGTH" displayLabel="Conductor Diameter" description="Overall diameter of the selected conductor when SagMode is not Calculated."/>
+    <ECStructProperty propertyName="ConductorReference" typeName="CableLibraryReference" displayLabel="Conductor Reference" description="The library record of the selected conductor."/>
+    <ECStructProperty propertyName="ConductorAppearance" typeName="CableAppearance" displayLabel="Conductor Appearance"/>
+    <ECStructProperty propertyName="Engineering" typeName="CableConductorEngineering" displayLabel="Engineering" description="Conductor and tension values captured for a calculated sag when SagMode is Calculated."/>
+  </ECStructClass>
+  <ECStructClass typeName="CableConductorEngineering" displayLabel="Cable Conductor Engineering" description="Engineering values captured for a calculated sag, so the sag can be regenerated without the library.">
+    <ECProperty propertyName="Code" typeName="string" displayLabel="Code"/>
+    <ECProperty propertyName="Family" typeName="string" displayLabel="Family"/>
+    <ECProperty propertyName="Source" typeName="string" displayLabel="Source"/>
+    <ECProperty propertyName="Revision" typeName="string" displayLabel="Revision"/>
+    <ECProperty propertyName="ValueOrigin" typeName="CableValueOrigin" displayLabel="Value Origin"/>
+    <ECProperty propertyName="OverallDiameter" typeName="double" kindOfQuantity="AECU:LENGTH" displayLabel="Overall Diameter"/>
+    <ECProperty propertyName="WeightPerLength" typeName="double" kindOfQuantity="AECU:LINEAR_DENSITY" displayLabel="Weight per Length" description="Mass per length of the conductor."/>
+    <ECProperty propertyName="TensionMode" typeName="CableTensionMode" displayLabel="Tension Mode"/>
+    <ECProperty propertyName="TensionPercent" typeName="double" displayLabel="Tension Percent" description="Horizontal tension as a percentage of the rated strength when TensionMode is Percentage."/>
+    <ECProperty propertyName="RatedStrength" typeName="double" kindOfQuantity="AECU:FORCE" displayLabel="Rated Strength"/>
+    <ECProperty propertyName="HorizontalTension" typeName="double" kindOfQuantity="AECU:FORCE" displayLabel="Horizontal Tension" description="The tension the sag is calculated from, in every tension mode."/>
+    <ECStructProperty propertyName="EngineeringRecord" typeName="CableLibraryReference" displayLabel="Engineering Record"/>
+    <ECStructProperty propertyName="Appearance" typeName="CableAppearance" displayLabel="Appearance"/>
+  </ECStructClass>
+  <ECStructClass typeName="CableLibraryReference" displayLabel="Cable Library Reference" description="Identifies the cable engineering library record a value came from.">
+    <ECProperty propertyName="LibraryId" typeName="string" displayLabel="Library ID"/>
+    <ECProperty propertyName="RecordId" typeName="string" displayLabel="Record ID"/>
+    <ECProperty propertyName="Revision" typeName="string" displayLabel="Revision"/>
+  </ECStructClass>
+  <ECStructClass typeName="CableAppearance" displayLabel="Cable Appearance" description="Display-only appearance of a conductor.">
+    <ECProperty propertyName="Color" typeName="string" displayLabel="Color" description="sRGB color as #RRGGBB."/>
+    <ECProperty propertyName="Transparency" typeName="double" displayLabel="Transparency" description="0 is opaque, 1 is fully transparent."/>
+    <ECProperty propertyName="Finish" typeName="CableFinish" displayLabel="Finish"/>
+  </ECStructClass>
+  <ECStructClass typeName="CableSupport" displayLabel="Cable Support" description="A point support. The cable route passes through the centroid of its attachment points, in any direction.">
+    <ECProperty propertyName="SupportId" typeName="string" displayLabel="Support ID"/>
+    <ECStructArrayProperty propertyName="Attachments" typeName="CableSupportAttachment" minOccurs="0" maxOccurs="unbounded" displayLabel="Attachments"/>
+  </ECStructClass>
+  <ECStructClass typeName="CableSupportAttachment" displayLabel="Cable Support Attachment" description="One conductor's nominal point on a support, relative to the cable element placement. Only the centroid of a support's attachments constrains the route.">
+    <ECProperty propertyName="ConductorId" typeName="string" displayLabel="Conductor ID"/>
+    <ECProperty propertyName="AttachmentId" typeName="string" displayLabel="Attachment ID"/>
+    <ECProperty propertyName="Point" typeName="point3d" displayLabel="Point"/>
+  </ECStructClass>
+  <ECStructClass typeName="CableSpacerHardware" displayLabel="Cable Spacer Hardware" description="Grip geometry of a spacer, in the spacer's own coordinates.">
+    <ECProperty propertyName="HardwareId" typeName="string" displayLabel="Hardware ID"/>
+    <ECProperty propertyName="Source" typeName="string" displayLabel="Source"/>
+    <ECProperty propertyName="Revision" typeName="string" displayLabel="Revision"/>
+    <ECProperty propertyName="LongitudinalAxis" typeName="point3d" displayLabel="Longitudinal Axis"/>
+    <ECStructArrayProperty propertyName="Contacts" typeName="CableSpacerContact" minOccurs="0" maxOccurs="unbounded" displayLabel="Contacts"/>
+    <ECProperty propertyName="HalfLength" typeName="double" kindOfQuantity="AECU:LENGTH" displayLabel="Half Length"/>
+    <ECProperty propertyName="FitTolerance" typeName="double" kindOfQuantity="AECU:LENGTH" displayLabel="Fit Tolerance"/>
+    <ECProperty propertyName="TangentTolerance" typeName="double" kindOfQuantity="AECU:ANGLE" displayLabel="Tangent Tolerance"/>
+  </ECStructClass>
+  <ECStructClass typeName="CableSpacerContact" displayLabel="Cable Spacer Contact" description="One spacer grip and the conductor it holds.">
+    <ECProperty propertyName="ConductorId" typeName="string" displayLabel="Conductor ID"/>
+    <ECProperty propertyName="Point" typeName="point3d" displayLabel="Point"/>
+  </ECStructClass>
   <ECEntityClass typeName="InsulatedPowerCable" displayLabel="Insulated Power Cable" modifier="None">
     <BaseClass>psrp:Conductor</BaseClass>
   </ECEntityClass>
