@@ -52,6 +52,19 @@
       <Class class="CommonFunctional"/>
     </Target>
   </ECRelationshipClass>
+  <!-- Functional types in catalogs (BWG 2026-11-20: introduce at the domain level, validate, then propose for BisCore). -->
+  <ECEntityClass typeName="EquipmentFunctionalType" displayLabel="Equipment Functional Type" description="A catalog functional type for electrical equipment: the properties shared by every instance of a device model or variant, used by both its 2D symbols and its 3D physical types. Per-placement values stay on the functional element. Lives in a DefinitionModel." modifier="None">
+    <BaseClass>func:FunctionalType</BaseClass>
+  </ECEntityClass>
+  <ECRelationshipClass typeName="PhysicalTypeFulfillsFunctionalType" strength="referencing" strengthDirection="Forward" modifier="None" description="Type-level counterpart of func:PhysicalElementFulfillsFunction: a physical type fulfils the functional type its placed physical elements fulfil. Many physical types can fulfil one functional type; a physical type fulfils at most one. A link table because bis:PhysicalType cannot take a new navigation property.">
+    <BaseClass>bis:ElementRefersToElements</BaseClass>
+    <Source multiplicity="(0..*)" roleLabel="fulfills" polymorphic="true">
+      <Class class="bis:PhysicalType"/>
+    </Source>
+    <Target multiplicity="(0..1)" roleLabel="is fulfilled by" polymorphic="true">
+      <Class class="func:FunctionalType"/>
+    </Target>
+  </ECRelationshipClass>
 
   <ECEntityClass typeName="CommonFunctionalAspect" displayLabel="Common Functional Aspect" description="Contains properties of an Functional Aspect." modifier="Abstract">
     <BaseClass>bis:ElementUniqueAspect</BaseClass>
