@@ -2676,7 +2676,7 @@
 
         <ECCustomAttributes>
             <Deprecated xmlns="CoreCustomAttributes.01.00.04">
-                <Description>SurfaceControlOwnsControlElement is no longer used for surface control, use ControlGroupOwnsControlElement instead.</Description>
+                <Description>SurfaceControlOwnsControlElement is no longer used for surface control, use SurfaceControlSetOwnsControlElement instead.</Description>
             </Deprecated>
         </ECCustomAttributes>
 
@@ -2699,22 +2699,22 @@
         </Target>
     </ECRelationshipClass>
 
-    <ECRelationshipClass typeName="ControlGroupHoldsSurfaceControl" modifier="None" strength="referencing" strengthDirection="forward">
+    <ECRelationshipClass typeName="SurfaceControlSetShapesSurface" modifier="None" strength="referencing" strengthDirection="forward">
         <BaseClass>bis:ElementRefersToElements</BaseClass>
 
         <Source multiplicity="(0..1)" roleLabel="holds" polymorphic="false">
-            <Class class="SurfaceControlGroup" />
+            <Class class="SurfaceControlSet" />
         </Source>
         <Target multiplicity="(1..*)" roleLabel="is held by" polymorphic="true">
             <Class class="ISurfaceControl" />
         </Target>
     </ECRelationshipClass>
 
-    <ECRelationshipClass typeName="ControlGroupOwnsControlElement" modifier="Sealed" strength="embedding" strengthDirection="forward">
-        <BaseClass>bis:ElementOwnsChildElements</BaseClass>
+    <ECRelationshipClass typeName="SurfaceControlSetOwnsControlElement" modifier="Sealed" strength="embedding" strengthDirection="forward">
+        <BaseClass>SurfaceControlElementOwnsControlElement</BaseClass>
 
-        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="true">
-            <Class class="SurfaceControlGroup"/>
+        <Source multiplicity="(1..1)" roleLabel="owns" polymorphic="false">
+            <Class class="SurfaceControlSet"/>
         </Source>
         <Target multiplicity="(0..*)" roleLabel="is owned by" polymorphic="true">
             <Class class="ISurfaceControlElement"/>
@@ -2754,11 +2754,12 @@
         <ECProperty propertyName="IsBreakline" typeName="boolean" description="Indicates whether the stroke is a breakline." displayLabel="Is Breakline" category="SurfaceControl"/>
         <ECProperty propertyName="EmitControlPoints" typeName="boolean" description="Indicates whether the stroke operation emit intermediate control points." displayLabel="Emit Control Points" category="SurfaceControl"/>
         <ECProperty propertyName="ControlPointTypeSource" typeName="IntermediatePointType" description="Specifies the source to derive the intermediate control point type from." displayLabel="Control Point Type Source" category="SurfaceControl"/>
-        <ECProperty propertyName="Resolution" typeName="double" description="Controls the spacing of the XY grid used when generating the triangulation for the interpolated surface." displayLabel="Resolution" category="SurfaceControl" kindOfQuantity="cvu:LENGTH"/>
+        <ECProperty propertyName="Interval" typeName="double" description="Drop interval along the stroke." category="SurfaceControl" kindOfQuantity="cvu:LENGTH"/>
     </ECStructClass>
 
-    <ECEntityClass typeName="SurfaceControlGroup" description="A group that holds surface control objects." displayLabel="Surface Control Group" modifier="Sealed">
-      <BaseClass>bis:InformationRecordElement</BaseClass>
+    <ECEntityClass typeName="SurfaceControlSet" description="A group that holds surface control objects." displayLabel="Surface Control Group" modifier="Sealed">
+        <BaseClass>bis:SpatialLocationElement</BaseClass>
+        <BaseClass>ISurfaceControlElement</BaseClass>
 
         <ECProperty propertyName="Resolution" typeName="double" description="Controls the spacing of the XY grid used when generating the triangulation for the interpolated surface." displayLabel="Resolution" category="SurfaceControl" kindOfQuantity="cvu:LENGTH"/>
     </ECEntityClass>
