@@ -52,6 +52,28 @@
       <Class class="CommonFunctional"/>
     </Target>
   </ECRelationshipClass>
+  <!-- Functional types in catalogs (BWG 2026-11-20: introduce at the domain level, validate, then propose for BisCore). -->
+  <ECEntityClass typeName="CommonFunctionalType" displayLabel="Common Functional Type" description="Common base class for catalog functional types: the properties shared by every instance of a device model or variant, used by both its 2D symbols and its 3D physical types. Per-placement values stay on the functional element. Lives in a DefinitionModel." modifier="Abstract">
+    <BaseClass>func:FunctionalType</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="EquipmentFunctionalType" displayLabel="Equipment Functional Type" description="A catalog functional type for electrical equipment: the properties shared by every instance of a device model or variant, used by both its 2D symbols and its 3D physical types. Per-placement values stay on the functional element. Lives in a DefinitionModel." modifier="None">
+    <BaseClass>CommonFunctionalType</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="StructureFunctionalType" displayLabel="Structure Functional Type" description="A catalog functional type for electrical structures: the properties shared by every instance of a structure model or variant, used by both its 2D symbols and its 3D physical types. Per-placement values stay on the functional element. Lives in a DefinitionModel." modifier="None">
+    <BaseClass>CommonFunctionalType</BaseClass>
+  </ECEntityClass>
+  <ECEntityClass typeName="FoundationFunctionalType" displayLabel="Foundation Functional Type" description="A catalog functional type for electrical foundations: the properties shared by every instance of a foundation model or variant, used by both its 2D symbols and its 3D physical types. Per-placement values stay on the functional element. Lives in a DefinitionModel." modifier="None">
+    <BaseClass>CommonFunctionalType</BaseClass>
+  </ECEntityClass>
+  <ECRelationshipClass typeName="CommonPhysicalTypeFulfillsFunctionalType" strength="referencing" strengthDirection="Forward" modifier="None" description="Type-level counterpart of CommonPhysicalFulfillsFunction: a physical type fulfils the functional type its placed physical elements fulfil. Many physical types can fulfil one functional type; a physical type fulfils at most one. A link table because bis:PhysicalType cannot take a new navigation property.">
+    <BaseClass>bis:ElementRefersToElements</BaseClass>
+    <Source multiplicity="(0..*)" roleLabel="fulfills" polymorphic="true">
+      <Class class="psrp:CommonPhysicalType"/>
+    </Source>
+    <Target multiplicity="(0..1)" roleLabel="is fulfilled by" polymorphic="true">
+      <Class class="CommonFunctionalType"/>
+    </Target>
+  </ECRelationshipClass>
 
   <ECEntityClass typeName="CommonFunctionalAspect" displayLabel="Common Functional Aspect" description="Contains properties of an Functional Aspect." modifier="Abstract">
     <BaseClass>bis:ElementUniqueAspect</BaseClass>
